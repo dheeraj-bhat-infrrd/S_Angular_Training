@@ -1,0 +1,9 @@
+.project
+/.settings/*
+
+.classpath
+.project
+.springBeans
+Source/SSCore/.settings
+Source/SSWeb/.settings
+Source/SSBatch/.settings
