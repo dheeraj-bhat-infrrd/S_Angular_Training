@@ -8,6 +8,13 @@ import java.util.List;
  */
 public class EmailEntity {
 
+	/**
+	 * Constants for indicating the recipient type, i.e mail to be sent as to/cc or bcc
+	 */
+	public static final int RECIPIENT_TYPE_TO = 0;
+	public static final int RECIPIENT_TYPE_CC = 1;
+	public static final int RECIPIENT_TYPE_BCC = 2;
+
 	private List<String> recipients;
 	private String subject;
 	private String body;
@@ -15,10 +22,6 @@ public class EmailEntity {
 	private String senderEmailId;
 	private String senderName;
 	private String senderPassword;
-
-	public static final int RECIPIENT_TYPE_TO = 0;
-	public static final int RECIPIENT_TYPE_CC = 1;
-	public static final int RECIPIENT_TYPE_BCC = 2;
 
 	public List<String> getRecipients() {
 		return recipients;
@@ -84,4 +87,4 @@ public class EmailEntity {
 
 }
 
-//JIRA: SS-7: By RM02: EOC
+// JIRA: SS-7: By RM02: EOC
