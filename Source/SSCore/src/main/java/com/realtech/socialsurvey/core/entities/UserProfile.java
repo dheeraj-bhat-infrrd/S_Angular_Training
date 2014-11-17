@@ -1,24 +1,24 @@
-package com.realtech.socialsurvey.core.entity;
+package com.realtech.socialsurvey.core.entities;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
- * The persistent class for the survey database table.
+ * The persistent class for the user_profile database table.
  * 
  */
 @Entity
-@NamedQuery(name="Survey.findAll", query="SELECT s FROM Survey s")
-public class Survey implements Serializable {
+@Table(name="user_profile")
+@NamedQuery(name="UserProfile.findAll", query="SELECT u FROM UserProfile u")
+public class UserProfile implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="SURVEY_ID")
-	private int surveyId;
+	@Column(name="USER_PROFILE_ID")
+	private int userProfileId;
 
 	@Column(name="AGENT_ID")
 	private int agentId;
@@ -48,19 +48,25 @@ public class Survey implements Serializable {
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to SurveyQuestion
-	@OneToMany(mappedBy="survey")
-	private List<SurveyQuestion> surveyQuestions;
+	//bi-directional many-to-one association to ProfilesMaster
+	@ManyToOne
+	@JoinColumn(name="PROFILES_MASTER_ID")
+	private ProfilesMaster profilesMaster;
 
-	public Survey() {
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JoinColumn(name="USER_ID")
+	private User user;
+
+	public UserProfile() {
 	}
 
-	public int getSurveyId() {
-		return this.surveyId;
+	public int getUserProfileId() {
+		return this.userProfileId;
 	}
 
-	public void setSurveyId(int surveyId) {
-		this.surveyId = surveyId;
+	public void setUserProfileId(int userProfileId) {
+		this.userProfileId = userProfileId;
 	}
 
 	public int getAgentId() {
@@ -135,26 +141,20 @@ public class Survey implements Serializable {
 		this.company = company;
 	}
 
-	public List<SurveyQuestion> getSurveyQuestions() {
-		return this.surveyQuestions;
+	public ProfilesMaster getProfilesMaster() {
+		return this.profilesMaster;
 	}
 
-	public void setSurveyQuestions(List<SurveyQuestion> surveyQuestions) {
-		this.surveyQuestions = surveyQuestions;
+	public void setProfilesMaster(ProfilesMaster profilesMaster) {
+		this.profilesMaster = profilesMaster;
 	}
 
-	public SurveyQuestion addSurveyQuestion(SurveyQuestion surveyQuestion) {
-		getSurveyQuestions().add(surveyQuestion);
-		surveyQuestion.setSurvey(this);
-
-		return surveyQuestion;
+	public User getUser() {
+		return this.user;
 	}
 
-	public SurveyQuestion removeSurveyQuestion(SurveyQuestion surveyQuestion) {
-		getSurveyQuestions().remove(surveyQuestion);
-		surveyQuestion.setSurvey(null);
-
-		return surveyQuestion;
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

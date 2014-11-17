@@ -1,24 +1,24 @@
-package com.realtech.socialsurvey.core.entity;
+package com.realtech.socialsurvey.core.entities;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.List;
 
 
 /**
- * The persistent class for the organization_level_settings database table.
+ * The persistent class for the survey database table.
  * 
  */
 @Entity
-@Table(name="organization_level_settings")
-@NamedQuery(name="OrganizationLevelSetting.findAll", query="SELECT o FROM OrganizationLevelSetting o")
-public class OrganizationLevelSetting implements Serializable {
+@NamedQuery(name="Survey.findAll", query="SELECT s FROM Survey s")
+public class Survey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="ORGANIZATION_LEVEL_SETTINGS_ID")
-	private int organizationLevelSettingsId;
+	@Column(name="SURVEY_ID")
+	private int surveyId;
 
 	@Column(name="AGENT_ID")
 	private int agentId;
@@ -41,12 +41,6 @@ public class OrganizationLevelSetting implements Serializable {
 	@Column(name="REGION_ID")
 	private int regionId;
 
-	@Column(name="SETTING_KEY")
-	private String settingKey;
-
-	@Column(name="SETTING_VALUE")
-	private String settingValue;
-
 	private int status;
 
 	//bi-directional many-to-one association to Company
@@ -54,15 +48,19 @@ public class OrganizationLevelSetting implements Serializable {
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	public OrganizationLevelSetting() {
+	//bi-directional many-to-one association to SurveyQuestion
+	@OneToMany(mappedBy="survey")
+	private List<SurveyQuestion> surveyQuestions;
+
+	public Survey() {
 	}
 
-	public int getOrganizationLevelSettingsId() {
-		return this.organizationLevelSettingsId;
+	public int getSurveyId() {
+		return this.surveyId;
 	}
 
-	public void setOrganizationLevelSettingsId(int organizationLevelSettingsId) {
-		this.organizationLevelSettingsId = organizationLevelSettingsId;
+	public void setSurveyId(int surveyId) {
+		this.surveyId = surveyId;
 	}
 
 	public int getAgentId() {
@@ -121,22 +119,6 @@ public class OrganizationLevelSetting implements Serializable {
 		this.regionId = regionId;
 	}
 
-	public String getSettingKey() {
-		return this.settingKey;
-	}
-
-	public void setSettingKey(String settingKey) {
-		this.settingKey = settingKey;
-	}
-
-	public String getSettingValue() {
-		return this.settingValue;
-	}
-
-	public void setSettingValue(String settingValue) {
-		this.settingValue = settingValue;
-	}
-
 	public int getStatus() {
 		return this.status;
 	}
@@ -151,6 +133,28 @@ public class OrganizationLevelSetting implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public List<SurveyQuestion> getSurveyQuestions() {
+		return this.surveyQuestions;
+	}
+
+	public void setSurveyQuestions(List<SurveyQuestion> surveyQuestions) {
+		this.surveyQuestions = surveyQuestions;
+	}
+
+	public SurveyQuestion addSurveyQuestion(SurveyQuestion surveyQuestion) {
+		getSurveyQuestions().add(surveyQuestion);
+		surveyQuestion.setSurvey(this);
+
+		return surveyQuestion;
+	}
+
+	public SurveyQuestion removeSurveyQuestion(SurveyQuestion surveyQuestion) {
+		getSurveyQuestions().remove(surveyQuestion);
+		surveyQuestion.setSurvey(null);
+
+		return surveyQuestion;
 	}
 
 }
