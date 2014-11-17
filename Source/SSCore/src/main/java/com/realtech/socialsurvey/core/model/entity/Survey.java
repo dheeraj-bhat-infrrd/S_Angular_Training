@@ -1,4 +1,5 @@
 package com.realtech.socialsurvey.core.model.entity;
+//JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -157,3 +158,5 @@ public class Survey implements Serializable {
 	}
 
 }
+
+//JIRA: SS-1: By RM06: EOC
