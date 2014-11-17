@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.model.entity;
+package com.realtech.socialsurvey.core.entities;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
