@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.entity;
+package com.realtech.socialsurvey.core.entities;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
@@ -7,18 +7,18 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the user_profile database table.
+ * The persistent class for the organization_level_settings database table.
  * 
  */
 @Entity
-@Table(name="user_profile")
-@NamedQuery(name="UserProfile.findAll", query="SELECT u FROM UserProfile u")
-public class UserProfile implements Serializable {
+@Table(name="organization_level_settings")
+@NamedQuery(name="OrganizationLevelSetting.findAll", query="SELECT o FROM OrganizationLevelSetting o")
+public class OrganizationLevelSetting implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="USER_PROFILE_ID")
-	private int userProfileId;
+	@Column(name="ORGANIZATION_LEVEL_SETTINGS_ID")
+	private int organizationLevelSettingsId;
 
 	@Column(name="AGENT_ID")
 	private int agentId;
@@ -41,6 +41,12 @@ public class UserProfile implements Serializable {
 	@Column(name="REGION_ID")
 	private int regionId;
 
+	@Column(name="SETTING_KEY")
+	private String settingKey;
+
+	@Column(name="SETTING_VALUE")
+	private String settingValue;
+
 	private int status;
 
 	//bi-directional many-to-one association to Company
@@ -48,25 +54,15 @@ public class UserProfile implements Serializable {
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to ProfilesMaster
-	@ManyToOne
-	@JoinColumn(name="PROFILES_MASTER_ID")
-	private ProfilesMaster profilesMaster;
-
-	//bi-directional many-to-one association to User
-	@ManyToOne
-	@JoinColumn(name="USER_ID")
-	private User user;
-
-	public UserProfile() {
+	public OrganizationLevelSetting() {
 	}
 
-	public int getUserProfileId() {
-		return this.userProfileId;
+	public int getOrganizationLevelSettingsId() {
+		return this.organizationLevelSettingsId;
 	}
 
-	public void setUserProfileId(int userProfileId) {
-		this.userProfileId = userProfileId;
+	public void setOrganizationLevelSettingsId(int organizationLevelSettingsId) {
+		this.organizationLevelSettingsId = organizationLevelSettingsId;
 	}
 
 	public int getAgentId() {
@@ -125,6 +121,22 @@ public class UserProfile implements Serializable {
 		this.regionId = regionId;
 	}
 
+	public String getSettingKey() {
+		return this.settingKey;
+	}
+
+	public void setSettingKey(String settingKey) {
+		this.settingKey = settingKey;
+	}
+
+	public String getSettingValue() {
+		return this.settingValue;
+	}
+
+	public void setSettingValue(String settingValue) {
+		this.settingValue = settingValue;
+	}
+
 	public int getStatus() {
 		return this.status;
 	}
@@ -139,22 +151,6 @@ public class UserProfile implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
-	}
-
-	public ProfilesMaster getProfilesMaster() {
-		return this.profilesMaster;
-	}
-
-	public void setProfilesMaster(ProfilesMaster profilesMaster) {
-		this.profilesMaster = profilesMaster;
-	}
-
-	public User getUser() {
-		return this.user;
-	}
-
-	public void setUser(User user) {
-		this.user = user;
 	}
 
 }
