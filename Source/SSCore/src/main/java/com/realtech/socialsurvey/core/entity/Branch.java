@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.model.entity;
+package com.realtech.socialsurvey.core.entity;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
@@ -7,24 +7,19 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the organization_level_settings database table.
+ * The persistent class for the branch database table.
  * 
  */
 @Entity
-@Table(name="organization_level_settings")
-@NamedQuery(name="OrganizationLevelSetting.findAll", query="SELECT o FROM OrganizationLevelSetting o")
-public class OrganizationLevelSetting implements Serializable {
+@NamedQuery(name="Branch.findAll", query="SELECT b FROM Branch b")
+public class Branch implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="ORGANIZATION_LEVEL_SETTINGS_ID")
-	private int organizationLevelSettingsId;
-
-	@Column(name="AGENT_ID")
-	private int agentId;
-
 	@Column(name="BRANCH_ID")
 	private int branchId;
+
+	private String branch;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -32,20 +27,14 @@ public class OrganizationLevelSetting implements Serializable {
 	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
 
+	@Column(name="IS_DEFAULT_BY_SYSTEM")
+	private int isDefaultBySystem;
+
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
 
 	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
-
-	@Column(name="REGION_ID")
-	private int regionId;
-
-	@Column(name="SETTING_KEY")
-	private String settingKey;
-
-	@Column(name="SETTING_VALUE")
-	private String settingValue;
 
 	private int status;
 
@@ -54,23 +43,12 @@ public class OrganizationLevelSetting implements Serializable {
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	public OrganizationLevelSetting() {
-	}
+	//bi-directional many-to-one association to Region
+	@ManyToOne
+	@JoinColumn(name="REGION_ID")
+	private Region region;
 
-	public int getOrganizationLevelSettingsId() {
-		return this.organizationLevelSettingsId;
-	}
-
-	public void setOrganizationLevelSettingsId(int organizationLevelSettingsId) {
-		this.organizationLevelSettingsId = organizationLevelSettingsId;
-	}
-
-	public int getAgentId() {
-		return this.agentId;
-	}
-
-	public void setAgentId(int agentId) {
-		this.agentId = agentId;
+	public Branch() {
 	}
 
 	public int getBranchId() {
@@ -79,6 +57,14 @@ public class OrganizationLevelSetting implements Serializable {
 
 	public void setBranchId(int branchId) {
 		this.branchId = branchId;
+	}
+
+	public String getBranch() {
+		return this.branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
 	}
 
 	public String getCreatedBy() {
@@ -97,6 +83,14 @@ public class OrganizationLevelSetting implements Serializable {
 		this.createdOn = createdOn;
 	}
 
+	public int getIsDefaultBySystem() {
+		return this.isDefaultBySystem;
+	}
+
+	public void setIsDefaultBySystem(int isDefaultBySystem) {
+		this.isDefaultBySystem = isDefaultBySystem;
+	}
+
 	public String getModifiedBy() {
 		return this.modifiedBy;
 	}
@@ -113,30 +107,6 @@ public class OrganizationLevelSetting implements Serializable {
 		this.modifiedOn = modifiedOn;
 	}
 
-	public int getRegionId() {
-		return this.regionId;
-	}
-
-	public void setRegionId(int regionId) {
-		this.regionId = regionId;
-	}
-
-	public String getSettingKey() {
-		return this.settingKey;
-	}
-
-	public void setSettingKey(String settingKey) {
-		this.settingKey = settingKey;
-	}
-
-	public String getSettingValue() {
-		return this.settingValue;
-	}
-
-	public void setSettingValue(String settingValue) {
-		this.settingValue = settingValue;
-	}
-
 	public int getStatus() {
 		return this.status;
 	}
@@ -151,6 +121,14 @@ public class OrganizationLevelSetting implements Serializable {
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public Region getRegion() {
+		return this.region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
 	}
 
 }
