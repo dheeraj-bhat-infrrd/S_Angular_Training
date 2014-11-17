@@ -1,24 +1,25 @@
-package com.realtech.socialsurvey.core.model.entity;
+package com.realtech.socialsurvey.core.entities;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
- * The persistent class for the region database table.
+ * The persistent class for the branch database table.
  * 
  */
 @Entity
-@NamedQuery(name="Region.findAll", query="SELECT r FROM Region r")
-public class Region implements Serializable {
+@NamedQuery(name="Branch.findAll", query="SELECT b FROM Branch b")
+public class Branch implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="REGION_ID")
-	private int regionId;
+	@Column(name="BRANCH_ID")
+	private int branchId;
+
+	private String branch;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -35,28 +36,35 @@ public class Region implements Serializable {
 	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	private String region;
-
 	private int status;
-
-	//bi-directional many-to-one association to Branch
-	@OneToMany(mappedBy="region")
-	private List<Branch> branches;
 
 	//bi-directional many-to-one association to Company
 	@ManyToOne
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	public Region() {
+	//bi-directional many-to-one association to Region
+	@ManyToOne
+	@JoinColumn(name="REGION_ID")
+	private Region region;
+
+	public Branch() {
 	}
 
-	public int getRegionId() {
-		return this.regionId;
+	public int getBranchId() {
+		return this.branchId;
 	}
 
-	public void setRegionId(int regionId) {
-		this.regionId = regionId;
+	public void setBranchId(int branchId) {
+		this.branchId = branchId;
+	}
+
+	public String getBranch() {
+		return this.branch;
+	}
+
+	public void setBranch(String branch) {
+		this.branch = branch;
 	}
 
 	public String getCreatedBy() {
@@ -99,14 +107,6 @@ public class Region implements Serializable {
 		this.modifiedOn = modifiedOn;
 	}
 
-	public String getRegion() {
-		return this.region;
-	}
-
-	public void setRegion(String region) {
-		this.region = region;
-	}
-
 	public int getStatus() {
 		return this.status;
 	}
@@ -115,34 +115,20 @@ public class Region implements Serializable {
 		this.status = status;
 	}
 
-	public List<Branch> getBranches() {
-		return this.branches;
-	}
-
-	public void setBranches(List<Branch> branches) {
-		this.branches = branches;
-	}
-
-	public Branch addBranch(Branch branch) {
-		getBranches().add(branch);
-		branch.setRegion(this);
-
-		return branch;
-	}
-
-	public Branch removeBranch(Branch branch) {
-		getBranches().remove(branch);
-		branch.setRegion(null);
-
-		return branch;
-	}
-
 	public Company getCompany() {
 		return this.company;
 	}
 
 	public void setCompany(Company company) {
 		this.company = company;
+	}
+
+	public Region getRegion() {
+		return this.region;
+	}
+
+	public void setRegion(Region region) {
+		this.region = region;
 	}
 
 }
