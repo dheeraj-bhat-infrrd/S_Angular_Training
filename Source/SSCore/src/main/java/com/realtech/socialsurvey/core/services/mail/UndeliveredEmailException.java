@@ -11,7 +11,7 @@ public class UndeliveredEmailException extends NonFatalException {
 	/**
 	 * default serial version id
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -215264659528341674L;
 
 	public UndeliveredEmailException() {
 		super();

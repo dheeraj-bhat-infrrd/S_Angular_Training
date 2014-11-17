@@ -8,7 +8,7 @@ public class InvalidInputException extends NonFatalException {
 	/**
 	 * default serial version id
 	 */
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2015020702364453334L;
 
 	public InvalidInputException() {
 		super();
