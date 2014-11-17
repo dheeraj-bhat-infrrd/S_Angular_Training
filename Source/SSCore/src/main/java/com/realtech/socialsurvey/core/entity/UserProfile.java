@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.model.entity;
+package com.realtech.socialsurvey.core.entity;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
@@ -7,19 +7,24 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the branch database table.
+ * The persistent class for the user_profile database table.
  * 
  */
 @Entity
-@NamedQuery(name="Branch.findAll", query="SELECT b FROM Branch b")
-public class Branch implements Serializable {
+@Table(name="user_profile")
+@NamedQuery(name="UserProfile.findAll", query="SELECT u FROM UserProfile u")
+public class UserProfile implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@Column(name="USER_PROFILE_ID")
+	private int userProfileId;
+
+	@Column(name="AGENT_ID")
+	private int agentId;
+
 	@Column(name="BRANCH_ID")
 	private int branchId;
-
-	private String branch;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -27,14 +32,14 @@ public class Branch implements Serializable {
 	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="IS_DEFAULT_BY_SYSTEM")
-	private int isDefaultBySystem;
-
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
 
 	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
+
+	@Column(name="REGION_ID")
+	private int regionId;
 
 	private int status;
 
@@ -43,12 +48,33 @@ public class Branch implements Serializable {
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to Region
+	//bi-directional many-to-one association to ProfilesMaster
 	@ManyToOne
-	@JoinColumn(name="REGION_ID")
-	private Region region;
+	@JoinColumn(name="PROFILES_MASTER_ID")
+	private ProfilesMaster profilesMaster;
 
-	public Branch() {
+	//bi-directional many-to-one association to User
+	@ManyToOne
+	@JoinColumn(name="USER_ID")
+	private User user;
+
+	public UserProfile() {
+	}
+
+	public int getUserProfileId() {
+		return this.userProfileId;
+	}
+
+	public void setUserProfileId(int userProfileId) {
+		this.userProfileId = userProfileId;
+	}
+
+	public int getAgentId() {
+		return this.agentId;
+	}
+
+	public void setAgentId(int agentId) {
+		this.agentId = agentId;
 	}
 
 	public int getBranchId() {
@@ -57,14 +83,6 @@ public class Branch implements Serializable {
 
 	public void setBranchId(int branchId) {
 		this.branchId = branchId;
-	}
-
-	public String getBranch() {
-		return this.branch;
-	}
-
-	public void setBranch(String branch) {
-		this.branch = branch;
 	}
 
 	public String getCreatedBy() {
@@ -83,14 +101,6 @@ public class Branch implements Serializable {
 		this.createdOn = createdOn;
 	}
 
-	public int getIsDefaultBySystem() {
-		return this.isDefaultBySystem;
-	}
-
-	public void setIsDefaultBySystem(int isDefaultBySystem) {
-		this.isDefaultBySystem = isDefaultBySystem;
-	}
-
 	public String getModifiedBy() {
 		return this.modifiedBy;
 	}
@@ -105,6 +115,14 @@ public class Branch implements Serializable {
 
 	public void setModifiedOn(Timestamp modifiedOn) {
 		this.modifiedOn = modifiedOn;
+	}
+
+	public int getRegionId() {
+		return this.regionId;
+	}
+
+	public void setRegionId(int regionId) {
+		this.regionId = regionId;
 	}
 
 	public int getStatus() {
@@ -123,12 +141,20 @@ public class Branch implements Serializable {
 		this.company = company;
 	}
 
-	public Region getRegion() {
-		return this.region;
+	public ProfilesMaster getProfilesMaster() {
+		return this.profilesMaster;
 	}
 
-	public void setRegion(Region region) {
-		this.region = region;
+	public void setProfilesMaster(ProfilesMaster profilesMaster) {
+		this.profilesMaster = profilesMaster;
+	}
+
+	public User getUser() {
+		return this.user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 }

@@ -1,24 +1,24 @@
-package com.realtech.socialsurvey.core.model.entity;
+package com.realtech.socialsurvey.core.entity;
 //JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.List;
 
 
 /**
- * The persistent class for the region database table.
+ * The persistent class for the license_details database table.
  * 
  */
 @Entity
-@NamedQuery(name="Region.findAll", query="SELECT r FROM Region r")
-public class Region implements Serializable {
+@Table(name="license_details")
+@NamedQuery(name="LicenseDetail.findAll", query="SELECT l FROM LicenseDetail l")
+public class LicenseDetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="REGION_ID")
-	private int regionId;
+	@Column(name="LICENSE_ID")
+	private int licenseId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -26,8 +26,11 @@ public class Region implements Serializable {
 	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="IS_DEFAULT_BY_SYSTEM")
-	private int isDefaultBySystem;
+	@Column(name="LICENSE_END_DATE")
+	private Timestamp licenseEndDate;
+
+	@Column(name="LICENSE_START_DATE")
+	private Timestamp licenseStartDate;
 
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
@@ -35,28 +38,30 @@ public class Region implements Serializable {
 	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	private String region;
+	@Column(name="PAYMENT_MODE")
+	private String paymentMode;
 
 	private int status;
 
-	//bi-directional many-to-one association to Branch
-	@OneToMany(mappedBy="region")
-	private List<Branch> branches;
+	//bi-directional many-to-one association to AccountsMaster
+	@ManyToOne
+	@JoinColumn(name="ACCOUNTS_MASTER_ID")
+	private AccountsMaster accountsMaster;
 
 	//bi-directional many-to-one association to Company
 	@ManyToOne
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
-	public Region() {
+	public LicenseDetail() {
 	}
 
-	public int getRegionId() {
-		return this.regionId;
+	public int getLicenseId() {
+		return this.licenseId;
 	}
 
-	public void setRegionId(int regionId) {
-		this.regionId = regionId;
+	public void setLicenseId(int licenseId) {
+		this.licenseId = licenseId;
 	}
 
 	public String getCreatedBy() {
@@ -75,12 +80,20 @@ public class Region implements Serializable {
 		this.createdOn = createdOn;
 	}
 
-	public int getIsDefaultBySystem() {
-		return this.isDefaultBySystem;
+	public Timestamp getLicenseEndDate() {
+		return this.licenseEndDate;
 	}
 
-	public void setIsDefaultBySystem(int isDefaultBySystem) {
-		this.isDefaultBySystem = isDefaultBySystem;
+	public void setLicenseEndDate(Timestamp licenseEndDate) {
+		this.licenseEndDate = licenseEndDate;
+	}
+
+	public Timestamp getLicenseStartDate() {
+		return this.licenseStartDate;
+	}
+
+	public void setLicenseStartDate(Timestamp licenseStartDate) {
+		this.licenseStartDate = licenseStartDate;
 	}
 
 	public String getModifiedBy() {
@@ -99,12 +112,12 @@ public class Region implements Serializable {
 		this.modifiedOn = modifiedOn;
 	}
 
-	public String getRegion() {
-		return this.region;
+	public String getPaymentMode() {
+		return this.paymentMode;
 	}
 
-	public void setRegion(String region) {
-		this.region = region;
+	public void setPaymentMode(String paymentMode) {
+		this.paymentMode = paymentMode;
 	}
 
 	public int getStatus() {
@@ -115,26 +128,12 @@ public class Region implements Serializable {
 		this.status = status;
 	}
 
-	public List<Branch> getBranches() {
-		return this.branches;
+	public AccountsMaster getAccountsMaster() {
+		return this.accountsMaster;
 	}
 
-	public void setBranches(List<Branch> branches) {
-		this.branches = branches;
-	}
-
-	public Branch addBranch(Branch branch) {
-		getBranches().add(branch);
-		branch.setRegion(this);
-
-		return branch;
-	}
-
-	public Branch removeBranch(Branch branch) {
-		getBranches().remove(branch);
-		branch.setRegion(null);
-
-		return branch;
+	public void setAccountsMaster(AccountsMaster accountsMaster) {
+		this.accountsMaster = accountsMaster;
 	}
 
 	public Company getCompany() {
