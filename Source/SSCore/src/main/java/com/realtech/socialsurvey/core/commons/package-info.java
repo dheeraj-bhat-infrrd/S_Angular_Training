@@ -1,8 +1,6 @@
 /**
  * Common services are put here.
  */
-/**
- * @author root
- *
- */
+//JIRA: SS-6: By RM03
+
 package com.realtech.socialsurvey.core.commons;
