@@ -52,7 +52,7 @@ public class Company implements Serializable {
 	private List<Region> regions;
 
 	//bi-directional many-to-one association to Survey
-	@OneToMany(mappedBy="company")
+	@OneToOne(mappedBy="company")
 	private List<Survey> surveys;
 
 	//bi-directional many-to-one association to SurveyQuestion
