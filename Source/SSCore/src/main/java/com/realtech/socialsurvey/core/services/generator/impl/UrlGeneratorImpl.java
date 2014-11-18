@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.generator.impl;
 //JIRA: SS-6: By RM03
 
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,9 +15,14 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 
 
 
+/**
+ * This class uses the AES algorithm to generate URL from the parameters by encoding them into the URL. 
+ * It also has function to decrypt a URL and extract the Map of parameters from them.
+ */
 public class UrlGeneratorImpl implements URLGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
+	private static EncryptionHelper encryptor = new EncryptionHelper();
 			
 	/**
 	 * Function that takes Map of key,values and returns cipher text.
@@ -25,6 +31,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 * @return returns String cipher of the key,value pairs in params
 	 * @throws InvalidInputException
 	 */
+	@Override
 	public String generateCipher(Map<String,String> params) throws InvalidInputException {
 		
 		if(params == null){
@@ -48,7 +55,9 @@ public class UrlGeneratorImpl implements URLGenerator {
 		plainText.deleteCharAt(plainText.length()-1);
 		
 		// Return the url.
-		return EncryptionHelper.encryptAES(plainText.toString(),"");
+		String cipher = encryptor.encryptAES(plainText.toString(),"");
+		LOG.info("generateCipher() Output : " + cipher);
+		return cipher;
 	}
 	
 		
@@ -60,6 +69,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 * @return returns String that contains url with encoded parameters.
 	 * @throws InvalidInputException
 	 */
+	@Override
 	public String generateUrl(Map<String, String> params,String baseUrl) throws InvalidInputException {
 		
 		if(params == null){
@@ -75,10 +85,14 @@ public class UrlGeneratorImpl implements URLGenerator {
 		LOG.info("generateUrl(): parameters: " + params.toString() + "  " + baseUrl);
 		
 		if(baseUrl.contains("?")){
-			return baseUrl + "&q=" + generateCipher(params);
+			String URL = baseUrl + "&q=" + generateCipher(params);
+			LOG.info("generateUrl() Output : " + URL);
+			return URL;
 		}
 		
-		return baseUrl + "?q=" + generateCipher(params);
+		String URL = baseUrl + "?q=" + generateCipher(params);
+		LOG.info("generateUrl() Output : " + URL);
+		return URL;
 	}
 	
 	
@@ -88,6 +102,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 * @return a String which is the decoded chipher text.
 	 * @throws InvalidInputException
 	 */
+	@Override
 	public String decryptCipher(String cipherText) throws InvalidInputException{
 		
 		if( cipherText == null || cipherText.isEmpty() ){
@@ -96,8 +111,11 @@ public class UrlGeneratorImpl implements URLGenerator {
 		}
 		
 		LOG.info("decryptCipher() : parameters: " + cipherText );
+		
+		String plainText = encryptor.decryptAES(cipherText, "");
+		LOG.info("decryptCipher() Output: " + plainText );
 				
-		return EncryptionHelper.decryptAES(cipherText, "");
+		return plainText;
 		
 	}
 	
@@ -108,6 +126,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 * @return a Map of key,value pairs of the parameters encoded.
 	 * @throws InvalidInputException
 	 */
+	@Override
 	public Map<String,String> decryptParameters(String parameterCipherText) throws InvalidInputException {
 		
 		if( parameterCipherText == null || parameterCipherText.isEmpty() ){
@@ -137,6 +156,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 * @throws InvalidInputException
 	 * @throws InvalidUrlException 
 	 */
+	@Override
 	public Map<String, String> decryptUrl(String Url) throws InvalidInputException, InvalidUrlException {
 		
 		if( Url == null || Url.isEmpty() ){
@@ -159,5 +179,5 @@ public class UrlGeneratorImpl implements URLGenerator {
 						
 		return decryptParameters(parameterCipherText);
 	}
-				
+						
 }
