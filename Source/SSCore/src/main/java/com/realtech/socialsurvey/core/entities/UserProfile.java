@@ -1,5 +1,4 @@
 package com.realtech.socialsurvey.core.entities;
-//JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -32,6 +31,9 @@ public class UserProfile implements Serializable {
 	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
 
+	@Column(name="EMAIL_ID")
+	private String emailId;
+
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
 
@@ -42,6 +44,9 @@ public class UserProfile implements Serializable {
 	private int regionId;
 
 	private int status;
+
+	@Column(name="USER_PROFILE_TYPE")
+	private String userProfileType;
 
 	//bi-directional many-to-one association to Company
 	@ManyToOne
@@ -101,6 +106,14 @@ public class UserProfile implements Serializable {
 		this.createdOn = createdOn;
 	}
 
+	public String getEmailId() {
+		return this.emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+
 	public String getModifiedBy() {
 		return this.modifiedBy;
 	}
@@ -133,6 +146,14 @@ public class UserProfile implements Serializable {
 		this.status = status;
 	}
 
+	public String getUserProfileType() {
+		return this.userProfileType;
+	}
+
+	public void setUserProfileType(String userProfileType) {
+		this.userProfileType = userProfileType;
+	}
+
 	public Company getCompany() {
 		return this.company;
 	}
@@ -158,5 +179,3 @@ public class UserProfile implements Serializable {
 	}
 
 }
-
-//JIRA: SS-1: By RM06: EOC
