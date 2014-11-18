@@ -53,6 +53,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 		return persistentClass;
 	}
 
+	@Override
 	@SuppressWarnings("unchecked")
 	public T findById(ID id) {
 		T entity;
