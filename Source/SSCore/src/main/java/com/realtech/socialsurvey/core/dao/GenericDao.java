@@ -11,18 +11,26 @@ import org.hibernate.criterion.Criterion;
  * It contains all the basic CRUD methods required by every Dao. 
  */
 
-	public interface GenericDao<T, ID extends Serializable> {  
-		  
-	    public T findById(ID id);
-	    public List<T> findAll();
-	    public T saveOrUpdate(T entity);
-	    public T save(T entity);
-	    public void delete(T entity);
-	    public List<T> findByExample(T exampleInstance, String[] excludeProperty);
-	    public void flush(); 
-	    public void clear();
-	    public List<T> findByCriteria(Criterion... criterion);
-	
+public interface GenericDao<T, ID extends Serializable> {
+
+	public T findById(ID id);
+
+	public List<T> findAll();
+
+	public T saveOrUpdate(T entity);
+
+	public T save(T entity);
+
+	public void delete(T entity);
+
+	public List<T> findByExample(T exampleInstance, String[] excludeProperty);
+
+	public void flush();
+
+	public void clear();
+
+	public List<T> findByCriteria(Criterion... criterion);
+
 }
 
-//JIRA: SS-8: By RM05: EOC
+// JIRA: SS-8: By RM05: EOC
