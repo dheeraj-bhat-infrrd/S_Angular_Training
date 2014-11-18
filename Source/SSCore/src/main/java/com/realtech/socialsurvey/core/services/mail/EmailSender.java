@@ -25,8 +25,6 @@ public final class EmailSender {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EmailSender.class);
 
-	private EmailSender() {}
-
 	/**
 	 * Method to send mail with provided email entity and smtp settings
 	 * 
@@ -35,7 +33,7 @@ public final class EmailSender {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
-	public static void sendMail(EmailEntity emailEntity, SmtpSettings smtpSettings) throws InvalidInputException, UndeliveredEmailException {
+	public void sendMail(EmailEntity emailEntity, SmtpSettings smtpSettings) throws InvalidInputException, UndeliveredEmailException {
 		if (emailEntity == null) {
 			throw new InvalidInputException("Email entity is null for sending mail");
 		}
@@ -126,4 +124,5 @@ public final class EmailSender {
 			throw new UndeliveredEmailException("Error while sending email", e);
 		}
 	}
+	
 }
