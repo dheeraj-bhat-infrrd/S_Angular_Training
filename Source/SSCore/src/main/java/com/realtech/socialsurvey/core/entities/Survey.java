@@ -1,5 +1,4 @@
 package com.realtech.socialsurvey.core.entities;
-//JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -20,12 +19,6 @@ public class Survey implements Serializable {
 	@Column(name="SURVEY_ID")
 	private int surveyId;
 
-	@Column(name="AGENT_ID")
-	private int agentId;
-
-	@Column(name="BRANCH_ID")
-	private int branchId;
-
 	@Column(name="CREATED_BY")
 	private String createdBy;
 
@@ -37,9 +30,6 @@ public class Survey implements Serializable {
 
 	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
-
-	@Column(name="REGION_ID")
-	private int regionId;
 
 	private int status;
 
@@ -61,22 +51,6 @@ public class Survey implements Serializable {
 
 	public void setSurveyId(int surveyId) {
 		this.surveyId = surveyId;
-	}
-
-	public int getAgentId() {
-		return this.agentId;
-	}
-
-	public void setAgentId(int agentId) {
-		this.agentId = agentId;
-	}
-
-	public int getBranchId() {
-		return this.branchId;
-	}
-
-	public void setBranchId(int branchId) {
-		this.branchId = branchId;
 	}
 
 	public String getCreatedBy() {
@@ -109,14 +83,6 @@ public class Survey implements Serializable {
 
 	public void setModifiedOn(Timestamp modifiedOn) {
 		this.modifiedOn = modifiedOn;
-	}
-
-	public int getRegionId() {
-		return this.regionId;
-	}
-
-	public void setRegionId(int regionId) {
-		this.regionId = regionId;
 	}
 
 	public int getStatus() {
@@ -158,5 +124,3 @@ public class Survey implements Serializable {
 	}
 
 }
-
-//JIRA: SS-1: By RM06: EOC
