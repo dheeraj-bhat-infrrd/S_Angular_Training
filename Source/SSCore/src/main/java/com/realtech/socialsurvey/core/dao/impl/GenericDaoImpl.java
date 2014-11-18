@@ -15,7 +15,8 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 
 //JIRA: SS-8: By RM05: BOC
 
-/*This is the base Dao which needs to be extended by each Dao.
+/**
+ * This is the base Dao which needs to be extended by each Dao.
  * It contains implementation for basic CRUD methods required by every Dao.
  */
 public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T, ID> {
