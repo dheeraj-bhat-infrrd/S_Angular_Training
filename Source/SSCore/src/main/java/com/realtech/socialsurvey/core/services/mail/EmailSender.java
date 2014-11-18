@@ -36,48 +36,58 @@ public final class EmailSender {
 	 * @throws UndeliveredEmailException
 	 */
 	public static void sendMail(EmailEntity emailEntity, SmtpSettings smtpSettings) throws InvalidInputException, UndeliveredEmailException {
+		if (emailEntity == null) {
+			throw new InvalidInputException("Email entity is null for sending mail");
+		}
+		if (smtpSettings == null) {
+			throw new InvalidInputException("Smtp settings is null for sending mail");
+		}
 		LOG.info("Method sendMail called with smtpSettings : " + smtpSettings + " and emailEntity : " + emailEntity);
-		int port = -1;
-		try {
-			port = Integer.parseInt(smtpSettings.getMailPort());
+
+		int port = smtpSettings.getMailPort();
+
+		if (emailEntity.getSenderEmailId() == null || emailEntity.getSenderEmailId().isEmpty()) {
+			throw new InvalidInputException("Sender email id is not valid for sending mail");
 		}
-		catch (NumberFormatException e) {
-			LOG.error("Error in sendMail while parsing port .Reason :" + e.getMessage(), e);
-			throw new InvalidInputException("Invalid port number while preparing mail to send", e);
+		if (emailEntity.getSenderName() == null || emailEntity.getSenderName().isEmpty()) {
+			throw new InvalidInputException("Sender name is not valid for sending mail");
 		}
+		if (emailEntity.getSenderPassword() == null || emailEntity.getSenderPassword().isEmpty()) {
+			throw new InvalidInputException("Sender password is not valid for sending mail");
+		}
+		List<String> recipients = emailEntity.getRecipients();
+		if (recipients == null || recipients.isEmpty()) {
+			throw new InvalidInputException("Recipient list is empty for sending mail");
+		}
+
 		Properties properties = new Properties();
 		properties.put("mail.smtp.auth", SmtpSettings.MAIL_SMTP_AUTH);
 		properties.put("mail.smtp.starttls.enable", SmtpSettings.MAIL_SMTP_STARTTLS_ENABLE);
+		LOG.debug("Preparing session object for sending mail");
 		Session mailSession = Session.getInstance(properties);
 		try {
+			LOG.debug("Preparing transport object for sending mail");
 			Transport transport = mailSession.getTransport(SmtpSettings.MAIL_TRANSPORT);
 			transport.connect(smtpSettings.getMailHost(), port, emailEntity.getSenderEmailId(), emailEntity.getSenderPassword());
-			List<String> recipients = emailEntity.getRecipients();
-			StringBuilder recipientsSb = null;
-			if (recipients == null || recipients.isEmpty()) {
-				throw new InvalidInputException("Recipient list is empty for sending mail");
-			}
-			recipientsSb = new StringBuilder();
+			LOG.trace("Connection successful");
+			StringBuilder recipientsSb = new StringBuilder();
 			int count = 0;
 			for (String recipientEmailId : recipients) {
 				if (count != 0) {
 					recipientsSb.append(",");
 				}
+				LOG.debug("Adding recipient : " + recipientEmailId);
 				recipientsSb.append(recipientEmailId);
+				count++;
 			}
+			LOG.debug("Recipients are : " + recipientsSb);
 
 			// Adding the recipients to address list
 			Address[] addresses = InternetAddress.parse(recipientsSb.toString());
 
 			// Setting up new MimeMessage
 			Message message = new MimeMessage(mailSession);
-			if (emailEntity.getSenderEmailId() != null && !emailEntity.getSenderEmailId().isEmpty() && emailEntity.getSenderName() != null
-					&& !emailEntity.getSenderName().isEmpty()) {
-				message.setFrom(new InternetAddress(emailEntity.getSenderEmailId(), emailEntity.getSenderName()));
-			}
-			else {
-				throw new InvalidInputException("Sender email Id is not valid for sending mail");
-			}
+			message.setFrom(new InternetAddress(emailEntity.getSenderEmailId(), emailEntity.getSenderName()));
 
 			// Adding the recipients addresses for sending mail as per the recipient type
 			if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_TO) {
@@ -104,6 +114,8 @@ public final class EmailSender {
 			LOG.debug("Mail to be sent : " + emailEntity.getBody());
 			transport.sendMessage(message, addresses);
 			transport.close();
+
+			LOG.info("Mail sent successfully. Returning from method sendMail");
 		}
 		catch (MessagingException e) {
 			LOG.error("Messaging exception while sending mail", e);
@@ -113,6 +125,5 @@ public final class EmailSender {
 			LOG.error("Unsupported Encoding Exception while sending mail", e);
 			throw new UndeliveredEmailException("Error while sending email", e);
 		}
-
 	}
 }
