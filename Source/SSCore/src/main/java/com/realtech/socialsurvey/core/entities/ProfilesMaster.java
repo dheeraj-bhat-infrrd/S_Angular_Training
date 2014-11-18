@@ -1,5 +1,4 @@
 package com.realtech.socialsurvey.core.entities;
-//JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -149,5 +148,3 @@ public class ProfilesMaster implements Serializable {
 	}
 
 }
-
-//JIRA: SS-1: By RM06: EOC

@@ -1,5 +1,4 @@
 package com.realtech.socialsurvey.core.entities;
-//JIRA: SS-1: By RM06: BOC
 
 import java.io.Serializable;
 import javax.persistence.*;
@@ -29,6 +28,9 @@ public class User implements Serializable {
 
 	@Column(name="DISPLAY_NAME")
 	private String displayName;
+
+	@Column(name="EMAIL_ID")
+	private String emailId;
 
 	@Column(name="LAST_LOGIN")
 	private Timestamp lastLogin;
@@ -94,6 +96,14 @@ public class User implements Serializable {
 
 	public void setDisplayName(String displayName) {
 		this.displayName = displayName;
+	}
+
+	public String getEmailId() {
+		return this.emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
 	}
 
 	public Timestamp getLastLogin() {
@@ -191,5 +201,3 @@ public class User implements Serializable {
 	}
 
 }
-
-//JIRA: SS-1: By RM06: EOC
