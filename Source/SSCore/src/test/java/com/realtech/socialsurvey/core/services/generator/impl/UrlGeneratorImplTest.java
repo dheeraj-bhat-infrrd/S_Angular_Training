@@ -13,10 +13,8 @@ import org.junit.Test;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 
-/**
- * @author RM03
- * JIRA Ticket SS-6
- */
+//JIRA: SS-6: By RM03
+
 
 public class UrlGeneratorImplTest {	
 	
