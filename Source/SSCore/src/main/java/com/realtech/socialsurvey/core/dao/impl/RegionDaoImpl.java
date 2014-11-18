@@ -1,7 +1,0 @@
-package com.realtech.socialsurvey.core.dao.impl;
-
-import com.realtech.socialsurvey.core.entities.Region;
-
-public class RegionDaoImpl extends GenericDaoImpl<Region, Integer> {
-
-}
