@@ -2,6 +2,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import com.realtech.socialsurvey.core.entities.UserProfile;
 
-public class UserProfileDao extends GenericDaoImpl<UserProfile, Integer> {
+public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> {
 
 }
