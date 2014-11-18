@@ -34,7 +34,7 @@ public class Survey implements Serializable {
 	private int status;
 
 	//bi-directional many-to-one association to Company
-	@ManyToOne
+	@OneToOne
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
