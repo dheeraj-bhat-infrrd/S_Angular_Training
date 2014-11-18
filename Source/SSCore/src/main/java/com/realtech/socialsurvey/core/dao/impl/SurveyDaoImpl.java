@@ -2,6 +2,6 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import com.realtech.socialsurvey.core.entities.Survey;
 
-public class SurveyDao extends GenericDaoImpl<Survey, Integer> {
+public class SurveyDaoImpl extends GenericDaoImpl<Survey, Integer> {
 
 }
