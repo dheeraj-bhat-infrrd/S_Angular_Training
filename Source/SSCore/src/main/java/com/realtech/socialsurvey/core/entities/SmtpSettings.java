@@ -8,7 +8,7 @@ package com.realtech.socialsurvey.core.entities;
 public class SmtpSettings {
 
 	private String mailHost;
-	private String mailPort;
+	private int mailPort;
 
 	public static String MAIL_SMTP_AUTH = "true";
 	public static String MAIL_SMTP_STARTTLS_ENABLE = "true";
@@ -22,11 +22,11 @@ public class SmtpSettings {
 		this.mailHost = mailHost;
 	}
 
-	public String getMailPort() {
+	public int getMailPort() {
 		return mailPort;
 	}
 
-	public void setMailPort(String mailPort) {
+	public void setMailPort(int mailPort) {
 		this.mailPort = mailPort;
 	}
 
