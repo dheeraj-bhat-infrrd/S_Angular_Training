@@ -2,15 +2,14 @@ package com.realtech.socialsurvey.core.services.generator;
 
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 
+//JIRA: SS-6: By RM03
+
 /**
- * @author RM03
- * JIRA Ticket SS-6
+ * Exception class for malformed Urls in the UrlGeneratorImpl class.
+ *
  */
 public class InvalidUrlException extends NonFatalException {
-
-	/**
-	 * 
-	 */
+	
 	private static final long serialVersionUID = 1L;
 	
 	public InvalidUrlException() {

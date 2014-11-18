@@ -1,4 +1,5 @@
 package com.realtech.socialsurvey.core.services.generator.impl;
+//JIRA: SS-6: By RM03
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,15 +7,12 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.realtech.socialsurvey.core.commons.EncryptionService;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 
-/**
- * @author RM03
- * JIRA Ticket SS-6
- */
+
 
 public class UrlGeneratorImpl implements URLGenerator {
 	
@@ -34,18 +32,23 @@ public class UrlGeneratorImpl implements URLGenerator {
 			throw new InvalidInputException("Parameter to generateCipher() in VerificationUrlGenerator is null!");
 		}
 		
-		String plainText = "";
+		LOG.info("generateCipher(): paramaters : " +params.toString());		
+		
+		StringBuilder plainText = new StringBuilder();
 		
 		// The parameters are arranged in format key=value separated by &.		
 		for(String key : params.keySet()){
-			plainText += key + "=" + params.get(key) + "&";
+			plainText.append(key);
+			plainText.append("=");
+			plainText.append(params.get(key));
+			plainText.append("&");
 		}
 
 		// Last extra & is removed.
-		plainText = plainText.substring(0, plainText.length()-1);
+		plainText.deleteCharAt(plainText.length()-1);
 		
 		// Return the url.
-		return EncryptionService.encryptAES(plainText,"");
+		return EncryptionHelper.encryptAES(plainText.toString(),"");
 	}
 	
 		
@@ -64,9 +67,15 @@ public class UrlGeneratorImpl implements URLGenerator {
 			throw new InvalidInputException("First parameter to generateUrl() in VerificationUrlGenerator is null!");
 		}
 		
-		if(baseUrl == null || baseUrl == ""){
+		if(baseUrl == null || baseUrl.isEmpty()){
 			LOG.error("Second parameter to generateUrl() in VerificationUrlGenerator is null or empty!");
 			throw new InvalidInputException("First parameter to generateUrl() in VerificationUrlGenerator is null or empty!");
+		}
+		
+		LOG.info("generateUrl(): parameters: " + params.toString() + "  " + baseUrl);
+		
+		if(baseUrl.contains("?")){
+			return baseUrl + "&q=" + generateCipher(params);
 		}
 		
 		return baseUrl + "?q=" + generateCipher(params);
@@ -81,12 +90,14 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 */
 	public String decryptCipher(String cipherText) throws InvalidInputException{
 		
-		if( cipherText == null){
-			LOG.error("Parameter to decryptCipher() in VerificationUrlGenerator is null!");
-			throw new InvalidInputException("Parameter to decryptCipher() in VerificationUrlGenerator is null!");
+		if( cipherText == null || cipherText.isEmpty() ){
+			LOG.error("Parameter to decryptCipher() in VerificationUrlGenerator is null or empty!");
+			throw new InvalidInputException("Parameter to decryptCipher() in VerificationUrlGenerator is null or empty!");
 		}
+		
+		LOG.info("decryptCipher() : parameters: " + cipherText );
 				
-		return EncryptionService.decryptAES(cipherText, "");
+		return EncryptionHelper.decryptAES(cipherText, "");
 		
 	}
 	
@@ -99,18 +110,20 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 */
 	public Map<String,String> decryptParameters(String parameterCipherText) throws InvalidInputException {
 		
-		if( parameterCipherText == null || parameterCipherText == ""){
+		if( parameterCipherText == null || parameterCipherText.isEmpty() ){
 			LOG.error("Parameter to decryptParameters() in VerificationUrlGenerator is null or empty!");
 			throw new InvalidInputException("Parameter to decryptParameters() in VerificationUrlGenerator is null!");
 		}
+		
+		LOG.info("decryptParameters() : parameters: " + parameterCipherText);
 		
 		Map<String,String> params = new HashMap<String,String>();
 		
 		String plainText = decryptCipher(parameterCipherText);
 		String keyValuePairs[] = plainText.split("&");
 		
-		for( int counter = 0;counter < keyValuePairs.length; counter += 2){
-			params.put(keyValuePairs[counter], keyValuePairs[counter+1]);
+		for( int counter = 0;counter < keyValuePairs.length; counter += 1){
+			params.put(keyValuePairs[counter].split("=")[0], keyValuePairs[counter].split("=")[1]);
 		}		
 		return params;
 		
@@ -126,10 +139,12 @@ public class UrlGeneratorImpl implements URLGenerator {
 	 */
 	public Map<String, String> decryptUrl(String Url) throws InvalidInputException, InvalidUrlException {
 		
-		if( Url == null || Url == ""){
+		if( Url == null || Url.isEmpty() ){
 			LOG.error("Parameter to decryptUrl() in VerificationUrlGenerator is null or empty!");
 			throw new InvalidInputException("Parameter to decryptUrl() in VerificationUrlGenerator is null!");
 		}
+		
+		LOG.info("decryptUrl() : parameters: " + Url );
 		
 		String[] urlSplit = Url.split("q=");
 		
@@ -138,30 +153,11 @@ public class UrlGeneratorImpl implements URLGenerator {
 			throw new InvalidUrlException("Url parameter sent to decryptUrl() of UrlGeneratorImpl is malformed!");			
 		}
 		
+		//In case there are additional parameters we will filter them out and get only the 'q' parameter
 		String parameterCipherText = urlSplit[1];
+		parameterCipherText = parameterCipherText.split("&")[0];
 						
 		return decryptParameters(parameterCipherText);
 	}
-	
-	public static void main(String args[]){
-		UrlGeneratorImpl v = new UrlGeneratorImpl();
-		Map<String,String> params = new HashMap<String,String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
-		
-		try {
-			System.out.println(v.generateUrl(params,"http://www.socialsurvey.com/"));
-		} catch (InvalidInputException e) {
-			e.printStackTrace();
-		}
-		try {
-			System.out.println(v.decryptUrl("sdfsfas"));
-		} catch (InvalidInputException e) {
-			e.printStackTrace();
-		} catch (InvalidUrlException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-		
+				
 }

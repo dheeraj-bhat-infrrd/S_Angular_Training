@@ -1,8 +1,5 @@
 /**
  * Contains implementation classes for the interface URLGenerator.
  */
-/**
- * @author root
- *
- */
+//JIRA: SS-6: By RM03
 package com.realtech.socialsurvey.core.services.generator.impl;
