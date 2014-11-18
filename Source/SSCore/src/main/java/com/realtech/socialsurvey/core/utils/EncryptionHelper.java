@@ -23,7 +23,7 @@ public class EncryptionHelper {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
 	
-	public static String getNullSafeString(String s) {
+	public String getNullSafeString(String s) {
         if (s != null) {
                 return s;
         }
@@ -32,7 +32,7 @@ public class EncryptionHelper {
         }
 	}
 	
-	public static byte[] hexStringToByteArray(String hexString) throws InvalidInputException {
+	public byte[] hexStringToByteArray(String hexString) throws InvalidInputException {
 		
 		if(hexString == null){
 			LOG.error("Null parameter passed to hexStringToByteArray of EncryptionHelper!");
@@ -47,7 +47,7 @@ public class EncryptionHelper {
 		return byteArray;
 	}
 
-	public static String byteArrayToHexString(byte[] byteArray) throws InvalidInputException {
+	public String byteArrayToHexString(byte[] byteArray) throws InvalidInputException {
 		
 		if(byteArray == null){
 			LOG.error("Null parameter passed to byteArrayToHexString of EncryptionHelper!");
@@ -66,17 +66,21 @@ public class EncryptionHelper {
 			s = s.substring(s.length() - 2);
 			hexString.append(s);
 		}
-		return hexString.toString();
+		String hexStr = hexString.toString();
+		LOG.info("byteArrayToHexString Output : " + hexStr);
+		return hexStr;
 	}
 
 
 	// Algorithm to generate a key to use with AES (256-bit)
-	public static SecretKeySpec generateAES256Key(String plainTextKey) throws InvalidInputException {
+	public SecretKeySpec generateAES256Key(String plainTextKey) throws InvalidInputException {
 		
 		if(plainTextKey == null){
 			LOG.error("Null parameter passed to generateAES256Key of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed to generateAES256Key of EncryptionHelper!");
 		}
+		
+		LOG.info("generateAES256Key input parameter : " + plainTextKey);
 		
 		byte[] key;
 		// Random salt
@@ -97,7 +101,7 @@ public class EncryptionHelper {
 
 	
 	// Call encryptAES instead
-	private static byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException{
+	private byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException{
 		
 		if(plainText == null){
 			LOG.error("Null parameter passed as first argument to encryptAES256Bytes of EncryptionHelper!");
@@ -141,7 +145,7 @@ public class EncryptionHelper {
 	}
 
 	// Call decryptAES instead
-	private static byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException{
+	private byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException{
 		
 		if(encryptedText == null){
 			LOG.error("Null parameter passed as first argument to decryptAES256Bytes of EncryptionHelper!");
@@ -186,7 +190,7 @@ public class EncryptionHelper {
 
 
 	// Encrypt string with AES 256
-	public static String encryptAES(String plainText, String plainTextKey) throws InvalidInputException {
+	public String encryptAES(String plainText, String plainTextKey) throws InvalidInputException {
 		if(plainText == null){
 			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
@@ -195,13 +199,15 @@ public class EncryptionHelper {
 			LOG.error("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 		}
+		LOG.info("encryptAES() input parameters : " + plainText + " " + plainTextKey);
 		
-		
-		return byteArrayToHexString(encryptAES256Bytes(plainText.getBytes(), generateAES256Key(plainTextKey)));
+		String encryptedText = byteArrayToHexString(encryptAES256Bytes(plainText.getBytes(), generateAES256Key(plainTextKey)));
+		LOG.info("encryptAES() output : " + encryptedText);
+		return encryptedText;
 	}
 
 	// Decrypt string with AES 256
-	public static String decryptAES(String encryptedHexString, String plainTextKey) throws InvalidInputException {
+	public String decryptAES(String encryptedHexString, String plainTextKey) throws InvalidInputException {
 		if(encryptedHexString == null){
 			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
@@ -210,7 +216,10 @@ public class EncryptionHelper {
 			LOG.error("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 		}
-		return new String(decryptAES256Bytes(hexStringToByteArray(encryptedHexString), generateAES256Key(plainTextKey)));
+		
+		LOG.info("encryptAES() input parameters : " + encryptedHexString + " " + plainTextKey);
+		String plainText = new String(decryptAES256Bytes(hexStringToByteArray(encryptedHexString), generateAES256Key(plainTextKey)));
+		return plainText;
 	}
 	
 	
