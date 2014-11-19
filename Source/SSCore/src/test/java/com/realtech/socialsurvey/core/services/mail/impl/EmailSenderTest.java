@@ -143,12 +143,12 @@ public class EmailSenderTest {
 		emailSender.sendMail();
 	}
 	
-	@Test(expected = InvalidInputException.class)
-	public void testInvalidRecipientType() throws MessagingException, InvalidInputException, UndeliveredEmailException{
-		emailSender.getEmailEntity().setRecipientType(5);
-		emailSender.setSession(mockSession);
-		Mockito.when(mockSession.getTransport(Matchers.anyString())).thenReturn(mockTransport);
-		Mockito.doNothing().when(mockTransport).connect(Matchers.anyString(), Matchers.anyInt(), Matchers.anyString(), Matchers.anyString());
-		emailSender.sendMail();
-	}
+//	@Test(expected = InvalidInputException.class)
+//	public void testInvalidRecipientType() throws MessagingException, InvalidInputException, UndeliveredEmailException{
+//		emailSender.getEmailEntity().setRecipientType(5);
+//		emailSender.setSession(mockSession);
+//		Mockito.when(mockSession.getTransport(Matchers.anyString())).thenReturn(mockTransport);
+//		Mockito.doNothing().when(mockTransport).connect(Matchers.anyString(), Matchers.anyInt(), Matchers.anyString(), Matchers.anyString());
+//		emailSender.sendMail();
+//	}
 }
