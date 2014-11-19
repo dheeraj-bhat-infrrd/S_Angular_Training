@@ -4,7 +4,6 @@ package com.realtech.socialsurvey.core.services.generator.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,7 +21,8 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 public class UrlGeneratorImpl implements URLGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
-				
+	private EncryptionHelper encryptionHelper;
+			
 	/**
 	 * Function that takes Map of key,values and returns cipher text.
 	 * AES algorithm used for encryption.
@@ -40,7 +40,6 @@ public class UrlGeneratorImpl implements URLGenerator {
 		
 		LOG.info("generateCipher(): paramaters : " +params.toString());	
 		
-		EncryptionHelper encryptor = new EncryptionHelper();
 		StringBuilder plainText = new StringBuilder();
 		
 		// The parameters are arranged in format key=value separated by &.		
@@ -55,7 +54,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 		plainText.deleteCharAt(plainText.length()-1);
 		
 		// Return the url.
-		String cipher = encryptor.encryptAES(plainText.toString(),"");
+		String cipher = encryptionHelper.encryptAES(plainText.toString(),"");
 		LOG.info("generateCipher() Output : " + cipher);
 		return cipher;
 	}
@@ -84,15 +83,20 @@ public class UrlGeneratorImpl implements URLGenerator {
 		
 		LOG.info("generateUrl(): parameters: " + params.toString() + "  " + baseUrl);
 		
+		String url;
+		// Check if url already has parameters
 		if(baseUrl.contains("?")){
-			String URL = baseUrl + "&q=" + generateCipher(params);
-			LOG.info("generateUrl() Output : " + URL);
-			return URL;
+			// If true we add an additional 'q' parameter at the end
+			url= baseUrl + "&q=" + generateCipher(params);
+			LOG.info("generateUrl() Output : " + url);
+			return url;
 		}
-		
-		String URL = baseUrl + "?q=" + generateCipher(params);
-		LOG.info("generateUrl() Output : " + URL);
-		return URL;
+		else{	
+			// If not we put the '?' and add the 'q' parameter
+			url = baseUrl + "?q=" + generateCipher(params);
+			LOG.info("generateUrl() Output : " + url);
+			return url;
+		}
 	}
 	
 	
@@ -112,15 +116,30 @@ public class UrlGeneratorImpl implements URLGenerator {
 		
 		LOG.info("decryptCipher() : parameters: " + cipherText );
 		
-		EncryptionHelper encryptor = new EncryptionHelper();
-		String plainText = encryptor.decryptAES(cipherText, "");
+		String plainText = encryptionHelper.decryptAES(cipherText, "");
 		LOG.info("decryptCipher() Output: " + plainText );
 				
 		return plainText;
 		
 	}
 	
-	
+	/**
+	 * Getter for encryptionHelper member variable.
+	 * @return
+	 */
+	public EncryptionHelper getEncryptionHelper() {
+		return encryptionHelper;
+	}
+
+	/**
+	 * Setter for the encryptionHelper member variable.
+	 * @param encryptionHelper
+	 */
+	public void setEncryptionHelper(EncryptionHelper encryptionHelper) {
+		this.encryptionHelper = encryptionHelper;
+	}
+
+
 	/**
 	 * Function that takes parameter cipher text and returns Map of key,value pairs.
 	 * @param parameterCipherText which is the cipher text of the parameters.
@@ -152,23 +171,24 @@ public class UrlGeneratorImpl implements URLGenerator {
 	
 	/**
 	 * Function that takes url with encoded cipher of the parameters and returns Map of key,value pairs.
-	 * @param Url which is the url with encoded cipher of the parameters.
+	 * @param url which is the url with encoded cipher of the parameters.
 	 * @return a Map of key,value pairs of the parameters encoded.
 	 * @throws InvalidInputException
 	 * @throws InvalidUrlException 
 	 */
 	@Override
-	public Map<String, String> decryptUrl(String Url) throws InvalidInputException, InvalidUrlException {
+	public Map<String, String> decryptUrl(String url) throws InvalidInputException, InvalidUrlException {
 		
-		if( Url == null || Url.isEmpty() ){
+		if( url == null || url.isEmpty() ){
 			LOG.error("Parameter to decryptUrl() in VerificationUrlGenerator is null or empty!");
 			throw new InvalidInputException("Parameter to decryptUrl() in VerificationUrlGenerator is null!");
 		}
 		
-		LOG.info("decryptUrl() : parameters: " + Url );
+		LOG.info("decryptUrl() : parameters: " + url );
 		
-		String[] urlSplit = Url.split("q=");
+		String[] urlSplit = url.split("q=");
 		
+		// We check if the url has a q parameter.
 		if(urlSplit.length != 2){
 			LOG.error("Url parameter sent to decryptUrl() of UrlGeneratorImpl is malformed!");
 			throw new InvalidUrlException("Url parameter sent to decryptUrl() of UrlGeneratorImpl is malformed!");			
@@ -180,5 +200,5 @@ public class UrlGeneratorImpl implements URLGenerator {
 						
 		return decryptParameters(parameterCipherText);
 	}
-						
+								
 }
