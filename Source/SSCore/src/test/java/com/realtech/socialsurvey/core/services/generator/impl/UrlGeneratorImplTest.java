@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -15,8 +16,28 @@ import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 
 //JIRA: SS-6: By RM03
 
-
+/**
+ * This the Junit test module for UrlGeneratorImpl in the generator package.
+ */
 public class UrlGeneratorImplTest {	
+	
+	UrlGeneratorImpl generator;
+	Map<String, String> params;
+	
+	/**
+	 * This method is called before the tests are run. 
+	 * Here we initialize the variables required for the tests.
+	 */
+	@Before
+	public void initialize(){
+		
+		generator = new UrlGeneratorImpl();
+		params = new HashMap<String, String>();
+		params.put("fname", "Karthik");
+		params.put("lname", "Srivatsa");
+		
+	}
+	
 	
 	/**
 	 * Tests if InvalidInputException is thrown correctly by generateCipher()
@@ -24,7 +45,6 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidGenerateCipher() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
 		generator.generateCipher(null);
 	}	
 	
@@ -34,12 +54,8 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test
 	public void testValidGenerateCipher() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
 		String url = generator.generateCipher(params);
-		assertNotNull(url);
+		assertEquals(url,"8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d");
 	}
 	
 	/**
@@ -48,7 +64,6 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidGenerateUrlWithoutParam() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
 		generator.generateUrl(null,"http://socialsurvey.com/");
 	}	
 	
@@ -58,10 +73,6 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidGenerateUrlWithoutBaseUrl() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
 		generator.generateUrl(params,"");
 	}	
 	
@@ -71,12 +82,8 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test
 	public void testValidGenerateUrl() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
-		Map<String, String> params = new HashMap<String, String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
 		String url = generator.generateUrl(params,"http://socialsurvey.com/");
-		assertNotNull(url);
+		assertEquals(url,"http://socialsurvey.com/?q=8d0f69ecdc877159750932044ffb68762c7e1c869bc2aab6fd7b7dc9c8df673d");
 	}
 	
 	/**
@@ -85,7 +92,6 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidInputException.class)
 	public void testInvalidDecryptCipher() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
 		generator.generateCipher(null);
 	}	
 	
@@ -95,12 +101,8 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test
 	public void testValidDecryptCipher() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
 		String plainText = generator.decryptCipher(generator.generateCipher(params));
-		assertNotNull(plainText);
+		assertEquals(plainText,"lname=Srivatsa&fname=Karthik");
 	}
 	
 	/**
@@ -109,22 +111,17 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidInputException.class)
 	public void testInvaliddecryptParameters() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
 		generator.decryptParameters(null);
 	}	
 	
 	/**
-	 * Tests if decryptParameters() returns an non null String
+	 * Tests if decryptParameters() returns an non null Map
 	 * @throws InvalidInputException
 	 */
 	@Test
 	public void testValiddecryptParameters() throws InvalidInputException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
 		Map<String,String> decryptedParameters = generator.decryptParameters(generator.generateCipher(params));
-		assertNotNull(decryptedParameters);
+		assertEquals(decryptedParameters,params);
 	}
 	
 	/**
@@ -134,7 +131,6 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidInputException.class)
 	public void testInvaliddecryptUrl() throws InvalidInputException, InvalidUrlException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
 		generator.decryptUrl(null);
 	}	
 	
@@ -145,28 +141,18 @@ public class UrlGeneratorImplTest {
 	 */
 	@Test(expected = InvalidUrlException.class)
 	public void testInvalidUrldecryptUrl() throws InvalidInputException, InvalidUrlException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
 		generator.decryptUrl("saddsfasdfasdf");
 	}	
 	
 	/**
-	 * Tests if decryptUrl() returns an non null String
+	 * Tests if decryptUrl() returns an non null Map of parameters
 	 * @throws InvalidInputException
 	 * @throws InvalidUrlException 
 	 */
 	@Test
 	public void testValiddecryptUrl() throws InvalidInputException, InvalidUrlException {
-		UrlGeneratorImpl generator = new UrlGeneratorImpl();
-		HashMap<String, String> params = new HashMap<String, String>();
-		params.put("fname", "Karthik");
-		params.put("lname", "Srivatsa");
 		Map<String,String> decryptedParameters = generator.decryptUrl(generator.generateUrl(params, "http://www.socialsurvey.com/"));
-		assertNotNull(decryptedParameters);
+		assertEquals(decryptedParameters,params);
 	}
-	
-	
-	
-	
-	
-	
+			
 }
