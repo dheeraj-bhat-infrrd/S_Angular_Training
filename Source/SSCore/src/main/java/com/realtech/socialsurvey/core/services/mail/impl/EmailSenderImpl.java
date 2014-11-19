@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.mail.impl;
 
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-
 import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -10,10 +9,8 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SmtpSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -25,12 +22,12 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 /**
  * Class with utility methods to send mails
  */
-public final class EmailSenderImpl implements EmailSender{
+public final class EmailSenderImpl implements EmailSender {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(EmailSenderImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(EmailSenderImpl.class);
 
 	private Session session;
+	private Message message;
 	private EmailEntity emailEntity;
 	private SmtpSettings smtpSettings;
 
@@ -40,6 +37,14 @@ public final class EmailSenderImpl implements EmailSender{
 
 	public void setSession(Session session) {
 		this.session = session;
+	}
+
+	public Message getMessage() {
+		return message;
+	}
+
+	public void setMessage(Message message) {
+		this.message = message;
 	}
 
 	public EmailEntity getEmailEntity() {
@@ -67,61 +72,45 @@ public final class EmailSenderImpl implements EmailSender{
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void sendMail() throws InvalidInputException,
-			UndeliveredEmailException {
-		if(session == null){
+	public void sendMail() throws InvalidInputException, UndeliveredEmailException {
+		if (session == null) {
 			LOG.error("session is null for sending mail");
-			throw new InvalidInputException(
-					"session is null for sending mail");
+			throw new InvalidInputException("session is null for sending mail");
 		}
 		if (emailEntity == null) {
 			LOG.error("Email entity is null for sending mail");
-			throw new InvalidInputException(
-					"Email entity is null for sending mail");
+			throw new InvalidInputException("Email entity is null for sending mail");
 		}
 		if (smtpSettings == null) {
 			LOG.error("Smtp settings is null for sending mail");
-			throw new InvalidInputException(
-					"Smtp settings is null for sending mail");
+			throw new InvalidInputException("Smtp settings is null for sending mail");
 		}
-		LOG.info("Method sendMail called with smtpSettings : " + smtpSettings
-				+ " and emailEntity : " + emailEntity);
+		LOG.info("Method sendMail called with smtpSettings : " + smtpSettings + " and emailEntity : " + emailEntity);
 
 		int port = smtpSettings.getMailPort();
 
-		if (emailEntity.getSenderEmailId() == null
-				|| emailEntity.getSenderEmailId().isEmpty()) {
+		if (emailEntity.getSenderEmailId() == null || emailEntity.getSenderEmailId().isEmpty()) {
 			LOG.error("Sender email id is not valid for sending mail");
-			throw new InvalidInputException(
-					"Sender email id is not valid for sending mail");
+			throw new InvalidInputException("Sender email id is not valid for sending mail");
 		}
-		if (emailEntity.getSenderName() == null
-				|| emailEntity.getSenderName().isEmpty()) {
+		if (emailEntity.getSenderName() == null || emailEntity.getSenderName().isEmpty()) {
 			LOG.error("Sender name is not valid for sending mail");
-			throw new InvalidInputException(
-					"Sender name is not valid for sending mail");
+			throw new InvalidInputException("Sender name is not valid for sending mail");
 		}
-		if (emailEntity.getSenderPassword() == null
-				|| emailEntity.getSenderPassword().isEmpty()) {
+		if (emailEntity.getSenderPassword() == null || emailEntity.getSenderPassword().isEmpty()) {
 			LOG.error("Sender password is not valid for sending mail");
-			throw new InvalidInputException(
-					"Sender password is not valid for sending mail");
+			throw new InvalidInputException("Sender password is not valid for sending mail");
 		}
 		List<String> recipients = emailEntity.getRecipients();
 		if (recipients == null || recipients.isEmpty()) {
 			LOG.error("Recipient list is empty for sending mail");
-			throw new InvalidInputException(
-					"Recipient list is empty for sending mail");
+			throw new InvalidInputException("Recipient list is empty for sending mail");
 		}
 
-		
 		try {
 			LOG.debug("Preparing transport object for sending mail");
-			Transport transport = session
-					.getTransport(SmtpSettings.MAIL_TRANSPORT);
-			transport.connect(smtpSettings.getMailHost(), port,
-					emailEntity.getSenderEmailId(),
-					emailEntity.getSenderPassword());
+			Transport transport = session.getTransport(SmtpSettings.MAIL_TRANSPORT);
+			transport.connect(smtpSettings.getMailHost(), port, emailEntity.getSenderEmailId(), emailEntity.getSenderPassword());
 			LOG.trace("Connection successful");
 			StringBuilder recipientsSb = new StringBuilder();
 			int count = 0;
@@ -136,26 +125,26 @@ public final class EmailSenderImpl implements EmailSender{
 			LOG.debug("Recipients are : " + recipientsSb);
 
 			// Adding the recipients to address list
-			Address[] addresses = InternetAddress
-					.parse(recipientsSb.toString());
+			Address[] addresses = InternetAddress.parse(recipientsSb.toString());
 
 			// Setting up new MimeMessage
-			Message message = new MimeMessage(session);
-			message.setFrom(new InternetAddress(emailEntity.getSenderEmailId(),
-					emailEntity.getSenderName()));
+			message = new MimeMessage(session);
+			message.setFrom(new InternetAddress(emailEntity.getSenderEmailId(), emailEntity.getSenderName()));
 
 			// Adding the recipients addresses for sending mail as per the
 			// recipient type
 			if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_TO) {
 				message.setRecipients(Message.RecipientType.TO, addresses);
-			} else if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_CC) {
+			}
+			else if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_CC) {
 				message.setRecipients(Message.RecipientType.CC, addresses);
-			} else if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_BCC) {
+			}
+			else if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_BCC) {
 				message.setRecipients(Message.RecipientType.BCC, addresses);
-			} else {
+			}
+			else {
 				LOG.error("Recipients type is not specified for sending mail");
-				throw new InvalidInputException(
-						"Invalid recipient type found for sending mail");
+				throw new InvalidInputException("Invalid recipient type found for sending mail");
 			}
 
 			// Set the subject of mail
@@ -170,12 +159,18 @@ public final class EmailSenderImpl implements EmailSender{
 			transport.close();
 
 			LOG.info("Mail sent successfully. Returning from method sendMail");
-		} catch (MessagingException e) {
+		}
+		catch (MessagingException e) {
 			LOG.error("Messaging exception while sending mail", e);
 			throw new UndeliveredEmailException("Error while sending email", e);
-		} catch (UnsupportedEncodingException e) {
+		}
+		catch (UnsupportedEncodingException e) {
 			LOG.error("Unsupported Encoding Exception while sending mail", e);
 			throw new UndeliveredEmailException("Error while sending email", e);
+		}
+		catch (IllegalStateException e) {
+			LOG.error("Illegal State Exception while sending mail", e);
+			throw new UndeliveredEmailException("Illegal State Exception while sending mail", e);
 		}
 	}
 
