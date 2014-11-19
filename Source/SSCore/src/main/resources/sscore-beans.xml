@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Email sender beans -->
+    <!-- <bean id="emailSender" class="com.realtech.socialsurvey.core.services.mail.impl.EmailSenderImpl" /> -->
+
+    <!--  Email sender for testing -->
+    <bean id="testEmailEntity" class = "com.realtech.socialsurvey.core.entities.EmailEntity" scope="prototype">
+        <property name = "recipients">
+            <list>
+                <value>x@y.com</value>
+            </list>
+        </property>
+        <property name="subject" value="Test Subject"/>
+        <property name="body" value="Test Body"/>
+        <property name="recipientType" value="0"/>
+        <property name="senderEmailId" value="a@b.com"/>
+        <property name="senderName" value="test"/>
+        <property name="senderPassword" value="*******"/>
+    </bean>
+    
+    <bean id="testSmtpSettings" class="com.realtech.socialsurvey.core.entities.SmtpSettings" scope="prototype">
+        <property name="mailHost" value="localhost"/>
+        <property name="mailPort" value="587"/>
+    </bean>
+    
+    <bean id="testEmailSender" class="com.realtech.socialsurvey.core.services.mail.impl.EmailSenderImpl" scope="prototype">
+        <property name="emailEntity" ref="testEmailEntity"/>
+        <property name="smtpSettings" ref="testSmtpSettings"/>
+    </bean>
+	
+</beans>
