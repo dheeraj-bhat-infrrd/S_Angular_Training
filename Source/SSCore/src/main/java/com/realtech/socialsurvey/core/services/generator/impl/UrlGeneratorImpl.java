@@ -22,8 +22,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 public class UrlGeneratorImpl implements URLGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
-	private static EncryptionHelper encryptor = new EncryptionHelper();
-			
+				
 	/**
 	 * Function that takes Map of key,values and returns cipher text.
 	 * AES algorithm used for encryption.
@@ -39,8 +38,9 @@ public class UrlGeneratorImpl implements URLGenerator {
 			throw new InvalidInputException("Parameter to generateCipher() in VerificationUrlGenerator is null!");
 		}
 		
-		LOG.info("generateCipher(): paramaters : " +params.toString());		
+		LOG.info("generateCipher(): paramaters : " +params.toString());	
 		
+		EncryptionHelper encryptor = new EncryptionHelper();
 		StringBuilder plainText = new StringBuilder();
 		
 		// The parameters are arranged in format key=value separated by &.		
@@ -112,6 +112,7 @@ public class UrlGeneratorImpl implements URLGenerator {
 		
 		LOG.info("decryptCipher() : parameters: " + cipherText );
 		
+		EncryptionHelper encryptor = new EncryptionHelper();
 		String plainText = encryptor.decryptAES(cipherText, "");
 		LOG.info("decryptCipher() Output: " + plainText );
 				

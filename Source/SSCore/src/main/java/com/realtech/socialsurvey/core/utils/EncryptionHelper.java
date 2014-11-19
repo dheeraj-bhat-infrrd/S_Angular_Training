@@ -19,10 +19,20 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
+/**
+ * This class houses all the encryption utilities required for the project.
+ *
+ */
+
 public class EncryptionHelper {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
 	
+	/**
+	 * Checks if String is null and returns blank String if it is null.
+	 * @param s is a String to be checked.
+	 * @return the String as it is if not null else a blank string.
+	 */
 	public String getNullSafeString(String s) {
         if (s != null) {
                 return s;
@@ -32,6 +42,12 @@ public class EncryptionHelper {
         }
 	}
 	
+	/**
+	 * Converts a hexadecimal string to a byte array.
+	 * @param hexString
+	 * @return a byte array of the hex string
+	 * @throws InvalidInputException
+	 */
 	public byte[] hexStringToByteArray(String hexString) throws InvalidInputException {
 		
 		if(hexString == null){
@@ -39,14 +55,24 @@ public class EncryptionHelper {
 			throw new InvalidInputException("Null parameter passed to hexStringToByteArray of EncryptionHelper!");
 		}
 		
+		LOG.info(" hexStringToByteArray() : input parameter : " + hexString );
+		
 		int len = hexString.length();
 		byte[] byteArray = new byte[len / 2];
 		for (int i = 0; i < len; i += 2) {
 			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
 		}
+		
+		LOG.info(" hexStringToByteArray() : output : " + byteArray.toString() );
 		return byteArray;
 	}
 
+	/**
+	 * converts a byte array into hexadecimal string.
+	 * @param byteArray
+	 * @return a hexadecimal string of the byte array.
+	 * @throws InvalidInputException
+	 */
 	public String byteArrayToHexString(byte[] byteArray) throws InvalidInputException {
 		
 		if(byteArray == null){
@@ -67,12 +93,16 @@ public class EncryptionHelper {
 			hexString.append(s);
 		}
 		String hexStr = hexString.toString();
-		LOG.info("byteArrayToHexString Output : " + hexStr);
+		LOG.info("byteArrayToHexString() Output : " + hexStr);
 		return hexStr;
 	}
 
-
-	// Algorithm to generate a key to use with AES (256-bit)
+	/**
+	 * Generates SecretKEySpec object from the plain text key.
+	 * @param plainTextKey
+	 * @return a SecretKeySpec object
+	 * @throws InvalidInputException
+	 */
 	public SecretKeySpec generateAES256Key(String plainTextKey) throws InvalidInputException {
 		
 		if(plainTextKey == null){
@@ -80,7 +110,7 @@ public class EncryptionHelper {
 			throw new InvalidInputException("Null parameter passed to generateAES256Key of EncryptionHelper!");
 		}
 		
-		LOG.info("generateAES256Key input parameter : " + plainTextKey);
+		LOG.info("generateAES256Key() :  input parameter : " + plainTextKey);
 		
 		byte[] key;
 		// Random salt
@@ -95,12 +125,15 @@ public class EncryptionHelper {
 			key = hexStringToByteArray("43c2fbc4e027b47c3d8eaff48f1bcb4fa3ecbe0585b1993e5f92b0b07b92eebb");
 		}
 		return new SecretKeySpec(key, "AES");
-	//		return new SecretKeySpec("0123456789012345".getBytes(), "AES");
 	}
-
-
 	
-	// Call encryptAES instead
+	/**
+	 * Converts the plain text byte array using the key into encrypted byte array.
+	 * @param plainText
+	 * @param key
+	 * @return encrypted text Byte Array
+	 * @throws InvalidInputException
+	 */
 	private byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException{
 		
 		if(plainText == null){
@@ -144,7 +177,13 @@ public class EncryptionHelper {
 		return encryptBytes;
 	}
 
-	// Call decryptAES instead
+	/**
+	 * Converts cipher text byte array using the key into plain text byte array.
+	 * @param encryptedText
+	 * @param key
+	 * @return plain text Byte Array
+	 * @throws InvalidInputException
+	 */
 	private byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException{
 		
 		if(encryptedText == null){
@@ -188,8 +227,14 @@ public class EncryptionHelper {
 		return decryptBytes;
 	}
 
-
-	// Encrypt string with AES 256
+	/**
+	 * Takes the plain text String and key String and uses AES encryption to convert it to
+	 * cipher text.
+	 * @param plainText
+	 * @param plainTextKey
+	 * @return cipher text String
+	 * @throws InvalidInputException
+	 */
 	public String encryptAES(String plainText, String plainTextKey) throws InvalidInputException {
 		if(plainText == null){
 			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
@@ -206,7 +251,14 @@ public class EncryptionHelper {
 		return encryptedText;
 	}
 
-	// Decrypt string with AES 256
+	/**
+	 * Takes the encrypted hexadecimal String and the key String and uses AES algorithm
+	 * to convert it to plain text String
+	 * @param encryptedHexString
+	 * @param plainTextKey
+	 * @return plain text String
+	 * @throws InvalidInputException
+	 */
 	public String decryptAES(String encryptedHexString, String plainTextKey) throws InvalidInputException {
 		if(encryptedHexString == null){
 			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
@@ -219,9 +271,8 @@ public class EncryptionHelper {
 		
 		LOG.info("encryptAES() input parameters : " + encryptedHexString + " " + plainTextKey);
 		String plainText = new String(decryptAES256Bytes(hexStringToByteArray(encryptedHexString), generateAES256Key(plainTextKey)));
+		LOG.info("decryptAES() output : " + plainText);
 		return plainText;
-	}
-	
-	
+	}		
  
 }
