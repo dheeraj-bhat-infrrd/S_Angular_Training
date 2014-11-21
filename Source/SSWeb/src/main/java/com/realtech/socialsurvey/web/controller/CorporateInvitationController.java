@@ -12,7 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.authentication.CaptchaValidaion;
+import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -22,7 +22,7 @@ public class CorporateInvitationController {
 	private static final Logger LOG = LoggerFactory.getLogger(CorporateInvitationController.class);
 	
 	@Autowired
-	CaptchaValidaion captchaValidation;
+	CaptchaValidation captchaValidation;
 	@Autowired
 	private RegistrationService registrationService;
 	
