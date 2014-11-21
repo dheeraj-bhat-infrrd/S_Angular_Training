@@ -43,7 +43,7 @@ public class UrlGeneratorImplTest {
 	
 	@BeforeClass
 	public static void before(){
-		context = new ClassPathXmlApplicationContext("sscore-beans.xml");
+		context = new ClassPathXmlApplicationContext("sscore-all-test-config.xml");
 	}
 	
 	@AfterClass

@@ -1,13 +1,19 @@
 package com.realtech.socialsurvey.core.entities;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 // JIRA: SS-7: By RM02: BOC
 
 /**
  * Entity containing the smtp settings for sending mail
  */
+@Component
 public class SmtpSettings {
 
+	@Value("${SMTP_HOST}")
 	private String mailHost;
+	@Value("${SMTP_PORT}")
 	private int mailPort;
 
 	public static String MAIL_SMTP_AUTH = "true";
