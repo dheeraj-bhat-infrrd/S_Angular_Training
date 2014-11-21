@@ -23,12 +23,15 @@ public class ReCaptchaValidationImpl implements CaptchaValidation {
 		LOG.info("Checking if Captch is Valid for remoteAddress : " + remoteAddress + "\t challenge : " + challenge + "\t Response : " + response);
 
 		if (remoteAddress == null || remoteAddress.isEmpty()) {
+			LOG.error("Invalid remote address passed");
 			throw new InvalidInputException("Remote address can not be null or empty");
 		}
 		if (challenge == null || challenge.isEmpty()) {
+			LOG.error("Invalid challenge passed");
 			throw new InvalidInputException("challenge field can not be null or empty");
 		}
 		if (response == null || response.isEmpty()) {
+			LOG.error("Invalid response passed");
 			throw new InvalidInputException("response field can not be null or empty");
 		}
 		ReCaptchaResponse captchaResponse = reCaptcha.checkAnswer(remoteAddress, challenge, response);
