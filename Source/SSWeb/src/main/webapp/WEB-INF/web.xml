@@ -7,20 +7,6 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 
     <display-name>SSWeb</display-name>
     
-   <!--
-		- Location of the XML file that defines the root application context.
-		- Applied by ContextLoaderListener.
-	-->
-    <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>classpath:spring/application-config.xml</param-value>
-    </context-param>
-
-    <listener>
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-    </listener>
-    
-    
     <!--
 		- Servlet that dispatches request to registered handlers (Controller implementations).
 	-->
