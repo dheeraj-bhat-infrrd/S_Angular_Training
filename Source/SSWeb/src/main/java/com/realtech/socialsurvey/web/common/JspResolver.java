@@ -7,4 +7,5 @@ package com.realtech.socialsurvey.web.common;
 public interface JspResolver {
 
 	public static final String CORPORATE_INVITATION = "corporateinvitation";
+	public static final String INVITATION = "invitation";
 }
