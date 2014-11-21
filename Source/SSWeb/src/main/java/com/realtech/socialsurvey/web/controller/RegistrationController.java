@@ -18,9 +18,9 @@ import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 @Controller
-public class CorporateInvitationController {
+public class RegistrationController {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CorporateInvitationController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
 	
 	@Autowired
 	CaptchaValidation captchaValidation;
