@@ -6,7 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
@@ -18,9 +19,11 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
  * This class uses the AES algorithm to generate URL from the parameters by encoding them into the URL. 
  * It also has function to decrypt a URL and extract the Map of parameters from them.
  */
+@Component
 public class UrlGeneratorImpl implements URLGenerator {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
+	@Autowired
 	private EncryptionHelper encryptionHelper;
 			
 	/**

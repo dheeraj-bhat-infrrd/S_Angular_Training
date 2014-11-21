@@ -53,7 +53,7 @@ public class Company implements Serializable {
 
 	//bi-directional many-to-one association to Survey
 	@OneToOne(mappedBy="company")
-	private List<Survey> surveys;
+	private Survey survey;
 
 	//bi-directional many-to-one association to SurveyQuestion
 	@OneToMany(mappedBy="company")
@@ -218,26 +218,14 @@ public class Company implements Serializable {
 		return region;
 	}
 
-	public List<Survey> getSurveys() {
-		return this.surveys;
-	}
-
-	public void setSurveys(List<Survey> surveys) {
-		this.surveys = surveys;
-	}
-
-	public Survey addSurvey(Survey survey) {
-		getSurveys().add(survey);
-		survey.setCompany(this);
-
+	
+	
+	public Survey getSurvey() {
 		return survey;
 	}
 
-	public Survey removeSurvey(Survey survey) {
-		getSurveys().remove(survey);
-		survey.setCompany(null);
-
-		return survey;
+	public void setSurvey(Survey survey) {
+		this.survey = survey;
 	}
 
 	public List<SurveyQuestion> getSurveyQuestions() {
