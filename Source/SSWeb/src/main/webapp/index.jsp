@@ -11,7 +11,8 @@
 		<title>Welcome</title>
 	</head> 
 	<body>
-		<c:url value="/showMessage.html" var="messageUrl" />
-		<a href="${messageUrl}">Click to enter</a>
+		<h3>
+		<a href="./invitation.do">Click here to Register</a>
+		</h3>
 	</body>
 </html>
