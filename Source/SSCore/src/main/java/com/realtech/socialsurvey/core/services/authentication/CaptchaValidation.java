@@ -4,7 +4,7 @@ package com.realtech.socialsurvey.core.services.authentication;
  * Validates the captcha information provided
  *
  */
-public interface CaptchaValidaion {
+public interface CaptchaValidation {
 
 	/**
 	 * Checks if the provided captcha is valid.
