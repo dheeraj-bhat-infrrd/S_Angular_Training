@@ -14,23 +14,33 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.SmtpSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
+@Component
 @PrepareForTest({ Session.class, EmailSenderImpl.class })
 @RunWith(PowerMockRunner.class)
 public class EmailSenderTest {
 
+	@Autowired
 	EmailSenderImpl emailSender;
+//	@InjectMocks
+//	EmailSenderImpl injectedEmailSender;
+//	@Mock
+//	SmtpSettings smtpSetings;
 	@Mock
 	Session mockSession;
 	@Mock
@@ -54,8 +64,7 @@ public class EmailSenderTest {
 
 	@Test(expected = InvalidInputException.class)
 	public void testNullSmtpSettings() throws InvalidInputException, UndeliveredEmailException {
-		emailSender.setSmtpSettings(null);
-		emailSender.sendMail();
+		emailSender.sendMail(new EmailEntity(), null, null);
 	}
 
 	@Test(expected = InvalidInputException.class)
