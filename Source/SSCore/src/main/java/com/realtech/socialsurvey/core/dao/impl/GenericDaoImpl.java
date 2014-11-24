@@ -44,10 +44,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public T findById(ID id) {
+	public T findById(Class<T> entityClass, ID id) {
 		T entity;
 		try {
-			entity = (T) getSession().load(getPersistentClass(), id);
+			entity = (T) getSession().load(entityClass, id);
 		} catch (HibernateException e) {
 			throw e;
 		}
