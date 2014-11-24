@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -65,14 +66,13 @@ public class RegistrationController {
 				catch (InvalidInputException e) {
 					LOG.error("InvalidInputException while inviting corporate to register", e);
 				}
-				/*
-				 * catch (UndeliveredEmailException e) {
-				 * LOG.error("UndeliveredEmailException while inviting corporate to register", e); }
-				 */
+				catch (UndeliveredEmailException e) {
+					LOG.error("UndeliveredEmailException while inviting corporate to register", e);
+				}
 			}
 			else {
 				LOG.debug("Captcha validation failed");
-				model.addAttribute("displaymessage", "Get value from constants");
+				model.addAttribute("displaymessage", "Captcha Validation failed");
 			}
 		}
 		catch (InvalidInputException e) {
