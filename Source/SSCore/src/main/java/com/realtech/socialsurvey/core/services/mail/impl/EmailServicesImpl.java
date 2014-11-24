@@ -54,7 +54,7 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("Firstname is empty or null for sending registration invite mail ");
 		}
 
-		EmailEntity emailEntity = prepareEmailForRegistrationInvite(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
 
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REGISTRATION_INVITATION_MAIL_SUBJECT;
 
@@ -85,7 +85,7 @@ public class EmailServicesImpl implements EmailServices {
 	 * @param recipientMailId
 	 * @return
 	 */
-	private EmailEntity prepareEmailForRegistrationInvite(String recipientMailId) {
+	private EmailEntity prepareEmailEntityForRegistrationInvite(String recipientMailId) {
 		LOG.debug("Preparing email entity for registration invitation for recipientMailId " + recipientMailId);
 		List<String> recipients = new ArrayList<String>();
 		recipients.add(recipientMailId);

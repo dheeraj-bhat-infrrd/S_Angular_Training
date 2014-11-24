@@ -129,7 +129,7 @@ public final class EmailSenderImpl implements EmailSender {
 		LOG.info("Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : " + subjectFileName
 				+ " and messageBodyReplacements : " + messageBodyReplacements);
 
-		if (subjectFileName == null) {
+		if (subjectFileName == null || subjectFileName.isEmpty()) {
 			throw new InvalidInputException("Subject file name is null for sending mail");
 		}
 		if (messageBodyReplacements == null) {

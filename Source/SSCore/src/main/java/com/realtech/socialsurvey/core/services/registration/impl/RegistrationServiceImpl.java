@@ -5,6 +5,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -22,23 +23,24 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	@Autowired
 	private URLGenerator urlGenerator;
-	
+
+	@Value("{APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+
 	@Autowired
-	EmailServices emailServices;
+	private EmailServices emailServices;
 
 	@Override
 	public void inviteCorporateToRegister(String firstName, String lastName, String emailId) throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName + "\t email id: " + emailId);
 
-		// TODO: Retrieve base url
-		String baseUrl = "www.socialsurvey.com";
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put("firstName", firstName);
 		urlParams.put("lastName", lastName);
 		urlParams.put("emailId", emailId);
 
 		LOG.debug("Generating URL");
-		String url = urlGenerator.generateUrl(urlParams, baseUrl);
+		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl);
 
 		LOG.debug("Sending invitation for registration");
 		inviteUser(url, emailId, firstName, lastName);
