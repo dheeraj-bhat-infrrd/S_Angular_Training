@@ -16,10 +16,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
+import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.SmtpSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.utils.FileOperations;
 
 // JIRA: SS-7: By RM02: BOC
 
@@ -34,16 +36,18 @@ public final class EmailSenderImpl implements EmailSender {
 	@Autowired
 	private SmtpSettings smtpSettings;
 
+	@Autowired
+	private FileOperations fileOperations;
+
 	/**
 	 * Method to send mail with provided email entity and smtp settings
 	 * 
 	 * @param emailEntity
-	 * @param smtpSettings
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void sendMail(EmailEntity emailEntity, String fileNameForMessageSubject, String fileNameForMessageBody) throws InvalidInputException, UndeliveredEmailException {
+	public void sendMail(EmailEntity emailEntity) throws InvalidInputException, UndeliveredEmailException {
 		if (emailEntity == null) {
 			LOG.error("Email entity is null for sending mail");
 			throw new InvalidInputException("Email entity is null for sending mail");
@@ -73,18 +77,10 @@ public final class EmailSenderImpl implements EmailSender {
 			LOG.error("Recipient list is empty for sending mail");
 			throw new InvalidInputException("Recipient list is empty for sending mail");
 		}
-		// check if subject needs to be read from a file
-		if (fileNameForMessageSubject != null && !fileNameForMessageSubject.isEmpty()) {
-			emailEntity.setSubject(readSubjectFromFile());
-		}
-		
-		if(fileNameForMessageBody != null && !fileNameForMessageBody.isEmpty()){
-			emailEntity.setBody(readBodyFromFile());
-		}
-		
-		// Create the session object
+
+		// Create the mail session object
 		Session session = createSession();
-				
+
 		try {
 			LOG.debug("Preparing transport object for sending mail");
 			Transport transport = session.getTransport(SmtpSettings.MAIL_TRANSPORT);
@@ -96,6 +92,7 @@ public final class EmailSenderImpl implements EmailSender {
 
 			// Setting up new MimeMessage
 			Message message = createMessage(emailEntity, session, addresses);
+
 			// Send the mail
 			LOG.debug("Mail to be sent : " + emailEntity.getBody());
 			transport.sendMessage(message, addresses);
@@ -117,7 +114,53 @@ public final class EmailSenderImpl implements EmailSender {
 		}
 	}
 
-	// creates a session object
+	/**
+	 * Method to mail with subject and body provided from templates and mail body replacements
+	 * required
+	 * 
+	 * @param emailEntity
+	 * @param subjectFileName
+	 * @param messageBodyReplacements
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendEmailWithBodyReplacements(EmailEntity emailEntity, String subjectFileName, FileContentReplacements messageBodyReplacements)
+			throws InvalidInputException, UndeliveredEmailException {
+		LOG.info("Method sendEmailWithBodyReplacements called for emailEntity : " + emailEntity + " subjectFileName : " + subjectFileName
+				+ " and messageBodyReplacements : " + messageBodyReplacements);
+
+		if (subjectFileName == null || subjectFileName.isEmpty()) {
+			throw new InvalidInputException("Subject file name is null for sending mail");
+		}
+		if (messageBodyReplacements == null) {
+			throw new InvalidInputException("Email body file name  and replacements are null for sending mail");
+		}
+
+		/**
+		 * Read the subject template to get the subject and set in emailEntity
+		 */
+		LOG.debug("Reading template to set the mail subject");
+		emailEntity.setSubject(fileOperations.getContentFromFile(subjectFileName));
+
+		/**
+		 * Read the mail body template, replace the required contents with arguments provided and
+		 * set in emailEntity
+		 */
+		LOG.debug("Reading template to set the mail body");
+		emailEntity.setBody(fileOperations.replaceFileContents(messageBodyReplacements));
+
+		// Send the mail
+		sendMail(emailEntity);
+
+		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
+
+	}
+
+	/**
+	 * Method to create mail session
+	 * 
+	 * @return
+	 */
 	private Session createSession() {
 		LOG.debug("Preparing session object for sending mail");
 		Properties properties = new Properties();
@@ -128,7 +171,13 @@ public final class EmailSenderImpl implements EmailSender {
 		return mailSession;
 	}
 
-	// creates addresses from the recipient list
+	/**
+	 * Method creates addresses from the recipient list
+	 * 
+	 * @param recipients
+	 * @return
+	 * @throws AddressException
+	 */
 	private Address[] createRecipientAddresses(List<String> recipients) throws AddressException {
 		LOG.debug("Creating recipient addresses");
 		StringBuilder recipientsSb = new StringBuilder();
@@ -148,15 +197,26 @@ public final class EmailSenderImpl implements EmailSender {
 		return addresses;
 	}
 
-	// created a Mime Message
-	private Message createMessage(EmailEntity emailEntity, Session session, Address[] addresses) throws UnsupportedEncodingException, MessagingException,
-			InvalidInputException {
+	/**
+	 * Method creates a Mime Message
+	 * 
+	 * @param emailEntity
+	 * @param session
+	 * @param addresses
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws MessagingException
+	 * @throws InvalidInputException
+	 */
+	private Message createMessage(EmailEntity emailEntity, Session session, Address[] addresses) throws UnsupportedEncodingException,
+			MessagingException, InvalidInputException {
 		LOG.debug("Creating message");
 		Message message = new MimeMessage(session);
 		message.setFrom(new InternetAddress(emailEntity.getSenderEmailId(), emailEntity.getSenderName()));
 
-		// Adding the recipients addresses for sending mail as per the
-		// recipient type
+		/**
+		 * Adding the recipients addresses for sending mail as per the recipient type
+		 */
 		if (emailEntity.getRecipientType() == EmailEntity.RECIPIENT_TYPE_TO) {
 			message.setRecipients(Message.RecipientType.TO, addresses);
 		}
@@ -177,16 +237,6 @@ public final class EmailSenderImpl implements EmailSender {
 		// Set the mail body
 		message.setContent(emailEntity.getBody(), "text/html");
 		return message;
-	}
-
-	private String readSubjectFromFile() {
-
-		return null;
-	}
-
-	private String readBodyFromFile() {
-
-		return null;
 	}
 
 }
