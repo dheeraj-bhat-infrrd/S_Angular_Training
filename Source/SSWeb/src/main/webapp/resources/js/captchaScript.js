@@ -25,21 +25,30 @@ function captchaLoaded() {
 						validators : {
 							notEmpty : {
 								message : 'First name can\'t be empty'
-							}
+							},
+							regexp: {
+		                        regexp: /^[a-z]+$/i,
+		                        message: 'Can only contain alphabets'
+		                    }
 						}
 					},
 					lastName : {
 						validators : {
-							notEmpty : {
-								message : 'Last name can\'t be empty'
-							}
+							regexp: {
+		                        regexp: /^[a-z\s]+$/i,
+		                        message: 'Can only contain alphabets'
+		                    }
 						}
 					},
 					emailId : {
 						validators : {
 							notEmpty : {
 								message : 'Email Id can\'t be empty'
-							}
+							},
+							regexp: {
+		                        regexp: /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]\.[0-9]\.[0-9]\.[0-9]\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]+))$/,
+		                        message: 'Email address not valid'
+		                    }
 						}
 					}
 				}

@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+// JIRA : SS-13 by RM-06 : BOC
+
 /**
- * Sends an invitation to the corporate admin
+ * Registration Controller Sends an invitation to the corporate admin
  */
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,13 +30,12 @@ public class RegistrationController {
 	@Autowired
 	private RegistrationService registrationService;
 
-	@RequestMapping(value="/invitation")
-	public String initRegisterPage(){
+	@RequestMapping(value = "/invitation")
+	public String initRegisterPage() {
 		LOG.info("Registration Step 1");
-		return JspResolver.INVITATION; 
+		return JspResolver.INVITATION;
 	}
-	
-	
+
 	@RequestMapping(value = "/corporateinvite", method = RequestMethod.POST)
 	public String inviteCorporate(Model model, HttpServletRequest request) {
 		LOG.info("Sending invitation to corporate");
@@ -43,13 +44,21 @@ public class RegistrationController {
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String emailId = request.getParameter("emailId");
-		// TODO: validate request parameters from the form
+
+		// validate request parameters from the form
+		if (isFormParametersValid(firstName, lastName, emailId)) {
+			LOG.debug("Valid parameters passed");
+		}
+		else {
+			LOG.error("Invalid arguments passed in form");
+			model.addAttribute("displaymessage", "Invalid arguments passed in form");
+		}
 
 		// validate captcha
 		try {
 			if (validateCaptcha(request)) {
 				LOG.debug("Captcha validation successful");
-				
+
 				// continue with the invitation
 				try {
 					registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
@@ -63,7 +72,7 @@ public class RegistrationController {
 			}
 			else {
 				LOG.debug("Captcha validation failed");
-				model.addAttribute("displaymessage", "Get value from constants");
+				model.addAttribute("displaymessage", "Captcha Validation failed");
 			}
 		}
 		catch (InvalidInputException e) {
@@ -72,6 +81,9 @@ public class RegistrationController {
 		return JspResolver.CORPORATE_INVITATION;
 	}
 
+	/*
+	 * Check if captcha is valid
+	 */
 	private boolean validateCaptcha(HttpServletRequest request) throws InvalidInputException {
 		LOG.debug("Validating captcha informations");
 		String remoteAddress = request.getRemoteAddr();
@@ -79,4 +91,27 @@ public class RegistrationController {
 		String captchaResponse = request.getParameter("recaptcha_response_field");
 		return captchaValidation.isCaptchaValid(remoteAddress, captchaChallenge, captchaResponse);
 	}
+
+	/*
+	 * Check if input parameters from form are valid
+	 */
+	private boolean isFormParametersValid(String fName, String lName, String emailId) {
+
+		String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+		String ALPHA_REGEX = "[a-zA-Z]+";
+
+		// check if first name is null or empty and only contains alpahabets
+		if (fName == null || fName.isEmpty() || !fName.matches(ALPHA_REGEX))
+			return false;
+		// check if first name is not null and not empty and only contains alpahabets
+		if (!(lName != null && !lName.isEmpty() && lName.matches(ALPHA_REGEX)))
+			return false;
+		// check if email Id isEmpty, null or whether it matches the regular expression or not
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(EMAIL_REGEX))
+			return false;
+
+		return true;
+	}
 }
+
+// JIRA : SS-13 by RM-06 : EOC
