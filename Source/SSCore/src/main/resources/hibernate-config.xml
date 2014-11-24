@@ -11,39 +11,36 @@
         http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/tx
         http://www.springframework.org/schema/tx/spring-tx.xsd">
-	
-	<bean id="dataSource"
-		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-		<property name="url">
-			<value>${MYSQL_DB_URL}</value>
-		</property>
-		<property name="driverClassName">
-			<value>${MYSQL_DRIVER}</value>
-		</property>
 
-		<property name="username">
-			<value>${MYSQL_DB_USER}</value>
-		</property>
-		<property name="password">
-			<value>${MYSQL_DB_PASS}</value>
+	<!-- Data source details. It is pointing to jndi which is currently configured in JBoss -->
+	<bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		<property name="jndiName">
+			<value>${JNDI_NAME}</value>
 		</property>
 	</bean>
-
 
 	<bean id="sessionFactory"
 		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
 		<property name="dataSource" ref="dataSource" />
 		<property name="hibernateProperties">
 			<props>
-				<!-- <prop key="hibernate.dialect">${jdbc.dialect}</prop> -->
 				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
 				<prop key="hibernate.show_sql">false</prop>
 				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<!-- Configurations specific to c3p0 connection pooling -->
+				
+				<prop key="hibernate.c3p0.acquire_increment">5</prop>
+				<prop key="hibernate.c3p0.idle_test_period">1800</prop>
+				<prop key="hibernate.c3p0.max_size">600</prop>
+				<prop key="hibernate.c3p0.max_statements">50</prop>
+				<prop key="hibernate.c3p0.min_size">5</prop>
+				<prop key="hibernate.c3p0.timeout">1800</prop>
 			</props>
 		</property>
 		<property name="annotatedClasses">
 			<list>
-				<value>com.realtech.socialsurvey.core.entities.AccountsMaster</value>
+				<value>com.realtech.socialsurvey.core.entities.AccountsMaster
+				</value>
 				<value>com.realtech.socialsurvey.core.entities.Branch</value>
 				<value>com.realtech.socialsurvey.core.entities.Company</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyInvitationLicenseKey
@@ -51,10 +48,12 @@
 				<value>com.realtech.socialsurvey.core.entities.LicenseDetail</value>
 				<value>com.realtech.socialsurvey.core.entities.OrganizationLevelSetting
 				</value>
-				<value>com.realtech.socialsurvey.core.entities.ProfilesMaster</value>
+				<value>com.realtech.socialsurvey.core.entities.ProfilesMaster
+				</value>
 				<value>com.realtech.socialsurvey.core.entities.Region</value>
 				<value>com.realtech.socialsurvey.core.entities.Survey</value>
-				<value>com.realtech.socialsurvey.core.entities.SurveyQuestion</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyQuestion
+				</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption
 				</value>
 				<value>com.realtech.socialsurvey.core.entities.User</value>
@@ -65,6 +64,8 @@
 	</bean>
 
 	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<!-- Transaction Manager being used for hibernate transactions -->
 	<bean id="transactionManager"
 		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory" />
