@@ -82,8 +82,9 @@ public class EmailEntity {
 	@Override
 	public String toString() {
 		return "EmailEntity [recipients=" + recipients + ", subject=" + subject + ", body=" + body + ", recipientType=" + recipientType
-				+ ", senderEmailId=" + senderEmailId + ", senderName=" + senderName + "]";
+				+ ", senderEmailId=" + senderEmailId + ", senderName=" + senderName;
 	}
+
 }
 
 // JIRA: SS-7: By RM02: EOC
