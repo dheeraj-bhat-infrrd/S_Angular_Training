@@ -1,3 +1,4 @@
+//JIRA: SS-12: Captcha Validation implementation: RM06: BOC
 package com.realtech.socialsurvey.core.services.authentication.impl;
 
 import net.tanesha.recaptcha.ReCaptcha;
@@ -34,12 +35,20 @@ public class ReCaptchaValidationImpl implements CaptchaValidation {
 			LOG.error("Invalid response passed");
 			throw new InvalidInputException("response field can not be null or empty");
 		}
-		ReCaptchaResponse captchaResponse = reCaptcha.checkAnswer(remoteAddress, challenge, response);
-		boolean isCaptchaValid = captchaResponse.isValid();
+		boolean isCaptchaValid = validateCaptcha(remoteAddress, challenge, response);
 
 		LOG.debug("isCaptcha valid " + isCaptchaValid);
 
 		return isCaptchaValid;
 	}
+	
+	// validates the captcha
+	private boolean validateCaptcha(String remoteAddress, String challenge, String response){
+		LOG.debug("Validationg captcha for remote address: "+remoteAddress+"\t challenge: "+challenge+"\t response: "+response);
+		ReCaptchaResponse captchaResponse = reCaptcha.checkAnswer(remoteAddress, challenge, response);
+		return captchaResponse.isValid();
+	}
 
 }
+
+//JIRA: SS-12: Captcha Validation implementation: RM06: EOC
