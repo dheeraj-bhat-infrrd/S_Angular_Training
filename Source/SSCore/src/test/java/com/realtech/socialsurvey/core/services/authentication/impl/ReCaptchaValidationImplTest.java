@@ -26,21 +26,21 @@ public class ReCaptchaValidationImplTest {
 	
 	
 	@Before
-	public void setUp() throws Exception {}
+	public void setUp() throws Exception {
+		captchaImp = PowerMockito.spy(new ReCaptchaValidationImpl());
+	}
 
 	@After
 	public void tearDown() throws Exception {}
 
 	@Test
 	public void testIsCaptchaValid() throws Exception {
-		captchaImp = PowerMockito.spy(new ReCaptchaValidationImpl());
 		PowerMockito.doReturn(true).when(captchaImp, "validateCaptcha", Matchers.anyString(), Matchers.anyString(), Matchers.anyString());
 		assertEquals(true, captchaImp.isCaptchaValid("localhost", "abc", "xyz"));
 	}
 	
 	@Test
 	public void testInvalidCaptcha() throws Exception{
-		captchaImp = PowerMockito.spy(new ReCaptchaValidationImpl());
 		PowerMockito.doReturn(false).when(captchaImp, "validateCaptcha", Matchers.anyString(), Matchers.anyString(), Matchers.anyString());
 		assertEquals(false, captchaImp.isCaptchaValid("localhost", "abc", "xyz"));
 	}
