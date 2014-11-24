@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
+import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 // JIRA: SS-7: By RM02: BOC
@@ -25,8 +26,13 @@ public final class FileOperations {
 	 * 
 	 * @param fileName
 	 * @return
+	 * @throws InvalidInputException
 	 */
-	public String getContentFromFile(String fileName) {
+	public String getContentFromFile(String fileName) throws InvalidInputException {
+		if (fileName == null || fileName.isEmpty()) {
+			LOG.error("filename is null or empty while getting content from file");
+			throw new InvalidInputException("File name is null or empty while getting contents from file");
+		}
 		LOG.debug("Getting content from file : " + fileName);
 		StringBuilder fileContentSb = new StringBuilder();
 		String strLine = "";
@@ -47,6 +53,7 @@ public final class FileOperations {
 		}
 		catch (IOException e) {
 			LOG.error("IOException occured while reading file.Reason : " + e.getMessage(), e);
+			throw new FatalException("IOException occured while reading file.Reason : " + e.getMessage(), e);
 		}
 		LOG.debug("File reading complete.Returning : " + content);
 		return content;
