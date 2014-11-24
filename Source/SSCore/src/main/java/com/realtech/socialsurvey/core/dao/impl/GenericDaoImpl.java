@@ -9,7 +9,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.dao.GenericDao;
 
@@ -19,30 +20,18 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
  * This is the base Dao which needs to be extended by each Dao. It contains
  * implementation for basic CRUD methods required by every Dao.
  */
+@Component
 public class GenericDaoImpl<T, ID extends Serializable> implements
 		GenericDao<T, ID> {
 
 	private Class<T> persistentClass;
+	@Autowired
 	private SessionFactory sessionFactory;
-	private Session session;
 
-	public void setSession(Session s) {
-		this.session = s;
-	}
-
-	public SessionFactory getSessionFactory() {
-		return sessionFactory;
-	}
-
-	public void setSessionFactory(SessionFactory sessionFactory) {
-		this.sessionFactory = sessionFactory;
-	}
-
-	@Transactional
 	protected Session getSession() {
+		Session session;
 		try {
-			if (session == null)
-				session = sessionFactory.openSession();
+			session = sessionFactory.getCurrentSession();
 		} catch (HibernateException e) {
 			throw e;
 		}
@@ -97,7 +86,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	}
 
 	@Override
-	@Transactional
 	public T save(T entity) {
 		try {
 			getSession().save(entity);
