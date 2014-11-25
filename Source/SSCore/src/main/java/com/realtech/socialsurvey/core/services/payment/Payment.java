@@ -10,6 +10,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
  */
 public interface Payment {
 	
-	public void subscribe(User user, Company company, int accountsMasterId, String planId, String nonce) throws NonFatalException;
+	public boolean subscribe(User user, Company company, int accountsMasterId, String planId, String nonce) throws NonFatalException;
 
 }
