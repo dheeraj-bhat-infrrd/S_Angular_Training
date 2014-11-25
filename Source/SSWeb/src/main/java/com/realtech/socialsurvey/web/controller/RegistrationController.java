@@ -5,6 +5,7 @@ package com.realtech.socialsurvey.web.controller;
  */
 
 import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
@@ -59,6 +61,9 @@ public class RegistrationController {
 				}
 				catch (UndeliveredEmailException e) {
 					LOG.error("UndeliveredEmailException while inviting corporate to register", e);
+				}
+				catch (NonFatalException e) {
+					LOG.error("NonFatalException while inviting corporate to register", e);
 				}
 			}
 			else {
