@@ -25,5 +25,13 @@ public class UndeliveredEmailException extends NonFatalException {
 		super(message, thrw);
 	}
 
+	public UndeliveredEmailException(String message, String errorCode, Throwable thrw) {
+		super(message, errorCode, thrw);
+	}
+
+	public UndeliveredEmailException(String message, String errorCode) {
+		super(message, errorCode);
+	}
+
 }
 // JIRA: SS-7: By RM02: EOC
