@@ -8,4 +8,5 @@ public interface JspResolver {
 
 	public static final String CORPORATE_INVITATION = "corporateinvitation";
 	public static final String INVITATION = "invitation";
+	public static final String ERROR_PAGE = "errorpage";
 }
