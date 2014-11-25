@@ -15,6 +15,8 @@
 	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/bootstrapValidator.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/resources/js/registerScript.js"></script>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -35,20 +37,19 @@
 					<div class="formBody" id="invitationBody">
 						<div class="formBodyMainText"><spring:message code="label.invitation.key"></spring:message></div>
 						<div class="formContainer">
-							<form role="form" id="registerForm" method="post"
-								action="./corporateinvite.do">
+							<form role="form" id="registerForm" onsubmit="validateInvitationForm();">
 								<div class="form-group formInputField">
-									<input id="regStep1FirstName" name="firstName"
+									<input id="firstName" name="firstName"
 										class="form-control formInput" type="text"
 										placeholder="First Name">
 								</div>
 								<div class="form-group formInputField">
-									<input id="regStep1LastName" name="lastName"
+									<input id="lastName" name="lastName"
 										class="form-control formInput" type="text"
 										placeholder="Last Name">
 								</div>
 								<div class="form-group formInputField">
-									<input id="regStep1EmailId" name="emailId"
+									<input id="emailId" name="emailId"
 										class="form-control formInput" type="email"
 										placeholder="Email ID">
 								</div>
