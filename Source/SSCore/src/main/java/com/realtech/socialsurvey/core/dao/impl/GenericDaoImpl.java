@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 
 //JIRA: SS-8: By RM05: BOC
 
@@ -32,8 +33,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 		Session session;
 		try {
 			session = sessionFactory.getCurrentSession();
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught while getting session. ",
+					hibernateException);
 		}
 		return session;
 	}
@@ -44,12 +47,14 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public T findById(ID id) {
+	public T findById(Class<T> entityClass, ID id) {
 		T entity;
 		try {
-			entity = (T) getSession().load(getPersistentClass(), id);
-		} catch (HibernateException e) {
-			throw e;
+			entity = (T) getSession().load(entityClass, id);
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in findById(). ",
+					hibernateException);
 		}
 		return entity;
 	}
@@ -58,8 +63,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	public List<T> findAll() {
 		try {
 			return findByCriteria();
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in findAll().",
+					hibernateException);
 		}
 	}
 
@@ -67,11 +74,17 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	@SuppressWarnings("unchecked")
 	public List<T> findByExample(T exampleInstance, String[] excludeProperty) {
 		Criteria crit = getSession().createCriteria(getPersistentClass());
-		Example example = Example.create(exampleInstance);
-		for (String exclude : excludeProperty) {
-			example.excludeProperty(exclude);
+		try {
+			Example example = Example.create(exampleInstance);
+			for (String exclude : excludeProperty) {
+				example.excludeProperty(exclude);
+			}
+			crit.add(example);
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in findByCriteria().",
+					hibernateException);
 		}
-		crit.add(example);
 		return crit.list();
 	}
 
@@ -79,8 +92,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	public T saveOrUpdate(T entity) {
 		try {
 			getSession().saveOrUpdate(entity);
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in saveOrUpdate().",
+					hibernateException);
 		}
 		return entity;
 	}
@@ -89,8 +104,9 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	public T save(T entity) {
 		try {
 			getSession().save(entity);
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException("HibernateException caught in save().",
+					hibernateException);
 		}
 		return entity;
 	}
@@ -99,8 +115,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	public void delete(T entity) {
 		try {
 			getSession().delete(entity);
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in delete(). ",
+					hibernateException);
 		}
 	}
 
@@ -108,8 +126,9 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	public void flush() {
 		try {
 			getSession().flush();
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in flush().", hibernateException);
 		}
 	}
 
@@ -117,8 +136,9 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	public void clear() {
 		try {
 			getSession().clear();
-		} catch (HibernateException e) {
-			throw e;
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in clear().", hibernateException);
 		}
 	}
 
@@ -126,8 +146,14 @@ public class GenericDaoImpl<T, ID extends Serializable> implements
 	@SuppressWarnings("unchecked")
 	public List<T> findByCriteria(Criterion... criterion) {
 		Criteria crit = getSession().createCriteria(getPersistentClass());
-		for (Criterion c : criterion) {
-			crit.add(c);
+		try {
+			for (Criterion c : criterion) {
+				crit.add(c);
+			}
+		} catch (HibernateException hibernateException) {
+			throw new DatabaseException(
+					"HibernateException caught in findByCriteria().",
+					hibernateException);
 		}
 		return crit.list();
 	}

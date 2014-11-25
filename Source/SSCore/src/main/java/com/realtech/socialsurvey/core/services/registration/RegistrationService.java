@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.registration;
 
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 /**
@@ -10,6 +11,10 @@ public interface RegistrationService {
 
 	/**
 	 * Sends invitation to corporate to register
+	 * 
+	 * @throws NonFatalException
 	 */
-	public void inviteCorporateToRegister(String firstName, String lastName, String emailId) throws InvalidInputException, UndeliveredEmailException;
+	public void inviteCorporateToRegister(String firstName, String lastName,
+			String emailId) throws InvalidInputException,
+			UndeliveredEmailException, NonFatalException;
 }
