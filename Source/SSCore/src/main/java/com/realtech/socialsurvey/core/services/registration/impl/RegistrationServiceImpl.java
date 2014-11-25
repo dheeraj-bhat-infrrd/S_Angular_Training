@@ -47,11 +47,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
-	@Override
 	@Transactional
+	@Override
 	public void inviteCorporateToRegister(String firstName, String lastName,
 			String emailId) throws InvalidInputException,
-			UndeliveredEmailException {
+			UndeliveredEmailException, NonFatalException {
 		LOG.info("Inviting corporate to register. Details\t first name:"
 				+ firstName + "\t lastName: " + lastName + "\t email id: "
 				+ emailId);
@@ -63,7 +63,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 		LOG.debug("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl);
-
 		LOG.debug("Sending invitation for registration");
 		inviteUser(url, emailId, firstName, lastName);
 
@@ -75,24 +74,23 @@ public class RegistrationServiceImpl implements RegistrationService {
 			FatalException.class })
 	private void inviteUser(String url, String emailId, String firstName,
 			String lastName) throws InvalidInputException,
-			UndeliveredEmailException {
-		LOG.info("Method inviteUser called with url : " + url + " emailId : "
+			UndeliveredEmailException,NonFatalException {
+		LOG.debug("Method inviteUser called with url : " + url + " emailId : "
 				+ emailId + " firstname : " + firstName + " lastName : "
 				+ lastName);
 
 		String queryParam = extractUrlQueryParam(url);
 
 		LOG.debug("Adding a new inviatation into the user_invite table");
-		int invitatioId = storeInvitation(queryParam, emailId);
-
+		UserInvite invite = storeInvitation(queryParam, emailId);
 		LOG.debug("Calling email services to send registration invitation mail");
 		emailServices.sendRegistrationInviteMail(url, emailId, firstName,
 				lastName);
 
 		LOG.debug("Updating invitaion id as successful");
-		storeInvitation(invitatioId);
+		storeInvitation(invite);
 
-		LOG.info("Method inviteUser finished successfully");
+		LOG.debug("Method inviteUser finished successfully");
 
 	}
 
@@ -100,7 +98,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * Method to extract the query parameter from encrypted url
 	 * 
 	 * @param url
-	 * @return
+	 * @return queryParam
 	 * @throws InvalidInputException
 	 */
 	private String extractUrlQueryParam(String url)
@@ -121,13 +119,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * This method stores the invitation related info into user_invite. It sets
 	 * all the required values in table and puts status as 0.
 	 */
-	private Integer storeInvitation(String queryParam, String emailId) {
-		LOG.info("Method storeInvitation called with query param : "
+	private UserInvite storeInvitation(String queryParam, String emailId)
+			throws NonFatalException {
+		LOG.debug("Method storeInvitation called with query param : "
 				+ queryParam + " and emailId : " + emailId);
 		UserInvite userInvite = new UserInvite();
 		try {
 			Company company = companyDao.findById(Company.class, 0);
-			System.out.println(company.getCompany());
 			ProfilesMaster profilesMaster = profilesMasterDao.findById(
 					ProfilesMaster.class, 0);
 			userInvite.setCompany(company);
@@ -140,40 +138,51 @@ public class RegistrationServiceImpl implements RegistrationService {
 			userInvite.setCreatedBy("GUEST");
 			userInvite = userInviteDao.save(userInvite);
 		} catch (HibernateException hibernateException) {
-			throw new FatalException(
-					"Fatal Exception caught while storing user invite details.",
+			LOG.error(
+					"Non-Fatal Exception caught while storing user invite details.",
+					hibernateException);
+			throw new NonFatalException(
+					"Non-Fatal Exception caught while storing user invite details.",
 					hibernateException);
 		} catch (Exception exception) {
-			throw new FatalException(
+			LOG.error(
+					"Non-Fatal Exception caught while storing user invite details.",
+					exception);
+			throw new NonFatalException(
 					"Fatal Exception caught while storing user invite details.",
 					exception);
 		}
-		LOG.info("Method storeInvitation finished");
-		return userInvite.getUserInviteId();
+		LOG.debug("Method storeInvitation finished");
+		return userInvite;
 	}
 
 	/*
 	 * This method updates the status for the given invitation id as successful.
 	 */
-	private void storeInvitation(int invitationId) {
+	private void storeInvitation(UserInvite userInvite)
+			throws NonFatalException {
 		try {
-			LOG.info("Method storeInvitation called with invitation ID : "
-					+ invitationId);
-			UserInvite userInvite = userInviteDao.findById(UserInvite.class,
-					invitationId);
+			LOG.debug("Method storeInvitation called with invitation ID : "
+					+ userInvite.getUserInviteId());
 			userInvite.setStatus(1);
 			userInvite.setModifiedBy("AGENT");
 			userInvite = userInviteDao.saveOrUpdate(userInvite);
 		} catch (HibernateException hibernateException) {
-			throw new FatalException(
-					"Fatal Exception caught while updating successful user invite details.",
+			LOG.error(
+					"Non Fatal Exception caught while updating successful user invite details.",
+					hibernateException);
+			throw new NonFatalException(
+					"Non Fatal Exception caught while updating successful user invite details.",
 					hibernateException);
 		} catch (Exception exception) {
-			throw new FatalException(
+			LOG.error(
+					"Non Fatal Exception caught while updating successful user invite details.",
+					exception);
+			throw new NonFatalException(
 					"Fatal Exception caught while updating successful user invite details.",
 					exception);
 		}
-		LOG.info("Method storeInvitation finished");
+		LOG.debug("Method storeInvitation finished");
 	}
 
 }
