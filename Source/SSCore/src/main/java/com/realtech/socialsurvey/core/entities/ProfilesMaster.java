@@ -11,7 +11,7 @@ import java.util.List;
  * 
  */
 @Entity
-@Table(name="profiles_master")
+@Table(name="PROFILES_MASTER")
 @NamedQuery(name="ProfilesMaster.findAll", query="SELECT p FROM ProfilesMaster p")
 public class ProfilesMaster implements Serializable {
 	private static final long serialVersionUID = 1L;
