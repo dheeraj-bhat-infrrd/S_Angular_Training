@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.registration.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.HibernateException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.UserInvite;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -137,20 +137,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 			userInvite.setModifiedBy("GUEST");
 			userInvite.setCreatedBy("GUEST");
 			userInvite = userInviteDao.save(userInvite);
-		} catch (HibernateException hibernateException) {
+		} catch (DatabaseException databaseException) {
 			LOG.error(
 					"Non-Fatal Exception caught while storing user invite details.",
-					hibernateException);
+					databaseException);
 			throw new NonFatalException(
 					"Non-Fatal Exception caught while storing user invite details.",
-					hibernateException);
-		} catch (Exception exception) {
-			LOG.error(
-					"Non-Fatal Exception caught while storing user invite details.",
-					exception);
-			throw new NonFatalException(
-					"Fatal Exception caught while storing user invite details.",
-					exception);
+					databaseException);
 		}
 		LOG.debug("Method storeInvitation finished");
 		return userInvite;
@@ -167,20 +160,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 			userInvite.setStatus(1);
 			userInvite.setModifiedBy("AGENT");
 			userInvite = userInviteDao.saveOrUpdate(userInvite);
-		} catch (HibernateException hibernateException) {
+		} catch (DatabaseException databaseException) {
 			LOG.error(
 					"Non Fatal Exception caught while updating successful user invite details.",
-					hibernateException);
+					databaseException);
 			throw new NonFatalException(
 					"Non Fatal Exception caught while updating successful user invite details.",
-					hibernateException);
-		} catch (Exception exception) {
-			LOG.error(
-					"Non Fatal Exception caught while updating successful user invite details.",
-					exception);
-			throw new NonFatalException(
-					"Fatal Exception caught while updating successful user invite details.",
-					exception);
+					databaseException);
 		}
 		LOG.debug("Method storeInvitation finished");
 	}
