@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.UserInvite;
-import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -56,8 +56,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		urlParams.put("emailId", emailId);
 
 		LOG.debug("Generating URL");
-		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl
-				+ "completeRegistration");
+		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + "completeRegistration");
 		LOG.debug("Sending invitation for registration");
 		inviteUser(url, emailId, firstName, lastName);
 
@@ -102,44 +101,20 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * This method stores the invitation related info into user_invite. It sets all the required
 	 * values in table and puts status as 0.
 	 */
-	private UserInvite storeInvitation(String queryParam, String emailId) throws NonFatalException {
+	private void storeInvitation(String queryParam, String emailId) throws NonFatalException {
 		LOG.debug("Method storeInvitation called with query param : " + queryParam + " and emailId : " + emailId);
 		UserInvite userInvite = new UserInvite();
-		try {
-			Company company = companyDao.findById(Company.class, 0);
-			ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, 0);
-			userInvite.setCompany(company);
-			userInvite.setProfilesMaster(profilesMaster);
-			userInvite.setInvitationEmailId(emailId);
-			userInvite.setInvitationParameters(queryParam);
-			userInvite.setInvitationSentBy(1);
-			userInvite.setStatus(0);
-			userInvite.setModifiedBy("GUEST");
-			userInvite.setCreatedBy("GUEST");
-			userInvite = userInviteDao.save(userInvite);
-		}
-		catch (DatabaseException databaseException) {
-			LOG.error("Non-Fatal Exception caught while storing user invite details.", databaseException);
-			throw new NonFatalException("Non-Fatal Exception caught while storing user invite details.", databaseException);
-		}
-		LOG.debug("Method storeInvitation finished");
-		return userInvite;
-	}
 
-	/*
-	 * This method updates the status for the given invitation id as successful.
-	 */
-	private void storeInvitation(UserInvite userInvite) throws NonFatalException {
-		try {
-			LOG.debug("Method storeInvitation called with invitation ID : " + userInvite.getUserInviteId());
-			userInvite.setStatus(1);
-			userInvite.setModifiedBy("AGENT");
-			userInvite = userInviteDao.saveOrUpdate(userInvite);
-		}
-		catch (DatabaseException databaseException) {
-			LOG.error("Non Fatal Exception caught while updating successful user invite details.", databaseException);
-			throw new NonFatalException("Non Fatal Exception caught while updating successful user invite details.", databaseException);
-		}
+		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
+		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.DEFAULT_PROFILE_ID);
+		userInvite.setCompany(company);
+		userInvite.setProfilesMaster(profilesMaster);
+		userInvite.setInvitationEmailId(emailId);
+		userInvite.setInvitationParameters(queryParam);
+		userInvite.setStatus(CommonConstants.STATUS_ACTIVE);
+		userInvite.setModifiedBy(CommonConstants.GUEST_USER_NAME);
+		userInvite.setCreatedBy(CommonConstants.GUEST_USER_NAME);
+		userInvite = userInviteDao.save(userInvite);
 		LOG.debug("Method storeInvitation finished");
 	}
 }
