@@ -87,14 +87,6 @@ public class UserProfile implements Serializable {
 		this.agentId = agentId;
 	}
 
-	public int getIsProfileComplete() {
-		return isProfileComplete;
-	}
-
-	public void setIsProfileComplete(int isProfileComplete) {
-		this.isProfileComplete = isProfileComplete;
-	}
-
 	public String getProfileCompletionStage() {
 		return profileCompletionStage;
 	}
@@ -103,6 +95,14 @@ public class UserProfile implements Serializable {
 		this.profileCompletionStage = profileCompletionStage;
 	}
 
+	public int getIsProfileComplete() {
+		return isProfileComplete;
+	}
+
+	public void setIsProfileComplete(int isProfileComplete) {
+		this.isProfileComplete = isProfileComplete;
+	}
+	
 	public int getBranchId() {
 		return this.branchId;
 	}

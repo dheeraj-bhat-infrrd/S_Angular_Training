@@ -122,6 +122,10 @@ public class User implements Serializable {
 		return this.loginName;
 	}
 
+	public void setLoginName(String loginName) {
+		this.loginName = loginName;
+	}
+	
 	public int getIsAtleastOneUserprofileComplete() {
 		return isAtleastOneUserprofileComplete;
 	}
@@ -129,10 +133,6 @@ public class User implements Serializable {
 	public void setIsAtleastOneUserprofileComplete(
 			int isAtleastOneUserprofileComplete) {
 		this.isAtleastOneUserprofileComplete = isAtleastOneUserprofileComplete;
-	}
-
-	public void setLoginName(String loginName) {
-		this.loginName = loginName;
 	}
 
 	public String getLoginPassword() {
