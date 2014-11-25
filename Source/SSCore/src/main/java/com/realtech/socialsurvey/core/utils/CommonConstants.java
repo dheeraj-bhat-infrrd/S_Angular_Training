@@ -17,6 +17,7 @@ public final class CommonConstants {
 	public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
 	public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
 	public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
+	public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties";
 
 }
 // SS-14 By RM02 EOC
