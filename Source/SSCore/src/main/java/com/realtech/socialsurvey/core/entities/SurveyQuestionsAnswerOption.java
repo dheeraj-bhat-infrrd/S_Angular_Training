@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  * 
  */
 @Entity
-@Table(name="survey_questions_answer_options")
+@Table(name="SURVEY_QUESTIONS_ANSWER_OPTIONS")
 @NamedQuery(name="SurveyQuestionsAnswerOption.findAll", query="SELECT s FROM SurveyQuestionsAnswerOption s")
 public class SurveyQuestionsAnswerOption implements Serializable {
 	private static final long serialVersionUID = 1L;
