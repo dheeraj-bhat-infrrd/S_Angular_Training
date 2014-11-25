@@ -3,9 +3,14 @@ package com.realtech.socialsurvey.core.entities;
 // JIRA: SS-7: By RM02: BOC
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
 /**
  * Entity for sending mail, contains all the attributes required for mail sending
  */
+@Entity
+@Table(name="EMAIL_ENTITY")
 public class EmailEntity {
 
 	/**

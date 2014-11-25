@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  * 
  */
 @Entity
-@Table(name="organization_level_settings")
+@Table(name="ORGANIZATION_LEVEL_SETTINGS")
 @NamedQuery(name="OrganizationLevelSetting.findAll", query="SELECT o FROM OrganizationLevelSetting o")
 public class OrganizationLevelSetting implements Serializable {
 	private static final long serialVersionUID = 1L;
