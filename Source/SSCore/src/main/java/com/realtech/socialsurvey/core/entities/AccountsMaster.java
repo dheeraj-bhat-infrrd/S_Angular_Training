@@ -11,7 +11,7 @@ import java.util.List;
  * 
  */
 @Entity
-@Table(name="accounts_master")
+@Table(name="ACCOUNTS_MASTER")
 @NamedQuery(name="AccountsMaster.findAll", query="SELECT a FROM AccountsMaster a")
 public class AccountsMaster implements Serializable {
 	private static final long serialVersionUID = 1L;
