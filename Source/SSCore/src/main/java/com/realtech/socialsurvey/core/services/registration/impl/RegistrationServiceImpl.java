@@ -32,7 +32,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Autowired
 	private URLGenerator urlGenerator;
 
-	@Value("{APPLICATION_BASE_URL}")
+	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
 
 	@Autowired
@@ -47,8 +47,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
-	@Transactional
+	
 	@Override
+	@Transactional(rollbackFor = { NonFatalException.class,
+			FatalException.class })
 	public void inviteCorporateToRegister(String firstName, String lastName,
 			String emailId) throws InvalidInputException,
 			UndeliveredEmailException, NonFatalException {
@@ -70,8 +72,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 				+ " for registration");
 	}
 
-	@Transactional(rollbackFor = { NonFatalException.class,
-			FatalException.class })
 	private void inviteUser(String url, String emailId, String firstName,
 			String lastName) throws InvalidInputException,
 			UndeliveredEmailException,NonFatalException {
