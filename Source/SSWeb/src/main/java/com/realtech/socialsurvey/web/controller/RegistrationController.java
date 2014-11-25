@@ -7,7 +7,6 @@ package com.realtech.socialsurvey.web.controller;
  */
 
 import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,11 +14,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 @Controller
@@ -28,9 +30,11 @@ public class RegistrationController {
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationController.class);
 
 	@Autowired
-	CaptchaValidation captchaValidation;
+	private CaptchaValidation captchaValidation;
 	@Autowired
 	private RegistrationService registrationService;
+	@Autowired
+	private MessageUtils messageUtils;
 
 	@RequestMapping(value = "/invitation")
 	public String initRegisterPage() {
@@ -41,81 +45,103 @@ public class RegistrationController {
 	@RequestMapping(value = "/corporateinvite", method = RequestMethod.POST)
 	public String inviteCorporate(Model model, HttpServletRequest request) {
 		LOG.info("Sending invitation to corporate");
-		LOG.debug("Validating form elements");
 
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String emailId = request.getParameter("emailId");
 
 		// validate request parameters from the form
-		if (isFormParametersValid(firstName, lastName, emailId)) {
-			LOG.debug("Valid parameters passed");
-		}
-		else {
-			LOG.error("Invalid arguments passed in form");
-			model.addAttribute("displaymessage", "Invalid arguments passed in form");
-		}
-
-		// validate captcha
 		try {
-			if (validateCaptcha(request)) {
-				LOG.debug("Captcha validation successful");
+			LOG.debug("Validating form elements");
+			validateFormParameters(firstName, lastName, emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
 
-				// continue with the invitation
-				try {
-					registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
-				}
-				catch (InvalidInputException e) {
-					LOG.error("InvalidInputException while inviting corporate to register", e);
-				}
-				catch (UndeliveredEmailException e) {
-					LOG.error("UndeliveredEmailException while inviting corporate to register", e);
-				}
-				catch (NonFatalException e) {
-					LOG.error("NonFatalException while inviting corporate to register", e);
-				}
+			// validate captcha
+			try {
+				validateCaptcha(request);
+				LOG.debug("Captcha validation successful");
 			}
-			else {
-				LOG.debug("Captcha validation failed");
-				model.addAttribute("displaymessage", "Captcha Validation failed");
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_CAPTCHA, e);
 			}
+			// continue with the invitation
+			try {
+				LOG.debug("Calling service for sending the registration invitation");
+				registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
+				LOG.debug("Service for sending the registration invitation excecuted successfully");
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+			catch (UndeliveredEmailException e) {
+				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+
+			LOG.info("Invitation to corporate for registration completed successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			//throw new FatalException("testing fatal exception");
 		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while inviting corporate to register", e);
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while sending registration invite. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.CORPORATE_INVITATION;
 	}
 
-	/*
+	/**
 	 * Check if captcha is valid
+	 * 
+	 * @param request
+	 * @throws InvalidInputException
 	 */
-	private boolean validateCaptcha(HttpServletRequest request) throws InvalidInputException {
-		LOG.debug("Validating captcha informations");
+	private void validateCaptcha(HttpServletRequest request) throws InvalidInputException {
+		LOG.debug("Validating captcha information");
+
+		boolean isCaptchaValid = false;
 		String remoteAddress = request.getRemoteAddr();
 		String captchaChallenge = request.getParameter("recaptcha_challenge_field");
 		String captchaResponse = request.getParameter("recaptcha_response_field");
-		return captchaValidation.isCaptchaValid(remoteAddress, captchaChallenge, captchaResponse);
+		isCaptchaValid = captchaValidation.isCaptchaValid(remoteAddress, captchaChallenge, captchaResponse);
+
+		/**
+		 * if captcha code entered by user is not valid, throw invalid input exception
+		 */
+		if (!isCaptchaValid) {
+			throw new InvalidInputException("Captcha is not valid");
+		}
 	}
 
-	/*
+	/**
 	 * Check if input parameters from form are valid
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @param emailId
+	 * @throws InvalidInputException
 	 */
-	private boolean isFormParametersValid(String fName, String lName, String emailId) {
+	private void validateFormParameters(String firstName, String lastName, String emailId) throws InvalidInputException {
 
 		String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 		String ALPHA_REGEX = "[a-zA-Z]+";
 
-		// check if first name is null or empty and only contains alpahabets
-		if (fName == null || fName.isEmpty() || !fName.matches(ALPHA_REGEX))
-			return false;
-		// check if first name is not null and not empty and only contains alpahabets
-		if (!(lName != null && !lName.isEmpty() && lName.matches(ALPHA_REGEX)))
-			return false;
-		// check if email Id isEmpty, null or whether it matches the regular expression or not
-		if (emailId == null || emailId.isEmpty() || !emailId.matches(EMAIL_REGEX))
-			return false;
+		// check if first name is null or empty and only contains alphabets
+		if (firstName == null || firstName.isEmpty() || !firstName.matches(ALPHA_REGEX)) {
+			throw new InvalidInputException("Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME);
+		}
 
-		return true;
+		// check if last name only contains alphabets
+		if (lastName != null && !lastName.isEmpty()) {
+			if (!(lastName.matches(ALPHA_REGEX))) {
+				throw new InvalidInputException("Last name is invalid in registration", DisplayMessageConstants.INVALID_LASTNAME);
+			}
+		}
+
+		// check if email Id isEmpty, null or whether it matches the regular expression or not
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(EMAIL_REGEX)) {
+			throw new InvalidInputException("Email address is invalid in registration", DisplayMessageConstants.INVALID_EMAILID);
+		}
+
 	}
 }
 
