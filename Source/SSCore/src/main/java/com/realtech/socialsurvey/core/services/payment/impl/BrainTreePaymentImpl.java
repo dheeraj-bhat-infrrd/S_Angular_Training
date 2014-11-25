@@ -30,6 +30,7 @@ public class BrainTreePaymentImpl implements Payment {
 
 	BraintreeGateway gateway = null;	
 	
+	
 	public void initialise(){		
 		gateway = new BraintreeGateway(
 		        Environment.SANDBOX,
@@ -39,6 +40,12 @@ public class BrainTreePaymentImpl implements Payment {
 		    );		
 	}
 	
+	/**
+	 * Adds a customer to the Braintree vault with customer details but without payment details.
+	 * @param user User object
+	 * @param company Company object
+	 * @return Success or Failure of the operation.
+	 */
 	private boolean addCustomerWithoutPayment(User user, Company company){
 
 		CustomerRequest request = new CustomerRequest()
@@ -98,15 +105,15 @@ public class BrainTreePaymentImpl implements Payment {
 	}
 
 	@Override
-	public void subscribe(User user, Company company, int accountsMasterId, String planId, String nonce) throws NonFatalException {
+	public boolean subscribe(User user, Company company, int accountsMasterId, String planId, String nonce) throws NonFatalException {
 		
 		Integer userId = user.getUserId();
 		if(containsCustomer(userId.toString())){
-			boolean result = subscribeCustomer(userId.toString(), planId);
+			return subscribeCustomer(userId.toString(), planId);
 		}
 		else{
 			addCustomerWithPayment(user, company, nonce);
-			boolean result = subscribeCustomer(userId.toString(), planId);
+			return subscribeCustomer(userId.toString(), planId);
 		}	
 	}
 	
@@ -125,7 +132,10 @@ public class BrainTreePaymentImpl implements Payment {
 		
 		TransactionRequest request = new TransactionRequest()
 	    .amount(new BigDecimal(amount))
-	    .paymentMethodNonce(paymentNonce);
+	    .paymentMethodNonce(paymentNonce)
+	    .options()
+	    	.submitForSettlement(true)
+	    	.done();
 
 		Result<Transaction> result = gateway.transaction().sale(request);
 		
@@ -142,6 +152,28 @@ public class BrainTreePaymentImpl implements Payment {
 				
 	}
 	
+	public String makePaymentForCustomer(String customerId, int amount){
+		
+		TransactionRequest request = new TransactionRequest()
+			.amount(new BigDecimal(amount))
+			.customerId(customerId)
+			.options()
+				.submitForSettlement(true)
+				.done();
+		Result<Transaction> result = gateway.transaction().sale(request);
+		
+		if(result.isSuccess()){
+			String transactionId = result.getTarget().getId();
+			LOG.info(" makePaymentForCustomer customerId : "+customerId + " : for amount : " + amount + " Status : " + result.isSuccess() + " Message : " + result.getMessage() + " Transaction ID : " + transactionId );
+			return transactionId;
+		}
+		else{
+			LOG.info(" makePaymentForCustomer customerId : "+customerId + " : for amount : " + amount + " Status : " + result.isSuccess() + " Message : " + result.getMessage() );
+			return null;
+
+		}
+	}
+	
 	public static void main(String[] args){
 		
 		BrainTreePaymentImpl payment = new BrainTreePaymentImpl();
@@ -156,7 +188,7 @@ public class BrainTreePaymentImpl implements Payment {
 		user.setEmailId("nishit@raremile.com");
 		user.setUserId(100002);
 		
-		System.out.println(payment.makePayment(1000, com.braintreegateway.test.Nonce.Transactable));
+		System.out.println(payment.makePaymentForCustomer("100002", 3500));
 		
 	}
 }
