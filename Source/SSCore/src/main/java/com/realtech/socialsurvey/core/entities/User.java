@@ -1,66 +1,70 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
+
 import javax.persistence.*;
+
 import java.sql.Timestamp;
 import java.util.List;
-
 
 /**
  * The persistent class for the users database table.
  * 
  */
 @Entity
-@Table(name="USERS")
-@NamedQuery(name="User.findAll", query="SELECT u FROM User u")
+@Table(name = "USERS")
+@NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
 public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="USER_ID")
+	@Column(name = "USER_ID")
 	private int userId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="DISPLAY_NAME")
+	@Column(name = "DISPLAY_NAME")
 	private String displayName;
 
-	@Column(name="EMAIL_ID")
+	@Column(name = "EMAIL_ID")
 	private String emailId;
 
-	@Column(name="LAST_LOGIN")
+	@Column(name = "IS_ATLEAST_ONE_USERPROFILE_COMPLETE")
+	private int isAtleastOneUserprofileComplete;
+
+	@Column(name = "LAST_LOGIN")
 	private Timestamp lastLogin;
 
-	@Column(name="LOGIN_NAME")
+	@Column(name = "LOGIN_NAME")
 	private String loginName;
 
-	@Column(name="LOGIN_PASSWORD")
+	@Column(name = "LOGIN_PASSWORD")
 	private String loginPassword;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
 	private String source;
 
-	@Column(name="SOURCE_USER_ID")
+	@Column(name = "SOURCE_USER_ID")
 	private int sourceUserId;
 
 	private int status;
 
-	//bi-directional many-to-one association to UserProfile
-	@OneToMany(mappedBy="user")
+	// bi-directional many-to-one association to UserProfile
+	@OneToMany(mappedBy = "user")
 	private List<UserProfile> userProfiles;
 
-	//bi-directional many-to-one association to Company
+	// bi-directional many-to-one association to Company
 	@ManyToOne
-	@JoinColumn(name="COMPANY_ID")
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
 	public User() {
@@ -120,6 +124,15 @@ public class User implements Serializable {
 
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
+	}
+	
+	public int getIsAtleastOneUserprofileComplete() {
+		return isAtleastOneUserprofileComplete;
+	}
+
+	public void setIsAtleastOneUserprofileComplete(
+			int isAtleastOneUserprofileComplete) {
+		this.isAtleastOneUserprofileComplete = isAtleastOneUserprofileComplete;
 	}
 
 	public String getLoginPassword() {
