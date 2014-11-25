@@ -13,8 +13,6 @@ import org.hibernate.criterion.Criterion;
 
 public interface GenericDao<T, ID extends Serializable> {
 
-	public T findById(ID id);
-
 	public List<T> findAll();
 
 	public T saveOrUpdate(T entity);
@@ -30,6 +28,8 @@ public interface GenericDao<T, ID extends Serializable> {
 	public void clear();
 
 	public List<T> findByCriteria(Criterion... criterion);
+
+	public T findById(Class<T> table, ID id);
 
 }
 

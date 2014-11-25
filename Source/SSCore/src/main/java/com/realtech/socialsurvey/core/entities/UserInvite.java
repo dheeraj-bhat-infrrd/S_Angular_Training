@@ -37,6 +37,9 @@ public class UserInvite implements Serializable {
 	@Column(name="INVITATION_TIME")
 	private Timestamp invitationTime;
 
+	@Column(name="INVITATION_PARAMETERS")
+	private String invitationParameters;
+	
 	@Column(name="INVITATION_VALID_UNTIL")
 	private Timestamp invitationValidUntil;
 
@@ -165,4 +168,11 @@ public class UserInvite implements Serializable {
 		this.profilesMaster = profilesMaster;
 	}
 
+	public String getInvitationParameters() {
+		return invitationParameters;
+	}
+
+	public void setInvitationParameters(String invitationParameters) {
+		this.invitationParameters = invitationParameters;
+	}
 }
