@@ -96,13 +96,19 @@
 	margin: 0 auto 5px;
 }
 
-#firstName,#lastName {
-	background: url(../images/iconUserName.png) no-repeat;
+#firstName {
+	background: url(../images/first-name.png) no-repeat;
 	background-position: 14px center;
 	background-size: 20px;
 }
 
-#emailId{
+#lastName {
+	background: url(../images/last-name.png) no-repeat;
+	background-position: 14px center;
+	background-size: 20px;
+}
+
+#emailId {
 	background: url(../images/iconEmailId.png) no-repeat;
 	background-position: 14px center;
 	background-size: 20px;
@@ -118,6 +124,16 @@
 	padding: 25px;
 }
 
-.overlay{
+.overlay {
 	padding: 20px;
+}
+
+.hide {
+	display: none;
+}
+
+#messageHeader{
+	background: #fff;
+	color: #777;
+	border-radius:3px;
 }
