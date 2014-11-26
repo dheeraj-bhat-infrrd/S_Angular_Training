@@ -8,6 +8,8 @@ function validateInvitationForm() {
 		$('#messageHeader').addClass("hide");
 	var payLoad = $("#registerForm").serialize();
 
+	if(!$('#registerForm').data('bootstrapValidator').isValid())
+		return;
 	$.ajax({
 		url : "./corporateinvite.do",
 		type : "POST",
