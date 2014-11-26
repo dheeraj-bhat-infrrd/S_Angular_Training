@@ -2,14 +2,12 @@ package com.realtech.socialsurvey.core.services.registration.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -26,8 +24,7 @@ import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 @Component
 public class RegistrationServiceImpl implements RegistrationService {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(RegistrationServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
 	@Autowired
 	private URLGenerator urlGenerator;
@@ -48,14 +45,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Override
-	@Transactional(rollbackFor = { NonFatalException.class,
-			FatalException.class })
-	public void inviteCorporateToRegister(String firstName, String lastName,
-			String emailId) throws InvalidInputException,
-			UndeliveredEmailException, NonFatalException {
-		LOG.info("Inviting corporate to register. Details\t first name:"
-				+ firstName + "\t lastName: " + lastName + "\t email id: "
-				+ emailId);
+	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
+	public void inviteCorporateToRegister(String firstName, String lastName, String emailId) throws InvalidInputException, UndeliveredEmailException,
+			NonFatalException {
+		LOG.info("Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName + "\t email id: " + emailId);
 
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put("firstName", firstName);
@@ -63,29 +56,23 @@ public class RegistrationServiceImpl implements RegistrationService {
 		urlParams.put("emailId", emailId);
 
 		LOG.debug("Generating URL");
-		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl
-				+ "completeRegistration");
+		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + "completeRegistration");
 		LOG.debug("Sending invitation for registration");
 		inviteUser(url, emailId, firstName, lastName);
 
-		LOG.info("Successfully sent invitation to :" + emailId
-				+ " for registration");
+		LOG.info("Successfully sent invitation to :" + emailId + " for registration");
 	}
 
-	private void inviteUser(String url, String emailId, String firstName,
-			String lastName) throws InvalidInputException,
-			UndeliveredEmailException, NonFatalException {
-		LOG.debug("Method inviteUser called with url : " + url + " emailId : "
-				+ emailId + " firstname : " + firstName + " lastName : "
-				+ lastName);
+	private void inviteUser(String url, String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException,
+			NonFatalException {
+		LOG.debug("Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName + " lastName : " + lastName);
 
 		String queryParam = extractUrlQueryParam(url);
 
 		LOG.debug("Adding a new inviatation into the user_invite table");
 		storeInvitation(queryParam, emailId);
 		LOG.debug("Calling email services to send registration invitation mail");
-		emailServices.sendRegistrationInviteMail(url, emailId, firstName,
-				lastName);
+		emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
 
 		LOG.debug("Method inviteUser finished successfully");
 
@@ -98,11 +85,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * @return queryParam
 	 * @throws InvalidInputException
 	 */
-	private String extractUrlQueryParam(String url)
-			throws InvalidInputException {
+	private String extractUrlQueryParam(String url) throws InvalidInputException {
 		if (url == null || url.isEmpty()) {
-			throw new InvalidInputException(
-					"Url is found null or empty while extracting the query param");
+			throw new InvalidInputException("Url is found null or empty while extracting the query param");
 		}
 		LOG.debug("Getting query param from the encrypted url " + url);
 		String queryParam = url.substring(url.indexOf("q=") + 2, url.length());
@@ -113,19 +98,15 @@ public class RegistrationServiceImpl implements RegistrationService {
 	}
 
 	/*
-	 * This method stores the invitation related info into user_invite. It sets
-	 * all the required values in table and puts status as 0.
+	 * This method stores the invitation related info into user_invite. It sets all the required
+	 * values in table and puts status as 0.
 	 */
-	private void storeInvitation(String queryParam, String emailId)
-			throws NonFatalException {
-		LOG.debug("Method storeInvitation called with query param : "
-				+ queryParam + " and emailId : " + emailId);
+	private void storeInvitation(String queryParam, String emailId) throws NonFatalException {
+		LOG.debug("Method storeInvitation called with query param : " + queryParam + " and emailId : " + emailId);
 		UserInvite userInvite = new UserInvite();
 
-		Company company = companyDao.findById(Company.class,
-				CommonConstants.DEFAULT_COMPANY_ID);
-		ProfilesMaster profilesMaster = profilesMasterDao.findById(
-				ProfilesMaster.class, CommonConstants.DEFAULT_PROFILE_ID);
+		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
+		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.DEFAULT_PROFILE_ID);
 		userInvite.setCompany(company);
 		userInvite.setProfilesMaster(profilesMaster);
 		userInvite.setInvitationEmailId(emailId);
