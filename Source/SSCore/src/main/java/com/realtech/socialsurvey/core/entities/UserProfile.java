@@ -4,63 +4,68 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-
 /**
  * The persistent class for the user_profile database table.
  * 
  */
 @Entity
-@Table(name="USER_PROFILE")
-@NamedQuery(name="UserProfile.findAll", query="SELECT u FROM UserProfile u")
+@Table(name = "USER_PROFILE")
+@NamedQuery(name = "UserProfile.findAll", query = "SELECT u FROM UserProfile u")
 public class UserProfile implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="USER_PROFILE_ID")
+	@Column(name = "USER_PROFILE_ID")
 	private int userProfileId;
 
-	@Column(name="AGENT_ID")
+	@Column(name = "AGENT_ID")
 	private int agentId;
 
-	@Column(name="BRANCH_ID")
+	@Column(name = "BRANCH_ID")
 	private int branchId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="EMAIL_ID")
+	@Column(name = "EMAIL_ID")
 	private String emailId;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "IS_PROFILE_COMPLETE")
+	private int isProfileComplete;
+
+	@Column(name = "PROFILE_COMPLETION_STAGE")
+	private String profileCompletionStage;
+
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	@Column(name="REGION_ID")
+	@Column(name = "REGION_ID")
 	private int regionId;
 
 	private int status;
 
-	@Column(name="USER_PROFILE_TYPE")
+	@Column(name = "USER_PROFILE_TYPE")
 	private String userProfileType;
 
-	//bi-directional many-to-one association to Company
+	// bi-directional many-to-one association to Company
 	@ManyToOne
-	@JoinColumn(name="COMPANY_ID")
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to ProfilesMaster
+	// bi-directional many-to-one association to ProfilesMaster
 	@ManyToOne
-	@JoinColumn(name="PROFILES_MASTER_ID")
+	@JoinColumn(name = "PROFILES_MASTER_ID")
 	private ProfilesMaster profilesMaster;
 
-	//bi-directional many-to-one association to User
+	// bi-directional many-to-one association to User
 	@ManyToOne
-	@JoinColumn(name="USER_ID")
+	@JoinColumn(name = "USER_ID")
 	private User user;
 
 	public UserProfile() {
@@ -82,6 +87,22 @@ public class UserProfile implements Serializable {
 		this.agentId = agentId;
 	}
 
+	public String getProfileCompletionStage() {
+		return profileCompletionStage;
+	}
+
+	public void setProfileCompletionStage(String profileCompletionStage) {
+		this.profileCompletionStage = profileCompletionStage;
+	}
+
+	public int getIsProfileComplete() {
+		return isProfileComplete;
+	}
+
+	public void setIsProfileComplete(int isProfileComplete) {
+		this.isProfileComplete = isProfileComplete;
+	}
+	
 	public int getBranchId() {
 		return this.branchId;
 	}
