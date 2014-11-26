@@ -1,6 +1,10 @@
 package com.realtech.socialsurvey.core.utils;
-//JIRA: SS-6: By RM03
 
+// JIRA: SS-6: By RM03
+
+import java.security.InvalidKeyException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -12,72 +16,71 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 
 /**
  * This class houses all the encryption utilities required for the project.
- *
  */
 @Component
 public class EncryptionHelper {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
-	
+
 	/**
 	 * Checks if String is null and returns blank String if it is null.
-	 * @param s is a String to be checked.
+	 * 
+	 * @param s
+	 *            is a String to be checked.
 	 * @return the String as it is if not null else a blank string.
 	 */
 	public String getNullSafeString(String s) {
-        if (s != null) {
-                return s;
-        }
-        else {
-                return "";
-        }
+		if (s != null) {
+			return s;
+		}
+		else {
+			return "";
+		}
 	}
-	
+
 	/**
 	 * Converts a hexadecimal string to a byte array.
+	 * 
 	 * @param hexString
 	 * @return a byte array of the hex string
 	 * @throws InvalidInputException
 	 */
 	public byte[] hexStringToByteArray(String hexString) throws InvalidInputException {
-		
-		if(hexString == null){
+
+		if (hexString == null) {
 			LOG.error("Null parameter passed to hexStringToByteArray of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed to hexStringToByteArray of EncryptionHelper!");
 		}
-		
-		LOG.info(" hexStringToByteArray() : input parameter : " + hexString );
-		
+
+		LOG.info(" hexStringToByteArray() : input parameter : " + hexString);
+
 		int len = hexString.length();
 		byte[] byteArray = new byte[len / 2];
 		for (int i = 0; i < len; i += 2) {
 			byteArray[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
 		}
-		
-		LOG.info(" hexStringToByteArray() : output : " + byteArray.toString() );
+
+		LOG.info(" hexStringToByteArray() : output : " + byteArray.toString());
 		return byteArray;
 	}
 
 	/**
 	 * converts a byte array into hexadecimal string.
+	 * 
 	 * @param byteArray
 	 * @return a hexadecimal string of the byte array.
 	 * @throws InvalidInputException
 	 */
 	public String byteArrayToHexString(byte[] byteArray) throws InvalidInputException {
-		
-		if(byteArray == null){
+
+		if (byteArray == null) {
 			LOG.error("Null parameter passed to byteArrayToHexString of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed to byteArrayToHexString of EncryptionHelper!");
 		}
-		
+
 		StringBuffer hexString = new StringBuffer();
 		for (int i = 0; i < byteArray.length; i++) {
 			byte temp = byteArray[i];
@@ -97,19 +100,20 @@ public class EncryptionHelper {
 
 	/**
 	 * Generates SecretKEySpec object from the plain text key.
+	 * 
 	 * @param plainTextKey
 	 * @return a SecretKeySpec object
 	 * @throws InvalidInputException
 	 */
 	public SecretKeySpec generateAES256Key(String plainTextKey) throws InvalidInputException {
-		
-		if(plainTextKey == null){
+
+		if (plainTextKey == null) {
 			LOG.error("Null parameter passed to generateAES256Key of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed to generateAES256Key of EncryptionHelper!");
 		}
-		
+
 		LOG.info("generateAES256Key() :  input parameter : " + plainTextKey);
-		
+
 		byte[] key;
 		// Random salt
 		String salt = "6f90b8d50f490e647d92e2a74d2c44d7";
@@ -124,26 +128,27 @@ public class EncryptionHelper {
 		}
 		return new SecretKeySpec(key, "AES");
 	}
-	
+
 	/**
 	 * Converts the plain text byte array using the key into encrypted byte array.
+	 * 
 	 * @param plainText
 	 * @param key
 	 * @return encrypted text Byte Array
 	 * @throws InvalidInputException
 	 */
-	private byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException{
-		
-		if(plainText == null){
+	private byte[] encryptAES256Bytes(byte[] plainText, SecretKeySpec key) throws InvalidInputException {
+
+		if (plainText == null) {
 			LOG.error("Null parameter passed as first argument to encryptAES256Bytes of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as first argument to encryptAES256Bytes of EncryptionHelper!");
 		}
-		
-		if(key == null){
+
+		if (key == null) {
 			LOG.error("Null parameter passed as second argument to encryptAES256Bytes of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument to encryptAES256Bytes of EncryptionHelper!");
 		}
-		
+
 		byte[] encryptBytes = null;
 		try {
 			// Instantiate the cipher
@@ -177,23 +182,24 @@ public class EncryptionHelper {
 
 	/**
 	 * Converts cipher text byte array using the key into plain text byte array.
+	 * 
 	 * @param encryptedText
 	 * @param key
 	 * @return plain text Byte Array
 	 * @throws InvalidInputException
 	 */
-	private byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException{
-		
-		if(encryptedText == null){
+	private byte[] decryptAES256Bytes(byte[] encryptedText, SecretKeySpec key) throws InvalidInputException {
+
+		if (encryptedText == null) {
 			LOG.error("Null parameter passed as first argument to decryptAES256Bytes of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as first argument to decryptAES256Bytes of EncryptionHelper!");
 		}
-		
-		if(key == null){
+
+		if (key == null) {
 			LOG.error("Null parameter passed as second argument to decryptAES256Bytes of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument to decryptAES256Bytes of EncryptionHelper!");
 		}
-		
+
 		byte[] decryptBytes = null;
 		try {
 			// Instantiate the cipher
@@ -226,51 +232,95 @@ public class EncryptionHelper {
 	}
 
 	/**
-	 * Takes the plain text String and key String and uses AES encryption to convert it to
-	 * cipher text.
+	 * Takes the plain text String and key String and uses AES encryption to convert it to cipher
+	 * text.
+	 * 
 	 * @param plainText
 	 * @param plainTextKey
 	 * @return cipher text String
 	 * @throws InvalidInputException
 	 */
 	public String encryptAES(String plainText, String plainTextKey) throws InvalidInputException {
-		if(plainText == null){
+		if (plainText == null) {
 			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
 		}
-		if(plainTextKey == null){
+		if (plainTextKey == null) {
 			LOG.error("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 		}
 		LOG.info("encryptAES() input parameters : " + plainText + " " + plainTextKey);
-		
+
 		String encryptedText = byteArrayToHexString(encryptAES256Bytes(plainText.getBytes(), generateAES256Key(plainTextKey)));
 		LOG.info("encryptAES() output : " + encryptedText);
 		return encryptedText;
 	}
 
 	/**
-	 * Takes the encrypted hexadecimal String and the key String and uses AES algorithm
-	 * to convert it to plain text String
+	 * Takes the encrypted hexadecimal String and the key String and uses AES algorithm to convert
+	 * it to plain text String
+	 * 
 	 * @param encryptedHexString
 	 * @param plainTextKey
 	 * @return plain text String
 	 * @throws InvalidInputException
 	 */
 	public String decryptAES(String encryptedHexString, String plainTextKey) throws InvalidInputException {
-		if(encryptedHexString == null){
+		if (encryptedHexString == null) {
 			LOG.error("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as first argument to encryptAES of EncryptionHelper!");
 		}
-		if(plainTextKey == null){
+		if (plainTextKey == null) {
 			LOG.error("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 			throw new InvalidInputException("Null parameter passed as second argument encryptAES of EncryptionHelper!");
 		}
-		
+
 		LOG.info("encryptAES() input parameters : " + encryptedHexString + " " + plainTextKey);
 		String plainText = new String(decryptAES256Bytes(hexStringToByteArray(encryptedHexString), generateAES256Key(plainTextKey)));
 		LOG.info("decryptAES() output : " + plainText);
 		return plainText;
-	}		
- 
+	}
+
+	/**
+	 * Method to SHA12 encrypt plane text and convert it to byte array
+	 * 
+	 * @param plainText
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private byte[] encryptSHA512Bytes(String plainText) {
+		LOG.debug("Method encryptSHA512Bytes called for plainText");
+		byte key[];
+		try {
+			MessageDigest md = MessageDigest.getInstance("SHA-512");
+			md.update(getNullSafeString(plainText).getBytes());
+			key = md.digest();
+		}
+		catch (NoSuchAlgorithmException ex) {
+			/**
+			 * Will return empty string if there is no SHA-512 implementation
+			 */
+			key = "".getBytes();
+		}
+		LOG.debug("Method encryptSHA512Bytes finished.Returning byte array");
+		return key;
+	}
+
+	//JIRA: SS-22 BY RM02
+	/**
+	 * Method to convert byte array to hex string to be used in application
+	 * 
+	 * @param plainText
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public String encryptSHA512(String plainText) throws InvalidInputException {
+		LOG.debug("encryptSHA512 called");
+
+		byte[] key = encryptSHA512Bytes(plainText);
+
+		LOG.debug("encryptSHA512 finished.Returning encrypted string");
+		return byteArrayToHexString(key);
+	}
+
 }
