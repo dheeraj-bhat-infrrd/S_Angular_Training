@@ -27,17 +27,25 @@
 	src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/captchaScript.js"></script>
+<script>
+	$(document).ready(function(){
+		 $('#formSubmit').click(function() {
+			validateInvitationForm();
+		}); 
+	});
+</script>
 </head>
 <body>
 	<div id="invitationMainWrapper" class="mainWrapper">
 		<div class="overlay">
 			<div class="formModalContainer">
+				<div class="hide" id="messageHeader"></div>
 				<div id="invitationContainer" class="formWrapper">
 					<div id="formHeaderBar"></div>
 					<div class="formBody" id="invitationBody">
 						<div class="formBodyMainText"><spring:message code="label.invitation.key"></spring:message></div>
 						<div class="formContainer">
-							<form role="form" id="registerForm" onsubmit="validateInvitationForm();">
+							<form role="form" id="registerForm">
 								<div class="form-group formInputField">
 									<input id="firstName" name="firstName"
 										class="form-control formInput" type="text"
@@ -58,7 +66,7 @@
 										<div id="recaptcha"></div>
 									</div>
 								</div>
-								<button type="submit" class="formButton">Submit</button>
+								<button class="formButton" id="formSubmit">Submit</button>
 							</form>
 						</div>
 					</div>
