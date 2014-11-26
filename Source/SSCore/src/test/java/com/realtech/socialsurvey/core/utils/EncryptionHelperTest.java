@@ -159,6 +159,7 @@ public class EncryptionHelperTest {
 		assertEquals(paramText, plainText);
 	}
 
+	//JIRA: SS-22 BY RM02
 	/**
 	 * Testing SHA512 encryption for valid output
 	 * 

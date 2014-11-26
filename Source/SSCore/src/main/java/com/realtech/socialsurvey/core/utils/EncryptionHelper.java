@@ -306,6 +306,7 @@ public class EncryptionHelper {
 		return key;
 	}
 
+	//JIRA: SS-22 BY RM02
 	/**
 	 * Method to convert byte array to hex string to be used in application
 	 * 
