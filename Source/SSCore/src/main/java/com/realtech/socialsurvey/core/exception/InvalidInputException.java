@@ -21,4 +21,12 @@ public class InvalidInputException extends NonFatalException {
 	public InvalidInputException(String message, Throwable thrw) {
 		super(message, thrw);
 	}
+	
+	public InvalidInputException(String message, String errorCode) {
+		super(message,errorCode);
+	}
+
+	public InvalidInputException(String message, String errorCode, Throwable thrw) {
+		super(message, errorCode, thrw);
+	}
 }
