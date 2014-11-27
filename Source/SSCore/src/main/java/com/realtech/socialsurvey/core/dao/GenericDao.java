@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.hibernate.criterion.Criterion;
 
@@ -30,6 +31,10 @@ public interface GenericDao<T, ID extends Serializable> {
 	public List<T> findByCriteria(Criterion... criterion);
 
 	public T findById(Class<T> table, ID id);
+
+	public List<T> findByKeyValue(Class<T> dataClass, Map<String, String> queries);
+
+	public List<T> findByColumn(Class<T> dataClass, String column, String value);
 
 }
 

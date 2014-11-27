@@ -16,6 +16,7 @@ public class UserInvite implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="USER_INVITE_ID")
 	private int userInviteId;
 
