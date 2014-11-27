@@ -77,7 +77,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		urlParams.put("emailId", emailId);
 
 		LOG.debug("Generating URL");
-		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + "completeRegistration");
+		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION);
 		LOG.debug("Sending invitation for registration");
 		inviteUser(url, emailId, firstName, lastName);
 
@@ -162,19 +162,24 @@ public class RegistrationServiceImpl implements RegistrationService {
 	}
 
 	private boolean validateUrlParameters(String encryptedUrlParameter) throws InvalidInputException {
+		LOG.debug("Method validateUrlParameters called.");
 		Map<String, String> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_INVITE_INVITATION_PARAMETERS_COLUMN, encryptedUrlParameter);
 		List<UserInvite> userInvite = userInviteDao.findByColumn(encryptedUrlParameter);
-		if (userInvite != null && !userInvite.isEmpty())
+		if (userInvite != null && !userInvite.isEmpty()){
+			LOG.debug("Method validateUrlParameters finished.");
 			return true;
-		else
-			throw new InvalidInputException("URL parameter provided is inappropriate.");
+		}
+		else{
+			InvalidInputException invalidInputException = new InvalidInputException("URL parameter provided is inappropriate."); 
+			LOG.error("Exception caught in validateUrlParameters()", invalidInputException);
+			throw invalidInputException;
+		}
 	}
 	
-
 	
 	public User createUser(Company company, String username, String password, String emailId) {
-		LOG.debug("Method createUser called for username : " + username + " and email-id : " + emailId);
+		LOG.info("Method createUser called for username : " + username + " and email-id : " + emailId);
 		User user = new User();
 		user.setUserId(1);
 		user.setCompany(company);
@@ -192,13 +197,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Method createUser finished");
 		user = userDao.save(user);
 		userDao.flush();
-		System.out.println(user.getUserId());
+		LOG.info("Method createUser finished for username : "+username);
 		return user;
 	}
 
 	
 	public void createUserProfile(User user, Company company, String emailId) {
-		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
+		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(CommonConstants.DEFAULT_AGENT_ID);
 		userProfile.setBranchId(CommonConstants.DEFAULT_BRANCH_ID);
@@ -216,6 +221,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		userProfile.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
 		LOG.debug("Method createUserProfile finished");
 		userProfileDao.save(userProfile);
+		LOG.info("Method createUserProfile() finished");
 	}
 
 
