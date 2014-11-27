@@ -110,6 +110,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 			InvalidUrlException {
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
+		System.out.println(encryptedPassword.toCharArray().length);
 		User user = createUser(company, username, encryptedPassword, emailId);
 		createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_NO_PROFILE_ID);
@@ -182,6 +183,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Method validateUrlParameters called.");
 		List<UserInvite> userInvite = userInviteDao.findByColumn(encryptedUrlParameter);
 		if (userInvite == null || userInvite.isEmpty()) {
+			LOG.error("Exception caught while validating company registration URL parameters.");
 			throw new InvalidInputException("URL parameter provided is inappropriate.");
 		}
 		LOG.debug("Method validateUrlParameters finished.");
@@ -220,19 +222,19 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(agentId);
-		userProfile.setBranchId(CommonConstants.DEFAULT_BRANCH_ID);
+		userProfile.setBranchId(branchId);
 		userProfile.setCompany(company);
 		userProfile.setEmailId(emailId);
 		userProfile.setIsProfileComplete(CommonConstants.STATUS_INACTIVE);
-		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
 		userProfile.setRegionId(CommonConstants.DEFAULT_REGION_ID);
 		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
 		userProfile.setUser(user);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 		userProfile.setCreatedOn(currentTimestamp);
 		userProfile.setModifiedOn(currentTimestamp);
-		userProfile.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
-		userProfile.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
+		userProfile.setCreatedBy(String.valueOf(user.getUserId()));
+		userProfile.setModifiedBy(String.valueOf(user.getUserId()));
 		LOG.debug("Method createUserProfile finished");
 		userProfileDao.save(userProfile);
 		LOG.info("Method createUserProfile() finished");
