@@ -15,9 +15,9 @@ public interface CommonConstants {
 	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 3;
 	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 4;
 	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 5;
-	public static final int DEFAULT_REGION_ID = 1;
-	public static final int DEFAULT_BRANCH_ID = 1;
-	public static final int DEFAULT_AGENT_ID = 1;
+	public static final int DEFAULT_REGION_ID = 0;
+	public static final int DEFAULT_BRANCH_ID = 0;
+	public static final int DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
 	public static final String GUEST_USER_NAME = "GUEST";
 	public static final String ADMIN_USER_NAME = "ADMIN";
@@ -25,6 +25,6 @@ public interface CommonConstants {
 	public static final Integer STATUS_INACTIVE = 0;
 	public static final String USER_INVITE_INVITATION_PARAMETERS_COLUMN = "invitationParameters";
 	public static final String USER_INVITE_INVITATION_VALID_UNTIL = "invitationValidUntil";
-	
+
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 }
