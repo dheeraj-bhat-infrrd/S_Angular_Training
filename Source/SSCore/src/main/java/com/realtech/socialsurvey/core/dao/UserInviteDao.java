@@ -10,7 +10,7 @@ import com.realtech.socialsurvey.core.entities.UserInvite;
  * Every DAO implements this interface.
  */
 
-public interface ParentDao<T, ID extends Serializable> extends GenericDao<T,ID>{
+public interface UserInviteDao<T, ID extends Serializable> extends GenericDao<T,ID>{
 	public List<UserInvite> findByColumn(String encryptedUrlParameter);
 }
 
