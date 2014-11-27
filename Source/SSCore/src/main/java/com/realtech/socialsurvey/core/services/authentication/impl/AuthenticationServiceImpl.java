@@ -22,6 +22,8 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
+	
+	private static final String USER_NAME = "LOGIN_NAME"; 
 
 	@Autowired
 	private GenericDao<User, Integer> userDao;
@@ -33,7 +35,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User validateUser(String userId, String password) throws InvalidInputException {
 
-		List<User> users = userDao.findByColumn(User.class, "LOGIN_NAME", userId);
+		List<User> users = userDao.findByColumn(User.class, USER_NAME, userId);
 
 		// Check if user list returned is null or empty
 		if (users == null || users.isEmpty()) {
