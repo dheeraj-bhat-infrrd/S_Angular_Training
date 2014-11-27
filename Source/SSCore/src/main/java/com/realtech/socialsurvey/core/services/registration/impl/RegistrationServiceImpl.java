@@ -1,21 +1,32 @@
 package com.realtech.socialsurvey.core.services.registration.impl;
 
+import java.sql.Timestamp;
+import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.ParentDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -35,14 +46,24 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Autowired
 	private EmailServices emailServices;
 
-	@Autowired
-	private GenericDao<UserInvite, Integer> userInviteDao;
+	@Resource
+	@Qualifier("userInvite")
+	private ParentDao<UserInvite, Integer> userInviteDao;
 
 	@Autowired
 	private GenericDao<Company, Integer> companyDao;
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
+
+	@Autowired
+	private GenericDao<User, Integer> userDao;
+
+	@Autowired
+	private GenericDao<UserProfile, Integer> userProfileDao;
+
+	@Autowired
+	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -63,6 +84,29 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.info("Successfully sent invitation to :" + emailId + " for registration");
 	}
 
+	/*
+	 * This method contains the process to be done after URL is hit by the User. It involves
+	 * decrypting URL and validating parameters.
+	 */
+	@Override
+	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
+	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException, InvalidUrlException {
+		Map<String, String> urlParameters = urlGenerator.decryptParameters(encryptedUrlParameter);
+		validateUrlParameters(encryptedUrlParameter);
+		return urlParameters;
+	}
+
+	/*
+	 * This method creates a new user post validation of URL.
+	 */
+	@Override
+	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
+	public void addIndependentUser(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
+			InvalidUrlException {
+		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
+		createUserProfile(createUser(company, username, password, emailId), company, emailId);
+	}
+
 	private void inviteUser(String url, String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException,
 			NonFatalException {
 		LOG.debug("Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName + " lastName : " + lastName);
@@ -73,7 +117,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 		storeInvitation(queryParam, emailId);
 		LOG.debug("Calling email services to send registration invitation mail");
 		emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
-
 		LOG.debug("Method inviteUser finished successfully");
 
 	}
@@ -106,7 +149,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		UserInvite userInvite = new UserInvite();
 
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
-		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.DEFAULT_PROFILE_ID);
+		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_NO_PROFILE_ID);
 		userInvite.setCompany(company);
 		userInvite.setProfilesMaster(profilesMaster);
 		userInvite.setInvitationEmailId(emailId);
@@ -116,5 +159,80 @@ public class RegistrationServiceImpl implements RegistrationService {
 		userInvite.setCreatedBy(CommonConstants.GUEST_USER_NAME);
 		userInvite = userInviteDao.save(userInvite);
 		LOG.debug("Method storeInvitation finished");
+	}
+
+	private boolean validateUrlParameters(String encryptedUrlParameter) throws InvalidInputException {
+		Map<String, String> queries = new HashMap<>();
+		queries.put(CommonConstants.USER_INVITE_INVITATION_PARAMETERS_COLUMN, encryptedUrlParameter);
+		List<UserInvite> userInvite = userInviteDao.findByColumn(encryptedUrlParameter);
+		if (userInvite != null && !userInvite.isEmpty())
+			return true;
+		else
+			throw new InvalidInputException("URL parameter provided is inappropriate.");
+	}
+	
+
+	
+	public User createUser(Company company, String username, String password, String emailId) {
+		LOG.debug("Method createUser called for username : " + username + " and email-id : " + emailId);
+		User user = new User();
+		user.setUserId(1);
+		user.setCompany(company);
+		user.setLoginName(username);
+		user.setLoginPassword(password);
+		user.setEmailId(emailId);
+		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
+		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_INACTIVE);
+		user.setStatus(CommonConstants.STATUS_ACTIVE);
+		Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
+		user.setCreatedOn(currentTimestamp);
+		user.setModifiedOn(currentTimestamp);
+		user.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
+		user.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
+		LOG.debug("Method createUser finished");
+		user = userDao.save(user);
+		userDao.flush();
+		System.out.println(user.getUserId());
+		return user;
+	}
+
+	
+	public void createUserProfile(User user, Company company, String emailId) {
+		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
+		UserProfile userProfile = new UserProfile();
+		userProfile.setAgentId(CommonConstants.DEFAULT_AGENT_ID);
+		userProfile.setBranchId(CommonConstants.DEFAULT_BRANCH_ID);
+		userProfile.setCompany(company);
+		userProfile.setEmailId(emailId);
+		userProfile.setIsProfileComplete(CommonConstants.STATUS_INACTIVE);
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
+		userProfile.setRegionId(CommonConstants.DEFAULT_REGION_ID);
+		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+		userProfile.setUser(user);
+		Timestamp currentTimestamp = new Timestamp(Calendar.getInstance().getTimeInMillis());
+		userProfile.setCreatedOn(currentTimestamp);
+		userProfile.setModifiedOn(currentTimestamp);
+		userProfile.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
+		userProfile.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
+		LOG.debug("Method createUserProfile finished");
+		userProfileDao.save(userProfile);
+	}
+
+
+	private void addOrganizationalDetails(Company company, Map<String, String> organizationalDetails) {
+		LOG.debug("Method addOrganizationalDetails called for company id : " + company.getCompanyId());
+		OrganizationLevelSetting organizationLevelSetting = new OrganizationLevelSetting();
+		organizationLevelSetting.setAgentId(CommonConstants.DEFAULT_AGENT_ID);
+		organizationLevelSetting.setBranchId(CommonConstants.DEFAULT_BRANCH_ID);
+		organizationLevelSetting.setCompany(company);
+		organizationLevelSetting.setRegionId(CommonConstants.DEFAULT_REGION_ID);
+		organizationLevelSetting.setStatus(CommonConstants.STATUS_ACTIVE);
+		for (Entry<String, String> organizationalDetail : organizationalDetails.entrySet()) {
+			organizationLevelSetting.setSettingKey(organizationalDetail.getKey());
+			organizationLevelSetting.setSettingValue(organizationalDetail.getValue());
+			organizationLevelSettingDao.save(organizationLevelSetting);
+			organizationLevelSettingDao.flush();
+		}
+		LOG.debug("Method addCompanyDetails finished");
 	}
 }

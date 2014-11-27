@@ -14,6 +14,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -24,7 +25,8 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
  * This is the base Dao which needs to be extended by each Dao. It contains implementation for basic
  * CRUD methods required by every Dao.
  */
-@Component
+@Primary
+@Component("generic")
 public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T, ID> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GenericDaoImpl.class);
