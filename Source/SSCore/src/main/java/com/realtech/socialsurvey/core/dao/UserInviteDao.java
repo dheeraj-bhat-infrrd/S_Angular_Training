@@ -14,4 +14,4 @@ public interface UserInviteDao<T, ID extends Serializable> extends GenericDao<T,
 	public List<UserInvite> findByColumn(String encryptedUrlParameter);
 }
 
-//JIRA: SS-8: By RM05: EOC
+//JIRA: SS-8: By RM05:EOC
