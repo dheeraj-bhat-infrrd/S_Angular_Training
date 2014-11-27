@@ -114,6 +114,23 @@
 	background-size: 20px;
 }
 
+#userId{
+	background: url(../images/userName.png) no-repeat;
+	background-position: 14px center;
+	background-size: 20px;
+}
+
+#password{
+	background: url(../images/key.png) no-repeat;
+	background-position: 14px center;
+	background-size: 20px;
+}
+#confirmPassword{
+	background: url(../images/double-key.png) no-repeat;
+	background-position: 14px center;
+	background-size: 20px;
+}
+
 .formWrapper {
 	border-radius: 4px;
 	overflow: hidden;
