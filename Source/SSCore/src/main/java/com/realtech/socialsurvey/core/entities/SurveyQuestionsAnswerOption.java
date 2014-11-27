@@ -16,6 +16,7 @@ public class SurveyQuestionsAnswerOption implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="SURVEY_QUESTIONS_ANSWER_OPTIONS_ID")
 	private int surveyQuestionsAnswerOptionsId;
 

@@ -16,6 +16,7 @@ public class OrganizationLevelSetting implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="ORGANIZATION_LEVEL_SETTINGS_ID")
 	private int organizationLevelSettingsId;
 
