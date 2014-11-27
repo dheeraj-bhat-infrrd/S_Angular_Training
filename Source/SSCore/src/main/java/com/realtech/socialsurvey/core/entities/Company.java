@@ -1,9 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-
 import javax.persistence.*;
-
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -19,6 +17,7 @@ public class Company implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="COMPANY_ID")
 	private int companyId;
 
