@@ -216,7 +216,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	}
 
 	/*
-	 * To add a new user profile into the USER_ROFILE table.
+	 * To add a new user profile into the USER_ROFILE table
 	 */
 	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId) {
 		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
