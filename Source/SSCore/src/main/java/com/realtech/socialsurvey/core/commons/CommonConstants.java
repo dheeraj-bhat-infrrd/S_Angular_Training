@@ -25,4 +25,6 @@ public interface CommonConstants {
 	public static final Integer STATUS_INACTIVE = 0;
 	public static final String USER_INVITE_INVITATION_PARAMETERS_COLUMN = "invitationParameters";
 	public static final String USER_INVITE_INVITATION_VALID_UNTIL = "invitationValidUntil";
+	
+	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 }
