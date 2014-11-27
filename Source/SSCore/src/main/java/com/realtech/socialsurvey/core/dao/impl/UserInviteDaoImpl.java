@@ -9,14 +9,14 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ParentDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
 // JIRA: SS-8: By RM05: BOC
 
 @Component("userInvite")
-public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> implements ParentDao<UserInvite, Integer> {
+public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> implements UserInviteDao<UserInvite, Integer> {
 
 	@SuppressWarnings("unchecked")
 	@Override
