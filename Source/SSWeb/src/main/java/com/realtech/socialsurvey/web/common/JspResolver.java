@@ -10,4 +10,7 @@ public interface JspResolver {
 	public static final String INVITATION = "invitation";
 	public static final String ERROR_PAGE = "errorpage";
 	public static final String MESSAGE_HEADER = "messageheader";
+	public static final String LOGIN = "login";
+	public static final String FORGOT_PASSWORD = "forgotpassword";
+	public static final String RESET_PASSWORD = "resetpassword";
 }
