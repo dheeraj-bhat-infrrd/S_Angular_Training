@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.ParentDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -50,7 +50,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	@Resource
 	@Qualifier("userInvite")
-	private ParentDao<UserInvite, Integer> userInviteDao;
+	private UserInviteDao<UserInvite, Integer> userInviteDao;
 
 	@Autowired
 	private GenericDao<Company, Integer> companyDao;
