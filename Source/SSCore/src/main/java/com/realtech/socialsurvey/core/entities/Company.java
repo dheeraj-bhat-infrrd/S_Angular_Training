@@ -22,6 +22,12 @@ public class Company implements Serializable {
 	private int companyId;
 
 	private String company;
+	
+	@Column(name="REGISTRATION_STAGE")
+	private String registrationStage;
+	
+	@Column(name="IS_REGISTRATION_COMPLETE")
+	private int isRegistrationComplete;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -90,6 +96,22 @@ public class Company implements Serializable {
 
 	public void setCompany(String company) {
 		this.company = company;
+	}
+
+	public String getRegistrationStage() {
+		return registrationStage;
+	}
+
+	public void setRegistrationStage(String registrationStage) {
+		this.registrationStage = registrationStage;
+	}
+
+	public int getIsRegistrationComplete() {
+		return isRegistrationComplete;
+	}
+
+	public void setIsRegistrationComplete(int isRegistrationComplete) {
+		this.isRegistrationComplete = isRegistrationComplete;
 	}
 
 	public String getCreatedBy() {

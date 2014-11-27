@@ -3,13 +3,13 @@ package com.realtech.socialsurvey.core.dao;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-
 import org.hibernate.criterion.Criterion;
 
-//JIRA: SS-8: By RM05: BOC
+// JIRA: SS-8: By RM05: BOC
 
-/*This is the base Dao which needs to be implemented by each GenericDao.
- * It contains all the basic CRUD methods required by every Dao. 
+/*
+ * This is the base Dao which needs to be implemented by each GenericDao. It contains all the basic
+ * CRUD methods required by every Dao.
  */
 
 public interface GenericDao<T, ID extends Serializable> {
@@ -19,6 +19,8 @@ public interface GenericDao<T, ID extends Serializable> {
 	public T saveOrUpdate(T entity);
 
 	public T save(T entity);
+
+	public void update(T entity);
 
 	public void delete(T entity);
 

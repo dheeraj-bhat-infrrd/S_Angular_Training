@@ -40,7 +40,13 @@ public class LicenseDetail implements Serializable {
 
 	@Column(name="PAYMENT_MODE")
 	private String paymentMode;
+	
+	@Column(name="NEXT_RETRY_TIME")
+	private Timestamp nextRetryTime;
 
+	@Column(name="PAYMENT_RETRIES")
+	private int paymentRetries;
+	
 	private int status;
 
 	//bi-directional many-to-one association to AccountsMaster
@@ -118,6 +124,22 @@ public class LicenseDetail implements Serializable {
 
 	public void setPaymentMode(String paymentMode) {
 		this.paymentMode = paymentMode;
+	}
+
+	public Timestamp getNextRetryTime() {
+		return nextRetryTime;
+	}
+
+	public void setNextRetryTime(Timestamp nextRetryTime) {
+		this.nextRetryTime = nextRetryTime;
+	}
+
+	public int getPaymentRetries() {
+		return paymentRetries;
+	}
+
+	public void setPaymentRetries(int paymentRetries) {
+		this.paymentRetries = paymentRetries;
 	}
 
 	public int getStatus() {
