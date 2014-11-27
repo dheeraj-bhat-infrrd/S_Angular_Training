@@ -126,7 +126,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		String queryParam = extractUrlQueryParam(url);
 
 		LOG.debug("Adding a new inviatation into the user_invite table");
-		storeInvitation(queryParam, emailId);
+		storeCompanyAdminInvitation(queryParam, emailId);
 		LOG.debug("Calling email services to send registration invitation mail");
 		emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
 		LOG.debug("Method inviteUser finished successfully");
@@ -156,7 +156,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * This method stores the invitation related info into user_invite. It sets all the required
 	 * values in table and puts status as 0.
 	 */
-	private void storeInvitation(String queryParam, String emailId) throws NonFatalException {
+	private void storeCompanyAdminInvitation(String queryParam, String emailId) throws NonFatalException {
 		LOG.debug("Method storeInvitation called with query param : " + queryParam + " and emailId : " + emailId);
 		UserInvite userInvite = new UserInvite();
 
