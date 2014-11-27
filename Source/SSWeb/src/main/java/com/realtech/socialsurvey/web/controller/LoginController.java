@@ -49,6 +49,14 @@ public class LoginController {
 		String password = request.getParameter("password");
 		LOG.info("User login with user Id :" + userId);
 		
+		//check if form parameters valid
+		if(userId == null || userId.isEmpty()){
+			LOG.error("User Id can not be null or empty : ");
+		}
+		if(password == null || password.isEmpty()){
+			LOG.error("User Id can not be null or empty : ");
+		}
+		
 		HttpSession session = request.getSession(true);
 
 		User user = null;
