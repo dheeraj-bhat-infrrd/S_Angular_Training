@@ -122,6 +122,17 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 	}
 
 	@Override
+	public void update(T entity) {
+		try {
+			getSession().update(entity);
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in update().", hibernateException);
+			throw new DatabaseException("HibernateException caught in u().", hibernateException);
+		}
+	}
+
+	@Override
 	public void delete(T entity) {
 		try {
 			getSession().delete(entity);
