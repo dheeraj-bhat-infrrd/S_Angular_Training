@@ -1,6 +1,6 @@
---Inserting default values into COMPANY
+-- Inserting default values into COMPANY
 INSERT INTO `ss_user`.`COMPANY` (`COMPANY_ID`, `COMPANY`, `STATUS`, `CREATED_ON`, `CREATED_BY`, `MODIFIED_ON`, `MODIFIED_BY`) VALUES ('1', 'Default', '1', '2014-11-25 19:34:12', 'ADMIN', '2014-11-25 19:34:12', 'ADMIN');
 
---Inserting default values into PROFILES_MASTER
+-- Inserting default values into PROFILES_MASTER
 INSERT INTO `ss_user`.`PROFILES_MASTER` (`PROFILE_ID`, `PROFILE`, `STATUS`, `CREATED_ON`, `CREATED_BY`, `MODIFIED_ON`, `MODIFIED_BY`) VALUES ('1', 'MANAGER', '1', '2014-11-25 19:37:12', 'ADMIN', '2014-11-25 19:37:12', 'ADMIN');
 
