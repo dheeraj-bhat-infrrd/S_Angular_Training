@@ -13,4 +13,6 @@ public interface JspResolver {
 	public static final String LOGIN = "login";
 	public static final String FORGOT_PASSWORD = "forgotpassword";
 	public static final String RESET_PASSWORD = "resetpassword";
+	public static final String REGISTRATION = "registration";
+	public static final String COMPANY_INFORMATION = "companyinformation";
 }
