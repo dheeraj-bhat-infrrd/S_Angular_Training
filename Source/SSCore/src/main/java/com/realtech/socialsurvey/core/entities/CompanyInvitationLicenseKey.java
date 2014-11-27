@@ -16,6 +16,7 @@ public class CompanyInvitationLicenseKey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="COMPANY_INVITATION_LICENSE_KEY_ID")
 	private int companyInvitationLicenseKeyId;
 
