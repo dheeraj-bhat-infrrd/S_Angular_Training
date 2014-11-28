@@ -4,45 +4,42 @@ import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
 
-
 /**
  * The persistent class for the survey_questions_answer_options database table.
- * 
  */
 @Entity
-@Table(name="SURVEY_QUESTIONS_ANSWER_OPTIONS")
-@NamedQuery(name="SurveyQuestionsAnswerOption.findAll", query="SELECT s FROM SurveyQuestionsAnswerOption s")
+@Table(name = "SURVEY_QUESTIONS_ANSWER_OPTIONS")
+@NamedQuery(name = "SurveyQuestionsAnswerOption.findAll", query = "SELECT s FROM SurveyQuestionsAnswerOption s")
 public class SurveyQuestionsAnswerOption implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="SURVEY_QUESTIONS_ANSWER_OPTIONS_ID")
+	@Column(name = "SURVEY_QUESTIONS_ANSWER_OPTIONS_ID")
 	private int surveyQuestionsAnswerOptionsId;
 
 	private String answer;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
 	private int status;
 
-	//bi-directional many-to-one association to SurveyQuestion
-	@ManyToOne
-	@JoinColumn(name="SURVEY_QUESTIONS_ID")
+	// bi-directional many-to-one association to SurveyQuestion
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "SURVEY_QUESTIONS_ID")
 	private SurveyQuestion surveyQuestion;
 
-	public SurveyQuestionsAnswerOption() {
-	}
+	public SurveyQuestionsAnswerOption() {}
 
 	public int getSurveyQuestionsAnswerOptionsId() {
 		return this.surveyQuestionsAnswerOptionsId;

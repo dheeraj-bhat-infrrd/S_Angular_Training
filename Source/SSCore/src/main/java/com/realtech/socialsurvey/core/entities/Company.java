@@ -44,39 +44,39 @@ public class Company implements Serializable {
 	private int status;
 
 	//bi-directional many-to-one association to Branch
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<Branch> branches;
 
 	//bi-directional many-to-one association to LicenseDetail
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<LicenseDetail> licenseDetails;
 
 	//bi-directional many-to-one association to OrganizationLevelSetting
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<OrganizationLevelSetting> organizationLevelSettings;
 
 	//bi-directional many-to-one association to Region
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<Region> regions;
 
-	//bi-directional many-to-one association to Survey
-	@OneToOne(mappedBy="company")
+	//bi-directional one-to-one association to Survey
+	@OneToOne(mappedBy="company", fetch = FetchType.LAZY)
 	private Survey survey;
 
 	//bi-directional many-to-one association to SurveyQuestion
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<SurveyQuestion> surveyQuestions;
 
 	//bi-directional many-to-one association to UserInvite
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<UserInvite> userInvites;
 
 	//bi-directional many-to-one association to UserProfile
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
 
 	//bi-directional many-to-one association to User
-	@OneToMany(mappedBy="company")
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<User> users;
 
 	public Company() {

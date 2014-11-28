@@ -5,64 +5,61 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-
 /**
  * The persistent class for the survey_questions database table.
- * 
  */
 @Entity
-@Table(name="SURVEY_QUESTIONS")
-@NamedQuery(name="SurveyQuestion.findAll", query="SELECT s FROM SurveyQuestion s")
+@Table(name = "SURVEY_QUESTIONS")
+@NamedQuery(name = "SurveyQuestion.findAll", query = "SELECT s FROM SurveyQuestion s")
 public class SurveyQuestion implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="SURVEY_QUESTIONS_ID")
+	@Column(name = "SURVEY_QUESTIONS_ID")
 	private int surveyQuestionsId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="IS_RATING_QUESTION")
+	@Column(name = "IS_RATING_QUESTION")
 	private int isRatingQuestion;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	@Column(name="`ORDER`")
+	@Column(name = "`ORDER`")
 	private int order;
 
 	private int status;
 
-	@Column(name="SURVEY_QUESTION")
+	@Column(name = "SURVEY_QUESTION")
 	private String surveyQuestion;
 
-	@Column(name="SURVEY_QUESTIONS_CODE")
+	@Column(name = "SURVEY_QUESTIONS_CODE")
 	private String surveyQuestionsCode;
 
-	//bi-directional many-to-one association to Company
-	@ManyToOne
-	@JoinColumn(name="COMPANY_ID")
+	// bi-directional many-to-one association to Company
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to Survey
-	@ManyToOne
-	@JoinColumn(name="SURVEY_ID")
+	// bi-directional many-to-one association to Survey
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "SURVEY_ID")
 	private Survey survey;
 
-	//bi-directional many-to-one association to SurveyQuestionsAnswerOption
-	@OneToMany(mappedBy="surveyQuestion")
+	// bi-directional many-to-one association to SurveyQuestionsAnswerOption
+	@OneToMany(mappedBy = "surveyQuestion", fetch = FetchType.LAZY)
 	private List<SurveyQuestionsAnswerOption> surveyQuestionsAnswerOptions;
 
-	public SurveyQuestion() {
-	}
+	public SurveyQuestion() {}
 
 	public int getSurveyQuestionsId() {
 		return this.surveyQuestionsId;
