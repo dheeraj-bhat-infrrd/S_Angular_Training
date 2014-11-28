@@ -63,6 +63,9 @@ public class BrainTreePaymentImpl implements Payment {
 
 	BraintreeGateway gateway = null;	
 	
+	/**
+	 * Initialises the Braintree gateway.
+	 */
 	public void initialise(){		
 		
 		LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey );
@@ -74,6 +77,12 @@ public class BrainTreePaymentImpl implements Payment {
 		    );		
 	}
 	
+	/**
+	 * Makes the dao calls to update LicenseDetails table.
+	 * @param accountsMasterId
+	 * @param companyId
+	 * @param userId
+	 */
 	public void updateLicenseTable(int accountsMasterId,int companyId,Integer userId){
 		
 		AccountsMaster accountsMaster = accountsMasterDao.findById(AccountsMaster.class, accountsMasterId);
@@ -206,7 +215,14 @@ public class BrainTreePaymentImpl implements Payment {
 		LOG.info("subscribeCustomer : customerId : " + customerId + " for planId : " + planId + " Status : " + result.isSuccess()+ " Message : " + result.getMessage() );
 		return result.isSuccess();		
 	}
-
+	
+	/**
+	 * This is the service called by the controller to make a subscription.
+	 * @param user
+	 * @param company
+	 * @param planId
+	 * @param nonce
+	 */
 	@Override
 	@Transactional
 	public boolean subscribe(User user,Company company, Integer planId, String nonce) throws NonFatalException {

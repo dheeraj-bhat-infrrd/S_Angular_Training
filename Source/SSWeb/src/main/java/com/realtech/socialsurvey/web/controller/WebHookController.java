@@ -26,6 +26,12 @@ public class WebHookController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(WebHookController.class);
 	
+	/**
+	 * Webhook for verifying the subscription hook by the GET request from Braintree.
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value="/webhook/subscription",method=RequestMethod.GET)
 	public @ResponseBody Object subscribeNotification(HttpServletRequest request,HttpServletResponse response){
 		
@@ -38,6 +44,12 @@ public class WebHookController {
 		return challenge;
 	}
 	
+	/**
+	 * Webhook for accepting subscription notifications from Braintree.
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value="/webhook/subscription",method=RequestMethod.POST)
 	public String getSubscriptionNotifications(HttpServletRequest request,HttpServletResponse response){
 		
