@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 /**
@@ -26,7 +32,12 @@ public class PaymentController {
 	private static final Logger LOG = LoggerFactory.getLogger(PaymentController.class);
 	
 	@Autowired
-	Payment gateway;
+	private Payment gateway;
+	
+	@Autowired
+	private MessageUtils messageUtils;
+	
+	
 	
 	/**
 	 * Method used to display the Braintree form to get card details.
@@ -38,7 +49,7 @@ public class PaymentController {
 	@RequestMapping(value="/payment")
 	public String paymentPage(Model model,HttpServletResponse response,HttpServletRequest request){
 		
-		LOG.info("Request for paymentPage : sending payment.jsp!");
+		LOG.info("Payment Step 1.");
 		gateway.initialise();
 		model.addAttribute("clienttoken", gateway.getClientToken());
 		return JspResolver.PAYMENT;
@@ -53,36 +64,51 @@ public class PaymentController {
 	@RequestMapping(value="/subscribe", method= RequestMethod.POST)
 	public String subscribeForPlan(Model model, HttpServletRequest request,HttpServletResponse response){
 		
-		LOG.info("Request for subscribeForPlan : sending subscribe.jsp!");
+		LOG.info("Payment Step 2.");
 		
-		boolean status=false;
+		boolean status=false;		
 		gateway.initialise();
-		User user = new User();
-		user.setUserId(1);
 		
-		Company company = new Company();
-		company.setCompany("Rare Mile Tech");
-		company.setCompanyId(1);
-		user.setCompany(company);
+		//Extract the session
+		HttpSession session = request.getSession(false);
 		
+		//Get the user object from the session and the company object from it
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		Company company = user.getCompany();
 		
-		int planId = 1; // TODO: get from request
-		String nonce = com.braintreegateway.test.Nonce.Transactable; // TODO: get from request
+		//Get the planId from the session
+		int planId = (int) session.getAttribute(CommonConstants.ACCOUNT_TYPE);
+		
+		//Get the nonce from the request
+		String nonce = request.getParameter("payment_method_nonce");
+		
 		try {
-			status = gateway.subscribe(user,company, planId, nonce);
+			try{
+				status = gateway.subscribe(user,company, planId, nonce);
+			}
+			catch(InvalidInputException e){
+				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown");
+				throw new InvalidInputException(e.getMessage(),DisplayMessageConstants.GENERAL_ERROR,e);
+				
+			}
 		}
 		catch (NonFatalException e) {
-			e.printStackTrace();
-		}
-		 		
-		if(status == true){
-			model.addAttribute("subscribeStatus", "You have been subscribed!");
-		}
-		else{
-			model.addAttribute("subscribeStatus", "There was an issue! It will be resolved!");
+			LOG.error("PaymentController subscribeForPlan() : NonFatalException : " + messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
 		
-		return JspResolver.SUBSCRIBE;
+		if(status == true){
+			LOG.info("Subscription Successful!");
+			model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		else{
+			LOG.info("Subscription Unsuccessful!");
+			model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		
 	}
 
 }

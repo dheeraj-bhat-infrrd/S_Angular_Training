@@ -15,18 +15,11 @@ public interface Payment {
 	
 	/**
 	 * Method to initialise the gateway.
+	 * @return 
 	 */
-	public void initialise();
+	public BraintreeGateway initialise();
 	
-	/**
-	 * Method used to add a customer to the Braintree vault with their payment details.
-	 * @param company
-	 * @param nonce
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	public boolean addCustomerWithPayment(Company company,String nonce) throws InvalidInputException;
-	
+		
 	/**
 	 * Method to generate client token to be used by the front end.
 	 * @return
@@ -50,12 +43,6 @@ public interface Payment {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, Integer planId, String nonce) throws NonFatalException;
-	
-	/**
-	 * Method used to return the instance of gateway being used.
-	 * @return
-	 */
-	public BraintreeGateway getGatewayInstance();
-
+	public boolean subscribe(User user,Company company, int planId, String nonce) throws NonFatalException;
+		
 }

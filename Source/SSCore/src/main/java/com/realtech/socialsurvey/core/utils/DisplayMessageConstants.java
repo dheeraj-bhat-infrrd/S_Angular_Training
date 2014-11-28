@@ -29,4 +29,8 @@ public final class DisplayMessageConstants {
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
 	public static final String USER_REGISTRATION_SUCCESSFUL = "USER_REGISTRATION_SUCCESSFUL";
+	public static final String SUBSCRIPTION_SUCCESSFUL = "USER_SUBSCRIPTION_SUCCESSFUL";
+	
+	// usuccessful message constants
+	public static final String SUBSCRIPTION_UNSUCCESSFUL = "SUBSCRIPTION_UNSUCCESSFUL";
 }
