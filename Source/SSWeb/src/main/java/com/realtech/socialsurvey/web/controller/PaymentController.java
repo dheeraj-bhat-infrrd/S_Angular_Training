@@ -28,6 +28,13 @@ public class PaymentController {
 	@Autowired
 	Payment gateway;
 	
+	/**
+	 * Method used to display the Braintree form to get card details.
+	 * @param model
+	 * @param response
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value="/payment")
 	public String paymentPage(Model model,HttpServletResponse response,HttpServletRequest request){
 		
@@ -38,7 +45,7 @@ public class PaymentController {
 	}
 	
 	/**
-	 * Method for a user to pay for a plan.
+	 * Method for a user to subscribe for a plan.
 	 * @param model
 	 * @param request
 	 * @return
