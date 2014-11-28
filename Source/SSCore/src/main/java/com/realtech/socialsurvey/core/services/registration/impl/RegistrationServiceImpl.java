@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.ParentDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -50,7 +50,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	@Resource
 	@Qualifier("userInvite")
-	private ParentDao<UserInvite, Integer> userInviteDao;
+	private UserInviteDao<UserInvite, Integer> userInviteDao;
 
 	@Autowired
 	private GenericDao<Company, Integer> companyDao;
@@ -110,7 +110,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 			InvalidUrlException {
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
-		System.out.println(encryptedPassword.toCharArray().length);
 		User user = createUser(company, username, encryptedPassword, emailId);
 		createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_NO_PROFILE_ID);
@@ -124,7 +123,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName + " lastName : " + lastName);
 
 		String queryParam = extractUrlQueryParam(url);
-
+		deactivateExistingInvitesWithSameParameters(queryParam);
 		LOG.debug("Adding a new inviatation into the user_invite table");
 		storeCompanyAdminInvitation(queryParam, emailId);
 		LOG.debug("Calling email services to send registration invitation mail");
@@ -181,8 +180,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 */
 	private boolean validateCompanyRegistrationUrlParameters(String encryptedUrlParameter) throws InvalidInputException {
 		LOG.debug("Method validateUrlParameters called.");
-		List<UserInvite> userInvite = userInviteDao.findByColumn(encryptedUrlParameter);
-		if (userInvite == null || userInvite.isEmpty()) {
+		List<UserInvite> userInvites = userInviteDao.findByColumn(encryptedUrlParameter);
+		if (userInvites == null || userInvites.isEmpty()) {
 			LOG.error("Exception caught while validating company registration URL parameters.");
 			throw new InvalidInputException("URL parameter provided is inappropriate.");
 		}
@@ -238,6 +237,28 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Method createUserProfile finished");
 		userProfileDao.save(userProfile);
 		LOG.info("Method createUserProfile() finished");
+	}
+
+	/*
+	 * This method gets the list of all the UserInvites already existing with the same parameter and
+	 * marks them as inactive.
+	 */
+	private void deactivateExistingInvitesWithSameParameters(String queryParam) {
+		LOG.debug("Method deactivateExistingCustomersWithSameParameters started.");
+		List<UserInvite> userinvites = userInviteDao.findByColumn(UserInvite.class, CommonConstants.USER_INVITE_INVITATION_PARAMETERS_COLUMN,
+				queryParam);
+		for (UserInvite userInvite : userinvites) {
+			deactivateUserInvite(userInvite);
+		}
+		LOG.debug("Method deactivateExistingCustomersWithSameParameters finished.");
+	}
+
+	/*
+	 * It marks a selected row in UserInvite as inactive.
+	 */
+	private void deactivateUserInvite(UserInvite userInvite) {
+		userInvite.setStatus(CommonConstants.STATUS_INACTIVE);
+		userInviteDao.update(userInvite);
 	}
 	// JIRA: SS-27: By RM05: EOC
 }

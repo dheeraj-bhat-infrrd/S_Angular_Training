@@ -9,14 +9,16 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.ParentDao;
+import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
 // JIRA: SS-8: By RM05: BOC
-
+/*
+ * This class contains methods specific to UserInvite entity.
+ */
 @Component("userInvite")
-public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> implements ParentDao<UserInvite, Integer> {
+public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> implements UserInviteDao<UserInvite, Integer> {
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -26,6 +28,7 @@ public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> imple
 		Timestamp currentTimestamp = new Timestamp(calendar.getTimeInMillis());
 		try {
 			criteria.add(Restrictions.eq(CommonConstants.USER_INVITE_INVITATION_PARAMETERS_COLUMN, encryptedUrlParameter));
+			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
 			calendar.set(1970, 01, 01, 0, 0);
 			//Valid_till date should either be equal to 01-JAN-1970 or less than today. 
 			Criterion criterion = Restrictions.or(
