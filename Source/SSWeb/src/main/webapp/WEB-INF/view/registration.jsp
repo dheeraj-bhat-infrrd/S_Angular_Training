@@ -34,22 +34,22 @@
 						<div class="formContainer">
 							<form role="form" id="registerForm" method="post" action="register.do">
 								<div class="form-group formInputField">
-									<input id="firstname" name="firstname"
+									<input id="firstName" name="firstname"
 										class="form-control formInput" type="text"
 										value="${firstname}" placeholder="'<spring:message code = "label.firstname.key" />'">
 								</div>
 								<div class="form-group formInputField">
-									<input id="lastname" name="lastname"
+									<input id="lastName" name="lastname"
 										class="form-control formInput" type="text" value="${lastname}"
 										placeholder='<spring:message code = "label.lastname.key" />'>
 								</div>
 								<div class="form-group formInputField">
-									<input id="emailid" name="emailid"
+									<input id="emailId" name="emailid"
 										class="form-control formInput" type="text" value="${emailid}"
 										placeholder='<spring:message code = "label.emailid.key" />'>
 								</div>
 								<div class="form-group formInputField">
-									<input id="username" name="username"
+									<input id="userId" name="username"
 										class="form-control formInput" type="text"
 										placeholder='<spring:message code = "label.username.key" />'>
 								</div>
@@ -59,7 +59,7 @@
 										placeholder='<spring:message code = "label.password.key" />'>
 								</div>
 								<div class="form-group formInputField">
-									<input id="confirmpassword" name="confirmpassword"
+									<input id="confirmPassword" name="confirmpassword"
 										class="form-control formInput" type="password"
 										placeholder='<spring:message code = "label.confirmpassword.key" />'>
 								</div>

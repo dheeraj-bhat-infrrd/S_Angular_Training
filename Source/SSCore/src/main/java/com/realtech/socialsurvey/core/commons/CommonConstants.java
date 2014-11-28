@@ -19,7 +19,6 @@ public interface CommonConstants {
 	public static final int DEFAULT_BRANCH_ID = 0;
 	public static final int DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
-	public static final String COMPANY_NAME = "company_name";
 	public static final String GUEST_USER_NAME = "GUEST";
 	public static final String ADMIN_USER_NAME = "ADMIN";
 	public static final Integer STATUS_ACTIVE = 1;
@@ -29,4 +28,17 @@ public interface CommonConstants {
 	public static final String USER_INVITE_INVITATION_VALID_UNTIL = "invitationValidUntil";
 
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
+
+	public static final String CONFIG_PROPERTIES_FILE = "config.properties";
+	public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
+	public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
+	public static final String SENDGRID_SENDER_PASSWORD = "SENDGRID_SENDER_PASSWORD";
+	public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties"; 
+	
+	// Constants to be used in code for referencing variables(i.e in maps or session attributes)
+	public static final String USER_IN_SESSION = "user";
+	public static final String COMPANY_NAME = "companyName";
+	public static final String ADDRESS = "address";
+	public static final String ZIPCODE = "zipCode";
+	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
 }
