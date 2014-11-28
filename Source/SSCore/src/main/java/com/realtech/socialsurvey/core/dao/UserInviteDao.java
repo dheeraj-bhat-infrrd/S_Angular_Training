@@ -1,16 +1,15 @@
 package com.realtech.socialsurvey.core.dao;
 
-import java.io.Serializable;
 import java.util.List;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 
 //JIRA: SS-8: By RM05: BOC
 
-/*This interface contains methods which are to be used by various DAOs.
- * Every DAO implements this interface.
+/*
+ * This interface contains methods for USER_INVITE TABLE related operations.
  */
 
-public interface UserInviteDao<T, ID extends Serializable> extends GenericDao<T,ID>{
+public interface UserInviteDao extends GenericDao<UserInvite, Integer>{
 	public List<UserInvite> findByColumn(String encryptedUrlParameter);
 }
 
