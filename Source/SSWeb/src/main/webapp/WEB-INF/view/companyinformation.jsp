@@ -9,12 +9,59 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title><spring:message code="label.title.settings.key" /></title>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap-theme.min.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/style.css">
+<script>
+	$(function() {
+		$('#companyInfoForm').bootstrapValidator({
+			fields : {
+				company : {
+					validators : {
+						notEmpty : {
+							message : 'First name can\'t be empty'
+						}
+					}
+				},
+				emailId : {
+					validators : {
+						notEmpty : {
+							message : 'Email Id can\'t be empty'
+						}
+					}
+				},
+				userId : {
+					validators : {
+						notEmpty : {
+							message : 'User Id can\'t be empty'
+						}
+					}
+				},
+				password : {
+					validators : {
+						notEmpty : {
+							message : 'Password can\'t be empty'
+						}
+					}
+				},
+				confirmPassword : {
+					validators : {
+						notEmpty : {
+							message : 'Re-enter the password'
+						}
+					}
+				}
+			}
+		});
+	});
+</script>
 </head>
 <body>
 	<div id="registrationMainWrapper" class="mainWrapper">
@@ -29,16 +76,18 @@
 						</div>
 						<div class="formContainer">
 							<form role="form" id="companyInfoForm" method="post"
-								action="">
+								action="addcompanyinformation.do">
 								<div class="form-group formInputField">
 									<input id="company" name="company"
 										class="form-control formInput" type="text"
 										placeholder='<spring:message code="label.company.key"/>'>
 								</div>
-								<div class="form-group formInputField">
-									<input id="logo" name="logo" class="form-control formInput"
-										type="file"
-										placeholder='<spring:message code="label.logo.key"/>'>
+								<div class="form-group">
+									<div class="input-group">
+										<input id="regStep3Logo" name="logo"
+											class="form-control formInput" type="text" placeholder="logo">
+										<div class="input-group-addon">...</div>
+									</div>
 								</div>
 								<div class="form-group formInputField">
 									<input id="address1" name="address1"
@@ -57,7 +106,7 @@
 								</div>
 								<div class="form-group formInputField">
 									<input id="contactno" name="contactno"
-										class="form-control formInput" type="password"
+										class="form-control formInput" type="text"
 										placeholder='<spring:message code="label.companycontactno.key"/>'>
 								</div>
 								<button class="formButton" id="formSubmit">
@@ -69,7 +118,8 @@
 				</div>
 				<div class="formModalFooter clearfix">
 					<div class="floatLeft formModalFooterContent">
-						<spring:message code="label.forgotpassword.key" />?
+						<spring:message code="label.forgotpassword.key" />
+						?
 					</div>
 					<div class="floatRight formModalFooterContent">
 						<span><spring:message code="label.alreadyhaveanacoount.key" />?</span>

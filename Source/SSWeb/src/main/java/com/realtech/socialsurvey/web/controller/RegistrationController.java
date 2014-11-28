@@ -8,6 +8,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -173,14 +176,23 @@ public class RegistrationController {
 			try {
 				if (emailId.equals(originalEmailId)) {
 					LOG.debug("Registering user with emailId : " + emailId);
-					registrationService.addCorporateAdmin(firstName, lastName, originalEmailId, username, confirmPassword);
+					User user = registrationService.addCorporateAdmin(firstName, lastName, originalEmailId, username, confirmPassword);
 					LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
+
+					LOG.debug("Adding newly registered user to session");
+					HttpSession session = request.getSession(true);
+					session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+					LOG.debug("Successfully added registered user to session");
 
 				}
 				else {
 					LOG.debug("Sending registration invite link on the new emailId : " + emailId + " added by the user");
 					registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE));
+
 					LOG.debug("Registration invite link on the new emailId : " + emailId + " sent successfully");
+					return JspResolver.MESSAGE_HEADER;
 				}
 
 				// Set the success message

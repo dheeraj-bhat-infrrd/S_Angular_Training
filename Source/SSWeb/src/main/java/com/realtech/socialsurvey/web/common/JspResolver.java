@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.common;
 
 /**
  * Holds the jsp name as constants
- *
  */
 public interface JspResolver {
 
@@ -17,4 +16,6 @@ public interface JspResolver {
 	public static final String COMPANY_INFORMATION = "companyinformation";
 	public static final String PAYMENT = "payment";
 	public static final String SUBSCRIBE = "subscribe";
+	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
+
 }

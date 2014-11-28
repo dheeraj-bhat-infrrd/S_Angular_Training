@@ -21,6 +21,10 @@ public final class DisplayMessageConstants {
 	public static final String PASSWORDS_MISMATCH = "PASSWORDS_MISMATCH";
 	public static final String REGISTRATION_GENERAL_ERROR = "REGISTRATION_GENERAL_ERROR";
 	public static final String INVALID_REGISTRATION_URL = "INVALID_REGISTRATION_URL";
+	public static final String INVALID_COMPANY_NAME = "INVALID_COMPANY_NAME";
+	public static final String INVALID_ADDRESS = "INVALID_ADDRESS";
+	public static final String INVALID_ZIPCODE = "INVALID_ZIPCODE";
+	public static final String INVALID_COMPANY_PHONEN0 = "INVALID_COMPANY_PHONEN0";
 
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";

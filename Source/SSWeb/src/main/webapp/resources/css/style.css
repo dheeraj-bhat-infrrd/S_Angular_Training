@@ -154,3 +154,7 @@
 	color: #777;
 	border-radius:3px;
 }
+
+.accountTypeBox {
+	float: left
+}
