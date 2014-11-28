@@ -41,4 +41,5 @@ public interface CommonConstants {
 	public static final String ADDRESS = "address";
 	public static final String ZIPCODE = "zipCode";
 	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
+	public static final String ACCOUNT_TYPE = "accountType"; 
 }
