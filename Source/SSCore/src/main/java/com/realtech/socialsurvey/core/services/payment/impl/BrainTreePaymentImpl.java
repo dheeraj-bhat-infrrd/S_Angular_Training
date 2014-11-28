@@ -95,7 +95,7 @@ public class BrainTreePaymentImpl implements Payment {
 		ld.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		ld.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		ld.setPaymentMode("A");
-		ld.setNextRetryTime(new Timestamp(1));
+		ld.setNextRetryTime(new Timestamp(86400000));
 		ld.setStatus(1);
 		ld.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
 		ld.setPaymentRetries(0);
