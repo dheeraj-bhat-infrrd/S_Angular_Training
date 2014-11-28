@@ -46,10 +46,10 @@ public class UserManagementServiceImpl implements UserManagementService {
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
-		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME));		
+		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME));
 		updateCompanyForUser(user, company);
 		updateCompanyForUserProfile(user, company);
-		addOrganizationalDetails(organizationalDetails);
+		addOrganizationalDetails(user, organizationalDetails);
 		LOG.info("Method addCompanyInformation finished for user " + user.getLoginName());
 		return user;
 	}
@@ -87,10 +87,11 @@ public class UserManagementServiceImpl implements UserManagementService {
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		List<UserProfile> userProfiles = user.getUserProfiles();
-		for (UserProfile userProfile : userProfiles) {
-			userProfile.setCompany(company);
-			userProfileDao.update(userProfile);
-		}
+		if (userProfiles != null)
+			for (UserProfile userProfile : userProfiles) {
+				userProfile.setCompany(company);
+				userProfileDao.update(userProfile);
+			}
 		LOG.debug("Method updateCompanyForUserProfile finished for user " + user.getLoginName());
 	}
 
@@ -98,7 +99,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 	 * This method adds all the key and value pairs into the ORGANIZATION_LEVEL_SETTINGS table.
 	 */
 
-	private void addOrganizationalDetails(Map<String, String> organizationalDetails) {
+	private void addOrganizationalDetails(User user, Map<String, String> organizationalDetails) {
 		LOG.debug("Method addOrganizationalDetails called.");
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		OrganizationLevelSetting organizationLevelSetting = new OrganizationLevelSetting();
@@ -107,6 +108,10 @@ public class UserManagementServiceImpl implements UserManagementService {
 		organizationLevelSetting.setCompany(company);
 		organizationLevelSetting.setRegionId(CommonConstants.DEFAULT_REGION_ID);
 		organizationLevelSetting.setStatus(CommonConstants.STATUS_ACTIVE);
+		organizationLevelSetting.setCreatedBy(String.valueOf(user.getUserId()));
+		organizationLevelSetting.setModifiedBy(String.valueOf(user.getUserId()));
+		organizationLevelSetting.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		organizationLevelSetting.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		for (Entry<String, String> organizationalDetail : organizationalDetails.entrySet()) {
 			organizationLevelSetting.setSettingKey(organizationalDetail.getKey());
 			organizationLevelSetting.setSettingValue(organizationalDetail.getValue());

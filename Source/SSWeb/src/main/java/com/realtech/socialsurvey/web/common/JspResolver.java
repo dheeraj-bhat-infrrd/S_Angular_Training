@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.common;
 
 /**
  * Holds the jsp name as constants
- *
  */
 public interface JspResolver {
 
@@ -15,4 +14,5 @@ public interface JspResolver {
 	public static final String RESET_PASSWORD = "resetpassword";
 	public static final String REGISTRATION = "registration";
 	public static final String COMPANY_INFORMATION = "companyinformation";
+	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 }
