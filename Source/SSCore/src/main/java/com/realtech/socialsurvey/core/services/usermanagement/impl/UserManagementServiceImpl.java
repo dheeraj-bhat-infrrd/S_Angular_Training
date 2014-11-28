@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
@@ -44,8 +45,14 @@ public class UserManagementServiceImpl implements UserManagementService {
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
+		if (organizationalDetails == null || organizationalDetails.isEmpty()) {
+			throw new InvalidInputException("Organization details map is empty or null");
+		}
+		if (!organizationalDetails.containsKey(CommonConstants.COMPANY_NAME)) {
+			throw new InvalidInputException("Company name is not present in organization details map");
+		}
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME));
 		updateCompanyForUser(user, company);
 		updateCompanyForUserProfile(user, company);

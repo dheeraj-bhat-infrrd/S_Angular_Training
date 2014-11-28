@@ -53,8 +53,8 @@ public class UserManagementController {
 		String companyContactNo = request.getParameter("contactno");
 
 		try {
+			validateCompanyInfoParams(companyName, address1, zipCode, companyContactNo);
 			String address = getCompleteAddress(address1, address2);
-			validateCompanyInfoParams(companyName, address, zipCode, companyContactNo);
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
@@ -68,8 +68,6 @@ public class UserManagementController {
 			LOG.debug("Calling services to add company details");
 			user = userManagementServices.addCompanyInformation(user, companyDetails);
 
-			LOG.debug("Updating the user object in session after adding the company details");
-			session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 			LOG.debug("Successfully executed service to add company details");
 
 		}
@@ -95,6 +93,7 @@ public class UserManagementController {
 	private void validateCompanyInfoParams(String companyName, String address, String zipCode, String companyContactNo) throws InvalidInputException {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
+
 		String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
 		if (companyName == null || companyName.isEmpty()) {
 			throw new InvalidInputException("Company name is null or empty while adding company information",
@@ -103,6 +102,7 @@ public class UserManagementController {
 		if (address == null || address.isEmpty()) {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
+		// TODO Validation for zip code with regex
 		if (zipCode == null || zipCode.isEmpty()) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
@@ -143,12 +143,28 @@ public class UserManagementController {
 	@RequestMapping(value = "/addaccounttype", method = RequestMethod.POST)
 	public String addAccountType(Model model, HttpServletRequest request) {
 		LOG.info("Method addAccountType of UserManagementController called");
-		String accountType = request.getParameter("accountType");
-		LOG.debug("AccountType obtained : " + accountType);
+		String strAccountType = request.getParameter("accounttype");
+		try {
+			if (strAccountType == null || strAccountType.isEmpty()) {
+				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
+			}
+			LOG.debug("AccountType obtained : " + strAccountType);
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			// TODO call services to save the account type
 
-		// TODO call services to save the account type
-		LOG.info("Method addAccountType of UserManagementController completed successfully");
-		return null;
+			// AccountType accountType = userManagementServices.addAccountTypeForCompany(user,
+			// strAccountType);
+
+			LOG.info("Method addAccountType of UserManagementController completed successfully");
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		return "";
+		// return JspResolver.PAYMENT;
 
 	}
 }
