@@ -58,11 +58,11 @@ public class PaymentController {
 		boolean status=false;
 		gateway.initialise();
 		User user = new User();
-		user.setUserId(10001);
+		user.setUserId(1);
 		
 		Company company = new Company();
 		company.setCompany("Rare Mile Tech");
-		company.setCompanyId(1001);
+		company.setCompanyId(1);
 		user.setCompany(company);
 		
 		

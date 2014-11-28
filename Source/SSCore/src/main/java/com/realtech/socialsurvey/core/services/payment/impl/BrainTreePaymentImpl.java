@@ -130,7 +130,7 @@ public class BrainTreePaymentImpl implements Payment {
 		
 		//Creating a new customer object
 		CustomerRequest request = new CustomerRequest()
-			.id(Integer.toString(company.getCompanyId()))
+			.id(String.valueOf(company.getCompanyId()))
 			.firstName(company.getCompany())
 			.paymentMethodNonce(nonce);
 		
