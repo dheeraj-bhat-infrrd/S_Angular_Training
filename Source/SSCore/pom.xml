@@ -127,6 +127,18 @@
 			<artifactId>recaptcha4j</artifactId>
 			<version>0.0.7</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>tomcat</groupId>
+			<artifactId>naming-common</artifactId>
+			<version>4.1.36</version>
+		</dependency>
+		
+		<dependency>
+		  <groupId>com.braintreepayments.gateway</groupId>
+		  <artifactId>braintree-java</artifactId>
+		  <version>2.38.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -1,11 +1,14 @@
 package com.realtech.socialsurvey.core.services.payment.impl;
 
-import java.math.BigDecimal;
+//JIRA: SS-15: By RM03
+
+import java.sql.Timestamp;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.ClientTokenRequest;
 import com.braintreegateway.Customer;
@@ -14,30 +17,80 @@ import com.braintreegateway.Environment;
 import com.braintreegateway.Result;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.SubscriptionRequest;
-import com.braintreegateway.Transaction;
-import com.braintreegateway.TransactionRequest;
 import com.braintreegateway.exceptions.NotFoundException;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
-//@Component
+/**
+ * This class implements the Payment interface and makes calls to the Braintree APIs
+ * to make payments and subscriptions. 
+ */
+
+
+@Component
 public class BrainTreePaymentImpl implements Payment {
+	
+	@Autowired
+	GenericDao<LicenseDetail, Integer> licenseDetailDao;
+	
+	@Autowired
+	GenericDao<AccountsMaster, Integer> accountsMasterDao;
+	
+	@Autowired
+	GenericDao<Company, Integer> companyDao;
+	
+	@Autowired
+	PropertyFileReader propertyFileReader;
+	
+	@Value("${MERCHANT_ID}")
+	String merchantId;
+	
+	@Value("${PUBLIC_KEY}")
+	String publicKey;
+	
+	@Value("${PRIVATE_KEY}")
+	String privateKey;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
 
 	BraintreeGateway gateway = null;	
 	
-	
 	public void initialise(){		
+		
+		LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey );
 		gateway = new BraintreeGateway(
 		        Environment.SANDBOX,
-		        "q5vjmsqhvr5swjzd",
-		        "cr8ht78s8kgfyw7t",
-		        "0950310c09106463f32aa2f931af5ef0"
+		        merchantId,
+		        publicKey,
+		        privateKey
 		    );		
+	}
+	
+	public void updateLicenseTable(int accountsMasterId,int companyId,Integer userId){
+		
+		AccountsMaster accountsMaster = accountsMasterDao.findById(AccountsMaster.class, accountsMasterId);
+		Company company = companyDao.findById(Company.class, companyId);
+		LicenseDetail ld = new LicenseDetail();
+		ld.setAccountsMaster(accountsMaster);
+		ld.setCompany(company);
+		ld.setCreatedBy(userId.toString());
+		ld.setModifiedBy(userId.toString());
+		ld.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		ld.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		ld.setPaymentMode("A");
+		ld.setNextRetryTime(new Timestamp(1));
+		ld.setStatus(1);
+		ld.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+		ld.setPaymentRetries(0);
+		licenseDetailDao.save(ld);		
 	}
 	
 	/**
@@ -45,9 +98,15 @@ public class BrainTreePaymentImpl implements Payment {
 	 * @param user User object
 	 * @param company Company object
 	 * @return Success or Failure of the operation.
+	 * @throws InvalidInputException 
 	 */
-	private boolean addCustomerWithoutPayment(User user, Company company){
-
+	public boolean addCustomerWithoutPayment(User user) throws InvalidInputException{
+		
+		if(user == null){
+			LOG.error("addCustomerWithoutPayment : parameter is null!");
+			throw new InvalidInputException("addCustomerWithoutPayment : parameter is null!");
+		}
+		
 		CustomerRequest request = new CustomerRequest()
 			.company(user.getCompany().getCompany())
 			.id(Integer.toString(user.getUserId()))
@@ -62,22 +121,49 @@ public class BrainTreePaymentImpl implements Payment {
 		return result.isSuccess();		
 	}
 	
-	public boolean addCustomerWithPayment(User user, Company company,String nonce){
+	/**
+	 * Adds a customer to the Braintree vault with customer details and payment method.
+	 * @param user User object
+	 * @param company Company object
+	 * @param nonce payment nonce String given by Braintree
+	 * @return Success or Failure of the operation.
+	 * @throws InvalidInputException 
+	 */
+	public boolean addCustomerWithPayment(Company company, String nonce) throws InvalidInputException{
+		
+		if(company == null){
+			LOG.error("addCustomerWithPayment : first parameter is null!");
+			throw new InvalidInputException("addCustomerWithPayment : first parameter is null!");
+		}
+		
+		if(nonce == null || nonce.equals("")){
+			LOG.error("addCustomerWithPayment : second parameter is null or empty!");
+			throw new InvalidInputException("addCustomerWithPayment : parameter is null or empty!");
+		}
 		CustomerRequest request = new CustomerRequest()
-			.company(user.getCompany().getCompany())
-			.id(Integer.toString(user.getUserId()))
-			.email(user.getEmailId())
-			.firstName(user.getDisplayName())
+			.id(Integer.toString(company.getCompanyId()))
+			.firstName(company.getCompany())
 			.paymentMethodNonce(nonce);
 		
 		Result<Customer> result = gateway.customer().create(request);
 		
-		LOG.info("addCustomerWithPayment : adding user " + Integer.toString(user.getUserId()) + " : Status : " + result.isSuccess() + " Message : " + result.getMessage());
+		LOG.info("addCustomerWithPayment : adding user " + Integer.toString(company.getCompanyId()) + " : Status : " + result.isSuccess() + " Message : " + result.getMessage());
 		
 		return result.isSuccess();		
 	}
 	
-	public boolean containsCustomer(String customerId){
+	/**
+	 * Checks if the Braintree vault has a customer with a particular ID.
+	 * @param customerId a String
+	 * @return True or False based on existence.
+	 * @throws InvalidInputException 
+	 */
+	public boolean containsCustomer(String customerId) throws InvalidInputException{
+		
+		if(customerId == null || customerId.equals("")){
+			LOG.error("containsCustomer : parameter is null or empty!");
+			throw new InvalidInputException("containsCustomer : parameter is null or empty!");
+		}
 		
 		try {
 			Customer customer = gateway.customer().find(customerId);
@@ -91,7 +177,24 @@ public class BrainTreePaymentImpl implements Payment {
 		
 	}
 	
-	public boolean subscribeCustomer(String customerId,String planId){
+	/**
+	 * Subscribes a particular customer with identified by the ID to a plan identified by plan ID.
+	 * @param customerId a String
+	 * @param planId a String
+	 * @return Success or Failure of the operation.
+	 * @throws InvalidInputException 
+	 */
+	public boolean subscribeCustomer(String customerId,String planId) throws InvalidInputException{
+		
+		if(customerId == null || customerId.equals("")){
+			LOG.error("subscribeCustomer : first parameter is null or empty!");
+			throw new InvalidInputException("subscribeCustomer : first parameter is null or empty!");			
+		}
+		
+		if(planId == null || planId.equals("")){
+			LOG.error("subscribeCustomer : second parameter is null or empty!");
+			throw new InvalidInputException("subscribeCustomer : second parameter is null or empty!");	
+		}
 		
 		Customer customer = gateway.customer().find(customerId);
 		SubscriptionRequest request = new SubscriptionRequest()
@@ -105,90 +208,82 @@ public class BrainTreePaymentImpl implements Payment {
 	}
 
 	@Override
-	public boolean subscribe(User user, Company company, int accountsMasterId, String planId, String nonce) throws NonFatalException {
+	@Transactional
+	public boolean subscribe(User user,Company company, Integer planId, String nonce) throws NonFatalException {
 		
-		Integer userId = user.getUserId();
-		if(containsCustomer(userId.toString())){
-			return subscribeCustomer(userId.toString(), planId);
+		boolean result=false;
+		if(company == null){
+			LOG.error("subscribe : first parameter is null!");
+			throw new InvalidInputException("subscribe : first parameter is null!");	
+		}
+		
+		if(planId == null || planId.equals("")){
+			LOG.error("subscribe : second parameter is null or empty!");
+			throw new InvalidInputException("subscribe : second parameter is null or empty!");	
+		}
+		
+		if(nonce == null || nonce.equals("")){
+			LOG.error("subscribe : third parameter is null or empty!");
+			throw new InvalidInputException("subscribe : third parameter is null or empty!");
+		}
+		
+		
+		String planIdString = propertyFileReader.getProperty("config.properties", planId.toString());
+		
+		Integer companyId = company.getCompanyId();
+		if(containsCustomer(companyId.toString())){
+			result = subscribeCustomer(companyId.toString(), planIdString);
 		}
 		else{
-			addCustomerWithPayment(user, company, nonce);
-			return subscribeCustomer(userId.toString(), planId);
+			addCustomerWithPayment(company, nonce);
+			result = subscribeCustomer(companyId.toString(), planIdString);
 		}	
+		if(result){
+			updateLicenseTable(planId, companyId,user.getUserId());
+		}
+		return result;
 	}
 	
+	/**
+	 * Returns a Braintree client token that is used by the frontend to setup the 
+	 * drop-in UI.
+	 * @return
+	 */
 	public String getClientToken(){
 		
-		return gateway.clientToken().generate();
+		LOG.info("Generating client token");
+		String clientToken = gateway.clientToken().generate();
+		LOG.info("Client token : " + clientToken );
+		return clientToken;
 	}
 	
-	public String getClientTokenWithCustomerId(String customerId){
+	/**
+	 * Returns a Braintree client token with the user payment details encrypted 
+	 * into it.
+	 * @param customerId String containing customer ID
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	public String getClientTokenWithCustomerId(String customerId) throws InvalidInputException{
 		
+		if(customerId == null || customerId.equals("")){
+			LOG.error("getClientTokenWithCustomerId : parameter is null or empty!");
+			throw new InvalidInputException("getClientTokenWithCustomerId : parameter is null or empty!");			
+		}
+		
+		LOG.info("Generating client token for customer ID : " + customerId);
 		ClientTokenRequest request = new ClientTokenRequest().customerId(customerId);
-		return gateway.clientToken().generate(request);
+		String clientToken = gateway.clientToken().generate(request);
+		LOG.info("Client token for customer ID " + customerId +" : " + clientToken );
+		return clientToken;
+	}
+			
+	/**
+	 * Returns the instance of the gateway being used.
+	 * @return
+	 */
+	public BraintreeGateway getGatewayInstance(){
+		return gateway;
 	}
 	
-	public String makePayment(int amount,String paymentNonce){
-		
-		TransactionRequest request = new TransactionRequest()
-	    .amount(new BigDecimal(amount))
-	    .paymentMethodNonce(paymentNonce)
-	    .options()
-	    	.submitForSettlement(true)
-	    	.done();
-
-		Result<Transaction> result = gateway.transaction().sale(request);
-		
-		if(result.isSuccess()){
-			String transactionId = result.getTarget().getId();
-			LOG.info(" makePayment : for amount : " + amount + " Status : " + result.isSuccess() + " Message : " + result.getMessage() + " Transaction ID : " + transactionId );
-			return transactionId;
-		}
-		else{
-			LOG.info(" makePayment : for amount : " + amount + " Status : " + result.isSuccess() + " Message : " + result.getMessage() );
-			return null;
-
-		}
-				
-	}
-	
-	public String makePaymentForCustomer(String customerId, int amount){
-		
-		TransactionRequest request = new TransactionRequest()
-			.amount(new BigDecimal(amount))
-			.customerId(customerId)
-			.options()
-				.submitForSettlement(true)
-				.done();
-		Result<Transaction> result = gateway.transaction().sale(request);
-		
-		if(result.isSuccess()){
-			String transactionId = result.getTarget().getId();
-			LOG.info(" makePaymentForCustomer customerId : "+customerId + " : for amount : " + amount + " Status : " + result.isSuccess() + " Message : " + result.getMessage() + " Transaction ID : " + transactionId );
-			return transactionId;
-		}
-		else{
-			LOG.info(" makePaymentForCustomer customerId : "+customerId + " : for amount : " + amount + " Status : " + result.isSuccess() + " Message : " + result.getMessage() );
-			return null;
-
-		}
-	}
-	
-	public static void main(String[] args){
-		
-		BrainTreePaymentImpl payment = new BrainTreePaymentImpl();
-		payment.initialise();
-		
-		Company company = new Company();
-		company.setCompany("Rare Mile Tech");
-		
-		User user = new User();
-		user.setCompany(company);
-		user.setDisplayName("nishit kannan");
-		user.setEmailId("nishit@raremile.com");
-		user.setUserId(100002);
-		
-		System.out.println(payment.makePaymentForCustomer("100002", 3500));
-		
-	}
 }
