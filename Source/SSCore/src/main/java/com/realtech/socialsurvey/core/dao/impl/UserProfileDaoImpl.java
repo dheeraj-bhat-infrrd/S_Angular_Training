@@ -35,7 +35,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> imp
 		userProfile.setEmailId(emailId);
 		userProfile.setIsProfileComplete(CommonConstants.STATUS_INACTIVE);
 		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
-		userProfile.setRegionId(CommonConstants.DEFAULT_REGION_ID);
+		userProfile.setRegionId(regionId);
 		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
 		userProfile.setUser(user);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());

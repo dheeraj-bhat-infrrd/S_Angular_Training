@@ -21,9 +21,11 @@ import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -95,41 +97,75 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException {
 		LOG.info("Method validateRegistrationUrl() called ");
+
 		Map<String, String> urlParameters = urlGenerator.decryptParameters(encryptedUrlParameter);
 		validateCompanyRegistrationUrlParameters(encryptedUrlParameter);
+
 		LOG.info("Method validateRegistrationUrl() finished ");
 		return urlParameters;
 	}
 
 	// JIRA: SS-27: By RM05: BOC
-	/*
-	 * This method creates a new user post validation of URL.
+	/**
+	 * This method creates a new user, user profile post validation of URL and also invalidates the
+	 * registration link used by the user to register
+	 * 
+	 * @throws UserAlreadyExistsException
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCorporateAdmin(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
-			InvalidUrlException {
+			InvalidUrlException, UserAlreadyExistsException {
+		LOG.info("Method to add corporate admin called for emailId : " + emailId);
+		if (userExists(username)) {
+			throw new UserAlreadyExistsException("User with User ID : " + username + " already exists");
+		}
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
+
+		LOG.debug("Creating new user with emailId : " + emailId);
 		User user = createUser(company, username, encryptedPassword, emailId);
+
+		LOG.debug("Creating user profile for :" + emailId);
 		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
 
+		LOG.debug("Invalidating registration link for emailId : " + emailId);
+		invalidateRegistrationInvite(emailId);
+
+		LOG.info("Successfully executed method to add corporate admin for emailId : " + emailId);
 		return user;
 	}
 
 	// JIRA: SS-27: By RM05: EOC
-
-	private void inviteUser(String url, String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException,
-			NonFatalException {
+	/**
+	 * Method to invite user for registration,includes storing invite in db, calling services to
+	 * send mail
+	 * 
+	 * @param url
+	 * @param emailId
+	 * @param firstName
+	 * @param lastName
+	 * @throws UserAlreadyExistsException
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 * @throws NonFatalException
+	 */
+	private void inviteUser(String url, String emailId, String firstName, String lastName) throws UserAlreadyExistsException, InvalidInputException,
+			UndeliveredEmailException {
 		LOG.debug("Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName + " lastName : " + lastName);
 
 		String queryParam = extractUrlQueryParam(url);
-		deactivateExistingInvitesWithSameParameters(queryParam);
-		LOG.debug("Adding a new inviatation into the user_invite table");
+		if (doesUserWithEmailIdExists(emailId)) {
+			throw new UserAlreadyExistsException("user with specified email id already exists");
+		}
+
+		LOG.debug("Calling method to store the registration invite");
 		storeCompanyAdminInvitation(queryParam, emailId);
+
 		LOG.debug("Calling email services to send registration invitation mail");
 		emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
+
 		LOG.debug("Method inviteUser finished successfully");
 
 	}
@@ -142,6 +178,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * @throws InvalidInputException
 	 */
 	private String extractUrlQueryParam(String url) throws InvalidInputException {
+
 		if (url == null || url.isEmpty()) {
 			throw new InvalidInputException("Url is found null or empty while extracting the query param");
 		}
@@ -153,24 +190,56 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	}
 
-	/*
-	 * This method stores the invitation related info into user_invite. It sets all the required
-	 * values in table and puts status as 0.
+	/**
+	 * Method to store a registration invite, inserts a new invite if it doesn't exist otherwise
+	 * updates it with new timestamp values
+	 * 
+	 * @param queryParam
+	 * @param emailId
+	 * @throws NonFatalException
 	 */
-	private void storeCompanyAdminInvitation(String queryParam, String emailId) throws NonFatalException {
+	private void storeCompanyAdminInvitation(String queryParam, String emailId) {
 		LOG.debug("Method storeInvitation called with query param : " + queryParam + " and emailId : " + emailId);
-		UserInvite userInvite = new UserInvite();
-
+		UserInvite userInvite = null;
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_NO_PROFILE_ID);
-		userInvite.setCompany(company);
-		userInvite.setProfilesMaster(profilesMaster);
-		userInvite.setInvitationEmailId(emailId);
-		userInvite.setInvitationParameters(queryParam);
-		userInvite.setStatus(CommonConstants.STATUS_ACTIVE);
-		userInvite.setModifiedBy(CommonConstants.GUEST_USER_NAME);
-		userInvite.setCreatedBy(CommonConstants.GUEST_USER_NAME);
-		userInvite = userInviteDao.save(userInvite);
+
+		LOG.debug("Checking if an invite already exists for queryParam :" + queryParam);
+		userInvite = checkExistingInviteWithSameParams(queryParam);
+		/**
+		 * if invite doesn't exist create a new one and store itF
+		 */
+		if (userInvite == null) {
+			userInvite = new UserInvite();
+			userInvite.setCompany(company);
+			userInvite.setProfilesMaster(profilesMaster);
+			userInvite.setInvitationEmailId(emailId);
+			userInvite.setInvitationParameters(queryParam);
+			userInvite.setInvitationTime(new Timestamp(System.currentTimeMillis()));
+			userInvite.setInvitationValidUntil(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
+			userInvite.setStatus(CommonConstants.STATUS_ACTIVE);
+			userInvite.setModifiedBy(CommonConstants.GUEST_USER_NAME);
+			userInvite.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			userInvite.setCreatedBy(CommonConstants.GUEST_USER_NAME);
+			userInvite.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+
+			LOG.debug("Inserting user invite");
+			userInvite = userInviteDao.save(userInvite);
+		}
+		/**
+		 * else update the timestamp of existing invite
+		 */
+		else {
+			userInvite.setStatus(CommonConstants.STATUS_ACTIVE);
+			userInvite.setModifiedBy(CommonConstants.GUEST_USER_NAME);
+			userInvite.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			userInvite.setInvitationTime(new Timestamp(System.currentTimeMillis()));
+			userInvite.setInvitationValidUntil(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
+
+			LOG.debug("Updating user invite");
+			userInviteDao.update(userInvite);
+		}
+
 		LOG.debug("Method storeInvitation finished");
 	}
 
@@ -182,7 +251,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 */
 	private boolean validateCompanyRegistrationUrlParameters(String encryptedUrlParameter) throws InvalidInputException {
 		LOG.debug("Method validateUrlParameters called.");
-		List<UserInvite> userInvites = userInviteDao.findByColumn(encryptedUrlParameter);
+		List<UserInvite> userInvites = userInviteDao.findByUrlParameter(encryptedUrlParameter);
 		if (userInvites == null || userInvites.isEmpty()) {
 			LOG.error("Exception caught while validating company registration URL parameters.");
 			throw new InvalidInputException("URL parameter provided is inappropriate.");
@@ -191,10 +260,16 @@ public class RegistrationServiceImpl implements RegistrationService {
 		return true;
 	}
 
-	/*
-	 * To add a new User into the USERS table.
+	/**
+	 * Method to create a new user
+	 * 
+	 * @param company
+	 * @param username
+	 * @param password
+	 * @param emailId
+	 * @return
 	 */
-	public User createUser(Company company, String username, String password, String emailId) {
+	private User createUser(Company company, String username, String password, String emailId) {
 		LOG.info("Method createUser called for username : " + username + " and email-id : " + emailId);
 		User user = new User();
 		user.setCompany(company);
@@ -209,33 +284,97 @@ public class RegistrationServiceImpl implements RegistrationService {
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
 		user.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
-		LOG.debug("Method createUser finished");
+
 		user = userDao.save(user);
-		userDao.flush();
 		LOG.info("Method createUser finished for username : " + username);
 		return user;
 	}
 
-	/*
-	 * This method gets the list of all the UserInvites already existing with the same parameter and
-	 * marks them as inactive.
+	/**
+	 * Method to check if an invite already exists for the same query parameters, if yes returns the
+	 * invite
+	 * 
+	 * @param queryParam
+	 * @return
 	 */
-	private void deactivateExistingInvitesWithSameParameters(String queryParam) {
-		LOG.debug("Method deactivateExistingCustomersWithSameParameters started.");
-		List<UserInvite> userinvites = userInviteDao.findByColumn(UserInvite.class, CommonConstants.USER_INVITE_INVITATION_PARAMETERS_COLUMN,
-				queryParam);
-		for (UserInvite userInvite : userinvites) {
-			deactivateUserInvite(userInvite);
+	private UserInvite checkExistingInviteWithSameParams(String queryParam) {
+		LOG.debug("Method checkExistingInviteWithSameParams started for queryparam : " + queryParam);
+		List<UserInvite> userinvites = userInviteDao.findByUrlParameter(queryParam);
+		UserInvite userInvite = null;
+		if (userinvites != null && !userinvites.isEmpty()) {
+			userInvite = userinvites.get(0);
 		}
-		LOG.debug("Method deactivateExistingCustomersWithSameParameters finished.");
+		LOG.debug("Method checkExistingInviteWithSameParams finished.Returning : " + userInvite);
+		return userInvite;
+	}
+
+	/**
+	 * Method to invalidate the registration invite link based on emailIds
+	 * 
+	 * @param emailId
+	 * @throws InvalidInputException
+	 */
+	private void invalidateRegistrationInvite(String emailId) throws InvalidInputException {
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("Email id is null for invalidating registration invite");
+		}
+		LOG.debug("Method to invalidate registration invite called for emailId : " + emailId);
+		List<UserInvite> userInvites = userInviteDao.findByColumn(UserInvite.class, CommonConstants.INVITATION_EMAIL_ID_COLUMN, emailId);
+		if (userInvites != null && !userInvites.isEmpty()) {
+			for (UserInvite userInvite : userInvites) {
+				userInvite.setStatus(CommonConstants.STATUS_INACTIVE);
+				userInvite.setModifiedBy(CommonConstants.GUEST_USER_NAME);
+				userInvite.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+				userInviteDao.update(userInvite);
+			}
+		}
+		else {
+			LOG.debug("Registration invite link to be invalidated is not present");
+		}
+		LOG.debug("Method to invalidate registration invite finished for emailId : " + emailId);
+
+	}
+
+	/**
+	 * Method to check whether a user with selected user name exists
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	private boolean userExists(String userName) {
+		LOG.debug("Method to check if user exists called for username : " + userName);
+		try {
+			List<User> users = userDao.findByColumn(User.class, CommonConstants.USER_LOGIN_NAME_COLUMN, userName);
+			if (!users.isEmpty() && users != null)
+				return true;
+		}
+		catch (DatabaseException databaseException) {
+			LOG.error("Exception caught in method userExists() while trying to fetch list of users with same username.", databaseException);
+			return false;
+		}
+		LOG.debug("Method to check if user exists finished for username : " + userName);
+		return false;
 	}
 
 	/*
-	 * It marks a selected row in UserInvite as inactive.
+	 * Method to tell whether email id is already present in users table.
 	 */
-	private void deactivateUserInvite(UserInvite userInvite) {
-		userInvite.setStatus(CommonConstants.STATUS_INACTIVE);
-		userInviteDao.update(userInvite);
+	private boolean doesUserWithEmailIdExists(String emailId) {
+		LOG.debug("Method isEmailIdAlreadyPresent started.");
+		try {
+			Map<String, Object> columns = new HashMap<>();
+			columns.put("emailId", emailId);
+			columns.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			List<User> users = userDao.findByKeyValue(User.class, columns);
+			LOG.debug("Method isEmailIdAlreadyPresent finished.");
+			if (users != null && !users.isEmpty())
+				return true;
+		}
+		catch (DatabaseException databaseException) {
+			LOG.error("Exception caughr while chnecking for email id in USERS.");
+			return false;
+		}
+		return false;
 	}
 	// JIRA: SS-27: By RM05: EOC
 }

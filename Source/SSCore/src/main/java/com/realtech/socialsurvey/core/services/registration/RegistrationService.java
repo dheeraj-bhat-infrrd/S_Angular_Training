@@ -4,6 +4,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
@@ -25,6 +26,6 @@ public interface RegistrationService {
 			throws InvalidInputException;
 
 	public User addCorporateAdmin(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
-			InvalidUrlException;
+			InvalidUrlException, UserAlreadyExistsException;
 
 }
