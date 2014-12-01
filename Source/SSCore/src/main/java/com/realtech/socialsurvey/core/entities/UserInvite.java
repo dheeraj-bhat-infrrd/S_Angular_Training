@@ -53,12 +53,12 @@ public class UserInvite implements Serializable {
 	private int status;
 
 	//bi-directional many-to-one association to Company
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
 	//bi-directional many-to-one association to ProfilesMaster
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="PROFILE_MASTERS_ID")
 	private ProfilesMaster profilesMaster;
 

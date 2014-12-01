@@ -45,11 +45,11 @@ public class AccountsMaster implements Serializable {
 	private int status;
 
 	//bi-directional many-to-one association to CompanyInvitationLicenseKey
-	@OneToMany(mappedBy="accountsMaster")
+	@OneToMany(mappedBy="accountsMaster",fetch = FetchType.LAZY)
 	private List<CompanyInvitationLicenseKey> companyInvitationLicenseKeys;
 
 	//bi-directional many-to-one association to LicenseDetail
-	@OneToMany(mappedBy="accountsMaster")
+	@OneToMany(mappedBy="accountsMaster",fetch = FetchType.LAZY)
 	private List<LicenseDetail> licenseDetails;
 
 	public AccountsMaster() {

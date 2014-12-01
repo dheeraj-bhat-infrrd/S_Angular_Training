@@ -60,7 +60,7 @@ public class User implements Serializable {
 	private int status;
 
 	// bi-directional many-to-one association to UserProfile
-	@OneToMany(mappedBy = "user")
+	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
 
 	// bi-directional many-to-one association to Company

@@ -50,7 +50,7 @@ public class OrganizationLevelSetting implements Serializable {
 	private int status;
 
 	//bi-directional many-to-one association to Company
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 

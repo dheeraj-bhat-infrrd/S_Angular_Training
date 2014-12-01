@@ -199,7 +199,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<T> findByColumn(Class<T> dataClass, String column, String value) {
+	public List<T> findByColumn(Class<T> dataClass, String column, Object value) {
 		Criteria criteria = getSession().createCriteria(dataClass);
 		try {
 			criteria.add(Restrictions.eq(column, value));
@@ -210,5 +210,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
+
 }
 // JIRA: SS-8: By RM05: EOC

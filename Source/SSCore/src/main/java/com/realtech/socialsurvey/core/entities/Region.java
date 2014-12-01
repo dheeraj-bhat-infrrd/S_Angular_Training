@@ -5,52 +5,49 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-
 /**
  * The persistent class for the region database table.
- * 
  */
 @Entity
-@Table(name="REGION")
-@NamedQuery(name="Region.findAll", query="SELECT r FROM Region r")
+@Table(name = "REGION")
+@NamedQuery(name = "Region.findAll", query = "SELECT r FROM Region r")
 public class Region implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="REGION_ID")
+	@Column(name = "REGION_ID")
 	private int regionId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="IS_DEFAULT_BY_SYSTEM")
+	@Column(name = "IS_DEFAULT_BY_SYSTEM")
 	private int isDefaultBySystem;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
 	private String region;
 
 	private int status;
 
-	//bi-directional many-to-one association to Branch
-	@OneToMany(mappedBy="region")
+	// bi-directional many-to-one association to Branch
+	@OneToMany(mappedBy = "region", fetch = FetchType.LAZY)
 	private List<Branch> branches;
 
-	//bi-directional many-to-one association to Company
-	@ManyToOne
-	@JoinColumn(name="COMPANY_ID")
+	// bi-directional many-to-one association to Company
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	public Region() {
-	}
+	public Region() {}
 
 	public int getRegionId() {
 		return this.regionId;
