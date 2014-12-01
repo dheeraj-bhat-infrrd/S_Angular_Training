@@ -22,7 +22,7 @@ public interface RegistrationService {
 			UndeliveredEmailException, NonFatalException;
 
 	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter)
-			throws InvalidInputException, InvalidUrlException;
+			throws InvalidInputException;
 
 	public User addCorporateAdmin(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
 			InvalidUrlException;

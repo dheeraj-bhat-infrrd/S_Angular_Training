@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -151,11 +152,21 @@ public class UserManagementController {
 			LOG.debug("AccountType obtained : " + strAccountType);
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			// TODO call services to save the account type
 
-			// AccountType accountType = userManagementServices.addAccountTypeForCompany(user,
-			// strAccountType);
+			LOG.debug("Calling sevices for adding account type of company");
+			AccountType accountType = null;
+			try {
+				accountType = userManagementServices.addAccountTypeForCompany(user, strAccountType);
+				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
 
+			model.addAttribute("accounttype", accountType);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			LOG.info("Method addAccountType of UserManagementController completed successfully");
 		}
 		catch (NonFatalException e) {
@@ -163,8 +174,7 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
-		return "";
-		// return JspResolver.PAYMENT;
+		return JspResolver.PAYMENT;
 
 	}
 }

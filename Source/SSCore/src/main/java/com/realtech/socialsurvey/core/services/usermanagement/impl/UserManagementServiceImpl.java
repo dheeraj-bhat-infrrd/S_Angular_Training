@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
@@ -65,31 +66,43 @@ public class UserManagementServiceImpl implements UserManagementService {
 		return user;
 	}
 
-	
 	// JIRA: SS-28: By RM05: BOC
 	/*
 	 * To add account as per the choice of User.
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public String addAccountTypeForCompany(User user, String accountType) {
+	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException {
 		LOG.info("Method addAccountTypeForCompany started for user : " + user.getLoginName());
-		switch (AccountType.valueOf(accountType).getValue()) {
-			case 1:
+		if (strAccountType == null || strAccountType.isEmpty()) {
+			throw new InvalidInputException("account type is null or empty while adding account type fro company");
+		}
+		int accountTypeValue = 0;
+		try {
+			accountTypeValue = Integer.parseInt(strAccountType);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException for account type :" + strAccountType);
+			throw new InvalidInputException("account type is not valid while adding account type fro company");
+		}
+		AccountType accountType = AccountType.getAccountType(accountTypeValue);
+		switch (accountType) {
+			case INDIVIDUAL:
 				addIndividual(user);
 				break;
-			case 2:
+			case TEAM:
 				addTeam(user);
 				break;
-			case 3:
+			case COMPANY:
 				addCompany(user);
 				break;
-			case 4:
+			case ENTERPRISE:
 				addEnterprise();
 		}
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
+
 	// JIRA: SS-28: By RM05: EOC
 
 	/*
