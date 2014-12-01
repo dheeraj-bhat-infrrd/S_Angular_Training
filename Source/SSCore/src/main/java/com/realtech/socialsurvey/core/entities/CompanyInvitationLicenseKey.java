@@ -41,7 +41,7 @@ public class CompanyInvitationLicenseKey implements Serializable {
 	private Timestamp validUntil;
 
 	//bi-directional many-to-one association to AccountsMaster
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="ACCOUNTS_MASTER_ID")
 	private AccountsMaster accountsMaster;
 

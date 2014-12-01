@@ -5,47 +5,44 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-
 /**
  * The persistent class for the survey database table.
- * 
  */
 @Entity
-@Table(name="SURVEY")
-@NamedQuery(name="Survey.findAll", query="SELECT s FROM Survey s")
+@Table(name = "SURVEY")
+@NamedQuery(name = "Survey.findAll", query = "SELECT s FROM Survey s")
 public class Survey implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="SURVEY_ID")
+	@Column(name = "SURVEY_ID")
 	private int surveyId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
 	private int status;
 
-	//bi-directional many-to-one association to Company
-	@OneToOne
-	@JoinColumn(name="COMPANY_ID")
+	// bi-directional many-to-one association to Company
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to SurveyQuestion
-	@OneToMany(mappedBy="survey")
+	// bi-directional many-to-one association to SurveyQuestion
+	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
 	private List<SurveyQuestion> surveyQuestions;
 
-	public Survey() {
-	}
+	public Survey() {}
 
 	public int getSurveyId() {
 		return this.surveyId;
