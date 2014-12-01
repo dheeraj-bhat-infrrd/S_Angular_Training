@@ -51,7 +51,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Resource
 	@Qualifier("userInvite")
 	private UserInviteDao userInviteDao;
-	
+
 	@Resource
 	@Qualifier("userProfile")
 	private UserProfileDao userProfileDao;
@@ -93,7 +93,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException, InvalidUrlException {
+	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException {
 		LOG.info("Method validateRegistrationUrl() called ");
 		Map<String, String> urlParameters = urlGenerator.decryptParameters(encryptedUrlParameter);
 		validateCompanyRegistrationUrlParameters(encryptedUrlParameter);
@@ -114,6 +114,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		User user = createUser(company, username, encryptedPassword, emailId);
 		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+
 		return user;
 	}
 

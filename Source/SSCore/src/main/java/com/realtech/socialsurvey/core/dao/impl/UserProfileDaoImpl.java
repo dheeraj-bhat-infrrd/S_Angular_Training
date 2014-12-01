@@ -20,9 +20,6 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> imp
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 	
 	@Autowired
-	private UserProfileDao userProfileDao;
-	
-	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 	
 	/*
@@ -46,7 +43,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> imp
 		userProfile.setModifiedOn(currentTimestamp);
 		userProfile.setCreatedBy(String.valueOf(user.getUserId()));
 		userProfile.setModifiedBy(String.valueOf(user.getUserId()));
-		userProfileDao.save(userProfile);
+		save(userProfile);
 		LOG.info("Method createUserProfile() finished");
 	}
 }
