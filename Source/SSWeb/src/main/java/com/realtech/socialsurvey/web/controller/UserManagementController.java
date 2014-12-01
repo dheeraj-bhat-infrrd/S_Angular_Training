@@ -96,6 +96,7 @@ public class UserManagementController {
 				+ " companyContactNo : " + companyContactNo);
 
 		String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
+		String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
 		if (companyName == null || companyName.isEmpty()) {
 			throw new InvalidInputException("Company name is null or empty while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_NAME);
@@ -103,8 +104,8 @@ public class UserManagementController {
 		if (address == null || address.isEmpty()) {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
-		// TODO Validation for zip code with regex
-		if (zipCode == null || zipCode.isEmpty()) {
+		
+		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(ZIPCODE_REGEX)) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(PHONENUMBER_REGEX)) {

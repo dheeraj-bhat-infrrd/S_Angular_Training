@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -20,20 +19,21 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 @Component("userInvite")
 public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> implements UserInviteDao {
 
+	/**
+	 * JIRA SS-33 BY RM02 Method selects the valid user invites for the specified url parameters
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<UserInvite> findByColumn(String encryptedUrlParameter) {
+	public List<UserInvite> findByUrlParameter(String encryptedUrlParameter) {
 		Criteria criteria = getSession().createCriteria(UserInvite.class);
-		Calendar calendar = Calendar.getInstance();
-		Timestamp currentTimestamp = new Timestamp(calendar.getTimeInMillis());
 		try {
 			criteria.add(Restrictions.eq(CommonConstants.USER_INVITE_INVITATION_PARAMETERS_COLUMN, encryptedUrlParameter));
 			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
-			calendar.set(1970, 01, 01, 0, 0);
+
 			// Valid_till date should either be equal to 01-JAN-1970 or less than today.
 			Criterion criterion = Restrictions.or(
-					Restrictions.eq(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL, new Timestamp(calendar.getTimeInMillis())),
-					Restrictions.lt(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL, currentTimestamp));
+					Restrictions.eq(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL, new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS)),
+					Restrictions.lt(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL, new Timestamp(System.currentTimeMillis())));
 			criteria.add(criterion);
 		}
 		catch (HibernateException hibernateException) {

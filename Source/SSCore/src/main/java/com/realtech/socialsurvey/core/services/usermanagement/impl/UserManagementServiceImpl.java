@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.usermanagement.impl;
 
+// JIRA: SS-27: By RM05: BOC
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,12 @@ public class UserManagementServiceImpl implements UserManagementService {
 	@Autowired
 	private GenericDao<User, Integer> userDao;
 
+	@Autowired
+	private GenericDao<Region, Integer> regionDao;
+
+	@Autowired
+	private GenericDao<Branch, Integer> branchDao;
+
 	@Resource
 	@Qualifier("userProfile")
 	private UserProfileDao userProfileDao;
@@ -49,8 +56,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
-	// JIRA: SS-25: By RM05: BOC
-	/*
+	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
 	 */
@@ -59,9 +65,16 @@ public class UserManagementServiceImpl implements UserManagementService {
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME));
+
+		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
+
+		LOG.debug("Calling method for updating company for user profiles");
 		updateCompanyForUserProfile(user, company);
+
+		LOG.debug("Calling method for adding organizational details");
 		addOrganizationalDetails(user, organizationalDetails);
+
 		LOG.info("Method addCompanyInformation finished for user " + user.getLoginName());
 		return user;
 	}
@@ -120,8 +133,12 @@ public class UserManagementServiceImpl implements UserManagementService {
 		return companyDao.save(company);
 	}
 
-	/*
-	 * This method updates company details for current user.
+	/**
+	 * This method updates company details for current user
+	 * 
+	 * @param user
+	 * @param company
+	 * @return
 	 */
 	private User updateCompanyForUser(User user, Company company) {
 		LOG.debug("Method updateCompanyForUser started for user " + user.getLoginName());
@@ -131,25 +148,34 @@ public class UserManagementServiceImpl implements UserManagementService {
 		return user;
 	}
 
-	/*
+	/**
 	 * This method updates company details in all the user profiles of current user.
+	 * 
+	 * @param user
+	 * @param company
 	 */
-
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
-		List<UserProfile> userProfiles = user.getUserProfiles();
-		if (userProfiles != null)
+		user = userDao.findById(User.class, user.getUserId());
+		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {
 				userProfile.setCompany(company);
 				userProfileDao.update(userProfile);
 			}
+		}
+		else {
+			LOG.warn("No profiles found for user : " + user.getUserId());
+		}
 		LOG.debug("Method updateCompanyForUserProfile finished for user " + user.getLoginName());
 	}
 
-	/*
+	/**
 	 * This method adds all the key and value pairs into the ORGANIZATION_LEVEL_SETTINGS table.
+	 * 
+	 * @param user
+	 * @param organizationalDetails
 	 */
-
 	private void addOrganizationalDetails(User user, Map<String, String> organizationalDetails) {
 		LOG.debug("Method addOrganizationalDetails called.");
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
@@ -171,40 +197,54 @@ public class UserManagementServiceImpl implements UserManagementService {
 				organizationLevelSettingDao.save(organizationLevelSetting);
 				organizationLevelSettingDao.flush();
 			}
-		LOG.debug("Method addCompanyDetails finished");
+		LOG.debug("Method addOrganizationalDetails finished");
 	}
 
-	/*
+	/**
 	 * Method to add an Individual. Makes entry in Region, Branch and UserProfile tables.
+	 * 
+	 * @param user
 	 */
 	private void addIndividual(User user) {
-		LOG.debug("Method addIndividual started for user : " + user.getLoginName());
-		// Add a new Region.
+		LOG.info("Method addIndividual started for user : " + user.getLoginName());
+
+		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
 		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-		// Create a new User Profile for Region Admin.
+
+		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId());
-		// Add a new branch.
+		profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+
+		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
-		// Create a new User Profile for Branch Admin.
+
+		LOG.debug("Creating user profile for branch admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId());
-		// Create a new User Profile for Agent.
+		profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+
+		LOG.debug("Creating user profile for agent");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId());
-		LOG.debug("Method addIndividual finished.");
+
+		LOG.info("Method addIndividual finished.");
 	}
 
-	/*
+	/**
 	 * Method to add a Team. Makes entry in Region table.
+	 * 
+	 * @param user
 	 */
 	private void addTeam(User user) {
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
-		// Add a new Region.
+
+		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
 		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-		// Create a new User Profile for Region Admin.
+
+		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId());
 		LOG.debug("Method addTeam finished.");
@@ -228,11 +268,17 @@ public class UserManagementServiceImpl implements UserManagementService {
 		LOG.debug("Method addEnterprise finished.");
 	}
 
-	/*
-	 * Method to add a new Region.
+	/**
+	 * Method to add a new region
+	 * 
+	 * @param user
+	 * @param isDefaultBySystem
+	 * @param regionName
+	 * @return
 	 */
 	private Region addRegion(User user, int isDefaultBySystem, String regionName) {
-		LOG.debug("Method addRegion started for user : " + user.getLoginName());
+		LOG.debug("Method addRegion started for user : " + user.getLoginName() + " isDefaultBySystem : " + isDefaultBySystem + " regionName :"
+				+ regionName);
 		Region region = new Region();
 		region.setCompany(user.getCompany());
 		region.setIsDefaultBySystem(isDefaultBySystem);
@@ -242,12 +288,19 @@ public class UserManagementServiceImpl implements UserManagementService {
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		region.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		region = regionDao.save(region);
 		LOG.debug("Method addRegion finished.");
 		return region;
 	}
 
-	/*
-	 * Method to add a new Branch.
+	/**
+	 * Method to add a new Branch
+	 * 
+	 * @param user
+	 * @param region
+	 * @param branchName
+	 * @param isDefaultBySystem
+	 * @return
 	 */
 	private Branch addBranch(User user, Region region, String branchName, int isDefaultBySystem) {
 		LOG.debug("Method addBranch started for user : " + user.getLoginName());
@@ -261,6 +314,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		branch = branchDao.save(branch);
 		LOG.debug("Method addBranch finished.");
 		return branch;
 	}

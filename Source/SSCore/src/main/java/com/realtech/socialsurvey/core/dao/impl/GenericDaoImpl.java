@@ -183,10 +183,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<T> findByKeyValue(Class<T> dataClass, Map<String, String> queries) {
+	public List<T> findByKeyValue(Class<T> dataClass, Map<String, Object> queries) {
 		Criteria criteria = getSession().createCriteria(dataClass);
 		try {
-			for (Entry<String, String> query : queries.entrySet()) {
+			for (Entry<String, Object> query : queries.entrySet()) {
 				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
 			}
 		}

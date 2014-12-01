@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
@@ -88,6 +89,9 @@ public class RegistrationController {
 			}
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+			catch (UserAlreadyExistsException e) {
+				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e);
 			}
 
 			LOG.info("Invitation to corporate for registration completed successfully");
@@ -185,15 +189,16 @@ public class RegistrationController {
 				/**
 				 * Commenting the code as now emailId is non editable in registration
 				 */
-				/*else {
-					LOG.debug("Sending registration invite link on the new emailId : " + emailId + " added by the user");
-					registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL,
-							DisplayMessageType.SUCCESS_MESSAGE));
-
-					LOG.debug("Registration invite link on the new emailId : " + emailId + " sent successfully");
-					return JspResolver.MESSAGE_HEADER;
-				}*/
+				/*
+				 * else { LOG.debug("Sending registration invite link on the new emailId : " +
+				 * emailId + " added by the user");
+				 * registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
+				 * model.addAttribute("message",
+				 * messageUtils.getDisplayMessage(DisplayMessageConstants
+				 * .REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				 * LOG.debug("Registration invite link on the new emailId : " + emailId +
+				 * " sent successfully"); return JspResolver.MESSAGE_HEADER; }
+				 */
 
 				// Set the success message
 				model.addAttribute("message",
@@ -202,6 +207,9 @@ public class RegistrationController {
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
+			}
+			catch (UserAlreadyExistsException e) {
+				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.USERNAME_ALREADY_TAKEN, e);
 			}
 		}
 		catch (NonFatalException e) {

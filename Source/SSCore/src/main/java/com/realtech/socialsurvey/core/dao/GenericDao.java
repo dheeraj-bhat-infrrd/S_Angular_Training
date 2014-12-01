@@ -34,7 +34,7 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public T findById(Class<T> table, ID id);
 
-	public List<T> findByKeyValue(Class<T> dataClass, Map<String, String> queries);
+	public List<T> findByKeyValue(Class<T> dataClass, Map<String, Object> queries);
 
 	public List<T> findByColumn(Class<T> dataClass, String column, Object value);
 }
