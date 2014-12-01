@@ -23,8 +23,10 @@ public interface CommonConstants {
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
 	public static final String GUEST_USER_NAME = "GUEST";
 	public static final String ADMIN_USER_NAME = "ADMIN";
-	public static final Integer STATUS_ACTIVE = 1;
-	public static final Integer STATUS_INACTIVE = 0;
+	public static final int STATUS_ACTIVE = 1;
+	public static final int STATUS_INACTIVE = 0;
+	public static final int PROCESS_COMPLETE = 1;
+	public static final int PROCESS_NOT_STARTED = 0;
 	public static final String USER_INVITE_INVITATION_PARAMETERS_COLUMN = "invitationParameters";
 	public static final String STATUS_COLUMN = "status";
 	public static final String USER_INVITE_INVITATION_VALID_UNTIL = "invitationValidUntil";
@@ -42,4 +44,5 @@ public interface CommonConstants {
 	public static final String ADDRESS = "address";
 	public static final String ZIPCODE = "zipCode";
 	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
+	public static final String RESET_PASSWORD = "resetpassword.do";
 }
