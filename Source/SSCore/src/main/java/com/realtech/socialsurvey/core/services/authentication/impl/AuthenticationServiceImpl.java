@@ -55,6 +55,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Autowired
 	private EncryptionHelper encryptionHelper;
 
+	/**
+	 * Method to validate user
+	 * 
+	 * @param User
+	 * @param password
+	 * @throws InvalidInputException
+	 */
 	@Override
 	public void validateUser(User user, String password) throws InvalidInputException {
 
@@ -68,11 +75,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			throw new InvalidInputException("Passwords do not match", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 
+		LOG.info("User authenticated with user name : " + user.getLoginName());
 	}
 
+	/**
+	 * Returns a User object for the given userId
+	 * 
+	 * @param userId
+	 * @return User
+	 * @throws InvalidInputException
+	 */
 	@Override
 	@Transactional
-	public User getUserObjWithLoginName(String userId) throws InvalidInputException {
+	public User getUserWithLoginName(String userId) throws InvalidInputException {
 		LOG.info("Fetching user object with userId : " + userId);
 		List<User> users = userDao.findByColumn(User.class, USER_NAME, userId);
 		// Check if user list returned is null or empty
@@ -83,6 +98,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return users.get(0);
 	}
 
+	/**
+	 * Get all the user profiles of a user
+	 * 
+	 * @param user
+	 * @return List of user profiles
+	 * @throws InvalidInputException
+	 */
 	@Override
 	@Transactional
 	public List<UserProfile> getUserProfileForUser(User user) throws InvalidInputException {
@@ -90,6 +112,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return userProfiles;
 	}
 
+	/**
+	 * Verifies if the user exists
+	 * 
+	 * @param EmailID
+	 * @return User object
+	 * @throws InvalidInputException
+	 */
 	@Override
 	@Transactional
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException {
@@ -99,9 +128,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 			LOG.error("No User object found with the passed emailId : " + emailId);
 			throw new InvalidInputException("Email ID not registered with us");
 		}
+		LOG.info("User verified with eamil Id : " + emailId);
 		return users.get(0);
 	}
 
+	/**
+	 * Sends an email to user with the link to reset password
+	 * 
+	 * @param emailId
+	 * @throws InvalidInputException
+	 */
 	@Override
 	public void sendResetPasswordLink(String emailId, String name) throws InvalidInputException, UndeliveredEmailException {
 
@@ -114,22 +150,36 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
 
 		// Send reset password link to the user email ID
-		emailServices.sendResetPasswordLink(url, emailId, name);
+		emailServices.sendResetPasswordEmail(url, emailId, name);
 	}
 
+	/**
+	 * Fetch a user object with the email ID
+	 * 
+	 * @param emailId
+	 * @return User object
+	 * @throws InvalidInputException
+	 */
 	@Override
 	@Transactional
-	public User getUserObjWithEmailId(String emailId) throws InvalidInputException {
+	public User getUserWithEmailId(String emailId) throws InvalidInputException {
 		LOG.info("Fetching user object with emailId : " + emailId);
 		List<User> users = userDao.findByColumn(User.class, EMAIL_ID, emailId);
 		// Check if user list returned is null or empty
 		if (users == null || users.isEmpty()) {
 			LOG.error("No Record found for the UserID : " + emailId);
-			throw new InvalidInputException("No Record found for the UserID : " + emailId);
+			throw new InvalidInputException("No Record found for the UserID : " + emailId,DisplayMessageConstants.USER_NOT_PRESENT);
 		}
 		return users.get(0);
 	}
-	
+
+	/**
+	 * Method to change the user password
+	 * 
+	 * @param user
+	 * @param password
+	 * @throws InvalidInputException
+	 */
 	@Override
 	@Transactional
 	public void changePassword(User user, String password) throws InvalidInputException {
