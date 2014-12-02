@@ -18,13 +18,13 @@ public class OrganizationLevelSetting implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="ORGANIZATION_LEVEL_SETTINGS_ID")
-	private int organizationLevelSettingsId;
+	private long organizationLevelSettingsId;
 
 	@Column(name="AGENT_ID")
-	private int agentId;
+	private long agentId;
 
 	@Column(name="BRANCH_ID")
-	private int branchId;
+	private long branchId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -39,7 +39,7 @@ public class OrganizationLevelSetting implements Serializable {
 	private Timestamp modifiedOn;
 
 	@Column(name="REGION_ID")
-	private int regionId;
+	private long regionId;
 
 	@Column(name="SETTING_KEY")
 	private String settingKey;
@@ -57,27 +57,27 @@ public class OrganizationLevelSetting implements Serializable {
 	public OrganizationLevelSetting() {
 	}
 
-	public int getOrganizationLevelSettingsId() {
+	public long getOrganizationLevelSettingsId() {
 		return this.organizationLevelSettingsId;
 	}
 
-	public void setOrganizationLevelSettingsId(int organizationLevelSettingsId) {
+	public void setOrganizationLevelSettingsId(long organizationLevelSettingsId) {
 		this.organizationLevelSettingsId = organizationLevelSettingsId;
 	}
 
-	public int getAgentId() {
+	public long getAgentId() {
 		return this.agentId;
 	}
 
-	public void setAgentId(int agentId) {
+	public void setAgentId(long agentId) {
 		this.agentId = agentId;
 	}
 
-	public int getBranchId() {
+	public long getBranchId() {
 		return this.branchId;
 	}
 
-	public void setBranchId(int branchId) {
+	public void setBranchId(long branchId) {
 		this.branchId = branchId;
 	}
 
@@ -113,11 +113,11 @@ public class OrganizationLevelSetting implements Serializable {
 		this.modifiedOn = modifiedOn;
 	}
 
-	public int getRegionId() {
+	public long getRegionId() {
 		return this.regionId;
 	}
 
-	public void setRegionId(int regionId) {
+	public void setRegionId(long regionId) {
 		this.regionId = regionId;
 	}
 

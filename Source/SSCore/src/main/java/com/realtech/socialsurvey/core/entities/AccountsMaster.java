@@ -19,7 +19,7 @@ public class AccountsMaster implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="ACCOUNTS_MASTER_ID")
-	private int accountsMasterId;
+	private long accountsMasterId;
 
 	@Column(name="ACCOUNT_NAME")
 	private String accountName;
@@ -55,11 +55,11 @@ public class AccountsMaster implements Serializable {
 	public AccountsMaster() {
 	}
 
-	public int getAccountsMasterId() {
+	public long getAccountsMasterId() {
 		return this.accountsMasterId;
 	}
 
-	public void setAccountsMasterId(int accountsMasterId) {
+	public void setAccountsMasterId(long accountsMasterId) {
 		this.accountsMasterId = accountsMasterId;
 	}
 
