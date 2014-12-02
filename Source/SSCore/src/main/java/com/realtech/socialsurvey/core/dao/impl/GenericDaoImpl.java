@@ -68,10 +68,12 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		return entity;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<T> findAll() {
+	public List<T> findAll(Class<T> entityClass) {
 		try {
-			return findByCriteria();
+			final Criteria crit = getSession().createCriteria(entityClass);
+			  return crit.list();
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in findAll().", hibernateException);
