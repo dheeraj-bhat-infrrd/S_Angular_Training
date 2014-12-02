@@ -11,6 +11,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -68,30 +69,20 @@ public class PaymentController {
 		
 		//Extract the session
 		HttpSession session = request.getSession(false);
-		
-		User user = new User();
-		Company company = new Company();
-		company.setCompany("Avicii Tech");
-		company.setCompanyId(12);
-		user.setCompany(company);
-		user.setUserId(1);
-		user.setDisplayName("KS");
-		
-		
-		
+				
 		//Get the user object from the session and the company object from it
-		//User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		//Company company = user.getCompany();
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		Company company = user.getCompany();
 		
 		//Get the planId from the session
 		int planId = Integer.parseInt(request.getParameter("accounttype"));
 		
 		//Get the nonce from the request
-		//String nonce = request.getParameter("payment_method_nonce");
+		String nonce = request.getParameter("payment_method_nonce");
 		
 		try {
 			try{
-				status = gateway.subscribe(user,company, planId, com.braintreegateway.test.Nonce.Transactable);
+				status = gateway.subscribe(user,company, planId, nonce);
 			}
 			catch(InvalidInputException e){
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown");
