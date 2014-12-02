@@ -242,7 +242,7 @@ public class LoginController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Reset user password executed successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSUFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
 		}
 		catch (NonFatalException e) {
@@ -251,7 +251,7 @@ public class LoginController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 
-		return JspResolver.LOGIN;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
