@@ -25,6 +25,9 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_ADDRESS = "INVALID_ADDRESS";
 	public static final String INVALID_ZIPCODE = "INVALID_ZIPCODE";
 	public static final String INVALID_COMPANY_PHONEN0 = "INVALID_COMPANY_PHONEN0";
+	public static final String INVALID_REGISTRATION_INVITE = "INVALID_REGISTRATION_INVITE";
+	public static final String USERNAME_ALREADY_TAKEN = "USERNAME_ALREADY_TAKEN";
+	public static final String EMAILID_ALREADY_TAKEN = "EMAILID_ALREADY_TAKEN";
 
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
@@ -32,5 +35,5 @@ public final class DisplayMessageConstants {
 	public static final String SUBSCRIPTION_SUCCESSFUL = "USER_SUBSCRIPTION_SUCCESSFUL";
 	
 	// usuccessful message constants
-	public static final String SUBSCRIPTION_UNSUCCESSFUL = "SUBSCRIPTION_UNSUCCESSFUL";
+	public static final String SUBSCRIPTION_UNSUCCESSFUL = "USER_SUBSCRIPTION_UNSUCCESSFUL";
 }
