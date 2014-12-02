@@ -38,7 +38,7 @@ public class WebHookController {
 		LOG.info("Notification Recieved!");
 		gateway.initialise();
 				
-		String challenge = gateway.getGatewayInstance().webhookNotification().verify(request.getParameter("bt_challenge"));
+		String challenge = gateway.initialise().webhookNotification().verify(request.getParameter("bt_challenge"));
 		LOG.info("Recieved challenge : " + challenge);
 		response.setContentType("text/html");		
 		return challenge;
@@ -54,7 +54,7 @@ public class WebHookController {
 	public String getSubscriptionNotifications(HttpServletRequest request,HttpServletResponse response){
 		
 		gateway.initialise();
-		WebhookNotification webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
+		WebhookNotification webhookNotification = gateway.initialise().webhookNotification().parse(
 			      request.getParameter("bt_signature"),
 			      request.getParameter("bt_payload")
 				);
