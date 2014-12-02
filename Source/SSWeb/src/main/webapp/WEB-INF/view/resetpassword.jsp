@@ -31,10 +31,14 @@
 								validating : 'glyphicon glyphicon-refresh'
 							},
 							fields : {
-								userId : {
+								emailId : {
 									validators : {
 										notEmpty : {
-											message : 'The username is required'
+											message : 'The email ID is required'
+										},
+										regexp : {
+											regexp : /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]\.[0-9]\.[0-9]\.[0-9]\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]+))$/,
+											message : 'Email address not valid'
 										}
 									}
 								},
@@ -48,9 +52,9 @@
 											min : 5,
 											message : "Password must be between 5 and 15 characters"
 										},
-										identical :{
-											field:'confirmPassword',
-											message:"Passwords do not match"	
+										identical : {
+											field : 'confirmPassword',
+											message : "Passwords do not match"
 										}
 									}
 								},
@@ -80,10 +84,11 @@
 							<spring:message code="label.title.resetpassword.key"></spring:message>
 						</div>
 						<div class="formContainer">
-							<form role="form" id="resetPasswordForm">
+							<form role="form" id="resetPasswordForm" method="post" action="./setnewpassword.do">
 								<div class="form-group formInputField">
-									<input id="userId" name="userId" class="form-control formInput"
-										type="text" placeholder="User ID">
+									<input id="emailId" name="emailId"
+										class="form-control formInput" type="email"
+										placeholder="Email ID">
 								</div>
 								<div class="form-group formInputField">
 									<input id="password" name="password"
@@ -95,7 +100,8 @@
 										class="form-control formInput" type="password"
 										placeholder="Confirm New Password">
 								</div>
-								<button class="formButton" id="loginFormSubmit">Submit</button>
+								<input type="hidden" value="${param.q}" name="q">
+								<button type="submit" class="formButton" id="resetPasswordFormSubmit">Submit</button>
 							</form>
 						</div>
 					</div>
