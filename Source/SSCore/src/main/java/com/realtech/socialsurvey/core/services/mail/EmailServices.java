@@ -11,13 +11,6 @@ public interface EmailServices {
 			UndeliveredEmailException;
 
 	// JIRA : SS-30 by RM-06
-	/**
-	 * Sends a reset password link to the user
-	 * 
-	 * @param url
-	 * @param recipientMailId
-	 * @throws InvalidInputException
-	 * @throws UndeliveredEmailException
-	 */
-	public void sendResetPasswordLink(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException;
+	
+	public void sendResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException;
 }

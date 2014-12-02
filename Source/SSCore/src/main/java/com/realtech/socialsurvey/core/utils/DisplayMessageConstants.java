@@ -29,6 +29,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_USER ="USERNAME DOES NOT EXIST, PLEASE SIGN UP"	;
 	public static final String USER_INACTIVE = "User ID not active anymore";
 	public static final String COMPANY_INACTIVE ="Company ID not active anymore";
+	public static final String USER_NOT_PRESENT = "User does not exists";
 	
 
 	// success message constants

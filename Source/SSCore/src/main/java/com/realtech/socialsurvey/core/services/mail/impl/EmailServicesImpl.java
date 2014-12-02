@@ -80,8 +80,15 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	/**
+	 * Sends a reset password link to the user
+	 * @param url
+	 * @param recipientMailId
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
 	@Override
-	public void sendResetPasswordLink(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException {
+	public void sendResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method to send Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
 
 		// check if the passed parameters are null or empty
