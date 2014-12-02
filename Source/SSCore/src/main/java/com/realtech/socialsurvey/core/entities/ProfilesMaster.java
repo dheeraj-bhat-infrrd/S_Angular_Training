@@ -5,48 +5,45 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-
 /**
  * The persistent class for the profiles_master database table.
- * 
  */
 @Entity
-@Table(name="PROFILES_MASTER")
-@NamedQuery(name="ProfilesMaster.findAll", query="SELECT p FROM ProfilesMaster p")
+@Table(name = "PROFILES_MASTER")
+@NamedQuery(name = "ProfilesMaster.findAll", query = "SELECT p FROM ProfilesMaster p")
 public class ProfilesMaster implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="PROFILE_ID")
+	@Column(name = "PROFILE_ID")
 	private int profileId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
 	private String profile;
 
 	private int status;
 
-	//bi-directional many-to-one association to UserInvite
-	@OneToMany(mappedBy="profilesMaster")
+	// bi-directional many-to-one association to UserInvite
+	@OneToMany(mappedBy = "profilesMaster", fetch = FetchType.LAZY)
 	private List<UserInvite> userInvites;
 
-	//bi-directional many-to-one association to UserProfile
-	@OneToMany(mappedBy="profilesMaster")
+	// bi-directional many-to-one association to UserProfile
+	@OneToMany(mappedBy = "profilesMaster", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
 
-	public ProfilesMaster() {
-	}
+	public ProfilesMaster() {}
 
 	public int getProfileId() {
 		return this.profileId;

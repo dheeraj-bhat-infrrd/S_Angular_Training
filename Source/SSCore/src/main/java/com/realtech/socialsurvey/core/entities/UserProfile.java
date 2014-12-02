@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 
 /**
  * The persistent class for the user_profile database table.
- * 
  */
 @Entity
 @Table(name = "USER_PROFILE")
@@ -55,22 +54,21 @@ public class UserProfile implements Serializable {
 	private String userProfileType;
 
 	// bi-directional many-to-one association to Company
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
 	// bi-directional many-to-one association to ProfilesMaster
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "PROFILES_MASTER_ID")
 	private ProfilesMaster profilesMaster;
 
 	// bi-directional many-to-one association to User
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "USER_ID")
 	private User user;
 
-	public UserProfile() {
-	}
+	public UserProfile() {}
 
 	public int getUserProfileId() {
 		return this.userProfileId;
@@ -103,7 +101,7 @@ public class UserProfile implements Serializable {
 	public void setIsProfileComplete(int isProfileComplete) {
 		this.isProfileComplete = isProfileComplete;
 	}
-	
+
 	public int getBranchId() {
 		return this.branchId;
 	}

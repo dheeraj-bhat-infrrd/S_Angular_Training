@@ -15,12 +15,12 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -50,7 +50,11 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	@Resource
 	@Qualifier("userInvite")
-	private UserInviteDao<UserInvite, Integer> userInviteDao;
+	private UserInviteDao userInviteDao;
+	
+	@Resource
+	@Qualifier("userProfile")
+	private UserProfileDao userProfileDao;
 
 	@Autowired
 	private GenericDao<Company, Integer> companyDao;
@@ -60,9 +64,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	@Autowired
 	private GenericDao<User, Integer> userDao;
-
-	@Autowired
-	private GenericDao<UserProfile, Integer> userProfileDao;
 
 	@Autowired
 	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
@@ -111,8 +112,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
 		User user = createUser(company, username, encryptedPassword, emailId);
-		createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
-				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_NO_PROFILE_ID);
+		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
 		return user;
 	}
 
@@ -212,31 +213,6 @@ public class RegistrationServiceImpl implements RegistrationService {
 		userDao.flush();
 		LOG.info("Method createUser finished for username : " + username);
 		return user;
-	}
-
-	/*
-	 * To add a new user profile into the USER_ROFILE table
-	 */
-	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId) {
-		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
-		UserProfile userProfile = new UserProfile();
-		userProfile.setAgentId(agentId);
-		userProfile.setBranchId(branchId);
-		userProfile.setCompany(company);
-		userProfile.setEmailId(emailId);
-		userProfile.setIsProfileComplete(CommonConstants.STATUS_INACTIVE);
-		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
-		userProfile.setRegionId(CommonConstants.DEFAULT_REGION_ID);
-		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
-		userProfile.setUser(user);
-		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-		userProfile.setCreatedOn(currentTimestamp);
-		userProfile.setModifiedOn(currentTimestamp);
-		userProfile.setCreatedBy(String.valueOf(user.getUserId()));
-		userProfile.setModifiedBy(String.valueOf(user.getUserId()));
-		LOG.debug("Method createUserProfile finished");
-		userProfileDao.save(userProfile);
-		LOG.info("Method createUserProfile() finished");
 	}
 
 	/*
