@@ -19,7 +19,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 /**
@@ -35,9 +34,7 @@ public class PaymentController {
 	private Payment gateway;
 	
 	@Autowired
-	private MessageUtils messageUtils;
-	
-	
+	private MessageUtils messageUtils;	
 	
 	/**
 	 * Method used to display the Braintree form to get card details.
@@ -72,19 +69,29 @@ public class PaymentController {
 		//Extract the session
 		HttpSession session = request.getSession(false);
 		
+		User user = new User();
+		Company company = new Company();
+		company.setCompany("Avicii Tech");
+		company.setCompanyId(12);
+		user.setCompany(company);
+		user.setUserId(1);
+		user.setDisplayName("KS");
+		
+		
+		
 		//Get the user object from the session and the company object from it
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		Company company = user.getCompany();
+		//User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		//Company company = user.getCompany();
 		
 		//Get the planId from the session
-		int planId = (int) session.getAttribute(CommonConstants.ACCOUNT_TYPE);
+		int planId = Integer.parseInt(request.getParameter("accounttype"));
 		
 		//Get the nonce from the request
-		String nonce = request.getParameter("payment_method_nonce");
+		//String nonce = request.getParameter("payment_method_nonce");
 		
 		try {
 			try{
-				status = gateway.subscribe(user,company, planId, nonce);
+				status = gateway.subscribe(user,company, planId, com.braintreegateway.test.Nonce.Transactable);
 			}
 			catch(InvalidInputException e){
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown");
@@ -98,7 +105,7 @@ public class PaymentController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		
-		if(status == true){
+		if(status){
 			LOG.info("Subscription Successful!");
 			model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
