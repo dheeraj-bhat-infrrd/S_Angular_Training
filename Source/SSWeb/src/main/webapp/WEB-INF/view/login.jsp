@@ -68,9 +68,10 @@
 							<spring:message code="label.login.key"></spring:message>
 						</div>
 						<div class="formContainer">
-							<form role="form" id="loginForm">
+							<form role="form" id="loginForm" method="post"
+								action="./userlogin.do">
 								<div class="form-group formInputField">
-									<input id="userId" name="userId" class="form-control formInput"
+									<input id="loginName" name="loginName" class="form-control formInput"
 										type="text" placeholder="User ID">
 								</div>
 								<div class="form-group formInputField">
@@ -78,7 +79,7 @@
 										class="form-control formInput" type="password"
 										placeholder="* * * * * *">
 								</div>
-								<button class="formButton" id="loginFormSubmit">Submit</button>
+								<button type="submit" class="formButton" id="loginFormSubmit">Submit</button>
 							</form>
 						</div>
 					</div>
