@@ -10,6 +10,4 @@ public final class EmailTemplateConstants {
 	public static final String EMAIL_TEMPLATES_FOLDER = "EmailTemplates/";
 	public static final String REGISTRATION_INVITATION_MAIL_SUBJECT = "RegistrationInvitationMailSubject.txt";
 	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
-	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
-	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
 }

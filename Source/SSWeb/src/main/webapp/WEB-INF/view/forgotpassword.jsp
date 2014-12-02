@@ -49,24 +49,24 @@
 </script>
 </head>
 <body>
-	<div id="forgotPasswordMainWrapper" class="mainWrapper">
+	<div id="invitationMainWrapper" class="mainWrapper">
 		<div class="overlay">
 			<div class="formModalContainer">
 				<div class="hide" id="messageHeader"></div>
-				<div id="forgotPasswordContainer" class="formWrapper">
+				<div id="loginContainer" class="formWrapper">
 					<div id="formHeaderBar"></div>
-					<div class="formBody" id="forgotPasswordBody">
+					<div class="formBody" id="invitationBody">
 						<div class="formBodyMainText">
 							<spring:message code="label.forgotpassword.key"></spring:message>
 						</div>
 						<div class="formContainer">
-							<form role="form" id="forgotPasswordForm" method="post" action="./sendresetpasswordlink.do">
+							<form role="form" id="loginForm">
 								<div class="form-group formInputField">
 									<input id="emailId" name="emailId"
 										class="form-control formInput" type="email"
 										placeholder="Email ID">
 								</div>
-								<button type="submit" class="formButton" id="forgotPasswordFormSubmit">Submit</button>
+								<button class="formButton" id="forgotPasswordFormSubmit">Submit</button>
 							</form>
 						</div>
 					</div>
