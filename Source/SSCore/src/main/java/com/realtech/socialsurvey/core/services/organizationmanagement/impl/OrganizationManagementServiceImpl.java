@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.services.usermanagement.impl;
+package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
 import java.sql.Timestamp;
@@ -26,11 +26,12 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
 
 @Component
-public class UserManagementServiceImpl implements UserManagementService {
+public class OrganizationManagementServiceImpl implements OrganizationManagementService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
@@ -55,6 +56,9 @@ public class UserManagementServiceImpl implements UserManagementService {
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
+
+	@Autowired
+	private UserManagementServices userManagementServices;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -101,16 +105,18 @@ public class UserManagementServiceImpl implements UserManagementService {
 		AccountType accountType = AccountType.getAccountType(accountTypeValue);
 		switch (accountType) {
 			case INDIVIDUAL:
-				addIndividual(user);
+				addIndividualAccountType(user);
 				break;
 			case TEAM:
-				addTeam(user);
+				addTeamAccountType(user);
 				break;
 			case COMPANY:
-				addCompany(user);
+				addCompanyAccountType(user);
 				break;
 			case ENTERPRISE:
-				addEnterprise();
+				addEnterpriseAccountType();
+			default:
+				throw new InvalidInputException("Account type is not valid");
 		}
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
@@ -203,18 +209,19 @@ public class UserManagementServiceImpl implements UserManagementService {
 	 * Method to add an Individual. Makes entry in Region, Branch and UserProfile tables.
 	 * 
 	 * @param user
+	 * @throws InvalidInputException
 	 */
-	private void addIndividual(User user) {
+	private void addIndividualAccountType(User user) throws InvalidInputException {
 		LOG.info("Method addIndividual started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
-		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+		ProfilesMaster profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId());
-		profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+		profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
@@ -222,7 +229,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 		LOG.debug("Creating user profile for branch admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId());
-		profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+		profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
@@ -235,13 +242,14 @@ public class UserManagementServiceImpl implements UserManagementService {
 	 * Method to add a Team. Makes entry in Region table.
 	 * 
 	 * @param user
+	 * @throws InvalidInputException
 	 */
-	private void addTeam(User user) {
+	private void addTeamAccountType(User user) throws InvalidInputException {
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
-		ProfilesMaster profilesMaster = profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+		ProfilesMaster profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
@@ -252,7 +260,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 	/*
 	 * Method to add a company.
 	 */
-	private void addCompany(User user) {
+	private void addCompanyAccountType(User user) {
 		LOG.debug("Method addCompany started for user : " + user.getLoginName());
 
 		LOG.debug("Method addCompany finished.");
@@ -261,7 +269,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 	/*
 	 * Method to add an Enterprise.
 	 */
-	private void addEnterprise() {
+	private void addEnterpriseAccountType() {
 		LOG.debug("Method addEnterprise started.");
 
 		LOG.debug("Method addEnterprise finished.");

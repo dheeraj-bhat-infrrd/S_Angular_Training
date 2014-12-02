@@ -17,7 +17,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -25,17 +25,17 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 // JIRA: SS-24 BY RM02 BOC
 
 /**
- * Controller to manage the settings and information provided by the user
+ * Controller to manage the organizational settings and information provided by the user
  */
 @Controller
-public class UserManagementController {
-	private static final Logger LOG = LoggerFactory.getLogger(UserManagementController.class);
+public class OrganizationManagementController {
+	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementController.class);
 
 	@Autowired
 	private MessageUtils messageUtils;
 
 	@Autowired
-	private UserManagementService userManagementServices;
+	private OrganizationManagementService organizationManagementServices;
 
 	/**
 	 * Method to call service for adding company information for a user
@@ -67,7 +67,7 @@ public class UserManagementController {
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
 
 			LOG.debug("Calling services to add company details");
-			user = userManagementServices.addCompanyInformation(user, companyDetails);
+			user = organizationManagementServices.addCompanyInformation(user, companyDetails);
 
 			LOG.debug("Successfully executed service to add company details");
 
@@ -104,7 +104,7 @@ public class UserManagementController {
 		if (address == null || address.isEmpty()) {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
-		
+
 		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(ZIPCODE_REGEX)) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
@@ -157,7 +157,7 @@ public class UserManagementController {
 			LOG.debug("Calling sevices for adding account type of company");
 			AccountType accountType = null;
 			try {
-				accountType = userManagementServices.addAccountTypeForCompany(user, strAccountType);
+				accountType = organizationManagementServices.addAccountTypeForCompany(user, strAccountType);
 				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
 			}
 			catch (InvalidInputException e) {
