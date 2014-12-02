@@ -73,7 +73,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 		updateCompanyForUserProfile(user, company);
 
 		LOG.debug("Calling method for adding organizational details");
-		addOrganizationalDetails(user, organizationalDetails);
+		addOrganizationalDetails(user, company, organizationalDetails);
 
 		LOG.info("Method addCompanyInformation finished for user " + user.getLoginName());
 		return user;
@@ -176,9 +176,8 @@ public class UserManagementServiceImpl implements UserManagementService {
 	 * @param user
 	 * @param organizationalDetails
 	 */
-	private void addOrganizationalDetails(User user, Map<String, String> organizationalDetails) {
+	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) {
 		LOG.debug("Method addOrganizationalDetails called.");
-		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		OrganizationLevelSetting organizationLevelSetting = new OrganizationLevelSetting();
 		organizationLevelSetting.setAgentId(CommonConstants.DEFAULT_AGENT_ID);
 		organizationLevelSetting.setBranchId(CommonConstants.DEFAULT_BRANCH_ID);
