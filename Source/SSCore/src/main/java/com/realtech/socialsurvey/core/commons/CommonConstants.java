@@ -23,14 +23,13 @@ public interface CommonConstants {
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
 	public static final String GUEST_USER_NAME = "GUEST";
 	public static final String ADMIN_USER_NAME = "ADMIN";
-	public static final int STATUS_ACTIVE = 1;
-	public static final int STATUS_INACTIVE = 0;
-	public static final int PROCESS_COMPLETE = 1;
-	public static final int PROCESS_NOT_STARTED = 0;
+	public static final Integer STATUS_ACTIVE = 1;
+	public static final Integer STATUS_INACTIVE = 0;
 	public static final String USER_INVITE_INVITATION_PARAMETERS_COLUMN = "invitationParameters";
 	public static final String STATUS_COLUMN = "status";
+	public static final String INVITATION_EMAIL_ID_COLUMN = "invitationEmailId";
 	public static final String USER_INVITE_INVITATION_VALID_UNTIL = "invitationValidUntil";
-	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";	
+	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String CONFIG_PROPERTIES_FILE = "config.properties";
 	public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
 	public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
@@ -38,11 +37,12 @@ public interface CommonConstants {
 	public static final String MESSAGE_PROPERTIES_FILE = "displaymessage.properties";
 	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
 	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
+	public static final String USER_LOGIN_NAME_COLUMN = "loginName";
+	public static final long EPOCH_TIME_IN_MILLIS = 1000l;
 	// Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	public static final String USER_IN_SESSION = "user";
 	public static final String COMPANY_NAME = "companyName";
 	public static final String ADDRESS = "address";
 	public static final String ZIPCODE = "zipCode";
 	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
-	public static final String RESET_PASSWORD = "resetpassword.do";
 }

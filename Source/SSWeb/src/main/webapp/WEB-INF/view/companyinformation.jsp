@@ -13,6 +13,8 @@
 	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/resources/js/bootstrapValidator.js"></script>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -21,45 +23,43 @@
 	href="${pageContext.request.contextPath}/resources/css/style.css">
 <script>
 	$(function() {
-		$('#companyInfoForm').bootstrapValidator({
-			fields : {
-				company : {
-					validators : {
-						notEmpty : {
-							message : 'First name can\'t be empty'
-						}
-					}
-				},
-				emailId : {
-					validators : {
-						notEmpty : {
-							message : 'Email Id can\'t be empty'
-						}
-					}
-				},
-				userId : {
-					validators : {
-						notEmpty : {
-							message : 'User Id can\'t be empty'
-						}
-					}
-				},
-				password : {
-					validators : {
-						notEmpty : {
-							message : 'Password can\'t be empty'
-						}
-					}
-				},
-				confirmPassword : {
-					validators : {
-						notEmpty : {
-							message : 'Re-enter the password'
-						}
-					}
-				}
-			}
-		});
+		$('#companyInfoForm')
+				.bootstrapValidator(
+						{
+							fields : {
+								company : {
+									validators : {
+										notEmpty : {
+											message : 'Please enter a company name'
+										}
+									}
+								},
+								address1 : {
+									validators : {
+										notEmpty : {
+											message : 'Please enter an address'
+										}
+									}
+								},
+								zipcode : {
+									validators : {
+										notEmpty : {
+											message : 'Please enter the zip code'
+										}
+									}
+								},
+								contactno : {
+									validators : {
+										notEmpty : {
+											message : 'Please enter a valid company contact number'
+										},
+										digits : {
+											message : 'Contact number can contain digits only'
+										}
+									}
+								}
+							}
+						});
 	});
 </script>
 </head>
@@ -76,7 +76,7 @@
 						</div>
 						<div class="formContainer">
 							<form role="form" id="companyInfoForm" method="post"
-								action="addcompanyinformation.do">
+								action="./addcompanyinformation.do">
 								<div class="form-group formInputField">
 									<input id="company" name="company"
 										class="form-control formInput" type="text"
@@ -109,7 +109,7 @@
 										class="form-control formInput" type="text"
 										placeholder='<spring:message code="label.companycontactno.key"/>'>
 								</div>
-								<button class="formButton" id="formSubmit">
+								<button class="formButton" id="formSubmit" type="submit">
 									<spring:message code="label.done.key" />
 								</button>
 							</form>
@@ -127,8 +127,7 @@
 								code="label.login.key" /></a>
 					</div>
 				</div>
-				<div class="formPageFooter">Copyright © 2014 Social Survey.
-					All rights reserved.</div>
+				<div class="formPageFooter"><spring:message code="label.copyright.key"/></div>
 			</div>
 		</div>
 	</div>

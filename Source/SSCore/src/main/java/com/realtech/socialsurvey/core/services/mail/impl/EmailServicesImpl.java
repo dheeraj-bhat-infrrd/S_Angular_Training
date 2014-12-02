@@ -16,8 +16,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
-
-// JIRA: SS-7: By RM02: BOC
+//JIRA: SS-7: By RM02: BOC
 /**
  * Implementation file for the email services
  */
@@ -81,46 +80,6 @@ public class EmailServicesImpl implements EmailServices {
 	}
 
 	/**
-	 * Sends a reset password link to the user
-	 * @param url
-	 * @param recipientMailId
-	 * @throws InvalidInputException
-	 * @throws UndeliveredEmailException
-	 */
-	@Override
-	public void sendResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException {
-		LOG.info("Method to send Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
-
-		// check if the passed parameters are null or empty
-
-		if (url == null || url.isEmpty()) {
-			LOG.error("URL generated can not be null or empty");
-			throw new InvalidInputException("URL generated can not be null or empty");
-		}
-
-		if (recipientMailId == null || recipientMailId.isEmpty()) {
-			LOG.error("Recipients Email Id can not be null or empty");
-			throw new InvalidInputException("Recipients Email Id can not be null or empty");
-		}
-
-		if (name == null || name.isEmpty()) {
-			LOG.error("Recipients Name can not be null or empty");
-			throw new InvalidInputException("Recipients Name can not be null or empty");
-		}
-		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
-		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_SUBJECT;
-		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
-		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY);
-		
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url));
-		
-		LOG.debug("Calling email sender to send mail");
-		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
-
-		LOG.info("Successfully sent reset password mail");
-	}
-
-	/**
 	 * Method to prepare email entity required to send email
 	 * 
 	 * @param recipientMailId
@@ -142,4 +101,4 @@ public class EmailServicesImpl implements EmailServices {
 		return emailEntity;
 	}
 }
-// JIRA: SS-7: By RM02: EOC
+//JIRA: SS-7: By RM02: EOC
