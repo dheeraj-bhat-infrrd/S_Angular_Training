@@ -40,12 +40,12 @@ public class Branch implements Serializable {
 	private int status;
 
 	//bi-directional many-to-one association to Company
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="COMPANY_ID")
 	private Company company;
 
 	//bi-directional many-to-one association to Region
-	@ManyToOne
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="REGION_ID")
 	private Region region;
 
