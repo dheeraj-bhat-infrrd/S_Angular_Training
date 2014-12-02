@@ -168,7 +168,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		// Check if user list returned is null or empty
 		if (users == null || users.isEmpty()) {
 			LOG.error("No Record found for the UserID : " + emailId);
-			throw new InvalidInputException("No Record found for the UserID : " + emailId,DisplayMessageConstants.USER_NOT_PRESENT);
+			throw new InvalidInputException("No Record found for the UserID : " + emailId);
 		}
 		return users.get(0);
 	}
