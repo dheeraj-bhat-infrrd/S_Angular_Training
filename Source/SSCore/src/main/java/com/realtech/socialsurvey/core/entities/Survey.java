@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * The persistent class for the survey database table.
+ * The persistent class for the SURVEY database table.
  */
 @Entity
 @Table(name = "SURVEY")
@@ -17,7 +17,7 @@ public class Survey implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "SURVEY_ID")
-	private int surveyId;
+	private long surveyId;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -31,24 +31,28 @@ public class Survey implements Serializable {
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
+	@Column(name = "STATUS")
 	private int status;
 
+	@Column(name = "SURVEY_NAME")
+	private String surveyName;
+
 	// bi-directional many-to-one association to Company
-	@OneToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	// bi-directional many-to-one association to SurveyQuestion
+	// bi-directional many-to-one association to SurveyQuestionsMapping
 	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
-	private List<SurveyQuestion> surveyQuestions;
+	private List<SurveyQuestionsMapping> surveyQuestionsMappings;
 
 	public Survey() {}
 
-	public int getSurveyId() {
+	public long getSurveyId() {
 		return this.surveyId;
 	}
 
-	public void setSurveyId(int surveyId) {
+	public void setSurveyId(long surveyId) {
 		this.surveyId = surveyId;
 	}
 
@@ -92,6 +96,14 @@ public class Survey implements Serializable {
 		this.status = status;
 	}
 
+	public String getSurveyName() {
+		return this.surveyName;
+	}
+
+	public void setSurveyName(String surveyName) {
+		this.surveyName = surveyName;
+	}
+
 	public Company getCompany() {
 		return this.company;
 	}
@@ -100,26 +112,26 @@ public class Survey implements Serializable {
 		this.company = company;
 	}
 
-	public List<SurveyQuestion> getSurveyQuestions() {
-		return this.surveyQuestions;
+	public List<SurveyQuestionsMapping> getSurveyQuestionsMappings() {
+		return this.surveyQuestionsMappings;
 	}
 
-	public void setSurveyQuestions(List<SurveyQuestion> surveyQuestions) {
-		this.surveyQuestions = surveyQuestions;
+	public void setSurveyQuestionsMappings(List<SurveyQuestionsMapping> surveyQuestionsMappings) {
+		this.surveyQuestionsMappings = surveyQuestionsMappings;
 	}
 
-	public SurveyQuestion addSurveyQuestion(SurveyQuestion surveyQuestion) {
-		getSurveyQuestions().add(surveyQuestion);
-		surveyQuestion.setSurvey(this);
+	public SurveyQuestionsMapping addSurveyQuestionsMapping(SurveyQuestionsMapping surveyQuestionsMapping) {
+		getSurveyQuestionsMappings().add(surveyQuestionsMapping);
+		surveyQuestionsMapping.setSurvey(this);
 
-		return surveyQuestion;
+		return surveyQuestionsMapping;
 	}
 
-	public SurveyQuestion removeSurveyQuestion(SurveyQuestion surveyQuestion) {
-		getSurveyQuestions().remove(surveyQuestion);
-		surveyQuestion.setSurvey(null);
+	public SurveyQuestionsMapping removeSurveyQuestionsMapping(SurveyQuestionsMapping surveyQuestionsMapping) {
+		getSurveyQuestionsMappings().remove(surveyQuestionsMapping);
+		surveyQuestionsMapping.setSurvey(null);
 
-		return surveyQuestion;
+		return surveyQuestionsMapping;
 	}
 
 }
