@@ -20,6 +20,7 @@ public class UserManagementServicesImpl implements UserManagementServices {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserManagementServices.class);
 	private static Map<Integer, ProfilesMaster> profileMasters = null;
+	private static boolean isProfileMastersMapPopulated = false;
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
@@ -35,9 +36,14 @@ public class UserManagementServicesImpl implements UserManagementServices {
 			throw new InvalidInputException("profile Id is not set for getting profile master");
 		}
 		ProfilesMaster profilesMaster = null;
-		if (profileMasters == null || profileMasters.isEmpty()) {
-			LOG.debug("Fetching profile masters from db and caching in map");
-			populateProfileMastersMap();
+		if (!isProfileMastersMapPopulated) {
+			synchronized (profileMasters) {
+				if (profileMasters == null || profileMasters.isEmpty()) {
+					LOG.debug("Fetching profile masters from db and caching in map");
+					populateProfileMastersMap();
+					isProfileMastersMapPopulated = true;
+				}
+			}
 		}
 		if (profileMasters.containsKey(profileId)) {
 			profilesMaster = profileMasters.get(profileId);

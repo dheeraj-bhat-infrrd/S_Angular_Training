@@ -115,6 +115,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				break;
 			case ENTERPRISE:
 				addEnterpriseAccountType();
+				break;
 			default:
 				throw new InvalidInputException("Account type is not valid");
 		}
