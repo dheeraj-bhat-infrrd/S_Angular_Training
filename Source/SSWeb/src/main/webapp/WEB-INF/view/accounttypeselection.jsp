@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<!-- JIRA : SS-24 by RM-02
+<!-- JIRA SS-31 BY RM02
 	Page for selecting the account type(plan)
 -->
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
@@ -11,6 +11,8 @@
 <title><spring:message code="label.title.registerUser.key" /></title>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script type="text/javascript"
+	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -20,8 +22,16 @@
 <script type="text/javascript">
 	function selectAccountType(accountType) {
 		console.log("selecting and saving account type");
-		$("#accountType").val(accountType);
-		document.accountTypeSelectionform.submit();
+		$('#accountType').val(accountType);
+		var url = "./addaccounttype.do";
+		callAjaxFormSubmit(url, selectAccountTypeCallBack,
+				"accountTypeSelectionForm");
+	}
+
+	function selectAccountTypeCallBack(data) {
+		console.log("callback for selectAccountType called");
+		$("#paymentSection").html(data);
+		console.log("callback for selectAccountType finished");
 	}
 </script>
 </head>
@@ -37,8 +47,7 @@
 							<spring:message code="label.accounttypeselection.header.key"></spring:message>
 						</div>
 						<div class="formContainer">
-							<form role="form" id="accountTypeSelectionForm" method="post"
-								action="addaccounttype.do">
+							<form id="accountTypeSelectionForm">
 								<div class="accountTypeBoxWrapper">
 									<div class="form-group formInputField">
 										<input type="hidden" name="accounttype" id="accountType" />
@@ -46,8 +55,9 @@
 											<div class="accountTypeBoxHeader">
 												<spring:message code="label.accounttype.individual.key" />
 											</div>
-											<button class="formButton" id="typeIndividualButton"
-												onclick="javascript:selectAccountType('individual')">
+											<button type="button" class="formButton"
+												id="typeIndividualButton"
+												onclick="javascript:selectAccountType(1)">
 												<spring:message code="label.select.key" />
 											</button>
 										</div>
@@ -55,8 +65,8 @@
 											<div class="accountTypeBoxHeader">
 												<spring:message code="label.accounttype.team.key" />
 											</div>
-											<button class="formButton" id="typeTeamButton"
-												onclick="javascript:selectAccountType('team')">
+											<button type="button" class="formButton" id="typeTeamButton"
+												onclick="javascript:selectAccountType(2)">
 												<spring:message code="label.select.key" />
 											</button>
 										</div>
@@ -64,17 +74,19 @@
 											<div class="accountTypeBoxHeader">
 												<spring:message code="label.accounttype.company.key" />
 											</div>
-											<button class="formButton" id="typeCompanyButton"
-												onclick="javascript:selectAccountType('company')">
+											<button type="button" class="formButton"
+												id="typeCompanyButton"
+												onclick="javascript:selectAccountType(3)">
 												<spring:message code="label.select.key" />
 											</button>
 										</div>
-										<div class="accountTypeBox" id="accountTypeEnterprise"
-											onclick="javascript:selectAccountType('enterprise')">
+										<div class="accountTypeBox" id="accountTypeEnterprise">
 											<div class="accountTypeBoxHeader">
 												<spring:message code="label.accounttype.enterprise.key" />
 											</div>
-											<button class="formButton" id="typeEnterpriseButton">
+											<button type="button" class="formButton"
+												id="typeEnterpriseButton"
+												onclick="javascript:selectAccountType(4)">
 												<spring:message code="label.select.key" />
 											</button>
 										</div>
@@ -85,8 +97,10 @@
 						</div>
 					</div>
 				</div>
-				<div class="formPageFooter">Copyright © 2014 Social Survey.
-					All rights reserved.</div>
+				<div id="paymentSection" class="paymentSection"></div>
+				<div class="formPageFooter">
+					<spring:message code="label.copyright.key"/>
+				</div>
 			</div>
 		</div>
 	</div>
