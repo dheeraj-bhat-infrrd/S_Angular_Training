@@ -68,10 +68,12 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		return entity;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<T> findAll() {
+	public List<T> findAll(Class<T> entityClass) {
 		try {
-			return findByCriteria();
+			final Criteria crit = getSession().createCriteria(entityClass);
+			  return crit.list();
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in findAll().", hibernateException);
@@ -183,10 +185,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public List<T> findByKeyValue(Class<T> dataClass, Map<String, String> queries) {
+	public List<T> findByKeyValue(Class<T> dataClass, Map<String, Object> queries) {
 		Criteria criteria = getSession().createCriteria(dataClass);
 		try {
-			for (Entry<String, String> query : queries.entrySet()) {
+			for (Entry<String, Object> query : queries.entrySet()) {
 				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
 			}
 		}
