@@ -63,14 +63,14 @@ public class LoginController {
 		try {
 			LOG.debug("Validation login form parameters");
 			// check if form parameters valid
-			verifyLoginFormParameters(loginName, password);
+			validateLoginFormParameters(loginName, password);
 
 			try {
 				user = authenticationService.getUserWithLoginName(loginName);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in fetching User. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 			LOG.debug("Check if company status active");
 			// check if user company active
@@ -91,7 +91,7 @@ public class LoginController {
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER_CREDENTIALS, e);
 			}
 
 			// Check if user Company Profile complete, if company registration not done redirect
@@ -113,6 +113,8 @@ public class LoginController {
 					userProfiles = authenticationService.getUserProfileForUser(user);
 				}
 			}
+			LOG.info("User login successful");
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
@@ -153,7 +155,7 @@ public class LoginController {
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in verifying registered user. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 			// Send reset password link
 			try {
@@ -163,6 +165,8 @@ public class LoginController {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
 		}
 		catch (NonFatalException e) {
@@ -171,7 +175,7 @@ public class LoginController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 
-		return JspResolver.LOGIN;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -227,7 +231,7 @@ public class LoginController {
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), e.getErrorCode(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 			try {
 				// change user's password
@@ -235,8 +239,10 @@ public class LoginController {
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), e.getErrorCode(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			LOG.info("Reset user password executed successfully");
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSUFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
 		}
 		catch (NonFatalException e) {
@@ -255,13 +261,15 @@ public class LoginController {
 	 * @param password
 	 * @throws InvalidInputException
 	 */
-	private void verifyLoginFormParameters(String loginName, String password) throws InvalidInputException {
+	private void validateLoginFormParameters(String loginName, String password) throws InvalidInputException {
+		LOG.debug("Validating Login form paramters");
 		if (loginName == null || loginName.isEmpty()) {
 			throw new InvalidInputException("User name passed can not be null", DisplayMessageConstants.INVALID_USERNAME);
 		}
 		if (password == null || password.isEmpty()) {
 			throw new InvalidInputException("Password passed can not be null");
 		}
+		LOG.debug("Login form parameters validated successfully");
 	}
 
 	/**
@@ -273,6 +281,7 @@ public class LoginController {
 	 * @throws InvalidInputException
 	 */
 	private void validateResetPasswordFormParameters(String emailId, String password, String confirmPassword) throws InvalidInputException {
+		LOG.debug("Validating reset password form paramters");
 		if (emailId == null || emailId.isEmpty()) {
 			LOG.error("Emaild passed can not be null or empty");
 			throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
@@ -291,6 +300,7 @@ public class LoginController {
 			LOG.error("Password and confirm password fields do not match");
 			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
+		LOG.debug("Reset password form parameters validated successfully");
 	}
 
 }

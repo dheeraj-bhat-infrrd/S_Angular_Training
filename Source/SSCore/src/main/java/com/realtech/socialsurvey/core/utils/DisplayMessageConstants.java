@@ -25,14 +25,17 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_ADDRESS = "INVALID_ADDRESS";
 	public static final String INVALID_ZIPCODE = "INVALID_ZIPCODE";
 	public static final String INVALID_COMPANY_PHONEN0 = "INVALID_COMPANY_PHONEN0";
-	public static final String INVALID_USER_CREDENTIALS ="INVALID USERNAME OR PASSWORD"	;
-	public static final String INVALID_USER ="USERNAME DOES NOT EXIST, PLEASE SIGN UP"	;
-	public static final String USER_INACTIVE = "User ID not active anymore";
-	public static final String COMPANY_INACTIVE ="Company ID not active anymore";
-	public static final String USER_NOT_PRESENT = "User does not exists";
+	public static final String INVALID_USER_CREDENTIALS ="INVALID_USER_CREDENTIALS"	;
+	public static final String INVALID_USER ="INVALID_USER"	;
+	public static final String USER_INACTIVE ="USER_INACTIVE";
+	public static final String COMPANY_INACTIVE ="COMPANY_INACTIVE";
+	public static final String USER_NOT_PRESENT = "USER_NOT_PRESENT";
 	
 
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
 	public static final String USER_REGISTRATION_SUCCESSFUL = "USER_REGISTRATION_SUCCESSFUL";
+	public static final String PASSWORD_RESET_LINK_SUCCESSFUL = "PASSWORD_RESET_LINK_SUCCESSFUL";
+	public static final String PASSWORD_CHANGE_SUCCESSUFUL = "PASSWORD_CHANGE_SUCCESSUFL";
+	public static final String USER_LOGIN_SUCCESSFUL = "USER_LOGIN_SUCCESSFUL";
 }
