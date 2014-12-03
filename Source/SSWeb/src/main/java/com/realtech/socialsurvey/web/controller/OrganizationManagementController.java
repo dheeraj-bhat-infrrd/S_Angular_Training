@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -40,6 +41,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private OrganizationManagementService organizationManagementServices;
+
+	@Autowired
+	private UserManagementServices userManagementServices;
 
 	/**
 	 * Method to call service for adding company information for a user

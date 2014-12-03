@@ -23,9 +23,9 @@ public interface RegistrationService {
 
 	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException;
 
-	public User addCorporateAdminAndUpdateStage(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
-			InvalidUrlException, UserAlreadyExistsException;
+	public User addCorporateAdminAndUpdateStage(String firstName, String lastName, String emailId, String username, String password)
+			throws InvalidInputException, InvalidUrlException, UserAlreadyExistsException;
 
-	public void updateProfileCompletionStage(User user, int profileMasterId, String profileCompletionStage) throws InvalidInputException;
+	public void updateProfileCompletionStage(User user, int profilesMasterId, String profileCompletionStage) throws InvalidInputException;
 
 }
