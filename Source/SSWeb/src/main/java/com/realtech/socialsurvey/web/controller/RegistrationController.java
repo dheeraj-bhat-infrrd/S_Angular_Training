@@ -177,7 +177,7 @@ public class RegistrationController {
 			try {
 				if (emailId.equals(originalEmailId)) {
 					LOG.debug("Registering user with emailId : " + emailId);
-					User user = registrationService.addCorporateAdmin(firstName, lastName, originalEmailId, username, confirmPassword);
+					User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, originalEmailId, username, confirmPassword);
 					LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 					LOG.debug("Adding newly registered user to session");

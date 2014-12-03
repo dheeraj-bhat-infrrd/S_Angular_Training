@@ -32,8 +32,8 @@ public class UserInviteDaoImpl extends GenericDaoImpl<UserInvite, Integer> imple
 
 			// Valid_till date should either be equal to 01-JAN-1970 or less than today.
 			Criterion criterion = Restrictions.or(
-					Restrictions.eq(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL, new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS)),
-					Restrictions.lt(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL, new Timestamp(System.currentTimeMillis())));
+					Restrictions.eq(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL_COLUMN, new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS)),
+					Restrictions.lt(CommonConstants.USER_INVITE_INVITATION_VALID_UNTIL_COLUMN, new Timestamp(System.currentTimeMillis())));
 			criteria.add(criterion);
 		}
 		catch (HibernateException hibernateException) {
