@@ -72,7 +72,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
-		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME));
+		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
@@ -132,11 +132,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * This method adds a new company into the COMPANY table.
 	 */
-	private Company addCompany(User user, String companyName) {
+	private Company addCompany(User user, String companyName, int isRegistrationComplete) {
 		LOG.debug("Method addCompany started for user " + user.getLoginName());
 		Company company = new Company();
 		company.setCompany(companyName);
-		company.setIsRegistrationComplete(CommonConstants.STATUS_ACTIVE);
+		company.setIsRegistrationComplete(isRegistrationComplete);
 		company.setStatus(CommonConstants.STATUS_ACTIVE);
 		company.setCreatedBy(String.valueOf(user.getUserId()));
 		company.setModifiedBy(String.valueOf(user.getUserId()));

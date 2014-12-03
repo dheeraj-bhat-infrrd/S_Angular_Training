@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -70,6 +71,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 	@Autowired
 	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
+
+	@Autowired
+	private UserManagementServices userManagementServices;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -404,7 +408,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 				+ profileMasterId + " and userId : " + user.getUserId());
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.USER_COLUMN, user);
-		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementServices.getProfilesMasterById(profileMasterId));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 
 		if (userProfiles != null && !userProfiles.isEmpty()) {
