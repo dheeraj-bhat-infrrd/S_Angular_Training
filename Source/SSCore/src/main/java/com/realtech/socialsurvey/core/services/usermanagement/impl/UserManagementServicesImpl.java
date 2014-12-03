@@ -19,7 +19,7 @@ import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServ
 public class UserManagementServicesImpl implements UserManagementServices {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserManagementServices.class);
-	private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();;
+	private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
 	private static boolean isProfileMastersMapPopulated = false;
 
 	@Autowired
