@@ -9,5 +9,5 @@ public interface OrganizationManagementService {
 
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails);
 
-	public AccountType addAccountTypeForCompany(User user, String accountType) throws InvalidInputException;
+	public AccountType addAccountTypeForCompanyAndUpdateStage(User user, String accountType) throws InvalidInputException;
 }
