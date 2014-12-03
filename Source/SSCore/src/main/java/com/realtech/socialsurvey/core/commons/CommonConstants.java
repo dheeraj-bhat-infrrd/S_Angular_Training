@@ -66,6 +66,8 @@ public interface CommonConstants {
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String USER_COLUMN = "user";
 	public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
+	public static final String AUTO_PAYMENT_MODE = "A";
+	public static final int INITIAL_PAYMENT_RETRIES = 0;
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)

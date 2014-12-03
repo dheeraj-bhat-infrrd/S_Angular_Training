@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -44,6 +45,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private UserManagementServices userManagementServices;
+	
+	@Autowired
+	private Payment gateway;
 
 	/**
 	 * Method to call service for adding company information for a user
@@ -176,7 +180,10 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-
+			
+			gateway.initialise();
+			model.addAttribute("accounttype", accountType.getValue());
+			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("accounttype", accountType);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
