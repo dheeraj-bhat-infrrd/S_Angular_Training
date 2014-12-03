@@ -80,15 +80,14 @@ public class PaymentController {
 		//Get the nonce from the request
 		String nonce = request.getParameter("payment_method_nonce");
 		
-		try {
-			try{
-				status = gateway.subscribe(user,company, planId, nonce);
-			}
-			catch(InvalidInputException e){
-				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown");
-				throw new InvalidInputException(e.getMessage(),DisplayMessageConstants.GENERAL_ERROR,e);
-				
-			}
+		try{
+			status = gateway.subscribe(user,company, planId, nonce);
+		}
+		catch(InvalidInputException e){
+			LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("PaymentController subscribeForPlan() : NonFatalException : " + messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));

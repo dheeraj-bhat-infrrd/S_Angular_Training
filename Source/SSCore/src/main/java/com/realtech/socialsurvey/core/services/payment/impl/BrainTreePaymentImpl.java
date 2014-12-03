@@ -24,7 +24,6 @@ import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
@@ -193,9 +192,9 @@ public class BrainTreePaymentImpl implements Payment {
 	 * @param customerId a String
 	 * @param planId a String
 	 * @return Success or Failure of the operation.
-	 * @throws InvalidInputException 
+	 * @throws NonFatalException 
 	 */
-	private boolean subscribeCustomer(String customerId,String planId) throws InvalidInputException{
+	private boolean subscribeCustomer(String customerId,String planId) throws NonFatalException{
 		
 		boolean resultStatus = false;
 		
@@ -221,7 +220,7 @@ public class BrainTreePaymentImpl implements Payment {
 			}
 			catch(Exception e){
 				LOG.error("Customer with id " + customerId + " : payment token error!");
-				throw new FatalException("Customer with id " + customerId + " : payment token error!");			
+				throw new NonFatalException("Customer with id " + customerId + " : payment token error!");			
 			}
 			
 			//Make a subscription request
@@ -271,26 +270,27 @@ public class BrainTreePaymentImpl implements Payment {
 			throw new InvalidInputException("subscribe : third parameter is null or empty!");
 		}
 		
-		LOG.info("BrainTreePaymentImpl : subscribe() : Executing method.");
-		LOG.info("Parameters provided : User : " + user.toString() + ", Company : " + company.toString() + ", paymentNonce : " + nonce);
+		LOG.info("Making a subscription!");
+		LOG.debug("BrainTreePaymentImpl : subscribe() : Executing method.");
+		LOG.debug("Parameters provided : User : " + user.toString() + ", Company : " + company.toString() + ", paymentNonce : " + nonce);
 		
-		LOG.info("Fetching the planId string using property file");
+		LOG.debug("Fetching the planId string using property file");
 		//Get the plan name used in Braintree
 		
 		String planIdString = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(planId));
 		if(planIdString == null){
-			LOG.info("Invalid Plan ID provided for subscription.");
+			LOG.error("Invalid Plan ID provided for subscription.");
 			throw new InvalidInputException("Invalid Plan ID provided for subscription.");
 		}
 		
 		//Check if the customer already exists in the vault.
 		if(containsCustomer(String.valueOf(company.getCompanyId()))){
-			LOG.info("Customer found in vault. Making subscription.");
+			LOG.debug("Customer found in vault. Making subscription.");
 			//If he does just subscribe the customer
 			result = subscribeCustomer(String.valueOf(company.getCompanyId()), planIdString);
 		}
 		else{
-			LOG.info("Customer does not exist in the vault.Adding customer to vault.");
+			LOG.debug("Customer does not exist in the vault.Adding customer to vault.");
 			//If he doesnt add him to the vault and subscribe him
 			if(	!addCustomerWithPayment(company, nonce) ){
 				LOG.error("Addition of customer with id : " + company.getCompanyId() + " failed! Aborting subscription.");
@@ -301,7 +301,6 @@ public class BrainTreePaymentImpl implements Payment {
 				result = subscribeCustomer(String.valueOf(company.getCompanyId()), planIdString);
 			}
 		}	
-		
 		
 		if(result){
 			LOG.info("Subscription successful. Updating the license table.");		
@@ -322,7 +321,8 @@ public class BrainTreePaymentImpl implements Payment {
 	 */
 	public String getClientToken(){
 		
-		LOG.info("BrainTreePaymentImpl : getClientToken() : Executing method.");
+		LOG.info("Making API call to fetch client token!");
+		LOG.debug("BrainTreePaymentImpl : getClientToken() : Executing method.");
 				
 		//API call to generate client token
 		String clientToken = gateway.clientToken().generate();
@@ -344,8 +344,9 @@ public class BrainTreePaymentImpl implements Payment {
 			LOG.error("getClientTokenWithCustomerId : parameter is null or empty!");
 			throw new InvalidInputException("getClientTokenWithCustomerId : parameter is null or empty!");			
 		}
-		LOG.info("BrainTreePaymentImpl : getClientTokenWithCustomerId() : Executing method.");
-		LOG.info("Parameters provided : customerId : " + customerId);
+		LOG.info("Making API call to fetch client token for customer ID!");
+		LOG.debug("BrainTreePaymentImpl : getClientTokenWithCustomerId() : Executing method.");
+		LOG.debug("Parameters provided : customerId : " + customerId);
 	
 		//API call to generate client token for a particular Id
 		ClientTokenRequest request = new ClientTokenRequest().customerId(customerId);
