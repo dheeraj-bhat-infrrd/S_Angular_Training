@@ -18,14 +18,14 @@ public interface RegistrationService {
 	 * 
 	 * @throws NonFatalException
 	 */
-	public void inviteCorporateToRegister(String firstName, String lastName,
-			String emailId) throws InvalidInputException,
-			UndeliveredEmailException, NonFatalException;
+	public void inviteCorporateToRegister(String firstName, String lastName, String emailId) throws InvalidInputException, UndeliveredEmailException,
+			NonFatalException;
 
-	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter)
-			throws InvalidInputException;
+	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException;
 
-	public User addCorporateAdmin(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
+	public User addCorporateAdminAndUpdateStage(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
 			InvalidUrlException, UserAlreadyExistsException;
+
+	public void updateProfileCompletionStage(User user, int profileMasterId, String profileCompletionStage) throws InvalidInputException;
 
 }

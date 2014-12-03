@@ -5,6 +5,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 
 public interface UserProfileDao extends GenericDao<UserProfile, Integer> {
-	
-	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId);
+
+	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete);
 }
