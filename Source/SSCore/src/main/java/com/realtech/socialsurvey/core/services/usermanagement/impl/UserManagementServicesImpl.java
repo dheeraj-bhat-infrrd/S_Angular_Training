@@ -19,7 +19,7 @@ import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServ
 public class UserManagementServicesImpl implements UserManagementServices {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserManagementServices.class);
-	private static Map<Integer, ProfilesMaster> profileMasters = null;
+	private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
 	private static boolean isProfileMastersMapPopulated = false;
 
 	@Autowired
@@ -61,7 +61,6 @@ public class UserManagementServicesImpl implements UserManagementServices {
 	 */
 	private void populateProfileMastersMap() {
 		LOG.debug("Getting all profile masters from database and storing in map");
-		profileMasters = new HashMap<Integer, ProfilesMaster>();
 		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAll(ProfilesMaster.class);
 		if (profileMasterList != null && !profileMasterList.isEmpty()) {
 			for (ProfilesMaster profilesMaster : profileMasterList) {
