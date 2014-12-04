@@ -38,6 +38,8 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public List<T> findByColumn(Class<T> dataClass, String column, Object value);
 
+	public long findNumberOfRows(Class<T> dataClass);
+
 	
 }
 
