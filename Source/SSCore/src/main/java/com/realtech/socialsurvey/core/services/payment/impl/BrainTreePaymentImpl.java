@@ -89,7 +89,7 @@ public class BrainTreePaymentImpl implements Payment {
 	 * @param userId
 	 * @throws InvalidInputException 
 	 */
-	private void updateLicenseTable(int accountsMasterId,Company company,int userId) throws InvalidInputException{
+	private void updateLicenseTable(int accountsMasterId,Company company,long userId) throws InvalidInputException{
 								
 		AccountsMaster accountsMaster = accountsMasterDao.findById(AccountsMaster.class, accountsMasterId);
 		if(accountsMaster == null){
@@ -149,7 +149,7 @@ public class BrainTreePaymentImpl implements Payment {
 		//Requesting Braintree to create a new customer object
 		Result<Customer> result = gateway.customer().create(request);
 		
-		LOG.debug("addCustomerWithPayment : adding user " + Integer.toString(company.getCompanyId()) + " : Status : " + result.isSuccess() + " Message : " + result.getMessage());
+		LOG.debug("addCustomerWithPayment : adding user " + Long.toString(company.getCompanyId()) + " : Status : " + result.isSuccess() + " Message : " + result.getMessage());
 		
 		return result.isSuccess();		
 	}
