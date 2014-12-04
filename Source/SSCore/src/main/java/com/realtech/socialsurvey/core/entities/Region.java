@@ -17,7 +17,7 @@ public class Region implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "REGION_ID")
-	private int regionId;
+	private long regionId;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -49,11 +49,11 @@ public class Region implements Serializable {
 
 	public Region() {}
 
-	public int getRegionId() {
+	public long getRegionId() {
 		return this.regionId;
 	}
 
-	public void setRegionId(int regionId) {
+	public void setRegionId(long regionId) {
 		this.regionId = regionId;
 	}
 

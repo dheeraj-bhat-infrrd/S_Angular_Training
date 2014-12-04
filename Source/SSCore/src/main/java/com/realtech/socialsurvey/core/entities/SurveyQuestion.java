@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import java.util.List;
 
 /**
- * The persistent class for the survey_questions database table.
+ * The persistent class for the SURVEY_QUESTIONS database table.
  */
 @Entity
 @Table(name = "SURVEY_QUESTIONS")
@@ -25,18 +25,13 @@ public class SurveyQuestion implements Serializable {
 	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name = "IS_RATING_QUESTION")
-	private int isRatingQuestion;
-
 	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	@Column(name = "`ORDER`")
-	private int order;
-
+	@Column(name = "STATUS")
 	private int status;
 
 	@Column(name = "SURVEY_QUESTION")
@@ -45,19 +40,13 @@ public class SurveyQuestion implements Serializable {
 	@Column(name = "SURVEY_QUESTIONS_CODE")
 	private String surveyQuestionsCode;
 
-	// bi-directional many-to-one association to Company
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "COMPANY_ID")
-	private Company company;
-
-	// bi-directional many-to-one association to Survey
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "SURVEY_ID")
-	private Survey survey;
-
 	// bi-directional many-to-one association to SurveyQuestionsAnswerOption
 	@OneToMany(mappedBy = "surveyQuestion", fetch = FetchType.LAZY)
 	private List<SurveyQuestionsAnswerOption> surveyQuestionsAnswerOptions;
+
+	// bi-directional many-to-one association to SurveyQuestionsMapping
+	@OneToMany(mappedBy = "surveyQuestion", fetch = FetchType.LAZY)
+	private List<SurveyQuestionsMapping> surveyQuestionsMappings;
 
 	public SurveyQuestion() {}
 
@@ -85,14 +74,6 @@ public class SurveyQuestion implements Serializable {
 		this.createdOn = createdOn;
 	}
 
-	public int getIsRatingQuestion() {
-		return this.isRatingQuestion;
-	}
-
-	public void setIsRatingQuestion(int isRatingQuestion) {
-		this.isRatingQuestion = isRatingQuestion;
-	}
-
 	public String getModifiedBy() {
 		return this.modifiedBy;
 	}
@@ -107,14 +88,6 @@ public class SurveyQuestion implements Serializable {
 
 	public void setModifiedOn(Timestamp modifiedOn) {
 		this.modifiedOn = modifiedOn;
-	}
-
-	public int getOrder() {
-		return this.order;
-	}
-
-	public void setOrder(int order) {
-		this.order = order;
 	}
 
 	public int getStatus() {
@@ -141,22 +114,6 @@ public class SurveyQuestion implements Serializable {
 		this.surveyQuestionsCode = surveyQuestionsCode;
 	}
 
-	public Company getCompany() {
-		return this.company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
-
-	public Survey getSurvey() {
-		return this.survey;
-	}
-
-	public void setSurvey(Survey survey) {
-		this.survey = survey;
-	}
-
 	public List<SurveyQuestionsAnswerOption> getSurveyQuestionsAnswerOptions() {
 		return this.surveyQuestionsAnswerOptions;
 	}
@@ -177,6 +134,28 @@ public class SurveyQuestion implements Serializable {
 		surveyQuestionsAnswerOption.setSurveyQuestion(null);
 
 		return surveyQuestionsAnswerOption;
+	}
+
+	public List<SurveyQuestionsMapping> getSurveyQuestionsMappings() {
+		return this.surveyQuestionsMappings;
+	}
+
+	public void setSurveyQuestionsMappings(List<SurveyQuestionsMapping> surveyQuestionsMappings) {
+		this.surveyQuestionsMappings = surveyQuestionsMappings;
+	}
+
+	public SurveyQuestionsMapping addSurveyQuestionsMapping(SurveyQuestionsMapping surveyQuestionsMapping) {
+		getSurveyQuestionsMappings().add(surveyQuestionsMapping);
+		surveyQuestionsMapping.setSurveyQuestion(this);
+
+		return surveyQuestionsMapping;
+	}
+
+	public SurveyQuestionsMapping removeSurveyQuestionsMapping(SurveyQuestionsMapping surveyQuestionsMapping) {
+		getSurveyQuestionsMappings().remove(surveyQuestionsMapping);
+		surveyQuestionsMapping.setSurveyQuestion(null);
+
+		return surveyQuestionsMapping;
 	}
 
 }
