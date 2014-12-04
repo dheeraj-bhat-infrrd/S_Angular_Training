@@ -27,8 +27,9 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {
@@ -36,19 +37,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
 	@Autowired
-	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
+	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
 
 	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
-	private GenericDao<User, Integer> userDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
-	private GenericDao<Region, Integer> regionDao;
+	private GenericDao<Region, Long> regionDao;
 
 	@Autowired
-	private GenericDao<Branch, Integer> branchDao;
+	private GenericDao<Branch, Long> branchDao;
 
 	@Resource
 	@Qualifier("userProfile")
@@ -58,7 +59,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Autowired
-	private UserManagementServices userManagementServices;
+	private UserManagementService userManagementService;
+
+	@Autowired
+	private RegistrationService registrationService;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -68,7 +72,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
-		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME));
+		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
@@ -89,7 +93,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException {
+	public AccountType addAccountTypeForCompanyAndUpdateStage(User user, String strAccountType) throws InvalidInputException {
 		LOG.info("Method addAccountTypeForCompany started for user : " + user.getLoginName());
 		if (strAccountType == null || strAccountType.isEmpty()) {
 			throw new InvalidInputException("account type is null or empty while adding account type fro company");
@@ -128,10 +132,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * This method adds a new company into the COMPANY table.
 	 */
-	private Company addCompany(User user, String companyName) {
+	private Company addCompany(User user, String companyName, int isRegistrationComplete) {
 		LOG.debug("Method addCompany started for user " + user.getLoginName());
 		Company company = new Company();
 		company.setCompany(companyName);
+		company.setIsRegistrationComplete(isRegistrationComplete);
+		company.setStatus(CommonConstants.STATUS_ACTIVE);
 		company.setCreatedBy(String.valueOf(user.getUserId()));
 		company.setModifiedBy(String.valueOf(user.getUserId()));
 		company.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -217,24 +223,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
-		ProfilesMaster profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId());
-		profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				CommonConstants.STATUS_ACTIVE);
+		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
 
 		LOG.debug("Creating user profile for branch admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
-				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId());
-		profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				CommonConstants.STATUS_ACTIVE);
+		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
-				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId());
+				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				CommonConstants.STATUS_ACTIVE);
+		/**
+		 * For an individual, only the company admin's profile completion stage is updated, all the
+		 * other profiles created by default need no action so their profile completion stage is
+		 * marked completed at the time of insert
+		 */
+		LOG.debug("Updating profile stage for company to payment stage");
+		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+				CommonConstants.PAYMENT_STAGE);
 
 		LOG.info("Method addIndividual finished.");
 	}
@@ -250,11 +267,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
-		ProfilesMaster profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId());
+				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				CommonConstants.STATUS_ACTIVE);
+
+		LOG.debug("Updating profile stage to payment stage for account type team");
+		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+				CommonConstants.PAYMENT_STAGE);
+
 		LOG.debug("Method addTeam finished.");
 	}
 
