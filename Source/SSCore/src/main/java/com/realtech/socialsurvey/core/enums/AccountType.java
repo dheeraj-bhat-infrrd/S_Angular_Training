@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.enums;
 
+import com.realtech.socialsurvey.core.exception.FatalException;
+
 // RM-05
 /*
  * Enum for identifying type of account.
@@ -30,5 +32,20 @@ public enum AccountType {
 
 	public void setValue(int value) {
 		this.value = value;
+	}
+
+	/**
+	 * Returns enum for the value provided
+	 * 
+	 * @param value
+	 * @return
+	 */
+	public static AccountType getAccountType(int value) {
+		for (AccountType accountType : values()) {
+			if (accountType.value == (value)) {
+				return accountType;
+			}
+		}
+		throw new FatalException("Specified account type not found. account type: " + value);
 	}
 }
