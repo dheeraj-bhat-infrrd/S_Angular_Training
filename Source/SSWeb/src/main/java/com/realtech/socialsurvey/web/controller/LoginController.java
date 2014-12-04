@@ -31,7 +31,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class LoginController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
-	
+
 	@Autowired
 	private AuthenticationService authenticationService;
 	@Autowired
@@ -58,7 +58,7 @@ public class LoginController {
 		String password = request.getParameter("password");
 		LOG.info("User login with user Id :" + loginName);
 		User user = null;
-		List<UserProfile> userProfiles = null;
+		UserProfile userProfile = null;
 
 		try {
 			LOG.debug("Validation login form parameters");
@@ -100,7 +100,7 @@ public class LoginController {
 			if (user.getCompany().getIsRegistrationComplete() != CommonConstants.PROCESS_COMPLETE) {
 				// redirect to company information page
 				LOG.info("Company profile not complete, redirecting to company information page");
-				model.addAttribute("redirectTo", "companyinformation.do");
+				model.addAttribute("redirectTo", CommonConstants.ADD_COMPANY_STAGE);
 			}
 			else {
 				// check if at least one of the user profiles are complete
@@ -109,14 +109,21 @@ public class LoginController {
 					// redirect user to complete the top priority profile
 					// Priority Company->region->branch->agent
 					LOG.info("None of the user profiles are complete , Redirect to top priority profile first");
-					// fetch user profiles
-					userProfiles = authenticationService.getUserProfileForUser(user);
+					// fetch company admin user profile
+					try {
+						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
+						//set model attribute to the value to which u need to redirect the url
+						model.addAttribute("redirectTo", userProfile.getProfileCompletionStage());
+					}
+					catch (InvalidInputException e) {
+						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
+						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
+					}
 				}
-				//if user login successful and all the details are filled
-				model.addAttribute("redirectTo", "dashboard.do");
 			}
 			LOG.info("User login successful");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
@@ -127,9 +134,21 @@ public class LoginController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	@RequestMapping(value = "/companyinformation")
+	/**
+	 * Start the companyinformation page
+	 * @return
+	 */
+	@RequestMapping(value = "/addcompanyinformation")
 	public String initCompanyInformationPage() {
 		return JspResolver.COMPANY_INFORMATION;
+	}
+	
+	/**
+	 * Start the dashboard page
+	 */
+	@RequestMapping(value = "/dashboard")
+	public String initDashboardPage() {
+		return JspResolver.DASHBOARD;
 	}
 
 	/**
@@ -244,7 +263,8 @@ public class LoginController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Reset user password executed successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
 		}
 		catch (NonFatalException e) {
