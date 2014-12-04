@@ -7,7 +7,7 @@ import java.util.List;
 
 
 /**
- * The persistent class for the company database table.
+ * The persistent class for the COMPANY database table.
  * 
  */
 @Entity
@@ -17,17 +17,12 @@ public class Company implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="COMPANY_ID")
-	private int companyId;
+	private long companyId;
 
+	@Column(name="COMPANY")
 	private String company;
-	
-	@Column(name="REGISTRATION_STAGE")
-	private String registrationStage;
-	
-	@Column(name="IS_REGISTRATION_COMPLETE")
-	private int isRegistrationComplete;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -35,12 +30,19 @@ public class Company implements Serializable {
 	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
 
+	@Column(name="IS_REGISTRATION_COMPLETE")
+	private int isRegistrationComplete;
+
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
 
 	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
 
+	@Column(name="REGISTRATION_STAGE")
+	private String registrationStage;
+
+	@Column(name="STATUS")
 	private int status;
 
 	//bi-directional many-to-one association to Branch
@@ -59,13 +61,13 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<Region> regions;
 
-	//bi-directional one-to-one association to Survey
-	@OneToOne(mappedBy="company", fetch = FetchType.LAZY)
-	private Survey survey;
-
-	//bi-directional many-to-one association to SurveyQuestion
+	//bi-directional many-to-one association to Survey
 	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
-	private List<SurveyQuestion> surveyQuestions;
+	private List<Survey> surveys;
+
+	//bi-directional many-to-one association to User
+	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	private List<User> users;
 
 	//bi-directional many-to-one association to UserInvite
 	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
@@ -75,18 +77,14 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
 
-	//bi-directional many-to-one association to User
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
-	private List<User> users;
-
 	public Company() {
 	}
 
-	public int getCompanyId() {
+	public long getCompanyId() {
 		return this.companyId;
 	}
 
-	public void setCompanyId(int companyId) {
+	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
 
@@ -96,22 +94,6 @@ public class Company implements Serializable {
 
 	public void setCompany(String company) {
 		this.company = company;
-	}
-
-	public String getRegistrationStage() {
-		return registrationStage;
-	}
-
-	public void setRegistrationStage(String registrationStage) {
-		this.registrationStage = registrationStage;
-	}
-
-	public int getIsRegistrationComplete() {
-		return isRegistrationComplete;
-	}
-
-	public void setIsRegistrationComplete(int isRegistrationComplete) {
-		this.isRegistrationComplete = isRegistrationComplete;
 	}
 
 	public String getCreatedBy() {
@@ -130,6 +112,14 @@ public class Company implements Serializable {
 		this.createdOn = createdOn;
 	}
 
+	public int getIsRegistrationComplete() {
+		return this.isRegistrationComplete;
+	}
+
+	public void setIsRegistrationComplete(int isRegistrationComplete) {
+		this.isRegistrationComplete = isRegistrationComplete;
+	}
+
 	public String getModifiedBy() {
 		return this.modifiedBy;
 	}
@@ -144,6 +134,14 @@ public class Company implements Serializable {
 
 	public void setModifiedOn(Timestamp modifiedOn) {
 		this.modifiedOn = modifiedOn;
+	}
+
+	public String getRegistrationStage() {
+		return this.registrationStage;
+	}
+
+	public void setRegistrationStage(String registrationStage) {
+		this.registrationStage = registrationStage;
 	}
 
 	public int getStatus() {
@@ -242,36 +240,48 @@ public class Company implements Serializable {
 		return region;
 	}
 
-	
-	
-	public Survey getSurvey() {
+	public List<Survey> getSurveys() {
+		return this.surveys;
+	}
+
+	public void setSurveys(List<Survey> surveys) {
+		this.surveys = surveys;
+	}
+
+	public Survey addSurvey(Survey survey) {
+		getSurveys().add(survey);
+		survey.setCompany(this);
+
 		return survey;
 	}
 
-	public void setSurvey(Survey survey) {
-		this.survey = survey;
+	public Survey removeSurvey(Survey survey) {
+		getSurveys().remove(survey);
+		survey.setCompany(null);
+
+		return survey;
 	}
 
-	public List<SurveyQuestion> getSurveyQuestions() {
-		return this.surveyQuestions;
+	public List<User> getUsers() {
+		return this.users;
 	}
 
-	public void setSurveyQuestions(List<SurveyQuestion> surveyQuestions) {
-		this.surveyQuestions = surveyQuestions;
+	public void setUsers(List<User> users) {
+		this.users = users;
 	}
 
-	public SurveyQuestion addSurveyQuestion(SurveyQuestion surveyQuestion) {
-		getSurveyQuestions().add(surveyQuestion);
-		surveyQuestion.setCompany(this);
+	public User addUser(User user) {
+		getUsers().add(user);
+		user.setCompany(this);
 
-		return surveyQuestion;
+		return user;
 	}
 
-	public SurveyQuestion removeSurveyQuestion(SurveyQuestion surveyQuestion) {
-		getSurveyQuestions().remove(surveyQuestion);
-		surveyQuestion.setCompany(null);
+	public User removeUser(User user) {
+		getUsers().remove(user);
+		user.setCompany(null);
 
-		return surveyQuestion;
+		return user;
 	}
 
 	public List<UserInvite> getUserInvites() {
@@ -316,28 +326,6 @@ public class Company implements Serializable {
 		userProfile.setCompany(null);
 
 		return userProfile;
-	}
-
-	public List<User> getUsers() {
-		return this.users;
-	}
-
-	public void setUsers(List<User> users) {
-		this.users = users;
-	}
-
-	public User addUser(User user) {
-		getUsers().add(user);
-		user.setCompany(this);
-
-		return user;
-	}
-
-	public User removeUser(User user) {
-		getUsers().remove(user);
-		user.setCompany(null);
-
-		return user;
 	}
 
 }

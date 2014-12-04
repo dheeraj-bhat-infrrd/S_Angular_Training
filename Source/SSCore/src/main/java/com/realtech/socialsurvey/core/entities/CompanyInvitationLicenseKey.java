@@ -18,7 +18,7 @@ public class CompanyInvitationLicenseKey implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="COMPANY_INVITATION_LICENSE_KEY_ID")
-	private int companyInvitationLicenseKeyId;
+	private long companyInvitationLicenseKeyId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -48,11 +48,11 @@ public class CompanyInvitationLicenseKey implements Serializable {
 	public CompanyInvitationLicenseKey() {
 	}
 
-	public int getCompanyInvitationLicenseKeyId() {
+	public long getCompanyInvitationLicenseKeyId() {
 		return this.companyInvitationLicenseKeyId;
 	}
 
-	public void setCompanyInvitationLicenseKeyId(int companyInvitationLicenseKeyId) {
+	public void setCompanyInvitationLicenseKeyId(long companyInvitationLicenseKeyId) {
 		this.companyInvitationLicenseKeyId = companyInvitationLicenseKeyId;
 	}
 

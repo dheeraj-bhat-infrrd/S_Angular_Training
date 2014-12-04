@@ -16,13 +16,13 @@ public class UserProfile implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "USER_PROFILE_ID")
-	private int userProfileId;
+	private long userProfileId;
 
 	@Column(name = "AGENT_ID")
-	private int agentId;
+	private long agentId;
 
 	@Column(name = "BRANCH_ID")
-	private int branchId;
+	private long branchId;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -46,7 +46,7 @@ public class UserProfile implements Serializable {
 	private Timestamp modifiedOn;
 
 	@Column(name = "REGION_ID")
-	private int regionId;
+	private long regionId;
 
 	private int status;
 
@@ -70,19 +70,19 @@ public class UserProfile implements Serializable {
 
 	public UserProfile() {}
 
-	public int getUserProfileId() {
+	public long getUserProfileId() {
 		return this.userProfileId;
 	}
 
-	public void setUserProfileId(int userProfileId) {
+	public void setUserProfileId(long userProfileId) {
 		this.userProfileId = userProfileId;
 	}
 
-	public int getAgentId() {
+	public long getAgentId() {
 		return this.agentId;
 	}
 
-	public void setAgentId(int agentId) {
+	public void setAgentId(long agentId) {
 		this.agentId = agentId;
 	}
 
@@ -102,11 +102,11 @@ public class UserProfile implements Serializable {
 		this.isProfileComplete = isProfileComplete;
 	}
 
-	public int getBranchId() {
+	public long getBranchId() {
 		return this.branchId;
 	}
 
-	public void setBranchId(int branchId) {
+	public void setBranchId(long branchId) {
 		this.branchId = branchId;
 	}
 
@@ -150,11 +150,11 @@ public class UserProfile implements Serializable {
 		this.modifiedOn = modifiedOn;
 	}
 
-	public int getRegionId() {
+	public long getRegionId() {
 		return this.regionId;
 	}
 
-	public void setRegionId(int regionId) {
+	public void setRegionId(long regionId) {
 		this.regionId = regionId;
 	}
 
