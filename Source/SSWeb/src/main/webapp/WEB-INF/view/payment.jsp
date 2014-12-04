@@ -9,16 +9,17 @@
 </head>
 <body>
 	<div id="messageHeader"><jsp:include page="messageheader.jsp"></jsp:include></div>
-	<form id="checkout" method="post" action="./dummypayment.do">
+	<form id="checkout" method="post" action="./subscribe.do">
+		<input type="hidden" value="${accounttype}" name="accounttype">
 		<div id="dropin" style="width: 400px;"></div>
 		<input type="submit"
 			value='<spring:message code="label.makepayment.key" />!'>
 	</form>
-	<!-- <script src="https://js.braintreegateway.com/v2/braintree.js"></script> -->
-	<!-- <script type="text/javascript">
+	<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+	<script type="text/javascript">
 		braintree.setup('${clienttoken}', 'dropin', {
 			container : 'dropin'
 		});
-	</script> -->
+	</script>
 </body>
 </html>

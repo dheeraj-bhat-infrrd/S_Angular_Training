@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -31,6 +32,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -59,16 +61,19 @@ public class RegistrationServiceImpl implements RegistrationService {
 	private UserProfileDao userProfileDao;
 
 	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Autowired
-	private GenericDao<User, Integer> userDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
-	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
+	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
+
+	@Autowired
+	private UserManagementService userManagementServices;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -114,8 +119,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCorporateAdmin(String firstName, String lastName, String emailId, String username, String password) throws InvalidInputException,
-			InvalidUrlException, UserAlreadyExistsException {
+	public User addCorporateAdminAndUpdateStage(String firstName, String lastName, String emailId, String username, String password)
+			throws InvalidInputException, InvalidUrlException, UserAlreadyExistsException {
 		LOG.info("Method to add corporate admin called for emailId : " + emailId);
 		if (userExists(username)) {
 			throw new UserAlreadyExistsException("User with User ID : " + username + " already exists");
@@ -126,9 +131,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Creating new user with emailId : " + emailId);
 		User user = createUser(company, username, encryptedPassword, emailId);
 
-		LOG.debug("Creating user profile for :" + emailId);
+		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
 		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
-				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
+				CommonConstants.STATUS_INACTIVE);
 
 		LOG.debug("Invalidating registration link for emailId : " + emailId);
 		invalidateRegistrationInvite(emailId);
@@ -376,5 +382,46 @@ public class RegistrationServiceImpl implements RegistrationService {
 		}
 		return false;
 	}
+
 	// JIRA: SS-27: By RM05: EOC
+
+	/**
+	 * JIRA SS-35 BY RM02 Method to update the profile completion stage of user i.e the stage which
+	 * user has completed while registration, stores the next step to be taken by user while
+	 * registration process
+	 * 
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public void updateProfileCompletionStage(User user, int profileMasterId, String profileCompletionStage) throws InvalidInputException {
+		if (profileCompletionStage == null || profileCompletionStage.isEmpty()) {
+			throw new InvalidInputException("Profile completion stage is not set for updation");
+		}
+		if (user == null) {
+			throw new InvalidInputException("UserId is not null for updation of Profile completion stage");
+		}
+		if (profileMasterId <= 0) {
+			throw new InvalidInputException("Profile master id is not set for updation of Profile completion stage");
+		}
+		LOG.info("Mehtod updateProfileCompletionStage called for profileCompletionStage : " + profileCompletionStage + " and profileMasterId : "
+				+ profileMasterId + " and userId : " + user.getUserId());
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.USER_COLUMN, user);
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementServices.getProfilesMasterById(profileMasterId));
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			for (UserProfile userProfile : userProfiles) {
+				userProfile.setProfileCompletionStage(profileCompletionStage);
+				userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+				userProfile.setModifiedBy(String.valueOf(user.getUserId()));
+				userProfileDao.update(userProfile);
+			}
+		}
+		else {
+			LOG.warn("No profile found for updating profile completion stage");
+		}
+		LOG.info("Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage);
+	}
 }
