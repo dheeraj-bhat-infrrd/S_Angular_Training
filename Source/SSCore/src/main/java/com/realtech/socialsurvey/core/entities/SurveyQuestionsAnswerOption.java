@@ -5,7 +5,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 
 /**
- * The persistent class for the survey_questions_answer_options database table.
+ * The persistent class for the SURVEY_QUESTIONS_ANSWER_OPTIONS database table.
  */
 @Entity
 @Table(name = "SURVEY_QUESTIONS_ANSWER_OPTIONS")
@@ -18,7 +18,11 @@ public class SurveyQuestionsAnswerOption implements Serializable {
 	@Column(name = "SURVEY_QUESTIONS_ANSWER_OPTIONS_ID")
 	private int surveyQuestionsAnswerOptionsId;
 
+	@Column(name = "ANSWER")
 	private String answer;
+
+	@Column(name = "ANSWER_ORDER")
+	private int answerOrder;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -32,6 +36,7 @@ public class SurveyQuestionsAnswerOption implements Serializable {
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
+	@Column(name = "STATUS")
 	private int status;
 
 	// bi-directional many-to-one association to SurveyQuestion
@@ -55,6 +60,14 @@ public class SurveyQuestionsAnswerOption implements Serializable {
 
 	public void setAnswer(String answer) {
 		this.answer = answer;
+	}
+
+	public int getAnswerOrder() {
+		return this.answerOrder;
+	}
+
+	public void setAnswerOrder(int answerOrder) {
+		this.answerOrder = answerOrder;
 	}
 
 	public String getCreatedBy() {

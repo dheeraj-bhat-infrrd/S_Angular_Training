@@ -18,7 +18,7 @@ public class UserInvite implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="USER_INVITE_ID")
-	private int userInviteId;
+	private long userInviteId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -65,11 +65,11 @@ public class UserInvite implements Serializable {
 	public UserInvite() {
 	}
 
-	public int getUserInviteId() {
+	public long getUserInviteId() {
 		return this.userInviteId;
 	}
 
-	public void setUserInviteId(int userInviteId) {
+	public void setUserInviteId(long userInviteId) {
 		this.userInviteId = userInviteId;
 	}
 

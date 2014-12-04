@@ -18,7 +18,7 @@ public class Branch implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="BRANCH_ID")
-	private int branchId;
+	private long branchId;
 
 	private String branch;
 
@@ -52,11 +52,11 @@ public class Branch implements Serializable {
 	public Branch() {
 	}
 
-	public int getBranchId() {
+	public long getBranchId() {
 		return this.branchId;
 	}
 
-	public void setBranchId(int branchId) {
+	public void setBranchId(long branchId) {
 		this.branchId = branchId;
 	}
 
