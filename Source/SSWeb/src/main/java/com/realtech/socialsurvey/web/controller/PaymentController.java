@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -33,6 +34,9 @@ public class PaymentController {
 	
 	@Autowired
 	private Payment gateway;
+	
+	@Autowired
+	private RegistrationService registrationService;
 	
 	@Autowired
 	private MessageUtils messageUtils;	
@@ -97,6 +101,14 @@ public class PaymentController {
 		
 		if(status){
 			LOG.info("Subscription Successful!");
+			try {
+				registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE);
+			}
+			catch (InvalidInputException invalidInputException) {
+				LOG.error("PaymentController subscribeForPlan() : NonFatalException : " + messageUtils.getDisplayMessage(invalidInputException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+				model.addAttribute("message", messageUtils.getDisplayMessage(invalidInputException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.MESSAGE_HEADER;
+			}
 			model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}

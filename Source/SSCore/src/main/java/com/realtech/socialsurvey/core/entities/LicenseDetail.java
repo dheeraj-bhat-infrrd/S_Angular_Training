@@ -18,7 +18,7 @@ public class LicenseDetail implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name="LICENSE_ID")
-	private int licenseId;
+	private long licenseId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
@@ -62,11 +62,11 @@ public class LicenseDetail implements Serializable {
 	public LicenseDetail() {
 	}
 
-	public int getLicenseId() {
+	public long getLicenseId() {
 		return this.licenseId;
 	}
 
-	public void setLicenseId(int licenseId) {
+	public void setLicenseId(long licenseId) {
 		this.licenseId = licenseId;
 	}
 

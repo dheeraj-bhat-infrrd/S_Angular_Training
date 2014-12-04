@@ -32,7 +32,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -61,19 +61,19 @@ public class RegistrationServiceImpl implements RegistrationService {
 	private UserProfileDao userProfileDao;
 
 	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Autowired
-	private GenericDao<User, Integer> userDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
-	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
+	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
 
 	@Autowired
-	private UserManagementServices userManagementServices;
+	private UserManagementService userManagementServices;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
