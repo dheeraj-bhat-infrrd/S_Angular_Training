@@ -194,7 +194,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			}
 		}
 		catch (HibernateException hibernateException) {
-			LOG.error("HibernateException caught in findByCriteria().", hibernateException);
+			LOG.error("HibernateException caught in findByKeyValue().", hibernateException);
 			throw new DatabaseException("HibernateException caught in findByKeyValue().", hibernateException);
 		}
 		return criteria.list();
@@ -208,7 +208,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			criteria.add(Restrictions.eq(column, value));
 		}
 		catch (HibernateException hibernateException) {
-			LOG.error("HibernateException caught in findByCriteria().", hibernateException);
+			LOG.error("HibernateException caught in findByColumn().", hibernateException);
 			throw new DatabaseException("HibernateException caught in findByColumn().", hibernateException);
 		}
 		return criteria.list();
