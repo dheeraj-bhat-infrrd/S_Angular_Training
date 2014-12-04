@@ -16,29 +16,27 @@ import com.realtech.socialsurvey.core.services.registration.impl.RegistrationSer
 
 @Component("userProfile")
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> implements UserProfileDao {
-	
+
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
-	
-	@Autowired
-	private UserProfileDao userProfileDao;
-	
+
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
-	
+
 	/*
 	 * To add a new user profile into the USER_ROFILE table
 	 */
 	@Override
-	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId) {
+	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId,String profileCompletionStage,int isProfileComplete) {
 		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(agentId);
 		userProfile.setBranchId(branchId);
 		userProfile.setCompany(company);
 		userProfile.setEmailId(emailId);
-		userProfile.setIsProfileComplete(CommonConstants.STATUS_INACTIVE);
+		userProfile.setIsProfileComplete(isProfileComplete);
 		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
-		userProfile.setRegionId(CommonConstants.DEFAULT_REGION_ID);
+		userProfile.setProfileCompletionStage(profileCompletionStage);
+		userProfile.setRegionId(regionId);
 		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
 		userProfile.setUser(user);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
@@ -46,7 +44,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> imp
 		userProfile.setModifiedOn(currentTimestamp);
 		userProfile.setCreatedBy(String.valueOf(user.getUserId()));
 		userProfile.setModifiedBy(String.valueOf(user.getUserId()));
-		userProfileDao.save(userProfile);
+		save(userProfile);
 		LOG.info("Method createUserProfile() finished");
 	}
 }
