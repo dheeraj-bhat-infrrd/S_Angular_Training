@@ -10,15 +10,15 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 
 /**
  * JIRA:SS-34 BY RM02 Implementation for User management services
  */
 @Component
-public class UserManagementServicesImpl implements UserManagementServices {
+public class UserManagementServiceImpl implements UserManagementService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UserManagementServices.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserManagementService.class);
 	private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
 	private static boolean isProfileMastersMapPopulated = false;
 
