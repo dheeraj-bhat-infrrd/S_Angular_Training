@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -130,7 +131,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in update().", hibernateException);
-			throw new DatabaseException("HibernateException caught in u().", hibernateException);
+			throw new DatabaseException("HibernateException caught in update().", hibernateException);
 		}
 	}
 
@@ -193,8 +194,8 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			}
 		}
 		catch (HibernateException hibernateException) {
-			LOG.error("HibernateException caught in findByCriteria().", hibernateException);
-			throw new DatabaseException("HibernateException caught in findByCriteria().", hibernateException);
+			LOG.error("HibernateException caught in findByKeyValue().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByKeyValue().", hibernateException);
 		}
 		return criteria.list();
 	}
@@ -207,11 +208,21 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			criteria.add(Restrictions.eq(column, value));
 		}
 		catch (HibernateException hibernateException) {
-			LOG.error("HibernateException caught in findByCriteria().", hibernateException);
-			throw new DatabaseException("HibernateException caught in findByCriteria().", hibernateException);
+			LOG.error("HibernateException caught in findByColumn().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByColumn().", hibernateException);
 		}
 		return criteria.list();
 	}
-
+	
+	@Override
+	public long findNumberOfRows(Class<T> dataClass) {
+		try {
+			return (long) getSession().createCriteria(dataClass).setProjection(Projections.rowCount()).uniqueResult();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findNumberOfRows().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findNumberOfRows().", hibernateException);
+		}
+	}
 }
 // JIRA: SS-8: By RM05: EOC
