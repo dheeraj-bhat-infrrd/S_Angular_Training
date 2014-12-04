@@ -18,8 +18,9 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -40,10 +41,13 @@ public class OrganizationManagementController {
 	private RegistrationService registrationService;
 
 	@Autowired
-	private OrganizationManagementService organizationManagementServices;
+	private OrganizationManagementService organizationManagementService;
 
 	@Autowired
-	private UserManagementServices userManagementServices;
+	private UserManagementService userManagementService;
+	
+	@Autowired
+	private Payment gateway;
 
 	/**
 	 * Method to call service for adding company information for a user
@@ -75,7 +79,7 @@ public class OrganizationManagementController {
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
 
 			LOG.debug("Calling services to add company details");
-			user = organizationManagementServices.addCompanyInformation(user, companyDetails);
+			user = organizationManagementService.addCompanyInformation(user, companyDetails);
 
 			LOG.debug("Updating profile completion stage");
 			registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
@@ -169,15 +173,17 @@ public class OrganizationManagementController {
 			LOG.debug("Calling sevices for adding account type of company");
 			AccountType accountType = null;
 			try {
-				accountType = organizationManagementServices.addAccountTypeForCompanyAndUpdateStage(user, strAccountType);
+				accountType = organizationManagementService.addAccountTypeForCompanyAndUpdateStage(user, strAccountType);
 				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-
-			model.addAttribute("accounttype", accountType);
+			
+			gateway.initialise();
+			model.addAttribute("accounttype", accountType.getValue());
+			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 

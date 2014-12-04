@@ -19,12 +19,12 @@ public interface CommonConstants {
 	 * Default constants
 	 */
 	// default company id for application. if any entity is linked to this id, then its an orphan entity
-	public static final int DEFAULT_COMPANY_ID = 1;
+	public static final long DEFAULT_COMPANY_ID = 1;
 	public static final String DEFAULT_BRANCH_NAME = "Defult Branch";
 	public static final String DEFAULT_REGION_NAME = "Defult Region";
-	public static final int DEFAULT_REGION_ID = 0;
-	public static final int DEFAULT_BRANCH_ID = 0;
-	public static final int DEFAULT_AGENT_ID = 0;
+	public static final long DEFAULT_REGION_ID = 0;
+	public static final long DEFAULT_BRANCH_ID = 0;
+	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
 
 	/**
@@ -43,6 +43,7 @@ public interface CommonConstants {
 	public static final String ADD_ACCOUNT_TYPE_STAGE = "addaccounttype.do";
 	public static final String PAYMENT_STAGE = "payment.do";
 	public static final String RESET_PASSWORD = "resetpassword.do";
+	public static final String LOGIN_STAGE = "login.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
 
 	/**
@@ -66,6 +67,8 @@ public interface CommonConstants {
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String USER_COLUMN = "user";
 	public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
+	public static final String AUTO_PAYMENT_MODE = "A";
+	public static final int INITIAL_PAYMENT_RETRIES = 0;
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)

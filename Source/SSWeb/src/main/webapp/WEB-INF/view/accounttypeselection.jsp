@@ -11,6 +11,7 @@
 <title><spring:message code="label.title.registerUser.key" /></title>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <link rel="stylesheet"
