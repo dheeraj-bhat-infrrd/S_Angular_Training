@@ -29,7 +29,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServices;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {
@@ -37,19 +37,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
 	@Autowired
-	private GenericDao<OrganizationLevelSetting, Integer> organizationLevelSettingDao;
+	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
 
 	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
-	private GenericDao<User, Integer> userDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
-	private GenericDao<Region, Integer> regionDao;
+	private GenericDao<Region, Long> regionDao;
 
 	@Autowired
-	private GenericDao<Branch, Integer> branchDao;
+	private GenericDao<Branch, Long> branchDao;
 
 	@Resource
 	@Qualifier("userProfile")
@@ -59,7 +59,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Autowired
-	private UserManagementServices userManagementServices;
+	private UserManagementService userManagementService;
 
 	@Autowired
 	private RegistrationService registrationService;
@@ -223,13 +223,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
-		ProfilesMaster profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE);
-		profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
@@ -238,7 +238,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE);
-		profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
@@ -267,7 +267,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
-		ProfilesMaster profilesMaster = userManagementServices.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,

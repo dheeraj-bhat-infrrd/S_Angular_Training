@@ -15,7 +15,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 
 @Component("userProfile")
-public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> implements UserProfileDao {
+public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
@@ -26,7 +26,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Integer> imp
 	 * To add a new user profile into the USER_ROFILE table
 	 */
 	@Override
-	public void createUserProfile(User user, Company company, String emailId, int agentId, int branchId, int regionId, int profileMasterId,String profileCompletionStage,int isProfileComplete) {
+	public void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,String profileCompletionStage,int isProfileComplete) {
 		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(agentId);

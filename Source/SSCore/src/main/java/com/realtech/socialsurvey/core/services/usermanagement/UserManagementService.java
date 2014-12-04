@@ -7,7 +7,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 /**
  * Interface with methods defined to manage user
  */
-public interface UserManagementServices {
+public interface UserManagementService {
 
 	public ProfilesMaster getProfilesMasterById(int profileId) throws InvalidInputException;
 
