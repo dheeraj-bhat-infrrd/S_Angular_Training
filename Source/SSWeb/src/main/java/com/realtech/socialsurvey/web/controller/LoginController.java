@@ -148,7 +148,17 @@ public class LoginController {
 	 */
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage() {
+		LOG.info("Dashboard Page started");
 		return JspResolver.DASHBOARD;
+	}
+	
+	/**
+	 * Start the add account type page
+	 */
+	@RequestMapping(value = "/addaccounttype")
+	public String initAddAccountTypePage(){
+		LOG.info("Add account type page started");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
 	}
 
 	/**
