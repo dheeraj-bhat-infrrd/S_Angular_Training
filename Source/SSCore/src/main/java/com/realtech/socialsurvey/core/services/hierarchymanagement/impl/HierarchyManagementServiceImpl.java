@@ -136,6 +136,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @throws InvalidInputException
 	 */
 	@Override
+	@Transactional
 	public boolean isMaxBranchAdditionExceeded(User user, AccountType accountType) throws InvalidInputException {
 		LOG.info("Method to check if max branch addition exceeded is called for user : " + user);
 		if (user == null) {
@@ -222,6 +223,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @throws InvalidInputException
 	 */
 	@Override
+	@Transactional
 	public boolean isMaxRegionAdditionExceeded(User user, AccountType accountType) throws InvalidInputException {
 		LOG.info("Method to check if max region addition exceeded is called for user : " + user);
 		if (user == null) {
