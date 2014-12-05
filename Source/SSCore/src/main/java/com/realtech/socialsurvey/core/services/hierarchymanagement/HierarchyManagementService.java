@@ -12,14 +12,14 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 /**
  * Services for managing hierarchy
  */
-public interface HierarchyManagementServices {
+public interface HierarchyManagementService {
 
 	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException;
 
 	public List<Region> getAllRegionsForCompany(Company company) throws InvalidInputException;
 	
-	public void deleteBranch(int branchId) throws InvalidInputException;
+	public void deleteBranch(long branchId) throws InvalidInputException;
 	
-	public void deleteRegion(int regionId) throws InvalidInputException;
+	public void deleteRegion(long regionId) throws InvalidInputException;
 
 }

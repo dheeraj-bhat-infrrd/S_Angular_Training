@@ -12,7 +12,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.hierarchymanagement.HierarchyManagementServices;
+import com.realtech.socialsurvey.core.services.hierarchymanagement.HierarchyManagementService;
 
 // JIRA SS-37 BY RM02 BOC
 
@@ -20,15 +20,15 @@ import com.realtech.socialsurvey.core.services.hierarchymanagement.HierarchyMana
  * Implementation class for Hierarchy management services
  */
 @Component
-public class HierarchyManagementServiceImpl implements HierarchyManagementServices {
+public class HierarchyManagementServiceImpl implements HierarchyManagementService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(HierarchyManagementServiceImpl.class);
 
 	@Autowired
-	private GenericDao<Branch, Integer> branchDao;
+	private GenericDao<Branch, Long> branchDao;
 
 	@Autowired
-	private GenericDao<Region, Integer> regionDao;
+	private GenericDao<Region, Long> regionDao;
 
 	private static final String COMPANY = "company";
 
@@ -83,7 +83,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public void deleteBranch(int branchId) throws InvalidInputException {
+	public void deleteBranch(long branchId) throws InvalidInputException {
 		LOG.info("Update branch status to inactive on delete");
 
 		LOG.debug("Fetch the branch object by ID");
@@ -96,7 +96,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		// set branch status as inactive
 		branch.setStatus(CommonConstants.STATUS_INACTIVE);
 		// update the branch status in database
-		branchDao.saveOrUpdate(branch);
+		branchDao.update(branch);
 		LOG.info("Branch status for branch ID :" + branchId + "/t successfully updated to inacitive");
 	}
 
@@ -108,7 +108,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public void deleteRegion(int regionId) throws InvalidInputException {
+	public void deleteRegion(long regionId) throws InvalidInputException {
 		LOG.info("Update region status to inactive on delete");
 		LOG.debug("Fetch the branch object by ID");
 		Region region = regionDao.findById(Region.class, regionId);
@@ -119,7 +119,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		// set region status as inactive
 		region.setStatus(CommonConstants.STATUS_INACTIVE);
 		// update the region status in the database
-		regionDao.saveOrUpdate(region);
+		regionDao.update(region);
 		LOG.info("Branch status for region ID :" + regionId + "/t successfully updated to inacitive");
 	}
 
