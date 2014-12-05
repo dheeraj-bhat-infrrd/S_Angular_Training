@@ -224,5 +224,20 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			throw new DatabaseException("HibernateException caught in findNumberOfRows().", hibernateException);
 		}
 	}
+	
+	@Override
+	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries) {
+		Criteria criteria = getSession().createCriteria(dataClass);
+		try {
+			for (Entry<String, Object> query : queries.entrySet()) {
+				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByKeyValue().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByKeyValue().", hibernateException);
+		}
+		return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
+	}
 }
 // JIRA: SS-8: By RM05: EOC
