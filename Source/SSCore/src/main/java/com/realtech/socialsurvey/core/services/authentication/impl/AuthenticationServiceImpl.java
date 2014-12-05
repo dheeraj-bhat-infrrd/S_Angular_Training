@@ -129,7 +129,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException {
 		LOG.info("Verify whether the User is registered with the emailId");
 		List<User> users = userDao.findByColumn(User.class, EMAIL_ID, emailId);
-		if (users.get(0) == null) {
+		if (users == null || users.isEmpty()) {
 			LOG.error("No User object found with the passed emailId : " + emailId);
 			throw new InvalidInputException("Email ID not registered with us");
 		}
@@ -218,7 +218,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
 		columns.put(CommonConstants.PROFILE_MASTER_COLUMN, profilesMaster);
 		List<UserProfile> userProfile = (List<UserProfile>) userProfileDao.findByKeyValue(UserProfile.class, columns);
-		if (userProfile == null) {
+		if (userProfile == null || userProfile.isEmpty()) {
 			LOG.error("No company admin profile found for the user");
 			throw new InvalidInputException("No company admin profile found for the user");
 		}
