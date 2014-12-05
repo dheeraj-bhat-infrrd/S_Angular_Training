@@ -31,7 +31,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class LoginController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
-
+	
 	@Autowired
 	private AuthenticationService authenticationService;
 	@Autowired
@@ -99,8 +99,8 @@ public class LoginController {
 			LOG.debug("Check if company profile registration complete");
 			if (user.getCompany().getIsRegistrationComplete() != CommonConstants.PROCESS_COMPLETE) {
 				// redirect to company information page
-				LOG.debug("Company profile not complete, redirecting to company information page");
-				return JspResolver.COMPANY_INFORMATION;
+				LOG.info("Company profile not complete, redirecting to company information page");
+				model.addAttribute("redirectTo", "companyinformation.do");
 			}
 			else {
 				// check if at least one of the user profiles are complete
@@ -108,10 +108,12 @@ public class LoginController {
 				if (user.getIsAtleastOneUserprofileComplete() != CommonConstants.PROCESS_COMPLETE) {
 					// redirect user to complete the top priority profile
 					// Priority Company->region->branch->agent
-					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
+					LOG.info("None of the user profiles are complete , Redirect to top priority profile first");
 					// fetch user profiles
 					userProfiles = authenticationService.getUserProfileForUser(user);
 				}
+				//if user login successful and all the details are filled
+				model.addAttribute("redirectTo", "dashboard.do");
 			}
 			LOG.info("User login successful");
 			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -122,7 +124,7 @@ public class LoginController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 
-		return JspResolver.DASHBOARD;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	@RequestMapping(value = "/companyinformation")

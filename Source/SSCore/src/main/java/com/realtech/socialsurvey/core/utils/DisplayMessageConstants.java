@@ -43,4 +43,6 @@ public final class DisplayMessageConstants {
 	public static final String PASSWORD_CHANGE_SUCCESSFUL = "PASSWORD_CHANGE_SUCCESSFUL";
 	public static final String USER_LOGIN_SUCCESSFUL = "USER_LOGIN_SUCCESSFUL";
 	public static final String SUBSCRIPTION_SUCCESSFUL = "USER_SUBSCRIPTION_SUCCESSFUL";
+	public static final String BRANCH_DELETE_SUCCESSFUL = "BRANCH_DELETE_SUCCESSFUL";
+	public static final String REGION_DELETE_SUCCESSFUL = "REGION_DELETE_SUCCESSFUL";
 }
