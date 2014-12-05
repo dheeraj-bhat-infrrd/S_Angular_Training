@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -43,9 +44,42 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/showbuildhierarchypage", method = RequestMethod.GET)
 	public String showBuildHierarchyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildHierarchyPage called");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		boolean isRegionAdditionAllowed = false;
+		boolean isBranchAdditionAllowed = false;
+
+		try {
+			try {
+				LOG.debug("Calling service for checking the status of regions already added");
+				isRegionAdditionAllowed = !hierarchyManagementService.isMaxRegionAdditionExceeded(user, accountType);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException while checking for max region addition",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			try {
+				LOG.debug("Calling service for checking the status of branches already added");
+				isBranchAdditionAllowed = !hierarchyManagementService.isMaxBranchAdditionExceeded(user, accountType);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException while checking for max region addition",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			model.addAttribute("isRegionAdditionAllowed", isRegionAdditionAllowed);
+			model.addAttribute("isBranchAdditionAllowed", isBranchAdditionAllowed);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException in showBuildHierarchyPage. Reason:" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 
 		LOG.info("Successfully completed method to showBuildHierarchyPage");
-		return null;
+		return JspResolver.BUILD_HIERARCHY;
 	}
 
 	/**
@@ -108,7 +142,7 @@ public class HierarchyManagementController {
 				// TODO : set the region in list in either model attribute or send it back as JSON
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Error occurred while fetching the branch list in method getAllRegionsForCompany");
+				LOG.error("Error occurred while fetching the regions list in method getAllRegionsForCompany");
 				throw new InvalidInputException("Error occurred while fetching the region list in method getAllBranchesForCompany",
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
@@ -117,7 +151,7 @@ public class HierarchyManagementController {
 			LOG.error("NonFatalException while fetching all regions. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.info("Successfully deactivated the list of regions");
+		LOG.info("Successfully fetched the list of regions");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
@@ -129,8 +163,8 @@ public class HierarchyManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/deactivateregion", method = RequestMethod.POST)
-	public String decatvieRegion(Model model, HttpServletRequest request) {
-		LOG.info("Deactive region");
+	public String deactivateRegion(Model model, HttpServletRequest request) {
+		LOG.info("Deactivating region");
 		Long regionId = Long.parseLong(request.getParameter("regionId"));
 		try {
 			// Update the region status to inactive
@@ -141,27 +175,27 @@ public class HierarchyManagementController {
 				LOG.error("Error occurred while deactivating the region");
 				throw new InvalidInputException("Error occurred while deactivating the region", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			LOG.info("Successfully deactived the branch " + regionId);
+			LOG.info("Successfully deactivated the region " + regionId);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while deactivating the region. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
-	 * Deactivates a region status
+	 * Deactivates a branch status
 	 * 
 	 * @param model
 	 * @param request
 	 * @return
 	 */
 	@RequestMapping(value = "/deactivatebranch", method = RequestMethod.POST)
-	public String decatvieBranch(Model model, HttpServletRequest request) {
-		LOG.info("Deactive region");
+	public String deactivateBranch(Model model, HttpServletRequest request) {
+		LOG.info("Deactivating branch");
 		Long branchId = Long.parseLong(request.getParameter("branchId"));
 		try {
 			// update the branch status to inactive
