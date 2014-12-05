@@ -40,6 +40,8 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public long findNumberOfRows(Class<T> dataClass);
 
+	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries);
+
 	
 }
 
