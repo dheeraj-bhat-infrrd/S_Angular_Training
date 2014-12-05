@@ -43,7 +43,7 @@ public interface CommonConstants {
 	public static final String ADD_ACCOUNT_TYPE_STAGE = "addaccounttype.do";
 	public static final String PAYMENT_STAGE = "payment.do";
 	public static final String RESET_PASSWORD = "resetpassword.do";
-	public static final String LOGIN_STAGE = "login.do";
+	public static final String LOGIN_STAGE = "dashboard.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
 
 	/**
