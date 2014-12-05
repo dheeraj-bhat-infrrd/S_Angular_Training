@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
 
-import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,11 +17,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -31,13 +32,15 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class LoginController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
-	
+
 	@Autowired
 	private AuthenticationService authenticationService;
 	@Autowired
 	private MessageUtils messageUtils;
 	@Autowired
 	private URLGenerator urlGenerator;
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage() {
@@ -58,8 +61,8 @@ public class LoginController {
 		String password = request.getParameter("password");
 		LOG.info("User login with user Id :" + loginName);
 		User user = null;
-		List<UserProfile> userProfiles = null;
-
+		UserProfile userProfile = null;
+		HttpSession session = null;
 		try {
 			LOG.debug("Validation login form parameters");
 			// check if form parameters valid
@@ -86,7 +89,7 @@ public class LoginController {
 			// Authenticate user
 			try {
 				authenticationService.validateUser(user, password);
-				HttpSession session = request.getSession(true);
+				session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 			}
 			catch (InvalidInputException e) {
@@ -100,7 +103,7 @@ public class LoginController {
 			if (user.getCompany().getIsRegistrationComplete() != CommonConstants.PROCESS_COMPLETE) {
 				// redirect to company information page
 				LOG.info("Company profile not complete, redirecting to company information page");
-				model.addAttribute("redirectTo", "companyinformation.do");
+				model.addAttribute("redirectTo", CommonConstants.ADD_COMPANY_STAGE);
 			}
 			else {
 				// check if at least one of the user profiles are complete
@@ -109,14 +112,23 @@ public class LoginController {
 					// redirect user to complete the top priority profile
 					// Priority Company->region->branch->agent
 					LOG.info("None of the user profiles are complete , Redirect to top priority profile first");
-					// fetch user profiles
-					userProfiles = authenticationService.getUserProfileForUser(user);
+					// fetch company admin user profile
+					try {
+						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
+						// set model attribute to the value to which u need to redirect the url
+						model.addAttribute("redirectTo", userProfile.getProfileCompletionStage());
+					}
+					catch (InvalidInputException e) {
+						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
+						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
+					}
+					long accountTypeMasterId = organizationManagementService.fetchAccountTypeForCompany(user.getCompany());
+					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(accountTypeMasterId));
 				}
-				//if user login successful and all the details are filled
-				model.addAttribute("redirectTo", "dashboard.do");
 			}
 			LOG.info("User login successful");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
@@ -127,9 +139,32 @@ public class LoginController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	@RequestMapping(value = "/companyinformation")
+	/**
+	 * Start the companyinformation page
+	 * 
+	 * @return
+	 */
+	@RequestMapping(value = "/addcompanyinformation")
 	public String initCompanyInformationPage() {
 		return JspResolver.COMPANY_INFORMATION;
+	}
+
+	/**
+	 * Start the dashboard page
+	 */
+	@RequestMapping(value = "/dashboard")
+	public String initDashboardPage() {
+		LOG.info("Dashboard Page started");
+		return JspResolver.DASHBOARD;
+	}
+
+	/**
+	 * Start the add account type page
+	 */
+	@RequestMapping(value = "/addaccounttype")
+	public String initAddAccountTypePage() {
+		LOG.info("Add account type page started");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
 	}
 
 	/**
@@ -244,7 +279,8 @@ public class LoginController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Reset user password executed successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
 		}
 		catch (NonFatalException e) {

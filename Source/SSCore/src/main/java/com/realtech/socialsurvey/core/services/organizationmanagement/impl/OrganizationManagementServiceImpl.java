@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -50,6 +51,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private GenericDao<Branch, Long> branchDao;
+
+	@Autowired
+	private GenericDao<LicenseDetail, Long> licenceDetailDao;
 
 	@Resource
 	@Qualifier("userProfile")
@@ -128,6 +132,29 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	// JIRA: SS-28: By RM05: EOC
+
+	/**
+	 * Fetch the account type master id passing 
+	 * @author RM-06
+	 * @param company
+	 * @return account master id
+	 */
+	@Override
+	@Transactional
+	public int fetchAccountTypeForCompany(Company company) throws InvalidInputException {
+
+		LOG.info("Fetch account type for company :" + company.getCompany());
+
+		List<LicenseDetail> licenseDetails = licenceDetailDao.findByColumn(LicenseDetail.class, CommonConstants.COMPANY, company);
+		if (licenseDetails == null || licenseDetails.isEmpty()) {
+			LOG.error("No license object present for the company : " + company.getCompany());
+			throw new InvalidInputException("No license object present for the company");
+		}
+		LOG.info("Successfully fetched the License detail for the current user's company");
+
+		// return the account type master ID
+		return licenseDetails.get(0).getAccountsMaster().getAccountsMasterId();
+	};
 
 	/*
 	 * This method adds a new company into the COMPANY table.
