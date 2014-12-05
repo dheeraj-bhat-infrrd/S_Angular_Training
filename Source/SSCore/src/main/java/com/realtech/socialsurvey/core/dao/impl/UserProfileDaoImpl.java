@@ -17,7 +17,7 @@ import com.realtech.socialsurvey.core.services.registration.impl.RegistrationSer
 @Component("userProfile")
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserProfileDaoImpl.class);
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
