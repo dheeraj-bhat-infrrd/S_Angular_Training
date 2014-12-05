@@ -114,18 +114,19 @@
 	background-size: 20px;
 }
 
-#userId{
+#userId {
 	background: url(../images/userName.png) no-repeat;
 	background-position: 14px center;
 	background-size: 20px;
 }
 
-#password{
+#password {
 	background: url(../images/key.png) no-repeat;
 	background-position: 14px center;
 	background-size: 20px;
 }
-#confirmPassword{
+
+#confirmPassword {
 	background: url(../images/double-key.png) no-repeat;
 	background-position: 14px center;
 	background-size: 20px;
@@ -137,7 +138,7 @@
 	background-color: #fff;
 }
 
-.formContainer {
+.overlay .formContainer {
 	padding: 25px;
 }
 
@@ -149,12 +150,45 @@
 	display: none;
 }
 
-#messageHeader{
+#messageHeader {
 	background: #fff;
 	color: #777;
-	border-radius:3px;
+	border-radius: 3px;
 }
 
 .accountTypeBox {
 	float: left
+}
+
+.hierarchySettingsWrapper {
+	width: 800px;
+	margin: 0 auto;
+}
+
+.hierarchySettingsModalContainer {
+	background: #FCFCFC;
+	border-radius: 3px;
+	padding: 20px;
+	border:1px #BBC0C6 solid;
+}
+
+.leftContainer {
+	width: 75%;
+}
+
+.form-Button {
+	background-color: #77B001;
+	width: 100px;
+	line-height: 27px;
+	text-align: center;
+}
+
+.formFooter {
+	margin: 0 auto;
+	width: 220px;
+	color: #E5F0D0;
+}
+
+.form-group{
+	color:#777;
 }
