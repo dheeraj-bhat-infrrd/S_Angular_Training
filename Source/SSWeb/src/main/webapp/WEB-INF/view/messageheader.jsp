@@ -4,5 +4,6 @@
 	<ul style="list-style-type: none;">
 		<li>${message.message} ${param.message}</li>
 	</ul>
+	<input id="redirectUrl" type = "hidden" value ="${redirectTo}">
 </div>
 </c:if>

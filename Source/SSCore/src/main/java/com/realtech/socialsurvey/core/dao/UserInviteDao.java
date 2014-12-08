@@ -10,7 +10,7 @@ import com.realtech.socialsurvey.core.entities.UserInvite;
  */
 
 public interface UserInviteDao extends GenericDao<UserInvite, Integer>{
-	public List<UserInvite> findByColumn(String encryptedUrlParameter);
+	public List<UserInvite> findByUrlParameter(String encryptedUrlParameter);
 }
 
 //JIRA: SS-8: By RM05:EOC

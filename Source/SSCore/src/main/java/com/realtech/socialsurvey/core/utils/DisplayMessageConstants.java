@@ -25,8 +25,22 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_ADDRESS = "INVALID_ADDRESS";
 	public static final String INVALID_ZIPCODE = "INVALID_ZIPCODE";
 	public static final String INVALID_COMPANY_PHONEN0 = "INVALID_COMPANY_PHONEN0";
-
+	public static final String INVALID_REGISTRATION_INVITE = "INVALID_REGISTRATION_INVITE";
+	public static final String USERNAME_ALREADY_TAKEN = "USERNAME_ALREADY_TAKEN";
+	public static final String EMAILID_ALREADY_TAKEN = "EMAILID_ALREADY_TAKEN";
+	public static final String INVALID_USER_CREDENTIALS ="INVALID_USER_CREDENTIALS"	;
+	public static final String INVALID_USER ="INVALID_USER"	;
+	public static final String USER_INACTIVE ="USER_INACTIVE";
+	public static final String COMPANY_INACTIVE ="COMPANY_INACTIVE";
+	public static final String USER_NOT_PRESENT = "USER_NOT_PRESENT";
+	public static final String SUBSCRIPTION_UNSUCCESSFUL = "USER_SUBSCRIPTION_UNSUCCESSFUL";
+	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
 	public static final String USER_REGISTRATION_SUCCESSFUL = "USER_REGISTRATION_SUCCESSFUL";
+	public static final String ACCOUNT_TYPE_SELECTION_SUCCESSFUL = "ACCOUNT_TYPE_SELECTION_SUCCESSFUL";
+	public static final String PASSWORD_RESET_LINK_SUCCESSFUL = "PASSWORD_RESET_LINK_SUCCESSFUL";
+	public static final String PASSWORD_CHANGE_SUCCESSFUL = "PASSWORD_CHANGE_SUCCESSFUL";
+	public static final String USER_LOGIN_SUCCESSFUL = "USER_LOGIN_SUCCESSFUL";
+	public static final String SUBSCRIPTION_SUCCESSFUL = "USER_SUBSCRIPTION_SUCCESSFUL";
 }
