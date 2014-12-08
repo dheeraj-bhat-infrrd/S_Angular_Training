@@ -63,6 +63,7 @@ public class LoginController {
 		User user = null;
 		UserProfile userProfile = null;
 		HttpSession session = null;
+
 		try {
 			LOG.debug("Validation login form parameters");
 			// check if form parameters valid
@@ -116,6 +117,7 @@ public class LoginController {
 					try {
 						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
 						// set model attribute to the value to which u need to redirect the url
+
 						model.addAttribute("redirectTo", userProfile.getProfileCompletionStage());
 					}
 					catch (InvalidInputException e) {
@@ -141,7 +143,7 @@ public class LoginController {
 	}
 
 	/**
-	 * Start the companyinformation page
+	 * Start the companyinformation page 
 	 * 
 	 * @return
 	 */
@@ -151,21 +153,21 @@ public class LoginController {
 	}
 
 	/**
-	 * Start the dashboard page
-	 */
-	@RequestMapping(value = "/dashboard")
-	public String initDashboardPage() {
-		LOG.info("Dashboard Page started");
-		return JspResolver.DASHBOARD;
-	}
-
-	/**
 	 * Start the add account type page
 	 */
 	@RequestMapping(value = "/addaccounttype")
 	public String initAddAccountTypePage() {
 		LOG.info("Add account type page started");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
+	}
+
+	/**
+	 * Start the dashboard page
+	 */
+	@RequestMapping(value = "/dashboard")
+	public String initDashboardPage() {
+		LOG.info("Dashboard Page started");
+		return JspResolver.DASHBOARD;
 	}
 
 	/**
