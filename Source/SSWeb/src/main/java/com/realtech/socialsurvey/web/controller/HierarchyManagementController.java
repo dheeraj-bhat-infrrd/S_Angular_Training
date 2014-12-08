@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -10,12 +11,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.hierarchymanagement.HierarchyManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -93,15 +96,14 @@ public class HierarchyManagementController {
 	public String fetchAllBranches(Model model, HttpServletRequest request) {
 
 		LOG.info("Fetching all the branches for current user");
-		// get current session
 		HttpSession session = request.getSession(false);
-		// get current user in session
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
-		// get the list of branches in company
 		try {
 			try {
-				hierarchyManagementService.getAllBranchesForCompany(user.getCompany());
+				LOG.debug("Calling service to get the list of branches in company");
+				List<Branch> branches = hierarchyManagementService.getAllBranchesForCompany(user.getCompany());
+				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
 
 				// TODO : set the branch in list in either model attribute or send it back as JSON
 			}
@@ -129,15 +131,14 @@ public class HierarchyManagementController {
 	public String fetchAllRegions(Model model, HttpServletRequest request) {
 
 		LOG.info("Fetching all the regions for current user");
-		// get current session
 		HttpSession session = request.getSession(false);
-		// get current user in session
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
-		// get the list of regions in company
 		try {
 			try {
-				hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
+				LOG.debug("Calling service to get the list of regions in company");
+				List<Region> regions = hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
+				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
 
 				// TODO : set the region in list in either model attribute or send it back as JSON
 			}
@@ -165,11 +166,18 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/deactivateregion", method = RequestMethod.POST)
 	public String deactivateRegion(Model model, HttpServletRequest request) {
 		LOG.info("Deactivating region");
-		Long regionId = Long.parseLong(request.getParameter("regionId"));
+
 		try {
+			long regionId = 0l;
 			// Update the region status to inactive
 			try {
+				regionId = Long.parseLong(request.getParameter("regionId"));
 				hierarchyManagementService.deleteRegion(regionId);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception occurred while parsing the region id.Reason :" + e.getMessage(), e);
+				throw new InvalidInputException("Number format exception occurred while parsing the region id",
+						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Error occurred while deactivating the region");
@@ -196,11 +204,16 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/deactivatebranch", method = RequestMethod.POST)
 	public String deactivateBranch(Model model, HttpServletRequest request) {
 		LOG.info("Deactivating branch");
-		Long branchId = Long.parseLong(request.getParameter("branchId"));
 		try {
+			long branchId = 0l;
 			// update the branch status to inactive
 			try {
+				branchId = Long.parseLong(request.getParameter("branchId"));
 				hierarchyManagementService.deleteBranch(branchId);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception occurred while parsing branch id");
+				throw new InvalidInputException("Number format exception occurred while parsing branch id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Error occurred while deactivating the branch");
@@ -216,6 +229,5 @@ public class HierarchyManagementController {
 		}
 		return JspResolver.MESSAGE_HEADER;
 	}
-
 }
 // JIRA SS-37 BY RM02 EOC

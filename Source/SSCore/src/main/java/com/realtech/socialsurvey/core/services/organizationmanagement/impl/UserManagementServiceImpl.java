@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.core.services.usermanagement.impl;
+package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,10 +8,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 /**
  * JIRA:SS-34 BY RM02 Implementation for User management services
@@ -19,7 +21,7 @@ import com.realtech.socialsurvey.core.services.usermanagement.UserManagementServ
 @Component
 public class UserManagementServiceImpl implements UserManagementService, InitializingBean {
 
-	private static final Logger LOG = LoggerFactory.getLogger(UserManagementService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserManagementServiceImpl.class);
 	private static Map<Integer, ProfilesMaster> profileMasters = new HashMap<Integer, ProfilesMaster>();
 
 	@Autowired
@@ -72,6 +74,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Successfully populated profile master from db into the hashMap");
 
 		LOG.info("afterPropertiesSet for UserManagementServiceImpl completed");
+	}
+	
+	@Override
+	@Transactional
+	public User createBranchAdmin(User assigneeUser, long branchId, long userId) throws InvalidInputException {
+		if (assigneeUser == null) {
+			throw new InvalidInputException("Company is null in createBranchAdmin");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in createBranchAdmin");
+		}
+		if (userId <= 0l) {
+			throw new InvalidInputException("User id is invalid in createBranchAdmin");
+		}
+		LOG.info("Method to createBranchAdmin called for branchId : " + branchId + " and userId : " + userId);
+		//userProfileDao.createUserProfile(userInSession, userInSession.getCompany(), emailId, agentId, branchId, regionId, profileMasterId, profileCompletionStage, isProfileComplete);
+
+		return null;
+	}
+
+	@Override
+	public User createRegionAdmin(User assigneeUser, long regionId, long userId) throws InvalidInputException {
+		if (assigneeUser == null) {
+			throw new InvalidInputException("Company is null in createRegionAdmin");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in createRegionAdmin");
+		}
+		if (userId <= 0l) {
+			throw new InvalidInputException("User id is invalid in createRegionAdmin");
+		}
+		return null;
 	}
 
 }
