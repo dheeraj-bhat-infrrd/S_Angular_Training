@@ -28,7 +28,7 @@ public interface CommonConstants {
 	public static final String USER_INVITE_INVITATION_PARAMETERS_COLUMN = "invitationParameters";
 	public static final String STATUS_COLUMN = "status";
 	public static final String USER_INVITE_INVITATION_VALID_UNTIL = "invitationValidUntil";
-	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";	
+	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String CONFIG_PROPERTIES_FILE = "config.properties";
 	public static final String SENDGRID_SENDER_USERNAME = "SENDGRID_SENDER_USERNAME";
 	public static final String SENDGRID_SENDER_NAME = "SENDGRID_SENDER_NAME";
@@ -43,4 +43,6 @@ public interface CommonConstants {
 	public static final String ZIPCODE = "zipCode";
 	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
 	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
+	public static final String SURVEY_COLUMN = "survey";
+	public static final String SURVEY_COMPANY_COLUMN = "company";
 }
