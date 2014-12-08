@@ -69,7 +69,8 @@ public interface CommonConstants {
 	public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
 	public static final String AUTO_PAYMENT_MODE = "A";
 	public static final int INITIAL_PAYMENT_RETRIES = 0;
-	public static final String IS_DEFAULT_BY_SYSTEM = "IS_DEFAULT_BY_SYSTEM";
+	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
+	public static final String COMPANY_COLUMN = "company";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
