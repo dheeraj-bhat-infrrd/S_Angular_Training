@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -20,6 +21,7 @@ import com.realtech.socialsurvey.core.services.authentication.AuthenticationServ
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
@@ -54,6 +56,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	/**
 	 * Method to validate user
@@ -124,7 +129,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException {
 		LOG.info("Verify whether the User is registered with the emailId");
 		List<User> users = userDao.findByColumn(User.class, EMAIL_ID, emailId);
-		if (users.get(0) == null) {
+		if (users == null || users.isEmpty()) {
 			LOG.error("No User object found with the passed emailId : " + emailId);
 			throw new InvalidInputException("Email ID not registered with us");
 		}
@@ -195,6 +200,30 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		userDao.saveOrUpdate(user);
 		LOG.info("Password successfully changed");
 
+	}
+
+	/**
+	 * Method to return the company admin user profile of the user
+	 * 
+	 * @param user
+	 * @return user profile
+	 */
+	@Override
+	@Transactional
+	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException {
+
+		LOG.info("Fetching company Admin user profile for the current user");
+		Map<String, Object> columns = new HashMap<>();
+		columns.put(USER, user);
+		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+		columns.put(CommonConstants.PROFILE_MASTER_COLUMN, profilesMaster);
+		List<UserProfile> userProfile = (List<UserProfile>) userProfileDao.findByKeyValue(UserProfile.class, columns);
+		if (userProfile == null || userProfile.isEmpty()) {
+			LOG.error("No company admin profile found for the user");
+			throw new InvalidInputException("No company admin profile found for the user");
+		}
+		LOG.info("Successfully fetched the company admin profile");
+		return userProfile.get(0);
 	}
 }
 
