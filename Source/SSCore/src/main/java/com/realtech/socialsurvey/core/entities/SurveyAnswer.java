@@ -1,7 +1,8 @@
 package com.realtech.socialsurvey.core.entities;
 
 /*
- * Stores answer to a specific question and order in which answer should appear for Multiple Choice Questions.
+ * Stores answer to a specific question and order in which answer should appear for Multiple Choice
+ * Questions.
  */
 public class SurveyAnswer {
 

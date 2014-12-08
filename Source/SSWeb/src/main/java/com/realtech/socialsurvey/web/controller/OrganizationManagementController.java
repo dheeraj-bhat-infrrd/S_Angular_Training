@@ -13,9 +13,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -24,17 +28,26 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 // JIRA: SS-24 BY RM02 BOC
 
 /**
- * Controller to manage the settings and information provided by the user
+ * Controller to manage the organizational settings and information provided by the user
  */
 @Controller
-public class UserManagementController {
-	private static final Logger LOG = LoggerFactory.getLogger(UserManagementController.class);
+public class OrganizationManagementController {
+	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementController.class);
 
 	@Autowired
 	private MessageUtils messageUtils;
 
 	@Autowired
-	private UserManagementService userManagementServices;
+	private RegistrationService registrationService;
+
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private UserManagementService userManagementService;
+	
+	@Autowired
+	private Payment gateway;
 
 	/**
 	 * Method to call service for adding company information for a user
@@ -66,7 +79,11 @@ public class UserManagementController {
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
 
 			LOG.debug("Calling services to add company details");
-			user = userManagementServices.addCompanyInformation(user, companyDetails);
+			user = organizationManagementService.addCompanyInformation(user, companyDetails);
+
+			LOG.debug("Updating profile completion stage");
+			registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 
 			LOG.debug("Successfully executed service to add company details");
 
@@ -95,6 +112,7 @@ public class UserManagementController {
 				+ " companyContactNo : " + companyContactNo);
 
 		String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
+		String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
 		if (companyName == null || companyName.isEmpty()) {
 			throw new InvalidInputException("Company name is null or empty while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_NAME);
@@ -102,8 +120,8 @@ public class UserManagementController {
 		if (address == null || address.isEmpty()) {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
-		// TODO Validation for zip code with regex
-		if (zipCode == null || zipCode.isEmpty()) {
+
+		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(ZIPCODE_REGEX)) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(PHONENUMBER_REGEX)) {
@@ -151,10 +169,23 @@ public class UserManagementController {
 			LOG.debug("AccountType obtained : " + strAccountType);
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			// TODO call services to save the account type
 
-			// AccountType accountType = userManagementServices.addAccountTypeForCompany(user,
-			// strAccountType);
+			LOG.debug("Calling sevices for adding account type of company");
+			AccountType accountType = null;
+			try {
+				accountType = organizationManagementService.addAccountTypeForCompanyAndUpdateStage(user, strAccountType);
+				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
+			
+			gateway.initialise();
+			model.addAttribute("accounttype", accountType.getValue());
+			model.addAttribute("clienttoken", gateway.getClientToken());
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
 			LOG.info("Method addAccountType of UserManagementController completed successfully");
 		}
@@ -163,8 +194,7 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
-		return "";
-		// return JspResolver.PAYMENT;
+		return JspResolver.PAYMENT;
 
 	}
 }
