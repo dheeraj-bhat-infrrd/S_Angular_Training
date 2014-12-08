@@ -12,5 +12,5 @@ public interface OrganizationManagementService {
 
 	public AccountType addAccountTypeForCompanyAndUpdateStage(User user, String accountType) throws InvalidInputException;
 	
-	public int fetchAccountTypeForCompany(Company company) throws InvalidInputException;
+	public long fetchAccountTypeMasterIdForCompany(Company company) throws InvalidInputException;
 }

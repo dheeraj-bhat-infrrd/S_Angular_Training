@@ -122,8 +122,9 @@ public class LoginController {
 						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
 					}
-					long accountTypeMasterId = organizationManagementService.fetchAccountTypeForCompany(user.getCompany());
-					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(accountTypeMasterId));
+					long accountTypeMasterId = organizationManagementService.fetchAccountTypeMasterIdForCompany(user.getCompany());
+					if (accountTypeMasterId != 0)
+						session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(accountTypeMasterId));
 				}
 			}
 			LOG.info("User login successful");

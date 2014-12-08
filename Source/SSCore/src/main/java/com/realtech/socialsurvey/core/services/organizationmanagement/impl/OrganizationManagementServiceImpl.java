@@ -141,14 +141,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public int fetchAccountTypeForCompany(Company company) throws InvalidInputException {
+	public long fetchAccountTypeMasterIdForCompany(Company company) throws InvalidInputException {
 
 		LOG.info("Fetch account type for company :" + company.getCompany());
 
 		List<LicenseDetail> licenseDetails = licenceDetailDao.findByColumn(LicenseDetail.class, CommonConstants.COMPANY, company);
 		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.error("No license object present for the company : " + company.getCompany());
-			throw new InvalidInputException("No license object present for the company");
+			return 0;
 		}
 		LOG.info("Successfully fetched the License detail for the current user's company");
 
