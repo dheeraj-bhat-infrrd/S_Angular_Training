@@ -28,9 +28,9 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {

@@ -1,22 +1,25 @@
-package com.realtech.socialsurvey.core.services.hierarchymanagement.impl;
+package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.hierarchymanagement.HierarchyManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 
 // JIRA SS-37 BY RM02 BOC
 
@@ -34,7 +37,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
 
-	private static final String COMPANY = "company";
+	@Resource
+	@Qualifier("userProfile")
+	private UserProfileDao userProfileDao;
 
 	/**
 	 * Fetch list of branches in a company
@@ -53,7 +58,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Fetching the list of branches for company :" + company.getCompany());
-		List<Branch> branchList = branchDao.findByColumn(Branch.class, COMPANY, company);
+		List<Branch> branchList = branchDao.findByColumn(Branch.class, CommonConstants.COMPANY_COLUMN, company);
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
 	}
@@ -74,7 +79,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Fetching the list of regions for company :" + company.getCompany());
-		List<Region> regionList = regionDao.findByColumn(Region.class, COMPANY, company);
+		List<Region> regionList = regionDao.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, company);
 		LOG.info("Region list fetched for the company " + company);
 		return regionList;
 	}
