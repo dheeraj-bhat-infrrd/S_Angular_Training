@@ -3,7 +3,7 @@ package com.realtech.socialsurvey.core.entities;
 import java.util.List;
 
 /*
- * This is a POJO class containing all the details of questions and answers related to a survey. 
+ * This is a POJO class containing all the details of questions and answers related to a survey.
  */
 public class SurveyQuestionDetails {
 

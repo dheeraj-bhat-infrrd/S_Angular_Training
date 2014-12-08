@@ -22,8 +22,8 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
-import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -90,6 +90,9 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
 			}
+			catch (UserAlreadyExistsException e) {
+				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e);
+			}
 
 			LOG.info("Invitation to corporate for registration completed successfully");
 			model.addAttribute("message",
@@ -121,10 +124,7 @@ public class RegistrationController {
 				urlParams = registrationService.validateRegistrationUrl(encryptedUrlParams);
 			}
 			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-			catch (InvalidUrlException e) {
-				throw new InvalidUrlException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_URL, e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
 			}
 			if (urlParams == null || urlParams.isEmpty()) {
 				throw new InvalidInputException("Url params are null or empty in showRegistrationPage");
@@ -139,6 +139,7 @@ public class RegistrationController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.LOGIN;
 		}
 		return JspResolver.REGISTRATION;
 	}
@@ -159,7 +160,6 @@ public class RegistrationController {
 		String lastName = request.getParameter("lastname");
 		String emailId = request.getParameter("emailid");
 		String originalEmailId = request.getParameter("originalemailid");
-		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String confirmPassword = request.getParameter("confirmpassword");
 
@@ -167,7 +167,7 @@ public class RegistrationController {
 			/**
 			 * Validate the parameters obtained from registration form
 			 */
-			validateRegistrationForm(firstName, lastName, emailId, username, password, confirmPassword);
+			validateRegistrationForm(firstName, lastName, emailId, password, confirmPassword);
 
 			/**
 			 * If emailId sent in the link and emailId entered by the user are same, register the
@@ -176,7 +176,7 @@ public class RegistrationController {
 			try {
 				if (emailId.equals(originalEmailId)) {
 					LOG.debug("Registering user with emailId : " + emailId);
-					User user = registrationService.addCorporateAdmin(firstName, lastName, originalEmailId, username, confirmPassword);
+					User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, originalEmailId, emailId, confirmPassword);
 					LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 					LOG.debug("Adding newly registered user to session");
@@ -185,15 +185,19 @@ public class RegistrationController {
 					LOG.debug("Successfully added registered user to session");
 
 				}
-				else {
-					LOG.debug("Sending registration invite link on the new emailId : " + emailId + " added by the user");
-					registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL,
-							DisplayMessageType.SUCCESS_MESSAGE));
-
-					LOG.debug("Registration invite link on the new emailId : " + emailId + " sent successfully");
-					return JspResolver.MESSAGE_HEADER;
-				}
+				/**
+				 * Commenting the code as now emailId is non editable in registration
+				 */
+				/*
+				 * else { LOG.debug("Sending registration invite link on the new emailId : " +
+				 * emailId + " added by the user");
+				 * registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
+				 * model.addAttribute("message",
+				 * messageUtils.getDisplayMessage(DisplayMessageConstants
+				 * .REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				 * LOG.debug("Registration invite link on the new emailId : " + emailId +
+				 * " sent successfully"); return JspResolver.MESSAGE_HEADER; }
+				 */
 
 				// Set the success message
 				model.addAttribute("message",
@@ -202,6 +206,9 @@ public class RegistrationController {
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
+			}
+			catch (UserAlreadyExistsException e) {
+				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.USERNAME_ALREADY_TAKEN, e);
 			}
 		}
 		catch (NonFatalException e) {
@@ -282,7 +289,7 @@ public class RegistrationController {
 	 * @param confirmPassword
 	 * @throws InvalidInputException
 	 */
-	private void validateRegistrationForm(String firstName, String lastName, String emailId, String username, String password, String confirmPassword)
+	private void validateRegistrationForm(String firstName, String lastName, String emailId, String password, String confirmPassword)
 			throws InvalidInputException {
 		LOG.debug("Validating registration form parameters");
 		/**
@@ -291,9 +298,6 @@ public class RegistrationController {
 		 */
 		validateFormParameters(firstName, lastName, emailId);
 
-		if (username == null || username.isEmpty()) {
-			throw new InvalidInputException("Username is not valid in registration", DisplayMessageConstants.INVALID_USERNAME);
-		}
 		if (password == null || password.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}

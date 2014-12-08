@@ -17,7 +17,7 @@ public class ProfilesMaster implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "PROFILE_ID")
-	private long profileId;
+	private int profileId;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -45,11 +45,11 @@ public class ProfilesMaster implements Serializable {
 
 	public ProfilesMaster() {}
 
-	public long getProfileId() {
+	public int getProfileId() {
 		return this.profileId;
 	}
 
-	public void setProfileId(long profileId) {
+	public void setProfileId(int profileId) {
 		this.profileId = profileId;
 	}
 
