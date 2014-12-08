@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -85,50 +86,64 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	}
 
 	/**
-	 * update branch status to inactive
+	 * Updates status of a branch
 	 * 
-	 * @param BranchId
+	 * @param user
+	 * @param branchId
+	 * @param status
 	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional
-	public void deleteBranch(long branchId) throws InvalidInputException {
-		LOG.info("Update branch status to inactive on delete");
-
-		LOG.debug("Fetch the branch object by ID");
+	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException {
+		LOG.info("Update branch of id :" + branchId + " status to :" + status);
+		if (user == null) {
+			throw new InvalidInputException("User is null in updateRegionStatus");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("BranchId is not set in updateRegionStatus");
+		}
+		
+		LOG.debug("Fetching the branch object by ID");
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		if (branch == null) {
 			LOG.error("No branch present with the branch Id :" + branchId);
 			throw new InvalidInputException("No branch present with the branch Id :" + branchId);
 		}
 
-		// set branch status as inactive
-		branch.setStatus(CommonConstants.STATUS_INACTIVE);
-		// update the branch status in database
+		branch.setStatus(status);
+		branch.setModifiedBy(String.valueOf(user.getUserId()));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		branchDao.update(branch);
-		LOG.info("Branch status for branch ID :" + branchId + "/t successfully updated to inacitive");
+		LOG.info("Branch status for branch ID :" + branchId + "/t successfully updated to:" + status);
 	}
 
 	/**
-	 * update region status to inactive
+	 * Updates the status of region
 	 * 
 	 * @param regionId
 	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional
-	public void deleteRegion(long regionId) throws InvalidInputException {
-		LOG.info("Update region status to inactive on delete");
+	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException {
+		LOG.info("Method updateRegionStatus called for regionId : " + regionId + " and status : " + status);
+		if (user == null) {
+			throw new InvalidInputException("User is null in updateRegionStatus");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in updateRegionStatus");
+		}
 		Region region = regionDao.findById(Region.class, regionId);
 		if (region == null) {
 			LOG.error("No region present with the region Id :" + regionId);
 			throw new InvalidInputException("No region present with the region Id :" + regionId);
 		}
-		// set region status as inactive
-		region.setStatus(CommonConstants.STATUS_INACTIVE);
-		// update the region status in the database
+		region.setStatus(status);
+		region.setModifiedBy(String.valueOf(user.getUserId()));
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		regionDao.update(region);
-		LOG.info("Region status for region ID :" + regionId + "/t successfully updated to inacitive");
+		LOG.info("Region status for region ID :" + regionId + "/t successfully updated to " + status);
 	}
 
 	/**

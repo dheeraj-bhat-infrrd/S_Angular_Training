@@ -169,10 +169,14 @@ public class HierarchyManagementController {
 
 		try {
 			long regionId = 0l;
-			// Update the region status to inactive
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
 			try {
 				regionId = Long.parseLong(request.getParameter("regionId"));
-				hierarchyManagementService.deleteRegion(regionId);
+				LOG.debug("Calling service to deactivate region");
+				hierarchyManagementService.updateRegionStatus(user, regionId, CommonConstants.STATUS_INACTIVE);
+				LOG.debug("Successfully executed service to deactivate region");
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception occurred while parsing the region id.Reason :" + e.getMessage(), e);
@@ -180,7 +184,7 @@ public class HierarchyManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Error occurred while deactivating the region");
+				LOG.error("Error occurred while deactivating the region",e);
 				throw new InvalidInputException("Error occurred while deactivating the region", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Successfully deactivated the region " + regionId);
@@ -206,17 +210,21 @@ public class HierarchyManagementController {
 		LOG.info("Deactivating branch");
 		try {
 			long branchId = 0l;
-			// update the branch status to inactive
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
-				hierarchyManagementService.deleteBranch(branchId);
+				
+				LOG.debug("Calling service to deactivate branch");
+				hierarchyManagementService.updateBranchStatus(user, branchId, CommonConstants.STATUS_INACTIVE);
+				LOG.debug("Successfully executed service to deactivate branch");
 			}
 			catch (NumberFormatException e) {
-				LOG.error("Number format exception occurred while parsing branch id");
+				LOG.error("Number format exception occurred while parsing branch id",e);
 				throw new InvalidInputException("Number format exception occurred while parsing branch id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Error occurred while deactivating the branch");
+				LOG.error("Error occurred while deactivating the branch",e);
 				throw new InvalidInputException("Error occurred while deactivating the branch", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Successfully deactived the branch " + branchId);
