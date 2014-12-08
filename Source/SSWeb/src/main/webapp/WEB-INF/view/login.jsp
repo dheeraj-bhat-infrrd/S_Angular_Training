@@ -22,6 +22,7 @@
 	href="${pageContext.request.contextPath}/resources/css/style.css">
 <script>
 	$(function() {
+		//Bootstap form validator
 		$('#loginForm')
 				.bootstrapValidator(
 						{
@@ -57,7 +58,7 @@
 </script>
 </head>
 <body>
-	<div id="invitationMainWrapper" class="mainWrapper">
+	<div id="loginMainWrapper" class="mainWrapper">
 		<div class="overlay">
 			<div class="formModalContainer">
 				<div class="hide" id="messageHeader"></div>
@@ -70,7 +71,7 @@
 						<div class="formContainer">
 							<form role="form" id="loginForm">
 								<div class="form-group formInputField">
-									<input id="userId" name="userId" class="form-control formInput"
+									<input id="loginName" name="loginName" class="form-control formInput"
 										type="text" placeholder="User ID">
 								</div>
 								<div class="form-group formInputField">
@@ -78,7 +79,7 @@
 										class="form-control formInput" type="password"
 										placeholder="* * * * * *">
 								</div>
-								<button class="formButton" id="loginFormSubmit">Submit</button>
+								<button type="button" class="formButton" id="loginFormSubmit" onclick="loginUser();">Submit</button>
 							</form>
 						</div>
 					</div>

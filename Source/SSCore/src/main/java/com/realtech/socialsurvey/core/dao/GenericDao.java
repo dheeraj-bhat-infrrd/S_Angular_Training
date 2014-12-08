@@ -14,7 +14,7 @@ import org.hibernate.criterion.Criterion;
 
 public interface GenericDao<T, ID extends Serializable> {
 
-	public List<T> findAll();
+	public List<T> findAll(Class<T> entityClass);
 
 	public T saveOrUpdate(T entity);
 
@@ -34,10 +34,11 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public T findById(Class<T> table, ID id);
 
-	public List<T> findByKeyValue(Class<T> dataClass, Map<String, String> queries);
+	public List<T> findByKeyValue(Class<T> dataClass, Map<String, Object> queries);
 
-	public List<T> findByColumn(Class<T> dataClass, String column, String value);
+	public List<T> findByColumn(Class<T> dataClass, String column, Object value);
 
+	
 }
 
 // JIRA: SS-8: By RM05: EOC
