@@ -12,7 +12,6 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 
 @Component("userProfile")
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao {
