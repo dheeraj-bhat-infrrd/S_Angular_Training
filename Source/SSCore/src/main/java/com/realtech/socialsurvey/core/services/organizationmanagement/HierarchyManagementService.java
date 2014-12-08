@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.realtech.socialsurvey.core.services.hierarchymanagement;
+package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import com.realtech.socialsurvey.core.entities.Branch;
