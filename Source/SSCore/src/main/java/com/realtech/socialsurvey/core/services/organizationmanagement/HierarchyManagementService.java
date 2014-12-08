@@ -19,10 +19,10 @@ public interface HierarchyManagementService {
 	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException;
 
 	public List<Region> getAllRegionsForCompany(Company company) throws InvalidInputException;
+	
+	public void updateBranchStatus(User user,long branchId,int status) throws InvalidInputException;
 
-	public void deleteBranch(long branchId) throws InvalidInputException;
-
-	public void deleteRegion(long regionId) throws InvalidInputException;
+	public void updateRegionStatus(User user,long regionId,int status) throws InvalidInputException;
 
 	public boolean isMaxBranchAdditionExceeded(User user, AccountType accountType) throws InvalidInputException;
 

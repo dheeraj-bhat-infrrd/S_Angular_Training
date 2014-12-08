@@ -110,7 +110,7 @@ public class PaymentController {
 				return JspResolver.MESSAGE_HEADER;
 			}
 			model.addAttribute("message",messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.LOGIN;
 		}
 		else{
 			LOG.info("Subscription Unsuccessful!");
