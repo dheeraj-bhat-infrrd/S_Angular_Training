@@ -160,7 +160,6 @@ public class RegistrationController {
 		String lastName = request.getParameter("lastname");
 		String emailId = request.getParameter("emailid");
 		String originalEmailId = request.getParameter("originalemailid");
-		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String confirmPassword = request.getParameter("confirmpassword");
 
@@ -168,7 +167,7 @@ public class RegistrationController {
 			/**
 			 * Validate the parameters obtained from registration form
 			 */
-			validateRegistrationForm(firstName, lastName, emailId, username, password, confirmPassword);
+			validateRegistrationForm(firstName, lastName, emailId, password, confirmPassword);
 
 			/**
 			 * If emailId sent in the link and emailId entered by the user are same, register the
@@ -177,7 +176,7 @@ public class RegistrationController {
 			try {
 				if (emailId.equals(originalEmailId)) {
 					LOG.debug("Registering user with emailId : " + emailId);
-					User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, originalEmailId, username, confirmPassword);
+					User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, originalEmailId, emailId, confirmPassword);
 					LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 					LOG.debug("Adding newly registered user to session");
@@ -290,7 +289,7 @@ public class RegistrationController {
 	 * @param confirmPassword
 	 * @throws InvalidInputException
 	 */
-	private void validateRegistrationForm(String firstName, String lastName, String emailId, String username, String password, String confirmPassword)
+	private void validateRegistrationForm(String firstName, String lastName, String emailId, String password, String confirmPassword)
 			throws InvalidInputException {
 		LOG.debug("Validating registration form parameters");
 		/**
@@ -299,9 +298,6 @@ public class RegistrationController {
 		 */
 		validateFormParameters(firstName, lastName, emailId);
 
-		if (username == null || username.isEmpty()) {
-			throw new InvalidInputException("Username is not valid in registration", DisplayMessageConstants.INVALID_USERNAME);
-		}
 		if (password == null || password.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}
