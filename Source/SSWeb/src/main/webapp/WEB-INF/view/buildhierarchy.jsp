@@ -35,11 +35,11 @@
 					class="hierarchySettingsModalContainer clearfix">
 					<div class="floatLeft leftContainer">
 						<div id="addRegionFormContainer" class="formContainer">
-							<form id="addRegionForm" class="form-horizontal">
+							<form id="add-region-form" class="form-horizontal">
 								<div class="form-group">
 									<label class="col-sm-3 control-label">New Region</label>
 									<div class="col-sm-7">
-										<input type="text" class="form-control" name="newRegion"
+										<input type="text" class="form-control" name="regionName"
 											id="newRegion" placeholder="New Region Name" />
 									</div>
 								</div>
@@ -58,7 +58,7 @@
 									</div>
 								</div>
 								<div class="formFooter clearfix">
-									<div class="form-Button floatLeft">Save</div>
+									<div class="form-Button floatLeft" id="btn-add-region">Save</div>
 									<div class="form-Button floatRight">Clear</div>
 								</div>
 							</form>
@@ -78,18 +78,18 @@
 					class="hierarchySettingsModalContainer clearfix">
 					<div class="floatLeft leftContainer">
 						<div id="addRegionFormContainer" class="formContainer">
-							<form id="addRegionForm" class="form-horizontal">
+							<form id="add-branch-form" class="form-horizontal">
 								<div class="form-group">
 									<label class="col-sm-3 control-label">New Branch</label>
 									<div class="col-sm-7">
-										<input type="text" class="form-control" name="newRegion"
+										<input type="text" class="form-control" name="branchName"
 											id="newRegion" placeholder="New Branch Name" />
 									</div>
 								</div>
 								<div class="form-group">
 									<label class="col-sm-3 control-label">Select Region</label>
 									<div class="col-sm-7">
-										<select id="selectRegion" class="form-control"></select>
+										<select id="select-region" class="form-control"></select>
 									</div>
 								</div>
 								<div class="form-group">
