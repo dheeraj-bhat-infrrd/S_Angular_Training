@@ -99,6 +99,7 @@ input:-webkit-autofill {
     width: 313px;
     border: none;
     padding: 0 10px;
+    color: #999;
 }
 
 .margin-bot-20 {
@@ -139,4 +140,8 @@ input:-webkit-autofill {
 
 .cursor-pointer {
     cursor: pointer;
+}
+
+.margin-bottom-50 {
+    margin-bottom: 50px;
 }
