@@ -19,11 +19,11 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
-    <div class="login-main-wrapper padding-001 login-wrapper-min-height">
+    <div class="login-main-wrapper invitation-min-height padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
                 <div class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
-                    <div class="logo login-logo"></div>
+                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
                     <div class="login-txt text-center font-24 margin-bot-20">Login To Do Your Survey</div>
                     <div class="login-input-wrapper margin-0-auto clearfix">
                         <div class="float-left login-wrapper-icon"></div>
@@ -42,11 +42,11 @@
                     </div>
                     <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center">SUBMIT</div>
                 </div>
-                <div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto col-xs-12">
+                <div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
                     <div class="float-left cursor-pointer">Forgot password?</div>
                     <div class="float-right">Already have an account? <span class="cursor-pointer"><strong>Login</strong></span></div>
                 </div>
-                <div class="footer-copyright">Copyright &copy; Social Survey. All rights reserved.</div>                
+                <div class="footer-copyright text-center">Copyright &copy; Social Survey. All rights reserved.</div>                
             </div>
         </div>
     </div>
