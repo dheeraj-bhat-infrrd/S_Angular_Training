@@ -304,12 +304,17 @@ public class HierarchyManagementController {
 			if (branchName == null || branchName.isEmpty()) {
 				throw new InvalidInputException("Branch name is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
 			}
-			if (branchAddress1 == null || branchAddress2.isEmpty()) {
+			if (branchAddress1 == null || branchAddress1.isEmpty()) {
 				throw new InvalidInputException("Branch address is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_ADDRESS);
 			}
 			long regionId = 0l;
 			try {
-				regionId = Long.parseLong(strRegionId);
+				/**
+				 * parse the regionId if a region is selected for the branch
+				 */
+				if (strRegionId != null && !strRegionId.isEmpty()) {
+					regionId = Long.parseLong(strRegionId);
+				}
 			}
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("NumberFormatException while parsing regionId", DisplayMessageConstants.GENERAL_ERROR, e);
