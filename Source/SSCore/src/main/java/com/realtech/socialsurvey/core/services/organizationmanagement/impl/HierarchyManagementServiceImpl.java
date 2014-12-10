@@ -341,12 +341,33 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("Branch name is null in addNewBranch");
 		}
 		LOG.info("Method add new branch called for regionId : " + regionId + " and branchName : " + branchName);
-
+		Region region = null;
 		LOG.debug("Fetching region for branch to be added");
-		Region region = regionDao.findById(Region.class, regionId);
+		/**
+		 * If region is selected by user, select it from db
+		 */
+		if (regionId > 0l) {
+			region = regionDao.findById(Region.class, regionId);
+		}
+		/**
+		 * else select the default region from db for that company
+		 */
+		else {
+			LOG.debug("Selecting the default region for company");
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.COMPANY, user.getCompany());
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
+			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
+			if (regions != null && !regions.isEmpty()) {
+				region = regions.get(0);
+			}
+		}
+		if (region == null) {
+			throw new InvalidInputException("No region is present in db for the company while adding branch");
+		}
 
 		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.STATUS_INACTIVE);
-		LOG.info("Successfully completed method add new branch for regionId : " + regionId + " and branchName : " + branchName);
+		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
 	}
