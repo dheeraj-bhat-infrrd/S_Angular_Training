@@ -1,0 +1,11 @@
+@media (min-width: 768px) {
+    .login-wrapper-resp{
+        width: 457px;
+        float: none;
+        box-shadow: 0px 1px 20px 2px #7C7C7C;
+    }
+    .login-footer-wrapper{
+        width: 457px;
+        float: none;
+    }
+}
