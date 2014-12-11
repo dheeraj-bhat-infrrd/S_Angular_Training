@@ -8,6 +8,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.login.title.key" /></title>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
@@ -33,10 +34,10 @@
                         <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder="Password">
                     </div>
                     <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit">LOGIN</div>
+                    <div class="hide forgot-pwd-mobile">Forgot password?</div>
                 </div>
                 <div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
                     <div class="float-left cursor-pointer">Forgot password?</div>
-                    <div class="float-right">Already have an account? <span class="cursor-pointer"><strong>Login</strong></span></div>
                 </div>
                 <div class="footer-copyright text-center">Copyright &copy; Social Survey. All rights reserved.</div>                
             </div>
@@ -54,7 +55,8 @@
             $(window).resize(adjustOnResize);
             
             function adjustOnResize(){
-                var winH2 = $(window).height()/2;
+                var winH = $(window).height();
+                var winH2 = winH/2;
                 var conH2 = $('.login-row').height()/2;
                 var offset = winH2 - conH2;
                 if(offset > 25){
@@ -66,7 +68,6 @@
                 if(validateForm('login-form')){
                     /* ===== FORM VALIDATED ===== */
                 }
-                var validate = true;
             });
             
         });
