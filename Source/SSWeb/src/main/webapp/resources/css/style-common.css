@@ -1,0 +1,147 @@
+@font-face{
+	font-family:'OpenSansLight';
+	src:url('../fonts/OpenSans-Light.ttf') format('truetype');
+}
+
+@font-face{
+	font-family:'OpenSans';
+	src:url('../fonts/OpenSans-Regular.ttf') format('truetype');
+}
+
+*{
+    font-family: 'OpenSans' !important;
+    font-weight: normal !important;
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+body {
+    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
+    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
+    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+    color: #666;
+}
+
+input,textarea{
+	outline: none;
+	resize: none !important;
+}
+
+input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset !important;
+}
+
+.box-border-box {
+    box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -o-box-sizing: border-box;
+    -ms-box-sizing: border-box;
+}
+
+.clearfix:after,.clearfix:before {
+	visibility: hidden;
+	display: block;
+	font-size: 0;
+	content: " ";
+	clear: both;
+	height: 0;
+}
+
+.float-left{
+	float: left;
+}
+
+.float-right {
+	float: right;
+}
+
+.hide{
+	display: none;
+}
+
+.show{
+    display: block;
+}
+
+.margin-0-auto{
+    margin: 0 auto;
+}
+
+.logo {
+    background: url(../images/logo.png) no-repeat center;
+}
+
+.bg-fff {
+    background-color: #fff;
+}
+
+.font-24 {
+    font-size: 24px;
+}
+
+.login-input-wrapper {
+    margin-bottom: 25px;
+    height: 50px;
+    width: 365px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    overflow: hidden;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.login-wrapper-icon {
+    height: 50px;
+    width: 50px;
+}
+
+.login-wrapper-txt {
+    height: 50px;
+    width: 313px;
+    border: none;
+    padding: 0 10px;
+    color: #999;
+}
+
+.margin-bot-20 {
+    margin-bottom: 20px;
+}
+
+.btn-submit {
+    margin-bottom: 25px;
+    height: 50px;
+    width: 365px;
+    border-radius: 3px;
+    color: #fff;
+    line-height: 50px;
+    background: url(../images/btn-submit.png) no-repeat center;
+    background-size: 100% auto;
+}
+
+.font-18 {
+    font-size: 18px;
+}
+
+.login-wrapper {
+    border-top: 5px solid #5cc7ef;
+    border-radius: 4px;
+}
+
+.padding-001 {
+    padding: 0.1px;
+}
+
+.margin-top-25 {
+    margin-top: 25px;
+}
+
+.margin-bottom-25 {
+    margin-bottom: 25px;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.margin-bottom-50 {
+    margin-bottom: 50px;
+}
