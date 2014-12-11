@@ -24,14 +24,14 @@
     .login-footer-wrapper,.footer-copyright{
         display: none;
     }
-    .registration-wrapper-min-height{
-        min-height: 500px;
+    .registration-wrapper-min-height, .invitation-min-height, .login-wrapper-min-height{
+        min-height: 400px;
     }
     .login-row{
         margin-top: 0 !important;
     }
     .login-wrapper{
-        margin-top: 0;
+        margin: 0;
         border-radius: 0;
     }
     .login-logo{
@@ -45,6 +45,14 @@
         line-height: 75px;
         font-size: 20px;
         border-bottom: 1px solid #D3DEE0;
+    }
+    .forgot-pwd-mobile{
+        display: block !important;
+        margin-top: -35px;
+        padding-left: 20px;
+    }
+    #reg-form,#login-form{
+        height: 100%;
     }
 }
 
