@@ -64,6 +64,7 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 			+ formId);
 	var $form = $("#"+formId);
 	var payLoad = $form.serialize();
+	console.log("payload is --"+payLoad);
 	$.ajax({
 		url : url,
 		type : "POST",
