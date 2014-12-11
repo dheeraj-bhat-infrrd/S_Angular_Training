@@ -30,6 +30,10 @@ input:-webkit-autofill {
     -webkit-box-shadow: 0 0 0 1000px white inset !important;
 }
 
+.input-error{
+    border: 1px solid red !important;
+}
+
 .box-border-box {
     box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -92,11 +96,13 @@ input:-webkit-autofill {
 .login-wrapper-icon {
     height: 50px;
     width: 50px;
+    min-width: 50px;
 }
 
 .login-wrapper-txt {
     height: 50px;
     width: 313px;
+    min-width: 250px;
     border: none;
     padding: 0 10px;
     color: #999;
@@ -107,7 +113,8 @@ input:-webkit-autofill {
 }
 
 .btn-submit {
-    margin-bottom: 25px;
+    margin-bottom: 50px;
+    text-transform: uppercase;
     height: 50px;
     width: 365px;
     border-radius: 3px;
@@ -144,4 +151,28 @@ input:-webkit-autofill {
 
 .margin-bottom-50 {
     margin-bottom: 50px;
+}
+
+.icn-fname {
+    background: url('../images/first-name.png') no-repeat center;
+}
+
+.icn-lname {
+    background: url('../images/last-name.png') no-repeat center;
+}
+
+.icn-email {
+    background: url('../images/email.png') no-repeat center;
+}
+
+.icn-user-id {
+    background: url('../images/User.png') no-repeat center;
+}
+
+.icn-password {
+    background: url('../images/password.png') no-repeat center;
+}
+
+.icn-confirm-password {
+    background: url('../images/conf_pwd.png') no-repeat center;
 }
