@@ -76,7 +76,9 @@
 				<div
 					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
 					<div class="float-left cursor-pointer">
-						<spring:message code="label.forgotpassword.key" />?
+						<a href="./forgotPassword.do">
+							<spring:message code="label.forgotpassword.key" />?
+						</a>
 					</div>
 					<div class="float-right">
 						<spring:message code="label.alreadyhaveanacoount.key" />?
