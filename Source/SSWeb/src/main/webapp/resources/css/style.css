@@ -214,3 +214,11 @@
 .invitation-min-height {
     min-height: 685px;
 }
+
+.login-wrapper-min-height {
+    min-height: 605px;
+}
+
+.registration-wrapper-min-height {
+    min-height: 965px;
+}
