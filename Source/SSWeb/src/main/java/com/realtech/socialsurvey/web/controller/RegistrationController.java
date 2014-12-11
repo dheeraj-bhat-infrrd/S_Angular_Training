@@ -213,7 +213,13 @@ public class RegistrationController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			/**
+			 * Adding the attributes required in page after reloading
+			 */
+			model.addAttribute("firstname", firstName);
+			model.addAttribute("lastname", lastName);
+			model.addAttribute("emailid", originalEmailId);
+			return JspResolver.REGISTRATION;
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
@@ -226,7 +232,7 @@ public class RegistrationController {
 	 * @param request
 	 * @throws InvalidInputException
 	 */
-	//TODO remove unused when captcha is uncommented
+	// TODO remove unused when captcha is uncommented
 	@SuppressWarnings("unused")
 	private void validateCaptcha(HttpServletRequest request) throws InvalidInputException {
 		LOG.debug("Validating captcha information");
