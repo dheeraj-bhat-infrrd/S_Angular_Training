@@ -71,8 +71,8 @@
 					</div>
 					<div class="float-right">
 						<spring:message code="label.alreadyhaveanacoount.key" />
-						? <span class="cursor-pointer"><strong><spring:message
-									code="label.login.key" /></strong></span>
+						? <span class="cursor-pointer"><a href="./login.do"><strong><spring:message
+									code="label.login.key" /></strong></a></span>
 					</div>
 				</div>
 				<div class="footer-copyright text-center">
