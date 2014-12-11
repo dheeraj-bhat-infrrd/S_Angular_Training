@@ -5,7 +5,7 @@ package com.realtech.socialsurvey.core.enums;
  */
 public enum DisplayMessageType {
 
-	ERROR_MESSAGE("error_message", 1), SUCCESS_MESSAGE("success_message", 2);
+	ERROR_MESSAGE("error-message", 1), SUCCESS_MESSAGE("success-message", 2);
 
 	private String name;
 	private int value;
