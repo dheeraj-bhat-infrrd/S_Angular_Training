@@ -71,13 +71,12 @@ public class RegistrationController {
 			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
 
 			// validate captcha
-			try {
-				validateCaptcha(request);
-				LOG.debug("Captcha validation successful");
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_CAPTCHA, e);
-			}
+			// TODO remove comment when captcha validation is needed
+			/*
+			 * try { validateCaptcha(request); LOG.debug("Captcha validation successful"); } catch
+			 * (InvalidInputException e) { throw new InvalidInputException(e.getMessage(),
+			 * DisplayMessageConstants.INVALID_CAPTCHA, e); }
+			 */
 			// continue with the invitation
 			try {
 				LOG.debug("Calling service for sending the registration invitation");
@@ -227,6 +226,8 @@ public class RegistrationController {
 	 * @param request
 	 * @throws InvalidInputException
 	 */
+	//TODO remove unused when captcha is uncommented
+	@SuppressWarnings("unused")
 	private void validateCaptcha(HttpServletRequest request) throws InvalidInputException {
 		LOG.debug("Validating captcha information");
 

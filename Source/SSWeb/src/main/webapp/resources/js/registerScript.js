@@ -2,11 +2,11 @@
  * Contains All related methods for registration
  */
 
-function validateInvitationForm() {
-	console.log("validating Invitation form");
+function submitInvitationForm() {
+	console.log("Method to submit Invitation form called");
 	var success;
-	if (!$('#messageHeader').hasClass("hide"))
-		$('#messageHeader').addClass("hide");
+	if (!$('#message-header').hasClass("hide"))
+		$('#message-header').addClass("hide");
 	var payLoad = $("#registerForm").serialize();
 
 	if (!$('#registerForm').data('bootstrapValidator').isValid())
