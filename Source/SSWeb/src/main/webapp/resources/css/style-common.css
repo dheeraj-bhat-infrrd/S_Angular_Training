@@ -180,3 +180,12 @@ input:-webkit-autofill {
 .margin-bottom-15 {
     margin-bottom: 15px;
 }
+
+.login-link{
+    color: #fff;
+}
+
+.login-link:hover{
+    color: #fff;
+    text-decoration: none;
+}
