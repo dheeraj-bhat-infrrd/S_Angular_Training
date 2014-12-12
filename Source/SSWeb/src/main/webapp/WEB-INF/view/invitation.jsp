@@ -56,23 +56,33 @@
 								placeholder='<spring:message code="label.emailid.key"/>'>
 						</div>
 						<!-- <div class="login-input-wrapper margin-0-auto clearfix"></div> -->
-						<div
-							class="btn-submit margin-0-auto cursor-pointer font-18 text-center"
-							id="inv-submit">
+						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="inv-submit">
 							<spring:message code="label.submit.key" />
 						</div>
+                        <div id="message-header" class="error-msg hide"></div>
+                        <div class="hide have-account-mobile cursor-pointer margin-bottom-15">
+                            <spring:message code="label.alreadyhaveanacoount.key" />
+						  ? 
+                        <span class="cursor-pointer">
+                            <a class="login-link" href="./login.do"><strong><spring:message code="label.login.key" /></strong></a>
+                        </span>
+                        </div>
 					</div>
 				</form>
 				<div
 					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
+<!--
 					<div class="float-left cursor-pointer">
 						<spring:message code="label.forgotpassword.key" />
 						?
 					</div>
+-->
 					<div class="float-right">
 						<spring:message code="label.alreadyhaveanacoount.key" />
-						? <span class="cursor-pointer"><a href="./login.do"><strong><spring:message
-									code="label.login.key" /></strong></a></span>
+						  ? 
+                        <span class="cursor-pointer">
+                            <a class="login-link" href="./login.do"><strong><spring:message code="label.login.key" /></strong></a>
+                        </span>
 					</div>
 				</div>
 				<div class="footer-copyright text-center">

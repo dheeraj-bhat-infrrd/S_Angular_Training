@@ -20,7 +20,6 @@
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
-            <div class="hide" id="message-header"></div>
             	<form id="frm-login">
 	                <div id="login-form" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
@@ -34,11 +33,12 @@
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder="Password">
 	                    </div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit"><spring:message code="label.login.button.key"/></div>
-	                    <div class="hide forgot-pwd-mobile"><a href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
+                        <div id="" class="error-msg hide"></div>
+	                    <div class="hide forgot-pwd-mobile"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
 	                </div>
                	 </form>
                 <div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
-                    <div class="float-left cursor-pointer"><a href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
+                    <div class="float-left cursor-pointer"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
                 </div>
                 <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
                 <spring:message code="label.copyrightposttext.key" /></div>                

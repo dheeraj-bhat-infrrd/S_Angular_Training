@@ -75,15 +75,17 @@
 				</form>
 				<div
 					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
+<!--
 					<div class="float-left cursor-pointer">
 						<a href="./forgotPassword.do">
 							<spring:message code="label.forgotpassword.key" />?
 						</a>
 					</div>
+-->
 					<div class="float-right">
 						<spring:message code="label.alreadyhaveanacoount.key" />?
 						<span class="cursor-pointer">
-							<a href="./login.do">
+							<a class="login-link" href="./login.do">
 								<strong><spring:message code="label.login.key" /></strong>
 							</a>
 						</span>
