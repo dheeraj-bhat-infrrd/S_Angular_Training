@@ -182,10 +182,10 @@ input:-webkit-autofill {
 }
 
 .login-link{
-    color: #fff;
+    color: #fcfcfc;
 }
 
 .login-link:hover{
-    color: #fff;
+    color: #fcfcfc;
     text-decoration: none;
 }

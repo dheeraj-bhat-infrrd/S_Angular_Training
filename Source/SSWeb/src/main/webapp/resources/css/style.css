@@ -189,7 +189,8 @@
 	color:#777;
 }
 .footer-copyright {
-    color: #fff;
+    color: #fcfcfc;
+    font-size: 12px;
 }
 
 .login-footer-txt {
@@ -212,7 +213,7 @@
 }
 
 .login-wrapper-min-height {
-    min-height: 605px;
+    min-height: 660px;
 }
 
 .registration-wrapper-min-height {
