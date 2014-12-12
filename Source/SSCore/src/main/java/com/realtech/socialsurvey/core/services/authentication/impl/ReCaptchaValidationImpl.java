@@ -5,17 +5,14 @@ import net.tanesha.recaptcha.ReCaptcha;
 import net.tanesha.recaptcha.ReCaptchaResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.entities.Captcha;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 
-@Component
 public class ReCaptchaValidationImpl implements CaptchaValidation {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CaptchaValidation.class);
 
-	@Autowired
 	ReCaptcha reCaptcha;
 
 	@Override
@@ -47,6 +44,18 @@ public class ReCaptchaValidationImpl implements CaptchaValidation {
 		LOG.debug("Validationg captcha for remote address: "+remoteAddress+"\t challenge: "+challenge+"\t response: "+response);
 		ReCaptchaResponse captchaResponse = reCaptcha.checkAnswer(remoteAddress, challenge, response);
 		return captchaResponse.isValid();
+	}
+
+	// null implementation
+	@Override
+	public Captcha presentCaptchaQuestion(String previousCaptchaId) {
+		return null;
+	}
+
+	// null implementation
+	@Override
+	public boolean validateCaptcha(String captchaId, String answer) throws InvalidInputException{
+		throw new InvalidInputException("Unimplemented");
 	}
 
 }
