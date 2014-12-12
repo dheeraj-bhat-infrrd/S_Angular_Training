@@ -218,3 +218,14 @@
 .registration-wrapper-min-height {
     min-height: 965px;
 }
+
+.error-msg {
+    margin-top: -35px;
+    line-height: 24px;
+    padding: 0 50px;
+    margin-bottom: 20px;
+}
+
+.forgot-pwd-mobile a{
+    color: #fff;
+}
