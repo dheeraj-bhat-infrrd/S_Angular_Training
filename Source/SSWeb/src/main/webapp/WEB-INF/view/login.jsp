@@ -34,7 +34,8 @@
                         <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder="Password">
                     </div>
                     <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit">LOGIN</div>
-                    <div class="hide forgot-pwd-mobile">Forgot password?</div>
+                    <div id="" class="error-msg hide"></div>
+                    <div class="hide forgot-pwd-mobile cursor-pointer margin-bottom-15">Forgot password?</div>
                 </div>
                 <div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
                     <div class="float-left cursor-pointer">Forgot password?</div>

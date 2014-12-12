@@ -102,7 +102,7 @@ input:-webkit-autofill {
 .login-wrapper-txt {
     height: 50px;
     width: 313px;
-    min-width: 250px;
+    min-width: 245px;
     border: none;
     padding: 0 10px;
     color: #999;
@@ -175,4 +175,8 @@ input:-webkit-autofill {
 
 .icn-confirm-password {
     background: url('../images/conf_pwd.png') no-repeat center;
+}
+
+.margin-bottom-15 {
+    margin-bottom: 15px;
 }

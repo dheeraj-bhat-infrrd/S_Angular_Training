@@ -22,8 +22,7 @@
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
-	<div
-		class="login-main-wrapper padding-001 registration-wrapper-min-height">
+	<div class="login-main-wrapper padding-001 registration-wrapper-min-height">
 		<div class="container login-container">
 			<div class="row login-row">
 				<div id="message-header"><jsp:include page="messageheader.jsp" /></div>
@@ -65,16 +64,14 @@
 								id="reg-conf-pwd" data-non-empty="true" name="confirmpassword"
 								placeholder='<spring:message code="label.confirmpassword.key" />'>
 						</div>
-						<div
-							class="btn-submit margin-0-auto cursor-pointer font-18 text-center"
-							id="reg-submit">
+						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reg-submit">
 							<spring:message code="label.submit.key" />
 						</div>
+                        <div id="" class="error-msg hide"></div>
 					</div>
 					<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
 				</form>
-				<div
-					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
+				<div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
 					<div class="float-left cursor-pointer">
 						<spring:message code="label.forgotpassword.key" />?
 					</div>
@@ -103,7 +100,7 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 
 	<script>
-		$(document).ready(function() {
+		$(document).ready(function(){
 			adjustOnResize();
 
 			$(window).resize(adjustOnResize);
