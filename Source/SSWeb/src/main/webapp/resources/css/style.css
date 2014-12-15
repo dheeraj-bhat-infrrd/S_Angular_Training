@@ -191,6 +191,7 @@
 .footer-copyright {
     color: #fcfcfc;
     font-size: 12px;
+    margin-bottom: 20px;
 }
 
 .login-footer-txt {
@@ -203,7 +204,7 @@
 }
 
 .login-main-wrapper {
-    height: 100%;
+    min-height: 100% !important;
     background: url('../images/bg.jpg') no-repeat;
 	background-size: cover;
 }
@@ -257,3 +258,4 @@
     top: 14px;
     width: 411px !important;
 }
+
