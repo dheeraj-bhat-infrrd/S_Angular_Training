@@ -114,7 +114,7 @@ public class LoginController {
 					// fetch company admin user profile
 					try {
 						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
-						//set model attribute to the value to which u need to redirect the url
+						// set model attribute to the value to which u need to redirect the url
 						model.addAttribute("redirectTo", userProfile.getProfileCompletionStage());
 					}
 					catch (InvalidInputException e) {
@@ -138,13 +138,14 @@ public class LoginController {
 
 	/**
 	 * Start the companyinformation page
+	 * 
 	 * @return
 	 */
 	@RequestMapping(value = "/addcompanyinformation")
 	public String initCompanyInformationPage() {
 		return JspResolver.COMPANY_INFORMATION;
 	}
-	
+
 	/**
 	 * Start the dashboard page
 	 */
@@ -153,12 +154,12 @@ public class LoginController {
 		LOG.info("Dashboard Page started");
 		return JspResolver.DASHBOARD;
 	}
-	
+
 	/**
 	 * Start the add account type page
 	 */
 	@RequestMapping(value = "/addaccounttype")
-	public String initAddAccountTypePage(){
+	public String initAddAccountTypePage() {
 		LOG.info("Add account type page started");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
 	}
@@ -200,15 +201,14 @@ public class LoginController {
 			}
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.FORGOT_PASSWORD;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.FORGOT_PASSWORD;
 	}
 
 	/**
@@ -282,10 +282,10 @@ public class LoginController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.RESET_PASSWORD;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.LOGIN;
 	}
 
 	/**
