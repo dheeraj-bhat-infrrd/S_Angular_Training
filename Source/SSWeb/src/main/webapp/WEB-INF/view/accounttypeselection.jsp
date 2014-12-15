@@ -12,57 +12,57 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-</head>
-    
+</head>    
 <body>
 	<div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
                 <div id="payment-form" class="payment-form login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-md-12 col-xs-12">
                     <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
-                    <div class="login-txt text-center font-24 margin-bot-20">Choose Account Type</div>
-                    <div class="clearfix payment-option-wrapper">
-                        <div class="float-left payment-option-tab padding-left-25">
-                            <div class="payment-tab-main">
-                                <div class="payment-tab-header">Individual</div>
-                                <div class="payment-tab-price"><span class="payment-txt-price">$35<sup>99</sup></span> <span class="txt-thin">Per Month</span></div>
-                                <div class="payment-tab-line1"><strong>1</strong> User Account(s)</div>
-                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
-                            </div>
-                            <div class="btn-payment-sel">Select</div>
-                        </div>
-                        <div class="float-left payment-option-tab">
-                            <div class="payment-tab-main">
-                                <div class="payment-tab-header">Team</div>
-                                <div class="payment-tab-price"><span class="payment-txt-price">$45<sup>99</sup></span> <span class="txt-thin">Per Month</span></div>
-                                <div class="payment-tab-line1"><strong>30</strong> User Account(s)</div>
-                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
-                            </div>
-                            <div class="btn-payment-sel">Select</div>
-                        </div>
-                        <div class="float-left payment-option-tab">
-                            <div class="payment-tab-main">
-                                <div class="payment-tab-header">Company</div>
-                                <div class="payment-tab-price"><span class="payment-txt-price">$65<sup>99</sup></span> <span class="txt-thin">Per Month</span></div>
-                                <div class="payment-tab-line1"><strong>60</strong> User Account(s)</div>
-                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
-                            </div>
-                            <div class="btn-payment-sel">Select</div>
-                        </div>
-                        <div class="float-left payment-option-tab padding-right-25">
-                            <div class="payment-tab-main">
-                                <div class="payment-tab-header">Enterprise</div>
-                                <div class="payment-tab-price"><span class="payment-txt-price">$99<sup>99</sup></span> <span class="txt-thin">Per Month</span></div>
-                                <div class="payment-tab-line1"><strong>100</strong> User Account(s)</div>
-                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
-                            </div>
-                            <div class="btn-payment-sel">Select</div>
-                        </div>
-                    </div>
-                    <div class="payment-details-wrapper hide">
-                        <form id="checkout" method="post" action="/checkout">
-                            <div id="dropin" class="payment-dropin"></div>
-                        </form>
+                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.accounttypeselection.header.key"/></div>
+	                    <form id="account-type-selection-form">
+		                    <div class="clearfix payment-option-wrapper">
+		                        <div class="float-left payment-option-tab padding-left-25">
+		                            <div class="payment-tab-main">
+		                                <div class="payment-tab-header"><spring:message code="label.accounttype.individual.key"/></div>
+		                                <div class="payment-tab-price"><span class="payment-txt-price">$35<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+		                                <div class="payment-tab-line1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+		                            </div>
+		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(1)"><spring:message code="label.accounttype.select.key"/></div>
+		                        </div>
+		                        <div class="float-left payment-option-tab">
+		                            <div class="payment-tab-main">
+		                                <div class="payment-tab-header"><spring:message code="label.accounttype.team.key"/></div>
+		                                <div class="payment-tab-price"><span class="payment-txt-price">$45<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+		                                <div class="payment-tab-line1"><strong>30</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+		                            </div>
+		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(2)"><spring:message code="label.accounttype.select.key"/></div>
+		                        </div>
+		                        <div class="float-left payment-option-tab">
+		                            <div class="payment-tab-main">
+		                                <div class="payment-tab-header"><spring:message code="label.accounttype.company.key"/></div>
+		                                <div class="payment-tab-price"><span class="payment-txt-price">$65<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+		                                <div class="payment-tab-line1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+		                            </div>
+		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(3)"><spring:message code="label.accounttype.select.key"/></div>
+		                        </div>
+		                        <div class="float-left payment-option-tab padding-right-25">
+		                            <div class="payment-tab-main">
+		                                <div class="payment-tab-header"><spring:message code="label.accounttype.enterprise.key"/></div>
+		                                <div class="payment-tab-price"><span class="payment-txt-price">$99<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+		                                <div class="payment-tab-line1"><strong>100</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+		                            </div>
+		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(4)"><spring:message code="label.accounttype.select.key"/></div>
+		                        </div>
+		                    </div>
+		                    <input type="hidden" name="accounttype" id="account-type" />
+	                    </form>
+                    <div id="payment-section">
+                    	<!-- Payment page comes here through ajax  -->
                     </div>
                 </div>
                 <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
@@ -71,13 +71,25 @@
             </div>
         </div>
     </div>
-    
-    <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-    
+        <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
     <script>
+	    function selectAccountType(accountType) {
+			console.log("selecting and saving account type");
+			$('#account-type').val(accountType);
+			var url = "./addaccounttype.do";
+			callAjaxFormSubmit(url, selectAccountTypeCallBack,
+					"account-type-selection-form");
+		}
+	
+		function selectAccountTypeCallBack(data) {
+			console.log("callback for selectAccountType called");
+			$("#payment-section").html(data);
+			console.log("callback for selectAccountType finished");
+		}
+		
         $(document).ready(function(){
             adjustOnResize();
             
@@ -93,7 +105,6 @@
                     $('.login-row').css('margin-top',offset+'px');
                 }
             }
-            
             
         });
     </script>
