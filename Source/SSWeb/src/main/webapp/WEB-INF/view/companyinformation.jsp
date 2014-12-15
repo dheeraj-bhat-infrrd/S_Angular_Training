@@ -1,135 +1,114 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<!-- JIRA : SS-24 by RM-02
-	Settings page for capturing company details while registration
+<!-- JIRA : SS-17 by RM-06
+	Invitation page to send user invite to register for the application 	
 -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title><spring:message code="label.title.settings.key" /></title>
 <script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/bootstrapValidator.js"></script>
+	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap-theme.min.css">
-<link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/style.css">
-<script>
-	$(function() {
-		$('#companyInfoForm')
-				.bootstrapValidator(
-						{
-							fields : {
-								company : {
-									validators : {
-										notEmpty : {
-											message : 'Please enter a company name'
-										}
-									}
-								},
-								address1 : {
-									validators : {
-										notEmpty : {
-											message : 'Please enter an address'
-										}
-									}
-								},
-								zipcode : {
-									validators : {
-										notEmpty : {
-											message : 'Please enter the zip code'
-										}
-									}
-								},
-								contactno : {
-									validators : {
-										notEmpty : {
-											message : 'Please enter a valid company contact number'
-										},
-										digits : {
-											message : 'Contact number can contain digits only'
-										}
-									}
-								}
-							}
-						});
-	});
-</script>
+<link rel="stylesheet" 
+	href="${pageContext.request.contextPath}/resources/css/style-common.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
-	<div id="registrationMainWrapper" class="mainWrapper">
-		<div class="overlay">
-			<div class="formModalContainer">
-				<div class="hide" id="messageHeader"></div>
-				<div id="registrationContainer" class="formWrapper">
-					<div id="formHeaderBar"></div>
-					<div class="formBody" id="companyInfoBody">
-						<div class="formBodyMainText">
-							<spring:message code="label.companysettings.header.key"></spring:message>
+	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
+		<div class="container login-container">
+			<div class="row login-row">
+				<div id="message-header"><jsp:include page="messageheader.jsp" /></div>
+				<form id="registration-form" method="POST" action="./register.do">
+					<div id="reg-form" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
+						<div class="logo login-logo margin-bottom-25 margin-top-25"></div>
+						<div class="login-txt text-center font-24 margin-bot-20">
+							<spring:message code="label.signuptostartsurvey.key" />
 						</div>
-						<div class="formContainer">
-							<form role="form" id="companyInfoForm" method="post"
-								action="./addcompanyinformation.do">
-								<div class="form-group formInputField">
-									<input id="company" name="company"
-										class="form-control formInput" type="text"
-										placeholder='<spring:message code="label.company.key"/>'>
-								</div>
-								<div class="form-group">
-									<div class="input-group">
-										<input id="regStep3Logo" name="logo"
-											class="form-control formInput" type="text" placeholder="logo">
-										<div class="input-group-addon">...</div>
-									</div>
-								</div>
-								<div class="form-group formInputField">
-									<input id="address1" name="address1"
-										class="form-control formInput" type="text"
-										placeholder='<spring:message code="label.address1.key"/>'>
-								</div>
-								<div class="form-group formInputField">
-									<input id="address2" name="address2"
-										class="form-control formInput" type="text"
-										placeholder='<spring:message code="label.address2.key"/>'>
-								</div>
-								<div class="form-group formInputField">
-									<input id="zipcode" name="zipcode"
-										class="form-control formInput" type="text"
-										placeholder='<spring:message code="label.zipcode.key"/>'>
-								</div>
-								<div class="form-group formInputField">
-									<input id="contactno" name="contactno"
-										class="form-control formInput" type="text"
-										placeholder='<spring:message code="label.companycontactno.key"/>'>
-								</div>
-								<button class="formButton" id="formSubmit" type="submit">
-									<spring:message code="label.done.key" />
-								</button>
-							</form>
+						<div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-company"></div>
+							<input class="float-left login-wrapper-txt" id="com-company" data-non-empty="true" name="company" placeholder='<spring:message code="label.company.key"/>'>
+						</div>
+						<div class="login-input-wrapper margin-0-auto clearfix pos-relative input-file-company">
+							<div class="float-left login-wrapper-icon icn-lname input-file-icn-left"></div>
+							<input type="file" class="float-left login-wrapper-txt txt-company-logo input-file-text" id="com-logo" data-non-empty="true" name="logo" placeholder='Logo'>
+                            <div class="float-right input-icon-internal icn-file" id="icn-file"></div>
+						</div>
+						<div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-address"></div>
+							<input class="float-left login-wrapper-txt" id="com-address1" data-non-empty="true" name="address1" placeholder='<spring:message code="label.address1.key"/>'>
+						</div>
+                        <div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-address"></div>
+							<input class="float-left login-wrapper-txt" id="com-address2" data-non-empty="true" name="address2" placeholder='<spring:message code="label.address2.key"/>'>
+						</div>
+                        <div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-zip"></div>
+							<input class="float-left login-wrapper-txt" id="com-zipcode" data-non-empty="true" name="zipcode" placeholder='<spring:message code="label.zipcode.key"/>'>
+						</div>
+                        <div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-contact"></div>
+							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
+						</div>
+						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reg-submit">
+                            <spring:message code="label.done.key" />
 						</div>
 					</div>
-				</div>
-				<div class="formModalFooter clearfix">
-					<div class="floatLeft formModalFooterContent">
-						<spring:message code="label.forgotpassword.key" />
-						?
+					<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
+				</form>
+				<div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
+					<div class="float-right">
+						<spring:message code="label.alreadyhaveanacoount.key" />?
+						<span class="cursor-pointer">
+							<a class="login-link" href="./login.do">
+								<strong><spring:message code="label.login.key" /></strong>
+							</a>
+						</span>
 					</div>
-					<div class="floatRight formModalFooterContent">
-						<span><spring:message code="label.alreadyhaveanacoount.key" />?</span>
-						<a href="#" class="loginLink"><spring:message
-								code="label.login.key" /></a>
-					</div>
 				</div>
-				<div class="formPageFooter"><spring:message code="label.copyright.key"/></div>
+				<div class="footer-copyright text-center">
+					<spring:message code="label.copyright.key" />
+					&copy;
+					<spring:message code="label.copyrightposttext.key" />
+				</div>
+                
 			</div>
 		</div>
 	</div>
+
+	<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+
+	<script>
+		$(document).ready(function() {
+			adjustOnResize();
+
+			$(window).resize(adjustOnResize);
+
+			function adjustOnResize() {
+				var winH = $(window).height();
+				var winH2 = winH / 2;
+				var conH2 = $('.login-row').height() / 2;
+				var offset = winH2 - conH2;
+				if (offset > 25) {
+					$('.login-row').css('margin-top', offset + 'px');
+				}
+			}
+            
+            $('#icn-file').click(function(){
+                $('#com-logo').trigger('click');
+            });
+			
+		});
+	</script>
+
 </body>
 </html>
