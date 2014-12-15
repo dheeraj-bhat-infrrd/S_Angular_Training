@@ -274,6 +274,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE);
 
+		LOG.debug("Adding a new branch");
+		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
+		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+
+		LOG.debug("Creating user profile for branch admin");
+		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
+				region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE);
+
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.PAYMENT_STAGE);
@@ -284,8 +292,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * Method to add a company.
 	 */
-	private void addCompanyAccountType(User user) {
+	private void addCompanyAccountType(User user) throws InvalidInputException {
 		LOG.debug("Method addCompany started for user : " + user.getLoginName());
+
+		LOG.debug("Adding a new region");
+		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+
+		LOG.debug("Creating user profile for region admin");
+		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
+				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Method addCompany finished.");
 	}
