@@ -135,7 +135,7 @@ input:-webkit-autofill {
 }
 
 .padding-001 {
-    padding: 0.1px;
+    padding: 1px;
 }
 
 .margin-top-25 {
@@ -208,4 +208,89 @@ input:-webkit-autofill {
 
 .pos-relative {
     position: relative;
+}
+
+.payment-option-tab {
+    width: 25%;
+    padding: 15px;
+    cursor: pointer;
+}
+
+.payment-tab-main {
+    background-color: #F9F9F9;
+    border-radius: 3px;
+    text-align: center;
+    border: 1px solid #cfcfcf;
+    padding-bottom: 30px;
+}
+
+.payment-tab-header {
+    line-height: 50px;
+    font-size: 18px;
+}
+
+.payment-tab-price {
+    color: #fff;
+    background-color: #5CC8EF;
+    line-height: 50px;
+    font-size: 22px;
+}
+
+.payment-tab-line1 {
+    font-size: 20px;
+    line-height: 36px;
+    color: #ADADAD;
+    font-family: 'OpenSansLight' !important;
+}
+
+.txt-thin {
+    font-size: 16px;
+    font-family: 'OpenSansLight' !important;
+}
+
+.payment-txt-price sup{
+    font-size: 14px;
+}
+.payment-tab-line2 {
+    color: #ADADAD;
+    line-height: 22px;
+    font-size: 14px;
+    font-family: 'OpenSansLight' !important;
+    padding: 0 5px;
+}
+
+.payment-tab-line1 strong{
+    color: #555;
+}
+.btn-payment-sel {
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'opensanslight' !important;
+    background-color: #5CC8EF;
+    font-size: 13px;
+    line-height: 36px;
+    text-align: center;
+    width: 80%;
+    margin: -18px auto 0;
+}
+
+.payment-details-wrapper {
+    padding: 25px;
+}
+
+.payment-dropin {
+    border-radius: 3px;
+    margin-bottom: 20px;
+}
+
+html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
+    border: 1px solid #cfcfcf;
+}
+
+.company-wrapper-min-height {
+    min-height: 875px;
+}
+
+.payment-method-options .button{
+    margin: 10px;
 }
