@@ -1,36 +1,28 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<!-- JIRA : SS-17 by RM-06
-	Invitation page to send user invite to register for the application 	
--->
 <!DOCTYPE">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><spring:message code="label.title.settings.key" /></title>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style.css">
-<link rel="stylesheet" 
-	href="${pageContext.request.contextPath}/resources/css/style-common.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
 	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
 		<div class="container login-container">
 			<div class="row login-row">
 				<div id="message-header"><jsp:include page="messageheader.jsp" /></div>
-				<form id="registration-form" method="POST" action="./register.do">
-					<div id="reg-form" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
+				<form id="company-info-form" method="POST" action="./addcompanyinformation.do">
+					<div id="company-info-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 						<div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 						<div class="login-txt text-center font-24 margin-bot-20">
-							<spring:message code="label.signuptostartsurvey.key" />
+							<spring:message code="label.companysettings.header.key"/>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-company"></div>
@@ -57,7 +49,7 @@
 							<div class="float-left login-wrapper-icon icn-contact"></div>
 							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
 						</div>
-						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reg-submit">
+						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="company-info-submit">
                             <spring:message code="label.done.key" />
 						</div>
 					</div>
@@ -102,9 +94,21 @@
 					$('.login-row').css('margin-top', offset + 'px');
 				}
 			}
+			
+			function submitCompanyInfoForm() {
+				console.log("submitting company information form");
+				$('#company-info-form').submit();
+			}
             
             $('#icn-file').click(function(){
                 $('#com-logo').trigger('click');
+            });
+            
+            $('#company-info-submit').click(function() {
+            	if (validateForm('company-info-div')) {
+            		/* ===== FORM VALIDATED ===== */
+					submitCompanyInfoForm();
+				}
             });
 			
 		});

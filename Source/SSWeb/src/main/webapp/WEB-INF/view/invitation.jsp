@@ -52,7 +52,7 @@
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
 							<input class="float-left login-wrapper-txt" id="inv-email"
-								data-non-empty="true" name="emailId"
+								data-non-empty="true" data-email = "true" name="emailId"
 								placeholder='<spring:message code="label.emailid.key"/>'>
 						</div>
 						<!-- <div class="login-input-wrapper margin-0-auto clearfix"></div> -->
@@ -71,12 +71,6 @@
 				</form>
 				<div
 					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
-<!--
-					<div class="float-left cursor-pointer">
-						<spring:message code="label.forgotpassword.key" />
-						?
-					</div>
--->
 					<div class="float-right">
 						<spring:message code="label.alreadyhaveanacoount.key" />
 						  ? 

@@ -48,40 +48,26 @@
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
-							<input class="float-left login-wrapper-txt" id="reg-email"
-								readonly="readonly" data-non-empty="true" name="emailid"
-								value="${emailid}"
-								placeholder='<spring:message code="label.emailid.key" />'>
+							<input class="float-left login-wrapper-txt" id="reg-email" readonly="readonly" data-non-empty="true" name="emailid"
+								value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-password"></div>
 							<input type="password" class="float-left login-wrapper-txt"
-								id="reg-pwd" data-non-empty="true" name="password"
-								placeholder='<spring:message code="label.password.key" />'>
+								id="reg-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
 						</div>
                             <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-confirm-password"></div>
-							<input type="password" class="float-left login-wrapper-txt"
-								id="reg-conf-pwd" data-non-empty="true" name="confirmpassword"
+							<input type="password" class="float-left login-wrapper-txt" id="reg-conf-pwd" data-non-empty="true" name="confirmpassword"
 								placeholder='<spring:message code="label.confirmpassword.key" />'>
 						</div>
-						<div
-							class="btn-submit margin-0-auto cursor-pointer font-18 text-center"
-							id="reg-submit">
+						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reg-submit">
 							<spring:message code="label.submit.key" />
 						</div>
 					</div>
 					<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
 				</form>
-				<div
-					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
-<!--
-					<div class="float-left cursor-pointer">
-						<a href="./forgotPassword.do">
-							<spring:message code="label.forgotpassword.key" />?
-						</a>
-					</div>
--->
+				<div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
 					<div class="float-right">
 						<spring:message code="label.alreadyhaveanacoount.key" />?
 						<span class="cursor-pointer">
@@ -100,10 +86,8 @@
 		</div>
 	</div>
 
-	<script
-		src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+	<script	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+	<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 
 	<script>
@@ -129,6 +113,17 @@
 
 			$('#reg-submit').click(function(e) {
 				if (validateForm('reg-form')) {
+					
+					/* === Validate passwords === */
+					if($('#reg-pwd').val() != $('#reg-conf-pwd').val()) {
+						$('#reg-pwd').parent().addClass('input-error');
+						$('#reg-conf-pwd').parent().addClass('input-error');
+						return false;
+					}else {
+						$('#reg-pwd').parent().removeClass('input-error');
+						$('#reg-conf-pwd').parent().removeClass('input-error');
+					}
+					
 					/* ===== FORM VALIDATED ===== */
 					submitRegistrationForm();
 				}
