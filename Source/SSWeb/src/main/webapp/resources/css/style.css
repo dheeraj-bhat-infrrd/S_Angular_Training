@@ -230,3 +230,30 @@
 .forgot-pwd-mobile a{
     color: #fff;
 }
+.input-icon-internal {
+    height: 46px;
+    width: 46px;
+    margin: 1px 1px 0 0;
+    border-radius: 2px;
+    position: relative;
+    background: url(../images/btn.png) no-repeat center;
+}
+
+.input-file-company {
+    overflow: hidden;
+}
+
+.input-file-icn-left {
+    z-index: 99999;
+    position: relative;
+    background-color: #fff !important;
+}
+
+.input-file-text {
+    position: absolute;
+    left: -48px;
+    outline: none;
+    height: auto !important;
+    top: 14px;
+    width: 411px !important;
+}
