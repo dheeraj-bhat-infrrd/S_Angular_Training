@@ -1,9 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<!-- JIRA : SS-17 by RM-06
-	Invitation page to send user invite to register for the application 	
--->
 <!DOCTYPE">
 <html>
 <head>
@@ -26,14 +23,14 @@
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.logintodosurvey.key"/> </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
-	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" placeholder="User ID">
+	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" placeholder='<spring:message code="label.username.key"/>'>
 	                    </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
-	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder="Password">
+	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key"/>'>
 	                    </div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit"><spring:message code="label.login.button.key"/></div>
-                        <div id="" class="error-msg hide"></div>
+                        <div id="message-header" class="error-msg"><jsp:include page="messageheader.jsp"/></div>
 	                    <div class="hide forgot-pwd-mobile"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
 	                </div>
                	 </form>
