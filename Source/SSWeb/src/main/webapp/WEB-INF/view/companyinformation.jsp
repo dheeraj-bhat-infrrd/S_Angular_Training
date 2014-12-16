@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
 		<div class="container login-container">
 			<div class="row login-row">
@@ -24,8 +25,21 @@
 						<div class="login-txt text-center font-24 margin-bot-20">
 							<spring:message code="label.companysettings.header.key"/>
 						</div>
-                        <div class="validation-msg-wrapper">
+                        <div id="serverSideerror" class="validation-msg-wrapper" >
                             <!--Use this container to input all the messages from JS and server-->
+                        </div>
+                        <div id="jsError" class="validation-msg-wrapper hide">
+                            <!--Use this container to input all the messages from JS and server-->
+                            <div class="error-wrapper clearfix">
+                                <div class="float-left msg-err-icn jsErrIcn"></div>
+                                <div class="float-left msg-err-txt-area">
+                                    <div class="err-msg-area">
+                                        <div class="err-msg-con">
+                                            <p id="jsErrTxt"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-company"></div>

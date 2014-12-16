@@ -8,9 +8,12 @@ function validateForm(id) {
 		if ($(this).data('non-empty') == true) {
 			if ($(this).val() == "") {
 				$(this).parent().addClass('input-error');
+                $('#jsError').show();
+                $('#jsErrTxt').html('Please enter the required fields.')
 				validate = false;
 			} else {
 				$(this).parent().removeClass('input-error');
+                $('#jsError').hide();
 			}
 		}
 
@@ -48,4 +51,12 @@ function validateForm(id) {
 		/* Form validated. */
 		return true;
 	}
+}
+
+function showOverlay(){
+    $('.overlay-loader').show();
+}
+
+function hideOverlay(){
+    $('.overlay-loader').hide();
 }
