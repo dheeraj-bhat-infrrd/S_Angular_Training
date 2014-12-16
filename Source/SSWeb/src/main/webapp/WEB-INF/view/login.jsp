@@ -21,6 +21,9 @@
 	                <div id="login-form" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.logintodosurvey.key"/> </div>
+                        <div class="validation-msg-wrapper">
+                            <!--Use this container to input all the messages from JS and server-->
+                        </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
 	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" placeholder='<spring:message code="label.username.key"/>'>
