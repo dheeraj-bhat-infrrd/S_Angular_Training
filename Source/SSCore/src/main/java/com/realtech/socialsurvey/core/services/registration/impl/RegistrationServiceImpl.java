@@ -129,7 +129,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
 
 		LOG.debug("Creating new user with emailId : " + emailId);
-		User user = createUser(company, username, encryptedPassword, emailId);
+		String displayName = getDisplayName(firstName, lastName);
+		User user = createUser(company, username, encryptedPassword, emailId, displayName);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
 		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
@@ -275,13 +276,14 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * @param emailId
 	 * @return
 	 */
-	private User createUser(Company company, String username, String password, String emailId) {
+	private User createUser(Company company, String username, String password, String emailId, String displayName) {
 		LOG.info("Method createUser called for username : " + username + " and email-id : " + emailId);
 		User user = new User();
 		user.setCompany(company);
 		user.setLoginName(username);
 		user.setLoginPassword(password);
 		user.setEmailId(emailId);
+		user.setDisplayName(displayName);
 		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
 		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_INACTIVE);
 		user.setStatus(CommonConstants.STATUS_ACTIVE);
@@ -423,5 +425,25 @@ public class RegistrationServiceImpl implements RegistrationService {
 			LOG.warn("No profile found for updating profile completion stage");
 		}
 		LOG.info("Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage);
+	}
+
+	/**
+	 * Method to get display name from first and last names
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @return
+	 */
+	private String getDisplayName(String firstName, String lastName) {
+		LOG.debug("Getting display name for first name: " + firstName + " and last name : " + lastName);
+		String displayName = firstName;
+		/**
+		 * if address line 2 is present, append it to address1 else the complete address is address1
+		 */
+		if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
+			displayName = firstName + " " + lastName;
+		}
+		LOG.debug("Returning display name" + displayName);
+		return displayName;
 	}
 }

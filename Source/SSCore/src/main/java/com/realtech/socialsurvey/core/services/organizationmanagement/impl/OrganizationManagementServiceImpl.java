@@ -251,7 +251,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		 */
 		LOG.debug("Updating profile stage for company to payment stage");
 		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-				CommonConstants.PAYMENT_STAGE);
+				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.info("Method addIndividual finished.");
 	}
@@ -276,7 +276,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-				CommonConstants.PAYMENT_STAGE);
+				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.debug("Method addTeam finished.");
 	}
