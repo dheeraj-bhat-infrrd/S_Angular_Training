@@ -37,6 +37,9 @@
 						<div class="login-txt text-center font-24 margin-bot-20">
 							<spring:message code="label.signupstartjourney.key" />
 						</div>
+                        <div class="validation-msg-wrapper">
+                            <!--Use this container to input all the messages from JS and server-->
+                        </div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-fname"></div>
 							<input class="float-left login-wrapper-txt" id="inv-fname"
