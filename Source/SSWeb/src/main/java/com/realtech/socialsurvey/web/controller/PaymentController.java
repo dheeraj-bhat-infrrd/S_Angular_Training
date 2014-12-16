@@ -58,7 +58,6 @@ public class PaymentController {
 	public String paymentPage(Model model, HttpServletResponse response, HttpServletRequest request) {
 
 		LOG.info("Payment Step 1.");
-		gateway.initialise();
 		model.addAttribute("clienttoken", gateway.getClientToken());
 		return JspResolver.PAYMENT;
 	}
@@ -76,7 +75,6 @@ public class PaymentController {
 		LOG.info("Payment Step 2.");
 		try {
 			boolean status = false;
-			gateway.initialise();
 
 			String strAccountType = request.getParameter("accounttype");
 			// Get the nonce from the request

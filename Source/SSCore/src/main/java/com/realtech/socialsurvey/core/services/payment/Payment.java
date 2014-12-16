@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.payment;
 
 import com.braintreegateway.BraintreeGateway;
+import com.braintreegateway.Subscription;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -17,7 +18,7 @@ public interface Payment {
 	 * Method to initialise the gateway.
 	 * @return 
 	 */
-	public BraintreeGateway initialise();
+	public BraintreeGateway getGatewayInstance();
 	
 		
 	/**
@@ -44,5 +45,7 @@ public interface Payment {
 	 * @throws NonFatalException
 	 */
 	public boolean subscribe(User user,Company company, int planId, String nonce) throws NonFatalException;
+	
+	public boolean retryPaymentAndUpdateLicenseTable(Subscription subscription) throws InvalidInputException;
 		
 }

@@ -69,6 +69,7 @@ public interface CommonConstants {
 	public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
 	public static final String AUTO_PAYMENT_MODE = "A";
 	public static final int INITIAL_PAYMENT_RETRIES = 0;
+	public static final String PAYMENT_GATEWAY = "Braintree";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
