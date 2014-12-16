@@ -204,7 +204,7 @@
 }
 
 .login-main-wrapper {
-    min-height: 100% !important;
+    height: 100% !important;
     background: url('../images/bg.jpg') no-repeat;
 	background-size: cover;
 }
@@ -258,4 +258,6 @@
     top: 14px;
     width: 411px !important;
 }
+
+
 
