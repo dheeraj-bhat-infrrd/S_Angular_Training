@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div class="overlay-loader hide"></div>
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
@@ -21,9 +22,25 @@
 	                <div id="login-form" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.logintodosurvey.key"/> </div>
+                        <div id="serverSideerror" class="validation-msg-wrapper" >
+                            <!--Use this container to input all the messages from JS and server-->
+                        </div>
+                        <div id="jsError" class="validation-msg-wrapper hide">
+                            <!--Use this container to input all the messages from JS and server-->
+                            <div class="error-wrapper clearfix">
+                                <div class="float-left msg-err-icn jsErrIcn"></div>
+                                <div class="float-left msg-err-txt-area">
+                                    <div class="err-msg-area">
+                                        <div class="err-msg-con">
+                                            <p id="jsErrTxt"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
-	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" placeholder='<spring:message code="label.username.key"/>'>
+	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" data-errMsg="101" placeholder='<spring:message code="label.username.key"/>'>
 	                    </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
