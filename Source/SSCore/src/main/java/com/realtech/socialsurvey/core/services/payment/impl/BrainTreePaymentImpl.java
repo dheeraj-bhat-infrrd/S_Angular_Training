@@ -503,7 +503,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		LOG.info("BraintreePaymentImpl : afterPropertiesSet() : Executing method ");
 		if (gateway == null) {
-			if (sandboxMode == 1) {
+			if (sandboxMode == CommonConstants.SANDBOX_MODE_TRUE) {
 				LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey);
 				gateway = new BraintreeGateway(Environment.SANDBOX, merchantId, publicKey, privateKey);
 			}
