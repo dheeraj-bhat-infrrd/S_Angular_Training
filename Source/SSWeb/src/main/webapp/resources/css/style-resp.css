@@ -28,7 +28,7 @@
     .login-footer-wrapper,.footer-copyright{
         display: none;
     }
-    .registration-wrapper-min-height, .invitation-min-height, .login-wrapper-min-height{
+    .registration-wrapper-min-height, .invitation-min-height, .login-wrapper-min-height, .company-wrapper-min-height{
         min-height: 450px;
     }
     .login-row{
