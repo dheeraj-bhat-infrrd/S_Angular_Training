@@ -55,6 +55,7 @@ public interface CommonConstants {
 	public static final int PROCESS_NOT_STARTED = 0;
 	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
 	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
+	public static final int SANDBOX_MODE_TRUE=1;
 
 	/**
 	 * Hibernate entities and column name constants
