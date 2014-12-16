@@ -32,6 +32,7 @@ input:-webkit-autofill {
 
 .input-error{
     border: 1px solid red !important;
+    margin-top: -1px !important;
 }
 
 .box-border-box {
@@ -135,7 +136,7 @@ input:-webkit-autofill {
 }
 
 .padding-001 {
-    padding: 1px;
+    padding: 1px 0 1px 0;
 }
 
 .margin-top-25 {
@@ -334,4 +335,27 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
   display: table-cell; 
   vertical-align: middle; 
   text-align: center; 
+}
+
+.overlay-loader {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 999999999;
+    background: url(../images/loader.gif) no-repeat center;
+    background-color: rgba(255,255,255,0.7);
+}
+
+.btn-payment{
+    border-radius: 3px;
+    color: #fff;
+    background-color: #5CC8EF;
+    font-size: 13px;
+    line-height: 36px;
+    text-align: center;
+    width: 150px;
+    box-shadow: none;
+    border: 0;
 }
