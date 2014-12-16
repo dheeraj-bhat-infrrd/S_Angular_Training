@@ -5,16 +5,13 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -55,9 +52,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Autowired
 	private GenericDao<LicenseDetail, Long> licenceDetailDao;
 
-	@Resource
-	@Qualifier("userProfile")
-	private UserProfileDao userProfileDao;
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
@@ -254,22 +250,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
-		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+				region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
+
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
 
 		LOG.debug("Creating user profile for branch admin");
-		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
+		createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
-		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
+		createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		/**
@@ -298,9 +296,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
-		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+				region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
 
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
@@ -378,6 +377,29 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branch = branchDao.save(branch);
 		LOG.debug("Method addBranch finished.");
 		return branch;
+	}
+
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
+		UserProfile userProfile = new UserProfile();
+		userProfile.setAgentId(agentId);
+		userProfile.setBranchId(branchId);
+		userProfile.setCompany(company);
+		userProfile.setEmailId(emailId);
+		userProfile.setIsProfileComplete(isProfileComplete);
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
+		userProfile.setProfileCompletionStage(profileCompletionStage);
+		userProfile.setRegionId(regionId);
+		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+		userProfile.setUser(user);
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		userProfile.setCreatedOn(currentTimestamp);
+		userProfile.setModifiedOn(currentTimestamp);
+		userProfile.setCreatedBy(createdBy);
+		userProfile.setModifiedBy(modifiedBy);
+		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }
 
