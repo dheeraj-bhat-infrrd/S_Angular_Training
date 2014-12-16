@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 
 // JIRA SS-37 BY RM02 BOC
 
@@ -42,6 +43,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	@Qualifier("userProfile")
 	private UserProfileDao userProfileDao;
 
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
 	/**
 	 * Fetch list of branches in a company
 	 * 
@@ -52,7 +56,6 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	@Override
 	@Transactional
 	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException {
-
 		if (company == null) {
 			LOG.error("Company object passed can not be null");
 			throw new InvalidInputException("Invalid Company passed");
@@ -103,7 +106,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		if (branchId <= 0l) {
 			throw new InvalidInputException("BranchId is not set in updateRegionStatus");
 		}
-		
+
 		LOG.debug("Fetching the branch object by ID");
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		if (branch == null) {
@@ -199,7 +202,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		LOG.debug("Method isMaxBranchAdditionExceeded called for user : " + user.getUserId() + " and maxBranchesAllowed :" + maxBranchesAllowed);
 		boolean isMaxBranchAdditionExceededForTeam = false;
 		if (maxBranchesAllowed != CommonConstants.NO_LIMIT) {
-			int numberOfBranches = getBranchesCount(user.getCompany());
+			long numberOfBranches = getBranchesCount(user.getCompany());
 			if (numberOfBranches == maxBranchesAllowed) {
 				isMaxBranchAdditionExceededForTeam = true;
 			}
@@ -219,17 +222,17 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param company
 	 * @return
 	 */
-	private int getBranchesCount(Company company) {
+	private long getBranchesCount(Company company) {
 		LOG.debug("Getting branches count for : " + company);
 
 		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.COMPANY_NAME, company);
+		queries.put(CommonConstants.COMPANY, company);
 		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		long branchesCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
 
 		LOG.debug("Returning branches count for : " + company + " branches count is : " + branchesCount);
-		return 0;
+		return branchesCount;
 
 	}
 
@@ -317,6 +320,81 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Returning regions count for : " + company + " regions count is : " + regionsCount);
 		return regionsCount;
+	}
+
+	/**
+	 * Method to add a new branch from UI
+	 * 
+	 * @param user
+	 * @param regionId
+	 * @param branchName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in addNewBranch");
+		}
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null in addNewBranch");
+		}
+		LOG.info("Method add new branch called for regionId : " + regionId + " and branchName : " + branchName);
+		Region region = null;
+		LOG.debug("Fetching region for branch to be added");
+		/**
+		 * If region is selected by user, select it from db
+		 */
+		if (regionId > 0l) {
+			region = regionDao.findById(Region.class, regionId);
+		}
+		/**
+		 * else select the default region from db for that company
+		 */
+		else {
+			LOG.debug("Selecting the default region for company");
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.COMPANY, user.getCompany());
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
+			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
+			if (regions != null && !regions.isEmpty()) {
+				region = regions.get(0);
+			}
+		}
+		if (region == null) {
+			throw new InvalidInputException("No region is present in db for the company while adding branch");
+		}
+
+		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.STATUS_INACTIVE);
+		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
+		return branch;
+
+	}
+
+	/**
+	 * Method to add a new region
+	 * 
+	 * @param user
+	 * @param regionName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public Region addNewRegion(User user, String regionName) throws InvalidInputException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in addNewRegion");
+		}
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null in addNewRegion");
+		}
+		LOG.info("Method add new region called for regionName : " + regionName);
+
+		Region region = organizationManagementService.addRegion(user, CommonConstants.STATUS_INACTIVE, regionName);
+
+		LOG.info("Successfully completed method add new region for regionName : " + regionName);
+		return region;
 	}
 }
 // JIRA SS-37 BY RM02 EOC
