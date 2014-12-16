@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -56,9 +55,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Qualifier("userInvite")
 	private UserInviteDao userInviteDao;
 
-	@Resource
-	@Qualifier("userProfile")
-	private UserProfileDao userProfileDao;
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -132,7 +130,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		User user = createUser(company, username, encryptedPassword, emailId);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
-		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
 				CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 
@@ -423,5 +421,28 @@ public class RegistrationServiceImpl implements RegistrationService {
 			LOG.warn("No profile found for updating profile completion stage");
 		}
 		LOG.info("Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage);
+	}
+
+	private void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
+		UserProfile userProfile = new UserProfile();
+		userProfile.setAgentId(agentId);
+		userProfile.setBranchId(branchId);
+		userProfile.setCompany(company);
+		userProfile.setEmailId(emailId);
+		userProfile.setIsProfileComplete(isProfileComplete);
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
+		userProfile.setProfileCompletionStage(profileCompletionStage);
+		userProfile.setRegionId(regionId);
+		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+		userProfile.setUser(user);
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		userProfile.setCreatedOn(currentTimestamp);
+		userProfile.setModifiedOn(currentTimestamp);
+		userProfile.setCreatedBy(createdBy);
+		userProfile.setModifiedBy(modifiedBy);
+		userProfileDao.save(userProfile);
+		LOG.debug("Method createUserProfile() finished");
 	}
 }
