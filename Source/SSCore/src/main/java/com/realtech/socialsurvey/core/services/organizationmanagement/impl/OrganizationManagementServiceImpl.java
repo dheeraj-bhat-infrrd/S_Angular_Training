@@ -250,9 +250,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
-		createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		UserProfile userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
+
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Adding a new branch");
@@ -294,9 +296,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
-		createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		UserProfile userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
 
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
@@ -376,7 +379,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return branch;
 	}
 
-	private void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
 			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
@@ -395,8 +398,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		userProfile.setModifiedOn(currentTimestamp);
 		userProfile.setCreatedBy(createdBy);
 		userProfile.setModifiedBy(modifiedBy);
-		userProfileDao.save(userProfile);
 		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }
 

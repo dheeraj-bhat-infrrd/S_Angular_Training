@@ -130,9 +130,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 		User user = createUser(company, username, encryptedPassword, emailId);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
-		createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		UserProfile userProfile = createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
 				CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
 
 		LOG.debug("Invalidating registration link for emailId : " + emailId);
 		invalidateRegistrationInvite(emailId);
@@ -423,7 +424,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.info("Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage);
 	}
 
-	private void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
 			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
@@ -442,7 +443,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		userProfile.setModifiedOn(currentTimestamp);
 		userProfile.setCreatedBy(createdBy);
 		userProfile.setModifiedBy(modifiedBy);
-		userProfileDao.save(userProfile);
 		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }
