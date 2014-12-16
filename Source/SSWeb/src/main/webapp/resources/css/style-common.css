@@ -122,8 +122,13 @@ input:-webkit-autofill {
     border-radius: 3px;
     color: #fff;
     line-height: 50px;
-    background: url(../images/btn-submit.png) no-repeat center;
+/*    background: url(../images/btn-submit.png) no-repeat center;*/
+    background: #5CC7EF;
     background-size: 100% auto;
+}
+
+.btn-submit:hover{
+    background: #7AB400;
 }
 
 .font-18 {
@@ -289,7 +294,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .company-wrapper-min-height {
-    min-height: 875px;
+    min-height: 940px;
 }
 
 .payment-method-options .button{
@@ -358,4 +363,13 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     width: 150px;
     box-shadow: none;
     border: 0;
+}
+
+.validation-msg-wrapper {
+    margin-top: 25px;
+}
+
+.jsErrIcn{
+    background: url(../images/err.png) no-repeat center;
+    background-size: 32px;
 }
