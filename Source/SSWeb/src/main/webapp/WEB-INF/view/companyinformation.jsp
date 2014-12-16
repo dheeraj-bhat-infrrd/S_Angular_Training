@@ -30,7 +30,7 @@
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix pos-relative input-file-company">
 							<div class="float-left login-wrapper-icon icn-lname input-file-icn-left"></div>
-							<input type="file" class="float-left login-wrapper-txt txt-company-logo input-file-text" id="com-logo" data-non-empty="true" name="logo" placeholder='Logo'>
+							<input type="file" class="float-left login-wrapper-txt txt-company-logo input-file-text" id="com-logo" name="logo" placeholder='Logo'>
                             <div class="float-right input-icon-internal icn-file" id="icn-file"></div>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
@@ -39,15 +39,15 @@
 						</div>
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-address"></div>
-							<input class="float-left login-wrapper-txt" id="com-address2" data-non-empty="true" name="address2" placeholder='<spring:message code="label.address2.key"/>'>
+							<input class="float-left login-wrapper-txt" id="com-address2" name="address2" placeholder='<spring:message code="label.address2.key"/>'>
 						</div>
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-zip"></div>
-							<input class="float-left login-wrapper-txt" id="com-zipcode" data-non-empty="true" name="zipcode" placeholder='<spring:message code="label.zipcode.key"/>'>
+							<input class="float-left login-wrapper-txt" id="com-zipcode" data-non-empty="true" data-zipcode = "true" name="zipcode" placeholder='<spring:message code="label.zipcode.key"/>'>
 						</div>
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-contact"></div>
-							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
+							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" data-phone = "true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
 						</div>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="company-info-submit">
                             <spring:message code="label.done.key" />
