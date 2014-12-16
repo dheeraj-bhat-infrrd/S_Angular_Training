@@ -212,10 +212,10 @@ public class LoginController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.FORGOT_PASSWORD;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.FORGOT_PASSWORD;
 	}
 
 	/**
@@ -289,10 +289,10 @@ public class LoginController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.RESET_PASSWORD;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.LOGIN;
 	}
 
 	/**

@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
 import javax.servlet.ServletRequest;
+import javax.servlet.http.HttpServletRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -8,9 +11,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 
+/**
+ * Controller for testing jsp pages styles directly This is meant for UI testing
+ */
 @Controller
 public class TestController {
 
+	private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
+
+	@RequestMapping(value = "/testpage")
+	public String testpage(HttpServletRequest request) {
+		LOG.info("Method testpage called");
+		return "registration";
+	}
+	
 	@Autowired
 	private CaptchaValidation captchaValidation;
 
