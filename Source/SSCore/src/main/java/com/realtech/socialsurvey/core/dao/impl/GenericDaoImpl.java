@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -71,6 +72,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@SuppressWarnings("unchecked")
 	@Override
+	@Transactional
 	public List<T> findAll(Class<T> entityClass) {
 		try {
 			final Criteria crit = getSession().createCriteria(entityClass);

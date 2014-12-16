@@ -134,7 +134,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
 		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
-				CommonConstants.STATUS_INACTIVE);
+				CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 
 		LOG.debug("Invalidating registration link for emailId : " + emailId);
 		invalidateRegistrationInvite(emailId);

@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -35,7 +36,9 @@ public class HierarchyManagementController {
 	@Autowired
 	private MessageUtils messageUtils;
 	@Autowired
-	HierarchyManagementService hierarchyManagementService;
+	private HierarchyManagementService hierarchyManagementService;
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -184,7 +187,7 @@ public class HierarchyManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Error occurred while deactivating the region",e);
+				LOG.error("Error occurred while deactivating the region", e);
 				throw new InvalidInputException("Error occurred while deactivating the region", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Successfully deactivated the region " + regionId);
@@ -214,17 +217,17 @@ public class HierarchyManagementController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
-				
+
 				LOG.debug("Calling service to deactivate branch");
 				hierarchyManagementService.updateBranchStatus(user, branchId, CommonConstants.STATUS_INACTIVE);
 				LOG.debug("Successfully executed service to deactivate branch");
 			}
 			catch (NumberFormatException e) {
-				LOG.error("Number format exception occurred while parsing branch id",e);
+				LOG.error("Number format exception occurred while parsing branch id", e);
 				throw new InvalidInputException("Number format exception occurred while parsing branch id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Error occurred while deactivating the branch",e);
+				LOG.error("Error occurred while deactivating the branch", e);
 				throw new InvalidInputException("Error occurred while deactivating the branch", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Successfully deactived the branch " + branchId);
@@ -236,6 +239,129 @@ public class HierarchyManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to add a new region
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "addregion", method = RequestMethod.POST)
+	public String addRegion(Model model, HttpServletRequest request) {
+		LOG.info("Method to add a region called in controller");
+		try {
+			String regionName = request.getParameter("regionName");
+			String regionAddress1 = request.getParameter("regionAddress1");
+			String regionAddress2 = request.getParameter("regionAddress2");
+
+			if (regionName == null || regionName.isEmpty()) {
+				throw new InvalidInputException("Region name is invalid while adding region", DisplayMessageConstants.INVALID_REGION_NAME);
+			}
+			if (regionAddress1 == null || regionAddress2.isEmpty()) {
+				throw new InvalidInputException("Region address is invalid while adding region", DisplayMessageConstants.INVALID_REGION_ADDRESS);
+			}
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+			String address = getCompleteAddress(regionAddress1, regionAddress2);
+			// TODO store address in database
+
+			LOG.debug("Calling service to add a new region");
+			try {
+				hierarchyManagementService.addNewRegion(user, regionName);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException occured while adding new region.REason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Successfully comppleted method to add a region in controller");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to add a new branch
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "addbranch", method = RequestMethod.POST)
+	public String addBranch(Model model, HttpServletRequest request) {
+		LOG.info("Method to add a branch called in controller");
+		try {
+			String branchName = request.getParameter("branchName");
+			String branchAddress1 = request.getParameter("branchAddress1");
+			String branchAddress2 = request.getParameter("branchAddress2");
+			String strRegionId = request.getParameter("regionId");
+
+			if (branchName == null || branchName.isEmpty()) {
+				throw new InvalidInputException("Branch name is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
+			}
+			if (branchAddress1 == null || branchAddress1.isEmpty()) {
+				throw new InvalidInputException("Branch address is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_ADDRESS);
+			}
+			long regionId = 0l;
+			try {
+				/**
+				 * parse the regionId if a region is selected for the branch
+				 */
+				if (strRegionId != null && !strRegionId.isEmpty()) {
+					regionId = Long.parseLong(strRegionId);
+				}
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormatException while parsing regionId", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+			String address = getCompleteAddress(branchAddress1, branchAddress2);
+			// TODO store address in database
+
+			try {
+				LOG.debug("Calling service to add a new branch");
+				hierarchyManagementService.addNewBranch(user, regionId, branchName);
+				LOG.debug("Successfully executed service to add a new branch");
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException occured while adding new branch.REason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Successfully comppleted controller to add a branch");
+		return JspResolver.MESSAGE_HEADER;
+
+	}
+
+	/**
+	 * Method to get complete address from address lines
+	 * 
+	 * @param address1
+	 * @param address2
+	 * @return
+	 */
+	private String getCompleteAddress(String address1, String address2) {
+		LOG.debug("Getting complete address for address1 : " + address1 + " and address2 : " + address2);
+		String address = address1;
+		/**
+		 * if address line 2 is present, append it to address1 else the complete address is address1
+		 */
+		if (address1 != null && !address1.isEmpty() && address2 != null && !address2.isEmpty()) {
+			address = address1 + " " + address2;
+		}
+		LOG.debug("Returning complete address" + address);
+		return address;
 	}
 }
 // JIRA SS-37 BY RM02 EOC

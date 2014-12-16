@@ -25,7 +25,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	 * To add a new user profile into the USER_ROFILE table
 	 */
 	@Override
-	public void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,String profileCompletionStage,int isProfileComplete) {
+	public void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(agentId);
@@ -41,8 +42,8 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 		userProfile.setCreatedOn(currentTimestamp);
 		userProfile.setModifiedOn(currentTimestamp);
-		userProfile.setCreatedBy(String.valueOf(user.getUserId()));
-		userProfile.setModifiedBy(String.valueOf(user.getUserId()));
+		userProfile.setCreatedBy(createdBy);
+		userProfile.setModifiedBy(modifiedBy);
 		save(userProfile);
 		LOG.info("Method createUserProfile() finished");
 	}

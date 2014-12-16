@@ -3,13 +3,18 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -18,6 +23,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 /**
  * JIRA:SS-34 BY RM02 Implementation for User management services
  */
+@DependsOn("generic")
 @Component
 public class UserManagementServiceImpl implements UserManagementService, InitializingBean {
 
@@ -27,11 +33,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
+	@Autowired
+	private GenericDao<User, Long> userDao;
+
+	@Resource
+	@Qualifier("userProfile")
+	private UserProfileDao userProfileDao;
+
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
 	 * pre-populated with afterPropertiesSet method
 	 */
 	@Override
+	@Transactional
 	public ProfilesMaster getProfilesMasterById(int profileId) throws InvalidInputException {
 		LOG.info("Method getProfilesMasterById called for profileId : " + profileId);
 		if (profileId <= 0) {
@@ -75,7 +89,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("afterPropertiesSet for UserManagementServiceImpl completed");
 	}
-	
+
+	/**
+	 * Method to create profile for a branch admin
+	 */
 	@Override
 	@Transactional
 	public User createBranchAdmin(User assigneeUser, long branchId, long userId) throws InvalidInputException {
@@ -89,11 +106,27 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("User id is invalid in createBranchAdmin");
 		}
 		LOG.info("Method to createBranchAdmin called for branchId : " + branchId + " and userId : " + userId);
-		//userProfileDao.createUserProfile(userInSession, userInSession.getCompany(), emailId, agentId, branchId, regionId, profileMasterId, profileCompletionStage, isProfileComplete);
 
-		return null;
+		LOG.debug("Selecting user for the userId provided for branch admin : " + userId);
+		User user = userDao.findById(User.class, userId);
+		if (user == null) {
+			throw new InvalidInputException("No user found for userId specified in createBranchAdmin");
+		}
+		/**
+		 * created and modified by are of the logged in user, rest user attributes come from
+		 */
+		userProfileDao.createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
+				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE,
+				CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+
+		LOG.info("Method to createBranchAdmin finished for branchId : " + branchId + " and userId : " + userId);
+
+		return user;
 	}
 
+	/**
+	 * Method to create profile for a region admin
+	 */
 	@Override
 	public User createRegionAdmin(User assigneeUser, long regionId, long userId) throws InvalidInputException {
 		if (assigneeUser == null) {
@@ -105,7 +138,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (userId <= 0l) {
 			throw new InvalidInputException("User id is invalid in createRegionAdmin");
 		}
-		return null;
-	}
+		LOG.info("Method to createRegionAdmin called for regionId : " + regionId + " and userId : " + userId);
 
+		LOG.debug("Selecting user for the userId provided for region admin : " + userId);
+		User user = userDao.findById(User.class, userId);
+		if (user == null) {
+			throw new InvalidInputException("No user found for userId specified in createRegionAdmin");
+		}
+		userProfileDao.createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
+				CommonConstants.DEFAULT_BRANCH_ID, regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE,
+				CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+
+		LOG.info("Method to createRegionAdmin finished for regionId : " + regionId + " and userId : " + userId);
+
+		return user;
+	}
 }

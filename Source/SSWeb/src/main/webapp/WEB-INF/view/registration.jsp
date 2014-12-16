@@ -107,11 +107,6 @@
 										placeholder='<spring:message code = "label.emailid.key" />'>
 								</div>
 								<div class="form-group formInputField">
-									<input id="userId" name="username"
-										class="form-control formInput" type="text"
-										placeholder='<spring:message code = "label.username.key" />'>
-								</div>
-								<div class="form-group formInputField">
 									<input id="password" name="password"
 										class="form-control formInput" type="password"
 										placeholder='<spring:message code = "label.password.key" />'>

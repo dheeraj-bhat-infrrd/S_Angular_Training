@@ -134,7 +134,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	// JIRA: SS-28: By RM05: EOC
 
 	/**
-	 * Fetch the account type master id passing 
+	 * Fetch the account type master id passing
+	 * 
 	 * @author RM-06
 	 * @param company
 	 * @return account master id
@@ -255,7 +256,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE);
+				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Adding a new branch");
@@ -264,13 +265,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Creating user profile for branch admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE);
+				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE);
+				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		/**
 		 * For an individual, only the company admin's profile completion stage is updated, all the
 		 * other profiles created by default need no action so their profile completion stage is
@@ -299,7 +300,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Creating user profile for region admin");
 		userProfileDao.createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE);
+				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
@@ -334,7 +335,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param regionName
 	 * @return
 	 */
-	private Region addRegion(User user, int isDefaultBySystem, String regionName) {
+	@Override
+	public Region addRegion(User user, int isDefaultBySystem, String regionName) {
 		LOG.debug("Method addRegion started for user : " + user.getLoginName() + " isDefaultBySystem : " + isDefaultBySystem + " regionName :"
 				+ regionName);
 		Region region = new Region();
@@ -360,7 +362,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param isDefaultBySystem
 	 * @return
 	 */
-	private Branch addBranch(User user, Region region, String branchName, int isDefaultBySystem) {
+	@Override
+	public Branch addBranch(User user, Region region, String branchName, int isDefaultBySystem) {
 		LOG.debug("Method addBranch started for user : " + user.getLoginName());
 		Branch branch = new Branch();
 		branch.setCompany(user.getCompany());
