@@ -114,9 +114,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * created and modified by are of the logged in user, rest user attributes come from
 		 */
-		createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
+		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+		userProfileDao.save(userProfile);
 
 		LOG.info("Method to createBranchAdmin finished for branchId : " + branchId + " and userId : " + userId);
 
@@ -144,16 +145,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user found for userId specified in createRegionAdmin");
 		}
-		createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+		userProfileDao.save(userProfile);
 
+		
 		LOG.info("Method to createRegionAdmin finished for regionId : " + regionId + " and userId : " + userId);
 
 		return user;
 	}
 
-	private void createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
 			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
@@ -172,7 +175,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		userProfile.setModifiedOn(currentTimestamp);
 		userProfile.setCreatedBy(createdBy);
 		userProfile.setModifiedBy(modifiedBy);
-		userProfileDao.save(userProfile);
 		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }
