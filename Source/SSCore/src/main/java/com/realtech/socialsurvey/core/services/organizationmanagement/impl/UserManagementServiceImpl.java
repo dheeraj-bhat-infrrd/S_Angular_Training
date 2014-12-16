@@ -115,7 +115,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		 * created and modified by are of the logged in user, rest user attributes come from
 		 */
 		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
-				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE,
+				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
 		userProfileDao.save(userProfile);
 
@@ -146,7 +146,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("No user found for userId specified in createRegionAdmin");
 		}
 		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
-				regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE, CommonConstants.STATUS_ACTIVE,
+				regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
 		userProfileDao.save(userProfile);
 

@@ -71,7 +71,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
 
 	@Autowired
-	private UserManagementService userManagementServices;
+	private UserManagementService userManagementService;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -127,8 +127,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
 
 		LOG.debug("Creating new user with emailId : " + emailId);
-		User user = createUser(company, username, encryptedPassword, emailId);
-
+		String displayName = getDisplayName(firstName, lastName);
+		User user = createUser(company, username, encryptedPassword, emailId, displayName);
+		userDao.save(user);
+		
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
 		UserProfile userProfile = createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
@@ -274,13 +276,14 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * @param emailId
 	 * @return
 	 */
-	private User createUser(Company company, String username, String password, String emailId) {
-		LOG.info("Method createUser called for username : " + username + " and email-id : " + emailId);
+	private User createUser(Company company, String username, String password, String emailId, String displayName) {
+		LOG.debug("Method createUser called for username : " + username + " and email-id : " + emailId);
 		User user = new User();
 		user.setCompany(company);
 		user.setLoginName(username);
 		user.setLoginPassword(password);
 		user.setEmailId(emailId);
+		user.setDisplayName(displayName);
 		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
 		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_INACTIVE);
 		user.setStatus(CommonConstants.STATUS_ACTIVE);
@@ -289,9 +292,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
 		user.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
-
-		user = userDao.save(user);
-		LOG.info("Method createUser finished for username : " + username);
+		LOG.debug("Method createUser finished for username : " + username);
 		return user;
 	}
 
@@ -407,7 +408,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 				+ profileMasterId + " and userId : " + user.getUserId());
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.USER_COLUMN, user);
-		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementServices.getProfilesMasterById(profileMasterId));
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(profileMasterId));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 
 		if (userProfiles != null && !userProfiles.isEmpty()) {
@@ -424,6 +425,26 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.info("Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage);
 	}
 
+	/**
+	 * Method to get display name from first and last names
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @return
+	 */
+	private String getDisplayName(String firstName, String lastName) {
+		LOG.debug("Getting display name for first name: " + firstName + " and last name : " + lastName);
+		String displayName = firstName;
+		/**
+		 * if address line 2 is present, append it to address1 else the complete address is address1
+		 */
+		if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
+			displayName = firstName + " " + lastName;
+		}
+		LOG.debug("Returning display name" + displayName);
+		return displayName;
+	}
+	
 	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
 			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());

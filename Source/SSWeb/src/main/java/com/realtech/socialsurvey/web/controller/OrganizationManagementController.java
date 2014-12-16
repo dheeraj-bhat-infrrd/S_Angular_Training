@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -45,7 +44,7 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
-	
+
 	@Autowired
 	private Payment gateway;
 
@@ -91,7 +90,7 @@ public class OrganizationManagementController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.COMPANY_INFORMATION;
 		}
 		LOG.info("Method addCompanyInformation of UserManagementController completed successfully");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
@@ -167,22 +166,9 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
-			LOG.debug("Calling sevices for adding account type of company");
-			AccountType accountType = null;
-			try {
-				accountType = organizationManagementService.addAccountTypeForCompanyAndUpdateStage(user, strAccountType);
-				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR);
-			}
 			
 			gateway.initialise();
-			model.addAttribute("accounttype", accountType.getValue());
+			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));

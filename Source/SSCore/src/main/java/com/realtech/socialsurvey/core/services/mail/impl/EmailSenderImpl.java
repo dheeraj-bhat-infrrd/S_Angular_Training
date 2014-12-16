@@ -52,10 +52,6 @@ public final class EmailSenderImpl implements EmailSender {
 			LOG.error("Email entity is null for sending mail");
 			throw new InvalidInputException("Email entity is null for sending mail");
 		}
-		if (smtpSettings == null) {
-			LOG.error("Smtp settings is null for sending mail");
-			throw new InvalidInputException("Smtp settings is null for sending mail");
-		}
 		LOG.info("Method sendMail called with smtpSettings : " + smtpSettings + " and emailEntity : " + emailEntity);
 
 		int port = smtpSettings.getMailPort();
