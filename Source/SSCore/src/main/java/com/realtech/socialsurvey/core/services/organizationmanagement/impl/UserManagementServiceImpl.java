@@ -1,22 +1,22 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
@@ -36,9 +36,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Autowired
 	private GenericDao<User, Long> userDao;
 
-	@Resource
-	@Qualifier("userProfile")
-	private UserProfileDao userProfileDao;
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -115,9 +114,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * created and modified by are of the logged in user, rest user attributes come from
 		 */
-		userProfileDao.createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
+		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+		userProfileDao.save(userProfile);
 
 		LOG.info("Method to createBranchAdmin finished for branchId : " + branchId + " and userId : " + userId);
 
@@ -145,12 +145,37 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user found for userId specified in createRegionAdmin");
 		}
-		userProfileDao.createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+				regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.LOGIN_STAGE, CommonConstants.STATUS_ACTIVE,
+				String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+		userProfileDao.save(userProfile);
 
+		
 		LOG.info("Method to createRegionAdmin finished for regionId : " + regionId + " and userId : " + userId);
 
 		return user;
+	}
+
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
+		UserProfile userProfile = new UserProfile();
+		userProfile.setAgentId(agentId);
+		userProfile.setBranchId(branchId);
+		userProfile.setCompany(company);
+		userProfile.setEmailId(emailId);
+		userProfile.setIsProfileComplete(isProfileComplete);
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
+		userProfile.setProfileCompletionStage(profileCompletionStage);
+		userProfile.setRegionId(regionId);
+		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+		userProfile.setUser(user);
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		userProfile.setCreatedOn(currentTimestamp);
+		userProfile.setModifiedOn(currentTimestamp);
+		userProfile.setCreatedBy(createdBy);
+		userProfile.setModifiedBy(modifiedBy);
+		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }

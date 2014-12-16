@@ -4,16 +4,13 @@ import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -38,10 +35,6 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
-
-	@Resource
-	@Qualifier("userProfile")
-	private UserProfileDao userProfileDao;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
