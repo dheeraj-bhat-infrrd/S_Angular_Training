@@ -23,4 +23,8 @@ public class Licenses {
 		this.license_disclaimer = license_disclaimer;
 	}
 
+	@Override
+	public String toString(){
+		return "authorized_in: "+authorized_in.toString()+"\t license_disclaimer: "+license_disclaimer;
+	}
 }

@@ -32,5 +32,10 @@ public class Association {
 	public void setLogo(String logo) {
 		this.logo = logo;
 	}
+	
+	@Override
+	public String toString(){
+		return "name: "+name+"\t info: "+info+"\t logo: "+logo;
+	}
 
 }

@@ -69,4 +69,10 @@ public class ContactDetailsSettings {
 		this.social_links = social_links;
 	}
 
+	@Override
+	public String toString() {
+		return "name: " + name + "\t address: " + address + "\t title: " + title + "\t mail_ids: " + mail_ids.toString() + "\t contact_numbers: "
+				+ contact_numbers.toString() + "\t social_links: " + social_links.toString();
+	}
+
 }

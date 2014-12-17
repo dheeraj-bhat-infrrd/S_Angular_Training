@@ -41,5 +41,10 @@ public class CRMInfo {
 	public void setConnection_successful(boolean connection_successful) {
 		this.connection_successful = connection_successful;
 	}
+	
+	@Override
+	public String toString(){
+		return "crm_source: "+crm_source+"\t crm_username: "+crm_username+"\t connection_successful: "+connection_successful;
+	}
 
 }

@@ -23,5 +23,10 @@ public class MiscValues {
 	public void setValue(String value) {
 		this.value = value;
 	}
+	
+	@Override
+	public String toString(){
+		return "key: "+key+"\t value: "+value;
+	}
 
 }

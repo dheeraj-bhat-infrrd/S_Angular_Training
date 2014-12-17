@@ -19,7 +19,8 @@
 
 	<bean id="mongoTemplate" class="org.springframework.data.mongodb.core.MongoTemplate">
 		<constructor-arg name="mongo" ref="mongo" />
-		<constructor-arg name="databaseName" value="demo" />
+		<constructor-arg name="databaseName" value="ss_db" />
+		<property name="writeResultChecking" value="LOG"/>
 	</bean> <!-- Factory bean that creates the Mongo instance -->
 
 	<bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">

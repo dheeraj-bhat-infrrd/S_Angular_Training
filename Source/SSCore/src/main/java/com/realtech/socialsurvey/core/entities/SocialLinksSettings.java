@@ -71,4 +71,10 @@ public class SocialLinksSettings {
 		this.others = others;
 	}
 
+	@Override
+	public String toString() {
+		return "facebook: " + facebook + "\t linkedin: " + linkedin + "\t googleplus: " + googleplus + "\t twitter: " + twitter + "\t yelp: " + yelp
+				+ "\t personal: " + personal.toString() + "\t others: " + others.toString();
+	}
+
 }
