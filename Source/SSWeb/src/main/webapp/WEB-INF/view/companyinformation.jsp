@@ -18,7 +18,6 @@
 	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
 		<div class="container login-container">
 			<div class="row login-row">
-				<div id="message-header"><jsp:include page="messageheader.jsp" /></div>
 				<form id="company-info-form" method="POST" action="./addcompanyinformation.do">
 					<div id="company-info-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 						<div class="logo login-logo margin-bottom-25 margin-top-25"></div>
@@ -26,10 +25,11 @@
 							<spring:message code="label.companysettings.header.key"/>
 						</div>
                         <div id="serverSideerror" class="validation-msg-wrapper" >
-                            <!--Use this container to input all the messages from JS and server-->
+                            <!--Use this container to input all the messages from server-->
+                            <jsp:include page="messageheader.jsp"/>
                         </div>
                         <div id="jsError" class="validation-msg-wrapper hide">
-                            <!--Use this container to input all the messages from JS and server-->
+                            <!--Use this container to input all the messages from JS-->
                             <div class="error-wrapper clearfix">
                                 <div class="float-left msg-err-icn jsErrIcn"></div>
                                 <div class="float-left msg-err-txt-area">

@@ -5,14 +5,17 @@ import net.tanesha.recaptcha.ReCaptcha;
 import net.tanesha.recaptcha.ReCaptchaResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import com.realtech.socialsurvey.core.entities.Captcha;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
+
 
 public class ReCaptchaValidationImpl implements CaptchaValidation {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CaptchaValidation.class);
 
+	@Autowired
 	ReCaptcha reCaptcha;
 
 	@Override
