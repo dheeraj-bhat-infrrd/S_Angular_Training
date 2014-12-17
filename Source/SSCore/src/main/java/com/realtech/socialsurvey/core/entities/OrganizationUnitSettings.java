@@ -10,7 +10,7 @@ public class OrganizationUnitSettings {
 
 	@Id
 	private String id;
-	private int iden;
+	private long iden;
 	private float profile_completion;
 	private String logo;
 	private ContactDetailsSettings contact_details;
@@ -28,11 +28,11 @@ public class OrganizationUnitSettings {
 		this.id = id;
 	}
 
-	public int getIden() {
+	public long getIden() {
 		return iden;
 	}
 
-	public void setIden(int iden) {
+	public void setIden(long iden) {
 		this.iden = iden;
 	}
 

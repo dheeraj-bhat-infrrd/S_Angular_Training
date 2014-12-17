@@ -4,7 +4,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,10 +11,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
@@ -35,7 +37,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
 
 	@Autowired
-	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -216,24 +218,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) {
 		LOG.debug("Method addOrganizationalDetails called.");
-		OrganizationLevelSetting organizationLevelSetting = new OrganizationLevelSetting();
-		organizationLevelSetting.setAgentId(CommonConstants.DEFAULT_AGENT_ID);
-		organizationLevelSetting.setBranchId(CommonConstants.DEFAULT_BRANCH_ID);
-		if (company != null)
-			organizationLevelSetting.setCompany(company);
-		organizationLevelSetting.setRegionId(CommonConstants.DEFAULT_REGION_ID);
-		organizationLevelSetting.setStatus(CommonConstants.STATUS_ACTIVE);
-		organizationLevelSetting.setCreatedBy(String.valueOf(user.getUserId()));
-		organizationLevelSetting.setModifiedBy(String.valueOf(user.getUserId()));
-		organizationLevelSetting.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-		organizationLevelSetting.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		if (organizationalDetails != null)
-			for (Entry<String, String> organizationalDetail : organizationalDetails.entrySet()) {
-				organizationLevelSetting.setSettingKey(organizationalDetail.getKey());
-				organizationLevelSetting.setSettingValue(organizationalDetail.getValue());
-				organizationLevelSettingDao.save(organizationLevelSetting);
-				organizationLevelSettingDao.flush();
-			}
+		// create a organization settings object
+		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
+		companySettings.setIden(company.getCompanyId());
+		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
+		contactDetailSettings.setName(company.getCompany());
+		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
+		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
+		companySettings.setContact_details(contactDetailSettings);
+		// insert the company settings
+		LOG.debug("Inserting company settings.");
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		
 		LOG.debug("Method addOrganizationalDetails finished");
 	}
 
