@@ -11,23 +11,14 @@ function validateForm(id) {
 	var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
 	
 	$('#' + id).find('input').each(function() {
-		if ($(this).data('non-empty') == true) {
-			if ($(this).val() == "") {
-				$(this).parent().addClass('input-error');
-                $('#jsError').show();
-                $('#jsErrTxt').html('Please enter the required fields.')
-				validate = false;
-			} else {
-				$(this).parent().removeClass('input-error');
-                $('#jsError').hide();
-			}
-		}
-
 		if ($(this).data('email') == true) {
 			if (emailRegex.test($(this).val()) == true) {
 				$(this).parent().removeClass('input-error');
+				 $('#jsError').hide();
 			}else {
 				validate = false;
+				$('#jsError').show();
+                $('#jsErrTxt').html('Please enter a valid emailId.');
 				$(this).parent().addClass('input-error');
 			}
 		}
@@ -35,8 +26,11 @@ function validateForm(id) {
 		if ($(this).data('zipcode') == true) {
 			if (zipcodeRegex.test($(this).val()) == true) {
 				$(this).parent().removeClass('input-error');
+				 $('#jsError').hide();
 			}else {
 				validate = false;
+				$('#jsError').show();
+                $('#jsErrTxt').html('Please enter a valid zipcode.');
 				$(this).parent().addClass('input-error');
 			}
 		}
@@ -44,9 +38,24 @@ function validateForm(id) {
 		if ($(this).data('phone') == true) {
 			if (phoneRegex.test($(this).val()) == true) {
 				$(this).parent().removeClass('input-error');
+				 $('#jsError').hide();
 			}else {
 				validate = false;
+				$('#jsError').show();
+                $('#jsErrTxt').html('Please enter a valid phone number.');
 				$(this).parent().addClass('input-error');
+			}
+		}
+		
+		if ($(this).data('non-empty') == true) {
+			if ($(this).val() == "") {
+				$(this).parent().addClass('input-error');
+                $('#jsError').show();
+                $('#jsErrTxt').html('Please enter the required fields.');
+				validate = false;
+			} else {
+				$(this).parent().removeClass('input-error');
+                $('#jsError').hide();
 			}
 		}
 	});
