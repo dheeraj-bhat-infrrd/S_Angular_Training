@@ -1,3 +1,4 @@
+/* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
     .login-main-wrapper{
         background: #fff;
@@ -72,6 +73,9 @@
         min-width: 50px;
         width: 15%;
     }
+    .hm-content-right{
+        border-left: 0;
+    }
 }
 
 
@@ -105,6 +109,9 @@
     .padding-right-25{
         padding-right: 25px;
     }
+    .header-links{
+        font-size: 16px;
+    }
 }
 
 
@@ -114,7 +121,66 @@
     .payment-option-tab{
         width: 50%;
     }
+    .header-logo{
+        width: 125px;
+    }
+    .header-links{
+        margin-left: 20px;
+    }
+    .header-links-item{
+        padding: 0 5px;
+        font-size: 13px;
+        line-height: 94px;
+    }
+    .user-info-seperator{
+        width: 25px;
+    }
+    .user-info-logo{
+        width: 125px;
+    }
+    .hm-content-right{
+        border-left: 0;
+    }
 }
+
+/* ============== MEDIUM SIZED SCREENS ==============*/
+@media (min-width: 992px) and (max-width: 1199px) {
+    .hm-item-row{
+        width: 100%
+    }
+    .hm-item-row-txt{
+        width: 280px;
+    }
+}
+
+/* ============== LARGE SIZED SCREENS ==============*/
+@media (min-width: 1200px) {
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
