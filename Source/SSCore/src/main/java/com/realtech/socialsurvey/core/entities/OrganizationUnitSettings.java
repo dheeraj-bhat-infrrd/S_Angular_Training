@@ -1,13 +1,16 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
+import org.springframework.data.annotation.Id;
 
 /**
  * Holds the company settings
  */
 public class OrganizationUnitSettings {
 
-	private int organization_id;
+	@Id
+	private int id;
+	private int iden;
 	private float profile_completion;
 	private String logo;
 	private ContactDetailsSettings contact_details;
@@ -17,12 +20,20 @@ public class OrganizationUnitSettings {
 	private List<Achievement> achievements;
 	private SurveySettings survey_setings;
 
-	public int getOrganization_id() {
-		return organization_id;
+	public int getId() {
+		return id;
 	}
 
-	public void setOrganization_id(int company_id) {
-		this.organization_id = company_id;
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getIden() {
+		return iden;
+	}
+
+	public void setIden(int iden) {
+		this.iden = iden;
 	}
 
 	public float getProfile_completion() {
