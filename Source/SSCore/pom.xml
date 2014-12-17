@@ -161,6 +161,13 @@
 			<version>${powermock.version}</version>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Spring-data mongodb dependency -->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-mongodb</artifactId>
+			<version>1.5.0.RELEASE</version>
+		</dependency>
 
 	</dependencies>
 
