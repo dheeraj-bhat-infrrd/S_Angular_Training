@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
-
-// JIRA: SS-15: By RM03
+//JIRA: SS-15: By RM03
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -77,7 +76,6 @@ public class PaymentController {
 		try {
 			boolean status = false;
 			gateway.initialise();
-
 			String strAccountType = request.getParameter("accounttype");
 			// Get the nonce from the request
 			String nonce = request.getParameter("payment_method_nonce");
@@ -138,6 +136,6 @@ public class PaymentController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.PAYMENT;
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.DASHBOARD;
 	}
 }

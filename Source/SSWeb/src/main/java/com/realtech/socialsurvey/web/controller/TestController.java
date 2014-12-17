@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -9,12 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
+import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -29,6 +32,9 @@ public class TestController {
 	private AuthenticationService authenticationService;
 	@Autowired
 	private MessageUtils messageUtils;
+	
+	@Autowired
+	private CaptchaValidation captchaValidation;
 
 	private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
@@ -37,7 +43,7 @@ public class TestController {
 		LOG.info("Method testpage called");
 		return "registration";
 	}
-
+	
 	@RequestMapping(value = "/jumptodashboard")
 	public String jumpToDashboard(Model model, HttpServletRequest req, HttpServletResponse response) {
 		LOG.info("Jumping to Dashboard with ");
@@ -62,4 +68,50 @@ public class TestController {
 		return JspResolver.DASHBOARD;
 	}
 
+	@RequestMapping("/test")
+	public String test() {
+
+		return "test";
+	}
+
+	@RequestMapping("/Invitation")
+	public String start() {
+
+		return "invitation";
+	}
+
+	@RequestMapping("/Register_User")
+	public String registerStepTwo() {
+
+		return "registerUser";
+	}
+
+	@RequestMapping("/Company_Info")
+	public String registerStepThree() {
+
+		return "companyInfo";
+	}
+
+	@RequestMapping("/form")
+	public String form() {
+
+		return "form";
+	}
+
+	@RequestMapping("/validat")
+	public String validate(@RequestParam("recaptcha_challenge_field") String challangeField,
+			@RequestParam("recaptcha_response_field") String responseField, ServletRequest servletRequest) {
+
+		String remoteAddress = servletRequest.getRemoteAddr();
+		
+		try {
+			captchaValidation.isCaptchaValid(remoteAddress, challangeField, responseField);
+		}
+		catch (InvalidInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		return "test";
+	}
 }
