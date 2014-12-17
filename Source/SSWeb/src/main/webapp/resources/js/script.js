@@ -1,3 +1,9 @@
+var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
+var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
+var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
+var is_safari = navigator.userAgent.indexOf("Safari") > -1;
+var is_Opera = navigator.userAgent.indexOf("Presto") > -1;
+
 function validateForm(id) {
 	var validate = true;
 	var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]\.[0-9]\.[0-9]\.[0-9]\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]+))$/;
@@ -59,4 +65,25 @@ function showOverlay(){
 
 function hideOverlay(){
     $('.overlay-loader').hide();
+}
+
+detectBrowser();
+
+function detectBrowser(){
+    if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
+        is_safari = true;
+        $('.input-file-text').css('left','-51px');
+    }else if(is_firefox){
+        $('.input-file-text').css('left','-44px');
+    }
+}
+
+function moveFileBtn(){
+    if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 101) + 'px')
+    }else if(is_firefox){
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
+    }else{
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
+    }
 }
