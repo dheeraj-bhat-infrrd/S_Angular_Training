@@ -13,4 +13,6 @@ public interface EmailServices {
 	// JIRA : SS-30 by RM-06
 	
 	public void sendResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendSubscriptionChargeUnsuccessfulEmail(String recipientMailId,String name,String retryDays) throws InvalidInputException, UndeliveredEmailException;
 }
