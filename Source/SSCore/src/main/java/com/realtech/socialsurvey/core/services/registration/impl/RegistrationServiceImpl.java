@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -31,8 +30,8 @@ import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -56,9 +55,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Qualifier("userInvite")
 	private UserInviteDao userInviteDao;
 
-	@Resource
-	@Qualifier("userProfile")
-	private UserProfileDao userProfileDao;
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -73,7 +71,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
 
 	@Autowired
-	private UserManagementService userManagementServices;
+	private UserManagementService userManagementService;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -131,11 +129,13 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.debug("Creating new user with emailId : " + emailId);
 		String displayName = getDisplayName(firstName, lastName);
 		User user = createUser(company, username, encryptedPassword, emailId, displayName);
-
+		userDao.save(user);
+		
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
-		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		UserProfile userProfile = createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
-				CommonConstants.STATUS_INACTIVE);
+				CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
 
 		LOG.debug("Invalidating registration link for emailId : " + emailId);
 		invalidateRegistrationInvite(emailId);
@@ -277,7 +277,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * @return
 	 */
 	private User createUser(Company company, String username, String password, String emailId, String displayName) {
-		LOG.info("Method createUser called for username : " + username + " and email-id : " + emailId);
+		LOG.debug("Method createUser called for username : " + username + " and email-id : " + emailId);
 		User user = new User();
 		user.setCompany(company);
 		user.setLoginName(username);
@@ -292,9 +292,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
 		user.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
-
-		user = userDao.save(user);
-		LOG.info("Method createUser finished for username : " + username);
+		LOG.debug("Method createUser finished for username : " + username);
 		return user;
 	}
 
@@ -410,7 +408,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 				+ profileMasterId + " and userId : " + user.getUserId());
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.USER_COLUMN, user);
-		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementServices.getProfilesMasterById(profileMasterId));
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(profileMasterId));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 
 		if (userProfiles != null && !userProfiles.isEmpty()) {
@@ -445,5 +443,28 @@ public class RegistrationServiceImpl implements RegistrationService {
 		}
 		LOG.debug("Returning display name" + displayName);
 		return displayName;
+	}
+	
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
+		UserProfile userProfile = new UserProfile();
+		userProfile.setAgentId(agentId);
+		userProfile.setBranchId(branchId);
+		userProfile.setCompany(company);
+		userProfile.setEmailId(emailId);
+		userProfile.setIsProfileComplete(isProfileComplete);
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
+		userProfile.setProfileCompletionStage(profileCompletionStage);
+		userProfile.setRegionId(regionId);
+		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+		userProfile.setUser(user);
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		userProfile.setCreatedOn(currentTimestamp);
+		userProfile.setModifiedOn(currentTimestamp);
+		userProfile.setCreatedBy(createdBy);
+		userProfile.setModifiedBy(modifiedBy);
+		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }

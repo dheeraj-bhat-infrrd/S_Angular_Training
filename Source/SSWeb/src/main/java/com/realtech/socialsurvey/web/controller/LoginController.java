@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -61,6 +62,7 @@ public class LoginController {
 		LOG.info("User login with user Id :" + loginName);
 		User user = null;
 		UserProfile userProfile = null;
+		HttpSession session = null;
 
 		try {
 			LOG.debug("Validation login form parameters");
@@ -88,7 +90,7 @@ public class LoginController {
 			// Authenticate user
 			try {
 				authenticationService.validateUser(user, password);
-				HttpSession session = request.getSession(true);
+				session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 			}
 			catch (InvalidInputException e) {
@@ -115,12 +117,16 @@ public class LoginController {
 					try {
 						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
 						// set model attribute to the value to which u need to redirect the url
+
 						model.addAttribute("redirectTo", userProfile.getProfileCompletionStage());
 					}
 					catch (InvalidInputException e) {
 						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
 					}
+					long accountTypeMasterId = organizationManagementService.fetchAccountTypeMasterIdForCompany(user.getCompany());
+					if (accountTypeMasterId != 0)
+						session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(accountTypeMasterId));
 				}
 			}
 			LOG.info("User login successful");
@@ -137,7 +143,7 @@ public class LoginController {
 	}
 
 	/**
-	 * Start the companyinformation page
+	 * Start the companyinformation page 
 	 * 
 	 * @return
 	 */
@@ -147,21 +153,21 @@ public class LoginController {
 	}
 
 	/**
-	 * Start the dashboard page
-	 */
-	@RequestMapping(value = "/dashboard")
-	public String initDashboardPage() {
-		LOG.info("Dashboard Page started");
-		return JspResolver.DASHBOARD;
-	}
-
-	/**
 	 * Start the add account type page
 	 */
 	@RequestMapping(value = "/addaccounttype")
 	public String initAddAccountTypePage() {
 		LOG.info("Add account type page started");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
+	}
+
+	/**
+	 * Start the dashboard page
+	 */
+	@RequestMapping(value = "/dashboard")
+	public String initDashboardPage() {
+		LOG.info("Dashboard Page started");
+		return JspResolver.DASHBOARD;
 	}
 
 	/**
@@ -201,6 +207,7 @@ public class LoginController {
 			}
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
