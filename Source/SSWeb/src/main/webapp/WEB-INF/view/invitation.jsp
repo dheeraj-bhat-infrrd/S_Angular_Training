@@ -9,24 +9,14 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <title><spring:message code="label.title.invitation.key" /></title>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-common.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
     <div class="overlay-loader hide"></div>
-	<div class="login-main-wrapper invitation-min-height padding-001 login-wrapper-min-height">
+	<div class="login-main-wrapper invitation-min-height padding-001">
 		<div class="container login-container">
 			<div class="row login-row">
 				<form id="invitation-form">
@@ -103,15 +93,10 @@
 		</div>
 	</div>
 
-	<script
-		src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+	<script	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+	<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-	<%-- <script type="text/javascript"
-	src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/captchaScript.js"></script> --%>
 
 	<script>
 		$(document).ready(function() {			
