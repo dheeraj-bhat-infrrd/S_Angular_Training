@@ -136,6 +136,6 @@ public class PaymentController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.PAYMENT;
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.DASHBOARD;
 	}
 }

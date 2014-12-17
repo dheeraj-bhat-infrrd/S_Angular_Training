@@ -23,10 +23,12 @@
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.logintodosurvey.key"/> </div>
                         <div id="serverSideerror" class="validation-msg-wrapper" >
-                            <!--Use this container to input all the messages from JS and server-->
+                            <!--Use this container to input all the messages from server-->
+                            <jsp:include page="messageheader.jsp"/>
                         </div>
                         <div id="jsError" class="validation-msg-wrapper hide">
-                            <!--Use this container to input all the messages from JS and server-->
+                            <!--Use this container to input all the messages from JS-->
+                            
                             <div class="error-wrapper clearfix">
                                 <div class="float-left msg-err-icn jsErrIcn"></div>
                                 <div class="float-left msg-err-txt-area">
@@ -87,7 +89,7 @@
             		$('#message-header').addClass("hide");
             	var payLoad = $("#frm-login").serialize();
             	var redirectTo = '';
-
+            	showOverlay();
             	$.ajax({
             		url : "./userlogin.do",
             		type : "POST",
@@ -102,6 +104,7 @@
 
             		},
             		complete : function(data) {
+            			hideOverlay();
             			if (success) {
             				console.log("Login Successful");
             				location.href = "./" + redirectTo;
