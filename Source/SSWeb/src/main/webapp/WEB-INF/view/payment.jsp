@@ -19,7 +19,7 @@
         <form id="checkout" method="POST" action="./subscribe.do">
             <div id="dropin" class="payment-dropin"></div>
             <input type="hidden" value="${accounttype}" name="accounttype">
-            <input type="submit" value='<spring:message code="label.makepayment.key" />'>
+            <input type="submit" class="btn-payment" value='<spring:message code="label.makepayment.key" />'>
         </form>
     </div>  
    

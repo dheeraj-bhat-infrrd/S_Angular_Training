@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>    
 <body>
+ <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
@@ -80,19 +81,23 @@
 			console.log("selecting and saving account type");
 			$('#account-type').val(accountType);
 			var url = "./addaccounttype.do";
+			
+			/* show the progress icon */
+	    	showOverlay();
 			callAjaxFormSubmit(url, selectAccountTypeCallBack,
 					"account-type-selection-form");
 		}
 	
 		function selectAccountTypeCallBack(data) {
 			console.log("callback for selectAccountType called");
+			
+			/* hide the progress icon */
+	    	hideOverlay();
 			$("#payment-section").html(data);
 			console.log("callback for selectAccountType finished");
 		}
-		
         $(document).ready(function(){
             adjustOnResize();
-            
             $(window).resize(adjustOnResize);
             $('.login-row').resize(adjustOnResize);
             
