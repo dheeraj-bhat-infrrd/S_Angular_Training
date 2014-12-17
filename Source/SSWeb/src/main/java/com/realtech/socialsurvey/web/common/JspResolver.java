@@ -17,4 +17,5 @@ public interface JspResolver {
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String PAYMENT = "payment";
 	public static final String DASHBOARD = "dashboard";
+	public static final String BUILD_HIERARCHY = "buildhierarchy";
 }

@@ -5,80 +5,77 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
 
-
 /**
  * The persistent class for the COMPANY database table.
- * 
  */
 @Entity
-@Table(name="COMPANY")
-@NamedQuery(name="Company.findAll", query="SELECT c FROM Company c")
+@Table(name = "COMPANY")
+@NamedQuery(name = "Company.findAll", query = "SELECT c FROM Company c")
 public class Company implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="COMPANY_ID")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "COMPANY_ID")
 	private long companyId;
 
-	@Column(name="COMPANY")
+	@Column(name = "COMPANY")
 	private String company;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="IS_REGISTRATION_COMPLETE")
+	@Column(name = "IS_REGISTRATION_COMPLETE")
 	private int isRegistrationComplete;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	@Column(name="REGISTRATION_STAGE")
+	@Column(name = "REGISTRATION_STAGE")
 	private String registrationStage;
 
-	@Column(name="STATUS")
+	@Column(name = "STATUS")
 	private int status;
 
-	//bi-directional many-to-one association to Branch
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to Branch
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<Branch> branches;
 
-	//bi-directional many-to-one association to LicenseDetail
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to LicenseDetail
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<LicenseDetail> licenseDetails;
 
-	//bi-directional many-to-one association to OrganizationLevelSetting
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to OrganizationLevelSetting
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<OrganizationLevelSetting> organizationLevelSettings;
 
-	//bi-directional many-to-one association to Region
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to Region
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<Region> regions;
 
-	//bi-directional many-to-one association to Survey
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to Survey
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<Survey> surveys;
 
-	//bi-directional many-to-one association to User
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to User
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<User> users;
 
-	//bi-directional many-to-one association to UserInvite
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to UserInvite
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<UserInvite> userInvites;
 
-	//bi-directional many-to-one association to UserProfile
-	@OneToMany(mappedBy="company", fetch = FetchType.LAZY)
+	// bi-directional many-to-one association to UserProfile
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
 
-	public Company() {
-	}
+	public Company() {}
 
 	public long getCompanyId() {
 		return this.companyId;
