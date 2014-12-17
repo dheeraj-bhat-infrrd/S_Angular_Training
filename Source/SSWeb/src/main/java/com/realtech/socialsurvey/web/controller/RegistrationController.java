@@ -43,8 +43,8 @@ public class RegistrationController {
 	private MessageUtils messageUtils;
 
 	@RequestMapping(value = "/invitation")
-	public String initRegisterPage() {
-		LOG.info("Registration Step 1");
+	public String initInvitationPage(Model model) {
+		LOG.info("Showing invitation page");
 		return JspResolver.INVITATION;
 	}
 
@@ -64,7 +64,6 @@ public class RegistrationController {
 		String lastName = request.getParameter("lastName");
 		String emailId = request.getParameter("emailId");
 
-		// validate request parameters from the form
 		try {
 			LOG.debug("Validating form elements");
 			validateFormParameters(firstName, lastName, emailId);
@@ -106,7 +105,7 @@ public class RegistrationController {
 
 	/**
 	 * JIRA:SS-26 BY RM02 Method to validate the url and present registration jsp with pre-populated
-	 * user details
+	 * user details when registration is done from invitation url
 	 * 
 	 * @param encryptedUrlParams
 	 * @param request
@@ -128,9 +127,10 @@ public class RegistrationController {
 			if (urlParams == null || urlParams.isEmpty()) {
 				throw new InvalidInputException("Url params are null or empty in showRegistrationPage");
 			}
-			model.addAttribute("firstname", urlParams.get("firstName"));
-			model.addAttribute("lastname", urlParams.get("lastName"));
-			model.addAttribute("emailid", urlParams.get("emailId"));
+			model.addAttribute("firstname", urlParams.get(CommonConstants.FIRST_NAME));
+			model.addAttribute("lastname", urlParams.get(CommonConstants.LAST_NAME));
+			model.addAttribute("emailid", urlParams.get(CommonConstants.EMAIL_ID));
+			model.addAttribute("isDirectRegistration", false);
 
 			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
 
@@ -140,6 +140,20 @@ public class RegistrationController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.LOGIN;
 		}
+		return JspResolver.REGISTRATION;
+	}
+
+	/**
+	 * Method to show the registration page directly
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/registration")
+	public String initDirectRegistration(Model model) {
+		LOG.info("Method called for showing up the direct registration page");
+		model.addAttribute("isDirectRegistration", true);
 		return JspResolver.REGISTRATION;
 	}
 
@@ -161,8 +175,14 @@ public class RegistrationController {
 		String originalEmailId = request.getParameter("originalemailid");
 		String password = request.getParameter("password");
 		String confirmPassword = request.getParameter("confirmpassword");
+		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
+
+			boolean isDirectRegistration = false;
+			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
+				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
+			}
 			/**
 			 * Validate the parameters obtained from registration form
 			 */
@@ -173,34 +193,14 @@ public class RegistrationController {
 			 * user else send a registration invite on the changed emailId
 			 */
 			try {
-				if (emailId.equals(originalEmailId)) {
-					LOG.debug("Registering user with emailId : " + emailId);
-					User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, originalEmailId, emailId, confirmPassword);
-					LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
+				LOG.debug("Registering user with emailId : " + emailId);
+				User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
-					LOG.debug("Adding newly registered user to session");
-					HttpSession session = request.getSession(true);
-					session.setAttribute(CommonConstants.USER_IN_SESSION, user);
-					LOG.debug("Successfully added registered user to session");
-
-				}
-				/**
-				 * Commenting the code as now emailId is non editable in registration
-				 */
-				/*
-				 * else { LOG.debug("Sending registration invite link on the new emailId : " +
-				 * emailId + " added by the user");
-				 * registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
-				 * model.addAttribute("message",
-				 * messageUtils.getDisplayMessage(DisplayMessageConstants
-				 * .REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-				 * LOG.debug("Registration invite link on the new emailId : " + emailId +
-				 * " sent successfully"); return JspResolver.MESSAGE_HEADER; }
-				 */
-
-				// Set the success message
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_REGISTRATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				LOG.debug("Adding newly registered user to session");
+				HttpSession session = request.getSession(true);
+				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+				LOG.debug("Successfully added registered user to session");
 
 			}
 			catch (InvalidInputException e) {
@@ -208,6 +208,9 @@ public class RegistrationController {
 			}
 			catch (UserAlreadyExistsException e) {
 				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.USERNAME_ALREADY_TAKEN, e);
+			}
+			catch (UndeliveredEmailException e) {
+				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
 		catch (NonFatalException e) {
@@ -223,6 +226,32 @@ public class RegistrationController {
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
+
+	}
+
+	/**
+	 * Method to verify an account
+	 * 
+	 * @param encryptedUrlParams
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/verification")
+	public String verifyAccount(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
+		LOG.info("Method to verify account called");
+		try {
+			registrationService.verifyAccount(encryptedUrlParams);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while verifying account. Reason : " + e.getMessage(), e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to verify account finished");
+		return JspResolver.MESSAGE_HEADER;
 
 	}
 

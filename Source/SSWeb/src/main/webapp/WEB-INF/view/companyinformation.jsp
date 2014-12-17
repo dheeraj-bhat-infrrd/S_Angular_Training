@@ -46,7 +46,7 @@
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix pos-relative input-file-company">
 							<div class="float-left login-wrapper-icon icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-							<input type="file" class="float-left login-wrapper-txt txt-company-logo input-file-text" id="com-logo" data-non-empty="true" name="logo" placeholder='Logo'>
+							<input type="file" class="float-left login-wrapper-txt txt-company-logo input-file-text" id="com-logo" name="logo" placeholder='Logo'>
                             <div class="float-right input-icon-internal icn-file" id="icn-file"></div>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
