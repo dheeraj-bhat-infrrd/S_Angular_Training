@@ -23,5 +23,10 @@ public class SurveySettings {
 	public void setShow_survey_above_score(float show_survey_above_score) {
 		this.show_survey_above_score = show_survey_above_score;
 	}
+	
+	@Override
+	public String toString(){
+		return "auto_post_score: "+auto_post_score+"\t show_survey_above_score: "+show_survey_above_score;
+	}
 
 }

@@ -23,4 +23,9 @@ public class AgentSettings extends OrganizationUnitSettings {
 		this.hobbies = hobbies;
 	}
 
+	@Override
+	public String toString() {
+		return super.toString() + "\t expertise: " + expertise.toString() + "\t hobbies: " + hobbies.toString();
+	}
+
 }

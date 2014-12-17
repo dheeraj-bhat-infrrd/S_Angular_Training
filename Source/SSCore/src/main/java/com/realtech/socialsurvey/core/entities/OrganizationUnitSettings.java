@@ -9,7 +9,7 @@ import org.springframework.data.annotation.Id;
 public class OrganizationUnitSettings {
 
 	@Id
-	private int id;
+	private String id;
 	private int iden;
 	private float profile_completion;
 	private String logo;
@@ -20,11 +20,11 @@ public class OrganizationUnitSettings {
 	private List<Achievement> achievements;
 	private SurveySettings survey_setings;
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 
@@ -98,6 +98,13 @@ public class OrganizationUnitSettings {
 
 	public void setSurvey_setings(SurveySettings survey_setings) {
 		this.survey_setings = survey_setings;
+	}
+
+	@Override
+	public String toString() {
+		return "iden: " + iden + "\t profile_completion: " + profile_completion + "\t logo: " + logo + "\t contact_details: "
+				+ contact_details.toString() + "\t crm_info: " + crm_info + "\t licenses: " + licenses.toString() + "\t associations: "
+				+ associations.toString() + "\t achievements: " + achievements.toString() + "\t survey_setings: " + survey_setings.toString();
 	}
 
 }
