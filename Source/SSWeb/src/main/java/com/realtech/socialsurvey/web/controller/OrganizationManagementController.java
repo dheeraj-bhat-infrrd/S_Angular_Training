@@ -167,7 +167,7 @@ public class OrganizationManagementController {
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
 			
-			gateway.initialise();
+			LOG.debug("Initialising payment gateway");
 			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
