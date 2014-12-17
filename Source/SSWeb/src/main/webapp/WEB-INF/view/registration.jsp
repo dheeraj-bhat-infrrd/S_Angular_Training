@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!-- JIRA : SS-17 by RM-06
 	Invitation page to send user invite to register for the application 	
 -->
@@ -10,16 +11,10 @@
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><spring:message code="label.title.registeruser.key" /></title>
-<script type="text/javascript"
-	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style.css">
-<link rel="stylesheet" 
-	href="${pageContext.request.contextPath}/resources/css/style-common.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
     <div class="overlay-loader hide"></div>
@@ -64,8 +59,16 @@
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
-							<input class="float-left login-wrapper-txt" id="reg-email" readonly="readonly" data-non-empty="true" name="emailid"
-								value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
+							<c:choose>
+								<c:when test="${not empty emailid}">
+								<input class="float-left login-wrapper-txt" id="reg-email" readonly="readonly" data-non-empty="true" name="emailid"
+									value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
+								</c:when>
+								<c:otherwise>
+									<input class="float-left login-wrapper-txt" id="reg-email" data-non-empty="true" name="emailid"
+									 placeholder='<spring:message code="label.emailid.key" />'>
+								</c:otherwise>
+							</c:choose>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-password"></div>
@@ -81,7 +84,8 @@
 							<spring:message code="label.submit.key" />
 						</div>
 					</div>
-					<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
+					<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid"/>
+					<input type="hidden" value = "${isDirectRegistration}" name="isDirectRegistration" id="isDirectRegistration"/>
 				</form>
 				<div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
 					<div class="float-right">
@@ -104,6 +108,7 @@
 
 	<script	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 	<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 
 	<script>
@@ -124,6 +129,7 @@
 
 			function submitRegistrationForm() {
 				console.log("submitting registration form");
+				showOverlay();
 				$('#registration-form').submit();
 			}
 
