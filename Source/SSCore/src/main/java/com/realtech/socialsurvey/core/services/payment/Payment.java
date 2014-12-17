@@ -1,11 +1,14 @@
 package com.realtech.socialsurvey.core.services.payment;
 
+import java.math.BigDecimal;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 /**
  * Handles the payment options for the application
@@ -46,6 +49,22 @@ public interface Payment {
 	 */
 	public boolean subscribe(User user,Company company, int planId, String nonce) throws NonFatalException;
 	
-	public boolean retryPaymentAndUpdateLicenseTable(Subscription subscription) throws InvalidInputException;
+	/**
+	 * Function to create a Braintree transaction with a particular payment method token and an amount
+	 * @param paymentMethodToken
+	 * @param amount
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public String makePayment(String paymentMethodToken, BigDecimal amount) throws InvalidInputException;
+	
+	/**
+	 * Updates the number of retries in the LicenseDetail table and sends a mail to the User.
+	 * @param subscription
+	 * @return boolean value
+	 * @throws UndeliveredEmailException 
+	 * @throws NoRecordsFetchedException 
+	 */
+	public void updateRetriesForPayment(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 		
 }

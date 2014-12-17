@@ -7,6 +7,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.braintreegateway.WebhookNotification;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -75,22 +79,33 @@ public class WebHookController {
 		try {
 
 			if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE) {
-				gateway.retryPaymentAndUpdateLicenseTable(webhookNotification.getSubscription());
+				gateway.updateRetriesForPayment(webhookNotification.getSubscription());
 			}
 
 		}
 		catch (InvalidInputException e) {
 
-			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInput Exception thrown : "
+			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInputException thrown : "
 					+ messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 
 		}
+		catch (UndeliveredEmailException e) {
+			LOG.error("WebHookController getSubscriptionNotifications() : UndeliveredEmailException thrown : "
+					+ messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : "
+					+ messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 
 		LOG.info("Subscription Notification handled!");
-		response.setStatus(200);
-		return ("");
+		return new ResponseEntity<String>("Notification recieved!", HttpStatus.OK);
 
 	}
 
