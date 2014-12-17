@@ -3,64 +3,96 @@ package com.realtech.socialsurvey.core.entities;
 import java.io.Serializable;
 import javax.persistence.*;
 import java.sql.Timestamp;
-
+import java.util.List;
 
 /**
  * The persistent class for the license_details database table.
- * 
  */
 @Entity
-@Table(name="LICENSE_DETAILS")
-@NamedQuery(name="LicenseDetail.findAll", query="SELECT l FROM LicenseDetail l")
+@Table(name = "LICENSE_DETAILS")
+@NamedQuery(name = "LicenseDetail.findAll", query = "SELECT l FROM LicenseDetail l")
 public class LicenseDetail implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="LICENSE_ID")
+	@Column(name = "LICENSE_ID")
 	private long licenseId;
 
-	@Column(name="CREATED_BY")
+	@Column(name = "SUBSCRIPTION_ID")
+	private String subscriptionId;
+
+	@Column(name = "CREATED_BY")
 	private String createdBy;
 
-	@Column(name="CREATED_ON")
+	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name="LICENSE_END_DATE")
+	@Column(name = "LICENSE_END_DATE")
 	private Timestamp licenseEndDate;
 
-	@Column(name="LICENSE_START_DATE")
+	@Column(name = "LICENSE_START_DATE")
 	private Timestamp licenseStartDate;
 
-	@Column(name="MODIFIED_BY")
+	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name="MODIFIED_ON")
+	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	@Column(name="PAYMENT_MODE")
+	@Column(name = "PAYMENT_MODE")
 	private String paymentMode;
-	
-	@Column(name="NEXT_RETRY_TIME")
+
+	@Column(name = "NEXT_RETRY_TIME")
 	private Timestamp nextRetryTime;
 
-	@Column(name="PAYMENT_RETRIES")
+	@Column(name = "PAYMENT_RETRIES")
 	private int paymentRetries;
-	
+
 	private int status;
 
-	//bi-directional many-to-one association to AccountsMaster
+	@Column(name = "SUBSCRIPTION_ID_SOURCE")
+	private String subscriptionIdSource;
+
+	// bi-directional many-to-one association to RetriedTransaction
+	@OneToMany(mappedBy = "licenseDetail", fetch = FetchType.LAZY)
+	private List<RetriedTransaction> retriedTransactions;
+
+	public List<RetriedTransaction> getRetriedTransactions() {
+		return retriedTransactions;
+	}
+
+	public void setRetriedTransactions(List<RetriedTransaction> retriedTransactions) {
+		this.retriedTransactions = retriedTransactions;
+	}
+
+	public String getSubscriptionId() {
+		return subscriptionId;
+	}
+
+	public String getSubscriptionIdSource() {
+		return subscriptionIdSource;
+	}
+
+	public void setSubscriptionId(String subscriptionId) {
+		this.subscriptionId = subscriptionId;
+	}
+
+	public void setSubscriptionIdSource(String subscriptionIdSource) {
+		this.subscriptionIdSource = subscriptionIdSource;
+	}
+
+	// bi-directional many-to-one association to AccountsMaster
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="ACCOUNTS_MASTER_ID")
+	@JoinColumn(name = "ACCOUNTS_MASTER_ID")
 	private AccountsMaster accountsMaster;
 
-	//bi-directional many-to-one association to Company
+	// bi-directional many-to-one association to Company
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="COMPANY_ID")
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	public LicenseDetail() {
-	}
+	public LicenseDetail() {}
 
 	public long getLicenseId() {
 		return this.licenseId;

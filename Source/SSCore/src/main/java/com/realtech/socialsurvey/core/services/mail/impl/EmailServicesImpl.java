@@ -82,6 +82,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	/**
 	 * Sends a reset password link to the user
+	 * 
 	 * @param url
 	 * @param recipientMailId
 	 * @throws InvalidInputException
@@ -111,9 +112,9 @@ public class EmailServicesImpl implements EmailServices {
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_SUBJECT;
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY);
-		
+
 		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url));
-		
+
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 
@@ -141,5 +142,49 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.debug("Prepared email entity for registrationInvite");
 		return emailEntity;
 	}
+
+	/**
+	 * Sends a mail to the user when his subscription payment fails.
+	 * 
+	 * @param recipientMailId
+	 *            ,name,retryDays
+	 * @return
+	 */
+	@Override
+	public void sendSubscriptionChargeUnsuccessfulEmail(String recipientMailId, String name, String retryDays) throws InvalidInputException,
+			UndeliveredEmailException {
+
+		LOG.info("Method to send subscription charge unsuccessful mail to : " + name);
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending unsuccessful subscription charge mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending subscription charge mail ");
+		}
+		if (name == null || name.isEmpty()) {
+			LOG.error("Name is empty or null for sending subscription charge mail ");
+			throw new InvalidInputException("Name is empty or null for sending subscription charge mail ");
+		}
+
+		LOG.debug("Executing sendSubscriptionChargeUnsuccessfulEmail() with parameters : " + recipientMailId + ", " + name + ", " + retryDays);
+
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT;
+
+		/**
+		 * Sequence of the replacement arguments in the list should be same as their sequence of
+		 * occurrence in the template
+		 */
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+				+ EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, retryDays));
+
+		LOG.info("Sending the mail.");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		LOG.info("Mail successfully sent!");
+
+	}
+
 }
 // JIRA: SS-7: By RM02: EOC
