@@ -25,11 +25,10 @@
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
-	<div
-		class="login-main-wrapper invitation-min-height padding-001 login-wrapper-min-height">
+    <div class="overlay-loader hide"></div>
+	<div class="login-main-wrapper invitation-min-height padding-001 login-wrapper-min-height">
 		<div class="container login-container">
 			<div class="row login-row">
-				<div id="message-header"></div>
 				<form id="invitation-form">
 					<div id="inv-form"
 						class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
@@ -37,6 +36,23 @@
 						<div class="login-txt text-center font-24 margin-bot-20">
 							<spring:message code="label.signupstartjourney.key" />
 						</div>
+                        <div id="serverSideerror" class="validation-msg-wrapper" >
+                            <!--Use this container to input all the messages from server-->
+                            <jsp:include page="messageheader.jsp"/>
+                        </div>
+                        <div id="jsError" class="validation-msg-wrapper hide">
+                            <!--Use this container to input all the messages from JS-->
+                            <div class="error-wrapper clearfix">
+                                <div class="float-left msg-err-icn jsErrIcn"></div>
+                                <div class="float-left msg-err-txt-area">
+                                    <div class="err-msg-area">
+                                        <div class="err-msg-con">
+                                            <p id="jsErrTxt"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-fname"></div>
 							<input class="float-left login-wrapper-txt" id="inv-fname"
@@ -59,7 +75,6 @@
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="inv-submit">
 							<spring:message code="label.submit.key" />
 						</div>
-                        <div id="message-header" class="error-msg hide"></div>
                         <div class="hide have-account-mobile cursor-pointer margin-bottom-15">
                             <spring:message code="label.alreadyhaveanacoount.key" />
 						  ? 
@@ -99,61 +114,54 @@
 	src="${pageContext.request.contextPath}/resources/js/captchaScript.js"></script> --%>
 
 	<script>
-		$(document)
-				.ready(
-						function() {
-							adjustOnResize();
+		$(document).ready(function() {			
+			adjustOnResize();
+			$(window).resize(adjustOnResize);
+			function adjustOnResize() {
+				var winH2 = $(window).height() / 2;
+				var conH2 = $('.login-row').height() / 2;
+				var offset = winH2 - conH2;
+				if (offset > 25) {
+					$('.login-row').css('margin-top',
+							offset + 'px');
+				}
+			}
 
-							$(window).resize(adjustOnResize);
+			/*
+				Function for submitting invitation form
+			 */
+			function submitInvitationForm() {
+				console.log("Method to submit Invitation form called");
+				if (!$('#serverSideerror').hasClass("hide"))
+					$('#serverSideerror').addClass("hide");
+				var url = "./corporateinvite.do";
+				showOverlay();
+				callAjaxFormSubmit(url,submitInvitationFormCallBack,"invitation-form");
+				console.log("Method to submit Invitation form finished");
+			}
 
-							function adjustOnResize() {
-								var winH2 = $(window).height() / 2;
-								var conH2 = $('.login-row').height() / 2;
-								var offset = winH2 - conH2;
-								if (offset > 25) {
-									$('.login-row').css('margin-top',
-											offset + 'px');
-								}
-							}
+			/*
+				Call back function for submitting invitation form
+			 */
+			function submitInvitationFormCallBack(data) {
+				hideOverlay();
+				$('#serverSideerror').html(data);
+				$('#serverSideerror').removeClass("hide");
+				if ($('#serverSideerror').find('div').hasClass('success-message')) {
+					$('#invitation-form')[0].reset();
+				}
+				//Recaptcha.reload();
+			}
 
-							/*
-								Function for submitting invitation form
-							 */
-							function submitInvitationForm() {
-								console
-										.log("Method to submit Invitation form called");
-								if (!$('#message-header').hasClass("hide"))
-									$('#message-header').addClass("hide");
-								var url = "./corporateinvite.do";
-								callAjaxFormSubmit(url,
-										submitInvitationFormCallBack,
-										"invitation-form");
-								console
-										.log("Method to submit Invitation form finished");
-							}
+			$('#inv-submit').click(function(e) {
+				if (validateForm('inv-form')) {
+					/* ===== FORM VALIDATED ===== */
+					console.log("form validated !!");
+					submitInvitationForm();
+				}
+			});
 
-							/*
-								Call back function for submitting invitation form
-							 */
-							function submitInvitationFormCallBack(data) {
-								$('#message-header').html(data);
-								$('#message-header').removeClass("hide");
-								if ($('#message-header').find('div').hasClass(
-										'success-message')) {
-									$('#invitation-form')[0].reset();
-								}
-								//Recaptcha.reload();
-							}
-
-							$('#inv-submit').click(function(e) {
-								if (validateForm('inv-form')) {
-									/* ===== FORM VALIDATED ===== */
-									console.log("form validated !!");
-									submitInvitationForm();
-								}
-							});
-
-						});
+		});
 	</script>
 
 </body>

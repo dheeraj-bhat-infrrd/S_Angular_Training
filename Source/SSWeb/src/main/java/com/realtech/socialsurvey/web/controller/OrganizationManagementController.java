@@ -17,9 +17,9 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -167,8 +167,12 @@ public class OrganizationManagementController {
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
 			
+<<<<<<< HEAD
 			
 			LOG.debug("Initialising payment gateway");
+=======
+			gateway.initialise();
+>>>>>>> 412b167a856a801e651354ef2cfb7430c2c641f0
 			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
