@@ -59,7 +59,7 @@ public class HierarchyManagementController {
 		try {
 			try {
 				LOG.debug("Calling service for checking the status of regions already added");
-				isRegionAdditionAllowed = !hierarchyManagementService.isMaxRegionAdditionExceeded(user, accountType);
+				isRegionAdditionAllowed = hierarchyManagementService.isRegionAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException while checking for max region addition",
@@ -68,7 +68,7 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service for checking the status of branches already added");
-				isBranchAdditionAllowed = !hierarchyManagementService.isMaxBranchAdditionExceeded(user, accountType);
+				isBranchAdditionAllowed = hierarchyManagementService.isBranchAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException while checking for max region addition",
@@ -267,7 +267,8 @@ public class HierarchyManagementController {
 
 			String address = getCompleteAddress(regionAddress1, regionAddress2);
 			// TODO store address in database
-
+			LOG.info("Address "+address+" is yet to be stored");
+			
 			LOG.debug("Calling service to add a new region");
 			try {
 				hierarchyManagementService.addNewRegion(user, regionName);
@@ -324,7 +325,8 @@ public class HierarchyManagementController {
 
 			String address = getCompleteAddress(branchAddress1, branchAddress2);
 			// TODO store address in database
-
+			LOG.info("Address "+address+" is yet to be stored");
+			
 			try {
 				LOG.debug("Calling service to add a new branch");
 				hierarchyManagementService.addNewBranch(user, regionId, branchName);

@@ -12,4 +12,7 @@ public final class EmailTemplateConstants {
 	public static final String REGISTRATION_INVITATION_MAIL_BODY = "RegistrationInvitationMailBody.html";
 	public static final String RESET_PASSWORD_MAIL_SUBJECT = "ResetPasswordMailSubject.txt";
 	public static final String RESET_PASSWORD_MAIL_BODY = "ResetPasswordMailBody.html";
+	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY="SubscriptionChargeUnsuccessfulMailBody.html";
+	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT="SubscriptionChargeUnsuccessfulMailSubject.txt";
+
 }

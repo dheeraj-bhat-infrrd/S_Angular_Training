@@ -180,6 +180,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private User updateCompanyForUser(User user, Company company) {
 		LOG.debug("Method updateCompanyForUser started for user " + user.getLoginName());
 		user.setCompany(company);
+		user.setIsOwner(CommonConstants.IS_OWNER);
 		userDao.update(user);
 		LOG.debug("Method updateCompanyForUser finished for user " + user.getLoginName());
 		return user;

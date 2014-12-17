@@ -1,9 +1,11 @@
 .project
 /.settings/*
-
+.gitignore
 .classpath
 .project
 .springBeans
 Source/SSCore/.settings
 Source/SSWeb/.settings
 Source/SSBatch/.settings
+.gitignore~
+Source/.settings/
