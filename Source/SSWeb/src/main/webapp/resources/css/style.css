@@ -210,7 +210,7 @@
 }
 
 .invitation-min-height {
-    min-height: 725px;
+    min-height: 750px;
 }
 
 .login-wrapper-min-height {
@@ -218,7 +218,7 @@
 }
 
 .registration-wrapper-min-height {
-    min-height: 900px;
+    min-height: 940px;
 }
 
 .error-msg {
@@ -263,3 +263,16 @@
 
 
 
+
+.account-type-height {
+    height: auto !important
+}
+
+.hm-content-right {
+    border-left: 1px solid #dcdcdc;
+}
+
+.hm-left-item {
+    border-bottom: 1px solid #dcdcdc;
+    padding: 0 45px 0 0;
+}
