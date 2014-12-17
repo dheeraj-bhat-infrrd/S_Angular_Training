@@ -24,9 +24,9 @@ public interface HierarchyManagementService {
 
 	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException;
 
-	public boolean isMaxBranchAdditionExceeded(User user, AccountType accountType) throws InvalidInputException;
+	public boolean isBranchAdditionAllowed(User user, AccountType accountType) throws InvalidInputException;
 
-	public boolean isMaxRegionAdditionExceeded(User user, AccountType accountType) throws InvalidInputException;
+	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException;
 
 	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException;
 
