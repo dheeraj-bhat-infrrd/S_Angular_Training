@@ -88,7 +88,7 @@
 				<div
 					class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
 					<div class="float-right">
-						<spring:message code="label.alreadyhaveanacoount.key" />
+						<a class="login-link" href="./jumptodashboard.do"><spring:message code="label.alreadyhaveanacoount.key" /></a>
 						  ? 
                         <span class="cursor-pointer">
                             <a class="login-link" href="./login.do"><strong><spring:message code="label.login.key" /></strong></a>
