@@ -185,6 +185,68 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Mail successfully sent!");
 
 	}
+	
+	/**
+	 * Method to send mail with verification link to verify the account
+	 * 
+	 * @param url
+	 * @param recipientMailId
+	 * @param recipientName
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
+			UndeliveredEmailException {
+		LOG.info("Method to send verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
+
+		if (url == null || url.isEmpty()) {
+			throw new InvalidInputException("URL generated can not be null or empty");
+		}
+
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			throw new InvalidInputException("Recipients Email Id can not be null or empty");
+		}
+
+		if (recipientName == null || recipientName.isEmpty()) {
+			throw new InvalidInputException("Recipients Name can not be null or empty");
+		}
+
+		EmailEntity emailEntity = prepareEmailEntityForVerificationMail(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_SUBJECT;
+		FileContentReplacements fileContentReplacements = new FileContentReplacements();
+		fileContentReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_BODY);
+
+		/**
+		 * order of arguments should be same as in the template
+		 */
+		fileContentReplacements.setReplacementArgs(Arrays.asList(recipientName, url));
+		LOG.debug("Calling email sender to send verification mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, fileContentReplacements);
+
+		LOG.info("Successfully sent verification mail");
+	}
+	
+	/**
+	 * Method to prepare email entity for verification mail
+	 * 
+	 * @param recipientMailId
+	 * @return
+	 */
+	private EmailEntity prepareEmailEntityForVerificationMail(String recipientMailId) {
+		LOG.debug("Preparing email entity for verification mail for recipientMailId " + recipientMailId);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setSenderEmailId(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_USERNAME));
+		emailEntity.setSenderPassword(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_PASSWORD));
+		emailEntity.setSenderName(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_NAME));
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for verification mail");
+		return emailEntity;
+	}
 
 }
 // JIRA: SS-7: By RM02: EOC

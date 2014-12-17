@@ -46,12 +46,14 @@ public interface CommonConstants {
 	public static final String DASHBOARD_STAGE = "dashboard.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
+	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 
 	/**
 	 * Status constants
 	 */
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
+	public static final int STATUS_NOT_VERIFIED = 2;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
 	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
@@ -86,6 +88,10 @@ public interface CommonConstants {
 	public static final String ZIPCODE = "zipCode";
 	public static final String COMPANY_CONTACT_NUMBER = "companyContactNo";
 	public static final String COMPANY = "company";
+	public static final String EMAIL_ID = "emailId";
+	public static final String FIRST_NAME = "firstName";
+	public static final String LAST_NAME = "lastName";
+	public static final String USER_ID = "userId";
 	
 
 	/**
