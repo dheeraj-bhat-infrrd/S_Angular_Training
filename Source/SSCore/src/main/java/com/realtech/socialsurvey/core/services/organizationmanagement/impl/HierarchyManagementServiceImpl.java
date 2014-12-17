@@ -153,80 +153,39 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public boolean isMaxBranchAdditionExceeded(User user, AccountType accountType) throws InvalidInputException {
-		LOG.info("Method to check if max branch addition exceeded is called for user : " + user);
+	public boolean isBranchAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
+		LOG.info("Method to check if further branch addition is allowed, called for user : " + user);
 		if (user == null) {
 			throw new InvalidInputException("User is null in isMaxBranchAdditionExceeded");
 		}
 		if (accountType == null) {
 			throw new InvalidInputException("Account type is null in isMaxBranchAdditionExceeded");
 		}
-		boolean isMaxBranchAdditionExceeded = false;
+		boolean isBranchAdditionAllowed = true;
 		switch (accountType) {
 			case INDIVIDUAL:
+				LOG.info("Checking branch addition for account type INDIVIDUAL");
 				// No branch addition is allowed for individual
-				isMaxBranchAdditionExceeded = true;
+				isBranchAdditionAllowed = false;
 				break;
 			case TEAM:
-				isMaxBranchAdditionExceeded = isMaxBranchAdditionExceeded(user, CommonConstants.MAX_BRANCH_LIMIT_TEAM);
+				LOG.info("Checking branch addition for account type TEAM");
+				isBranchAdditionAllowed = false;
 				break;
 			case COMPANY:
-				isMaxBranchAdditionExceeded = isMaxBranchAdditionExceeded(user, CommonConstants.NO_LIMIT);
+				LOG.info("Checking branch addition for account type COMPANY");
+				isBranchAdditionAllowed = true;
 				break;
 			case ENTERPRISE:
-				isMaxBranchAdditionExceeded = isMaxBranchAdditionExceeded(user, CommonConstants.NO_LIMIT);
+				LOG.info("Checking branch addition for account type INDIVIDUAL");
+				isBranchAdditionAllowed = true;
 				break;
 			default:
 				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
 		}
-		LOG.info("Returning from isMaxBranchAdditionExceeded for user : " + user.getUserId() + " isMaxBranchAdditionExceeded is :"
-				+ isMaxBranchAdditionExceeded);
-		return isMaxBranchAdditionExceeded;
-	}
-
-	/**
-	 * Method to check if the maximum number of branches allowed to be added has exceeded comparing
-	 * already existing branches with max allowed branches passed
-	 * 
-	 * @param user
-	 * @return
-	 */
-	private boolean isMaxBranchAdditionExceeded(User user, int maxBranchesAllowed) {
-		LOG.debug("Method isMaxBranchAdditionExceeded called for user : " + user.getUserId() + " and maxBranchesAllowed :" + maxBranchesAllowed);
-		boolean isMaxBranchAdditionExceededForTeam = false;
-		if (maxBranchesAllowed != CommonConstants.NO_LIMIT) {
-			long numberOfBranches = getBranchesCount(user.getCompany());
-			if (numberOfBranches == maxBranchesAllowed) {
-				isMaxBranchAdditionExceededForTeam = true;
-			}
-		}
-		else {
-			LOG.debug("No limit present for branch addition for user : " + user.getUserId());
-		}
-
-		LOG.debug("Method isMaxBranchAdditionExceededForTeam finished for user : " + user.getUserId() + " Returning : "
-				+ isMaxBranchAdditionExceededForTeam);
-		return isMaxBranchAdditionExceededForTeam;
-	}
-
-	/**
-	 * Method to get the count of branches for a company
-	 * 
-	 * @param company
-	 * @return
-	 */
-	private long getBranchesCount(Company company) {
-		LOG.debug("Getting branches count for : " + company);
-
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.COMPANY, company);
-		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		long branchesCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
-
-		LOG.debug("Returning branches count for : " + company + " branches count is : " + branchesCount);
-		return branchesCount;
-
+		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isMaxBranchAdditionExceeded is :"
+				+ isBranchAdditionAllowed);
+		return isBranchAdditionAllowed;
 	}
 
 	/**
@@ -240,79 +199,40 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public boolean isMaxRegionAdditionExceeded(User user, AccountType accountType) throws InvalidInputException {
-		LOG.info("Method to check if max region addition exceeded is called for user : " + user);
+	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
+		LOG.info("Method to check if further region addition is allowed called for user : " + user);
 		if (user == null) {
 			throw new InvalidInputException("User is null in isMaxRegionAdditionExceeded");
 		}
 		if (accountType == null) {
 			throw new InvalidInputException("Account type is null in isMaxRegionAdditionExceeded");
 		}
-		boolean isMaxRegionAdditionExceeded = false;
+		boolean isRegionAdditionAllowed = true;
 		switch (accountType) {
 			case INDIVIDUAL:
+				LOG.info("Checking Region addition for account type INDIVIDUAL");
 				// No region addition is allowed for individual
-				isMaxRegionAdditionExceeded = true;
+				isRegionAdditionAllowed = false;
 				break;
 			case TEAM:
+				LOG.info("Checking Region addition for account type TEAM");
 				// No region addition is allowed for team
-				isMaxRegionAdditionExceeded = true;
+				isRegionAdditionAllowed = false;
 				break;
 			case COMPANY:
-				isMaxRegionAdditionExceeded = isMaxRegionAdditionExceeded(user, CommonConstants.MAX_REGION_LIMIT_COMPANY);
+				LOG.info("Checking Region addition for account type COMPANY");
+				isRegionAdditionAllowed = false;
 				break;
 			case ENTERPRISE:
-				isMaxRegionAdditionExceeded = isMaxRegionAdditionExceeded(user, CommonConstants.NO_LIMIT);
+				LOG.info("Checking Region addition for account type ENTERPRISE");
+				isRegionAdditionAllowed = true;
 				break;
 			default:
-				throw new InvalidInputException("Account type is invalid in isMaxRegionAdditionExceeded");
+				throw new InvalidInputException("Account type is invalid in isRegionAdditionAllowed");
 		}
-		LOG.info("Returning from isMaxRegionAdditionExceeded for user : " + user.getUserId() + " isMaxRegionAdditionExceeded is :"
-				+ isMaxRegionAdditionExceeded);
-		return isMaxRegionAdditionExceeded;
-	}
-
-	/**
-	 * Method to check if the maximum number of regions allowed to be added has exceeded comparing
-	 * already existing regions with max allowed regions passed
-	 * 
-	 * @param user
-	 * @param maxRegionsAllowed
-	 * @return
-	 */
-	private boolean isMaxRegionAdditionExceeded(User user, int maxRegionsAllowed) {
-		LOG.debug("Method isMaxRegionAdditionExceeded called for user : " + user.getUserId() + " and maxRegionsAllowed :" + maxRegionsAllowed);
-		boolean isMaxRegionAdditionExceededForTeam = false;
-		if (maxRegionsAllowed != CommonConstants.NO_LIMIT) {
-			long numberOfRegions = getRegionsCount(user.getCompany());
-			if (numberOfRegions == maxRegionsAllowed) {
-				isMaxRegionAdditionExceededForTeam = true;
-			}
-		}
-		else {
-			LOG.debug("No limit present for region addition for user : " + user.getUserId());
-		}
-		LOG.debug("Method isMaxRegionAdditionExceeded finished for user : " + user.getUserId() + " Returning : " + isMaxRegionAdditionExceededForTeam);
-		return isMaxRegionAdditionExceededForTeam;
-	}
-
-	/**
-	 * Method to get count of regions
-	 * 
-	 * @param company
-	 * @return
-	 */
-	private long getRegionsCount(Company company) {
-		LOG.debug("Getting regions count for : " + company);
-
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.COMPANY_NAME, company.getCompany());
-		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		long regionsCount = regionDao.findNumberOfRowsByKeyValue(Region.class, queries);
-
-		LOG.debug("Returning regions count for : " + company + " regions count is : " + regionsCount);
-		return regionsCount;
+		LOG.info("Returning from isRegionAdditionAllowed for user : " + user.getUserId() + " isRegionAdditionAllowed is :"
+				+ isRegionAdditionAllowed);
+		return isRegionAdditionAllowed;
 	}
 
 	/**
