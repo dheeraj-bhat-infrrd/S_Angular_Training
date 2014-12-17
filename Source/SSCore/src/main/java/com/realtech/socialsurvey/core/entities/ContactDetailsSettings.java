@@ -7,6 +7,7 @@ public class ContactDetailsSettings {
 
 	private String name;
 	private String address;
+	private String zipcode;
 	private String about_me;
 	private String title;
 	private MailIdSettings mail_ids;
@@ -27,6 +28,14 @@ public class ContactDetailsSettings {
 
 	public void setAddress(String address) {
 		this.address = address;
+	}
+
+	public String getZipcode() {
+		return zipcode;
+	}
+
+	public void setZipcode(String zipcode) {
+		this.zipcode = zipcode;
 	}
 
 	public String getAbout_me() {
