@@ -36,6 +36,17 @@ public class User implements Serializable {
 
 	@Column(name = "IS_ATLEAST_ONE_USERPROFILE_COMPLETE")
 	private int isAtleastOneUserprofileComplete;
+	
+	@Column(name = "IS_OWNER")
+	private int isOwner;
+
+	public int getIsOwner() {
+		return isOwner;
+	}
+
+	public void setIsOwner(int isOwner) {
+		this.isOwner = isOwner;
+	}
 
 	@Column(name = "LAST_LOGIN")
 	private Timestamp lastLogin;

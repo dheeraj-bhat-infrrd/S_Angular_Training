@@ -57,6 +57,8 @@ public interface CommonConstants {
 	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
 	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
 	public static final int SANDBOX_MODE_TRUE=1;
+	public static final int IS_OWNER = 1;
+	public static final int IS_NOT_OWNER = 0;
 
 	/**
 	 * Hibernate entities and column name constants
@@ -70,12 +72,9 @@ public interface CommonConstants {
 	public static final String PROFILE_MASTER_COLUMN = "profilesMaster";
 	public static final String AUTO_PAYMENT_MODE = "A";
 	public static final int INITIAL_PAYMENT_RETRIES = 0;
-<<<<<<< HEAD
 	public static final String PAYMENT_GATEWAY = "Braintree";
-=======
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
->>>>>>> 412b167a856a801e651354ef2cfb7430c2c641f0
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -98,4 +97,6 @@ public interface CommonConstants {
 	public static final int MAX_BRANCH_LIMIT_TEAM = 1;
 	public static final int NO_LIMIT = -1;
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
+	public static final int INITIAL_INDEX = 0;
+
 }

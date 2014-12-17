@@ -5,6 +5,9 @@ package com.realtech.socialsurvey.core.services.payment.impl;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -31,8 +34,10 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.generator.impl.UrlGeneratorImpl;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
@@ -54,7 +59,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private GenericDao<RetriedTransaction, Integer> retriedTransactionDao;
 
 	@Autowired
+	private GenericDao<User, Integer> userDao;
+
+	@Autowired
 	private PropertyFileReader propertyFileReader;
+
+	@Autowired
+	private EmailServices emailServices;
 
 	@Value("${MERCHANT_ID}")
 	private String merchantId;
@@ -71,7 +82,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
 
-	private static final Logger LOG = LoggerFactory.getLogger(UrlGeneratorImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 
 	private BraintreeGateway gateway = null;
 
@@ -396,9 +407,19 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		return clientToken;
 	}
 
-	private String makePayment(String paymentMethodToken, BigDecimal amount) throws InvalidInputException {
+	/**
+	 * Function to create a Braintree transaction with a particular payment method token and an
+	 * amount
+	 * 
+	 * @param paymentMethodToken
+	 * @param amount
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public String makePayment(String paymentMethodToken, BigDecimal amount) throws InvalidInputException {
 
 		String transactionId = null;
+
 		if (paymentMethodToken == null || paymentMethodToken.isEmpty()) {
 			LOG.error("makePayment() : first parameter is null or invalid!");
 			throw new InvalidInputException("makePayment() : first parameter is null or invalid!");
@@ -429,10 +450,21 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	}
 
 	@Transactional
-	public boolean retryPaymentAndUpdateLicenseTable(Subscription subscription) throws InvalidInputException {
+	/**
+	 * Updates the number of retries in the LicenseDetail table and sends a mail to the User.
+	 * @param subscription
+	 * @return boolean value
+	 */
+	public void updateRetriesForPayment(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException {
 
-		LOG.info("Retrying payment and updating the license table!");
-		boolean status = false;
+		LOG.info("Updating the license table with the next retry time!");
+
+		LicenseDetail licenseDetail = null;
+		List<LicenseDetail> licenseDetails = null;
+		List<User> users = null;
+		User user = null;
+
+		// Setting the calendar to retry days ahead of current time
 		Calendar now = Calendar.getInstance();
 		now.add(Calendar.DATE, retryDays);
 
@@ -443,59 +475,52 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		LOG.debug("Executing retryPaymentAndUpdateLicenseTable with parameter : " + subscription.toString());
 
-		String paymentMethodToken = subscription.getPaymentMethodToken();
-		BigDecimal amount = subscription.getPrice();
 		String subscriptionId = subscription.getId();
 
-		// Checking if a transaction has already been made in less than retry time.
-		LicenseDetail licenseDetail = licenseDetailDao.findByColumn(LicenseDetail.class, "subscriptionId", subscriptionId).get(0);
-		Timestamp timeOfNotification = new Timestamp(System.currentTimeMillis());
+		// Checking if the notification is the first one. If not LicenseDetails table isnt updated
+		// again.
+		licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, "subscriptionId", subscriptionId);
 
-		if (timeOfNotification.before(licenseDetail.getNextRetryTime())) {
-			LOG.info("Transaction has already been made in less than the configured retry interval!");
-			// If transaction has already been made we stop and return true and wait for the next
-			// retry time.
-			return true;
-		}
-
-		LOG.debug("Making Payment with the tstoken : " + paymentMethodToken + " and amount : " + amount + " for subscription id : " + subscriptionId);
-
-		String transactionId = makePayment(paymentMethodToken, amount);
-
-		if (transactionId != null) {
-			LOG.info("Payment successful with id : " + transactionId);
-			status = true;
+		if (licenseDetails.isEmpty() || licenseDetails == null) {
+			LOG.error("Subscription details not found in the LicenseDetail table.");
+			throw new NoRecordsFetchedException("Subscription details not found in the LicenseDetail table.");
 		}
 		else {
-			LOG.info("Payment failed!");
-			status = false;
+			licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
+		}
+		Timestamp timeOfNotification = new Timestamp(System.currentTimeMillis());
+
+		// Getting the list of corporate admins from user profiles table
+		Map<String, Object> queries = new HashMap<>();
+		queries.put("company", licenseDetail.getCompany());
+		queries.put("isOwner", CommonConstants.IS_OWNER);
+		users = userDao.findByKeyValue(User.class, queries);
+
+		if (users.isEmpty() || users == null) {
+			LOG.error("Corporate Admin details not found in the User table.");
+			throw new NoRecordsFetchedException("Corporate Admin details not found in the User table.");
+		}
+		else {
+			user = users.get(CommonConstants.INITIAL_INDEX);
 		}
 
-		if (status) {
-			LOG.info("Updating LicenseDetail table with subscriptionId : " + subscriptionId);
-			licenseDetail.setPaymentRetries(licenseDetail.getPaymentRetries() + 1);
-			licenseDetail.setNextRetryTime(new Timestamp(now.getTimeInMillis()));
-			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			licenseDetailDao.saveOrUpdate(licenseDetail);
-			LOG.info("License table updated!");
-
-			LOG.info("Adding details to the RetriedTransaction table.");
-			RetriedTransaction retriedTransaction = new RetriedTransaction();
-			retriedTransaction.setLicenseDetail(licenseDetail);
-			retriedTransaction.setAmount(amount.floatValue());
-			retriedTransaction.setPaymentToken(paymentMethodToken);
-			retriedTransaction.setStatus(CommonConstants.STATUS_ACTIVE);
-			retriedTransaction.setTransactionId(transactionId);
-			retriedTransaction.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
-			retriedTransaction.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-			retriedTransaction.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
-			retriedTransaction.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			retriedTransactionDao.save(retriedTransaction);
-
-			LOG.info("RetriedTransaction table updated!");
+		if (timeOfNotification.before(licenseDetail.getNextRetryTime())) {
+			LOG.info("License retry date has already been updated!");
+			// LicenseDetail table is not updated.
+			return;
 		}
 
-		return status;
+		LOG.info("Updating LicenseDetail table with subscriptionId : " + subscriptionId);
+		licenseDetail.setNextRetryTime(new Timestamp(now.getTimeInMillis()));
+		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		licenseDetailDao.saveOrUpdate(licenseDetail);
+		LOG.info("License table updated!");
+
+		LOG.info("Sending email to the customer!");
+		emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getDisplayName(), String.valueOf(retryDays));
+
+		LOG.info("Email sent successfully!");
+
 	}
 
 	@Override
