@@ -96,3 +96,15 @@ function moveFileBtn(){
         $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
     }
 }
+
+$('#hm-item-dd').click(function(){
+    $('#hm-dd-wrapper').slideToggle(200);
+});
+
+
+
+
+
+
+
+

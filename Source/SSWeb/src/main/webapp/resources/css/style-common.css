@@ -620,3 +620,61 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     border-bottom: 1px solid #dcdcdc;
     padding: 0 0 0 45px;
 }
+
+.hm-dd-wrapper {
+    position: absolute;
+    width: 323px;
+    background-color: #fff;
+    padding: 8px;
+    border: 1px solid #dcdcdc;
+}
+
+.hm-dd-item {
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 36px;
+    cursor: pointer;
+}
+
+.hm-dd-item:last-child{
+    border-bottom: 0;
+}
+
+
+
+.z-in-9 {
+    z-index: 99999;
+}
+
+.hm-top-panel-content {
+    margin: 25px 0;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.hm-btn-wrapper-fix {
+    width: 235px;
+}
+
+.margin-right-0 {
+    margin-right: 0;
+}
+
+.margin-top-5 {
+    margin-top: 5px;
+}
+
+.hm-bottom-panel {
+    padding-right: 25px;
+    padding-left: 25px;
+}
+
+.padding-left-30 {
+    padding-left: 30px;
+}
+
+.padding-right-30 {
+    padding-right: 30px;
+}
+
+.padding-0150 {
+    padding: 0 15px 0;
+}
