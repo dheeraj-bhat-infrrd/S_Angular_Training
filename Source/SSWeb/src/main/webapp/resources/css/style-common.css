@@ -33,6 +33,8 @@ input:-webkit-autofill {
 .input-error{
     border: 1px solid red !important;
     margin-top: -1px !important;
+    z-index: 99999;
+    position: relative;
 }
 
 .box-border-box {
@@ -294,7 +296,8 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .company-wrapper-min-height {
-    min-height: 985px;
+    min-height: 100%;
+    height: auto !important;
 }
 
 .payment-method-options .button{
@@ -318,7 +321,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     width: 50px;
     height: 50px;
     background-color: #ccc;
-    margin-right: 10px;
+/*    margin-right: 10px;*/
 }
 
 .msg-err-txt-area{
