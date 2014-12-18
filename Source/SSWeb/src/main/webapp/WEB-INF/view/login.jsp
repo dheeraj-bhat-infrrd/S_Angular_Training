@@ -48,7 +48,6 @@
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key"/>'>
 	                    </div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit"><spring:message code="label.login.button.key"/></div>
-                        <div id="message-header" class="error-msg"><jsp:include page="messageheader.jsp"/></div>
 	                    <div class="hide forgot-pwd-mobile"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
 	                </div>
                	 </form>
@@ -68,8 +67,7 @@
     
     <script>
         $(document).ready(function(){
-            adjustOnResize();
-            
+            adjustOnResize();            
             $(window).resize(adjustOnResize);
             
             function adjustOnResize(){
@@ -95,7 +93,7 @@
             		type : "POST",
             		data : payLoad,
             		success : function(data) {
-            			console.log(data);
+            			hideOverlay();
             			$('#message-header').html(data);
             			if ($('#message-header').find('div').hasClass('success-message'))
             				success = 1;
@@ -104,7 +102,6 @@
 
             		},
             		complete : function(data) {
-            			hideOverlay();
             			if (success) {
             				console.log("Login Successful");
             				location.href = "./" + redirectTo;
