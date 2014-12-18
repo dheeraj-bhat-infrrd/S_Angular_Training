@@ -88,6 +88,9 @@
     .hm-content-left, .hm-content-right{
         padding: 0;
     }
+    .login-container {
+        margin-top: 0;
+    }
 }
 
 
