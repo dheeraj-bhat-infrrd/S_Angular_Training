@@ -76,6 +76,21 @@
     .hm-content-right{
         border-left: 0;
     }
+    .hm-item-row{
+        width: 100%
+    }
+    .hm-bottom-panel-item{
+        padding: 0 15px;
+    }
+    .hm-left-item, .hm-right-item{
+        padding: 0;
+    }
+    .hm-content-left, .hm-content-right{
+        padding: 0;
+    }
+    .login-container {
+        margin-top: 0;
+    }
 }
 
 
@@ -138,8 +153,28 @@
     .user-info-logo{
         width: 125px;
     }
-    .hm-content-right{
-        border-left: 0;
+    .hm-item-row{
+        width: 100%
+    }
+    .hm-item-row-left{
+        width: 90px;
+        font-size: 13px;
+    }
+    .hm-item-row-txt{
+        width: 225px;
+        font-size: 13px;
+    }
+    .hm-left-item{
+        padding: 0 20px 0 0;
+    }
+    .hm-right-item{
+        padding: 0 0 0 20px;
+    }
+    .hm-sub-search-txt{
+        width: 125px;
+    }
+    .hm-sub-header-left{
+        font-size: 18px;
     }
 }
 
@@ -148,7 +183,7 @@
     .hm-item-row{
         width: 100%
     }
-    .hm-item-row-txt{
+    .hm-item-row-txt, .hm-dd-wrapper{
         width: 280px;
     }
 }
