@@ -7,7 +7,7 @@
 		<groupId>com.realtech.socialsurvey</groupId>
 		<artifactId>parent</artifactId>
 		<version>1.0</version>
-  	</parent>
+	</parent>
 	<artifactId>SSBatch</artifactId>
 	<packaging>jar</packaging>
 	<name>Command Line Spring Batch Module</name>
@@ -19,8 +19,8 @@
 	</description>
 	<properties>
 		<maven.test.failure.ignore>true</maven.test.failure.ignore>
-		<spring.framework.version>3.0.6.RELEASE</spring.framework.version>
-		<spring.batch.version>2.1.7.RELEASE</spring.batch.version>
+		<spring.framework.version>3.2.4.RELEASE</spring.framework.version>
+		<spring.batch.version>2.1.9.RELEASE</spring.batch.version>
 	</properties>
 	<profiles>
 		<profile>
@@ -41,7 +41,7 @@
 					<version>1.0.1</version>
 				</dependency>
 			</dependencies>
-		</profile>	 
+		</profile>
 	</profiles>
 
 	<dependencies>
@@ -65,6 +65,11 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-context</artifactId>
+			<version>${spring.framework.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
 			<version>${spring.framework.version}</version>
 		</dependency>
 		<dependency>
@@ -117,10 +122,15 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.14</version>
 		</dependency>
+		<dependency>
+			<groupId>com.realtech.socialsurvey</groupId>
+			<artifactId>SSCore</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>
-		 
+
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -130,7 +140,7 @@
 					<target>1.5</target>
 				</configuration>
 			</plugin>
-			 
+
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
@@ -145,7 +155,7 @@
 					</arguments>
 				</configuration>
 			</plugin>
-		 
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
@@ -172,5 +182,5 @@
 			</snapshots>
 		</pluginRepository>
 	</pluginRepositories>
- 
+
 </project>
