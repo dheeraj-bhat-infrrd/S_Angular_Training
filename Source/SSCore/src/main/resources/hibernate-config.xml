@@ -28,7 +28,7 @@
             <value>root</value>
         </property>
         <property name="password">
-            <value>raremile</value>
+            <value>root</value>
         </property>
     </bean>
 
