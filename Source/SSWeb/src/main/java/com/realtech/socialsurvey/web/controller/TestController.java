@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
@@ -55,7 +56,7 @@ public class TestController {
 				user = authenticationService.getUserWithLoginName("nishit@raremile.com");
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 			}
-			catch (InvalidInputException e) {
+			catch (NoRecordsFetchedException e) {
 				LOG.error("Invalid Input exception in fetching User. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}

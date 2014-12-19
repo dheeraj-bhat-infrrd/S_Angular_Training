@@ -131,11 +131,6 @@
 			<version>0.0.7</version>
 		</dependency>
 
-		<dependency>
-			<groupId>tomcat</groupId>
-			<artifactId>naming-common</artifactId>
-			<version>4.1.36</version>
-		</dependency>
 
 		<dependency>
 			<groupId>com.braintreepayments.gateway</groupId>
