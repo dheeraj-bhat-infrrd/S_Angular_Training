@@ -10,59 +10,63 @@ function validateForm(id) {
 	var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 	var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
 	
+	//hide the server error
+	$("#serverSideerror").hide();
+	
 	$('#' + id).find('input').each(function() {
-		if ($(this).data('email') == true) {
-			if (emailRegex.test($(this).val()) == true) {
-				$(this).parent().removeClass('input-error');
-				 $('#jsError').hide();
-			}else {
-				validate = false;
-				$('#jsError').show();
-                $('#jsErrTxt').html('Please enter a valid emailId.');
-				$(this).parent().addClass('input-error');
-			}
-		}
-		
-		if ($(this).data('zipcode') == true) {
-			if (zipcodeRegex.test($(this).val()) == true) {
-				$(this).parent().removeClass('input-error');
-				 $('#jsError').hide();
-			}else {
-				validate = false;
-				$('#jsError').show();
-                $('#jsErrTxt').html('Please enter a valid zipcode.');
-				$(this).parent().addClass('input-error');
-			}
-		}
-		
-		if ($(this).data('phone') == true) {
-			if (phoneRegex.test($(this).val()) == true) {
-				$(this).parent().removeClass('input-error');
-				 $('#jsError').hide();
-			}else {
-				validate = false;
-				$('#jsError').show();
-                $('#jsErrTxt').html('Please enter a valid phone number.');
-				$(this).parent().addClass('input-error');
-			}
-		}
 		
 		if ($(this).data('non-empty') == true) {
 			if ($(this).val() == "") {
 				$(this).parent().addClass('input-error');
-                $('#jsError').show();
-                $('#jsErrTxt').html('Please enter the required fields.');
+				$('#jsErrTxt').html('Please enter the required fields.');
 				validate = false;
 			} else {
 				$(this).parent().removeClass('input-error');
-                $('#jsError').hide();
+			}
+		}
+		
+		if ($(this).data('email') == true) {
+			if ($(this).val() != "") {
+				if (emailRegex.test($(this).val()) == true) {
+					$(this).parent().removeClass('input-error');
+				}else {
+					validate = false;
+	                $('#jsErrTxt').html('Please enter a valid emailId.');
+					$(this).parent().addClass('input-error');
+				}
+			}
+		}
+		
+		if ($(this).data('zipcode') == true) {
+			if ($(this).val() != "") {
+				if (zipcodeRegex.test($(this).val()) == true) {
+					$(this).parent().removeClass('input-error');
+				}else {
+					validate = false;
+	                $('#jsErrTxt').html('Please enter a valid zipcode.');
+					$(this).parent().addClass('input-error');
+				}
+			}
+		}
+		
+		if ($(this).data('phone') == true) {
+			if ($(this).val() != "") {
+				if (phoneRegex.test($(this).val()) == true) {
+					$(this).parent().removeClass('input-error');
+				}else {
+					validate = false;
+	                $('#jsErrTxt').html('Please enter a valid phone number.');
+					$(this).parent().addClass('input-error');
+				}
 			}
 		}
 	});
 
 	if (!validate) {
+		$('#jsError').show();
 		return false;
 	} else {
+		$('#jsError').hide();
 		/* Form validated. */
 		return true;
 	}
@@ -96,3 +100,7 @@ function moveFileBtn(){
         $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
     }
 }
+
+$('#hm-item-dd').click(function(){
+	   $('#hm-dd-wrapper').slideToggle(200);
+	});

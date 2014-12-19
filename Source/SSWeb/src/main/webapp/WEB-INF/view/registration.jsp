@@ -2,9 +2,6 @@
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!-- JIRA : SS-17 by RM-06
-	Invitation page to send user invite to register for the application 	
--->
 <!DOCTYPE">
 <html>
 <head>
@@ -65,7 +62,7 @@
 									value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
 								</c:when>
 								<c:otherwise>
-									<input class="float-left login-wrapper-txt" id="reg-email" data-non-empty="true" name="emailid"
+									<input class="float-left login-wrapper-txt" id="reg-email" data-non-empty="true" data-email = "true" name="emailid"
 									 placeholder='<spring:message code="label.emailid.key" />'>
 								</c:otherwise>
 							</c:choose>
@@ -114,7 +111,6 @@
 	<script>
 		$(document).ready(function() {
 			adjustOnResize();
-
 			$(window).resize(adjustOnResize);
 
 			function adjustOnResize() {
@@ -134,14 +130,16 @@
 			}
 
 			$('#reg-submit').click(function(e) {
-				if (validateForm('reg-form')) {
-					
+				if (validateForm('reg-form')) {					
 					/* === Validate passwords === */
 					if($('#reg-pwd').val() != $('#reg-conf-pwd').val()) {
 						$('#reg-pwd').parent().addClass('input-error');
 						$('#reg-conf-pwd').parent().addClass('input-error');
+						$('#jsError').show();
+		                $('#jsErrTxt').html('Passwords do not match');
 						return false;
 					}else {
+						$('#jsError').hide();
 						$('#reg-pwd').parent().removeClass('input-error');
 						$('#reg-conf-pwd').parent().removeClass('input-error');
 					}

@@ -276,3 +276,13 @@
     border-bottom: 1px solid #dcdcdc;
     padding: 0 45px 0 0;
 }
+
+.file-main {
+    position: relative;
+    top: -97px;
+    opacity: 0;
+}
+
+.file-pick-logo {
+    top: -50px;
+}
