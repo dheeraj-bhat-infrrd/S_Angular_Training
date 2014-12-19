@@ -425,6 +425,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .user-info-seperator {
     height: 78px;
     width: 36px;
+    background: url(../images/divider.png) no-repeat center;
 }
 
 .user-info-initial {
@@ -489,7 +490,8 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .icn-plus {
     cursor: pointer;
-    background: url(../images/iconPlus.png) no-repeat center;
+    background: url(../images/iconPlus.png) no-repeat;
+    background-position: right center;
 }
 
 .padding-right-0 {
@@ -580,7 +582,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     width: 150px;
     outline: none;
     border: 0;
-    height: 59px;
+    height: 58px;
 }
 
 .hm-sub-header-left {
@@ -620,7 +622,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-right-item {
-    border-bottom: 1px solid #dcdcdc;
+/*    border-bottom: 1px solid #dcdcdc;*/
     padding: 0 0 0 45px;
 }
 
@@ -680,4 +682,28 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .padding-0150 {
     padding: 0 15px 0;
+}
+
+.header-menu-icn {
+    height: 50px;
+    width: 50px;
+}
+
+.icn-menu {
+    background-color: #f1f1f1;
+}
+
+.dd-icn {
+    height: 44px;
+    width: 35px;
+    background-color: #f1f1f1;
+}
+
+.dd-icn-height-adjust {
+    height: 60px;
+}
+
+.mobile-search-panel-adj{
+    float: none;
+    width: 100%;
 }
