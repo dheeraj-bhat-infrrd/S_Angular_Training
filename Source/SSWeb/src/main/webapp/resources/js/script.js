@@ -80,7 +80,7 @@ function hideOverlay(){
     $('.overlay-loader').hide();
 }
 
-detectBrowser();
+//detectBrowser();
 
 function detectBrowser(){
     if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
@@ -101,6 +101,21 @@ function moveFileBtn(){
     }
 }
 
-$('#hm-item-dd').click(function(){
-	   $('#hm-dd-wrapper').slideToggle(200);
-	});
+$('#hm-item-dd-top').click(function(){
+   $('#hm-dd-wrapper-top').slideToggle(200);
+});
+
+$('#hm-item-dd-bottom').click(function(){
+   $('#hm-dd-wrapper-bottom').slideToggle(200);
+});
+
+$('#header-menu-icn').click(function(){
+    $('#header-links').slideToggle(200);
+});
+
+$('.hm-header-dd-icn').click(function(){
+    $(this).parent().next('.create-branch-dd').slideToggle();
+});
+$('.dd-icn-type2').click(function(){
+    $(this).parent().parent().next('.create-branch-dd').slideToggle();
+});
