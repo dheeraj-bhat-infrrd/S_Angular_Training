@@ -17,7 +17,7 @@
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
-            	<form id="frm-login">
+            	<form id="frm-login" method="POST" action="./userlogin.do">
 	                <div id="login-form" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.logintodosurvey.key"/> </div>
@@ -41,14 +41,13 @@
                         </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
-	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" data-errMsg="101" placeholder='<spring:message code="label.username.key"/>'>
+	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" data-email="true" placeholder='<spring:message code="label.username.key"/>'>
 	                    </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key"/>'>
 	                    </div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit"><spring:message code="label.login.button.key"/></div>
-                        <div id="message-header" class="error-msg"><jsp:include page="messageheader.jsp"/></div>
 	                    <div class="hide forgot-pwd-mobile"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
 	                </div>
                	 </form>
@@ -68,8 +67,7 @@
     
     <script>
         $(document).ready(function(){
-            adjustOnResize();
-            
+            adjustOnResize();            
             $(window).resize(adjustOnResize);
             
             function adjustOnResize(){
@@ -83,37 +81,11 @@
             }
             
             function loginUser() {
-            	console.log("loggin in user");
-            	var success = 0;
-            	if (!$('#message-header').hasClass("hide"))
-            		$('#message-header').addClass("hide");
-            	var payLoad = $("#frm-login").serialize();
-            	var redirectTo = '';
-            	showOverlay();
-            	$.ajax({
-            		url : "./userlogin.do",
-            		type : "POST",
-            		data : payLoad,
-            		success : function(data) {
-            			console.log(data);
-            			$('#message-header').html(data);
-            			if ($('#message-header').find('div').hasClass('success-message'))
-            				success = 1;
-            			$('#message-header').removeClass("hide");
-            			redirectTo = $("#redirectUrl").val();
-
-            		},
-            		complete : function(data) {
-            			hideOverlay();
-            			if (success) {
-            				console.log("Login Successful");
-            				location.href = "./" + redirectTo;
-            			}
-            		}
-            	});
-
+            	console.log("submitting login form");
+				showOverlay();
+				$('#frm-login').submit();
             }
-            
+                       
             $('#login-submit').click(function(e){
                 if(validateForm('login-form')){
                     /* ===== FORM VALIDATED ===== */

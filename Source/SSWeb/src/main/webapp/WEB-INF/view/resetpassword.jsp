@@ -21,6 +21,24 @@
 	                <div id="reset-pwd-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.forgotpassword.key"/></div>
+	                    <div id="serverSideerror" class="validation-msg-wrapper" >
+                            <!--Use this container to input all the messages from server-->
+                            <jsp:include page="messageheader.jsp"/>
+                        </div>
+                        <div id="jsError" class="validation-msg-wrapper hide">
+                            <!--Use this container to input all the messages from JS-->
+                            
+                            <div class="error-wrapper clearfix">
+                                <div class="float-left msg-err-icn jsErrIcn"></div>
+                                <div class="float-left msg-err-txt-area">
+                                    <div class="err-msg-area">
+                                        <div class="err-msg-con">
+                                            <p id="jsErrTxt"></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
 	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" data-email = "true" name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
@@ -34,7 +52,6 @@
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-cnf-pwd" data-non-empty="true" name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
 	                    </div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reset-pwd-submit"><spring:message code="label.submit.key"/></div>
-                        <div id="message-header" class="error-msg"><jsp:include page="messageheader.jsp"/></div>
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">
                	 </form>
@@ -74,8 +91,11 @@
                 	if($('#login-pwd').val() != $('#login-cnf-pwd').val()) {
 						$('#login-pwd').parent().addClass('input-error');
 						$('#login-cnf-pwd').parent().addClass('input-error');
+						$('#jsError').show();
+		                $('#jsErrTxt').html('Passwords do not match');
 						return false;
 					}else {
+						$('#jsError').hide();
 						$('#login-pwd').parent().removeClass('input-error');
 						$('#login-cnf-pwd').parent().removeClass('input-error');
 					}
