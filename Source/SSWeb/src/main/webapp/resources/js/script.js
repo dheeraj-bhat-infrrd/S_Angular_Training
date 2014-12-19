@@ -119,3 +119,11 @@ $('.hm-header-dd-icn').click(function(){
 $('.dd-icn-type2').click(function(){
     $(this).parent().parent().next('.create-branch-dd').slideToggle();
 });
+
+function showPayment(){
+	$('.overlay-payment').show();
+}
+
+function hidePayment(){
+	$('.overlay-payment').hide();
+}
