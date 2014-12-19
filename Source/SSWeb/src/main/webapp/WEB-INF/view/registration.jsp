@@ -50,8 +50,7 @@
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-lname"></div>
-							<input class="float-left login-wrapper-txt" id="reg-lname"
-								data-non-empty="true" name="lastname" value="${lastname}"
+							<input class="float-left login-wrapper-txt" id="reg-lname" name="lastname" value="${lastname}"
 								placeholder='<spring:message code="label.lastname.key" />'>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">

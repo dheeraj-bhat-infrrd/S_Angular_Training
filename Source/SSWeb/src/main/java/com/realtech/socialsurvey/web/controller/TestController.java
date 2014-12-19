@@ -66,7 +66,7 @@ public class TestController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
-		return JspResolver.DASHBOARD;
+		return JspResolver.LANDING;
 	}
 
 	@RequestMapping("/test")

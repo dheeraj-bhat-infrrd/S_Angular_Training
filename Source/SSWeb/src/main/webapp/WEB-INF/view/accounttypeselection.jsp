@@ -14,6 +14,11 @@
 </head>    
 <body>
  <div class="overlay-loader hide"></div>
+ <div class="overlay-payment hide">
+ 	<div id="payment-section">
+		<!-- Payment page comes here through ajax  -->
+	</div>
+ </div>
 	<div class="login-main-wrapper padding-001 login-wrapper-min-height account-type-height">
         <div class="container login-container">
             <div class="row login-row">
@@ -61,9 +66,7 @@
 		                    </div>
 		                    <input type="hidden" name="accounttype" id="account-type" />
 	                    </form>
-                    <div id="payment-section">
-                    	<!-- Payment page comes here through ajax  -->
-                    </div>
+                    
                 </div>
                 <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
                     <spring:message code="label.copyrightposttext.key" />
@@ -94,6 +97,7 @@
 			/* hide the progress icon */
 	    	hideOverlay();
 			$("#payment-section").html(data);
+			showPayment();
 			console.log("callback for selectAccountType finished");
 		}
         $(document).ready(function(){
