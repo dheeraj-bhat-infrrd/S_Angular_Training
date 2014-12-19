@@ -15,7 +15,7 @@
 <body>
     <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
-		<div class="container login-container">
+		<div class="container login-container margin-top-25 margin-bottom-25">
 			<div class="row login-row">
 				<form id="company-info-form" method="POST" action="./addcompanyinformation.do">
 					<div id="company-info-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
@@ -45,9 +45,16 @@
 							<input class="float-left login-wrapper-txt" id="com-company" data-non-empty="true" name="company" placeholder='<spring:message code="label.company.key"/>'>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix pos-relative input-file-company">
-							<div class="float-left login-wrapper-icon icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-							<input type="file" class="float-left login-wrapper-txt txt-company-logo input-file-text" id="com-logo" name="logo" placeholder='Logo'>
-                            <div class="float-right input-icon-internal icn-file" id="icn-file"></div>
+                            <div class="clearfix file-decoy">
+                                <div class="float-left login-wrapper-icon icn-lname input-file-icn-left" id="input-file-icn-left"></div>
+                                <input type="text" class="float-left login-wrapper-txt txt-company-logo" id="com-logo-decoy" name="" placeholder='Logo'>
+                                <div class="float-right input-icon-internal icn-file file-pick-logo" id="icn-file"></div>
+                            </div>
+                            <div class="clearfix file-main">
+                                <div class="float-left login-wrapper-icon icn-lname" id=""></div>
+                                <input type="file" class="float-left login-wrapper-txt txt-company-logo" id="com-logo" name="logo" placeholder='Logo'>
+                                <div class="float-right input-icon-internal icn-file" id="icn-file"></div>
+                            </div>
 						</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-address"></div>
@@ -98,9 +105,9 @@
 
 	<script>
 		$(document).ready(function() {
-			adjustOnResize();
+//			adjustOnResize();
 
-			$(window).resize(adjustOnResize);
+//			$(window).resize(adjustOnResize);
 
 			function adjustOnResize() {
 				var winH = $(window).height();
@@ -126,6 +133,11 @@
             		/* ===== FORM VALIDATED ===== */
 					submitCompanyInfoForm();
 				}
+            });
+            
+            $('#com-logo').change(function(){
+                var fileAdd = $(this).val().split('\\');
+                $('#com-logo-decoy').val(fileAdd[fileAdd.length - 1]);
             });
 			
 		});
