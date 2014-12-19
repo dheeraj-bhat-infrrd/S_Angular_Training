@@ -80,8 +80,10 @@ public class ContactDetailsSettings {
 
 	@Override
 	public String toString() {
-		return "name: " + name + "\t address: " + address + "\t title: " + title + "\t mail_ids: " + mail_ids.toString() + "\t contact_numbers: "
-				+ contact_numbers.toString() + "\t social_links: " + social_links.toString();
+		return "name: " + name + "\t address: " + address + "\t title: " + title + "\t mail_ids: "
+				+ (mail_ids != null ? mail_ids.toString() : "null") + "\t contact_numbers: "
+				+ (contact_numbers != null ? contact_numbers.toString() : "null") + "\t social_links: "
+				+ (social_links != null ? social_links.toString() : "null");
 	}
 
 }
