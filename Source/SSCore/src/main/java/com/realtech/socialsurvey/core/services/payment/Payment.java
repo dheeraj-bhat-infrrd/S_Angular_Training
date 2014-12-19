@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.payment;
 import java.math.BigDecimal;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
+import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -66,5 +67,13 @@ public interface Payment {
 	 * @throws NoRecordsFetchedException 
 	 */
 	public void updateRetriesForPayment(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
-		
+	
+	/**
+	 * Retries payment for a particular subscription id and returns the Transaction object.
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
+	 */
+	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException;
 }
