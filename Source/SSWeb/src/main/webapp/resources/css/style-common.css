@@ -448,6 +448,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     line-height: 40px;
     margin-top: 19px;
     color: #fff;
+    text-transform: uppercase;
     font-weight: bold !important;
 }
 
@@ -480,6 +481,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     margin-top: 19px;
     text-align: center;
     background-color: #77b000;
+    cursor: pointer;
 }
 
 .hm-header-main-wrapper {
@@ -717,4 +719,48 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .mobile-search-panel-adj{
     float: none;
     width: 100%;
+}
+.um-header {
+    font-size: 20px;
+    margin-bottom: 25px;
+}
+
+.um-item-row-icon {
+    float: right;
+    height: 50px;
+    width: 50px;
+    background-color: #f1f1f1;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.um-item-row-left {
+    width: 80px;
+    float: left;
+    line-height: 50px;
+}
+
+.um-item-row-txt {
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    width: 300px;
+    height: 50px;
+    padding: 0 10px;
+}
+
+.um-tag-item-txt {
+    line-height: 32px;
+}
+
+.um-tag-item-icn {
+    height: 32px;
+    width: 16px;
+    cursor: pointer;
+    margin-left: 5px;
+    background-color: #f1f1f1;
+}
+
+.um-tag-item-wrapper {
+    margin: 0 20px;
 }
