@@ -259,11 +259,6 @@
     width: 411px !important;
 }
 
-
-
-
-
-
 .account-type-height {
     height: auto !important
 }
@@ -273,7 +268,7 @@
 }
 
 .hm-left-item {
-    border-bottom: 1px solid #dcdcdc;
+/*    border-bottom: 1px solid #dcdcdc;*/
     padding: 0 45px 0 0;
 }
 
@@ -285,4 +280,9 @@
 
 .file-pick-logo {
     top: -50px;
+}
+
+.hm-main-content-wrapper {
+    position: relative;
+    z-index: 9;
 }

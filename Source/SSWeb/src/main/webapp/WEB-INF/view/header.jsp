@@ -16,7 +16,7 @@
     <div class="header-main-wrapper">
         <div class="container clearfix header-container">
             <div class="header-logo float-left"></div>
-            <div class="header-links float-left clearfix">
+            <div id="header-links" class="header-links float-left clearfix">
                 <div class="header-links-item">Dashboard</div>
                 <div class="header-links-item">Company</div>
                 <div class="header-links-item">Build Survey</div>
@@ -27,5 +27,6 @@
                 <div class="float-left user-info-seperator"></div>
                 <div class="float-left user-info-logo"></div>
             </div>
+            <div id="header-menu-icn" class="header-menu-icn icn-menu float-right hide"></div>
         </div>
     </div>
