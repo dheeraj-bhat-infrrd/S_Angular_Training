@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
 
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,8 +16,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -98,6 +101,18 @@ public class LoginController {
 
 				HttpSession session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+
+				AccountType accountType = null;
+				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+				if (licenseDetails != null && !licenseDetails.isEmpty()) {
+					LicenseDetail licenseDetail = licenseDetails.get(0);
+					accountType = AccountType.getAccountType(licenseDetail.getLicenseId());
+					LOG.debug("Adding account type in session");
+					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				}
+				else {
+					LOG.debug("License details not found for the user's company");
+				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
@@ -173,7 +188,7 @@ public class LoginController {
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage() {
 		LOG.info("Dashboard Page started");
-		return JspResolver.DASHBOARD;
+		return JspResolver.LANDING;
 	}
 
 	/**
@@ -368,7 +383,7 @@ public class LoginController {
 				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
 				break;
 			case CommonConstants.DASHBOARD_STAGE:
-				redirectTo = JspResolver.DASHBOARD;
+				redirectTo = JspResolver.LANDING;
 				break;
 			default:
 				throw new InvalidInputException("Profile completion stage is invalid", DisplayMessageConstants.GENERAL_ERROR);

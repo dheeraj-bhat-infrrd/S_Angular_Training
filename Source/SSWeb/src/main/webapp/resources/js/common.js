@@ -75,3 +75,7 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 		}
 	});
 }
+
+function getMainContent(url,whereToDisplay) {
+	
+}
