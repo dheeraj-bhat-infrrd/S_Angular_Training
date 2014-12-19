@@ -103,8 +103,11 @@ public class OrganizationUnitSettings {
 	@Override
 	public String toString() {
 		return "iden: " + iden + "\t profile_completion: " + profile_completion + "\t logo: " + logo + "\t contact_details: "
-				+ contact_details.toString() + "\t crm_info: " + crm_info + "\t licenses: " + licenses.toString() + "\t associations: "
-				+ associations.toString() + "\t achievements: " + achievements.toString() + "\t survey_setings: " + survey_setings.toString();
+				+ (contact_details != null ? contact_details.toString() : "null") + "\t crm_info: "
+				+ (crm_info != null ? crm_info.toString() : "null") + "\t licenses: " + (licenses != null ? licenses.toString() : "null")
+				+ "\t associations: " + (associations != null ? associations.toString() : "") + "\t achievements: "
+				+ (achievements != null ? achievements.toString() : "null") + "\t survey_setings: "
+				+ (survey_setings != null ? survey_setings.toString() : "");
 	}
 
 }

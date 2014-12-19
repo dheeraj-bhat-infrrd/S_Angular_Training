@@ -34,10 +34,10 @@ public class MailIdSettings {
 	public void setOthers(List<MiscValues> others) {
 		this.others = others;
 	}
-	
+
 	@Override
-	public String toString(){
-		return "work: "+work+"\t personal: "+personal+"\t others: "+others.toString();
+	public String toString() {
+		return "work: " + work + "\t personal: " + personal + "\t others: " + (others != null ? others.toString() : "null");
 	}
 
 }

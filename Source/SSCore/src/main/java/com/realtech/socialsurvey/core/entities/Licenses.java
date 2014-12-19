@@ -24,7 +24,7 @@ public class Licenses {
 	}
 
 	@Override
-	public String toString(){
-		return "authorized_in: "+authorized_in.toString()+"\t license_disclaimer: "+license_disclaimer;
+	public String toString() {
+		return "authorized_in: " + (authorized_in != null ? authorized_in.toString() : "null") + "\t license_disclaimer: " + license_disclaimer;
 	}
 }
