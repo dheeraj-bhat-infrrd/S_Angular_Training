@@ -86,19 +86,32 @@
             	$('#reset-pwd-form').submit();
             }
             
+            $('#login-user-id').blur(function() {
+				validateEmailId(this.id);
+			});
+            
+            $('#login-pwd').blur(function() {
+				validatePassword(this.id);
+			});
+            
+            $('#login-cnf-pwd').blur(function() {
+				validateConfirmPassword('login-pwd',this.id);
+			});
+            
+            function validateResetPasswordForm(id) {
+            	
+            	if(!validateEmailId('login-user-id'))
+            		return false;
+            	if(!validatePassword('login-pwd'))
+            		return false;
+            	if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd'))
+            		return false;
+            	
+				return true;
+			}
+            
             $('#reset-pwd-submit').click(function(e){
-                if(validateForm('reset-pwd-form')){
-                	if($('#login-pwd').val() != $('#login-cnf-pwd').val()) {
-						$('#login-pwd').parent().addClass('input-error');
-						$('#login-cnf-pwd').parent().addClass('input-error');
-						$('#jsError').show();
-		                $('#jsErrTxt').html('Passwords do not match');
-						return false;
-					}else {
-						$('#jsError').hide();
-						$('#login-pwd').parent().removeClass('input-error');
-						$('#login-cnf-pwd').parent().removeClass('input-error');
-					}
+                if(validateResetPasswordForm('reset-pwd-form')){
                     /* ===== FORM VALIDATED ===== */
                 	submitResetPasswordForm();
                 }

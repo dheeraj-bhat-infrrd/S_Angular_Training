@@ -78,11 +78,21 @@
             }
             
             $('#forgot-pwd-submit').click(function(e){
-                if(validateForm('forgot-pwd-form')){
+                if(validateForgotPasswordForm('forgot-pwd-form')){
                     /* ===== FORM VALIDATED ===== */
                 	submitForgotPasswordForm();
                 }
             });
+            
+            $('#login-user-id').blur(function() {
+				validateEmailId(this.id);
+			});
+            
+            function validateForgotPasswordForm(id) {
+				if(!validateEmailId('login-user-id'))
+					return false;
+				return true;
+			}
             
         });
     </script>
