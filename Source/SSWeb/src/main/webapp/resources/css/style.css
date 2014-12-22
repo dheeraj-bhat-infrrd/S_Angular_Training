@@ -214,11 +214,11 @@
 }
 
 .login-wrapper-min-height {
-    min-height: 660px;
+    min-height: 730px;
 }
 
 .registration-wrapper-min-height {
-    min-height: 940px;
+    min-height: 980px;
 }
 
 .error-msg {
@@ -260,7 +260,7 @@
 }
 
 .account-type-height {
-    height: auto !important
+/*    height: auto !important*/
 }
 
 .hm-content-right {
@@ -285,4 +285,10 @@
 .hm-main-content-wrapper {
     position: relative;
     z-index: 9;
+}
+
+
+
+.registration-wrapper-min-height .login-row {
+    margin-top: 80px;
 }
