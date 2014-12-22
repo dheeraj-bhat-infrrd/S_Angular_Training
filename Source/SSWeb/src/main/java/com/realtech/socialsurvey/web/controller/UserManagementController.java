@@ -42,8 +42,6 @@ public class UserManagementController {
 
 	// JIRA SS-42 BY RM05 BOC
 
-	
-	
 	@RequestMapping(value = "/deactivateExistingUser", method = RequestMethod.POST)
 	public String deactivateExistingUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
 			UserAlreadyExistsException {
@@ -226,9 +224,9 @@ public class UserManagementController {
 	 */
 	@RequestMapping(value = "/removeRegionAdmin", method = RequestMethod.POST)
 	public String removeRegionAdmin(Model model, HttpServletRequest request) throws InvalidInputException {
-		
+
 		LOG.info("Method to remove region admin called");
-		
+
 		try {
 
 			String region = request.getParameter("regionId");
@@ -242,16 +240,16 @@ public class UserManagementController {
 				LOG.error("Null or empty value passed for user id in assignRegionAdmin()");
 				throw new InvalidInputException("Null or empty value passed for user id in removeRegionAdmin()");
 			}
-			
+
 			long regionId = 0l;
 			long userId = 0l;
-			
+
 			try {
 				regionId = Long.parseLong(region);
 				userId = Long.parseLong(userIdToRemove);
 				HttpSession session = request.getSession(false);
 				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			
+
 				// Remove the given user from branch admin.
 				userManagementService.removeRegionAdmin(admin, regionId, userId);
 			}

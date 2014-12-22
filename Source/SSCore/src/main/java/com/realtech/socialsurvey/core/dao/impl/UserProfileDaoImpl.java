@@ -12,24 +12,24 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserProfileDaoImpl.class);
-	
+
 	/*
 	 * Method to deactivate all the user profiles for a given user.
 	 */
-	
+
 	@Override
 	public void deactivateUserProfileByUser(User admin, User userToBeDeactivated) {
 
-		LOG.info("Method deactivateUserProfileByUser called to deactivate user : "+userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getDisplayName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
-		//Setting status for user profile as inactive.
+		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
 		query.setParameter(1, String.valueOf(admin.getUserId()));
 		query.setParameter(2, String.valueOf(new Timestamp(System.currentTimeMillis())));
 		query.setParameter(3, userToBeDeactivated);
 		query.executeUpdate();
-		LOG.info("Method deactivateUserProfileByUser called to deactivate user : "+userToBeDeactivated.getDisplayName());
-		
+		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getDisplayName());
+
 	}
 
 	/*
@@ -37,16 +37,16 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	 */
 	@Override
 	public void deactivateUserProfileForBranch(User admin, long branchId, User userToBeDeactivated) {
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : "+userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
-		//Setting status for user profile as inactive.
+		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
 		query.setParameter(1, String.valueOf(admin.getUserId()));
 		query.setParameter(2, String.valueOf(new Timestamp(System.currentTimeMillis())));
 		query.setParameter(3, userToBeDeactivated);
 		query.setParameter(4, branchId);
 		query.executeUpdate();
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : "+userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
 	}
 
 	/*
@@ -54,15 +54,15 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	 */
 	@Override
 	public void deactivateUserProfileForRegion(User admin, long regionId, User userToBeDeactivated) {
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : "+userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
-		//Setting status for user profile as inactive.
+		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
 		query.setParameter(1, String.valueOf(admin.getUserId()));
 		query.setParameter(2, String.valueOf(new Timestamp(System.currentTimeMillis())));
 		query.setParameter(3, userToBeDeactivated);
 		query.setParameter(4, regionId);
 		query.executeUpdate();
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : "+userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
 	}
 }
