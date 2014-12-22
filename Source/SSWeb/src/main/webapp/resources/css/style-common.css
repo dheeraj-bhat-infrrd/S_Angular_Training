@@ -914,3 +914,12 @@ button.paypal.is-active {
 .icn-right-tick {
     background: url(../images/icnLoanOfficer.png) no-repeat center;
 }
+
+.header-slider {
+    width: 80%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    background-color: #fff;
+    box-shadow: -3px 0px 8px 1px #ccc;
+}

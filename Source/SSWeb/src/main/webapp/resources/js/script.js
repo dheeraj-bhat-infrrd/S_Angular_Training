@@ -110,7 +110,18 @@ $('#hm-item-dd-bottom').click(function(){
 });
 
 $('#header-menu-icn').click(function(){
-    $('#header-links').slideToggle(200);
+//    $('#header-links').slideToggle(200);
+    $('#header-slider-wrapper').addClass('rt-panel-slide');
+    $('body').addClass('body-no-scroll');
+});
+
+$('#header-slider-wrapper').click(function(){
+    $('#header-slider-wrapper').removeClass('rt-panel-slide');
+    $('body').removeClass('body-no-scroll');
+});
+
+$('#header-links-slider, .header-slider').click(function(e){
+    e.stopPropagation();
 });
 
 $('.hm-header-dd-icn').click(function(){
