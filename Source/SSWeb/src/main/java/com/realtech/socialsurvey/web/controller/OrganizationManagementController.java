@@ -30,7 +30,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 // JIRA: SS-24 BY RM02 BOC
 
 /**
- * Controller to manage the organizational settings and information provided by the user
+ * Controller to manage the organizational settings and information provided by the user.
  */
 @Controller
 public class OrganizationManagementController {
