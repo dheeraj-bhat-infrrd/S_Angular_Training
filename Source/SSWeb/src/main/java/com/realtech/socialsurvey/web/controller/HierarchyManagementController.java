@@ -85,7 +85,7 @@ public class HierarchyManagementController {
 		}
 
 		LOG.info("Successfully completed method to showBuildHierarchyPage");
-		return JspResolver.BUILD_HIERARCHY;
+		return JspResolver.HIERARCHY_MANAGEMENT;
 	}
 
 	/**
@@ -267,8 +267,8 @@ public class HierarchyManagementController {
 
 			String address = getCompleteAddress(regionAddress1, regionAddress2);
 			// TODO store address in database
-			LOG.info("Address "+address+" is yet to be stored");
-			
+			LOG.info("Address " + address + " is yet to be stored");
+
 			LOG.debug("Calling service to add a new region");
 			try {
 				hierarchyManagementService.addNewRegion(user, regionName);
@@ -325,8 +325,8 @@ public class HierarchyManagementController {
 
 			String address = getCompleteAddress(branchAddress1, branchAddress2);
 			// TODO store address in database
-			LOG.info("Address "+address+" is yet to be stored");
-			
+			LOG.info("Address " + address + " is yet to be stored");
+
 			try {
 				LOG.debug("Calling service to add a new branch");
 				hierarchyManagementService.addNewBranch(user, regionId, branchName);

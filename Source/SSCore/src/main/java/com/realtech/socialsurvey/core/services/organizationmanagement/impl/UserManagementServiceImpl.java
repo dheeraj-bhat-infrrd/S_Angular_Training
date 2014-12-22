@@ -145,19 +145,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user found for userId specified in createRegionAdmin");
 		}
-		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
-				regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
-				String.valueOf(assigneeUser.getUserId()), String.valueOf(assigneeUser.getUserId()));
+		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
+				CommonConstants.DEFAULT_BRANCH_ID, regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID,
+				CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()),
+				String.valueOf(assigneeUser.getUserId()));
 		userProfileDao.save(userProfile);
 
-		
 		LOG.info("Method to createRegionAdmin finished for regionId : " + regionId + " and userId : " + userId);
 
 		return user;
 	}
 
-	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
-			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId,
+			int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(agentId);
@@ -177,5 +177,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		userProfile.setModifiedBy(modifiedBy);
 		LOG.debug("Method createUserProfile() finished");
 		return userProfile;
+	}
+
+	/**
+	 * Method to update a user's status
+	 */
+	@Override
+	@Transactional
+	public void updateUserStatus(long userId, int status) throws InvalidInputException {
+		LOG.info("Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status);
+		User user = userDao.findById(User.class, userId);
+		if (user == null) {
+			throw new InvalidInputException("No user present for the specified userId");
+		}
+		user.setStatus(status);
+		user.setModifiedBy(String.valueOf(userId));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		userDao.update(user);
+
+		LOG.info("Successfully completed method to update user status");
 	}
 }

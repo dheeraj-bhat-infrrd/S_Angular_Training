@@ -4,6 +4,7 @@ import java.util.List;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 // JIRA : SS-21 by RM-06 : BOC
@@ -15,7 +16,7 @@ public interface AuthenticationService {
 	
 	public void validateUser(User user, String password) throws InvalidInputException;
 
-	public User getUserWithLoginName(String userId) throws InvalidInputException;
+	public User getUserWithLoginName(String userId) throws NoRecordsFetchedException;
 
 	public List<UserProfile> getUserProfileForUser(User user) throws InvalidInputException;
 	

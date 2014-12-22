@@ -12,7 +12,7 @@
 	</head> 
 	<body>
 		<h3>
-		<a href="./invitation.do">Click here to Register</a>
+		<a href="./registration.do">Click here to Register</a>
 		</h3>
 	</body>
 </html>

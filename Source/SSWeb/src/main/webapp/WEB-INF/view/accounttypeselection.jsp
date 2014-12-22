@@ -7,7 +7,6 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.makepayment.title.key" /></title>
-    <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
@@ -15,7 +14,12 @@
 </head>    
 <body>
  <div class="overlay-loader hide"></div>
-	<div class="login-main-wrapper padding-001 login-wrapper-min-height">
+ <div class="overlay-payment hide">
+ 	<div id="payment-section">
+		<!-- Payment page comes here through ajax  -->
+	</div>
+ </div>
+	<div class="login-main-wrapper padding-001 login-wrapper-min-height account-type-height">
         <div class="container login-container">
             <div class="row login-row">
                 <div id="payment-form" class="payment-form login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-md-12 col-xs-12">
@@ -62,9 +66,7 @@
 		                    </div>
 		                    <input type="hidden" name="accounttype" id="account-type" />
 	                    </form>
-                    <div id="payment-section">
-                    	<!-- Payment page comes here through ajax  -->
-                    </div>
+                    
                 </div>
                 <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
                     <spring:message code="label.copyrightposttext.key" />
@@ -72,10 +74,11 @@
             </div>
         </div>
     </div>
-    <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-    <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-        <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
+    <script	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+	<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+    <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
     <script>
 	    function selectAccountType(accountType) {
 			console.log("selecting and saving account type");
@@ -94,6 +97,7 @@
 			/* hide the progress icon */
 	    	hideOverlay();
 			$("#payment-section").html(data);
+			showPayment();
 			console.log("callback for selectAccountType finished");
 		}
         $(document).ready(function(){
