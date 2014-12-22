@@ -47,11 +47,11 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 				if (!imageFormat(convFile)) {
 					throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT);
 				}
-				if (!imageDimension(convFile)) {
-					throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS);
-				}
 				if (!imageSize(convFile)) {
 					throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE);
+				}
+				if (!imageDimension(convFile)) {
+					throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS);
 				}
 
 				// Creating the directory to store file
@@ -79,11 +79,12 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 			}
 			finally {
 				try {
-					stream.close();
+					if (stream != null) {
+						stream.close();
+					}
 				}
 				catch (IOException e) {
 					LOG.error("IOException occured while closing the BufferedOutputStream. Reason : " + e.getMessage(), e);
-					throw new FatalException("IOException occured while closing the BufferedOutputStream. Reason : " + e.getMessage(), e);
 				}
 			}
 		}
@@ -139,12 +140,15 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 		}
 		finally {
 			try {
-				reader.dispose();
-				imageStream.close();
+				if (reader != null) {
+					reader.dispose();
+				}
+				if (imageStream != null) {
+					imageStream.close();
+				}
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
-				throw new FatalException("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
 			}
 		}
 	}
@@ -183,12 +187,16 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 		}
 		finally {
 			try {
-				reader.dispose();
-				imageStream.close();
+				if (reader != null) {
+					reader.dispose();
+				}
+				if (imageStream != null) {
+					imageStream.close();
+				}
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
-				throw new FatalException("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
+				// throw new FatalException("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
 			}
 		}
 	}
