@@ -1,3 +1,4 @@
+/* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
     .login-main-wrapper{
         background: #fff;
@@ -72,6 +73,183 @@
         min-width: 50px;
         width: 15%;
     }
+    .hm-content-right{
+        border-left: 0;
+        margin-top: 0;
+    }
+    .hm-item-row{
+        width: 100%;
+        margin-bottom: -1px;
+    }
+    .hm-bottom-panel-item{
+        padding: 0 15px;
+    }
+    .hm-left-item, .hm-right-item{
+        padding: 0;
+        border-bottom: 0;
+    }
+    .hm-content-left, .hm-content-right{
+        padding: 0;
+        border-bottom: 0
+    }
+    .login-container {
+        margin-top: 0;
+    }
+    .header-container{
+        height: 50px;
+        position: relative;
+        border-bottom: 1px solid #dcdcdc;
+        z-index: 99999;
+    }
+    .header-logo{
+        height: 50px;
+        width: 115px;
+        background-size: auto 30px;
+    }
+    .header-links{
+        background-color: #fff;
+        height: auto;
+        position: absolute;
+        width: 100%;
+        margin: 0;
+        top: 50px;
+        display: none;
+        box-shadow: 0px 3px 8px 0px #ccc;
+    }
+    .header-links-item{
+        width: 100%;
+        line-height: 50px;
+        float: none;
+        height: auto;
+        padding: 0 15px;
+        line-height: 50px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .header-user-info, .hm-header-row-right{
+        display: none;
+    }
+    .header-menu-icn{
+        display: block;
+    }
+    .header-main-wrapper .container, .hm-header-main-wrapper .container, .hm-main-content-wrapper .container{
+        padding: 0;
+    }
+    .hm-header-main-wrapper{
+        background-color: #fff;
+    }
+    .hm-header-row{
+        height: 48px;
+    }
+    .hm-header-row-left{
+        color: #555;
+        font-size: 16px;
+        width: 100%;
+        float: none;
+        text-align: center;
+        line-height: 48px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .hm-main-content-wrapper{
+        margin-top: 0;
+    }
+    .hm-item-header-left{
+        font-size: 16px;
+        font-family: opensans !important;
+    }
+    .hm-sub-header-left{
+        font-size: 16px;
+        font-family: opensans !important;
+    }
+    .hm-sub-header, .hm-sub-item, .hm-item-header{
+        padding: 0 10px;
+    }
+    .hm-item-content{
+        padding: 0px 10px 0;
+        margin-top: -1px;
+    }
+    .dd-icn{
+        display: block;
+    }
+    .hm-item-row-right-btn-save{
+        width: 235px;
+        margin: 10px auto !important;
+        float: none;
+    }
+    .float-left.icn-save.cursor-pointer{
+        margin-right: 0;
+    }
+    .hm-item-row-left, .um-item-row-left{
+        display: none;
+    }
+    .hm-item-row-right{
+        float: none;
+        margin: 0 -10px;
+    }
+    .hm-item-row-txt, .um-item-row-txt{
+        width: 100%;
+        box-shadow: none;
+        border-radius: 0;
+        border-left: 0;
+        border-right: 0;
+        padding: 10px 10px 10px 50px;
+    }
+    .hm-dd-wrapper{
+        width: 100%;
+        border-left: 0;
+        border-right: 0;
+        box-shadow: 0px 3px 8px 0px #ccc;
+    }
+    .hm-sub-search-txt{
+        width: 115px;
+    }
+    .footer-text{
+        font-size: 10px;
+    }
+    .hm-top-panel-content{
+        margin-top: -1px;
+        margin-bottom: 0px;
+        border-bottom: 0;
+    }
+    .hm-top-panel-item{
+        padding: 0 10px;
+    }
+    .hm-bottom-panel, .hm-bottom-panel-item{
+        padding: 0;
+    }
+    .hm-bottom-panel{
+        margin-bottom: 0;
+    }
+    .hm-sub-header{
+        border-top: 1px solid #dcdcdc;
+    }
+    .create-branch-dd{
+        display: none;
+    }
+    .margin-top-2-resp{
+        margin-top: -2px;
+    }
+    .hm-sub-header{
+        height: 50px;
+        line-height: 50px;
+    }
+    .hm-sub-search-txt, .hm-sub-height-adjust{
+        height: 48px;
+    }
+    .um-header {
+        font-size: 16px;
+        padding-left: 10px;
+        line-height: 50px;
+        border-bottom: 1px solid #dcdcdc;
+        margin-bottom: -1px;
+    }
+    .um-item-row-icon{
+        position: absolute;
+        right: 0;
+        margin-right: 0;
+    }
+    .um-top-tag-wrapper{
+        margin-top: 25px;
+    }
 }
 
 
@@ -105,6 +283,12 @@
     .padding-right-25{
         padding-right: 25px;
     }
+    .header-links{
+        font-size: 16px;
+    }
+    .create-branch-dd{
+        display: block !important;
+    }
 }
 
 
@@ -114,7 +298,94 @@
     .payment-option-tab{
         width: 50%;
     }
+    .header-logo{
+        width: 125px;
+    }
+    .header-links{
+        margin-left: 20px;
+    }
+    .header-links-item{
+        padding: 0 5px;
+        font-size: 13px;
+        line-height: 94px;
+    }
+    .user-info-seperator{
+        width: 25px;
+    }
+    .user-info-logo{
+        width: 125px;
+    }
+    .hm-item-row{
+        width: 100%
+    }
+    .hm-item-row-left{
+        width: 90px;
+        font-size: 13px;
+    }
+    .um-item-row-left{
+        width: 70px;
+        font-size: 13px;
+    }
+    .hm-item-row-txt{
+        width: 225px;
+        font-size: 13px;
+    }
+    .um-item-row-txt{
+        width: 190px;
+        font-size: 13px;
+    }
+    .hm-left-item{
+        padding: 0 20px 0 0;
+    }
+    .hm-right-item{
+        padding: 0 0 0 20px;
+    }
+    .hm-sub-search-txt{
+        width: 125px;
+    }
+    .hm-sub-header-left{
+        font-size: 18px;
+    }
 }
+
+/* ============== MEDIUM SIZED SCREENS ==============*/
+@media (min-width: 992px) and (max-width: 1199px) {
+    .hm-item-row{
+        width: 100%
+    }
+    .hm-item-row-txt, .hm-dd-wrapper, .um-item-row-txt{
+        width: 280px;
+    }
+}
+
+/* ============== LARGE SIZED SCREENS ==============*/
+@media (min-width: 1200px) {
+    
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
