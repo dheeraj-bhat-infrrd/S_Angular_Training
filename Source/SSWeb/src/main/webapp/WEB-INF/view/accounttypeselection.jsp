@@ -29,37 +29,49 @@
 		                    <div class="clearfix payment-option-wrapper">
 		                        <div class="float-left payment-option-tab padding-left-25">
 		                            <div class="payment-tab-main">
-		                                <div class="payment-tab-header"><spring:message code="label.accounttype.individual.key"/></div>
-		                                <div class="payment-tab-price"><span class="payment-txt-price">$35<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
-		                                <div class="payment-tab-line1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+		                                <div class="payment-text-wrapper hide">
+                                            <div class="payment-tab-header"><spring:message code="label.accounttype.individual.key"/></div>
+                                            <div class="payment-tab-price"><span class="payment-txt-price">$35<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+                                            <div class="payment-tab-line1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        </div>
+		                                <div id="individual-card-info" class="payment-card-info-wrapper"></div>
 		                            </div>
 		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(1)"><spring:message code="label.accounttype.select.key"/></div>
 		                        </div>
 		                        <div class="float-left payment-option-tab">
 		                            <div class="payment-tab-main">
-		                                <div class="payment-tab-header"><spring:message code="label.accounttype.team.key"/></div>
-		                                <div class="payment-tab-price"><span class="payment-txt-price">$45<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
-		                                <div class="payment-tab-line1"><strong>30</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        <div class="payment-text-wrapper">
+                                            <div class="payment-tab-header"><spring:message code="label.accounttype.team.key"/></div>
+                                            <div class="payment-tab-price"><span class="payment-txt-price">$45<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+                                            <div class="payment-tab-line1"><strong>30</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        </div>
+                                        <div id="team-card-info" class="hide payment-card-info-wrapper"></div>
 		                            </div>
 		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(2)"><spring:message code="label.accounttype.select.key"/></div>
 		                        </div>
 		                        <div class="float-left payment-option-tab">
 		                            <div class="payment-tab-main">
-		                                <div class="payment-tab-header"><spring:message code="label.accounttype.company.key"/></div>
-		                                <div class="payment-tab-price"><span class="payment-txt-price">$65<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
-		                                <div class="payment-tab-line1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        <div class="payment-text-wrapper">
+                                            <div class="payment-tab-header"><spring:message code="label.accounttype.company.key"/></div>
+                                            <div class="payment-tab-price"><span class="payment-txt-price">$65<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+                                            <div class="payment-tab-line1"><strong>60</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        </div>
+                                        <div id="company-card-info" class="hide payment-card-info-wrapper"></div>
 		                            </div>
 		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(3)"><spring:message code="label.accounttype.select.key"/></div>
 		                        </div>
 		                        <div class="float-left payment-option-tab padding-right-25">
 		                            <div class="payment-tab-main">
-		                                <div class="payment-tab-header"><spring:message code="label.accounttype.enterprise.key"/></div>
-		                                <div class="payment-tab-price"><span class="payment-txt-price">$99<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
-		                                <div class="payment-tab-line1"><strong>100</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
-		                                <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        <div class="payment-text-wrapper">
+                                            <div class="payment-tab-header"><spring:message code="label.accounttype.enterprise.key"/></div>
+                                            <div class="payment-tab-price"><span class="payment-txt-price">$99<sup>99</sup></span> <span class="txt-thin"><spring:message code="label.permonth.key"/></span></div>
+                                            <div class="payment-tab-line1"><strong>100</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+                                        </div>
+                                        <div id="enterprise-card-info" class="hide payment-card-info-wrapper"></div>
 		                            </div>
 		                            <div class="btn-payment-sel" onclick="javascript:selectAccountType(4)"><spring:message code="label.accounttype.select.key"/></div>
 		                        </div>

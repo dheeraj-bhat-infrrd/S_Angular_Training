@@ -109,8 +109,8 @@
 
 	<script>
 		$(document).ready(function() {
-			adjustOnResize();
-			$(window).resize(adjustOnResize);
+//			adjustOnResize();
+//			$(window).resize(adjustOnResize);
 
 			function adjustOnResize() {
 				var winH = $(window).height();
