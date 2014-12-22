@@ -148,7 +148,7 @@
 			formData.append("logo", $('#com-logo').prop("files")[0]);
 			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
 			$.ajax({
-				url : "./uploadFile.do",
+				url : "./uploadcompanylogo.do",
 				type : "POST",
 				dataType : 'text',
 				contentType : false,

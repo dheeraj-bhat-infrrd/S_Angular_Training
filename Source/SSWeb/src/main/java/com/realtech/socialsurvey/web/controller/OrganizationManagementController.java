@@ -61,7 +61,7 @@ public class OrganizationManagementController {
 	 * @return
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	@RequestMapping(value = "/uploadcompanylogo", method = RequestMethod.POST)
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
 		String logoName = "";
@@ -70,12 +70,16 @@ public class OrganizationManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
+			if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME).toString() != null) {
+				request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
+			}
+			
 			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.debug("Setting Logo image name to Session");
-		request.getSession(false).setAttribute("logoName", logoName);
+		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
 
 		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
 		return JspResolver.MESSAGE_HEADER;
