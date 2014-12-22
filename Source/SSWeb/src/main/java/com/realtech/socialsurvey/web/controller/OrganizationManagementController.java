@@ -65,7 +65,6 @@ public class OrganizationManagementController {
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
 		String logoName = "";
-		
 		LOG.debug("Overriding Logo image name in Session");
 		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, "");
 		try {
@@ -79,7 +78,7 @@ public class OrganizationManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
-		LOG.debug("Setting Logo image name in Session");
+		LOG.debug("Setting Logo image name to Session");
 		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
 
 		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
