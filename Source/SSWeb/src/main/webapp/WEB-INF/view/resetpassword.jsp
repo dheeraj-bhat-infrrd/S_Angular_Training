@@ -86,7 +86,7 @@
             	$('#reset-pwd-form').submit();
             }
             
-            $('#reset-pwd-div').click(function(e){
+            $('#reset-pwd-submit').click(function(e){
                 if(validateForm('reset-pwd-form')){
                 	if($('#login-pwd').val() != $('#login-cnf-pwd').val()) {
 						$('#login-pwd').parent().addClass('input-error');
