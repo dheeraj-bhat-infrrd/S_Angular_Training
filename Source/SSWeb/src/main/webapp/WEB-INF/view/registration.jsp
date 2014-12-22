@@ -129,8 +129,8 @@
 			}
 
 			$('#reg-submit').click(function(e) {
-				if (validateForm('reg-form')) {					
-					/* === Validate passwords === */
+				if (validateRegistrationForm('reg-form')) {					
+					/* === Validate passwords ===
 					if($('#reg-pwd').val() != $('#reg-conf-pwd').val()) {
 						$('#reg-pwd').parent().addClass('input-error');
 						$('#reg-conf-pwd').parent().addClass('input-error');
@@ -142,11 +142,50 @@
 						$('#reg-pwd').parent().removeClass('input-error');
 						$('#reg-conf-pwd').parent().removeClass('input-error');
 					}
-					
-					/* ===== FORM VALIDATED ===== */
+					===== FORM VALIDATED ===== */
 					submitRegistrationForm();
 				}
 			});
+			
+			/* ==Functions to trigger form validation of various input elements== */
+			$('#reg-fname').blur(function() {
+				validateFirstName(this.id);
+			});
+			
+			$('#reg-lname').blur(function() {
+				validateLastName(this.id);
+			});
+			
+			$('#reg-email').blur(function() {
+				validateEmailId(this.id);
+			});
+			
+			$('#reg-pwd').blur(function() {
+				validatePassword(this.id);
+			});
+			
+			$('#reg-conf-pwd').blur(function(){
+				validateConfirmPassword('reg-pwd',this.id);
+			});
+			
+			function validateRegistrationForm(id) {
+				//hide the server error
+            	$("#serverSideerror").hide();
+            	
+				//Validate form input elements
+				if(!validateFirstName('reg-fname'))
+					return false;
+				if(!validateLastName('reg-lname'))
+					return false;
+				if(!validateEmailId('reg-email'))
+					return false;
+				if(!validatePassword('reg-pwd'))
+					return false;
+				if(!validateConfirmPassword('reg-pwd', 'reg-conf-pwd'))
+            		return false;
+            	
+            	return true;
+			}
 
 		});
 	</script>
