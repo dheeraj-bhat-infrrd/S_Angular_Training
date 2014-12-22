@@ -67,7 +67,7 @@ public class OrganizationManagementController {
 		String logoName = "";
 		try {
 			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
-			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESS", DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
