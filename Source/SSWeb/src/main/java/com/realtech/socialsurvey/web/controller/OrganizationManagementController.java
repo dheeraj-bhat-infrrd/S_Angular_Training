@@ -65,15 +65,17 @@ public class OrganizationManagementController {
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
 		String logoName = "";
+		
+		LOG.debug("Overriding Logo image name in Session");
+		if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME) != null) {
+			request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
+		}
+		
 		try {
 			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
-			if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME).toString() != null) {
-				request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
-			}
-			
 			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
