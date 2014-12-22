@@ -104,4 +104,13 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 
+	/**
+	 * Logo related config
+	 */
+	public static final String MAX_LOGO_SIZE_BYTES = "MAX_LOGO_SIZE_BYTES";
+	public static final String MAX_LOGO_WIDTH_PIXELS = "MAX_LOGO_WIDTH_PIXELS";
+	public static final String MAX_LOGO_HEIGHT_PIXELS = "MAX_LOGO_HEIGHT_PIXELS";
+	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
+	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
+	public static final String LOGO_NAME = "logoName";
 }
