@@ -17,7 +17,7 @@
 	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
 		<div class="container login-container margin-top-25 margin-bottom-25">
 			<div class="row login-row">
-				<form id="company-info-form" method="POST" action="./addcompanyinformation.do">
+				<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data">
 					<div id="company-info-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 						<div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 						<div class="login-txt text-center font-24 margin-bot-20">
@@ -142,6 +142,24 @@
 			
 		});
 	</script>
-
+	<script>
+		$("#company-info-form").on("change", function() {
+			var formData = new FormData();
+			formData.append("logo", $('#com-logo').prop("files")[0]);
+			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
+			$.ajax({
+				url : "./uploadcompanylogo.do",
+				type : "POST",
+				dataType : 'text',
+				contentType : false,
+				processData : false,
+				cache : false,
+				data : formData,
+				success : function(response) {
+					$("#serverSideerror").html(response);
+				}
+			});
+		});
+	</script>
 </body>
 </html>
