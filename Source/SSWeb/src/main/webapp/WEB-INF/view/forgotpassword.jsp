@@ -77,7 +77,7 @@
             	$('#forgot-pwd-form').submit();
             }
             
-            $('#forgot-pwd-div').click(function(e){
+            $('#forgot-pwd-submit').click(function(e){
                 if(validateForm('forgot-pwd-form')){
                     /* ===== FORM VALIDATED ===== */
                 	submitForgotPasswordForm();
