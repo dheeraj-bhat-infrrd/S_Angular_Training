@@ -39,6 +39,10 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_BRANCH_NAME = "INVALID_BRANCH_NAME";
 	public static final String INVALID_BRANCH_ADDRESS = "INVALID_BRANCH_ADDRESS";
 	public static final String INVALID_VERIFICATION_URL = "INVALID_VERIFICATION_URL";
+	public static final String INVALID_LOGO_FORMAT = "INVALID_LOGO_FORMAT";
+	public static final String INVALID_LOGO_DIMENSIONS = "INVALID_LOGO_DIMENSIONS";
+	public static final String INVALID_LOGO_SIZE = "INVALID_LOGO_SIZE";
+	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";

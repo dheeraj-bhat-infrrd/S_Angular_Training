@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -20,6 +23,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -48,6 +52,36 @@ public class OrganizationManagementController {
 	@Autowired
 	private Payment gateway;
 
+	@Autowired
+	private ImageUploadService logoUploadService;
+
+	/**
+	 * Method to upload logo image for a company
+	 * 
+	 * @param fileLocal
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/uploadFile", method = RequestMethod.POST)
+	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
+		LOG.info("Method imageUpload of OrganizationManagementController called");
+		String logoName = "";
+		try {
+			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
+			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESS", DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.debug("Setting Logo image name to Session");
+		request.getSession(false).setAttribute("logoName", logoName);
+
+		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
 	/**
 	 * Method to call service for adding company information for a user
 	 * 
@@ -70,7 +104,9 @@ public class OrganizationManagementController {
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
+			/*String logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
+			session.removeAttribute(CommonConstants.LOGO_NAME);*/
+			
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
 			companyDetails.put(CommonConstants.ADDRESS, address);
