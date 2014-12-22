@@ -127,3 +127,13 @@ function showPayment(){
 function hidePayment(){
 	$('.overlay-payment').hide();
 }
+
+$('#icn-status-green').click(function(){
+    $(this).hide();
+    $('#icn-status-red').show();
+});
+
+$('#icn-status-red').click(function(){
+    $(this).hide();
+    $('#icn-status-green').show();
+});
