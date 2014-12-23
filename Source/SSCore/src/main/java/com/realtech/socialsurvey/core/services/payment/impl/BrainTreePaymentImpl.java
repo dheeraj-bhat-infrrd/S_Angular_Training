@@ -522,50 +522,54 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("Email sent successfully!");
 
 	}
-	
+
 	/**
 	 * Retries payment for a particular subscription id and returns the Transaction object.
+	 * 
 	 * @param subscriptionId
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws NoRecordsFetchedException
 	 */
-	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException{
-		
-		if( subscriptionId == null || subscriptionId.isEmpty()){
+	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException {
+
+		if (subscriptionId == null || subscriptionId.isEmpty()) {
 			LOG.error("Parameter to retrySubscriptionCharge() is empty or null!");
 			throw new InvalidInputException("Parameter to retrySubscriptionCharge() is empty or null!");
 		}
 		
+		Result<Transaction> retryResult = null;
+
 		LOG.info("Retrying subscription charge for id : " + subscriptionId);
 		Transaction transaction = null;
-		Result<Transaction> retryResult = gateway.subscription().retryCharge(subscriptionId);
-			if (retryResult.isSuccess()) {
-				LOG.info("Retry of transaction for subscription id : " + subscriptionId + " Status : " + retryResult.isSuccess());
-			    Result<Transaction> result = gateway.transaction().submitForSettlement(
-			        retryResult.getTarget().getId()
-			    );
-			    if (result.isSuccess()){
-			    	LOG.info("The transaction has been successfully submitted for settlement.");
-			    	transaction = result.getTarget();
-			    }
-			    else{
-			    	LOG.error("Submission for transaction settlement for id : " + result.getTarget().getId() + " unsuccessful ");
-			    	transaction = result.getTarget();
-			    }
-			}
-			else{
-				LOG.error("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : " + retryResult.getMessage());
-				throw new NoRecordsFetchedException("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : " + retryResult.getMessage());
-			}
 		
+		retryResult = gateway.subscription().retryCharge(subscriptionId);
+		
+		if (retryResult.isSuccess()) {
+			LOG.info("Retry of transaction for subscription id : " + subscriptionId + " Status : " + retryResult.isSuccess());
+			Result<Transaction> result = gateway.transaction().submitForSettlement(retryResult.getTarget().getId());
+			if (result.isSuccess()) {
+				LOG.info("The transaction has been successfully submitted for settlement.");
+				transaction = result.getTarget();
+			}
+			else {
+				LOG.error("Submission for transaction settlement for id : " + result.getTarget().getId() + " unsuccessful ");
+				transaction = result.getTarget();
+			}
+		}
+		else {
+			LOG.error("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : " + retryResult.getMessage());
+			throw new NoRecordsFetchedException("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : "
+					+ retryResult.getMessage());
+		}
+
 		LOG.info("End of the retrySubscriptionCharge method.");
 		return transaction;
-		
+
 	}
 
 	@Override
-	public void afterPropertiesSet() throws Exception {
+	public void afterPropertiesSet() {
 
 		LOG.info("BraintreePaymentImpl : afterPropertiesSet() : Executing method ");
 		if (gateway == null) {
