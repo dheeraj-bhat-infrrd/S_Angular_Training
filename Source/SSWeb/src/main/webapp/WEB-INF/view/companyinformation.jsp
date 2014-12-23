@@ -143,7 +143,7 @@
 		});
 	</script>
 	<script>
-		$("#company-info-form").on("change", function() {
+		$("#com-logo").on("change", function() {
 			var formData = new FormData();
 			formData.append("logo", $('#com-logo').prop("files")[0]);
 			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
