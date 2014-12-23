@@ -248,5 +248,33 @@ public class EmailServicesImpl implements EmailServices {
 		return emailEntity;
 	}
 
+	@Override
+	public void sendFatalExceptionEmail(String recipientMailId,String stackTrace) throws InvalidInputException, UndeliveredEmailException {
+		
+		LOG.info("Sending FatalException email to the admin.");
+		
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending fatal exception mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending fatal exception mail ");
+		}
+		
+
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(stackTrace));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent fatal exception mail");
+		
+	}
+
 }
 // JIRA: SS-7: By RM02: EOC

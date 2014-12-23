@@ -1,0 +1,7 @@
+Hi %s,
+<br>
+<br>
+An exception has occured. The stack trace for the exception is :
+%s
+<br>
+<br>
