@@ -9,8 +9,12 @@ import java.sql.Timestamp;
  */
 @Entity
 @Table(name = "USER_PROFILE")
-@NamedQuery(name = "UserProfile.findAll", query = "SELECT u FROM UserProfile u")
+@NamedQueries({
+		@NamedQuery(name = "UserProfile.updateProfileByUser", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ?"),
+		@NamedQuery(name = "UserProfile.updateProfileByUserAndBranch", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ? and u.branchId = ?"),
+		@NamedQuery(name = "UserProfile.updateProfileByUserAndRegion", query = "update UserProfile u set u.status = ?, u.modifiedBy = ?, u.modifiedOn = ? where u.user = ? and u.regionId = ?") })
 public class UserProfile implements Serializable {
+
 	private static final long serialVersionUID = 1L;
 
 	@Id

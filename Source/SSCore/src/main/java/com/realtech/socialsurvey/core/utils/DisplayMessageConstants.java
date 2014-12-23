@@ -43,6 +43,8 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_LOGO_DIMENSIONS = "INVALID_LOGO_DIMENSIONS";
 	public static final String INVALID_LOGO_SIZE = "INVALID_LOGO_SIZE";
 	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
+	public static final String MAX_USERS_LIMIT_REACHED = "MAX_USERS_LIMIT_REACHED";
+	
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";

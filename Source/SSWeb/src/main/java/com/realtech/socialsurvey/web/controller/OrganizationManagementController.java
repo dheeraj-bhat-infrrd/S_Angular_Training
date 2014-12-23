@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +22,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -38,9 +38,6 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private MessageUtils messageUtils;
-
-	@Autowired
-	private RegistrationService registrationService;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
@@ -122,7 +119,7 @@ public class OrganizationManagementController {
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
 
 			LOG.debug("Updating profile completion stage");
-			registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+			userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 
 			LOG.debug("Successfully executed service to add company details");
