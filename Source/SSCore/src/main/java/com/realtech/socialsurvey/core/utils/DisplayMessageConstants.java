@@ -55,5 +55,6 @@ public final class DisplayMessageConstants {
 	public static final String BRANCH_DELETE_SUCCESSFUL = "BRANCH_DELETE_SUCCESSFUL";
 	public static final String REGION_DELETE_SUCCESSFUL = "REGION_DELETE_SUCCESSFUL";
 	public static final String EMAIL_VERIFICATION_SUCCESSFUL = "EMAIL_VERIFICATION_SUCCESSFUL";
+	public static final String BRANCH_ADDITION_SUCCESSFUL = "BRANCH_ADDITION_SUCCESSFUL";	
 	
 }

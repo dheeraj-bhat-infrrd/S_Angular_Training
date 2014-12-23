@@ -95,7 +95,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public AccountType addAccountTypeForCompanyAndUpdateStage(User user, String strAccountType) throws InvalidInputException {
+	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException {
 		LOG.info("Method addAccountTypeForCompany started for user : " + user.getLoginName());
 		if (strAccountType == null || strAccountType.isEmpty()) {
 			throw new InvalidInputException("account type is null or empty while adding account type fro company");
@@ -120,7 +120,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				addCompanyAccountType(user);
 				break;
 			case ENTERPRISE:
-				addEnterpriseAccountType();
+				LOG.debug("Selected account type as enterprise so no action required");
 				break;
 			default:
 				throw new InvalidInputException("Account type is not valid");
@@ -269,14 +269,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileAgent);
-		/**
-		 * For an individual, only the company admin's profile completion stage is updated, all the
-		 * other profiles created by default need no action so their profile completion stage is
-		 * marked completed at the time of insert
-		 */
-		LOG.debug("Updating profile stage for company to payment stage");
-		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.info("Method addIndividual finished.");
 	}
@@ -310,19 +302,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 
-		
-		LOG.debug("Updating profile stage to payment stage for account type team");
-		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-				CommonConstants.DASHBOARD_STAGE);
-
 		LOG.debug("Method addTeam finished.");
 	}
 
-	/*
-	 * Method to add a company.
+	/**
+	 * Method to add company account type
+	 * @param user
+	 * @throws InvalidInputException
 	 */
 	private void addCompanyAccountType(User user) throws InvalidInputException {
-		LOG.debug("Method addCompany started for user : " + user.getLoginName());
+		LOG.debug("Method addCompanyAccountType started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
@@ -334,16 +323,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfile);
 		
-		LOG.debug("Method addCompany finished.");
-	}
-
-	/*
-	 * Method to add an Enterprise.
-	 */
-	private void addEnterpriseAccountType() {
-		LOG.debug("Method addEnterprise started.");
-
-		LOG.debug("Method addEnterprise finished.");
+		LOG.debug("Method addCompanyAccountType finished.");
 	}
 
 	/**
