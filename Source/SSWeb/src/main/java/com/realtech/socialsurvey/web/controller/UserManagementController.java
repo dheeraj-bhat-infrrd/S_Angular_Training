@@ -44,74 +44,104 @@ public class UserManagementController {
 	public String inviteNewUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
 			UserAlreadyExistsException {
 		LOG.info("Method to add a new user by existing admin called.");
-
-		String firstName = request.getParameter(CommonConstants.FIRST_NAME);
-		String lastName = request.getParameter(CommonConstants.LAST_NAME);
-		String emailId = request.getParameter(CommonConstants.EMAIL_ID);
-
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
 		try {
-			if (userManagementService.isUserAdditionAllowed(user)) {
-				userManagementService.inviteUserToRegister(user, firstName, lastName, emailId);
+			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
+			String lastName = request.getParameter(CommonConstants.LAST_NAME);
+			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
+
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+			try {
+				if (userManagementService.isUserAdditionAllowed(user)) {
+					userManagementService.inviteUserToRegister(user, firstName, lastName, emailId);
+				}
+				else {
+					throw new InvalidInputException("Limit for maximum users has already reached.", DisplayMessageConstants.MAX_USERS_LIMIT_REACHED);
+				}
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+			catch (UndeliveredEmailException e) {
+				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+			catch (NonFatalException e) {
+				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e);
 			}
 		}
-		catch (InvalidInputException e) {
-			throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		catch (UndeliveredEmailException e) {
-			throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
-		}
-		catch (NonFatalException e) {
-			throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e);
-		}
+		model.addAttribute("message",
+				messageUtils.getDisplayMessage(DisplayMessageConstants.REGISTRATION_INVITE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		LOG.info("Method to add a new user by existing admin finished.");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
-	public String findUserByUserId(Model model, HttpServletRequest request) throws InvalidInputException {
+	@RequestMapping(value = "/finduserbyuserid", method = RequestMethod.POST)
+	public String findUserByUserId(Model model, HttpServletRequest request) throws NonFatalException {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
-		String userIdStr = request.getParameter(CommonConstants.USER_ID);
-		if (userIdStr == null || userIdStr.isEmpty()) {
-			LOG.error("Invalid user id passed in method findUserByUserId().");
-			throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+		try {
+			String userIdStr = request.getParameter(CommonConstants.USER_ID);
+			if (userIdStr == null || userIdStr.isEmpty()) {
+				LOG.error("Invalid user id passed in method findUserByUserId().");
+				throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+			}
+			long userId = 0;
+			try {
+				userId = Long.parseLong(userIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception while parsing user Id", e);
+				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			User user = userManagementService.getUserByUserId(userId);
+			model.addAttribute("searchedUser", user);
 		}
-		long userId = Long.parseLong(userIdStr);
-		User user = userManagementService.getUserByUserId(userId);
-		model.addAttribute("user",user);
-		LOG.info("Method to fetch user by user, findUserByUserId() finished.");
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to fetch user by user id , findUserByUserId() finished.");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
 	public String findUserByEmail(Model model, HttpServletRequest request) throws InvalidInputException {
 		LOG.info("Method to find users by email id called.");
-
-		String emailId = request.getParameter("emailId");
-		if (emailId == null || emailId.isEmpty()) {
-			LOG.error("Invalid email id passed in method findUserByEmail().");
-			throw new InvalidInputException("Invalid email id passed in method findUserByEmail().");
-		}
-
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		if (user == null) {
-			LOG.error("No user found in current session in deactivateExistingUser().");
-			throw new InvalidInputException("No user found in current session in deactivateExistingUser().");
-		}
-
 		try {
-			user = userManagementService.getUserByEmailId(user, emailId);
-			model.addAttribute("user", user);
-		}
-		catch (InvalidInputException invalidInputException) {
-			throw new InvalidInputException(invalidInputException.getMessage(), invalidInputException);
-		}
-		catch (NoRecordsFetchedException e) {
-			LOG.error("Sorry! No matching email found in our database.", e);
 
+			String emailId = request.getParameter("emailId");
+			if (emailId == null || emailId.isEmpty()) {
+				LOG.error("Invalid email id passed in method findUserByEmail().");
+				throw new InvalidInputException("Invalid email id passed in method findUserByEmail().");
+			}
+
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (user == null) {
+				LOG.error("No user found in current session in deactivateExistingUser().");
+				throw new InvalidInputException("No user found in current session in deactivateExistingUser().");
+			}
+
+			try {
+				user = userManagementService.getUserByEmailId(user, emailId);
+				model.addAttribute("searchedUser", user);
+			}
+			catch (InvalidInputException invalidInputException) {
+				throw new InvalidInputException(invalidInputException.getMessage(), invalidInputException);
+			}
+			catch (NoRecordsFetchedException e) {
+				LOG.error("Sorry! No matching email found in our database.", e);
+				throw new NoRecordsFetchedException("Sorry! No matching email found in our database.", e);
+			}
+		}
+		// TODO add success message.
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while searching for user by email id id. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to find users by email id finished.");
 		return JspResolver.MESSAGE_HEADER;
@@ -121,31 +151,40 @@ public class UserManagementController {
 	public String removeExistingUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
 			UserAlreadyExistsException {
 		LOG.info("Method to deactivate an existing user called.");
-
-		long userIdToRemove = Long.parseLong(request.getParameter("userIdToRemove"));
-
-		if (userIdToRemove < 0) {
-			LOG.error("Invalid user Id found to remove in removeExistingUser().");
-			throw new InvalidInputException("Invalid user Id found to remove in removeExistingUser().");
-		}
-
-		HttpSession session = request.getSession();
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		if (user == null) {
-			LOG.error("No user found in current session in removeExistingUser().");
-			throw new InvalidInputException("No user found in current session in removeExistingUser().");
-		}
 		try {
-			userManagementService.removeExistingUser(user, userIdToRemove);
+			long userIdToRemove = 0;
+			try {
+				userIdToRemove = Long.parseLong(request.getParameter("userIdToRemove"));
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception while parsing user Id", e);
+				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			if (userIdToRemove < 0) {
+				LOG.error("Invalid user Id found to remove in removeExistingUser().");
+				throw new InvalidInputException("Invalid user Id found to remove in removeExistingUser().");
+			}
+
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (user == null) {
+				LOG.error("No user found in current session in removeExistingUser().");
+				throw new InvalidInputException("No user found in current session in removeExistingUser().");
+			}
+			try {
+				userManagementService.removeExistingUser(user, userIdToRemove);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
 		}
-		catch (InvalidInputException e) {
-			throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while removing user. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to remove an existing user finished.");
 		return JspResolver.MESSAGE_HEADER;
 	}
-
-	// JIRA SS-42 BY RM05 EOC
 
 	/**
 	 * Method to assign a user as branch admin
@@ -154,13 +193,13 @@ public class UserManagementController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/assignbranchadmin", method = RequestMethod.POST)
-	public String assignBranchAdmin(Model model, HttpServletRequest request) {
-		LOG.info("Method to assign branch admin called");
+	@RequestMapping(value = "/assignorunassignbranchadmin", method = RequestMethod.POST)
+	public String assignOrUnassignBranchAdmin(Model model, HttpServletRequest request) {
+		LOG.info("Method to assign or unassign branch admin called");
 		try {
-
 			String branch = request.getParameter("branchId");
 			String userToAssign = request.getParameter("userId");
+			String isAssign = request.getParameter("isAssign");
 
 			if (branch == null || branch.isEmpty()) {
 				LOG.error("Null or empty value passed for branch in assignBranchAdmin()");
@@ -178,22 +217,29 @@ public class UserManagementController {
 				userId = Long.parseLong(userToAssign);
 				HttpSession session = request.getSession(false);
 				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-				// Assigns the given user as branch admin
-				userManagementService.assignBranchAdmin(admin, branchId, userId);
+				if (isAssign.equalsIgnoreCase("YES"))
+					// Assigns the given user as branch admin
+					userManagementService.assignBranchAdmin(admin, branchId, userId);
+				else if (isAssign.equalsIgnoreCase("NO"))
+					// Unassigns the given user as branch admin
+					userManagementService.unassignBranchAdmin(admin, branchId, userId);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception while parsing branch Id or user id", e);
 				throw new NonFatalException("Number format execption while parsing branch Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		catch (NonFatalException e) {
-			LOG.error("Exception occured while assigning branch admin.Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		// TODO add success message.
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while trying to assign or unassign a user to branch. Reason : " + nonFatalException.getMessage(),
+					nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.info("Successfully completed method to assign branch admin");
+		LOG.info("Successfully completed method to assign or unassign branch admin");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	// JIRA SS-42 BY RM05 EOC
 	/**
 	 * Method to assign a user as region admin.
 	 * 
@@ -236,60 +282,12 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
+		//TODO add success message.
 		catch (NonFatalException e) {
-			LOG.error("Exception occured while assigning branch admin.Reason : " + e.getMessage(), e);
+			LOG.error("Exception occured while assigning branch admin. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to assign region admin");
-		return JspResolver.MESSAGE_HEADER;
-	}
-
-	/**
-	 * Method to remove a branch admin.
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/unassignbranchadmin", method = RequestMethod.POST)
-	public String unassignBranchAdmin(Model model, HttpServletRequest request) {
-		LOG.info("Method to remove branch admin called");
-		try {
-
-			String branch = request.getParameter("branchId");
-			String userIdToRemove = request.getParameter("userId");
-
-			if (branch == null || branch.isEmpty()) {
-				LOG.error("Null or empty value passed for branch in assignBranchAdmin()");
-				throw new InvalidInputException("Null or empty value passed for branch in assignBranchAdmin()");
-			}
-			if (userIdToRemove == null || userIdToRemove.isEmpty()) {
-				LOG.error("Null or empty value passed for user id in assignBranchAdmin()");
-				throw new InvalidInputException("Null or empty value passed for user id in assignBranchAdmin()");
-			}
-
-			long branchId = 0l;
-			long userId = 0l;
-			HttpSession session;
-
-			try {
-				branchId = Long.parseLong(branch);
-				userId = Long.parseLong(userIdToRemove);
-				session = request.getSession(false);
-				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-				// Remove the given user from branch admin.
-				userManagementService.unassignBranchAdmin(admin, branchId, userId);
-			}
-			catch (NumberFormatException e) {
-				LOG.error("Number format exception while parsing branch Id or user id", e);
-				throw new NonFatalException("Number format execption while parsing branch Id", DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("Exception occured while assigning branch admin.Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-		LOG.info("Successfully completed method to remove branch admin");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
@@ -338,6 +336,7 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
+		//TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning region admin.Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
