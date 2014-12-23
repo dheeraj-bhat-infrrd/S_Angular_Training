@@ -472,13 +472,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Transactional
 	@Override
 	public User getUserByUserId(long userId) {
-		LOG.info("Method to find user on the basis of user id started for user id "+userId);
+		LOG.info("Method to find user on the basis of user id started for user id " + userId);
 		User user = null;
-		userDao.findById(User.class, userId);
-		LOG.info("Method to find user on the basis of user id finished for user id "+userId);
+		user = userDao.findById(User.class, userId);
+		LOG.info("Method to find user on the basis of user id finished for user id " + userId);
 		return user;
 	}
-
+	
 	// JIRA SS-42 BY RM05 EOC
 
 	@Override
