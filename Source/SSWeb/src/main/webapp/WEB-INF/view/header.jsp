@@ -15,6 +15,17 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div id="header-slider-wrapper" class="header-slider-wrapper">
+        <div class="header-slider">
+            <div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
+                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
+                <div class="header-links-item"><a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
+                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
+                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.usermanagement.key"/></a></div>
+            </div>
+        </div>
+    </div>
+    
     <div class="header-main-wrapper">
         <div class="container clearfix header-container">
             <div class="header-logo float-left"></div>

@@ -85,12 +85,60 @@
 				showOverlay();
 				$('#frm-login').submit();
             }
-                       
+            
+            //Function to validate the login form
+            function validateLoginForm(id){
+            	var validate = true;
+            	//hide the server error
+            	$("#serverSideerror").hide();
+            	
+            	//check if login password is valid
+            	if(!validatePassword('login-pwd')){
+            		return false;
+            	}
+            	if (!validate) {
+            		$('#jsError').show();
+            		return false;
+            	} else {
+            		$('#jsError').hide();
+            		/* Form validated. */
+            		return true;
+            	}
+            }
+            
+            function validateUserId(elementId) {
+            	if ($('#'+elementId).val() != "") {
+    				if (emailRegex.test($('#'+elementId).val()) == true) {
+    					$('#'+elementId).parent().removeClass('input-error');
+    					$('#jsError').addClass('hide');
+    					return true;
+    				}else {
+    					$('#jsErrTxt').html('Please enter a valid userId.');
+    					$('#jsError').removeClass('hide');
+    					$('#'+elementId).parent().addClass('input-error');
+    					return false;
+    				}
+    			}else{
+    				$('#jsErrTxt').html('Please enter the User ID.');
+    				return false;
+    			}
+			}
+            
             $('#login-submit').click(function(e){
-                if(validateForm('login-form')){
+                if(validateLoginForm('login-form')){
                     /* ===== FORM VALIDATED ===== */
                 	loginUser();
                 }
+            });
+           
+            /**
+            *Form validation for login page
+            */
+            $('#login-user-id').blur(function() {
+            	validateUserId(this.id);
+            });
+            $('#login-pwd').blur(function(){
+            	validatePassword(this.id);
             });
             
         });
