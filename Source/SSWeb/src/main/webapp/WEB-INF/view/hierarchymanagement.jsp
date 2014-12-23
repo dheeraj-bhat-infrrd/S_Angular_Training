@@ -30,30 +30,22 @@
                                         <input type="text" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
                                     </div>
                                 </div>
-                                <div class="hm-item-row clearfix">
-                                    <div class="hm-item-row-left text-right"><spring:message code="label.selectregion.key"/></div>
-                                    <div class="hm-item-row-right z-in-9 pos-relative">
-                                        <div class="hm-item-row-txt cursor-pointer hm-item-dd" id="hm-item-dd-top"></div>
-                                        <div class="hm-dd-wrapper hide" id="hm-dd-wrapper-top">
-                                            <div class="hm-dd-item">Sample text</div>
-                                            <div class="hm-dd-item">Sample text</div>
-                                            <div class="hm-dd-item">Sample text</div>
-                                            <div class="hm-dd-item">Sample text</div>
+                            </div>
+                            <div class="clearfix">
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-top-panel-item">
+                                    <div class="hm-item-row clearfix">
+                                        <div class="hm-item-row-left text-right"><spring:message code="label.address1.key"/></div>
+                                        <div class="hm-item-row-right">
+                                            <input type="text" class="hm-item-row-txt" placeholder='<spring:message code="label.address1.key"/>'>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-top-panel-item">
-                                <div class="hm-item-row clearfix">
-                                    <div class="hm-item-row-left text-right"><spring:message code="label.address1.key"/></div>
-                                    <div class="hm-item-row-right">
-                                        <input type="text" class="hm-item-row-txt" placeholder='<spring:message code="label.address1.key"/>'>
-                                    </div>
-                                </div>
-                                <div class="hm-item-row clearfix">
-                                    <div class="hm-item-row-left text-right"><spring:message code="label.address2.key"/></div>
-                                    <div class="hm-item-row-right">
-                                        <input type="text" class="hm-item-row-txt" placeholder='<spring:message code="label.address2.key"/>'>
+                                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-top-panel-item">
+                                    <div class="hm-item-row clearfix">
+                                        <div class="hm-item-row-left text-right"><spring:message code="label.address2.key"/></div>
+                                        <div class="hm-item-row-right">
+                                            <input type="text" class="hm-item-row-txt" placeholder='<spring:message code="label.address2.key"/>'>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

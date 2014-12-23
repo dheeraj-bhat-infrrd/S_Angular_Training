@@ -230,6 +230,7 @@ input:-webkit-autofill {
     text-align: center;
     border: 1px solid #cfcfcf;
     padding-bottom: 30px;
+    min-height: 237px;
 }
 
 .payment-tab-header {
@@ -729,7 +730,6 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     float: right;
     height: 50px;
     width: 50px;
-    background-color: #f1f1f1;
     margin-left: 10px;
     margin-right: 10px;
 }
@@ -758,9 +758,168 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     width: 16px;
     cursor: pointer;
     margin-left: 5px;
-    background-color: #f1f1f1;
+    background: url(../images/icntagClose.png) no-repeat;
+    background-position: top center;
 }
 
 .um-tag-item-wrapper {
     margin: 0 20px;
+}
+.um-tag-item-wrapper:first-child{
+    margin: 0;
+}
+
+.um-top-status-title {
+    font-size: 16px;
+    line-height: 32px;
+    margin-right: 45px;
+}
+
+
+
+.um-tag-row {
+    padding: 0 15px;
+}
+
+.um-top-status-wrapper {
+    padding: 0 15px;
+}
+
+.um-status-icon {
+    width: 40px;
+    height: 32px;
+}
+
+.um-top-status-text {
+    margin-right: 10px;
+    line-height: 32px;
+}
+
+.um-table {
+    border-collapse: collapse;
+}
+
+.um-table td,um-table th {
+    border: 0;
+}
+
+.um-table thead td{
+    line-height: 44px;
+    padding-left: 10px;
+    font-size: 13px;
+    font-weight: bold !important;
+}
+
+.um-table{
+    width: 100%;
+}
+
+.um-table tbody tr{
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.um-table tbody tr:hover{
+    background-color: #f9f9fb
+}
+
+.um-top-container {
+    padding-bottom: 25px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.um-bottom-container {
+    margin-top: 25px;
+}
+
+td.um-table-content {
+    line-height: 40px;
+    font-size: 14px;
+    padding-left: 10px;
+}
+
+.um-panel-content {
+    padding: 0 15px;
+}
+
+.tm-table-tick-icn {
+    margin: 0 auto;
+    height: 40px;
+    width: 40px;
+}
+
+.tm-table-status-icn {
+    height: 40px;
+    width: 40px;
+    margin: 0 auto;
+}
+
+.tm-table-remove-icn {
+    height: 40px;
+    width: 40px;
+    margin: 0 auto;
+}
+
+.col-username{
+    width: 24%;
+}
+
+.col-email{
+    width: 43%;
+}
+
+.col-loanoff{
+    width: 23%;
+}
+
+.um-table tbody .col-loanoff{
+    padding-left: 30px !important;
+}
+
+
+.col-status, .col-remove{
+    width: 5%;
+}
+
+button.paypal.is-active {
+    margin: 10px;
+}
+.icn-tick {
+    background: url(../images/icnTick.png) no-repeat center;
+}
+
+.icn-status-green {
+    background: url(../images/icnActive.png) no-repeat center;
+}
+
+.icn-status-red {
+    background: url(../images/icnInActive.png) no-repeat center;
+}
+
+.icn-person-remove {
+    background: url(../images/icnRemovePpl.png) no-repeat center;
+}
+
+.icn-remove-user {
+    background: url(../images/icnRemovePpl.png) no-repeat center;
+}
+
+.icn-green-col {
+    background: url(../images/icnGreenLight.png) no-repeat center;
+}
+
+.icn-green-brown {
+    background: url(../images/icnBrownLight.png) no-repeat center;
+}
+
+.icn-right-tick {
+    background: url(../images/icnLoanOfficer.png) no-repeat center;
+}
+
+.header-slider {
+    width: 80%;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    background-color: #fff;
+    box-shadow: -3px 0px 8px 1px #ccc;
 }

@@ -185,13 +185,16 @@
         float: none;
         margin: 0 -10px;
     }
+    .um-item-row-right {
+        margin: 0 -15px;
+    }
     .hm-item-row-txt, .um-item-row-txt{
         width: 100%;
         box-shadow: none;
         border-radius: 0;
         border-left: 0;
         border-right: 0;
-        padding: 10px 10px 10px 50px;
+        padding: 10px 50px 10px 50px;
     }
     .hm-dd-wrapper{
         width: 100%;
@@ -249,6 +252,15 @@
     }
     .um-top-tag-wrapper{
         margin-top: 25px;
+    }
+    .um-top-status-title{
+        margin-right: 15px;
+    }
+    .col-email,.col-loanoff{
+        display: none !important;
+    }
+    .um-bottom-content{
+        padding: 0 !important;
     }
 }
 
@@ -331,7 +343,7 @@
         font-size: 13px;
     }
     .um-item-row-txt{
-        width: 190px;
+        width: 165px;
         font-size: 13px;
     }
     .hm-left-item{
@@ -354,7 +366,7 @@
         width: 100%
     }
     .hm-item-row-txt, .hm-dd-wrapper, .um-item-row-txt{
-        width: 280px;
+        width: 260px;
     }
 }
 
