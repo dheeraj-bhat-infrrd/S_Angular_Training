@@ -11,6 +11,5 @@
             </div>
         </div>
     </div>
-	<input id="redirectUrl" type = "hidden" value ="${redirectTo}">
 </div>
 </c:if>

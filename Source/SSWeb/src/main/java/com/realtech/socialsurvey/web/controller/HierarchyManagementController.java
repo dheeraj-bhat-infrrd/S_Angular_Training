@@ -62,7 +62,7 @@ public class HierarchyManagementController {
 				isRegionAdditionAllowed = hierarchyManagementService.isRegionAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException while checking for max region addition",
+				throw new InvalidInputException("InvalidInputException while checking for max region addition. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
@@ -71,7 +71,7 @@ public class HierarchyManagementController {
 				isBranchAdditionAllowed = hierarchyManagementService.isBranchAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException while checking for max region addition",
+				throw new InvalidInputException("InvalidInputException while checking for max region addition. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
@@ -101,6 +101,8 @@ public class HierarchyManagementController {
 		LOG.info("Fetching all the branches for current user");
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		String jspToReturn = null;
 
 		try {
 			try {
@@ -108,7 +110,18 @@ public class HierarchyManagementController {
 				List<Branch> branches = hierarchyManagementService.getAllBranchesForCompany(user.getCompany());
 				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
 
-				// TODO : set the branch in list in either model attribute or send it back as JSON
+				model.addAttribute("branches", branches);
+				
+				/**
+				 * UI for enterprise branches and regions is different hence deciding which jsp to
+				 * return
+				 */
+				if (accountType == AccountType.ENTERPRISE) {
+					jspToReturn = JspResolver.EXISTING_ENTERPRISE_BRANCHES;
+				}
+				else {
+					jspToReturn = JspResolver.EXISTING_BRANCHES;
+				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Error occurred while fetching the branch list in method getAllBranchesForCompany");
@@ -119,8 +132,9 @@ public class HierarchyManagementController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching all branches. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return jspToReturn;
 	}
 
 	/**
@@ -143,7 +157,7 @@ public class HierarchyManagementController {
 				List<Region> regions = hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
 				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
 
-				// TODO : set the region in list in either model attribute or send it back as JSON
+				model.addAttribute("regions", regions);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Error occurred while fetching the regions list in method getAllRegionsForCompany");
@@ -154,9 +168,10 @@ public class HierarchyManagementController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching all regions. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.info("Successfully fetched the list of regions");
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.EXISTING_ENTERPRISE_REGIONS;
 	}
 
 	/**
@@ -331,6 +346,9 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to add a new branch");
 				hierarchyManagementService.addNewBranch(user, regionId, branchName);
 				LOG.debug("Successfully executed service to add a new branch");
+
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException occured while adding new branch.REason : " + e.getMessage(),
