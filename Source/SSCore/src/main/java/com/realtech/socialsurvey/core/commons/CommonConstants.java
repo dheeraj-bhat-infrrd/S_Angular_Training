@@ -76,7 +76,8 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
-
+	public static final String BRANCH_ID_COLUMN = "branchId";
+	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
