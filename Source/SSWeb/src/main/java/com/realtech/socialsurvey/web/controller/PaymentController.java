@@ -19,8 +19,8 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -37,7 +37,7 @@ public class PaymentController {
 	private Payment gateway;
 
 	@Autowired
-	private RegistrationService registrationService;
+	private UserManagementService userManagementService;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
@@ -114,7 +114,7 @@ public class PaymentController {
 							DisplayMessageConstants.GENERAL_ERROR, e);
 				}
 				try {
-					registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+					userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 							CommonConstants.DASHBOARD_STAGE);
 				}
 				catch (InvalidInputException e) {
