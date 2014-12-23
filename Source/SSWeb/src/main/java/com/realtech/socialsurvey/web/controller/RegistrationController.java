@@ -201,7 +201,7 @@ public class RegistrationController {
 				HttpSession session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 				LOG.debug("Successfully added registered user to session");
-
+				
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
