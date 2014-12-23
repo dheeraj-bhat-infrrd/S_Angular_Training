@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 @Component
@@ -30,6 +31,9 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 
 	@Autowired
 	private PropertyFileReader propertyFileReader;
+	
+	@Autowired
+	private EncryptionHelper encryptionHelper;
 
 	@Override
 	public String imageUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException {
@@ -64,7 +68,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 				// Create the file on server
 				LOG.debug("Creating the file on server");
 				String logoFormat = logoName.substring(logoName.lastIndexOf("."));
-				String logoNameHash = logoName.hashCode() + "";
+				String logoNameHash = encryptionHelper.encryptSHA512(logoName+(System.currentTimeMillis()));
 				File serverFile = new File(dir.getAbsolutePath() + File.separator + logoNameHash + logoFormat);
 				stream = new BufferedOutputStream(new FileOutputStream(serverFile));
 				stream.write(bytes);
@@ -121,7 +125,9 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 				reader = readers.next();
 				reader.setInput(imageStream, true, true);
 
-				String formatName = reader.getFormatName();
+				// Find the format of the image and converting to upper to match with allowed extensions
+				String formatName = reader.getFormatName().toUpperCase();
+				LOG.debug("Format of the file: "+formatName);
 				String[] listFormats = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.LIST_LOGO_FORMATS)
 						.split(",");
 				Set<String> setFormats = new HashSet<String>(Arrays.asList(listFormats));
