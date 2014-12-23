@@ -8,7 +8,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
  */
 public interface UserProfileDao extends GenericDao<UserProfile, Long> {
 
-	public void deactivateUserProfileByUser(User admin, User userToBeDeactivated);
+	public void deactivateAllUserProfilesForUser(User admin, User userToBeDeactivated);
 
 	public void deactivateUserProfileForBranch(User admin, long branchId, User userToBeDeactivated);
 

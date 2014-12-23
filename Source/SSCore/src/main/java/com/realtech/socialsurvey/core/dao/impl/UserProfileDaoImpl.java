@@ -18,7 +18,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	 */
 
 	@Override
-	public void deactivateUserProfileByUser(User admin, User userToBeDeactivated) {
+	public void deactivateAllUserProfilesForUser(User admin, User userToBeDeactivated) {
 
 		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getDisplayName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
