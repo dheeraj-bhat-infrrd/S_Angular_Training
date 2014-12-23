@@ -28,13 +28,11 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -62,9 +60,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private UserManagementService userManagementService;
-
-	@Autowired
-	private RegistrationService registrationService;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -275,7 +270,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		 * marked completed at the time of insert
 		 */
 		LOG.debug("Updating profile stage for company to payment stage");
-		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.info("Method addIndividual finished.");
@@ -312,7 +307,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		
 		LOG.debug("Updating profile stage to payment stage for account type team");
-		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.debug("Method addTeam finished.");

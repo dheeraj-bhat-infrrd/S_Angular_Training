@@ -13,13 +13,14 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.JspResolver;
 
 // JIRA SS-37 BY RM02 BOC
 
@@ -37,21 +38,61 @@ public class UserManagementController {
 	@Autowired
 	private UserManagementService userManagementService;
 
-	@Autowired
-	private RegistrationService registrationService;
-
 	// JIRA SS-42 BY RM05 BOC
 
-	@RequestMapping(value = "/deactivateExistingUser", method = RequestMethod.POST)
-	public String deactivateExistingUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
+	@RequestMapping(value = "/invitenewuser", method = RequestMethod.POST)
+	public String inviteNewUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
 			UserAlreadyExistsException {
-		LOG.info("Method to deactivate an existing user called.");
+		LOG.info("Method to add a new user by existing admin called.");
 
-		long userIdToRemove = Long.parseLong(request.getParameter("userIdToRemove"));
+		String firstName = request.getParameter(CommonConstants.FIRST_NAME);
+		String lastName = request.getParameter(CommonConstants.LAST_NAME);
+		String emailId = request.getParameter(CommonConstants.EMAIL_ID);
 
-		if (userIdToRemove < 0) {
-			LOG.error("Invalid user Id found to remove in deactivateExistingUser().");
-			throw new InvalidInputException("Invalid user Id found to remove in deactivateExistingUser().");
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+		try {
+			if (userManagementService.isUserAdditionAllowed(user)) {
+				userManagementService.inviteUserToRegister(user, firstName, lastName, emailId);
+			}
+		}
+		catch (InvalidInputException e) {
+			throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+		}
+		catch (UndeliveredEmailException e) {
+			throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+		}
+		catch (NonFatalException e) {
+			throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e);
+		}
+		LOG.info("Method to add a new user by existing admin finished.");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
+	public String findUserByUserId(Model model, HttpServletRequest request) throws InvalidInputException {
+		LOG.info("Method to fetch user by user, findUserByUserId() started.");
+		String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		if (userIdStr == null || userIdStr.isEmpty()) {
+			LOG.error("Invalid user id passed in method findUserByUserId().");
+			throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+		}
+		long userId = Long.parseLong(userIdStr);
+		User user = userManagementService.getUserByUserId(userId);
+		model.addAttribute("user",user);
+		LOG.info("Method to fetch user by user, findUserByUserId() finished.");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
+	public String findUserByEmail(Model model, HttpServletRequest request) throws InvalidInputException {
+		LOG.info("Method to find users by email id called.");
+
+		String emailId = request.getParameter("emailId");
+		if (emailId == null || emailId.isEmpty()) {
+			LOG.error("Invalid email id passed in method findUserByEmail().");
+			throw new InvalidInputException("Invalid email id passed in method findUserByEmail().");
 		}
 
 		HttpSession session = request.getSession();
@@ -60,14 +101,48 @@ public class UserManagementController {
 			LOG.error("No user found in current session in deactivateExistingUser().");
 			throw new InvalidInputException("No user found in current session in deactivateExistingUser().");
 		}
+
 		try {
-			userManagementService.deactivateExistingUser(user, userIdToRemove);
+			user = userManagementService.getUserByEmailId(user, emailId);
+			model.addAttribute("user", user);
+		}
+		catch (InvalidInputException invalidInputException) {
+			throw new InvalidInputException(invalidInputException.getMessage(), invalidInputException);
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("Sorry! No matching email found in our database.", e);
+
+		}
+		LOG.info("Method to find users by email id finished.");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/removeexistinguser", method = RequestMethod.POST)
+	public String removeExistingUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
+			UserAlreadyExistsException {
+		LOG.info("Method to deactivate an existing user called.");
+
+		long userIdToRemove = Long.parseLong(request.getParameter("userIdToRemove"));
+
+		if (userIdToRemove < 0) {
+			LOG.error("Invalid user Id found to remove in removeExistingUser().");
+			throw new InvalidInputException("Invalid user Id found to remove in removeExistingUser().");
+		}
+
+		HttpSession session = request.getSession();
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		if (user == null) {
+			LOG.error("No user found in current session in removeExistingUser().");
+			throw new InvalidInputException("No user found in current session in removeExistingUser().");
+		}
+		try {
+			userManagementService.removeExistingUser(user, userIdToRemove);
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
 		}
-		LOG.info("Method to deactivate an existing user finished.");
-		return "success";
+		LOG.info("Method to remove an existing user finished.");
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// JIRA SS-42 BY RM05 EOC
@@ -104,7 +179,7 @@ public class UserManagementController {
 				HttpSession session = request.getSession(false);
 				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 				// Assigns the given user as branch admin
-				userManagementService.createBranchAdmin(admin, branchId, userId);
+				userManagementService.assignBranchAdmin(admin, branchId, userId);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception while parsing branch Id or user id", e);
@@ -116,7 +191,7 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to assign branch admin");
-		return null;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -146,13 +221,15 @@ public class UserManagementController {
 
 			long regionId = 0l;
 			long userId = 0l;
+			HttpSession session;
+
 			try {
 				regionId = Long.parseLong(region);
 				userId = Long.parseLong(userToAssign);
-				HttpSession session = request.getSession(false);
+				session = request.getSession(false);
 				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-				// Assigns the given user as branch admin
-				userManagementService.createBranchAdmin(admin, regionId, userId);
+				// Assigns the given user as region admin
+				userManagementService.assignRegionAdmin(admin, regionId, userId);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception while parsing region Id or user id", e);
@@ -164,7 +241,7 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to assign region admin");
-		return null;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -174,8 +251,8 @@ public class UserManagementController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/removebranchadmin", method = RequestMethod.POST)
-	public String removeBranchAdmin(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/unassignbranchadmin", method = RequestMethod.POST)
+	public String unassignBranchAdmin(Model model, HttpServletRequest request) {
 		LOG.info("Method to remove branch admin called");
 		try {
 
@@ -193,13 +270,15 @@ public class UserManagementController {
 
 			long branchId = 0l;
 			long userId = 0l;
+			HttpSession session;
+
 			try {
 				branchId = Long.parseLong(branch);
 				userId = Long.parseLong(userIdToRemove);
-				HttpSession session = request.getSession(false);
+				session = request.getSession(false);
 				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 				// Remove the given user from branch admin.
-				userManagementService.removeBranchAdmin(admin, branchId, userId);
+				userManagementService.unassignBranchAdmin(admin, branchId, userId);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception while parsing branch Id or user id", e);
@@ -211,7 +290,7 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to remove branch admin");
-		return null;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -222,8 +301,8 @@ public class UserManagementController {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	@RequestMapping(value = "/removeRegionAdmin", method = RequestMethod.POST)
-	public String removeRegionAdmin(Model model, HttpServletRequest request) throws InvalidInputException {
+	@RequestMapping(value = "/unassignregionadmin", method = RequestMethod.POST)
+	public String unassignRegionAdmin(Model model, HttpServletRequest request) throws InvalidInputException {
 
 		LOG.info("Method to remove region admin called");
 
@@ -243,15 +322,16 @@ public class UserManagementController {
 
 			long regionId = 0l;
 			long userId = 0l;
+			HttpSession session;
 
 			try {
 				regionId = Long.parseLong(region);
 				userId = Long.parseLong(userIdToRemove);
-				HttpSession session = request.getSession(false);
+				session = request.getSession(false);
 				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
 				// Remove the given user from branch admin.
-				userManagementService.removeRegionAdmin(admin, regionId, userId);
+				userManagementService.unassignRegionAdmin(admin, regionId, userId);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception while parsing region Id or user id", e);
@@ -263,7 +343,7 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to remove region admin");
-		return null;
+		return JspResolver.MESSAGE_HEADER;
 	}
 }
 // JIRA SS-37 BY RM02 EOC
