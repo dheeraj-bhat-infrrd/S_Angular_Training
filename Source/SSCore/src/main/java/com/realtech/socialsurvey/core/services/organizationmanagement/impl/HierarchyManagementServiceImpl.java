@@ -54,8 +54,12 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("Invalid Company passed");
 		}
 
-		LOG.info("Fetching the list of branches for company :" + company.getCompany());
-		List<Branch> branchList = branchDao.findByColumn(Branch.class, CommonConstants.COMPANY_COLUMN, company);
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());		
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
 	}
@@ -76,7 +80,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Fetching the list of regions for company :" + company.getCompany());
-		List<Region> regionList = regionDao.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, company);
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
 		LOG.info("Region list fetched for the company " + company);
 		return regionList;
 	}
@@ -156,10 +164,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	public boolean isBranchAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
 		LOG.info("Method to check if further branch addition is allowed, called for user : " + user);
 		if (user == null) {
-			throw new InvalidInputException("User is null in isMaxBranchAdditionExceeded");
+			throw new InvalidInputException("User is null in isBranchAdditionAllowed");
 		}
 		if (accountType == null) {
-			throw new InvalidInputException("Account type is null in isMaxBranchAdditionExceeded");
+			throw new InvalidInputException("Account type is null in isBranchAdditionAllowed");
 		}
 		boolean isBranchAdditionAllowed = true;
 		switch (accountType) {
@@ -181,9 +189,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 				isBranchAdditionAllowed = true;
 				break;
 			default:
-				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
+				throw new InvalidInputException("Account type is invalid in isBranchAdditionAllowed");
 		}
-		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isMaxBranchAdditionExceeded is :"
+		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isBranchAdditionAllowed is :"
 				+ isBranchAdditionAllowed);
 		return isBranchAdditionAllowed;
 	}
@@ -202,10 +210,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
 		LOG.info("Method to check if further region addition is allowed called for user : " + user);
 		if (user == null) {
-			throw new InvalidInputException("User is null in isMaxRegionAdditionExceeded");
+			throw new InvalidInputException("User is null in isRegionAdditionAllowed");
 		}
 		if (accountType == null) {
-			throw new InvalidInputException("Account type is null in isMaxRegionAdditionExceeded");
+			throw new InvalidInputException("Account type is null in isRegionAdditionAllowed");
 		}
 		boolean isRegionAdditionAllowed = true;
 		switch (accountType) {
