@@ -63,11 +63,9 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		try {
 			entity = (T) getSession().load(entityClass, id);
 		}
-		catch (Exception hibernateException) {
-			throw hibernateException;
-			// LOG.error("HibernateException caught in findById(). ", hibernateException);
-			// throw new DatabaseException("HibernateException caught in findById(). ",
-			// hibernateException);
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findById(). ", hibernateException);
+			throw new DatabaseException("HibernateException caught in findById(). ", hibernateException);
 		}
 		return entity;
 	}
@@ -78,7 +76,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 	public List<T> findAll(Class<T> entityClass) {
 		try {
 			final Criteria crit = getSession().createCriteria(entityClass);
-			return crit.list();
+			  return crit.list();
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in findAll().", hibernateException);
@@ -217,7 +215,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
-
+	
 	@Override
 	public long findNumberOfRows(Class<T> dataClass) {
 		try {
@@ -228,7 +226,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			throw new DatabaseException("HibernateException caught in findNumberOfRows().", hibernateException);
 		}
 	}
-
+	
 	@Override
 	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries) {
 		Criteria criteria = getSession().createCriteria(dataClass);
