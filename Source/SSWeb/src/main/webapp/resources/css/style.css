@@ -331,3 +331,40 @@
     position: fixed;
     top: 0;
 }
+.st-score-txt {
+    height: 110px;
+    line-height: 26px;
+    width: 360px;
+}
+
+.icn-spanner {
+    background: url(../images/spanner.png) no-repeat center;
+}
+
+.icn-blue-tick {
+    background: url(../images/blue-tick.png) no-repeat center;
+}
+
+.icn-full-star {
+    background: url(../images/full-star.png) no-repeat center;
+}
+
+.icn-half-star {
+    background: url(../images/half-star.png) no-repeat center;
+}
+
+.icn-no-star {
+    background: url(../images/no-star.png) no-repeat center;
+}
+
+.icn-pen {
+    background: url(../images/pen.png) no-repeat center;
+}
+
+.st-checkbox-on {
+    background: url(../images/check-yes.png) no-repeat center;
+}
+
+.st-checkbox-off {
+    background: url(../images/check-no.png) no-repeat center;
+}
