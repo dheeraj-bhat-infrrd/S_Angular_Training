@@ -60,6 +60,9 @@ public interface CommonConstants {
 	public static final int SANDBOX_MODE_TRUE=1;
 	public static final int IS_OWNER = 1;
 	public static final int IS_NOT_OWNER = 0;
+	public static final int SUBSCRIPTION_DUE = 1;
+	public static final int SUBSCRIPTION_NOT_DUE = 0;
+
 
 	/**
 	 * Hibernate entities and column name constants

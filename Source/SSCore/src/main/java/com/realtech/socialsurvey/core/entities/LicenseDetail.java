@@ -48,6 +48,17 @@ public class LicenseDetail implements Serializable {
 
 	@Column(name = "PAYMENT_RETRIES")
 	private int paymentRetries;
+	
+	@Column(name = "IS_SUBSCRIPTION_DUE")
+	private int isSubscriptionDue;
+
+	public int getIsSubscriptionDue() {
+		return isSubscriptionDue;
+	}
+
+	public void setIsSubscriptionDue(int isSubscriptionDue) {
+		this.isSubscriptionDue = isSubscriptionDue;
+	}
 
 	private int status;
 

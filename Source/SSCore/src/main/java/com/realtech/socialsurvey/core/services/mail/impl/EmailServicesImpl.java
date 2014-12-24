@@ -275,6 +275,64 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent fatal exception mail");
 		
 	}
+	
+	@Override
+	public void sendRetryChargeEmail(String recipientMailId,String displayName,String retries) throws InvalidInputException, UndeliveredEmailException {
+			
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending retry charge mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending retry charge mail ");
+		}
+		
+		LOG.info("Sending retry charge email to : " + recipientMailId);
+
+		
+
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,retries));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent retry charge mail");
+		
+	}
+	
+	@Override
+	public void sendRetryExhaustedEmail(String recipientMailId,String displayName) throws InvalidInputException, UndeliveredEmailException {
+			
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
+		}
+		
+		LOG.info("Sending retries exhausted email to : " + recipientMailId);
+
+		
+
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent retries exhausted mail");
+		
+	}
 
 }
 // JIRA: SS-7: By RM02: EOC
