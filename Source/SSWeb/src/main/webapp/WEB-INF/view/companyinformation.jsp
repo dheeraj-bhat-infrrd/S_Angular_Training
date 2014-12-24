@@ -141,24 +141,22 @@
             });
 			
 		});
-	</script>
-	<script>
+
+		function uploadImageSuccessCallback(response) {
+			$("#serverSideerror").html(response);
+			var success = "Logo has been uploaded successfully";
+			var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+			if (success != successMsg) {
+				$('#com-logo').val('');
+				$('#com-logo-decoy').val('');
+			}
+		}
+		
 		$("#com-logo").on("change", function() {
 			var formData = new FormData();
 			formData.append("logo", $('#com-logo').prop("files")[0]);
 			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
-			$.ajax({
-				url : "./uploadcompanylogo.do",
-				type : "POST",
-				dataType : 'text',
-				contentType : false,
-				processData : false,
-				cache : false,
-				data : formData,
-				success : function(response) {
-					$("#serverSideerror").html(response);
-				}
-			});
+			callAjaxPOSTWithTextData("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
 		});
 	</script>
 </body>
