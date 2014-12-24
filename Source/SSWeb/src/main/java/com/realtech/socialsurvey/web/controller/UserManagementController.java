@@ -40,9 +40,14 @@ public class UserManagementController {
 
 	// JIRA SS-42 BY RM05 BOC
 
+	@RequestMapping(value = "/showusermangementpage", method = RequestMethod.GET)
+	public String initUserManagementPage() {
+		LOG.info("User Management page started");
+		return JspResolver.USER_MANAGEMENT;
+	}
+
 	@RequestMapping(value = "/invitenewuser", method = RequestMethod.POST)
-	public String inviteNewUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
-			UserAlreadyExistsException {
+	public String inviteNewUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a new user by existing admin called.");
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
@@ -80,8 +85,8 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	@RequestMapping(value = "/finduserbyuserid", method = RequestMethod.POST)
-	public String findUserByUserId(Model model, HttpServletRequest request) throws NonFatalException {
+	@RequestMapping(value = "/finduserandbranchesbyuserid", method = RequestMethod.POST)
+	public String findUserAndAssignedBranchesByUserId(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
@@ -98,18 +103,44 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			User user = userManagementService.getUserByUserId(userId);
+			userManagementService.get;
 			model.addAttribute("searchedUser", user);
+
+			// TODO : add assigned branches to the as model attribute assignedBranches
+
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.info("Method to fetch user by user id , findUserByUserId() finished.");
-		return JspResolver.MESSAGE_HEADER;
+		// return user details page on success
+		return JspResolver.USER_DETAILS;
+	}
+
+	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.POST)
+	public String findUsersForCompany(Model model, HttpServletRequest request) {
+		LOG.info("Method to fetch user by user, findUserByUserId() started.");
+		try {
+			String userIdStr = request.getParameter(CommonConstants.USER_ID);
+			if (userIdStr == null || userIdStr.isEmpty()) {
+				LOG.error("Invalid user id passed in method findUserByUserId().");
+				throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+			}
+			long userId = 0;
+			try {
+				userId = Long.parseLong(userIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception while parsing user Id", e);
+				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			userManagementService.getUsersForCompany(userId);
 	}
 
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
-	public String findUserByEmail(Model model, HttpServletRequest request) throws InvalidInputException {
+	public String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
 		try {
 
@@ -148,8 +179,7 @@ public class UserManagementController {
 	}
 
 	@RequestMapping(value = "/removeexistinguser", method = RequestMethod.POST)
-	public String removeExistingUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
-			UserAlreadyExistsException {
+	public String removeExistingUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to deactivate an existing user called.");
 		try {
 			long userIdToRemove = 0;
@@ -282,7 +312,7 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		//TODO add success message.
+		// TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning branch admin. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
@@ -297,10 +327,9 @@ public class UserManagementController {
 	 * @param model
 	 * @param request
 	 * @return
-	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/unassignregionadmin", method = RequestMethod.POST)
-	public String unassignRegionAdmin(Model model, HttpServletRequest request) throws InvalidInputException {
+	public String unassignRegionAdmin(Model model, HttpServletRequest request) {
 
 		LOG.info("Method to remove region admin called");
 
@@ -336,7 +365,7 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		//TODO add success message.
+		// TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning region admin.Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
@@ -344,5 +373,6 @@ public class UserManagementController {
 		LOG.info("Successfully completed method to remove region admin");
 		return JspResolver.MESSAGE_HEADER;
 	}
+
 }
 // JIRA SS-37 BY RM02 EOC

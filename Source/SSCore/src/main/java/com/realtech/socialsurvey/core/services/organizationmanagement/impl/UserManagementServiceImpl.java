@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -69,7 +70,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
-	@Autowired
+	@Resource
+	@Qualifier("user")
 	private UserDao userDao;
 
 	@Autowired
@@ -478,7 +480,39 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to find user on the basis of user id finished for user id " + userId);
 		return user;
 	}
-	
+
+	/*
+	 * Method to return list of branches assigned to the user passed.
+	 */
+	@Transactional
+	@Override
+	public List<Branch> getBranchesAssignedToUser(User user) {
+		LOG.info("Method to find branches assigned to the user started for " + user.getDisplayName());
+		Set<>userProfileDao.getBranchIdsForUser(user);
+		LOG.info("Method to find branches assigned to the user finished for " + user.getDisplayName());
+	}
+
+	/*
+	 * Method to return list of users belonging to the same company as that of user passed.
+	 */
+	@Transactional
+	@Override
+	public List<User> getUsersForCompany(long userId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getUsersForCompany() started for " + userId);
+		User user = userDao.findById(User.class, userId);
+		if (user == null) {
+			LOG.error("No user found for user id : " + userId);
+			throw new InvalidInputException("No user found for userId specified in getUsersForCompany()");
+		}
+		List<User> users = userDao.getUsersForCompany(user.getCompany());
+		if (users == null || users.isEmpty()) {
+			LOG.error("No user found for company : " + user.getCompany().getCompany());
+			throw new NoRecordsFetchedException("No user found for company : " + user.getCompany().getCompany());
+		}
+		LOG.info("Method getUsersForCompany() started for " + userId);
+		return users;
+	}
+
 	// JIRA SS-42 BY RM05 EOC
 
 	@Override

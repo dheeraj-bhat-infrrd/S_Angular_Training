@@ -4,10 +4,12 @@ import java.util.List;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -16,6 +18,7 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 // JIRA SS-42 By RM-05 : BOC
+@Component("user")
 public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDaoImpl.class);
@@ -101,6 +104,30 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		
 		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished.");
 		return (int) criteria.setProjection(Projections.rowCount()).uniqueResult();
+	}
+	
+	/*
+	 * Method to get list of active and unauthorized users belonging to a company.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<User> getUsersForCompany(Company company){
+		LOG.info("Method getUsersForCompany called to fetch list of users of company : " +company.getCompany());
+		Criteria criteria = getSession().createCriteria(User.class);
+		try {
+			criteria.add(Restrictions.eq(CommonConstants.COMPANY,company));
+
+			Criterion criterion = Restrictions.or(
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED));
+			criteria.add(criterion);
+			criteria.addOrder(Order.asc("displayName"));
+		}
+		catch (HibernateException hibernateException) {
+			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);
+		}
+		LOG.info("Method getUsersForCompany finished to fetch list of users of company : " +company.getCompany());
+		return (List<User>) criteria.list();
 	}
 }
 // JIRA SS-42 By RM-05 EOC
