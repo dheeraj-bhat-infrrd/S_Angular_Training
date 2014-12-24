@@ -1,5 +1,22 @@
 <jsp:include page="header.jsp"/>
 
+<div class="overlay-disable hide">
+    <div class="overlay-disable-wrapper">
+        <div class="ol-header">Disable Account</div>
+        <div class="ol-content">
+            <div class="ol-txt">Are you sure?</div>
+            <div class="clearfix">
+                <div class="float-left ol-btn-wrapper">
+                    <div id="ol-btn-continue" class="ol-btn">Continue</div>
+                </div>
+                <div class="float-left ol-btn-wrapper">
+                    <div id="ol-btn-cancel" class="ol-btn">Cancel</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -141,36 +158,36 @@
                 </div>
             </div>
         </div>
-        <div class="um-top-container">
+        <div class="um-top-container border-0">
             <div class="um-header margin-top-25">Other Settings</div>
             <div class="st-others-wrapper clearfix">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 st-settings-tab">
                     <div class="clearfix st-settings-item-wrapper">
                         <div class="float-left st-settings-check-wrapper">
-                            <div id="st-settings-checkbox-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
-                            <div id="st-settings-checkbox-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
+                            <div id="st-settings-location-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
+                            <div id="st-settings-location-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
                         </div>
-                        <div class="float-left st-check-txt-OR">Enable location</div>
+                        <div class="float-left st-check-txt-OR">Enable Location</div>
                     </div>
                     <div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="clearfix st-settings-item-wrapper">
                         <div class="float-left st-settings-check-wrapper">
-                            <div id="st-settings-checkbox-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
-                            <div id="st-settings-checkbox-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
+                            <div id="st-settings-account-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
+                            <div id="st-settings-account-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
                         </div>
-                        <div class="float-left st-check-txt-OR">Enable location</div>
+                        <div class="float-left st-check-txt-OR">Disable Account</div>
                     </div>
                     <div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="clearfix st-settings-item-wrapper">
                         <div class="float-left st-settings-check-wrapper">
-                            <div id="st-settings-checkbox-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
-                            <div id="st-settings-checkbox-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
+                            <div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
+                            <div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
                         </div>
-                        <div class="float-left st-check-txt-OR">Enable location</div>
+                        <div class="float-left st-check-txt-OR" id="st-chg-payment-info">Change Payment Information</div>
                     </div>
                     <div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
                 </div>
@@ -178,5 +195,44 @@
         </div>
     </div>
 </div>
+
+<jsp:include page="scripts.jsp"/>
+
+<script>
+    $(document).ready(function(){
+        $('#st-settings-location-on').click(function(){
+            $('#st-settings-location-off').show();
+            $(this).hide();
+        });
+        $('#st-settings-location-off').click(function(){
+            $('#st-settings-location-on').show();
+            $(this).hide();
+        });
+        $('#st-settings-account-on').click(function(){
+            $('#st-settings-account-off').show();
+            $(this).hide();
+        });
+        $('#st-settings-account-off').click(function(){
+            $('#st-settings-account-on').show();
+            $(this).hide();
+            $('.overlay-disable').show();
+        });
+        $('#st-settings-payment-on').click(function(){
+            $('#st-settings-payment-off').show();
+            $(this).hide();
+        });
+        $('#st-settings-payment-off').click(function(){
+            $('#st-settings-payment-on').show();
+            $(this).hide();
+        });
+        
+        $('#ol-btn-cancel').click(function(){
+            $('#st-settings-account-off').show();
+            $('#st-settings-account-on').hide();
+            $('.overlay-disable').hide();
+        });
+        
+    });
+</script>
 
 <jsp:include page="footer.jsp"/>
