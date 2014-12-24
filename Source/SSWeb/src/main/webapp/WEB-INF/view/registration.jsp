@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div id="overlay-toast" class="overlay-toast">Sample error message</div>
     <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 registration-wrapper-min-height">
 		<div class="container login-container">
@@ -48,11 +49,13 @@
 								data-non-empty="true" name="firstname" value="${firstname}"
 								placeholder='<spring:message code="label.firstname.key" />'>
 						</div>
+                        <div id="reg-page-firstname" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-lname"></div>
 							<input class="float-left login-wrapper-txt" id="reg-lname" name="lastname" value="${lastname}"
 								placeholder='<spring:message code="label.lastname.key" />'>
 						</div>
+                        <div id="reg-page-lastname" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
 							<c:choose>
@@ -66,16 +69,19 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
+                        <div id="reg-page-email" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-password"></div>
 							<input type="password" class="float-left login-wrapper-txt"
 								id="reg-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
 						</div>
-                            <div class="login-input-wrapper margin-0-auto clearfix">
+                        <div id="reg-page-password" class="input-error-2 margin-0-auto">Please enter the above field</div>
+                        <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-confirm-password"></div>
 							<input type="password" class="float-left login-wrapper-txt" id="reg-conf-pwd" data-non-empty="true" name="confirmpassword"
 								placeholder='<spring:message code="label.confirmpassword.key" />'>
 						</div>
+                        <div id="reg-page-conf-password" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reg-submit">
 							<spring:message code="label.submit.key" />
 						</div>
