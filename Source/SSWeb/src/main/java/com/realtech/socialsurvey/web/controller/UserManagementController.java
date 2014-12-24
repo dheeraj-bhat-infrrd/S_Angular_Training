@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -37,6 +38,8 @@ public class UserManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	private static final int BATCH_SIZE = 20;
 
 	// JIRA SS-42 BY RM05 BOC
 
@@ -103,7 +106,7 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			User user = userManagementService.getUserByUserId(userId);
-			userManagementService.get;
+//			userManagementService.get;
 			model.addAttribute("searchedUser", user);
 
 			// TODO : add assigned branches to the as model attribute assignedBranches
@@ -136,7 +139,19 @@ public class UserManagementController {
 				LOG.error("Number format exception while parsing user Id", e);
 				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			userManagementService.getUsersForCompany(userId);
+			List<User> allUsers = userManagementService.getUsersForCompany(userId);
+			List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, BATCH_SIZE);
+			model.addAttribute("allUsersList",allUsers);
+			model.addAttribute("currentIndex", BATCH_SIZE);
+			model.addAttribute("usersList",users);
+		}catch(NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
+		// return user details page on success
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
