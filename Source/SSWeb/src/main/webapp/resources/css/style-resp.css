@@ -417,6 +417,10 @@
     .score-rt-post-OR {
         padding-left: 55px;
     }
+    #st-chg-payment-info{
+        width: 150px;
+        line-height: 20px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
