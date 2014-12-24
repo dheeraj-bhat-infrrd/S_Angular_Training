@@ -81,6 +81,9 @@
         width: 100%;
         margin-bottom: -1px;
     }
+    .item-row-OR{
+        width: 100%;
+    }
     .hm-bottom-panel-item{
         padding: 0 15px;
     }
@@ -262,6 +265,50 @@
     .um-bottom-content{
         padding: 0 !important;
     }
+    .st-score-txt, .st-score-rt{
+        width: 100%;
+        padding: 10px;
+    }
+    .st-score-txt{
+        height: auto;
+        margin-bottom: 20px;
+    }
+    .score-rt-post {
+        width: 260px;
+        height: 110px;
+        padding: 0 !important;
+        float: none;
+        border: 0;
+        margin: 0 auto;
+    }
+    .st-bottom-wrapper{
+        margin-top: 25px !important;
+        padding: 0px 15px;
+    }
+    .st-rating-wrapper{
+        margin-right: 9px !important;
+    }
+    .st-rating-input{
+        width: 50px;
+    }
+    .st-header-txt-lft{
+        font-size: 14px;
+    }
+    .st-check-main, .st-check-wrapper{
+        margin-top: 15px;
+    }
+    .st-check-main{
+        float: none;
+    }
+    .st-check-txt-OR{
+        line-height: 25px;
+        font-size: 14px;
+        width: 178px;
+        margin-top: 15px;
+    }
+    .st-settings-check-wrapper{
+        margin-top: 15px;
+    }
 }
 
 
@@ -330,6 +377,12 @@
     .hm-item-row{
         width: 100%
     }
+    .item-row-OR{
+        width: 375px;
+    }
+    .overflow-hidden {
+        overflow: hidden;
+    }
     .hm-item-row-left{
         width: 90px;
         font-size: 13px;
@@ -358,6 +411,16 @@
     .hm-sub-header-left{
         font-size: 18px;
     }
+    .st-score-txt, .st-score-rt{
+        width: 100%;
+    }
+    .score-rt-post-OR {
+        padding-left: 55px;
+    }
+    #st-chg-payment-info{
+        width: 150px;
+        line-height: 20px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -365,8 +428,26 @@
     .hm-item-row{
         width: 100%
     }
+    .item-row-OR{
+        width: 465px;
+    }
     .hm-item-row-txt, .hm-dd-wrapper, .um-item-row-txt{
         width: 260px;
+    }
+    .um-item-row-txt-OR{
+        width: 240px;
+    }
+    .st-score-txt{
+        width: 310px;
+    }
+    .st-score-rt {
+        width: 600px;
+    }
+    .score-rt-post{
+        padding: 0px 0px 20px 0px;
+    }
+    .score-rt-post-OR {
+        padding-left: 15px;
     }
 }
 
