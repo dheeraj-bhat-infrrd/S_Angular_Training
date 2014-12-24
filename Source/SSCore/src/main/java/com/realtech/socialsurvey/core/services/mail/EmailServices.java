@@ -19,4 +19,8 @@ public interface EmailServices {
 	public void sendFatalExceptionEmail(String recipientMailId,String stackTrace) throws InvalidInputException, UndeliveredEmailException;
 	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
 	UndeliveredEmailException;
+
+	void sendRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException, UndeliveredEmailException;
+
+	void sendRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
 }

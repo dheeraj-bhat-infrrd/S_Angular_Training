@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.RetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 /**
@@ -73,7 +74,25 @@ public interface Payment {
 	 * @param subscriptionId
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws RetryUnsuccessfulException 
 	 */
-	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException;
+	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, RetryUnsuccessfulException;
+	
+	/**
+	 * Checks if the status of a particular transaction is settling.
+	 * @param transactionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public boolean checkTransactionSettling(String transactionId) throws NoRecordsFetchedException, InvalidInputException;
+	
+	/**
+	 * Checks if the status of a particular transaction is settled.
+	 * @param transactionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public boolean checkTransactionSettled(String transactionId) throws NoRecordsFetchedException, InvalidInputException; 
 }

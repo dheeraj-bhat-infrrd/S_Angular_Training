@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.RetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
@@ -511,6 +512,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		LOG.info("Updating LicenseDetail table with subscriptionId : " + subscriptionId);
+		licenseDetail.setIsSubscriptionDue(CommonConstants.SUBSCRIPTION_DUE);
 		licenseDetail.setNextRetryTime(new Timestamp(now.getTimeInMillis()));
 		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		licenseDetailDao.saveOrUpdate(licenseDetail);
@@ -529,42 +531,122 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param subscriptionId
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
+	 * @throws RetryUnsuccessfulException 
 	 */
-	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException {
+	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, RetryUnsuccessfulException {
 
 		if (subscriptionId == null || subscriptionId.isEmpty()) {
 			LOG.error("Parameter to retrySubscriptionCharge() is empty or null!");
 			throw new InvalidInputException("Parameter to retrySubscriptionCharge() is empty or null!");
 		}
-		
+
 		Result<Transaction> retryResult = null;
 
 		LOG.info("Retrying subscription charge for id : " + subscriptionId);
 		Transaction transaction = null;
-		
+
 		retryResult = gateway.subscription().retryCharge(subscriptionId);
-		
+
 		if (retryResult.isSuccess()) {
+			
 			LOG.info("Retry of transaction for subscription id : " + subscriptionId + " Status : " + retryResult.isSuccess());
+			transaction = retryResult.getTarget();
+			
+			LOG.info("Submitting the transaction with id : " + transaction.getId() + " for settlement.");
 			Result<Transaction> result = gateway.transaction().submitForSettlement(retryResult.getTarget().getId());
+			
 			if (result.isSuccess()) {
 				LOG.info("The transaction has been successfully submitted for settlement.");
-				transaction = result.getTarget();
 			}
 			else {
 				LOG.error("Submission for transaction settlement for id : " + result.getTarget().getId() + " unsuccessful ");
-				transaction = result.getTarget();
 			}
 		}
 		else {
 			LOG.error("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : " + retryResult.getMessage());
-			throw new NoRecordsFetchedException("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : "
+			throw new RetryUnsuccessfulException("Retry for subscription id : " + subscriptionId + " unsuccessful. Message : "
 					+ retryResult.getMessage());
 		}
 
 		LOG.info("End of the retrySubscriptionCharge method.");
 		return transaction;
+
+	}
+	
+	/**
+	 * Checks if the status of a particular transaction is settling.
+	 * @param transactionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public boolean checkTransactionSettling(String transactionId) throws NoRecordsFetchedException, InvalidInputException {
+
+		if (transactionId == null || transactionId.isEmpty()) {
+
+			LOG.error("Parameter to checkTransactionSettling is null or empty");
+			throw new InvalidInputException("Parameter to checkTransactionSettling is null or empty");
+
+		}
+
+		LOG.info("Finding if the transaction with id : " + transactionId + " is settling.");
+
+		boolean status = false;
+		Transaction transaction = null;
+
+		try {
+			transaction = gateway.transaction().find(transactionId);
+
+		}
+		catch (NotFoundException e) {
+			LOG.error("Transaction details not found in the Braintree vault for id :" + transactionId);
+			throw new NoRecordsFetchedException("Transaction details not found in the Braintree vault for id :" + transactionId);
+		}
+
+		if (transaction.getStatus() == Transaction.Status.AUTHORIZED || transaction.getStatus() == Transaction.Status.SETTLING
+				|| transaction.getStatus() == Transaction.Status.SUBMITTED_FOR_SETTLEMENT) {
+			status = true;
+		}
+
+		return status;
+
+	}
+	
+	/**
+	 * Checks if the status of a particular transaction is settled.
+	 * @param transactionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public boolean checkTransactionSettled(String transactionId) throws NoRecordsFetchedException, InvalidInputException {
+
+		if (transactionId == null || transactionId.isEmpty()) {
+
+			LOG.error("Parameter to checkTransactionSettled is null or empty");
+			throw new InvalidInputException("Parameter to checkTransactionSettled is null or empty");
+
+		}
+
+		LOG.info("Finding if the transaction with id : " + transactionId + " is settled.");
+
+		boolean status = false;
+		Transaction transaction = null;
+
+		try {
+			transaction = gateway.transaction().find(transactionId);
+
+		}
+		catch (NotFoundException e) {
+			LOG.error("Transaction details not found in the Braintree vault for id :" + transactionId);
+			throw new NoRecordsFetchedException("Transaction details not found in the Braintree vault for id :" + transactionId);
+		}
+
+		if (transaction.getStatus() == Transaction.Status.SETTLED) {
+			status = true;
+		}
+
+		return status;
 
 	}
 

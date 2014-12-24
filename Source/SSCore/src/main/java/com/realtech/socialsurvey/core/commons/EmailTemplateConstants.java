@@ -16,8 +16,15 @@ public final class EmailTemplateConstants {
 	public static final String SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT="SubscriptionChargeUnsuccessfulMailSubject.txt";
 	public static final String VERIFICATION_MAIL_BODY = "VerificationMailBody.html";
 	public static final String VERIFICATION_MAIL_SUBJECT = "VerificationMailSubject.txt";
-	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.txt";
+	public static final String FATAL_EXCEPTION_MAIL_BODY = "FatalExceptionMailBody.html";
 	public static final String FATAL_EXCEPTION_MAIL_SUBJECT = "FatalExceptionMailSubject.txt";
+	public static final String RETRY_CHARGE_MAIL_BODY = "RetryChargeMailBody.html";
+	public static final String RETRY_CHARGE_MAIL_SUBJECT = "RetryChargeMailSubject.txt";
+	public static final String RETRIES_EXHAUSTED_MAIL_BODY = "RetriesExhaustedMailBody.html";
+	public static final String RETRIES_EXHAUSTED_MAIL_SUBJECT = "RetriesExhaustedMailSubject.txt";
+
+	
+
 
 
 }
