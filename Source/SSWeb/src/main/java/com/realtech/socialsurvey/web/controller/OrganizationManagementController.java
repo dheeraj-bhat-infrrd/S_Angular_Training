@@ -109,11 +109,8 @@ public class OrganizationManagementController {
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			/*Object logoNameAttr = session.getAttribute(CommonConstants.LOGO_NAME);
-			if (logoNameAttr != null) {
-				String logoName = logoNameAttr.toString();
-				session.removeAttribute(CommonConstants.LOGO_NAME);
-			}*/
+			/*String logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
+			session.removeAttribute(CommonConstants.LOGO_NAME);*/
 			
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
