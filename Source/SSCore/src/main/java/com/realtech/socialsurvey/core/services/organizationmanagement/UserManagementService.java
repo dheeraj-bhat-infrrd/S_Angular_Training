@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -42,7 +43,11 @@ public interface UserManagementService {
 	public boolean isUserAdditionAllowed(User user) throws NoRecordsFetchedException;
 	
 	public User getUserByUserId(long userId);
-
+	
+	public List<Branch> getBranchesAssignedToUser(User user);
+	
+	public List<User> getUsersForCompany(long user) throws InvalidInputException, NoRecordsFetchedException;
+	
 	// JIRA SS-42 BY RM05 EOC
 	
 	/**
