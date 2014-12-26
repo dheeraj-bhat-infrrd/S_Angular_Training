@@ -90,8 +90,10 @@
             }
             
             $('input').keypress(function(e){
+            	e.stopPropagation();
 	        	// detect enter
 	        	if (e.which==13){
+	        		e.preventDefault();
 	        		submitForgotPasswordForm();
 	        	}
 			});
