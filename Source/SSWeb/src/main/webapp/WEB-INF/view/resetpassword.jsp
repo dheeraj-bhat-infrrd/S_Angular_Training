@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+	<div id="overlay-toast" class="overlay-toast"></div>
+    <div class="overlay-loader hide"></div>
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
@@ -43,14 +45,17 @@
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
 	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" data-email = "true" name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
 	                    </div>
+	                    <div id="login-page-username" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
 	                    </div>
+	                    <div id="login-page-pwd" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-confirm-password"></div>
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-cnf-pwd" data-non-empty="true" name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
 	                    </div>
+	                    <div id="login-page-cnf-pwd" class="input-error-2 margin-0-auto"></div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reset-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">
@@ -66,9 +71,10 @@
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
     
     <script>
+    	var isResetFormValid;
         $(document).ready(function(){
             adjustOnResize();
-            
+            isResetFormValid = false;
             $(window).resize(adjustOnResize);
             
             function adjustOnResize(){
@@ -83,7 +89,9 @@
             
             function submitResetPasswordForm() {
             	console.log("submitting reset password form");
-            	$('#reset-pwd-form').submit();
+            	if(validateResetPasswordForm('reset-pwd-form')){
+                	$('#reset-pwd-form').submit();
+                }
             }
             
             $('#login-user-id').blur(function() {
@@ -99,22 +107,47 @@
 			});
             
             function validateResetPasswordForm(id) {
-            	
-            	if(!validateEmailId('login-user-id'))
-            		return false;
-            	if(!validatePassword('login-pwd'))
-            		return false;
-            	if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd'))
-            		return false;
-            	
-				return true;
+            	var isFocussed = false;
+            	isResetFormValid = true;
+            	var isSmallScreen = false;
+            	if($(window).width()<768){
+            		isSmallScreen = true;
+            	}
+            	if(!validateEmailId('login-user-id')){
+            		isResetFormValid = false;
+            		if(!isFocussed){
+            			$('#login-user-id').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isResetFormValid;
+            		}
+            	}
+            	if(!validatePassword('login-pwd')){
+            		isResetFormValid = false;
+            		if(!isFocussed){
+            			$('#login-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isResetFormValid;
+            		}
+            	}
+            	if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd')){
+            		isResetFormValid = false;
+            		if(!isFocussed){
+            			$('#login-cnf-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isResetFormValid;
+            		}
+            	}
+            	return isResetFormValid;
 			}
             
             $('#reset-pwd-submit').click(function(e){
-                if(validateResetPasswordForm('reset-pwd-form')){
-                    /* ===== FORM VALIDATED ===== */
-                	submitResetPasswordForm();
-                }
+            	submitResetPasswordForm();
             });
             
         });

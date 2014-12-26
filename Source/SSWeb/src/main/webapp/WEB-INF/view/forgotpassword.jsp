@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+	<div id="overlay-toast" class="overlay-toast"></div>
+    <div class="overlay-loader hide"></div>
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
@@ -43,6 +45,7 @@
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
 	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" data-email="" name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
 	                    </div>
+	                    <div id="login-page-username" class="input-error-2 margin-0-auto"></div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="forgot-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
                	 </form>
@@ -57,7 +60,9 @@
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
     
     <script>
+    	var isForgotPasswordFormValid;
         $(document).ready(function(){
+        	isForgotPasswordFormValid=false;
             adjustOnResize();
             
             $(window).resize(adjustOnResize);
@@ -74,14 +79,13 @@
             
             function submitForgotPasswordForm() {
             	console.log("submitting forgot password form");
-            	$('#forgot-pwd-form').submit();
+            	if(validateForgotPasswordForm('forgot-pwd-form')){
+            		$('#forgot-pwd-form').submit();
+                }
             }
             
             $('#forgot-pwd-submit').click(function(e){
-                if(validateForgotPasswordForm('forgot-pwd-form')){
-                    /* ===== FORM VALIDATED ===== */
                 	submitForgotPasswordForm();
-                }
             });
             
             $('#login-user-id').blur(function() {
@@ -89,9 +93,23 @@
 			});
             
             function validateForgotPasswordForm(id) {
-				if(!validateEmailId('login-user-id'))
-					return false;
-				return true;
+            	var isFocussed = false;
+            	var isSmallScreen = false;
+            	isForgotPasswordFormValid = true;
+            	if($(window).width()<768){
+            		isSmallScreen = true;
+            	}
+            	if(!validateEmailId('login-user-id')){
+					isForgotPasswordFormValid = false;
+					if(!isFocussed){
+            			$('#login-user-id').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isForgotPasswordFormValid;
+            		}
+            	}
+            	return isForgotPasswordFormValid;
 			}
             
         });
