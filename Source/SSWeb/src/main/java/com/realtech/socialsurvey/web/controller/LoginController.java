@@ -106,7 +106,7 @@ public class LoginController {
 				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 				if (licenseDetails != null && !licenseDetails.isEmpty()) {
 					LicenseDetail licenseDetail = licenseDetails.get(0);
-					accountType = AccountType.getAccountType(licenseDetail.getLicenseId());
+					accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 					LOG.debug("Adding account type in session");
 					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 				}
