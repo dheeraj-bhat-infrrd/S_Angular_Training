@@ -159,7 +159,7 @@
         line-height: 48px;
         border-bottom: 1px solid #dcdcdc;
     }
-    .hm-main-content-wrapper{
+    .hm-main-content-wrapper, .prof-main-content-wrapper{
         margin-top: 0;
     }
     .hm-item-header-left{
@@ -319,6 +319,104 @@
     .input-error-2{
         display: none !important;
     }
+    .prof-map-wrapper{
+        display: none;
+    }
+    .prof-addline2{
+        display: none;
+    }
+    .prof-addline1{
+        font-size: 14px;
+        height: 78px;
+        white-space: inherit;
+    }
+    .prof-img-wrapper{
+        padding: 0;
+    }
+    .prof-image{
+        width: 100%;
+    }
+    .prof-rating-mobile-wrapper{
+        display: block;
+        border-right: 1px solid #dcdcdc;
+        height: 50px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .prof-btn-wrapper{
+        width: 100%;
+        padding-left: 5px;
+        margin-left: -15px;
+        border-top: 1px solid #dcdcdc;
+        padding-top: 8px;
+        bottom: 11px;
+    }
+    .prof-btn-survey{
+        width: 140px;
+        height: 36px;
+        line-height: 36px;
+        margin: 0 auto;
+    }
+    .prof-rating .st-rating-wrapper{
+        display: none;
+    }
+    .prof-rating-mobile-wrapper .st-rating-wrapper{
+        margin-right: 0 !important;
+    }
+    .prof-rating-mobile-wrapper .rating-star{
+        width: 28px;
+        background-size: 80%;
+    }
+    .inc-dl{
+        width: 20%;
+    }
+    .prof-dowload-width{
+        width: 100%;
+    }
+    .txt-download{
+        font-size: 12px;
+        width: 80%;
+    }
+    .prof-wrapper{
+        height: auto;
+    }
+    .prof-name-wrapper{
+        padding-top: 10px;
+        overflow: hidden;
+        padding-bottom: 0px;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .prof-name-container{
+        height: 154px;
+    }
+    .prof-name{
+        font-size: 16px;
+    }
+    .prof-address{
+        font-size: 14px;
+        line-height: 22px;
+    }
+    .prof-name-container{
+        height: 148px;
+    }
+    .prof-left-panel-wrapper{
+        padding: 0;
+    }
+    .prof-left-row{
+        padding: 10px;
+    }
+    .payment-section{
+        width: 100%;
+    }
+    .payment-details-wrapper, .overlay-payment{
+        padding: 10px;
+    }
+    .btn-payment{
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    #payment-details-form{
+        padding: 0;
+    }
 }
 
 
@@ -433,6 +531,18 @@
     #st-chg-payment-info{
         width: 150px;
         line-height: 20px;
+    }
+    .lp-con-row-item{
+        width: 134px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
+    }
+    .lp-assoc-row, .lp-auth-row, .lp-hob-row, .lp-ach-row, .lp-exp-row{
+        width: 180px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
 }
 
