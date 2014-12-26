@@ -30,7 +30,7 @@
 			                                <div class="hm-item-row clearfix">
 			                                    <div class="hm-item-row-left text-right"><spring:message code="label.branchname.key"/></div>
 			                                    <div class="hm-item-row-right">
-			                                        <input type="text" name="branchName" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
+			                                        <input type="text" name="branchName" id = "branch-name-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
 			                                    </div>
 			                                </div>
 			                            </div>
@@ -60,6 +60,7 @@
 			                            </div>
 			                        </div>
 			                    </div>
+			                     <input type="hidden" name="branchId" id="branch-id-hidden"/>
 		                    </form>
 	                    	<div id="existing-branches">
 	               				<!-- Existing branches get populated here through ajax from existingbranches.jsp  -->
@@ -84,7 +85,7 @@
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.newregion.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="regionName" placeholder='<spring:message code="label.newregion.key"/>'>
+			                                    <input type="text" class="hm-item-row-txt" name="regionName" id = "region-name-txt" placeholder='<spring:message code="label.newregion.key"/>'>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
@@ -108,6 +109,7 @@
 			                                </div>
 			                            </div>
 			                  		</div> 
+			                  		<input type="hidden" name="regionId" id="region-id-hidden">
 			                  	</form>
 			                        <div id="existing-regions">                   
 				                        <!-- Regions get populated here through ajax from existingenterpriseregions.jsp  -->
@@ -128,19 +130,18 @@
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.branchname.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="branchName" placeholder='<spring:message code="label.newbranch.key"/>'>
+			                                    <input type="text" id="branch-name-txt" class="hm-item-row-txt" name="branchName" placeholder='<spring:message code="label.newbranch.key"/>'>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.selectregion.key"/></div>
 			                                <div class="hm-item-row-right pos-relative">
-			                                    <input class="hm-item-row-txt cursor-pointer" id="hm-item-dd-bottom">
-			                                    <input type="hidden" name="regionId" id="region-id"/>
+			                                    <input class="hm-item-row-txt cursor-pointer" type="text" id="selected-region-txt" autocomplete="off">
+			                                    <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
+			                                    <input type="hidden" name="branchId" id="branch-id-hidden"/>
 			                                    <div class="hm-dd-wrapper hide" id="hm-dd-wrapper-bottom">
-			                                        <div class="hm-dd-item" data-regionId = "1">Region 1</div>
-			                                        <div class="hm-dd-item" data-regionId = "2">Region 2</div>
-			                                        <div class="hm-dd-item" data-regionId = "3">Region 3</div>
-			                                        <div class="hm-dd-item" data-regionId = "4">Region 4</div>
+			                                       
+			                                        <!-- Regions are populated here through ajax from regionsautocomplete.jsp -->
 			                                    </div>
 			                                </div>
 			                            </div>
@@ -169,18 +170,16 @@
 		                        <div id="existing-branches">
 		                       		<!-- Branch list is populated here through ajax from existingenterprisebranches.jsp -->
 		                    	</div>
-		                </div>
-		                <div class="hm-right-item hm-left-item-bottom no-border padding-left-25">
-		                    
-		                </div>
-		            </div>
-		        </div>
-		                <div class="hm-left-item hm-left-item-bottom no-border">
-		                    
-		                </div>
-		            </div>
-		            
-		            
+		                	</div>
+			                <div class="hm-right-item hm-left-item-bottom no-border padding-left-25">
+			                    
+			                </div>
+		            	</div>
+		        	</div>
+	                <div class="hm-left-item hm-left-item-bottom no-border">
+	                    
+	                </div>
+		    	</div>
        		</c:when>
         </c:choose>
     </div>
@@ -193,20 +192,15 @@
 			showRegions();
 		}
 
-		$('#hm-item-dd-bottom').click(function(){
+		$('#selected-region-txt').click(function(){
 		   $('#hm-dd-wrapper-bottom').slideToggle(200);
 		});
 		
-		$('.hm-dd-item').click(function(){
-			$('#hm-item-dd-bottom').val($(this).html());
-			$('#region-id').val($(this).data('regionId'));
-			$('#hm-dd-wrapper-bottom').slideToggle(200);
-		});
 	});
-	$("#branch-save-icon").click(function(e){
-		addBranch("add-branch-form");
+	$("#branch-save-icon").click(function(){
+		addOrUpdateBranch("add-branch-form");
 	});
 	$("#region-save-icon").click(function(e) {
-		addRegion("add-region-form");
+		addOrUpdateRegion("add-region-form");
 	});
 </script>

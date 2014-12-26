@@ -15,7 +15,7 @@
 	<c:when test = "${not empty branches}">
 		<c:forEach var="branch" items="${branches}">
 			<div class="hm-sub-item clearfix">
-			    <div class="float-left hm-sub-item-left">${branch.branch}</div>
+			    <div class="float-left hm-sub-item-left branch-element" data-branchid = "${branch.branchId}" data-regionid = "${branch.region.regionId}" data-regionname = "${branch.region.region}">${branch.branch}</div>
 			    <div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick ="javascript:deleteBranch('${branch.branchId}')"></div>
 			</div>
 		</c:forEach>
