@@ -385,6 +385,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     border: 0;
 }
 
+.btn-payment:hover{
+    background-color: #7AB400;
+}
+
 .validation-msg-wrapper {
     margin-top: 25px;
 }
@@ -968,11 +972,14 @@ button.paypal.is-active {
     width: 540px;
 }
 
-
-
 .bord-rt-dc {
     border-right: 1px solid #dcdcdc;
 }
+
+.bord-bot-dc {
+    border-bottom: 1px solid #dcdcdc;
+}
+
 
 .st-score-rt {
     width: 700px;
@@ -1225,4 +1232,126 @@ button.paypal.is-active {
     left: 10%;
     z-index: 999999999;
     background-color: rgba(0,0,0,0.7);
+}
+
+.header-title-light {
+    font-size: 20px;
+    font-family: opensanslight;
+}
+
+.prof-image {
+    width: 100%;
+    height: 200px;
+    max-height: 200px;
+    background-color: #f1f1f1;        
+}
+
+.prof-download-contact {
+    position: absolute;
+    height: 50px;
+    line-height: 50px;
+    background-color: rgba(0,0,0,0.6);
+    bottom: 0;
+    width: 100%;
+}
+
+.inc-dl {
+    height: 50px;
+    width: 50px;
+    background-color: red;
+}
+
+.txt-download {
+    width: 150px;
+    text-align: center;
+    color: #fff;
+}
+
+.prof-dowload-width {
+    width: 200px;
+    margin: 0 auto;
+}
+
+.maring-0 {
+    margin: 0 !important;
+}
+
+.prof-name {
+    font-size: 22px;
+}
+
+.prof-address {
+    line-height: 26px;
+    font-size: 18px;
+}
+
+.prof-addline1 {
+    height: 26px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-weight: bold !important;
+}
+
+.prof-btn-survey {
+    font-family: 'opensanslight' !important;
+    background-color: #5CC8EF;
+    font-size: 13px;
+    height: 40px;
+    line-height: 40px;
+    width: 150px;
+    text-align: center;
+    cursor: pointer;
+    border-radius: 3px;
+    color: #fff;
+}
+.prof-btn-survey:hover{
+    background-color: #7AB400;
+}
+
+.prof-wrapper {
+    height: 200px;
+}
+
+.prof-addline2 {
+    font-size: 16px;
+}
+
+.prof-btn-wrapper {
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    height: 40px;
+}
+
+.prof-rating-mobile-wrapper {
+    height: 50px;
+}
+
+.social-item-icon {
+    height: 50px;
+    width: 40px;
+    margin-right: 10px;
+    background-color: #f1f1f1;
+}
+
+.prof-left-row {
+    padding: 15px 0;
+}
+
+.left-panel-header {
+    line-height: 36px;
+    font-size: 18px;
+}
+
+.left-panel-content {
+    padding: 0 10px;
+}
+
+.blue-text {
+    color: #5CC8EF;
+}
+
+.lp-row {
+    line-height: 44px;
 }
