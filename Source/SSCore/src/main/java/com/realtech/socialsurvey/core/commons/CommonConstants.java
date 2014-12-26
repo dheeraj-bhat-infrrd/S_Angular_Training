@@ -55,9 +55,9 @@ public interface CommonConstants {
 	public static final int STATUS_NOT_VERIFIED = 2;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
-	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
-	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
-	public static final int SANDBOX_MODE_TRUE=1;
+	public static final int YES = 1;
+	public static final int NO = 0;
+	public static final int SANDBOX_MODE_TRUE = 1;
 	public static final int IS_OWNER = 1;
 	public static final int IS_NOT_OWNER = 0;
 
@@ -91,7 +91,6 @@ public interface CommonConstants {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
-	
 
 	/**
 	 * other constants
