@@ -94,9 +94,11 @@
 					</div>
 				</div>
 				<div class="footer-copyright text-center">
-					<spring:message code="label.copyright.key" />
-					&copy;
-					<spring:message code="label.copyrightposttext.key" />
+					<spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
 				</div>
                 
 			</div>
@@ -237,7 +239,12 @@
 				$('#com-logo-decoy').val('');
 			}
 		}
-		
+		$('input').keypress(function(e){
+        	// detect enter
+        	if (e.which==13){
+        		submitCompanyInfoForm();
+        	}
+		});
 		$("#com-logo").on("change", function() {
 			var formData = new FormData();
 			formData.append("logo", $('#com-logo').prop("files")[0]);
