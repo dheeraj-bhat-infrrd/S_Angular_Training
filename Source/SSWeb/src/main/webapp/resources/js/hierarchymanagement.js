@@ -246,5 +246,4 @@ function updateRegionCallBack(data) {
 	showRegions();
 	$(".create-branch-dd input[type='text']").val("");
 	$(".create-branch-dd input[type='hidden']").val("");
-	showBranches();
 }

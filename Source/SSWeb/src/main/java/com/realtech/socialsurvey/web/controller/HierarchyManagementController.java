@@ -111,7 +111,6 @@ public class HierarchyManagementController {
 				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
 
 				model.addAttribute("branches", branches);
-
 				/**
 				 * UI for enterprise branches and regions is different hence deciding which jsp to
 				 * return

@@ -54,12 +54,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			LOG.error("Company object passed can not be null");
 			throw new InvalidInputException("Invalid Company passed");
 		}
-
-		LOG.info("Fetching the list of branches for company :" + company.getCompany());
-		Map<String, Object> queries = new HashMap<String, Object>();
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());		
+		Map<String,Object> queries = new HashMap<String,Object>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-
 		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
@@ -81,10 +79,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Fetching the list of regions for company :" + company.getCompany());
-		Map<String, Object> queries = new HashMap<String, Object>();
+
+		Map<String,Object> queries = new HashMap<String,Object>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-
+		
 		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
 		LOG.info("Region list fetched for the company " + company);
 		return regionList;
@@ -193,6 +192,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 				throw new InvalidInputException("Account type is invalid in isBranchAdditionAllowed");
 		}
 		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isBranchAdditionAllowed is :" + isBranchAdditionAllowed);
+
 		return isBranchAdditionAllowed;
 	}
 

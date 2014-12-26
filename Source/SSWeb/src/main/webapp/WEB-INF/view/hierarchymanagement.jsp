@@ -30,7 +30,7 @@
 			                                <div class="hm-item-row clearfix">
 			                                    <div class="hm-item-row-left text-right"><spring:message code="label.branchname.key"/></div>
 			                                    <div class="hm-item-row-right">
-			                                        <input type="text" name="branchName" id = "branch-name-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
+			                                        <input type="text" name="branchName" id="branch-name-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
 			                                    </div>
 			                                </div>
 			                            </div>
