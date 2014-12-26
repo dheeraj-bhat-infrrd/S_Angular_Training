@@ -60,8 +60,13 @@
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">
                	 </form>
-                <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
-                <spring:message code="label.copyrightposttext.key" /></div>                
+                <div class="footer-copyright text-center">
+                <spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
+                </div>                
             </div>
         </div>
     </div>
@@ -93,6 +98,13 @@
                 	$('#reset-pwd-form').submit();
                 }
             }
+            
+            $('input').keypress(function(e){
+	        	// detect enter
+	        	if (e.which==13){
+	        		submitResetPasswordForm();
+	        	}
+			});
             
             $('#login-user-id').blur(function() {
 				validateEmailId(this.id);

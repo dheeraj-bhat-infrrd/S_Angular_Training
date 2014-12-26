@@ -57,8 +57,13 @@
                 <div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
                     <div class="float-left cursor-pointer"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
                 </div>
-                <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
-                <spring:message code="label.copyrightposttext.key" /></div>                
+                <div class="footer-copyright text-center">
+               <spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
+                </div>                
             </div>
         </div>
     </div>
@@ -92,6 +97,13 @@
 					showOverlay();
 				}
             }
+            
+            $('input').keypress(function(e){
+	        	// detect enter
+	        	if (e.which==13){
+	        		loginUser();
+	        	}
+			});
             
             //Function to validate the login form
             function validateLoginForm(id){
