@@ -74,11 +74,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Qualifier("user")
 	private UserDao userDao;
 
-	@Autowired
+	@Resource
+	@Qualifier("userProfile")
 	private UserProfileDao userProfileDao;
 
 	@Autowired
 	private GenericDao<LicenseDetail, Long> licenseDetailsDao;
+
+	@Autowired
+	private GenericDao<Branch, Long> branchDao;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -486,10 +490,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Transactional
 	@Override
-	public List<Branch> getBranchesAssignedToUser(User user) {
+	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException {
 		LOG.info("Method to find branches assigned to the user started for " + user.getDisplayName());
-		Set<>userProfileDao.getBranchIdsForUser(user);
+		List<Long> branchIds = userProfileDao.getBranchIdsForUser(user);
+		if (branchIds == null || branchIds.isEmpty()) {
+			LOG.error("No branch found for user : " + user.getUserId());
+			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
+		}
+		List<Branch> branches = branchDao.findByColumnForMultipleValues(Branch.class, "branchId", branchIds);
 		LOG.info("Method to find branches assigned to the user finished for " + user.getDisplayName());
+		return branches;
 	}
 
 	/*
@@ -550,7 +560,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("No user found for userId specified in createBranchAdmin");
 		}
 
-		// Re-activate the existing user profile if user for given branch already exists.
+		// Re-activate the existing user profile if user for given branch
+		// already exists.
 		UserProfile userProfile = getUserProfileForBranch(branchId, user);
 		if (userProfile == null) {
 			LOG.debug("Creating new User profile as User does not exist for given branch.");
