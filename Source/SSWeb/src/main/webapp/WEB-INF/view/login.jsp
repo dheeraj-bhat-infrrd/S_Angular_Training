@@ -69,7 +69,9 @@
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
     
     <script>
+    var isLoginFormValid;
         $(document).ready(function(){
+        	isLoginFormValid = false;
             adjustOnResize();            
             $(window).resize(adjustOnResize);
             
@@ -85,53 +87,102 @@
             
             function loginUser() {
             	console.log("submitting login form");
-				showOverlay();
-				$('#frm-login').submit();
+				if(validateLoginForm('login-form')){
+					$('#frm-login').submit();
+					showOverlay();
+				}
             }
             
             //Function to validate the login form
             function validateLoginForm(id){
-            	var validate = true;
             	//hide the server error
             	$("#serverSideerror").hide();
-            	
-            	//check if login password is valid
-            	if(!validatePassword('login-pwd')){
-            		return false;
+            	isLoginFormValid=true;
+            	var isFocussed = false;
+            	var isSmallScreen = false;
+            	if($(window).width()<768){
+            		isSmallScreen = true;
             	}
-            	if (!validate) {
-            		$('#jsError').show();
-            		return false;
-            	} else {
-            		$('#jsError').hide();
-            		/* Form validated. */
-            		return true;
+            	if(!validateUserId('login-user-id')){
+            		isLoginFormValid=false;
+            		if(!isFocussed){
+            			$('#login-user-id').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isLoginFormValid;
+            		}
             	}
+            	if(!validateLoginPassword('login-pwd')){
+            		isLoginFormValid = false;
+            		if(!isFocussed){
+            			$('#login-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isLoginFormValid;
+            		}
+            	}
+            	return isLoginFormValid;
             }
             
             function validateUserId(elementId) {
-            	if ($('#'+elementId).val() != "") {
-    				if (emailRegex.test($('#'+elementId).val()) == true) {
-    					$('#'+elementId).parent().removeClass('input-error');
-    					$('#jsError').addClass('hide');
-    					return true;
-    				}else {
-    					$('#jsErrTxt').html('Please enter a valid userId.');
-    					$('#jsError').removeClass('hide');
-    					$('#'+elementId).parent().addClass('input-error');
-    					return false;
-    				}
-    			}else{
-    				$('#jsErrTxt').html('Please enter the User ID.');
-    				return false;
-    			}
+            	
+            	if($(window).width()<768){
+            		if ($('#'+elementId).val() != "") {
+	    				if (emailRegex.test($('#'+elementId).val()) == true) {
+	    					return true;
+	    				}else {
+	    					$('#overlay-toast').html('Please enter a valid userId.');
+	    					showToast();
+	    					return false;
+	    				}
+	    			}else{
+	    				$('#overlay-toast').html('please enter User ID.');
+	    				showToast();
+	    				return false;
+	    			}
+            	}else{
+	            	if ($('#'+elementId).val() != "") {
+	    				if (emailRegex.test($('#'+elementId).val()) == true) {
+	    					$('#'+elementId).parent().next('.input-error-2').hide();
+	    					return true;
+	    				}else {
+	    					$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid userId.');
+	    					$('#'+elementId).parent().next('.input-error-2').show();
+	    					return false;
+	    				}
+	    			}else{
+	    				$('#'+elementId).parent().next('.input-error-2').html('please enter User ID.');
+	    				$('#'+elementId).parent().next('.input-error-2').show();
+	    				return false;
+	    			}
+            	}
 			}
             
+            function validateLoginPassword(elementId){
+            	if($(window).width()<768){
+            		if ($('#'+elementId).val() != "") {
+            			return true;
+	    			}else{
+	    				$('#overlay-toast').html('please enter password.');
+	    				showToast();    
+	    				return false;
+	    			}
+            	}else{
+	            	if ($('#'+elementId).val() != "") {
+	    					$('#'+elementId).parent().next('.input-error-2').hide();
+	    					return true;
+	    			}else{
+	    				$('#'+elementId).parent().next('.input-error-2').html('please enter password.');
+	    				$('#'+elementId).parent().next('.input-error-2').show();    
+	    				return false;
+	    			}
+            	}
+            }
+            
             $('#login-submit').click(function(e){
-                if(validateLoginForm('login-form')){
-                    /* ===== FORM VALIDATED ===== */
-                	loginUser();
-                }
+                loginUser();
             });
            
             /**
@@ -141,16 +192,8 @@
             	validateUserId(this.id);
             });
             $('#login-pwd').blur(function(){
-            	validatePassword(this.id);
+            	validateLoginPassword(this.id);
             });
-            
-            function showToast(){
-                $('#overlay-toast').fadeIn();
-                setTimeout(function(){
-                    $('#overlay-toast').fadeOut();
-                },3000);
-            }
-            
         });
     </script>
     

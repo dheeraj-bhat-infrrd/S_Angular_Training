@@ -114,7 +114,9 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 
 	<script>
+		var isRegistrationFormValid;
 		$(document).ready(function() {
+			isRegistrationFormValid=false;
 //			adjustOnResize();
 //			$(window).resize(adjustOnResize);
 
@@ -130,27 +132,14 @@
 
 			function submitRegistrationForm() {
 				console.log("submitting registration form");
-				showOverlay();
-				$('#registration-form').submit();
+				if(validateRegistrationForm('reg-form')){
+					$('#registration-form').submit();
+					showOverlay();
+				}
 			}
 
 			$('#reg-submit').click(function(e) {
-				if (validateRegistrationForm('reg-form')) {					
-					/* === Validate passwords ===
-					if($('#reg-pwd').val() != $('#reg-conf-pwd').val()) {
-						$('#reg-pwd').parent().addClass('input-error');
-						$('#reg-conf-pwd').parent().addClass('input-error');
-						$('#jsError').show();
-		                $('#jsErrTxt').html('Passwords do not match');
-						return false;
-					}else {
-						$('#jsError').hide();
-						$('#reg-pwd').parent().removeClass('input-error');
-						$('#reg-conf-pwd').parent().removeClass('input-error');
-					}
-					===== FORM VALIDATED ===== */
-					submitRegistrationForm();
-				}
+				submitRegistrationForm();
 			});
 			
 			/* ==Functions to trigger form validation of various input elements== */
@@ -177,20 +166,64 @@
 			function validateRegistrationForm(id) {
 				//hide the server error
             	$("#serverSideerror").hide();
-            	
-				//Validate form input elements
-				if(!validateFirstName('reg-fname'))
-					return false;
-				if(!validateLastName('reg-lname'))
-					return false;
-				if(!validateEmailId('reg-email'))
-					return false;
-				if(!validatePassword('reg-pwd'))
-					return false;
-				if(!validateConfirmPassword('reg-pwd', 'reg-conf-pwd'))
-            		return false;
-            	
-            	return true;
+            	isRegistrationFormValid = true;
+            	var isFocussed = false;
+            	var isSmallScreen = false;
+            	if($(window).width()<768){
+            		isSmallScreen = true;
+            	}
+            	//Validate form input elements
+				if(!validateFirstName('reg-fname')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-fname').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validateLastName('reg-lname')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-lname').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validateEmailId('reg-email')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-email').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validatePassword('reg-pwd')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validateConfirmPassword('reg-pwd', 'reg-conf-pwd')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-conf-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+            	return isRegistrationFormValid;
 			}
 
 		});

@@ -14,6 +14,7 @@ var maxPwdLength = 15;
 function validateForm(id) {
 	var validate = true;
 	
+	
 	//hide the server error
 	$("#serverSideerror").hide();
 	
@@ -84,6 +85,14 @@ function hideOverlay(){
     $('.overlay-loader').hide();
 }
 
+//show Toast
+function showToast(){
+    $('#overlay-toast').fadeIn();
+    setTimeout(function(){
+        $('#overlay-toast').fadeOut();
+    },3000);
+}
+
 //detectBrowser();
 
 function detectBrowser(){
@@ -114,7 +123,18 @@ $('#hm-item-dd-bottom').click(function(){
 });
 
 $('#header-menu-icn').click(function(){
-    $('#header-links').slideToggle(200);
+//    $('#header-links').slideToggle(200);
+    $('#header-slider-wrapper').addClass('rt-panel-slide');
+    $('body').addClass('body-no-scroll');
+});
+
+$('#header-slider-wrapper').click(function(){
+    $('#header-slider-wrapper').removeClass('rt-panel-slide');
+    $('body').removeClass('body-no-scroll');
+});
+
+$('#header-links-slider, .header-slider').click(function(e){
+    e.stopPropagation();
 });
 
 $('.hm-header-dd-icn').click(function(){
@@ -152,54 +172,98 @@ $('.login-wrapper-txt').focus(function(){
 
 //Function to validate email id in a form
 function validateEmailId(elementId){
-	if ($('#'+elementId).val() != "") {
-		if (emailRegex.test($('#'+elementId).val()) == true) {
-			$('#'+elementId).parent().removeClass('input-error');
-			$('#jsError').addClass('hide');
-			return true;
-		}else {
-			$('#jsErrTxt').html('Please enter a valid Email Id.');
-			$('#jsError').removeClass('hide');
-			$('#'+elementId).parent().addClass('input-error');
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (emailRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid email id.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('please enter email id.');
+			showToast();
 			return false;
 		}
 	}else{
-		$('#jsErrTxt').html('Please enter the Email Id.');
-		return false;
+    	if ($('#'+elementId).val() != "") {
+			if (emailRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid email id.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('please enter email id.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
 	}
 }
 
 //Function to validate the first name
 function validateFirstName(elementId){
-	if ($('#'+elementId).val() != "") {
-		if (nameRegex.test($('#'+elementId).val()) == true) {
-			$('#'+elementId).parent().removeClass('input-error');
-			$('#jsError').addClass('hide');
-			return true;
-		}else {
-			$('#jsErrTxt').html('Please enter a valid first name.');
-			$('#jsError').removeClass('hide');
-			$('#'+elementId).parent().addClass('input-error');
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid first name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('please enter first name.');
+			showToast();
 			return false;
 		}
 	}else{
-		$('#jsErrTxt').html('Please enter the First Name.');
-		return false;
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid first name.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('please enter first name.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
 	}
 }
 
 //Function to validate the last name
 function validateLastName(elementId){
-	if ($('#'+elementId).val() != "") {
-		if (nameRegex.test($('#'+elementId).val()) == true) {
-			$('#'+elementId).parent().removeClass('input-error');
-			$('#jsError').addClass('hide');
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid last name.');
+				showToast();
+				return false;
+			}
+		}else{
 			return true;
-		}else {
-			$('#jsErrTxt').html('Please enter a valid last name.');
-			$('#jsError').removeClass('hide');
-			$('#'+elementId).parent().addClass('input-error');
-			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid last name.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			return true;
 		}
 	}
 }
@@ -207,43 +271,212 @@ function validateLastName(elementId){
 //function to validate a password in form
 function validatePassword(elementId) {
 	var password = $('#'+elementId).val();
-	if (password != "") {
-		//check if password length is proper
-		if(password.length < minPwdLength || password.length > maxPwdLength){
-			$('#jsErrTxt').html('Password must be between 6-15 characters.');
-			$('#jsError').removeClass('hide');
-			$('#'+elementId).parent().addClass('input-error');
-			return false;
-		}
-		if (passwordRegex.test(password) == true) {
-			$('#'+elementId).parent().removeClass('input-error');
-			$('#jsError').addClass('hide');
-			return true;
-		}else {
-			$('#jsErrTxt').html('Password must have at least one special character.');
-			$('#jsError').removeClass('hide');
-			$('#'+elementId).parent().addClass('input-error');
+	if($(window).width()<768){
+		if (password != "") {
+			//check if password length is proper
+			if(password.length < minPwdLength || password.length > maxPwdLength){
+				$('#overlay-toast').html('Password must be between 6-15 characters.');
+				showToast();
+				return false;
+			}
+			else if (passwordRegex.test(password) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Passwords must contain one special charcter.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('please enter Password.');
+			showToast();
 			return false;
 		}
 	}else{
-		$('#jsErrTxt').html('Please enter the Password.');
-		return false;
+		if (password != "") {
+			//check if password length is proper
+			if(password.length < minPwdLength || password.length > maxPwdLength){
+				$('#'+elementId).parent().next('.input-error-2').html('Password must be between 6-15 characters.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+			else if (passwordRegex.test(password) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Passwords must contain one special charcter.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('please enter Password.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
 	}
 }
-
 //Function to match password and confirm password
 function validateConfirmPassword(pwdId, confirmPwdId){
 	/* === Validate passwords === */
-	if($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-		$('#'+pwdId).parent().addClass('input-error');
-		$('#'+confirmPwdId).parent().addClass('input-error');
-		$('#jsError').show();
-        $('#jsErrTxt').html('Passwords do not match');
-		return false;
-	}else {
-		$('#jsError').hide();
-		$('#'+pwdId).parent().removeClass('input-error');
-		$('#'+confirmPwdId).parent().removeClass('input-error');
-		return true;
+	if($(window).width()<768){
+		if($('#'+confirmPwdId).val() != ""){
+			if($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
+				$('#overlay-toast').html('Passwords do not match.');
+				showToast();
+				return false;
+			}else {
+				return true;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter confirm password.');
+			showToast();
+			return false;
+		}
+		
+	}else{
+		if($('#'+confirmPwdId).val() != ""){
+			if($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
+				$('#'+confirmPwdId).parent().next('.input-error-2').html('Passwords do not match.');
+				$('#'+confirmPwdId).parent().next('.input-error-2').show();
+				return false;
+			}else {
+				$('#'+confirmPwdId).parent().next('.input-error-2').hide();
+				return true;
+			}
+		}else{
+			$('#'+confirmPwdId).parent().next('.input-error-2').html('Please enter confirm password.');
+			$('#'+confirmPwdId).parent().next('.input-error-2').show();
+			return false;
+		}
 	}
+		
+}
+
+
+//Function to validate company name
+function validateCompany(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid company name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('please enter company name.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid company name.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('please enter company name.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate the zipcode
+function validateZipcode(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (zipcodeRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid zipcode.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('please enter zipcode.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (zipcodeRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid zipcode.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('please enter zipcode.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate the phone number
+function validatePhoneNumber(elementId) {
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (phoneRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid phone number.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter phone number.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (phoneRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid phone number.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter phone number.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Address 1
+function validateAddress1(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+				return true;
+		}else{
+			$('#overlay-toast').html('Please enter address.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter address.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Address 2
+function validateAddress2(elementId){
+	return true;
 }
