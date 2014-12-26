@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -13,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -51,6 +51,9 @@ public class UserManagementController {
 		return JspResolver.USER_MANAGEMENT;
 	}
 
+	/*
+	 * Method to send invitation to a new user to join.
+	 */
 	@RequestMapping(value = "/invitenewuser", method = RequestMethod.POST)
 	public String inviteNewUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a new user by existing admin called.");
@@ -90,14 +93,20 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to fetch list of branches a user is assigned to.
+	 */
 	@RequestMapping(value = "/finduserandbranchesbyuserid", method = RequestMethod.POST)
 	public String findUserAndAssignedBranchesByUserId(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
-			if (userIdStr == null || userIdStr.isEmpty()) {
+			if (userIdStr == null) {
 				LOG.error("Invalid user id passed in method findUserByUserId().");
 				throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+			}
+			else if (userIdStr.isEmpty()) {
+				return JspResolver.USER_DETAILS;
 			}
 			long userId = 0;
 			try {
@@ -108,10 +117,11 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			User user = userManagementService.getUserByUserId(userId);
-			// userManagementService.get;
+			List<Branch> branches = userManagementService.getBranchesAssignedToUser(user);
 			model.addAttribute("searchedUser", user);
 
-			// TODO : add assigned branches to the as model attribute assignedBranches
+			// Adding assigned branches to the model attribute as assignedBranches
+			model.addAttribute("assignedBranches", branches);
 
 		}
 		catch (NonFatalException nonFatalException) {
@@ -124,6 +134,10 @@ public class UserManagementController {
 		return JspResolver.USER_DETAILS;
 	}
 
+	/*
+	 * Method to fetch list of all the users who belong to the same as that of current user. Current
+	 * user is company admin who can assign different roles to other users.
+	 */
 	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.POST)
 	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
@@ -144,6 +158,9 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to find a user on the basis of email id provided.
+	 */
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
 	public String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
@@ -183,6 +200,9 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to remove an existing user. Soft delete is done.
+	 */
 	@RequestMapping(value = "/removeexistinguser", method = RequestMethod.POST)
 	public String removeExistingUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to deactivate an existing user called.");
@@ -379,6 +399,10 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to get list of all users from database for the company to which current user belongs
+	 * to.
+	 */
 	private void getAllUsersForCompany(Model model, HttpServletRequest request) throws NonFatalException {
 		LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
@@ -400,7 +424,7 @@ public class UserManagementController {
 			maxIndex = allUsers.size();
 			model.addAttribute("hasMoreUsers", false);
 		}
-		else{
+		else {
 			model.addAttribute("hasMoreUsers", true);
 		}
 		List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, maxIndex);
@@ -410,6 +434,10 @@ public class UserManagementController {
 		LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company.");
 	}
 
+	/*
+	 * Method to iterate over the list of all the users which is fetched from database. It returns
+	 * same number of users as that of configured for maximum batch size.
+	 */
 	private void getNextListOfUsers(Model model, HttpServletRequest request) {
 		LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company.");
 		Map<String, Object> modelMap = model.asMap();

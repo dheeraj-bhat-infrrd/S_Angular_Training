@@ -29,27 +29,27 @@ public interface UserManagementService {
 
 	public void inviteUserToRegister(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
 			UserAlreadyExistsException, UndeliveredEmailException;
-	
+
 	public void removeExistingUser(User admin, long userIdToBeDeactivated) throws InvalidInputException;
 
 	public void unassignBranchAdmin(User admin, long branchId, long userIdToRemove) throws InvalidInputException;
 
 	public void unassignRegionAdmin(User admin, long regionId, long userIdToRemove) throws InvalidInputException;
-	
+
 	public User getUserByEmailId(User admin, String emailId) throws InvalidInputException, NoRecordsFetchedException;
 
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException;
-	
+
 	public boolean isUserAdditionAllowed(User user) throws NoRecordsFetchedException;
-	
+
 	public User getUserByUserId(long userId);
-	
-	public List<Branch> getBranchesAssignedToUser(User user);
-	
+
+	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException;
+
 	public List<User> getUsersForCompany(long user) throws InvalidInputException, NoRecordsFetchedException;
-	
+
 	// JIRA SS-42 BY RM05 EOC
-	
+
 	/**
 	 * Sends invitation to corporate to register
 	 * 
