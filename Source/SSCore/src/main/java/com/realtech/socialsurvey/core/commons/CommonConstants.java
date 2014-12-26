@@ -80,6 +80,7 @@ public interface CommonConstants {
 	public static final String SURVEY_COLUMN = "survey";
 	public static final String SURVEY_COMPANY_COLUMN = "company";
 	
+
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
 
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,10 +16,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -53,114 +57,138 @@ public class LoginController {
 		return JspResolver.FORGOT_PASSWORD;
 	}
 
+	/**
+	 * Method for logging in user
+	 * 
+	 * @param model
+	 * @param request
+	 * @param response
+	 * @return
+	 */
 	@RequestMapping(value = "/userlogin", method = RequestMethod.POST)
 	public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
-
+		LOG.info("Login controller called for user login");
 		String loginName = request.getParameter("loginName");
 		String password = request.getParameter("password");
-		LOG.info("User login with user Id :" + loginName);
 		User user = null;
 		UserProfile userProfile = null;
+		String redirectTo = null;
 
 		try {
-			LOG.debug("Validation login form parameters");
-			// check if form parameters valid
 			validateLoginFormParameters(loginName, password);
 
 			try {
 				user = authenticationService.getUserWithLoginName(loginName);
 			}
-			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in fetching User. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
+			catch (NoRecordsFetchedException e) {
+				LOG.error("No Records Fetched Exception in fetching User. Reason " + e.getMessage(), e);
+				throw new NoRecordsFetchedException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
-			LOG.debug("Check if company status active");
-			// check if user company active
+			LOG.debug("Check if company status is active");
 			if (user.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE) {
-				throw new InvalidInputException("Company is inactive", DisplayMessageConstants.COMPANY_INACTIVE);
-			}
-			// check if User active
-			LOG.debug("Check if user status active");
-			if (user.getStatus() == CommonConstants.STATUS_INACTIVE) {
-				throw new InvalidInputException("User not active", DisplayMessageConstants.USER_INACTIVE);
+				throw new InvalidInputException("Company is inactive in login", DisplayMessageConstants.COMPANY_INACTIVE);
 			}
 
-			// Authenticate user
+			LOG.debug("Checking if user is not in inactive mode");
+			if (user.getStatus() == CommonConstants.STATUS_INACTIVE) {
+				throw new InvalidInputException("User not active in login", DisplayMessageConstants.USER_INACTIVE);
+			}
+
 			try {
+				LOG.debug("Calling authentication service to validate user while login");
 				authenticationService.validateUser(user, password);
+				LOG.debug("Successfully executed authentication service to validate user while login");
+
 				HttpSession session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+
+				AccountType accountType = null;
+				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+				if (licenseDetails != null && !licenseDetails.isEmpty()) {
+					LicenseDetail licenseDetail = licenseDetails.get(0);
+					accountType = AccountType.getAccountType(licenseDetail.getLicenseId());
+					LOG.debug("Adding account type in session");
+					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				}
+				else {
+					LOG.debug("License details not found for the user's company");
+				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER_CREDENTIALS, e);
 			}
 
-			// Check if user Company Profile complete, if company registration not done redirect
-			// to company registration page
-			LOG.debug("Check if company profile registration complete");
-			if (user.getCompany().getIsRegistrationComplete() != CommonConstants.PROCESS_COMPLETE) {
-				// redirect to company information page
-				LOG.info("Company profile not complete, redirecting to company information page");
-				model.addAttribute("redirectTo", CommonConstants.ADD_COMPANY_STAGE);
+			/**
+			 * Check if if the company inserted is default company or registration is not complete ,
+			 * if company registration not done redirect to company registration page
+			 */
+			LOG.debug("Checking if company profile registration complete");
+			if (user.getCompany().getCompanyId() == CommonConstants.DEFAULT_COMPANY_ID
+					|| user.getCompany().getIsRegistrationComplete() != CommonConstants.PROCESS_COMPLETE) {
+
+				LOG.debug("Company profile not complete, redirecting to company information page");
+				redirectTo = JspResolver.COMPANY_INFORMATION;
 			}
 			else {
-				// check if at least one of the user profiles are complete
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
-				if (user.getIsAtleastOneUserprofileComplete() != CommonConstants.PROCESS_COMPLETE) {
-					// redirect user to complete the top priority profile
-					// Priority Company->region->branch->agent
-					LOG.info("None of the user profiles are complete , Redirect to top priority profile first");
-					// fetch company admin user profile
+				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
+					/**
+					 * redirect user to complete the top priority profile. Priority
+					 * Company->region->branch->agent
+					 */
+					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
+
 					try {
+						LOG.debug("Calling service for fetching company admin user profile");
 						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
-						//set model attribute to the value to which u need to redirect the url
-						model.addAttribute("redirectTo", userProfile.getProfileCompletionStage());
 					}
 					catch (InvalidInputException e) {
 						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
 					}
+
+					redirectTo = getRedirectionFromProfileCompletionStage(userProfile.getProfileCompletionStage());
+
 				}
 			}
 			LOG.info("User login successful");
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGIN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.LOGIN;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return redirectTo;
 	}
 
 	/**
 	 * Start the companyinformation page
+	 * 
 	 * @return
 	 */
 	@RequestMapping(value = "/addcompanyinformation")
 	public String initCompanyInformationPage() {
 		return JspResolver.COMPANY_INFORMATION;
 	}
-	
+
+	/**
+	 * Start the add account type page
+	 */
+	@RequestMapping(value = "/addaccounttype")
+	public String initAddAccountTypePage() {
+		LOG.info("Add account type page started");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
+	}
+
 	/**
 	 * Start the dashboard page
 	 */
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage() {
 		LOG.info("Dashboard Page started");
-		return JspResolver.DASHBOARD;
-	}
-	
-	/**
-	 * Start the add account type page
-	 */
-	@RequestMapping(value = "/addaccounttype")
-	public String initAddAccountTypePage(){
-		LOG.info("Add account type page started");
-		return JspResolver.ACCOUNT_TYPE_SELECTION;
+		return JspResolver.LANDING;
 	}
 
 	/**
@@ -205,10 +233,10 @@ public class LoginController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.FORGOT_PASSWORD;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.FORGOT_PASSWORD;
 	}
 
 	/**
@@ -282,10 +310,10 @@ public class LoginController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.RESET_PASSWORD;
 		}
 
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.LOGIN;
 	}
 
 	/**
@@ -296,12 +324,12 @@ public class LoginController {
 	 * @throws InvalidInputException
 	 */
 	private void validateLoginFormParameters(String loginName, String password) throws InvalidInputException {
-		LOG.debug("Validating Login form paramters");
+		LOG.debug("Validating Login form paramters loginName :" + loginName);
 		if (loginName == null || loginName.isEmpty()) {
 			throw new InvalidInputException("User name passed can not be null", DisplayMessageConstants.INVALID_USERNAME);
 		}
 		if (password == null || password.isEmpty()) {
-			throw new InvalidInputException("Password passed can not be null");
+			throw new InvalidInputException("Password passed can not be null", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		LOG.debug("Login form parameters validated successfully");
 	}
@@ -335,6 +363,34 @@ public class LoginController {
 			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
 		LOG.debug("Reset password form parameters validated successfully");
+	}
+
+	/**
+	 * Method to get the redirect page from profile completion stage
+	 * 
+	 * @param profileCompletionStage
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String getRedirectionFromProfileCompletionStage(String profileCompletionStage) throws InvalidInputException {
+		LOG.debug("Method getRedirectionFromProfileCompletionStage called for profileCompletionStage: " + profileCompletionStage);
+		String redirectTo = null;
+		switch (profileCompletionStage) {
+			case CommonConstants.ADD_COMPANY_STAGE:
+				redirectTo = JspResolver.COMPANY_INFORMATION;
+				break;
+			case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
+				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
+				break;
+			case CommonConstants.DASHBOARD_STAGE:
+				redirectTo = JspResolver.LANDING;
+				break;
+			default:
+				throw new InvalidInputException("Profile completion stage is invalid", DisplayMessageConstants.GENERAL_ERROR);
+		}
+
+		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
+		return redirectTo;
 	}
 
 }

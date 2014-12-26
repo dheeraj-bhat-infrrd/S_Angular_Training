@@ -34,6 +34,15 @@ public final class DisplayMessageConstants {
 	public static final String COMPANY_INACTIVE ="COMPANY_INACTIVE";
 	public static final String USER_NOT_PRESENT = "USER_NOT_PRESENT";
 	public static final String SUBSCRIPTION_UNSUCCESSFUL = "USER_SUBSCRIPTION_UNSUCCESSFUL";
+	public static final String INVALID_REGION_NAME = "INVALID_REGION_NAME";
+	public static final String INVALID_REGION_ADDRESS = "INVALID_REGION_ADDRESS";
+	public static final String INVALID_BRANCH_NAME = "INVALID_BRANCH_NAME";
+	public static final String INVALID_BRANCH_ADDRESS = "INVALID_BRANCH_ADDRESS";
+	public static final String INVALID_VERIFICATION_URL = "INVALID_VERIFICATION_URL";
+	public static final String INVALID_LOGO_FORMAT = "INVALID_LOGO_FORMAT";
+	public static final String INVALID_LOGO_DIMENSIONS = "INVALID_LOGO_DIMENSIONS";
+	public static final String INVALID_LOGO_SIZE = "INVALID_LOGO_SIZE";
+	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
@@ -43,4 +52,8 @@ public final class DisplayMessageConstants {
 	public static final String PASSWORD_CHANGE_SUCCESSFUL = "PASSWORD_CHANGE_SUCCESSFUL";
 	public static final String USER_LOGIN_SUCCESSFUL = "USER_LOGIN_SUCCESSFUL";
 	public static final String SUBSCRIPTION_SUCCESSFUL = "USER_SUBSCRIPTION_SUCCESSFUL";
+	public static final String BRANCH_DELETE_SUCCESSFUL = "BRANCH_DELETE_SUCCESSFUL";
+	public static final String REGION_DELETE_SUCCESSFUL = "REGION_DELETE_SUCCESSFUL";
+	public static final String EMAIL_VERIFICATION_SUCCESSFUL = "EMAIL_VERIFICATION_SUCCESSFUL";
+	
 }
