@@ -15,17 +15,17 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswer;
+import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 import com.realtech.socialsurvey.core.services.surveybuilding.SurveyBuilder;
 
 // JIRA: SS-32: By RM05: BOC
-/*
+/**
  * This class is responsible for creating a new survey and modifying a pre-existing survey.
  */
 @Component
@@ -48,8 +48,13 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
 
-	/*
+	@Autowired
+	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
+
+	/**
 	 * Method to create a new Survey into the survey table.
+	 * 
+	 * @throws InvalidInputException
 	 */
 	@Transactional
 	@Override
@@ -64,7 +69,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			throw new InvalidInputException("Invalid argument. Null value is passed for surveyQuestions.");
 		}
 
-		Survey survey = addSurvey(surveyName, user.getCompany(), user);
+		Company company = user.getCompany();
+		Survey survey = addSurvey(surveyName, company, user);
+		mapSurveyToCompany(survey, company, user);
 		if (surveyQuestions != null) {
 			for (SurveyQuestionDetails surveyQuestionDetails : surveyQuestions) {
 				SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
@@ -75,8 +82,38 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.info("Method createNewSurvey() finished.");
 	}
 
-	/*
+
+	/**
+	 * Method to create a new survey company mapping into database.
+	 * 
+	 * @throws InvalidInputException
+	 */
+	@Transactional
+	@Override
+	public void addSurveyToCompany(Survey survey, Company company, User user) throws InvalidInputException {
+		LOG.info("Method addSurveyToCompany() started.");
+		if (survey == null) {
+			LOG.error("Invalid argument. Null value is passed for survey.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
+		}
+		if (company == null) {
+			LOG.error("Invalid argument. Null value is passed for company.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for company.");
+		}
+		if (user == null) {
+			LOG.error("Invalid argument. Null value is passed for user.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
+		}
+		
+		mapSurveyToCompany(survey, company, user);
+		LOG.info("Method addSurveyToCompany() finished.");
+	}
+
+	
+	/**
 	 * Method to update an existing survey by the Corporate Admin.
+	 * 
+	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional
@@ -104,8 +141,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.info("Method addQuestionsToExistingSurvey() finished.");
 	}
 
-	/*
+	/**
 	 * Method to mark survey to questions mapping as inactive in SURVEY_QUESTIONS_MAPPING.
+	 * 
+	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional
@@ -126,10 +165,12 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.info("Method deactivateExistingSurveyMappings() finished.");
 	}
 
-	/*
+	/**
 	 * Method to fetch all the questions that belong to the specified survey. Company is fetched for
 	 * user passed which in turn is used to get survey ID. Assumption : Only 1 survey is linked to a
 	 * company.
+	 * 
+	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional
@@ -189,13 +230,12 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		return surveyQuestionDetailsList;
 	}
 
-	/*
+	/**
 	 * Creates a new entry for new survey into database.
 	 */
 	private Survey addSurvey(String surveyName, Company company, User user) {
 		LOG.debug("Method addSurvey() called to add a new survey.");
 		Survey survey = new Survey();
-		survey.setCompany(company);
 		survey.setSurveyName(surveyName);
 		survey.setStatus(CommonConstants.STATUS_ACTIVE);
 		survey.setCreatedBy(String.valueOf(user.getUserId()));
@@ -207,7 +247,25 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		return survey;
 	}
 
-	/*
+	/**
+	 * Creates a new survey company mapping into database.
+	 */
+	private SurveyCompanyMapping mapSurveyToCompany(Survey survey, Company company, User user) {
+		LOG.debug("Method addSurveyCompanyMapping() called to add a new surveyCompanyMapping.");
+		SurveyCompanyMapping mapping = new SurveyCompanyMapping();
+		mapping.setSurvey(survey);
+		mapping.setCompany(company);
+		mapping.setStatus(CommonConstants.STATUS_ACTIVE);
+		mapping.setCreatedBy(String.valueOf(user.getUserId()));
+		mapping.setModifiedBy(String.valueOf(user.getUserId()));
+		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		mapping = surveyCompanyMappingDao.save(mapping);
+		LOG.debug("Method addSurveyCompanyMapping() finished.");
+		return mapping;
+	}
+
+	/**
 	 * Method to store questions as well as all the answers for each question.
 	 */
 	private SurveyQuestion addNewQuestionsAndAnswers(User user, Survey survey, String question, String questionType, List<SurveyAnswer> answers) {
@@ -221,7 +279,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		return surveyQuestion;
 	}
 
-	// Method to insert new question into SURVEY_QUESTION table.
+	/**
+	 * Method to insert new question into SURVEY_QUESTION table.
+	 */
 	private SurveyQuestion addNewQuestion(User user, String question, String questionType) {
 		LOG.debug("Method addNewQuestion started()");
 		SurveyQuestion surveyQuestion = new SurveyQuestion();
@@ -236,7 +296,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		return surveyQuestion;
 	}
 
-	/*
+	/**
 	 * Method to add answers to a question.
 	 */
 	private void addAnswersToQuestion(User user, SurveyQuestion surveyQuestion, List<SurveyAnswer> answers) {
@@ -262,6 +322,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.debug("Method addAnswersToQuestion() finished.");
 	}
 
+	/**
+	 * Creates a new entry for new survey question mapping into database.
+	 */
 	private void mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey) {
 		LOG.debug("Method mapQuestionToSurvey() started to map questions with survey.");
 		SurveyQuestionsMapping surveyQuestionsMapping = new SurveyQuestionsMapping();
