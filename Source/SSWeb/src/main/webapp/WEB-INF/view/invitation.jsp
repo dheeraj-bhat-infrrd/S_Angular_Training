@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div id="overlay-toast" class="overlay-toast">Sample error message</div>
     <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper invitation-min-height padding-001">
 		<div class="container login-container">
@@ -49,19 +50,21 @@
 								data-non-empty="true" name="firstName"
 								placeholder='<spring:message code="label.firstname.key"/>'>
 						</div>
+                        <div id="inv-page-firstname" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-lname"></div>
 							<input class="float-left login-wrapper-txt" id="inv-lname"
 								data-non-empty="true" name="lastName"
 								placeholder='<spring:message code="label.lastname.key"/>'>
 						</div>
+                        <div id="inv-page-lastname" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
 							<input class="float-left login-wrapper-txt" id="inv-email"
 								data-non-empty="true" data-email = "true" name="emailId"
 								placeholder='<spring:message code="label.emailid.key"/>'>
 						</div>
-						<!-- <div class="login-input-wrapper margin-0-auto clearfix"></div> -->
+						<div id="inv-page-email" class="input-error-2 margin-0-auto">Please enter the above field</div>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="inv-submit">
 							<spring:message code="label.submit.key" />
 						</div>
