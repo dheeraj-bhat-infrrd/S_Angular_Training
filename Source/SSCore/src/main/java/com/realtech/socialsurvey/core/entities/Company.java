@@ -1,9 +1,17 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * The persistent class for the COMPANY database table.
@@ -61,7 +69,7 @@ public class Company implements Serializable {
 
 	// bi-directional many-to-one association to Survey
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
-	private List<Survey> surveys;
+	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
 	// bi-directional many-to-one association to User
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
@@ -237,26 +245,26 @@ public class Company implements Serializable {
 		return region;
 	}
 
-	public List<Survey> getSurveys() {
-		return this.surveys;
+	public List<SurveyCompanyMapping> getSurveyCompanyMappings() {
+		return this.surveyCompanyMappings;
 	}
 
-	public void setSurveys(List<Survey> surveys) {
-		this.surveys = surveys;
+	public void setSurveyCompanyMappings(List<SurveyCompanyMapping> surveyCompanyMappings) {
+		this.surveyCompanyMappings = surveyCompanyMappings;
 	}
 
-	public Survey addSurvey(Survey survey) {
-		getSurveys().add(survey);
-		survey.setCompany(this);
+	public SurveyCompanyMapping addSurveyCompanyMapping(SurveyCompanyMapping surveyCompanyMapping) {
+		getSurveyCompanyMappings().add(surveyCompanyMapping);
+		surveyCompanyMapping.setCompany(this);
 
-		return survey;
+		return surveyCompanyMapping;
 	}
 
-	public Survey removeSurvey(Survey survey) {
-		getSurveys().remove(survey);
-		survey.setCompany(null);
+	public SurveyCompanyMapping removeSurveyCompanyMapping(SurveyCompanyMapping surveyCompanyMapping) {
+		getSurveyCompanyMappings().remove(surveyCompanyMapping);
+		surveyCompanyMapping.setCompany(null);
 
-		return survey;
+		return surveyCompanyMapping;
 	}
 
 	public List<User> getUsers() {
