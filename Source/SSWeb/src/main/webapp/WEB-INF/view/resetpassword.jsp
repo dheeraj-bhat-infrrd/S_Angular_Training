@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
-	<div id="overlay-toast" class="overlay-toast">Sample error message</div>
+	<div id="overlay-toast" class="overlay-toast"></div>
     <div class="overlay-loader hide"></div>
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
@@ -45,17 +45,17 @@
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
 	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" data-email = "true" name="emailId" placeholder='<spring:message code="label.emailid.key"/>'>
 	                    </div>
-	                    <div id="login-page-username" class="input-error-2 margin-0-auto">Please enter the above field</div>
+	                    <div id="login-page-username" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
 	                    </div>
-	                    <div id="login-page-pwd" class="input-error-2 margin-0-auto">Please enter the above field</div>
+	                    <div id="login-page-pwd" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-confirm-password"></div>
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-cnf-pwd" data-non-empty="true" name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
 	                    </div>
-	                    <div id="login-page-cnf-pwd" class="input-error-2 margin-0-auto">Please enter the above field</div>
+	                    <div id="login-page-cnf-pwd" class="input-error-2 margin-0-auto"></div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reset-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">
