@@ -182,7 +182,7 @@ function validateEmailId(elementId){
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter email id.');
+			$('#overlay-toast').html('Please enter email id.');
 			showToast();
 			return false;
 		}
@@ -197,7 +197,7 @@ function validateEmailId(elementId){
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter email id.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter email id.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
@@ -216,7 +216,7 @@ function validateFirstName(elementId){
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter first name.');
+			$('#overlay-toast').html('Please enter first name.');
 			showToast();
 			return false;
 		}
@@ -231,7 +231,7 @@ function validateFirstName(elementId){
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter first name.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter first name.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
@@ -282,12 +282,12 @@ function validatePassword(elementId) {
 			else if (passwordRegex.test(password) == true) {
 				return true;
 			}else {
-				$('#overlay-toast').html('Passwords must contain one special charcter.');
+				$('#overlay-toast').html('Password must contain one special character.');
 				showToast();
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter Password.');
+			$('#overlay-toast').html('Please enter password.');
 			showToast();
 			return false;
 		}
@@ -303,12 +303,12 @@ function validatePassword(elementId) {
 				$('#'+elementId).parent().next('.input-error-2').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Passwords must contain one special charcter.');
+				$('#'+elementId).parent().next('.input-error-2').html('Password must contain one special character.');
 				$('#'+elementId).parent().next('.input-error-2').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter Password.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter password.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
@@ -364,7 +364,7 @@ function validateCompany(elementId){
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter company name.');
+			$('#overlay-toast').html('Please enter company name.');
 			showToast();
 			return false;
 		}
@@ -379,7 +379,7 @@ function validateCompany(elementId){
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter company name.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter company name.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
@@ -398,7 +398,7 @@ function validateZipcode(elementId){
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter zipcode.');
+			$('#overlay-toast').html('Please enter zipcode.');
 			showToast();
 			return false;
 		}
@@ -413,7 +413,7 @@ function validateZipcode(elementId){
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter zipcode.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter zipcode.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
