@@ -6,6 +6,7 @@ import java.sql.Timestamp;
 
 /**
  * The persistent class for the SURVEY_QUESTIONS_MAPPING database table.
+ * 
  */
 @Entity
 @Table(name = "SURVEY_QUESTIONS_MAPPING")
@@ -49,7 +50,8 @@ public class SurveyQuestionsMapping implements Serializable {
 	@JoinColumn(name = "SURVEY_QUESTIONS_ID")
 	private SurveyQuestion surveyQuestion;
 
-	public SurveyQuestionsMapping() {}
+	public SurveyQuestionsMapping() {
+	}
 
 	public long getSurveyQuestionsMappingId() {
 		return this.surveyQuestionsMappingId;
