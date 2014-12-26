@@ -22,4 +22,19 @@ public interface OrganizationUnitSettingsDao {
 	 */
 	public void insertAgentSettings(AgentSettings agentSettings);
 	
+	/**
+	 * Fetches the organization unit settings for the given identifier and collection name
+	 * @param identifier
+	 * @param collectionName
+	 * @return
+	 */
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsById(long identifier, String collectionName);
+	
+	/**
+	 * Returns the agent settings 
+	 * @param identitifier
+	 * @return
+	 */
+	public AgentSettings fetchAgentSettingsById(long identifier);
+	
 }

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
 import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -221,6 +222,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
 		companySettings.setIden(company.getCompanyId());
+		if (organizationalDetails.get(CommonConstants.LOGO_NAME) != null) {
+			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_NAME));
+		}
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
@@ -229,7 +233,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// insert the company settings
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-		
+
 		LOG.debug("Method addOrganizationalDetails finished");
 	}
 
@@ -258,16 +262,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
 
 		LOG.debug("Creating user profile for branch admin");
-		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(),
-				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
+				branch.getBranchId(), CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
-		UserProfile userProfileAgent = createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), CommonConstants.DEFAULT_BRANCH_ID,
-				CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfileAgent = createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(),
+				CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(),
+				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
+				String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileAgent);
 
 		LOG.info("Method addIndividual finished.");
@@ -297,16 +302,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
-		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(), region.getRegionId(),
-				profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
+				branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
+
+		LOG.debug("Updating profile stage to payment stage for account type team");
+		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.debug("Method addTeam finished.");
 	}
 
 	/**
 	 * Method to add company account type
+	 * 
 	 * @param user
 	 * @throws InvalidInputException
 	 */
@@ -322,8 +332,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfile);
-		
+
 		LOG.debug("Method addCompanyAccountType finished.");
+
 	}
 
 	/**
@@ -401,6 +412,116 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method createUserProfile() finished");
 		return userProfile;
 	}
+
+	@Override
+	public void editCompanySettings(User user) {
+		LOG.info("Editing company information by user: " + user.toString());
+	}
+
+	@Override
+	public OrganizationUnitSettings getCompanySettings(User user) throws InvalidInputException {
+		if (user == null) {
+			throw new InvalidInputException("User is not set");
+		}
+		LOG.info("Get company settings for the user: " + user.toString());
+		// get the company id
+		if (user.getCompany() == null) {
+			throw new InvalidInputException("User object is partially set. Could not find the comany details");
+		}
+		long companyId = user.getCompany().getCompanyId();
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		return companySettings;
+	}
+
+	@Override
+	public Map<Long, OrganizationUnitSettings> getRegionSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
+		Map<Long, OrganizationUnitSettings> regionSettings = null;
+		if (userProfiles != null && userProfiles.size() > 0) {
+			LOG.info("Get region settings for the user profiles: " + userProfiles.toString());
+			regionSettings = new HashMap<Long, OrganizationUnitSettings>();
+			OrganizationUnitSettings regionSetting = null;
+			// get the region profiles and get the settings for each of them.
+			for (UserProfile userProfile : userProfiles) {
+				regionSetting = new OrganizationUnitSettings();
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					LOG.debug("Getting settings for " + userProfile);
+					// get the region id and get the profile
+					if (userProfile.getRegionId() > 0l) {
+						regionSetting = getRegionSettings(userProfile.getRegionId());
+						if (regionSetting != null) {
+							regionSettings.put(userProfile.getRegionId(), regionSetting);
+						}
+					}
+					else {
+						LOG.warn("Not a valid region id for region profile: " + userProfile + ". Skipping the record");
+					}
+				}
+			}
+		}
+		else {
+			throw new InvalidInputException("User profiles are not set");
+		}
+
+		return regionSettings;
+	}
+
+	@Override
+	public Map<Long, OrganizationUnitSettings> getBranchSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
+		Map<Long, OrganizationUnitSettings> branchSettings = null;
+		if (userProfiles != null && userProfiles.size() > 0) {
+			LOG.info("Get branch settings for the user profiles: " + userProfiles.toString());
+			branchSettings = new HashMap<Long, OrganizationUnitSettings>();
+			OrganizationUnitSettings branchSetting = null;
+			// get the branch profiles and get the settings for each of them.
+			for (UserProfile userProfile : userProfiles) {
+				branchSetting = new OrganizationUnitSettings();
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					LOG.debug("Getting settings for " + userProfile);
+					// get the branch id and get the profile
+					if (userProfile.getBranchId() > 0l) {
+						branchSetting = getBranchSettings(userProfile.getBranchId());
+						if (branchSetting != null) {
+							branchSettings.put(userProfile.getBranchId(), branchSetting);
+						}
+					}
+					else {
+						LOG.warn("Not a valid branch id for branch profile: " + userProfile + ". Skipping the record");
+					}
+				}
+			}
+		}
+		else {
+			throw new InvalidInputException("User profiles are not set");
+		}
+
+		return branchSettings;
+	}
+
+	@Override
+	public OrganizationUnitSettings getRegionSettings(long regionId) throws InvalidInputException {
+		OrganizationUnitSettings regionSettings = null;
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Invalid region id. :" + regionId);
+		}
+		LOG.info("Get the region settings for region id: " + regionId);
+		regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		return regionSettings;
+	}
+
+	@Override
+	public OrganizationUnitSettings getBranchSettings(long branchId) throws InvalidInputException {
+		OrganizationUnitSettings branchSettings = null;
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Invalid branch id. :" + branchId);
+		}
+		LOG.info("Get the branch settings for region id: " + branchId);
+		branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		return branchSettings;
+	}
+
 }
 
 // JIRA: SS-27: By RM05: EOC

@@ -82,6 +82,7 @@ public interface CommonConstants {
 	 */
 	public static final String USER_IN_SESSION = "user";
 	public static final String ACCOUNT_TYPE_IN_SESSION = "accounttype";
+	public static final String CANONICAL_USERSETTINGS_IN_SESSION = "cannonicalusersettings";
 	public static final String COMPANY_NAME = "companyName";
 	public static final String ADDRESS = "address";
 	public static final String ZIPCODE = "zipCode";
