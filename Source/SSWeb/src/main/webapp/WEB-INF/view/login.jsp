@@ -99,8 +99,10 @@
             }
             
             $('input').keypress(function(e){
+            	
 	        	// detect enter
 	        	if (e.which==13){
+	        		e.preventDefault();
 	        		loginUser();
 	        	}
 			});
@@ -145,12 +147,12 @@
 	    				if (emailRegex.test($('#'+elementId).val()) == true) {
 	    					return true;
 	    				}else {
-	    					$('#overlay-toast').html('Please enter a valid userId.');
+	    					$('#overlay-toast').html('Please enter a valid user name.');
 	    					showToast();
 	    					return false;
 	    				}
 	    			}else{
-	    				$('#overlay-toast').html('please enter User ID.');
+	    				$('#overlay-toast').html('Please enter user name.');
 	    				showToast();
 	    				return false;
 	    			}
@@ -160,12 +162,12 @@
 	    					$('#'+elementId).parent().next('.input-error-2').hide();
 	    					return true;
 	    				}else {
-	    					$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid userId.');
+	    					$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid user name.');
 	    					$('#'+elementId).parent().next('.input-error-2').show();
 	    					return false;
 	    				}
 	    			}else{
-	    				$('#'+elementId).parent().next('.input-error-2').html('please enter User ID.');
+	    				$('#'+elementId).parent().next('.input-error-2').html('Please enter user name.');
 	    				$('#'+elementId).parent().next('.input-error-2').show();
 	    				return false;
 	    			}
@@ -177,7 +179,7 @@
             		if ($('#'+elementId).val() != "") {
             			return true;
 	    			}else{
-	    				$('#overlay-toast').html('please enter password.');
+	    				$('#overlay-toast').html('Please enter password.');
 	    				showToast();    
 	    				return false;
 	    			}
@@ -186,7 +188,7 @@
 	    					$('#'+elementId).parent().next('.input-error-2').hide();
 	    					return true;
 	    			}else{
-	    				$('#'+elementId).parent().next('.input-error-2').html('please enter password.');
+	    				$('#'+elementId).parent().next('.input-error-2').html('Please enter password.');
 	    				$('#'+elementId).parent().next('.input-error-2').show();    
 	    				return false;
 	    			}

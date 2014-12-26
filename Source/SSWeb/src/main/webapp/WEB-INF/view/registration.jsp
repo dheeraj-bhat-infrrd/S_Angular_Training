@@ -143,6 +143,7 @@
 			$('input').keypress(function(e){
 	        	// detect enter
 	        	if (e.which==13){
+	        		e.preventDefault();
 	        		submitRegistrationForm();
 	        	}
 			});
