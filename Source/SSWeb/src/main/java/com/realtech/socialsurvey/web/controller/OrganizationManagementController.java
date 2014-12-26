@@ -11,16 +11,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -28,7 +30,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 // JIRA: SS-24 BY RM02 BOC
 
 /**
- * Controller to manage the organizational settings and information provided by the user
+ * Controller to manage the organizational settings and information provided by the user.
  */
 @Controller
 public class OrganizationManagementController {
@@ -45,10 +47,46 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private UserManagementService userManagementService;
-	
+
 	@Autowired
 	private Payment gateway;
 
+	@Autowired
+	private ImageUploadService logoUploadService;
+
+	/**
+	 * Method to upload logo image for a company
+	 * 
+	 * @param fileLocal
+	 * @return
+	 * @throws IOException
+	 */
+	@RequestMapping(value = "/uploadcompanylogo", method = RequestMethod.POST)
+	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
+		LOG.info("Method imageUpload of OrganizationManagementController called");
+		String logoName = "";
+		
+		LOG.debug("Overriding Logo image name in Session");
+		if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME) != null) {
+			request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
+		}
+		
+		try {
+			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
+			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.debug("Setting Logo image name to Session");
+		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
+
+		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
 	/**
 	 * Method to call service for adding company information for a user
 	 * 
@@ -71,7 +109,9 @@ public class OrganizationManagementController {
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
+			/*String logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
+			session.removeAttribute(CommonConstants.LOGO_NAME);*/
+			
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
 			companyDetails.put(CommonConstants.ADDRESS, address);
@@ -91,7 +131,7 @@ public class OrganizationManagementController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.COMPANY_INFORMATION;
 		}
 		LOG.info("Method addCompanyInformation of UserManagementController completed successfully");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
@@ -167,22 +207,9 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
-			LOG.debug("Calling sevices for adding account type of company");
-			AccountType accountType = null;
-			try {
-				accountType = organizationManagementService.addAccountTypeForCompanyAndUpdateStage(user, strAccountType);
-				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR);
-			}
 			
-			gateway.initialise();
-			model.addAttribute("accounttype", accountType.getValue());
+			LOG.debug("Initialising payment gateway");
+			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_TYPE_SELECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));

@@ -82,6 +82,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	/**
 	 * Sends a reset password link to the user
+	 * 
 	 * @param url
 	 * @param recipientMailId
 	 * @throws InvalidInputException
@@ -111,9 +112,9 @@ public class EmailServicesImpl implements EmailServices {
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_SUBJECT;
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY);
-		
+
 		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url));
-		
+
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 
@@ -141,5 +142,111 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.debug("Prepared email entity for registrationInvite");
 		return emailEntity;
 	}
+
+	/**
+	 * Sends a mail to the user when his subscription payment fails.
+	 * 
+	 * @param recipientMailId
+	 *            ,name,retryDays
+	 * @return
+	 */
+	@Override
+	public void sendSubscriptionChargeUnsuccessfulEmail(String recipientMailId, String name, String retryDays) throws InvalidInputException,
+			UndeliveredEmailException {
+
+		LOG.info("Method to send subscription charge unsuccessful mail to : " + name);
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending unsuccessful subscription charge mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending subscription charge mail ");
+		}
+		if (name == null || name.isEmpty()) {
+			LOG.error("Name is empty or null for sending subscription charge mail ");
+			throw new InvalidInputException("Name is empty or null for sending subscription charge mail ");
+		}
+
+		LOG.debug("Executing sendSubscriptionChargeUnsuccessfulEmail() with parameters : " + recipientMailId + ", " + name + ", " + retryDays);
+
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT;
+
+		/**
+		 * Sequence of the replacement arguments in the list should be same as their sequence of
+		 * occurrence in the template
+		 */
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER
+				+ EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, retryDays));
+
+		LOG.info("Sending the mail.");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+		LOG.info("Mail successfully sent!");
+
+	}
+	
+	/**
+	 * Method to send mail with verification link to verify the account
+	 * 
+	 * @param url
+	 * @param recipientMailId
+	 * @param recipientName
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
+			UndeliveredEmailException {
+		LOG.info("Method to send verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
+
+		if (url == null || url.isEmpty()) {
+			throw new InvalidInputException("URL generated can not be null or empty");
+		}
+
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			throw new InvalidInputException("Recipients Email Id can not be null or empty");
+		}
+
+		if (recipientName == null || recipientName.isEmpty()) {
+			throw new InvalidInputException("Recipients Name can not be null or empty");
+		}
+
+		EmailEntity emailEntity = prepareEmailEntityForVerificationMail(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_SUBJECT;
+		FileContentReplacements fileContentReplacements = new FileContentReplacements();
+		fileContentReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.VERIFICATION_MAIL_BODY);
+
+		/**
+		 * order of arguments should be same as in the template
+		 */
+		fileContentReplacements.setReplacementArgs(Arrays.asList(recipientName, url));
+		LOG.debug("Calling email sender to send verification mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, fileContentReplacements);
+
+		LOG.info("Successfully sent verification mail");
+	}
+	
+	/**
+	 * Method to prepare email entity for verification mail
+	 * 
+	 * @param recipientMailId
+	 * @return
+	 */
+	private EmailEntity prepareEmailEntityForVerificationMail(String recipientMailId) {
+		LOG.debug("Preparing email entity for verification mail for recipientMailId " + recipientMailId);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setSenderEmailId(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_USERNAME));
+		emailEntity.setSenderPassword(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_PASSWORD));
+		emailEntity.setSenderName(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_NAME));
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for verification mail");
+		return emailEntity;
+	}
+
 }
 // JIRA: SS-7: By RM02: EOC

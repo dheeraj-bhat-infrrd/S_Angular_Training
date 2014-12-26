@@ -16,5 +16,7 @@ public interface JspResolver {
 	public static final String COMPANY_INFORMATION = "companyinformation";
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String PAYMENT = "payment";
+	public static final String LANDING = "landing";
+	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
 	public static final String DASHBOARD = "dashboard";
 }

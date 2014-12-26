@@ -52,6 +52,7 @@
 				<value>com.realtech.socialsurvey.core.entities.ProfilesMaster
 				</value>
 				<value>com.realtech.socialsurvey.core.entities.Region</value>
+				<value>com.realtech.socialsurvey.core.entities.RetriedTransaction</value>
 				<value>com.realtech.socialsurvey.core.entities.Survey</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestion
 				</value>

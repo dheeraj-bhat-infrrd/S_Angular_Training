@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
-import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationLevelSetting;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -27,12 +26,11 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
-import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.usermanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -56,9 +54,8 @@ public class RegistrationServiceImpl implements RegistrationService {
 	@Qualifier("userInvite")
 	private UserInviteDao userInviteDao;
 
-	@Resource
-	@Qualifier("userProfile")
-	private UserProfileDao userProfileDao;
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -73,7 +70,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 	private GenericDao<OrganizationLevelSetting, Long> organizationLevelSettingDao;
 
 	@Autowired
-	private UserManagementService userManagementServices;
+	private UserManagementService userManagementService;
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -82,9 +79,9 @@ public class RegistrationServiceImpl implements RegistrationService {
 		LOG.info("Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName + "\t email id: " + emailId);
 
 		Map<String, String> urlParams = new HashMap<String, String>();
-		urlParams.put("firstName", firstName);
-		urlParams.put("lastName", lastName);
-		urlParams.put("emailId", emailId);
+		urlParams.put(CommonConstants.FIRST_NAME, firstName);
+		urlParams.put(CommonConstants.LAST_NAME, lastName);
+		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 
 		LOG.debug("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION);
@@ -116,31 +113,91 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * registration link used by the user to register
 	 * 
 	 * @throws UserAlreadyExistsException
+	 * @throws UndeliveredEmailException
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCorporateAdminAndUpdateStage(String firstName, String lastName, String emailId, String username, String password)
-			throws InvalidInputException, InvalidUrlException, UserAlreadyExistsException {
+	public User addCorporateAdminAndUpdateStage(String firstName, String lastName, String emailId, String password, boolean isDirectRegistration)
+			throws InvalidInputException, UserAlreadyExistsException, UndeliveredEmailException {
 		LOG.info("Method to add corporate admin called for emailId : " + emailId);
-		if (userExists(username)) {
-			throw new UserAlreadyExistsException("User with User ID : " + username + " already exists");
+		if (userExists(emailId)) {
+			throw new UserAlreadyExistsException("User with User ID : " + emailId + " already exists");
 		}
 		Company company = companyDao.findById(Company.class, CommonConstants.DEFAULT_COMPANY_ID);
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
+		int status = CommonConstants.STATUS_ACTIVE;
 
-		LOG.debug("Creating new user with emailId : " + emailId);
-		User user = createUser(company, username, encryptedPassword, emailId);
+		/**
+		 * If the registration is not through an invite, status of the user is "not verified" and a
+		 * verification link is sent. For an invitation, email is already verified hence status is
+		 * active
+		 */
+		if (isDirectRegistration) {
+			status = CommonConstants.STATUS_NOT_VERIFIED;
+		}
+
+		LOG.debug("Creating new user with emailId : " + emailId + " and verification status : " + status);
+		String displayName = getDisplayName(firstName, lastName);
+		User user = createUser(company, encryptedPassword, emailId, displayName, status);
+		user = userDao.save(user);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
-		userProfileDao.createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
+		UserProfile userProfile = createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
-				CommonConstants.STATUS_INACTIVE);
+				CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		userProfileDao.save(userProfile);
 
-		LOG.debug("Invalidating registration link for emailId : " + emailId);
-		invalidateRegistrationInvite(emailId);
+		/**
+		 * if it is direct registration, send verification link else invalidate the invitation link
+		 */
+		if (isDirectRegistration) {
+			LOG.debug("Calling method for sending verification link for user : " + user.getUserId());
+			sendVerificationLink(user);
+		}
+		else {
+			LOG.debug("Invalidating registration link for emailId : " + emailId);
+			invalidateRegistrationInvite(emailId);
+		}
 
 		LOG.info("Successfully executed method to add corporate admin for emailId : " + emailId);
 		return user;
+	}
+
+	/**
+	 * Method to generate and send verification link
+	 * 
+	 * @param user
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	private void sendVerificationLink(User user) throws InvalidInputException, UndeliveredEmailException {
+		LOG.debug("Method sendVerificationLink of Registration service called");
+		String verificationUrl = null;
+		try {
+
+			Map<String, String> params = new HashMap<String, String>();
+			params.put(CommonConstants.EMAIL_ID, user.getEmailId());
+			params.put(CommonConstants.USER_ID, String.valueOf(user.getUserId()));
+
+			LOG.debug("Calling url generator to generate verification link");
+			verificationUrl = urlGenerator.generateUrl(params, applicationBaseUrl + CommonConstants.REQUEST_MAPPING_MAIL_VERIFICATION);
+		}
+		catch (InvalidInputException e) {
+			throw new InvalidInputException("Could not generate url for verification.Reason : " + e.getMessage(), e);
+		}
+
+		try {
+			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
+			emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getDisplayName());
+		}
+		catch (InvalidInputException e) {
+			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
+		}
+		catch (UndeliveredEmailException e) {
+			throw new UndeliveredEmailException("Could not send mail for verification.Reason : " + e.getMessage(), e);
+		}
+
+		LOG.debug("Method sendVerificationLink of Registration service finished");
 	}
 
 	// JIRA: SS-27: By RM05: EOC
@@ -270,29 +327,28 @@ public class RegistrationServiceImpl implements RegistrationService {
 	 * Method to create a new user
 	 * 
 	 * @param company
-	 * @param username
 	 * @param password
 	 * @param emailId
+	 * @param displayName
 	 * @return
 	 */
-	private User createUser(Company company, String username, String password, String emailId) {
-		LOG.info("Method createUser called for username : " + username + " and email-id : " + emailId);
+	private User createUser(Company company, String password, String emailId, String displayName, int status) {
+		LOG.debug("Method createUser called for email-id : " + emailId + " and status : " + status);
 		User user = new User();
 		user.setCompany(company);
-		user.setLoginName(username);
+		user.setLoginName(emailId);
 		user.setLoginPassword(password);
 		user.setEmailId(emailId);
+		user.setDisplayName(displayName);
 		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
-		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_INACTIVE);
-		user.setStatus(CommonConstants.STATUS_ACTIVE);
+		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+		user.setStatus(status);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 		user.setCreatedOn(currentTimestamp);
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
 		user.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
-
-		user = userDao.save(user);
-		LOG.info("Method createUser finished for username : " + username);
+		LOG.debug("Method createUser finished for email-id : " + emailId);
 		return user;
 	}
 
@@ -408,7 +464,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 				+ profileMasterId + " and userId : " + user.getUserId());
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.USER_COLUMN, user);
-		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementServices.getProfilesMasterById(profileMasterId));
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(profileMasterId));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 
 		if (userProfiles != null && !userProfiles.isEmpty()) {
@@ -423,5 +479,73 @@ public class RegistrationServiceImpl implements RegistrationService {
 			LOG.warn("No profile found for updating profile completion stage");
 		}
 		LOG.info("Mehtod updateProfileCompletionStage finished for profileCompletionStage : " + profileCompletionStage);
+	}
+
+	/**
+	 * Method to verify a user's account
+	 * 
+	 * @param encryptedUrlParams
+	 * @throws InvalidInputException
+	 */
+	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
+	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException {
+		LOG.info("Method to verify account called for encryptedUrlParams");
+		Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+		if (urlParams == null || urlParams.isEmpty()) {
+			throw new InvalidInputException("Url params are invalid for account verification");
+		}
+		if (urlParams.containsKey(CommonConstants.USER_ID)) {
+			long userId = Long.parseLong(urlParams.get(CommonConstants.USER_ID));
+
+			LOG.debug("Calling user management service for updating user status to active");
+			userManagementService.updateUserStatus(userId, CommonConstants.STATUS_ACTIVE);
+		}
+		else {
+			throw new InvalidInputException("User id field not present in url params");
+		}
+		LOG.info("Successfully completed method to verify account");
+	}
+
+	/**
+	 * Method to get display name from first and last names
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @return
+	 */
+	private String getDisplayName(String firstName, String lastName) {
+		LOG.debug("Getting display name for first name: " + firstName + " and last name : " + lastName);
+		String displayName = firstName;
+		/**
+		 * if address line 2 is present, append it to address1 else the complete address is address1
+		 */
+		if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
+			displayName = firstName + " " + lastName;
+		}
+		LOG.debug("Returning display name" + displayName);
+		return displayName;
+	}
+
+	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId,
+			int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
+		UserProfile userProfile = new UserProfile();
+		userProfile.setAgentId(agentId);
+		userProfile.setBranchId(branchId);
+		userProfile.setCompany(company);
+		userProfile.setEmailId(emailId);
+		userProfile.setIsProfileComplete(isProfileComplete);
+		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
+		userProfile.setProfileCompletionStage(profileCompletionStage);
+		userProfile.setRegionId(regionId);
+		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+		userProfile.setUser(user);
+		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		userProfile.setCreatedOn(currentTimestamp);
+		userProfile.setModifiedOn(currentTimestamp);
+		userProfile.setCreatedBy(createdBy);
+		userProfile.setModifiedBy(modifiedBy);
+		LOG.debug("Method createUserProfile() finished");
+		return userProfile;
 	}
 }
