@@ -47,7 +47,9 @@ public interface UserManagementService {
 	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException;
 
 	public List<User> getUsersForCompany(long user) throws InvalidInputException, NoRecordsFetchedException;
-
+	
+	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException;
+	
 	// JIRA SS-42 BY RM05 EOC
 
 	/**

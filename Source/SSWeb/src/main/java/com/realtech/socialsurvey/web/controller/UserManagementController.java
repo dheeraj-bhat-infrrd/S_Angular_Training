@@ -241,6 +241,41 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to assign a user to a branch.
+	 */
+	@RequestMapping(value = "/assignusertobranch", method = RequestMethod.POST)
+	public String assignUserToBranch(Model model, HttpServletRequest request) throws NonFatalException {
+		User admin = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+		String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		String branchIdStr = request.getParameter("branchId");
+		if (userIdStr == null || userIdStr.isEmpty()) {
+			LOG.error("Invalid user id passed in method assignUserToBranch().");
+			throw new InvalidInputException("Invalid user id passed in method assignUserToBranch().");
+		}
+		if (branchIdStr == null || branchIdStr.isEmpty()) {
+			LOG.error("Invalid branch id passed in method assignUserToBranch().");
+			throw new InvalidInputException("Invalid branch id passed in method assignUserToBranch().");
+		}
+		
+		LOG.info("Method to assign user to branch is called for user " + userIdStr);
+		long userId = 0;
+		long branchId = 0;
+		try {
+			userId = Long.parseLong(userIdStr);
+			branchId = Long.parseLong(branchIdStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception while parsing user Id or branch id", e);
+			throw new NonFatalException("Number format execption while parsing user id or branch id", DisplayMessageConstants.GENERAL_ERROR, e);
+		}
+
+		userManagementService.assignUserToBranch(admin, userId, branchId);
+		
+		LOG.info("Method to assign user to branch is called for user " + userIdStr);
+		return JspResolver.MESSAGE_HEADER;
+	}
+
 	/**
 	 * Method to assign a user as branch admin
 	 * 
