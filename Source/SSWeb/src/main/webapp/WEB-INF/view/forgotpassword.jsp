@@ -49,8 +49,13 @@
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="forgot-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
                	 </form>
-                <div class="footer-copyright text-center"><spring:message code="label.copyright.key" /> &copy; 
-                <spring:message code="label.copyrightposttext.key" /></div>                
+                <div class="footer-copyright text-center">
+               <spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
+                </div>                
             </div>
         </div>
     </div>
@@ -83,6 +88,13 @@
             		$('#forgot-pwd-form').submit();
                 }
             }
+            
+            $('input').keypress(function(e){
+	        	// detect enter
+	        	if (e.which==13){
+	        		submitForgotPasswordForm();
+	        	}
+			});
             
             $('#forgot-pwd-submit').click(function(e){
                 	submitForgotPasswordForm();
