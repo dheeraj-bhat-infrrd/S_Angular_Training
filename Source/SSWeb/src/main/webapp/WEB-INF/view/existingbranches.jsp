@@ -20,7 +20,7 @@
 		        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30">
 			        <c:forEach items="${branches}" step="2" var="branch">
 			            <div class="hm-sub-item clearfix">
-			                <div class="float-left hm-sub-item-left">${branch.branch}</div>
+			                <div class="float-left hm-sub-item-left branch-element" data-branchid = "${branch.branchId}" data-regionid = "${branch.region.regionId}" data-regionname = "${branch.region.region}">${branch.branch}</div>
 			                <div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"${branch.branchId} onclick ="javascript:deleteBranch('${branch.branchId}')"></div>
 			            </div>		            
 			        </c:forEach>
@@ -28,7 +28,7 @@
 		        <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30">
 		            <c:forEach items="${branches}" step="2" var="branch" begin="1">
 			            <div class="hm-sub-item clearfix">
-			                <div class="float-left hm-sub-item-left">${branch.branch}</div>
+			                <div class="float-left hm-sub-item-left branch-element" data-branchid = "${branch.branchId}" data-regionid = "${branch.region.regionId}" data-regionname = "${branch.region.region}">${branch.branch}</div>
 			                <div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"${branch.branchId} onclick ="javascript:deleteBranch('${branch.branchId}')"></div>
 			            </div>		            
 			        </c:forEach>

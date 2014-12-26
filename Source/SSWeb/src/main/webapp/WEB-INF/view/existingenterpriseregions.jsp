@@ -15,7 +15,7 @@
 	<c:when test = "${not empty regions}">
 		<c:forEach var="region" items="${regions}">
 			<div class="hm-sub-item clearfix">
-			    <div class="float-left hm-sub-item-left">${region.region}</div>
+			    <div class="float-left hm-sub-item-left region-element" data-regionid = "${region.regionId}">${region.region}</div>
 			    <div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick="javascript:deleteRegion('${region.regionId}')"></div>
 			</div>
 		</c:forEach>

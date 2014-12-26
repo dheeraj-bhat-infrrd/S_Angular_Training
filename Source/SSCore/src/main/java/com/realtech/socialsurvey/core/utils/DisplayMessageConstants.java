@@ -43,6 +43,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_LOGO_DIMENSIONS = "INVALID_LOGO_DIMENSIONS";
 	public static final String INVALID_LOGO_SIZE = "INVALID_LOGO_SIZE";
 	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
+	public static final String INVALID_REGION_SELECTED = "INVALID_REGION_SELECTED";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
@@ -56,5 +57,6 @@ public final class DisplayMessageConstants {
 	public static final String REGION_DELETE_SUCCESSFUL = "REGION_DELETE_SUCCESSFUL";
 	public static final String EMAIL_VERIFICATION_SUCCESSFUL = "EMAIL_VERIFICATION_SUCCESSFUL";
 	public static final String BRANCH_ADDITION_SUCCESSFUL = "BRANCH_ADDITION_SUCCESSFUL";	
-	
+	public static final String REGION_UPDATION_SUCCESSFUL = "REGION_UPDATION_SUCCESSFUL";	
+	public static final String BRANCH_UPDATION_SUCCESSFUL = "BRANCH_UPDATION_SUCCESSFUL";		
 }
