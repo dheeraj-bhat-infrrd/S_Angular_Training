@@ -100,9 +100,11 @@
 					</div>
 				</div>
 				<div class="footer-copyright text-center">
-					<spring:message code="label.copyright.key" />
-					&copy;
-					<spring:message code="label.copyrightposttext.key" />
+					<spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
 				</div>
 			</div>
 		</div>
@@ -137,6 +139,13 @@
 					showOverlay();
 				}
 			}
+			
+			$('input').keypress(function(e){
+	        	// detect enter
+	        	if (e.which==13){
+	        		submitRegistrationForm();
+	        	}
+			});
 
 			$('#reg-submit').click(function(e) {
 				submitRegistrationForm();
