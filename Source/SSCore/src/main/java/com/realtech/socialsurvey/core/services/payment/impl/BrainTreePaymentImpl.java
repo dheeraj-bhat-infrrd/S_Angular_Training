@@ -517,7 +517,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
-		emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getDisplayName(), String.valueOf(retryDays));
+		emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
 
 		LOG.info("Email sent successfully!");
 

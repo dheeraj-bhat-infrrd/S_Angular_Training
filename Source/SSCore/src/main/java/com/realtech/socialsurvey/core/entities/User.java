@@ -28,8 +28,11 @@ public class User implements Serializable {
 	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name = "DISPLAY_NAME")
-	private String displayName;
+	@Column(name = "FIRST_NAME")
+	private String firstName;
+	
+	@Column(name = "LAST_NAME")
+	private String lastName;
 
 	@Column(name = "EMAIL_ID")
 	private String emailId;
@@ -106,12 +109,20 @@ public class User implements Serializable {
 		this.createdOn = createdOn;
 	}
 
-	public String getDisplayName() {
-		return this.displayName;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getEmailId() {

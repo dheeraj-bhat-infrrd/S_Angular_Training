@@ -28,7 +28,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	@Override
 	public void deactivateAllUserProfilesForUser(User admin, User userToBeDeactivated) {
 
-		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
 		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
@@ -36,7 +36,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		query.setParameter(2, String.valueOf(new Timestamp(System.currentTimeMillis())));
 		query.setParameter(3, userToBeDeactivated);
 		query.executeUpdate();
-		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName());
 
 	}
 
@@ -45,7 +45,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	 */
 	@Override
 	public void deactivateUserProfileForBranch(User admin, long branchId, User userToBeDeactivated) {
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
 		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
@@ -54,7 +54,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		query.setParameter(3, userToBeDeactivated);
 		query.setParameter(4, branchId);
 		query.executeUpdate();
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName());
 	}
 
 	/*
@@ -62,7 +62,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	 */
 	@Override
 	public void deactivateUserProfileForRegion(User admin, long regionId, User userToBeDeactivated) {
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName());
 		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
 		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
@@ -71,13 +71,13 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 		query.setParameter(3, userToBeDeactivated);
 		query.setParameter(4, regionId);
 		query.executeUpdate();
-		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getDisplayName());
+		LOG.info("Method deactivateUserProfileForBranch called to deactivate user : " + userToBeDeactivated.getFirstName());
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<Long> getBranchIdsForUser(User user) {
-		LOG.info("Method getBranchIdsForUser called to fetch branch ids assigned to user : " + user.getDisplayName());
+		LOG.info("Method getBranchIdsForUser called to fetch branch ids assigned to user : " + user.getFirstName());
 		Criteria criteria = getSession().createCriteria(UserProfile.class);
 		List<Long> branchIds = new ArrayList<>();
 		try {
@@ -93,7 +93,7 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 			LOG.error("Exception caught in fetchUserByEmailId() ", hibernateException);
 			throw new DatabaseException("Exception caught in fetchUserByEmailId() ", hibernateException);
 		}
-		LOG.info("Method getBranchIdsForUser finished to fetch branche ids assigned to user : " + user.getDisplayName());
+		LOG.info("Method getBranchIdsForUser finished to fetch branche ids assigned to user : " + user.getFirstName());
 		return branchIds;
 	}
 }
