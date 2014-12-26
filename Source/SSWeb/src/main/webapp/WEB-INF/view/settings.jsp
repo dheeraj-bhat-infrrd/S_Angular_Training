@@ -1,5 +1,3 @@
-<jsp:include page="header.jsp"/>
-
 <div class="overlay-disable hide">
     <div class="overlay-disable-wrapper">
         <div class="ol-header">Disable Account</div>
@@ -196,7 +194,6 @@
     </div>
 </div>
 
-<jsp:include page="scripts.jsp"/>
 
 <script>
     $(document).ready(function(){

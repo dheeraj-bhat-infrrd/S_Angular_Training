@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -65,12 +66,12 @@ public class OrganizationManagementController {
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
 		String logoName = "";
-		
+
 		LOG.debug("Overriding Logo image name in Session");
 		if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME) != null) {
 			request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
 		}
-		
+
 		try {
 			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
@@ -86,7 +87,7 @@ public class OrganizationManagementController {
 		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
 		return JspResolver.MESSAGE_HEADER;
 	}
-	
+
 	/**
 	 * Method to call service for adding company information for a user
 	 * 
@@ -109,14 +110,20 @@ public class OrganizationManagementController {
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			/*String logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
-			session.removeAttribute(CommonConstants.LOGO_NAME);*/
-			
+			String logoName = null;
+			if(session.getAttribute(CommonConstants.LOGO_NAME) !=null){
+				logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
+			}
+			session.removeAttribute(CommonConstants.LOGO_NAME);
+
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
 			companyDetails.put(CommonConstants.ADDRESS, address);
 			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
+			if (logoName != null) {
+				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
+			}
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
@@ -207,7 +214,7 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			
+
 			LOG.debug("Initialising payment gateway");
 			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
@@ -223,6 +230,26 @@ public class OrganizationManagementController {
 		}
 		return JspResolver.PAYMENT;
 
+	}
+
+	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
+	public String showCompanySettings(Model model, HttpServletRequest request) {
+		LOG.info("Method showCompanySettings of UserManagementController called");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		try {
+			LOG.debug("Getting company settings");
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+			LOG.debug("Showing company settings: " + companySettings.toString());
+			// setting the object in settings
+			session.setAttribute("companysettings", companySettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		return JspResolver.COMPANY_SETTINGS;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC
