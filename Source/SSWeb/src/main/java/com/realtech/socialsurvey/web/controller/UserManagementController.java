@@ -155,7 +155,7 @@ public class UserManagementController {
 		}
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
 		// return user details page on success
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.USER_LIST;
 	}
 
 	/*
@@ -440,20 +440,21 @@ public class UserManagementController {
 	 */
 	private void getAllUsersForCompany(Model model, HttpServletRequest request) throws NonFatalException {
 		LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
-		String userIdStr = request.getParameter(CommonConstants.USER_ID);
-		if (userIdStr == null || userIdStr.isEmpty()) {
+		User user = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+	//	String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		if (user == null) {
 			LOG.error("Invalid user id passed in method findUserByUserId().");
 			throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
 		}
-		long userId = 0;
+		/*long userId = 0;
 		try {
 			userId = Long.parseLong(userIdStr);
 		}
 		catch (NumberFormatException e) {
 			LOG.error("Number format exception while parsing user Id", e);
 			throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
-		}
-		List<User> allUsers = userManagementService.getUsersForCompany(userId);
+		}*/
+		List<User> allUsers = userManagementService.getUsersForCompany(user);
 		int maxIndex = BATCH_SIZE;
 		if (allUsers.size() <= BATCH_SIZE) {
 			maxIndex = allUsers.size();
