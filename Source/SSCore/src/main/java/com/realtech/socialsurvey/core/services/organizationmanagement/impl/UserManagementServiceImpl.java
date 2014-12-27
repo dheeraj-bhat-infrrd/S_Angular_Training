@@ -505,19 +505,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Transactional
 	@Override
-	public List<User> getUsersForCompany(long userId) throws InvalidInputException, NoRecordsFetchedException {
-		LOG.info("Method getUsersForCompany() started for " + userId);
-		User user = userDao.findById(User.class, userId);
+	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException {
 		if (user == null) {
-			LOG.error("No user found for user id : " + userId);
-			throw new InvalidInputException("No user found for userId specified in getUsersForCompany()");
+			LOG.error("User cannote be null." );
+			throw new InvalidInputException("Null value found  user found for userId specified in getUsersForCompany()");
 		}
+		LOG.info("Method getUsersForCompany() started for " + user.getUserId());
 		List<User> users = userDao.getUsersForCompany(user.getCompany());
 		if (users == null || users.isEmpty()) {
 			LOG.error("No user found for company : " + user.getCompany().getCompany());
 			throw new NoRecordsFetchedException("No user found for company : " + user.getCompany().getCompany());
 		}
-		LOG.info("Method getUsersForCompany() started for " + userId);
+		LOG.info("Method getUsersForCompany() started for " + user.getUserId());
 		return users;
 	}
 
