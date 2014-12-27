@@ -155,7 +155,7 @@ public class UserManagementController {
 		}
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
 		// return user details page on success
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.USER_LIST;
 	}
 
 	/*
@@ -238,6 +238,41 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to remove an existing user finished.");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/*
+	 * Method to assign a user to a branch.
+	 */
+	@RequestMapping(value = "/assignusertobranch", method = RequestMethod.POST)
+	public String assignUserToBranch(Model model, HttpServletRequest request) throws NonFatalException {
+		User admin = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+		String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		String branchIdStr = request.getParameter("branchId");
+		if (userIdStr == null || userIdStr.isEmpty()) {
+			LOG.error("Invalid user id passed in method assignUserToBranch().");
+			throw new InvalidInputException("Invalid user id passed in method assignUserToBranch().");
+		}
+		if (branchIdStr == null || branchIdStr.isEmpty()) {
+			LOG.error("Invalid branch id passed in method assignUserToBranch().");
+			throw new InvalidInputException("Invalid branch id passed in method assignUserToBranch().");
+		}
+		
+		LOG.info("Method to assign user to branch is called for user " + userIdStr);
+		long userId = 0;
+		long branchId = 0;
+		try {
+			userId = Long.parseLong(userIdStr);
+			branchId = Long.parseLong(branchIdStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception while parsing user Id or branch id", e);
+			throw new NonFatalException("Number format execption while parsing user id or branch id", DisplayMessageConstants.GENERAL_ERROR, e);
+		}
+
+		userManagementService.assignUserToBranch(admin, userId, branchId);
+		
+		LOG.info("Method to assign user to branch is called for user " + userIdStr);
 		return JspResolver.MESSAGE_HEADER;
 	}
 
@@ -405,20 +440,21 @@ public class UserManagementController {
 	 */
 	private void getAllUsersForCompany(Model model, HttpServletRequest request) throws NonFatalException {
 		LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
-		String userIdStr = request.getParameter(CommonConstants.USER_ID);
-		if (userIdStr == null || userIdStr.isEmpty()) {
+		User user = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+	//	String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		if (user == null) {
 			LOG.error("Invalid user id passed in method findUserByUserId().");
 			throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
 		}
-		long userId = 0;
+		/*long userId = 0;
 		try {
 			userId = Long.parseLong(userIdStr);
 		}
 		catch (NumberFormatException e) {
 			LOG.error("Number format exception while parsing user Id", e);
 			throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
-		}
-		List<User> allUsers = userManagementService.getUsersForCompany(userId);
+		}*/
+		List<User> allUsers = userManagementService.getUsersForCompany(user);
 		int maxIndex = BATCH_SIZE;
 		if (allUsers.size() <= BATCH_SIZE) {
 			maxIndex = allUsers.size();

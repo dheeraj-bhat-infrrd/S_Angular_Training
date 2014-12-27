@@ -173,8 +173,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.debug("Creating new user with emailId : " + emailId + " and verification status : " + status);
-		String displayName = getDisplayName(firstName, lastName);
-		User user = createUser(company, encryptedPassword, emailId, displayName, status);
+		User user = createUser(company, encryptedPassword, emailId, firstName, lastName, status);
 		user = userDao.save(user);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
@@ -290,8 +289,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new UserAlreadyExistsException("User with User ID : " + emailId + " already exists");
 		}
 
-		String displayName = getDisplayName(firstName, lastName);
-		User user = createUser(admin.getCompany(), null, emailId, displayName, CommonConstants.STATUS_NOT_VERIFIED);
+		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_NOT_VERIFIED);
 		user = userDao.save(user);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
@@ -327,13 +325,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		userToBeDeactivated.setModifiedBy(String.valueOf(admin.getUserId()));
 		userToBeDeactivated.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 
-		LOG.info("Deactivating user " + userToBeDeactivated.getDisplayName());
+		LOG.info("Deactivating user " + userToBeDeactivated.getFirstName());
 		userDao.update(userToBeDeactivated);
 
 		// Marks all the user profiles for given user as inactive.
 		userProfileDao.deactivateAllUserProfilesForUser(admin, userToBeDeactivated);
 
-		LOG.info("Method to deactivate user " + userToBeDeactivated.getDisplayName() + " finished.");
+		LOG.info("Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished.");
 	}
 
 	@Transactional
@@ -491,14 +489,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Transactional
 	@Override
 	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException {
-		LOG.info("Method to find branches assigned to the user started for " + user.getDisplayName());
+		LOG.info("Method to find branches assigned to the user started for " + user.getFirstName());
 		List<Long> branchIds = userProfileDao.getBranchIdsForUser(user);
 		if (branchIds == null || branchIds.isEmpty()) {
 			LOG.error("No branch found for user : " + user.getUserId());
 			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
 		}
 		List<Branch> branches = branchDao.findByColumnForMultipleValues(Branch.class, "branchId", branchIds);
-		LOG.info("Method to find branches assigned to the user finished for " + user.getDisplayName());
+		LOG.info("Method to find branches assigned to the user finished for " + user.getFirstName());
 		return branches;
 	}
 
@@ -507,19 +505,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Transactional
 	@Override
-	public List<User> getUsersForCompany(long userId) throws InvalidInputException, NoRecordsFetchedException {
-		LOG.info("Method getUsersForCompany() started for " + userId);
-		User user = userDao.findById(User.class, userId);
+	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException {
 		if (user == null) {
-			LOG.error("No user found for user id : " + userId);
-			throw new InvalidInputException("No user found for userId specified in getUsersForCompany()");
+			LOG.error("User cannote be null." );
+			throw new InvalidInputException("Null value found  user found for userId specified in getUsersForCompany()");
 		}
+		LOG.info("Method getUsersForCompany() started for " + user.getUserId());
 		List<User> users = userDao.getUsersForCompany(user.getCompany());
 		if (users == null || users.isEmpty()) {
 			LOG.error("No user found for company : " + user.getCompany().getCompany());
 			throw new NoRecordsFetchedException("No user found for company : " + user.getCompany().getCompany());
 		}
-		LOG.info("Method getUsersForCompany() started for " + userId);
+		LOG.info("Method getUsersForCompany() started for " + user.getUserId());
 		return users;
 	}
 
@@ -654,12 +651,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 
 		if (userProfiles == null || userProfiles.isEmpty()) {
-			LOG.debug("User " + user.getDisplayName() + " has never been assigned to branch id " + branchId + " earlier.");
+			LOG.debug("User " + user.getFirstName() + " has never been assigned to branch id " + branchId + " earlier.");
 		}
 
 		else {
 			userProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-			LOG.debug("User " + user.getDisplayName() + " is already present for branch " + branchId + " with status " + userProfile.getStatus());
+			LOG.debug("User " + user.getFirstName() + " is already present for branch " + branchId + " with status " + userProfile.getStatus());
 		}
 		LOG.debug("Method to check whether same user is already present in user profile with inactive state completed.");
 		return userProfile;
@@ -682,6 +679,46 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		userDao.update(user);
 
 		LOG.info("Successfully completed method to update user status");
+	}
+
+	/*
+	 * Method to assign a user to a particular branch.
+	 */
+	@Transactional
+	@Override
+	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException {
+		
+		if (admin == null) {
+			throw new InvalidInputException("No admin user present.");
+		}
+		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
+		User user = userDao.findById(User.class, userId);
+
+		if (user == null) {
+			throw new InvalidInputException("No user present for the specified userId");
+		}
+		
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.USER_COLUMN, user);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		UserProfile userProfile;
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			// Create a new entry in UserProfile to map user to the branch.
+			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
+					CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
+					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+		}
+		else {
+			userProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+			if (userProfile.getStatus() == CommonConstants.STATUS_INACTIVE) {
+				userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+				userProfile.setModifiedBy(String.valueOf(admin.getUserId()));
+				userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			}
+		}
+		userProfileDao.saveOrUpdate(userProfile);
+		LOG.info("Method to assign user to a branch finished for user : " + admin.getUserId());
 	}
 
 	/**
@@ -709,7 +746,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
-			emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getDisplayName());
+			emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName());
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
@@ -853,14 +890,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @param displayName
 	 * @return
 	 */
-	private User createUser(Company company, String password, String emailId, String displayName, int status) {
+	private User createUser(Company company, String password, String emailId, String firstName, String lastName, int status) {
 		LOG.debug("Method createUser called for email-id : " + emailId + " and status : " + status);
 		User user = new User();
 		user.setCompany(company);
 		user.setLoginName(emailId);
 		user.setLoginPassword(password);
 		user.setEmailId(emailId);
-		user.setDisplayName(displayName);
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
 		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
 		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 		user.setStatus(status);
@@ -961,24 +999,4 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	// JIRA: SS-27: By RM05: EOC
-
-	/**
-	 * Method to get display name from first and last names
-	 * 
-	 * @param firstName
-	 * @param lastName
-	 * @return
-	 */
-	private String getDisplayName(String firstName, String lastName) {
-		LOG.debug("Getting display name for first name: " + firstName + " and last name : " + lastName);
-		String displayName = firstName;
-		/**
-		 * if address line 2 is present, append it to address1 else the complete address is address1
-		 */
-		if (firstName != null && !firstName.isEmpty() && lastName != null && !lastName.isEmpty()) {
-			displayName = firstName + " " + lastName;
-		}
-		LOG.debug("Returning display name" + displayName);
-		return displayName;
-	}
 }

@@ -47,7 +47,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		@SuppressWarnings("unchecked") List<User> users = (List<User>) criteria.list();
 
 		if (users == null || users.isEmpty()) {
-			LOG.error("Could not find any record in USER for : " + user.getDisplayName());
+			LOG.error("Could not find any record in USER for : " + user.getFirstName());
 			throw new NoRecordsFetchedException("Could not find any record in License_Details for : " + user.getCompany().getCompany());
 		}
 
