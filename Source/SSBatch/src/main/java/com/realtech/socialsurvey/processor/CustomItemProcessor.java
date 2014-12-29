@@ -61,7 +61,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 	private int retryDays;
 
 	private static final Logger LOG = LoggerFactory.getLogger(CustomItemProcessor.class);
-
+		
 	private User getCorporateAdmin(Company company) throws InvalidInputException, NoRecordsFetchedException {
 
 		if (company == null) {

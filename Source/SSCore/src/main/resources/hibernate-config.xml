@@ -15,22 +15,12 @@
 
 	<!-- Data source details. It is pointing to jndi which is currently configured 
 		in JBoss -->
-	<bean id="dataSource"
-        class="org.springframework.jdbc.datasource.DriverManagerDataSource">
-        <property name="url">
-            <value>jdbc:mysql://localhost:3306/ss_user</value>
-        </property>
-        <property name="driverClassName">
-            <value>com.mysql.jdbc.Driver</value>
-        </property>    
-
-        <property name="username">
-            <value>root</value>
-        </property>
-        <property name="password">
-            <value>raremile</value>
-        </property>
-    </bean>
+    
+    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+		 <property name="jndiName">
+		 <value>${JNDI_NAME}</value>
+		 </property>
+	</bean>
 
 
 	<bean id="sessionFactory"
