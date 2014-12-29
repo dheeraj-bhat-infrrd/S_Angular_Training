@@ -37,4 +37,13 @@ public interface OrganizationUnitSettingsDao {
 	 */
 	public AgentSettings fetchAgentSettingsById(long identifier);
 	
+	/**
+	 * Updates a particular element in the collection
+	 * @param keyToUpdate
+	 * @param updatedRecord
+	 * @param unitSettings
+	 * @param collectionName
+	 */
+	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings, String collectionName);
+	
 }
