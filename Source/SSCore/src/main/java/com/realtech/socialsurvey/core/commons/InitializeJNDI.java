@@ -27,7 +27,7 @@ public class InitializeJNDI {
 			MysqlConnectionPoolDataSource mysqlds = new MysqlConnectionPoolDataSource();
 			mysqlds.setUrl("jdbc:mysql://localhost:3306/ss_user");
 			mysqlds.setUser("root");
-			mysqlds.setPassword("");
+			mysqlds.setPassword("raremile");
 			ic.bind("java:/env/datasources/ss_user", mysqlds);
 			IS_JNDI_INITIALIZED = true;
 		}
