@@ -54,6 +54,10 @@ input:-webkit-autofill {
 	height: 0;
 }
 
+a, a:hover, a:visited{
+    text-decoration: none !important;
+}
+
 .float-left{
 	float: left;
 }
@@ -87,12 +91,13 @@ input:-webkit-autofill {
 }
 
 .login-input-wrapper {
+    position: relative;
     margin-bottom: 25px;
     height: 50px;
     width: 365px;
     border: 1px solid #e3e3e3;
     border-radius: 3px;
-    overflow: hidden;
+/*    overflow: hidden;*/
     box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
 
@@ -103,11 +108,11 @@ input:-webkit-autofill {
 }
 
 .login-wrapper-txt {
-    height: 50px;
+    height: 48px;
     width: 313px;
     min-width: 245px;
     border: none;
-    padding: 0 10px;
+    padding: 0 30px 0 10px;
     color: #999;
     outline: none !important;
 }
@@ -430,8 +435,8 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .user-info-logo {
     height: 78px;
     width: 145px;
-    background: url(../images/userInfoLogo.png) no-repeat center;
-    background-size: 100% auto;
+  /*  background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 100% auto; */
 }
 
 .user-info-seperator {
@@ -922,4 +927,302 @@ button.paypal.is-active {
     right: 0;
     background-color: #fff;
     box-shadow: -3px 0px 8px 1px #ccc;
+}
+
+#payment-details-form {
+    padding: 10px 25px;
+}
+
+.payment-section {
+    box-shadow: 0px 1px 20px 2px #7C7C7C;
+    background-color: #fff;
+    width: 500px;
+    margin: 50px auto;
+    border-top: 5px solid #5cc7ef;
+    border-radius: 4px;
+}
+
+.pu-acc-type-sel {
+    line-height: 40px;
+    border-bottom: 1px solid #dcdcdc;
+    padding: 0 15px;
+}
+
+.acc-type-payment {
+    padding-top: 25px;
+}
+
+.pu-acc-type-val {
+    font-weight: bold !important;
+    font-size: 16px;
+}
+.margin-left-0 {
+    margin-left: 0;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
+}
+
+.item-row-OR {
+    width: 540px;
+}
+
+
+
+.bord-rt-dc {
+    border-right: 1px solid #dcdcdc;
+}
+
+.st-score-rt {
+    width: 700px;
+}
+
+.score-rt-post {
+    width: 50%;
+    height: 110px;
+    padding: 0px 20px 20px 20px;
+}
+
+.rating-star {
+    float: left;
+    height: 50px;
+    width: 35px;
+    margin-right: 1px;
+}
+
+.st-rating-wrapper {
+    margin-right: 30px;
+}
+
+.st-rating-input {
+    width: 75px;
+    height: 50px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    padding: 0 10px;
+}
+
+.padding-left-70 {
+    padding-left: 70px;
+}
+
+.padding-left-45 {
+    padding-left: 45px;
+}
+
+.st-score-rt-top {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+.score-rt-post-OR {
+    padding-left: 45px;
+}
+
+.st-header-txt-rt-icn {
+    height: 35px;
+    width: 35px;
+}
+
+.margin-left-20 {
+    margin-left: 20px;
+}
+
+.st-header-txt-lft {
+    font-size: 16px;
+    line-height: 35px;
+}
+
+.st-header-txt-lft-rt {
+    margin-bottom: 20px;
+}
+
+.st-header-txt-input {
+    width: 100%;
+    height: 150px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    padding: 10px;
+}
+
+.margin-top-50 {
+    margin-bottom: 50px;
+}
+
+.st-checkbox {
+    height: 50px;
+    width: 25px;
+}
+
+.st-reminder-wrapper {
+    line-height: 50px;
+    margin-bottom: 25px;
+    padding: 0 15px;
+}
+
+.st-input-reminder {
+    margin: 0 20px;
+}
+
+.st-check-wrapper {
+    margin: 0 20px;
+}
+
+.st-settings-tab {
+    line-height: 26px;
+}
+
+.st-settings-checkbox {
+    height: 26px !important;
+}
+
+.st-settings-item-wrapper {
+    margin-bottom: 15px;
+    line-height: 26px;
+}
+
+.st-settings-check-wrapper {
+    margin-right: 10px;
+}
+.border-0 {
+    border: 0;
+}
+
+.overlay-disable {
+    min-height: 400px;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 999999999;
+    min-height: 480px;
+    background-color: rgba(255,255,255,0.7);
+}
+
+.overlay-disable-wrapper {
+    margin: 100px auto 0;
+    width: 90%;
+    border-top: 5px solid #5cc7ef;
+    border-radius: 4px;
+    overflow: hidden;
+    background-color: #fff;
+    max-width: 500px;
+    box-shadow: 0px 1px 20px 2px #7C7C7C;
+}
+
+.ol-header {
+    line-height: 50px;
+    font-size: 16px;
+    border-bottom: 1px solid #dcdcdc;
+    padding: 0 15px;
+}
+
+.ol-content {
+    padding: 15px;
+}
+
+.ol-txt {
+    line-height: 32px;
+}
+
+.ol-btn-wrapper {
+    width: 50%;
+    padding: 15px;
+}
+
+.ol-btn {
+    cursor: pointer;
+    max-width: 150px;
+    width: 100%;
+    margin: 0 auto;
+    border-radius: 3px;
+    color: #fff;
+    font-family: 'opensanslight' !important;
+    background-color: #5CC8EF;
+    font-size: 13px;
+    line-height: 36px;
+    text-align: center;
+}
+
+.ol-btn:hover{
+    background-color: #7AB400;
+}
+.input-error-wrapper {
+    position: absolute;
+    height: 50px;
+    width: 30px;
+    background-color: #f1f1f1;
+    right: 0;
+}
+
+.input-error-excl {
+    width: 30px;
+    height: 50px;
+}
+
+.input-error-bubble {
+    width: 300px;
+    height: 50px;
+    position: absolute;
+    right: 292px;
+    bottom: 115px;
+    padding: 10px;
+    border-radius: 4px;
+}
+
+.arrow_box {
+	position: relative;
+	background: #fff;
+	border: 1px solid #ef1835;
+}
+.arrow_box:after, .arrow_box:before {
+	top: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+.arrow_box:after {
+	border-color: rgba(255, 255, 255, 0);
+	border-top-color: #fff;
+	border-width: 14px;
+	margin-left: -14px;
+}
+.arrow_box:before {
+	border-color: rgba(239, 24, 53, 0);
+	border-top-color: #ef1835;
+	border-width: 15px;
+	margin-left: -15px;
+}
+.input-error-2 {
+    display: none;
+    font-size: 13px;
+    width: 365px;
+    color: #ef1835;
+    margin-top: -15px;
+    margin-bottom: 10px;
+}
+
+.overlay-toast {
+    display: none;
+    color: #fff;
+    position: fixed;
+    bottom: 50px;
+    width: 80%;
+    line-height: 32px;
+    border-radius: 3px;
+    overflow: hidden;
+    line-height: 32px;
+    text-align: center;
+    left: 10%;
+    z-index: 999999999;
+    background-color: rgba(0,0,0,0.7);
 }

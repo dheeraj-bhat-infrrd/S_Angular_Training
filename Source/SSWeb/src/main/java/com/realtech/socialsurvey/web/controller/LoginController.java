@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -44,6 +45,8 @@ public class LoginController {
 	private URLGenerator urlGenerator;
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage() {
@@ -73,6 +76,7 @@ public class LoginController {
 		User user = null;
 		UserProfile userProfile = null;
 		String redirectTo = null;
+		AccountType accountType = null;
 
 		try {
 			validateLoginFormParameters(loginName, password);
@@ -93,20 +97,20 @@ public class LoginController {
 			if (user.getStatus() == CommonConstants.STATUS_INACTIVE) {
 				throw new InvalidInputException("User not active in login", DisplayMessageConstants.USER_INACTIVE);
 			}
-
+			HttpSession session = request.getSession(true);
 			try {
 				LOG.debug("Calling authentication service to validate user while login");
 				authenticationService.validateUser(user, password);
 				LOG.debug("Successfully executed authentication service to validate user while login");
 
-				HttpSession session = request.getSession(true);
+				
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
-				AccountType accountType = null;
+				
 				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 				if (licenseDetails != null && !licenseDetails.isEmpty()) {
 					LicenseDetail licenseDetail = licenseDetails.get(0);
-					accountType = AccountType.getAccountType(licenseDetail.getLicenseId());
+					accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 					LOG.debug("Adding account type in session");
 					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 				}
@@ -131,6 +135,10 @@ public class LoginController {
 				redirectTo = JspResolver.COMPANY_INFORMATION;
 			}
 			else {
+				// get the user's canonical settings
+				LOG.info("Fetching the user's canonical settings and setting it in session");
+				userManagementService.getCanonicalUserSettings(user, accountType);
+				session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userManagementService);
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 					/**
@@ -152,6 +160,8 @@ public class LoginController {
 
 				}
 			}
+			
+			// TODO: get the settings for the user
 			LOG.info("User login successful");
 		}
 		catch (NonFatalException e) {
