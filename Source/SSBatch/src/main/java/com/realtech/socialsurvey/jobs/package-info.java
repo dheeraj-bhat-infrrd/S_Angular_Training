@@ -1,7 +1,5 @@
 /**
- * 
+ * This is the package for spring batch job runners.
  */
-/**
- * @author karthik
- */
+
 package com.realtech.socialsurvey.jobs;

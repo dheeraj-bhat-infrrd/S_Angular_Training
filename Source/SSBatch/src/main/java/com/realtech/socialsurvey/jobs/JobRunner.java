@@ -1,5 +1,5 @@
 package com.realtech.socialsurvey.jobs;
-
+//JIRA: SS-61: By RM03
 
 import java.util.Date;
 import org.slf4j.Logger;
@@ -15,8 +15,12 @@ import org.springframework.batch.core.repository.JobInstanceAlreadyCompleteExcep
 import org.springframework.batch.core.repository.JobRestartException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import com.realtech.socialsurvey.processor.CustomItemProcessor;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 
+/**
+ * Initiates the batch job.
+ *
+ */
 @Component
 public class JobRunner {
 	
@@ -36,7 +40,7 @@ public class JobRunner {
 			LOG.info("Running the jobs from the task scheduler!");
 			
 			String dateParam = new Date().toString();
-			JobParameters param = new JobParametersBuilder().addString("date", dateParam).toJobParameters();
+			JobParameters param = new JobParametersBuilder().addString(CommonConstants.JOB_PARAMETER_NAME, dateParam).toJobParameters();
 			
 			LOG.info("Starting job execution.");
 			JobExecution jobExecution = jobLauncher.run(job, param);

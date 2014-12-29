@@ -1,7 +1,5 @@
 /**
- * 
+ * This is the package for custom spring item writers.
  */
-/**
- * @author karthik
- */
+
 package com.realtech.socialsurvey.writer;

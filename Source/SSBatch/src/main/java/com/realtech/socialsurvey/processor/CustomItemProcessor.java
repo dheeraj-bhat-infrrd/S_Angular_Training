@@ -1,4 +1,5 @@
 package com.realtech.socialsurvey.processor;
+//JIRA: SS-61: By RM03
 
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -28,6 +29,9 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 
+/**
+ * This is the custom item proccessor class that processes the LicenseDetail table.
+ */
 @Component
 public class CustomItemProcessor implements ItemProcessor<LicenseDetail, LicenseDetail> {
 
@@ -61,7 +65,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 	private int retryDays;
 
 	private static final Logger LOG = LoggerFactory.getLogger(CustomItemProcessor.class);
-		
+
 	private User getCorporateAdmin(Company company) throws InvalidInputException, NoRecordsFetchedException {
 
 		if (company == null) {
@@ -204,7 +208,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		return transaction;
 
 	}
-	
+
 	@Transactional
 	public LicenseDetail process(LicenseDetail licenseDetail) {
 
@@ -214,7 +218,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		if (licenseDetail.getPaymentRetries() <= maxPaymentRetries) {
 
 			try {
-				
+
 				LOG.info("Number of retries for License id : " + licenseDetail.getLicenseId() + " has not exceeded.");
 
 				RetriedTransaction existingTransaction = checkForExistingTransactions(licenseDetail);
@@ -222,7 +226,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 				if (existingTransaction != null) {
 
 					LOG.info("Transaction already exists. transaction id : " + existingTransaction.getTransactionId());
-					
+
 					LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settling.");
 					// Check if the transaction is settling
 					if (paymentGateway.checkTransactionSettling(existingTransaction.getTransactionId())) {
@@ -232,7 +236,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 						licenseDetail.setModifiedOn(now);
 						return licenseDetail;
 					}
-					
+
 					LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settled.");
 					// Check if the transaction has been settled
 					if (paymentGateway.checkTransactionSettled(existingTransaction.getTransactionId())) {
@@ -251,7 +255,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 					existingTransaction.setTransactionId(transaction.getId());
 					existingTransaction.setAmount(transaction.getAmount().floatValue());
 					existingTransaction.setModifiedOn(now);
-					
+
 					retriedTransactionDao.saveOrUpdate(existingTransaction);
 
 					LOG.info("Updating License Detail entity to reflect changes of new retry.");
@@ -270,7 +274,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 					transaction = retryChargeAndSendMail(licenseDetail);
 
 					LOG.info("Updating Retried Transaction table with the new transaction details.");
-					
+
 					retriedTransaction.setTransactionId(transaction.getId());
 					retriedTransaction.setAmount(transaction.getAmount().floatValue());
 					retriedTransaction.setLicenseDetail(licenseDetail);
@@ -358,7 +362,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 					LOG.error("CustomItemProcessor : UndeliveredEmailException caught when sending Fatal Exception mail. Message : "
 							+ e1.getMessage());
 				}
-				
+
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught : Message : " + e.getMessage());
@@ -378,7 +382,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 			}
 
 		}
-		
+
 		LOG.info("Successfully processed License detail object with id : " + licenseDetail.getLicenseId());
 
 		return licenseDetail;
