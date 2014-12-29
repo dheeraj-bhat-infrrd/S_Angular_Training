@@ -13,7 +13,7 @@ public interface SurveyBuilder {
 	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions, String surveyName) throws InvalidInputException;
 
 	public void addSurveyToCompany(Survey survey, Company company, User user) throws InvalidInputException;
-	
+
 	public void addQuestionsToExistingSurvey(User user, Survey survey, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException;
 
 	public void deactivateExistingSurveyMappings(User user, SurveyQuestion surveyQuestion) throws InvalidInputException;

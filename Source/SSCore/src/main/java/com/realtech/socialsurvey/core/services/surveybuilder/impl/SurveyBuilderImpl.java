@@ -60,6 +60,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	@Override
 	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions, String surveyName) throws InvalidInputException {
 		LOG.info("Method createNewSurvey() started.");
+		if (surveyName == null || surveyName.equals("")) {
+			LOG.error("Invalid argument. Null value is passed for surveyName.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for surveyName.");
+		}
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
