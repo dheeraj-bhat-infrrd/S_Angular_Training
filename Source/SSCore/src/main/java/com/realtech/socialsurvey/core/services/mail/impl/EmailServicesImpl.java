@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -31,6 +32,9 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Autowired
 	private PropertyFileReader propertyReader;
+	
+	@Value("${MAX_PAYMENT_RETRIES}")
+	int maxPaymentRetries;
 
 	/**
 	 * Method to send registration invite mail to a single recipient
@@ -296,7 +300,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY);
 
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,retries));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,retries,String.valueOf(maxPaymentRetries)));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);

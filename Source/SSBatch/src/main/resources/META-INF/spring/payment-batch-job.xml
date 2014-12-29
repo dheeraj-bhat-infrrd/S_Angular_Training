@@ -18,7 +18,7 @@
 	</batch:job>
 	<bean id="databaseItemReader"
 		class="org.springframework.batch.item.database.HibernateCursorItemReader">
-		<property name="queryString" value="from LicenseDetail where isSubscriptionDue=1 and nextRetryTime &lt; current_timestamp" />
+		<property name="queryString" value= "from LicenseDetail as l inner join fetch l.company where l.isSubscriptionDue=1 and l.nextRetryTime &lt; current_timestamp" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 

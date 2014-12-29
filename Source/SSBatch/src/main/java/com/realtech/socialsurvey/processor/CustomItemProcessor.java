@@ -69,13 +69,13 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 			throw new InvalidInputException("Parameter to getCorporateAdmin is null!");
 		}
 
-		LOG.debug("Fetching corporate user for the company with id : ");// + company.getCompanyId());
+		LOG.debug("Fetching corporate user for the company with id : " + company.getCompanyId());
 		User user = null;
 		List<User> users = null;
 
 		HashMap<String, Object> queries = new HashMap<>();
-		queries.put("company", company);
-		queries.put("isOwner", CommonConstants.IS_OWNER);
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER);
 
 		LOG.debug("Making the database call to USERS table to fetch records.");
 		users = userDao.findByKeyValue(User.class, queries);
@@ -100,7 +100,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		RetriedTransaction existingTransaction = null;
 
 		HashMap<String, Object> queries = new HashMap<>();
-		queries.put("licenseDetail", licenseDetail);
+		queries.put(CommonConstants.LICENSE_DETAIL_COLUMN, licenseDetail);
 
 		LOG.debug("Querying RetriedTransaction table for transactions for license id : " + licenseDetail.getLicenseId());
 
@@ -214,13 +214,16 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		if (licenseDetail.getPaymentRetries() <= maxPaymentRetries) {
 
 			try {
+				
+				LOG.info("Number of retries for License id : " + licenseDetail.getLicenseId() + " has not exceeded.");
 
 				RetriedTransaction existingTransaction = checkForExistingTransactions(licenseDetail);
 
 				if (existingTransaction != null) {
 
 					LOG.info("Transaction already exists. transaction id : " + existingTransaction.getTransactionId());
-
+					
+					LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settling.");
 					// Check if the transaction is settling
 					if (paymentGateway.checkTransactionSettling(existingTransaction.getTransactionId())) {
 
@@ -229,7 +232,8 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 						licenseDetail.setModifiedOn(now);
 						return licenseDetail;
 					}
-
+					
+					LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settled.");
 					// Check if the transaction has been settled
 					if (paymentGateway.checkTransactionSettled(existingTransaction.getTransactionId())) {
 
@@ -247,7 +251,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 					existingTransaction.setTransactionId(transaction.getId());
 					existingTransaction.setAmount(transaction.getAmount().floatValue());
 					existingTransaction.setModifiedOn(now);
-
+					
 					retriedTransactionDao.saveOrUpdate(existingTransaction);
 
 					LOG.info("Updating License Detail entity to reflect changes of new retry.");
@@ -266,7 +270,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 					transaction = retryChargeAndSendMail(licenseDetail);
 
 					LOG.info("Updating Retried Transaction table with the new transaction details.");
-
+					
 					retriedTransaction.setTransactionId(transaction.getId());
 					retriedTransaction.setAmount(transaction.getAmount().floatValue());
 					retriedTransaction.setLicenseDetail(licenseDetail);
@@ -336,7 +340,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 				LOG.info("Blocking the user by changing status in the Company table.");
 				company.setStatus(CommonConstants.STATUS_INACTIVE);
 				company.setModifiedOn(now);
-				companyDao.update(company);
+				companyDao.merge(company);
 
 				LOG.info("Updating LicenseDetails table with payment retries and the next retry time.");
 				licenseDetail.setNextRetryTime(new Timestamp(thisDay.getTimeInMillis()));
