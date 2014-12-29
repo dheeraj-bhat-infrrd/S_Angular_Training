@@ -52,6 +52,7 @@ public interface UserManagementService {
 
 	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
 	
+	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException;
 	// JIRA SS-42 BY RM05 EOC
 
 	/**
