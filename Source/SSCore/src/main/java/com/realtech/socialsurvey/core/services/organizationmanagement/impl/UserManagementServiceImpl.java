@@ -383,7 +383,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		int maxUsersAllowed = licenseDetails.get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getMaxUsersAllowed();
-		int currentNumberOfUsers = userDao.getUsersCountForCompany(user.getCompany());
+		long currentNumberOfUsers = userDao.getUsersCountForCompany(user.getCompany());
 
 		isUserAdditionAllowed = (currentNumberOfUsers < maxUsersAllowed) ? true : false;
 
@@ -721,6 +721,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to assign user to a branch finished for user : " + admin.getUserId());
 	}
 
+	/*
+	 * Method to update the given user as active or inactive.
+	 */
+	@Transactional
+	@Override
+	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException{
+		LOG.info("Method to update a user called for user : "+userIdToUpdate);
+		if (admin == null) {
+			throw new InvalidInputException("No admin user present.");
+		}
+		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
+		User user = userDao.findById(User.class, userIdToUpdate);
+
+		if (user == null) {
+			throw new InvalidInputException("No user present for the specified userId");
+		}
+		
+		user.setModifiedBy(String.valueOf(admin.getUserId()));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		LOG.info("Setting the user {} as {}",user.getFirstName(), isActive);
+		if(isActive){
+			user.setStatus(CommonConstants.STATUS_ACTIVE);
+		}
+		else{
+			user.setStatus(CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+		}
+		
+		userDao.update(user);
+		
+		LOG.info("Method to update a user finished for user : "+userIdToUpdate);
+	}
+	
 	/**
 	 * Method to generate and send verification link
 	 * 

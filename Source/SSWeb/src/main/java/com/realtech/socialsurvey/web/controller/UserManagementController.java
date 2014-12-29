@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -41,6 +42,10 @@ public class UserManagementController {
 	@Autowired
 	private UserManagementService userManagementService;
 
+
+	@Autowired
+	private AuthenticationService authenticationService;
+	
 	private static final int BATCH_SIZE = 20;
 
 	// JIRA SS-42 BY RM05 BOC
@@ -68,6 +73,7 @@ public class UserManagementController {
 			try {
 				if (userManagementService.isUserAdditionAllowed(user)) {
 					userManagementService.inviteUserToRegister(user, firstName, lastName, emailId);
+					authenticationService.sendResetPasswordLink(emailId, firstName+" "+lastName);
 				}
 				else {
 					throw new InvalidInputException("Limit for maximum users has already reached.", DisplayMessageConstants.MAX_USERS_LIMIT_REACHED);
@@ -175,8 +181,8 @@ public class UserManagementController {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			if (user == null) {
-				LOG.error("No user found in current session in deactivateExistingUser().");
-				throw new InvalidInputException("No user found in current session in deactivateExistingUser().");
+				LOG.error("No user found in current session in findUserByEmail().");
+				throw new InvalidInputException("No user found in current session in findUserByEmail().");
 			}
 
 			try {
@@ -257,7 +263,7 @@ public class UserManagementController {
 			LOG.error("Invalid branch id passed in method assignUserToBranch().");
 			throw new InvalidInputException("Invalid branch id passed in method assignUserToBranch().");
 		}
-		
+
 		LOG.info("Method to assign user to branch is called for user " + userIdStr);
 		long userId = 0;
 		long branchId = 0;
@@ -271,7 +277,7 @@ public class UserManagementController {
 		}
 
 		userManagementService.assignUserToBranch(admin, userId, branchId);
-		
+
 		LOG.info("Method to assign user to branch is called for user " + userIdStr);
 		return JspResolver.MESSAGE_HEADER;
 	}
@@ -292,12 +298,16 @@ public class UserManagementController {
 			String isAssign = request.getParameter("isAssign");
 
 			if (branch == null || branch.isEmpty()) {
-				LOG.error("Null or empty value passed for branch in assignBranchAdmin()");
-				throw new InvalidInputException("Null or empty value passed for branch in assignBranchAdmin()");
+				LOG.error("Null or empty value passed for branch in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for branch in assignOrUnassignBranchAdmin()");
 			}
 			if (userToAssign == null || userToAssign.isEmpty()) {
-				LOG.error("Null or empty value passed for user id in assignBranchAdmin()");
-				throw new InvalidInputException("Null or empty value passed for user id in assignBranchAdmin()");
+				LOG.error("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
+			}
+			if (isAssign == null || isAssign.isEmpty()) {
+				LOG.error("Null or empty value passed for check field isAssign in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
 			}
 
 			long branchId = 0l;
@@ -403,8 +413,8 @@ public class UserManagementController {
 				throw new InvalidInputException("Null or empty value passed for region id in removeRegionAdmin()");
 			}
 			if (userIdToRemove == null || userIdToRemove.isEmpty()) {
-				LOG.error("Null or empty value passed for user id in assignRegionAdmin()");
-				throw new InvalidInputException("Null or empty value passed for user id in removeRegionAdmin()");
+				LOG.error("Null or empty value passed for user id in unassignRegionAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in unassignRegionAdmin()");
 			}
 
 			long regionId = 0l;
@@ -431,6 +441,63 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to remove region admin");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to activate or deactivate a user.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updateuser", method = RequestMethod.POST)
+	public String updateUser(Model model, HttpServletRequest request) {
+
+		LOG.info("Method to activate or deactivate a user, activateOrDecativateUser() called.");
+		try {
+
+			String isAssign = request.getParameter("isAssign");
+			if (isAssign == null || isAssign.isEmpty()) {
+				LOG.error("Null or empty value passed for check field isAssign in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
+			}
+			long userIdToUpdate = 0;
+			try {
+				userIdToUpdate = Long.parseLong(request.getParameter("userIdToUpdate"));
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception while parsing user Id", e);
+				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			if (userIdToUpdate < 0) {
+				LOG.error("Invalid user Id found to update in updateUser().");
+				throw new InvalidInputException("Invalid user Id found to update in updateUser().");
+			}
+
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (user == null) {
+				LOG.error("No user found in current session in updateUser().");
+				throw new InvalidInputException("No user found in current session in updateUser().");
+			}
+			try {
+				if (isAssign.equalsIgnoreCase("YES"))
+					// Set the given user as active.
+					userManagementService.updateUser(user, userIdToUpdate, true);
+				else if (isAssign.equalsIgnoreCase("NO"))
+					// Set the given user as inactive.
+					userManagementService.updateUser(user, userIdToUpdate, false);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while removing user. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to activate or deactivate a user, updateUser() finished.");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
