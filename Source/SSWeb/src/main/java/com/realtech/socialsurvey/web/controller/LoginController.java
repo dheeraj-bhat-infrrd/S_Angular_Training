@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -137,8 +138,10 @@ public class LoginController {
 			else {
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
-				userManagementService.getCanonicalUserSettings(user, accountType);
-				session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userManagementService);
+				UserSettings userSettings = userManagementService.getCanonicalUserSettings(user, accountType);
+				session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+				// Set the session variables
+				setSettingVariablesInSession(session);
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 					/**
@@ -161,7 +164,6 @@ public class LoginController {
 				}
 			}
 			
-			// TODO: get the settings for the user
 			LOG.info("User login successful");
 		}
 		catch (NonFatalException e) {
@@ -401,6 +403,22 @@ public class LoginController {
 
 		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
+	}
+	
+	private void setSettingVariablesInSession(HttpSession session){
+		LOG.info("Settings related session values being set.");
+		if(session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null){
+			// setting the logo name
+			UserSettings userSettings = (UserSettings)session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			// check if company has a logo
+			if(userSettings.getCompanySettings().getLogo() != null){
+				LOG.debug("Settings logo image from company settings");
+				session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, userSettings.getCompanySettings().getLogo());
+			}else{
+				LOG.debug("Could not find logo settings in company. Checking in lower heirarchy.");
+				//TODO: Check the lower level hierarchy for logo
+			}
+		}
 	}
 
 }
