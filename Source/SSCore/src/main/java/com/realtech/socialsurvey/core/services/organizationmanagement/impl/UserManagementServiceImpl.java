@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -507,7 +508,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Override
 	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException {
 		if (user == null) {
-			LOG.error("User cannote be null." );
+			LOG.error("User cannote be null.");
 			throw new InvalidInputException("Null value found  user found for userId specified in getUsersForCompany()");
 		}
 		LOG.info("Method getUsersForCompany() started for " + user.getUserId());
@@ -687,7 +688,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Transactional
 	@Override
 	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException {
-		
+
 		if (admin == null) {
 			throw new InvalidInputException("No admin user present.");
 		}
@@ -697,7 +698,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user present for the specified userId");
 		}
-		
+
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_COLUMN, user);
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
@@ -726,8 +727,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Transactional
 	@Override
-	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException{
-		LOG.info("Method to update a user called for user : "+userIdToUpdate);
+	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException {
+		LOG.info("Method to update a user called for user : " + userIdToUpdate);
 		if (admin == null) {
 			throw new InvalidInputException("No admin user present.");
 		}
@@ -737,22 +738,46 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user present for the specified userId");
 		}
-		
+
 		user.setModifiedBy(String.valueOf(admin.getUserId()));
 		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		LOG.info("Setting the user {} as {}",user.getFirstName(), isActive);
-		if(isActive){
+		LOG.info("Setting the user {} as {}", user.getFirstName(), isActive);
+		if (isActive) {
 			user.setStatus(CommonConstants.STATUS_ACTIVE);
 		}
-		else{
+		else {
 			user.setStatus(CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 		}
-		
+
 		userDao.update(user);
-		
-		LOG.info("Method to update a user finished for user : "+userIdToUpdate);
+
+		LOG.info("Method to update a user finished for user : " + userIdToUpdate);
 	}
-	
+
+	/*
+	 * Method to get list of all the branches, current user is admin of.
+	 */
+	@Transactional
+	@Override
+	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException {
+		if (user == null) {
+			throw new InvalidInputException("No user found in method getBranchesForUser()");
+		}
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.", user.getFirstName());
+		List<ProfilesMaster> profilesMasters = new ArrayList<>();
+		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
+		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
+		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
+		List<Long> branchIds = userProfileDao.getBranchesForAdmin(user, profilesMasters);
+		if (branchIds == null || branchIds.isEmpty()) {
+			LOG.error("No branch found for user : " + user.getUserId());
+			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
+		}
+		List<Branch> branches = branchDao.findByColumnForMultipleValues(Branch.class, "branchId", branchIds);
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
+		return branches;
+	}
+
 	/**
 	 * Method to generate and send verification link
 	 * 
