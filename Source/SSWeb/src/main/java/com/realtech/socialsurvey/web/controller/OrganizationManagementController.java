@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +15,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -111,7 +114,7 @@ public class OrganizationManagementController {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			String logoName = null;
-			if(session.getAttribute(CommonConstants.LOGO_NAME) !=null){
+			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
 				logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
 			}
 			session.removeAttribute(CommonConstants.LOGO_NAME);
@@ -250,6 +253,74 @@ public class OrganizationManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		return JspResolver.COMPANY_SETTINGS;
+	}
+
+	@RequestMapping(value = "/saveencompassdetails", method = RequestMethod.POST)
+	public String saveEncompassDetails(Model model, HttpServletRequest request) {
+		LOG.info("Saving encompass details");
+		HttpSession session = request.getSession(false);
+		// test connection
+		// set the request attribute so that test method throws an exception in case connection
+		// fails
+		request.setAttribute("saveencompassdetails", "true");
+		try {
+			testEncompassConnection(model, request);
+			// save the details
+			CRMInfo crmInfo = new CRMInfo();
+			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
+			crmInfo.setCrm_username(request.getParameter("encompass-username"));
+			crmInfo.setCrm_password(request.getParameter("encompass-password"));
+			crmInfo.setUrl(request.getParameter("encompass-url"));
+			crmInfo.setConnection_successful(true);
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
+			// set the updated settings value in session
+			companySettings.setCrm_info(crmInfo);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/testencompassconnection", method = RequestMethod.POST)
+	public String testEncompassConnection(Model model, HttpServletRequest request) throws NonFatalException {
+		LOG.info("Testing connections");
+		try {
+			// validate the parameters
+			if (validateEncompassParameters(request)) {
+				// TODO: code to test connection
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+		}
+		catch (NonFatalException e) {
+			if (request.getAttribute("saveencompassdetails") != null) {
+				throw e;
+			}
+			else {
+				LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			}
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private boolean validateEncompassParameters(HttpServletRequest request) throws InvalidInputException {
+		LOG.debug("Validating encompass parameters");
+		String userName = request.getParameter("encompass-username");
+		String password = request.getParameter("encompass-password");
+		String url = request.getParameter("encompass-url");
+		if (userName == null || userName.isEmpty() || password == null || password.isEmpty() || url == null || url.isEmpty()) {
+			LOG.warn("Encompass validation failed");
+			throw new InvalidInputException("All fields not set for encompass", DisplayMessageConstants.GENERAL_ERROR);
+		}
+		LOG.debug("Encompass validation passed.");
+		return true;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

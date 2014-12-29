@@ -28,55 +28,69 @@
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
-        <div class="um-top-container">
-            <div class="um-header"><spring:message code="label.header.encompass.configuration.key" /></div>
-            <div class="clearfix um-panel-content">
-                <div class="row">
-                    <div class="um-top-row cleafix">
-                        <div class="clearfix um-top-form-wrapper">
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
-                                <div class="hm-item-row item-row-OR clearfix">
-                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.username.key" /></div>
-                                    <div class="clearfix float-right st-username-icons">
-                                        <div class="um-item-row-icon margin-left-0"></div>
-                                        <div class="um-item-row-icon margin-left-0"></div>
-                                    </div>
-                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
-                                        <input type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item overflow-hidden">
-                                <div class="hm-item-row item-row-OR clearfix">
-                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.password.key" /></div>
-                                    <div class="clearfix float-right st-password-icons">
-                                        <div class="um-item-row-icon margin-left-0"></div>
-                                        <div class="um-item-row-icon margin-left-0"></div>
-                                    </div>
-                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
-                                        <input type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
-                                <div class="hm-item-row item-row-OR clearfix">
-                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.url.key" /></div>
-                                    <div class="clearfix float-right st-url-icons">
-                                        <div class="um-item-row-icon icn-spanner margin-left-0"></div>
-                                        <div class="um-item-row-icon icn-blue-tick margin-left-0"></div>
-                                    </div>
-                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
-                                        <input type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="URL">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                    </div>
-                    
-                </div>
-            </div>
-        </div>
+    	<form id="encompass-form">
+	        <div class="um-top-container">
+	            <div class="um-header"><spring:message code="label.header.encompass.configuration.key" /></div>
+	            <div class="clearfix um-panel-content">
+	                <div class="row">
+	                    <div class="um-top-row cleafix">
+	                        <div class="clearfix um-top-form-wrapper">
+	                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
+	                                <div class="hm-item-row item-row-OR clearfix">
+	                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.username.key" /></div>
+	                                    <div class="clearfix float-right st-username-icons">
+	                                        <div class="um-item-row-icon margin-left-0"></div>
+	                                        <div class="um-item-row-icon margin-left-0"></div>
+	                                    </div>
+	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
+		                                    <!-- check the encompass username -->
+		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null &&  cannonicalusersettings.companySettings.crm_info.crm_username != null}">
+		                                    	<c:set var="encomapssusername" value="${cannonicalusersettings.companySettings.crm_info.crm_username }"/>
+		                                    </c:if>
+		                                    <input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encomapssusername}">
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item overflow-hidden">
+	                                <div class="hm-item-row item-row-OR clearfix">
+	                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.password.key" /></div>
+	                                    <div class="clearfix float-right st-password-icons">
+	                                        <div class="um-item-row-icon margin-left-0"></div>
+	                                        <div class="um-item-row-icon margin-left-0"></div>
+	                                    </div>
+	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
+	                                    	<!-- check the encompass password -->
+		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null &&  cannonicalusersettings.companySettings.crm_info.crm_password != null}">
+		                                    	<c:set var="encomapsspassword" value="${cannonicalusersettings.companySettings.crm_info.crm_password }"/>
+		                                    </c:if>
+	                                        <input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encomapsspassword}">
+	                                    </div>
+	                                </div>
+	                            </div>
+	                            <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
+	                                <div class="hm-item-row item-row-OR clearfix">
+	                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.url.key" /></div>
+	                                    <div class="clearfix float-right st-url-icons">
+	                                        <div id="encompass-testconnection" class="um-item-row-icon icn-spanner margin-left-0"></div>
+	                                        <div id="encompass-save" class="um-item-row-icon icn-blue-tick margin-left-0"></div>
+	                                    </div>
+	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
+	                                    	<!-- check the encompass password -->
+		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null &&  cannonicalusersettings.companySettings.crm_info.url != null}">
+		                                    	<c:set var="encomapssurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
+		                                    </c:if>
+	                                        <input id="encompass-url" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
+	                                    </div>
+	                                </div>
+	                            </div>
+	                        </div>
+	                        
+	                    </div>
+	                    
+	                </div>
+	            </div>
+	        </div>
+        </form>
         <div class="um-top-container">
             <div class="um-header margin-top-25">Score Post Settings</div>
             <div class="clearfix st-score-wrapper">
@@ -196,7 +210,7 @@
     </div>
 </div>
 
-
+<script src="${pageContext.request.contextPath}/resources/js/settings.js"></script>
 <script>
     $(document).ready(function(){
         $('#st-settings-location-on').click(function(){
@@ -230,7 +244,17 @@
             $('#st-settings-account-on').hide();
             $('.overlay-disable').hide();
         });
-        
+       $('#encompass-save').click(function(){
+    	   alert("saving encompass details")
+    	   saveEncompassDetails("encompass-form");
+       }); 
+       $('#encompass-testconnection').click(function(){
+    	   alert("testing encompass connection")
+    	   testEncompassConnection("encompass-form");
+       });
     });
+    
+    
+    
 </script>
 
