@@ -76,7 +76,8 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		LOG.debug("Fetching corporate user for the company with id : " + company.getCompanyId());
 		User user = null;
 		List<User> users = null;
-
+		
+		//Fetching the list of users from USERS table with the IS_OWNER set and having the same company.
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER);
@@ -101,8 +102,11 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 			LOG.error("Null parameter given to checkForExistingTransactions!");
 			throw new InvalidInputException("Null parameter given to checkForExistingTransactions!");
 		}
+		
+		LOG.debug("Checking for existing transactions for the License Id : " + licenseDetail.getLicenseId());
 		RetriedTransaction existingTransaction = null;
-
+		
+		// find records in RETRIED_TRANSACTIONS table with the same license id or in hibernate sense the object.
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.LICENSE_DETAIL_COLUMN, licenseDetail);
 
@@ -162,6 +166,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 
 		try {
 			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
+			LOG.debug("Failure mail sent to admin.");
 		}
 		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : InvalidInputException caught when sending Fatal Exception mail. Message : " + e1.getMessage());
@@ -183,7 +188,8 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 
 		LOG.debug("Retrying charge for subscription id : " + licenseDetail.getSubscriptionId());
 		Transaction transaction = null;
-
+		
+		//Retrying the subscription charge.
 		transaction = paymentGateway.retrySubscriptionCharge(licenseDetail.getSubscriptionId());
 
 		LOG.debug("Retry successful. Sending email.");
@@ -211,7 +217,8 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 
 	@Transactional
 	public LicenseDetail process(LicenseDetail licenseDetail) {
-
+		
+		LOG.info("Processing the record with License Detail Id : " + licenseDetail.getLicenseId() );
 		Calendar thisDay = Calendar.getInstance();
 		thisDay.add(Calendar.DATE, retryDays);
 
