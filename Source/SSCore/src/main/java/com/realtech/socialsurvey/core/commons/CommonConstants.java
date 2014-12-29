@@ -92,6 +92,7 @@ public interface CommonConstants {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
+	public static final String LOGO_DISPLAY_IN_SESSION="displaylogo";
 
 	/**
 	 * other constants

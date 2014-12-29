@@ -1,3 +1,5 @@
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="overlay-disable hide">
     <div class="overlay-disable-wrapper">
         <div class="ol-header">Disable Account</div>
@@ -18,7 +20,7 @@
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
-            <div class="float-left hm-header-row-left">Settings</div>
+            <div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
         </div>
     </div>
 </div>
@@ -27,14 +29,14 @@
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
         <div class="um-top-container">
-            <div class="um-header">Encompass Configuration</div>
+            <div class="um-header"><spring:message code="label.header.encompass.configuration.key" /></div>
             <div class="clearfix um-panel-content">
                 <div class="row">
                     <div class="um-top-row cleafix">
                         <div class="clearfix um-top-form-wrapper">
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
                                 <div class="hm-item-row item-row-OR clearfix">
-                                    <div class="um-item-row-left text-right">Username</div>
+                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.username.key" /></div>
                                     <div class="clearfix float-right st-username-icons">
                                         <div class="um-item-row-icon margin-left-0"></div>
                                         <div class="um-item-row-icon margin-left-0"></div>
@@ -46,7 +48,7 @@
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item overflow-hidden">
                                 <div class="hm-item-row item-row-OR clearfix">
-                                    <div class="um-item-row-left text-right">Password</div>
+                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.password.key" /></div>
                                     <div class="clearfix float-right st-password-icons">
                                         <div class="um-item-row-icon margin-left-0"></div>
                                         <div class="um-item-row-icon margin-left-0"></div>
@@ -58,7 +60,7 @@
                             </div>
                             <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
                                 <div class="hm-item-row item-row-OR clearfix">
-                                    <div class="um-item-row-left text-right">URL</div>
+                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.url.key" /></div>
                                     <div class="clearfix float-right st-url-icons">
                                         <div class="um-item-row-icon icn-spanner margin-left-0"></div>
                                         <div class="um-item-row-icon icn-blue-tick margin-left-0"></div>
@@ -232,4 +234,3 @@
     });
 </script>
 
-<jsp:include page="footer.jsp"/>
