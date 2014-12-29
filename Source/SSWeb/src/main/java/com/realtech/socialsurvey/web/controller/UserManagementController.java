@@ -252,7 +252,7 @@ public class UserManagementController {
 	 */
 	@RequestMapping(value = "/assignusertobranch", method = RequestMethod.POST)
 	public String assignUserToBranch(Model model, HttpServletRequest request) throws NonFatalException {
-		User admin = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+		User admin = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		String branchIdStr = request.getParameter("branchId");
 		if (userIdStr == null || userIdStr.isEmpty()) {
@@ -500,6 +500,34 @@ public class UserManagementController {
 		LOG.info("Method to activate or deactivate a user, updateUser() finished.");
 		return JspResolver.MESSAGE_HEADER;
 	}
+	
+	/**
+	 * Method to get list of all the branches, current user is admin of.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	@RequestMapping(value = "/fetchBranches", method = RequestMethod.POST)
+	public String getBranchesForUser(Model model, HttpServletRequest request) {
+		
+		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		try{
+		if (user == null) {
+			LOG.error("Invalid user passed in method getBranchesForUser().");
+			throw new InvalidInputException("Invalid user id passed in method getBranchesForUser().");
+		}
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.",user.getFirstName());
+		List<Branch> branches = userManagementService.getBranchesForUser(user);
+		model.addAttribute("branches", branches);
+		}catch(NonFatalException nonFatalException) {
+			LOG.error("NonFatalException in getBranchesForUser(). Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finisheded.",user.getFirstName());
+		return JspResolver.MESSAGE_HEADER;
+	}
 
 	/*
 	 * Method to get list of all users from database for the company to which current user belongs
@@ -507,7 +535,8 @@ public class UserManagementController {
 	 */
 	private void getAllUsersForCompany(Model model, HttpServletRequest request) throws NonFatalException {
 		LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
-		User user = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 	//	String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		if (user == null) {
 			LOG.error("Invalid user id passed in method findUserByUserId().");
@@ -531,8 +560,8 @@ public class UserManagementController {
 			model.addAttribute("hasMoreUsers", true);
 		}
 		List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, maxIndex);
-		model.addAttribute("allUsersList", allUsers);
-		model.addAttribute("currentIndex", BATCH_SIZE);
+		session.setAttribute("allUsersList", allUsers);
+		session.setAttribute("currentIndex", BATCH_SIZE);
 		model.addAttribute("usersList", users);
 		LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company.");
 	}
@@ -544,7 +573,8 @@ public class UserManagementController {
 	private void getNextListOfUsers(Model model, HttpServletRequest request) {
 		LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company.");
 		Map<String, Object> modelMap = model.asMap();
-		int currentIndex = (Integer) modelMap.get("currentIndex");
+		HttpSession session = request.getSession(false);
+		int currentIndex = (Integer) session.getAttribute("currentIndex");
 		@SuppressWarnings("unchecked") List<User> allUsers = (List<User>) modelMap.get("allUsersList");
 		int maxIndex = currentIndex + BATCH_SIZE;
 		if (allUsers.size() <= maxIndex) {
@@ -558,7 +588,7 @@ public class UserManagementController {
 		List<User> users = allUsers.subList(currentIndex, maxIndex);
 		currentIndex = maxIndex;
 		model.addAttribute("usersList", users);
-		model.addAttribute("currentIndex", currentIndex);
+		session.setAttribute("currentIndex", currentIndex);
 		LOG.debug("Method getNextListOfUsers() finished to fetch next set of users for same company.");
 	}
 }
