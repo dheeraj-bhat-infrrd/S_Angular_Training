@@ -1,7 +1,5 @@
 /**
- * 
+ * This is the package for custom spring item processors.
  */
-/**
- * @author karthik
- */
+
 package com.realtech.socialsurvey.processor;

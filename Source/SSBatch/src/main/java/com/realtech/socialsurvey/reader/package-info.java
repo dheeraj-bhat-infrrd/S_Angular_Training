@@ -1,7 +1,5 @@
 /**
- * 
+ * This is the package for custom spring item readers.
  */
-/**
- * @author karthik
- */
+
 package com.realtech.socialsurvey.reader;
