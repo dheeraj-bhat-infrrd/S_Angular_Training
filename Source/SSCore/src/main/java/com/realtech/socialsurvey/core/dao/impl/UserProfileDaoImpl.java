@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -90,10 +91,36 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 			branchIds = criteria.list();
 		}
 		catch (HibernateException hibernateException) {
-			LOG.error("Exception caught in fetchUserByEmailId() ", hibernateException);
-			throw new DatabaseException("Exception caught in fetchUserByEmailId() ", hibernateException);
+			LOG.error("Exception caught in getBranchIdsForUser() ", hibernateException);
+			throw new DatabaseException("Exception caught in getBranchIdsForUser() ", hibernateException);
 		}
-		LOG.info("Method getBranchIdsForUser finished to fetch branche ids assigned to user : " + user.getFirstName());
+		LOG.info("Method getBranchIdsForUser finished to fetch branch ids assigned to user : " + user.getFirstName());
+		return branchIds;
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<Long> getBranchesForAdmin(User user, List<ProfilesMaster> profilesMasters) {
+		LOG.info("Method getBranchesForAdmin() called to fetch branches assigned to user : " + user.getFirstName());
+		Criteria criteria = getSession().createCriteria(UserProfile.class);
+		List<Long> branchIds = new ArrayList<>();
+		try {
+			criteria.add(Restrictions.eq(CommonConstants.USER_COLUMN, user));
+
+			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
+			criteria.add(criterion);
+			criteria.add(Restrictions.eq(CommonConstants.COMPANY_COLUMN, user.getCompany()));
+			criteria.add(Restrictions.in(CommonConstants.PROFILE_MASTER_COLUMN, profilesMasters));
+			criteria.setProjection(Projections.distinct(Projections.projectionList().add(Projections.property("branchId"), "branchId")));
+			branchIds = criteria.list();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("Exception caught in getBranchesForAdmin() ", hibernateException);
+			throw new DatabaseException("Exception caught in getBranchesForAdmin() ", hibernateException);
+		}
+		LOG.info("Method getBranchesForAdmin() finished to fetch branches assigned to user : " + user.getFirstName());
 		return branchIds;
 	}
 }
