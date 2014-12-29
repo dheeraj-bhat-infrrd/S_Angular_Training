@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -30,12 +31,11 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.registration.impl.RegistrationServiceImpl;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(RegistrationServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -230,6 +230,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
 		companySettings.setContact_details(contactDetailSettings);
+		companySettings.setCreatedOn(System.currentTimeMillis());
+		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		// insert the company settings
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -520,6 +522,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		return branchSettings;
+	}
+
+	@Override
+	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if (crmInfo == null) {
+			throw new InvalidInputException("CRM info cannot be null.");
+		}
+		LOG.info("Updating comapnySettings: " + companySettings+" with crm info: "+crmInfo);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the record successfully");
 	}
 
 }

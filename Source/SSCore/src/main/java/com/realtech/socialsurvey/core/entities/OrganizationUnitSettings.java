@@ -20,6 +20,10 @@ public class OrganizationUnitSettings {
 	private List<Association> associations;
 	private List<Achievement> achievements;
 	private SurveySettings survey_setings;
+	private String createdBy;
+	private String modifiedBy;
+	private long createdOn;
+	private long modifiedOn;
 
 	public String getId() {
 		return id;
@@ -107,6 +111,38 @@ public class OrganizationUnitSettings {
 
 	public void setSurvey_setings(SurveySettings survey_setings) {
 		this.survey_setings = survey_setings;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	public long getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(long createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public long getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(long modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 
 	@Override

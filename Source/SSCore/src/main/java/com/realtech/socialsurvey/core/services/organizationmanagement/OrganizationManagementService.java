@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.util.List;
 import java.util.Map;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -68,4 +69,12 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings getBranchSettings(long branchId) throws InvalidInputException;
+	
+	/**
+	 * Updates the crm info in the settings
+	 * @param companySettings
+	 * @param crmInfo
+	 * @throws InvalidInputException
+	 */
+	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException;
 }
