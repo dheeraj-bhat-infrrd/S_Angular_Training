@@ -53,6 +53,7 @@ public interface CommonConstants {
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_NOT_VERIFIED = 2;
+	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
 	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
