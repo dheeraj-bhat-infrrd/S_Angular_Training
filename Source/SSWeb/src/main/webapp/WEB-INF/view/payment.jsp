@@ -16,11 +16,31 @@
     
 <body>
     <div class="payment-details-wrapper">
-        <form id="checkout" method="POST" action="./subscribe.do">
-            <div id="dropin" class="payment-dropin"></div>
-            <input type="hidden" value="${accounttype}" name="accounttype">
-            <input type="submit" class="btn-payment" value='<spring:message code="label.makepayment.key" />'>
-        </form>
+    	<div id="acc-type-payment" class="acc-type-payment">
+	          <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.paymentinformation.key"/></div>
+	          <div class="clearfix pu-acc-type-sel">
+	              <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.accounttype.key"/></div>
+	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">
+	              		<!-- Value is populated dynamically based on selected account type -->
+	              </div>
+	          </div>
+	          <div class="clearfix pu-acc-type-sel margin-bottom-25">
+	              <div class="pu-acc-type-txt float-left" id="pu-acc-amount-txt"><spring:message code="label.totalamount.key"/></div>
+	              <div class="pu-acc-type-val float-right" id="pu-acc-amount-val">
+	              		<!-- Value is populated dynamically based on selected account type -->
+	              </div>
+	          </div>
+	          <div id="payment-details-form" class="payment-details-form">
+			        <form id="checkout" method="POST" action="./subscribe.do">
+			            <div id="dropin" class="payment-dropin"></div>
+				            <div class="clearfix">
+					            <input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key" />'>
+					            <input type="button" id="cancel-payment" class="btn-payment float-right" value='<spring:message code="label.cancel.key" />'>
+				            </div>
+			            <input type="hidden" value="${accounttype}" name="accounttype">
+			        </form>
+	      	</div>
+        </div>
     </div>  
    
     <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
@@ -33,6 +53,10 @@
 			container : 'dropin'
 		});
    });
+   
+   $("#cancel-payment").click(function() {
+	   hidePayment();
+   })
 	
 	</script>
 </body>

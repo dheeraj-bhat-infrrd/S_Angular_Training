@@ -15,6 +15,7 @@ public class OrganizationUnitSettings {
 	private String logo;
 	private ContactDetailsSettings contact_details;
 	private CRMInfo crm_info;
+	private MailContentSettings mail_content_settings;
 	private Licenses licenses;
 	private List<Association> associations;
 	private List<Achievement> achievements;
@@ -66,6 +67,14 @@ public class OrganizationUnitSettings {
 
 	public void setCrm_info(CRMInfo crm_info) {
 		this.crm_info = crm_info;
+	}
+
+	public MailContentSettings getMail_content_settings() {
+		return mail_content_settings;
+	}
+
+	public void setMail_content_settings(MailContentSettings mail_content_settings) {
+		this.mail_content_settings = mail_content_settings;
 	}
 
 	public Licenses getLicenses() {
