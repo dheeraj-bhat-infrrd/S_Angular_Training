@@ -30,7 +30,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 
 /**
- * This is the custom item proccessor class that processes the LicenseDetail table.
+ * This is the custom item processor class that processes the LicenseDetail table.
  */
 @Component
 public class CustomItemProcessor implements ItemProcessor<LicenseDetail, LicenseDetail> {
