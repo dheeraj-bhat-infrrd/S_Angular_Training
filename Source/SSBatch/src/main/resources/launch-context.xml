@@ -14,6 +14,7 @@
 
 	<import resource="classpath:/META-INF/spring/payment-batch-job.xml" />
 	<import resource="classpath:sscore-beans.xml" />
+	<import resource="classpath:hibernate-config-batch.xml" />
 
 	<!-- JobRepository and JobLauncher are configuration/setup classes -->
 

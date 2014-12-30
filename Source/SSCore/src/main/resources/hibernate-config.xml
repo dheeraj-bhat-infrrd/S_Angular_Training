@@ -16,11 +16,11 @@
 	<!-- Data source details. It is pointing to jndi which is currently configured 
 		in JBoss -->
     
-    <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
+    <!-- <bean id="dataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
 		 <property name="jndiName">
 		 <value>${JNDI_NAME}</value>
 		 </property>
-	</bean>
+	</bean> -->
 
 
 	<bean id="sessionFactory"
