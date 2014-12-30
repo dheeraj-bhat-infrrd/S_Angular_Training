@@ -13,9 +13,10 @@ public class OrganizationUnitSettings {
 	private long iden;
 	private float profile_completion;
 	private String logo;
+	private boolean isLocationEnabled;
 	private ContactDetailsSettings contact_details;
 	private CRMInfo crm_info;
-	private MailContentSettings mail_content_settings;
+	private MailContentSettings mail_content;
 	private Licenses licenses;
 	private List<Association> associations;
 	private List<Achievement> achievements;
@@ -57,6 +58,14 @@ public class OrganizationUnitSettings {
 		this.logo = logo;
 	}
 
+	public boolean isLocationEnabled() {
+		return isLocationEnabled;
+	}
+
+	public void setLocationEnabled(boolean isLocationEnabled) {
+		this.isLocationEnabled = isLocationEnabled;
+	}
+
 	public ContactDetailsSettings getContact_details() {
 		return contact_details;
 	}
@@ -74,11 +83,11 @@ public class OrganizationUnitSettings {
 	}
 
 	public MailContentSettings getMail_content_settings() {
-		return mail_content_settings;
+		return mail_content;
 	}
 
 	public void setMail_content_settings(MailContentSettings mail_content_settings) {
-		this.mail_content_settings = mail_content_settings;
+		this.mail_content = mail_content_settings;
 	}
 
 	public Licenses getLicenses() {

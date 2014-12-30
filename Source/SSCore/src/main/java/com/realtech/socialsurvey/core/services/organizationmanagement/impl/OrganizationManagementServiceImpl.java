@@ -19,6 +19,8 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.MailContent;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -535,6 +537,41 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Updating comapnySettings: " + companySettings+" with crm info: "+crmInfo);
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated the record successfully");
+	}
+	
+	@Override
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException{
+		if(companySettings == null){
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if(mailBody == null || mailBody.isEmpty()){
+			throw new InvalidInputException("Mail body cannot be empty.");
+		}
+		if(mailCategory == null){
+			throw new InvalidInputException("Invalid mail category.");
+		}
+		LOG.debug("Updating "+mailCategory+" for settings: "+companySettings.toString()+" with mail body: "+mailBody);
+		MailContentSettings originalContentSettings = companySettings.getMail_content_settings();
+		MailContentSettings mailContentSettings = new MailContentSettings();
+		MailContent mailContent = new MailContent();
+		mailContent.setMail_body(mailBody);
+		if(mailCategory.equals(CommonConstants.SURVEY_MAIL_BODY_CATEGORY)){
+			if(originalContentSettings != null){
+				mailContentSettings.setTake_survey_reminder_mail(originalContentSettings.getTake_survey_reminder_mail());
+			}
+			mailContentSettings.setTake_survey_mail(mailContent); 
+		}else if(mailCategory.equals(CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY)){
+			if(originalContentSettings != null){
+				mailContentSettings.setTake_survey_mail(originalContentSettings.getTake_survey_mail());
+			}
+			mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		}else{
+			throw new InvalidInputException("Invalid mail category");
+		}
+		LOG.info("Updating company settings mail content");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_MAIL_CONTENT, mailContentSettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated company settings mail content");
+		return mailContentSettings;
 	}
 
 }

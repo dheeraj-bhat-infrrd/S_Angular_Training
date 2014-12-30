@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -321,6 +322,47 @@ public class OrganizationManagementController {
 		}
 		LOG.debug("Encompass validation passed.");
 		return true;
+	}
+
+	@RequestMapping(value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+	public String setSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Saving survey participation mail body");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailBody = null;
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+			MailContentSettings updatedMailContentSettings = null;
+			if(mailCategory != null && mailCategory.equals("participationmail")){
+				mailBody = request.getParameter("survey-participation-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+			}else{
+				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation reminder mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+			}
+			// update the mail content settings in session
+			companySettings.setMail_content_settings(updatedMailContentSettings);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC
