@@ -256,36 +256,90 @@ function updateRegionCallBack(data) {
 	$(".create-branch-dd input[type='hidden']").val("");
 }
 
-//Region/Branch Delete popup overlay
-var branchIdDelete = null;
+
+
+// Region Delete popup overlay
 var regionIdDelete = null;
 function deleteRegionPopup(regionId) {
-	$('#overlay-header').html("Remove Region");
    	regionIdDelete = regionId;
-   	$('#overlay-confirm').show();
+	var urlCheck = "./hasbranchesregion.do?regionId=" + regionId;
+	console.log("Check for deactivation url : " + urlCheck);
+	callAjaxPOST(urlCheck, deleteRegionCheckCallBack, true);
 }
+function deleteRegionCheckCallBack(response) {
+	$("#serverSideerror").html(response);
+
+	var success = "Selected Region could be deleted";
+	var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Region", "Are you Sure?");
+	} else {
+		createPopupInfo("Remove Region");
+	}
+}
+
+
+// Branch Delete popup overlay
+var branchIdDelete = null;
 function deleteBranchPopup(branchId) {
-	$('#overlay-header').html("Remove Branch");
-   	branchIdDelete = branchId;
+	branchIdDelete = branchId;
+	var urlCheck = "./hasusersbranch.do?branchId=" + branchId;
+	console.log("Check for deactivation url : " + urlCheck);
+	callAjaxPOST(urlCheck, deleteBranchCheckCallBack, true);
+}
+function deleteBranchCheckCallBack(response) {
+	$("#serverSideerror").html(response);
+	
+	var success = "Selected Branch could be deleted";
+	var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Branch", "Are you Sure?");
+	} else {
+		createPopupInfo("Remove Branch");
+	}
+}
+
+
+// Pop-up Overlay modifications
+function createPopupConfirm(header, body) {
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$('#overlay-header').html(header);
+	$('#overlay-txt').html(body);
+
+	$('#overlay-confirm').show();
+}
+function createPopupInfo(header) {
+	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-header').html(header);
+	
    	$('#overlay-confirm').show();
 }
 $('#overlay-continue').click(function(){
-	$('#overlay-confirm').hide();
-	if(regionIdDelete != null) {
-		deleteRegion(regionIdDelete);
-		regionIdDelete = null;
-	} else if(branchIdDelete != null) {
-		deleteBranch(branchIdDelete);
-		branchIdDelete = null;
+	if ($('#overlay-continue').attr("disabled") != "disabled") {
+		$('#overlay-confirm').hide();
+		$("#serverSideerror").html('');
+		if(regionIdDelete != null) {
+			deleteRegion(regionIdDelete);
+			regionIdDelete = null;
+		} else if(branchIdDelete != null) {
+			deleteBranch(branchIdDelete);
+			branchIdDelete = null;
+		}
 	}
 });
 $('#overlay-cancel').click(function(){
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
 	if(regionIdDelete != null) {
 		regionIdDelete = null;
 	} else if(branchIdDelete != null) {
 		branchIdDelete = null;
 	}
 	$('#overlay-confirm').hide();
+	$("#serverSideerror").html('');
 });
 
 

@@ -205,8 +205,12 @@
 <div class="overlay-disable hide" id="overlay-confirm">
 	<div class="overlay-disable-wrapper">
 		<div class="ol-header" id="overlay-header"></div>
+		<div id="serverSideerror" class="validation-msg-wrapper">
+			<!--Use this container to input all the messages from server-->
+			<jsp:include page="messageheader.jsp" />
+		</div>
 		<div class="ol-content">
-			<div class="ol-txt">Are you sure?</div>
+			<div class="ol-txt" id="overlay-txt"></div>
 			<div class="clearfix">
 				<div class="float-left ol-btn-wrapper">
 					<div id="overlay-continue" class="ol-btn">Continue</div>
