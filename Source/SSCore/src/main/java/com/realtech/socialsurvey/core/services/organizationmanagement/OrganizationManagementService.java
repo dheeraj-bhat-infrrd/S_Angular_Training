@@ -5,6 +5,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
@@ -77,4 +78,14 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException;
+	
+	/**
+	 * Updates the mail body content for company settings
+	 * @param companySettings
+	 * @param mailBody
+	 * @param mailCategory
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException;
 }

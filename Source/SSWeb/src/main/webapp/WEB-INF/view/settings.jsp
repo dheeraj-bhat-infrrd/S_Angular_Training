@@ -130,47 +130,50 @@
             </div>
         </div>
         <div class="um-top-container">
-            <div class="um-header margin-top-25">Email Configuration</div>
-            <div class="clearfix st-bottom-wrapper margin-top-50">
-                <div class="st-header-txt-lft-rt clearfix margin-top-25">
-                    <div class="float-left st-header-txt-lft">Mailer Content</div>
-                    <div class="float-right clearfix st-header-txt-rt">
-                        <div class="float-left st-header-txt-rt-icn icn-pen"></div>
-                        <div class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
-                    </div>
-                </div>
-                <div class="st-header-txt-wrapper">
-                    <textarea class="st-header-txt-input"></textarea>
-                </div>
-            </div>
-            <div class="clearfix st-bottom-wrapper margin-top-50">
-                <div class="st-header-txt-lft-rt clearfix margin-top-25">
-                    <div class="float-left st-header-txt-lft">Reminder Mail Content</div>
-                    <div class="float-right clearfix st-header-txt-rt">
-                        <div class="float-left st-header-txt-rt-icn icn-pen"></div>
-                        <div class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
-                    </div>
-                </div>
-                <div class="st-header-txt-wrapper">
-                    <textarea class="st-header-txt-input"></textarea>
-                </div>
-            </div>
-            <div class="clearfix st-bottom-wrapper st-reminder-wrapper">
-                <div class="float-left">Set reminder interval</div>
-                <div class="clearfix float-left">
-                    <div class="float-left st-input-reminder">
-                        <input class="st-rating-input"/>
-                    </div>
-                    <div class="float-left">Days</div>
-                </div>
-                <div class="clearfix st-check-main float-left">
-                    <div class="float-left st-check-wrapper">
-                        <div id="st-checkbox-on" class="st-checkbox st-checkbox-on"></div>
-                        <div id="st-checkbox-off" class="st-checkbox st-checkbox-off hide"></div>
-                    </div>
-                    <div class="float-left st-check-txt-OR">Click here if you do not want to send any reminder</div>
-                </div>
-            </div>
+        	<form id="mail-body-settings-form">
+        		<input type="hidden" name="mailcategory" id="mailcategory">
+	            <div class="um-header margin-top-25"><spring:message code="label.header.email.configuration.key" /></div>
+	            <div class="clearfix st-bottom-wrapper margin-top-50">
+	                <div class="st-header-txt-lft-rt clearfix margin-top-25">
+	                    <div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
+	                    <div class="float-right clearfix st-header-txt-rt">
+	                        <div class="float-left st-header-txt-rt-icn icn-pen"></div>
+	                        <div id="save-participation-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
+	                    </div>
+	                </div>
+	                <div class="st-header-txt-wrapper">
+	                    <textarea id="survey-participation-mailcontent" name="survey-participation-mailcontent" class="st-header-txt-input">${surveymailbody}</textarea>
+	                </div>
+	            </div>
+	            <div class="clearfix st-bottom-wrapper margin-top-50">
+	                <div class="st-header-txt-lft-rt clearfix margin-top-25">
+	                    <div class="float-left st-header-txt-lft"><spring:message code="label.header.reminder.mailer.content.key" /></div>
+	                    <div class="float-right clearfix st-header-txt-rt">
+	                        <div class="float-left st-header-txt-rt-icn icn-pen"></div>
+	                        <div id="save-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
+	                    </div>
+	                </div>
+	                <div class="st-header-txt-wrapper">
+	                    <textarea id="survey-participation-reminder-mailcontent" name="survey-participation-reminder-mailcontent" class="st-header-txt-input">${surveyremindermailbody}</textarea>
+	                </div>
+	            </div>
+	            <div class="clearfix st-bottom-wrapper st-reminder-wrapper">
+	                <div class="float-left"><spring:message code="label.reminder.interval.key" /></div>
+	                <div class="clearfix float-left">
+	                    <div class="float-left st-input-reminder">
+	                        <input class="st-rating-input"/>
+	                    </div>
+	                    <div class="float-left"><spring:message code="label.days.key" /></div>
+	                </div>
+	                <div class="clearfix st-check-main float-left">
+	                    <div class="float-left st-check-wrapper">
+	                        <div id="st-checkbox-on" class="st-checkbox st-checkbox-on"></div>
+	                        <div id="st-checkbox-off" class="st-checkbox st-checkbox-off hide"></div>
+	                    </div>
+	                    <div class="float-left st-check-txt-OR">Click here if you do not want to send any reminder</div>
+	                </div>
+	            </div>
+            </form>
         </div>
         <div class="um-top-container border-0">
             <div class="um-header margin-top-25">Other Settings</div>
@@ -211,8 +214,12 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/resources/js/settings.js"></script>
+<script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
+<script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script>
     $(document).ready(function(){
+    	$('#survey-participation-mailcontent').ckeditor();
+    	$('#survey-participation-reminder-mailcontent').ckeditor();
         $('#st-settings-location-on').click(function(){
             $('#st-settings-location-off').show();
             $(this).hide();
@@ -251,6 +258,14 @@
        $('#encompass-testconnection').click(function(){
     	   alert("testing encompass connection")
     	   testEncompassConnection("encompass-form");
+       });
+       $('#save-participation-mail-content').click(function(){
+    	   alert("saving participation details");
+    	   saveSurveyParticipationMailBodyContent("mail-body-settings-form");
+       });
+       $('#save-participation-reminder-mail-content').click(function(){
+    	   alert("saving participation reminder details");
+    	   saveSurveyParticipationReminderMailBodyContent("mail-body-settings-form");
        });
     });
     
