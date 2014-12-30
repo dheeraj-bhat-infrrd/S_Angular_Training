@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -253,6 +254,47 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Check for associated branches for the region
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/hasbranchesregion", method = RequestMethod.POST)
+	public String hasBranchesForRegion(Model model, HttpServletRequest request) {
+		LOG.info("Fetching all the branches for current region");
+		String messageToReturn = null;
+		
+		try {
+			long regionId = 0l;
+			try {
+				regionId = Long.parseLong(request.getParameter("regionId"));
+				LOG.debug("Calling service to get the list of branches in region");
+				List<Branch> branches = hierarchyManagementService.getAllBranchesForRegion(regionId);
+				LOG.debug("Successfully executed service to get the list of branches in region : " + branches);
+				if (branches != null && branches.iterator().hasNext()) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				} else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("REGION_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the branch list in method hasBranchesForRegion");
+				throw new InvalidInputException("Error occurred while fetching the branch list in method hasBranchesForRegion",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching all branches for region. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+	
+	/**
 	 * Deactivates a branch status
 	 * 
 	 * @param model
@@ -292,6 +334,48 @@ public class HierarchyManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/**
+	 * Check for associated user profiles for the branch
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/hasusersbranch", method = RequestMethod.POST)
+	public String hasUsersForBranch(Model model, HttpServletRequest request) {
+		LOG.info("Fetching all the users for current branch");
+		String messageToReturn = null;
+
+		try {
+			long branchId = 0l;
+			try {
+				branchId = Long.parseLong(request.getParameter("branchId"));
+				LOG.debug("Calling service to get the list of users in branch");
+				List<UserProfile> userList = hierarchyManagementService.getAllUserProfilesForBranch(branchId);
+				LOG.debug("Successfully executed service to get the list of users in branch : " + userList);
+				
+				if (userList != null && userList.iterator().hasNext()) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("USER_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				} else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the users list in method hasUsersForBranch");
+				throw new InvalidInputException("Error occurred while fetching the users list in method hasUsersForBranch",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching all users for branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+	
 	/**
 	 * Method to add a new region
 	 * 
