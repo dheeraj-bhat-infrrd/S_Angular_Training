@@ -100,6 +100,9 @@ public interface CommonConstants {
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
 	public static final String JOB_PARAMETER_NAME = "date";
+	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
+	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
+	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
 
 	/**
 	 * other constants
@@ -122,4 +125,11 @@ public interface CommonConstants {
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
+
+	// settings constants
+	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
+	
+	// mail content
+	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
+	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
 }

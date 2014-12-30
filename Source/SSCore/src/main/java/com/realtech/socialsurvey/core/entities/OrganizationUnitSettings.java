@@ -13,13 +13,18 @@ public class OrganizationUnitSettings {
 	private long iden;
 	private float profile_completion;
 	private String logo;
+	private boolean isLocationEnabled;
 	private ContactDetailsSettings contact_details;
 	private CRMInfo crm_info;
-	private MailContentSettings mail_content_settings;
+	private MailContentSettings mail_content;
 	private Licenses licenses;
 	private List<Association> associations;
 	private List<Achievement> achievements;
 	private SurveySettings survey_setings;
+	private String createdBy;
+	private String modifiedBy;
+	private long createdOn;
+	private long modifiedOn;
 
 	public String getId() {
 		return id;
@@ -53,6 +58,14 @@ public class OrganizationUnitSettings {
 		this.logo = logo;
 	}
 
+	public boolean isLocationEnabled() {
+		return isLocationEnabled;
+	}
+
+	public void setLocationEnabled(boolean isLocationEnabled) {
+		this.isLocationEnabled = isLocationEnabled;
+	}
+
 	public ContactDetailsSettings getContact_details() {
 		return contact_details;
 	}
@@ -70,11 +83,11 @@ public class OrganizationUnitSettings {
 	}
 
 	public MailContentSettings getMail_content_settings() {
-		return mail_content_settings;
+		return mail_content;
 	}
 
 	public void setMail_content_settings(MailContentSettings mail_content_settings) {
-		this.mail_content_settings = mail_content_settings;
+		this.mail_content = mail_content_settings;
 	}
 
 	public Licenses getLicenses() {
@@ -107,6 +120,38 @@ public class OrganizationUnitSettings {
 
 	public void setSurvey_setings(SurveySettings survey_setings) {
 		this.survey_setings = survey_setings;
+	}
+
+	public String getCreatedBy() {
+		return createdBy;
+	}
+
+	public void setCreatedBy(String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public String getModifiedBy() {
+		return modifiedBy;
+	}
+
+	public void setModifiedBy(String modifiedBy) {
+		this.modifiedBy = modifiedBy;
+	}
+
+	public long getCreatedOn() {
+		return createdOn;
+	}
+
+	public void setCreatedOn(long createdOn) {
+		this.createdOn = createdOn;
+	}
+
+	public long getModifiedOn() {
+		return modifiedOn;
+	}
+
+	public void setModifiedOn(long modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 
 	@Override
