@@ -14,6 +14,21 @@ function testEncompassConnection(formid) {
 	}
 }
 
+function saveSurveyParticipationMailBodyContent(formid){
+	$('#mailcategory').val('participationmail');
+	updateMailContent(formid);
+}
+
+function saveSurveyParticipationReminderMailBodyContent(formid){
+	$('#mailcategory').val('');
+	updateMailContent(formid);
+}
+
+function updateMailContent(formid){
+	var url = "./savesurveyparticipationmail.do";
+	callAjaxFormSubmit(url, updateMailContentCallBack, formid);
+}
+
 function validateEncompassInput(formid) {
 	return true;
 }
@@ -24,4 +39,8 @@ function saveEncompassDetailsCallBack(data) {
 
 function testEncompassConnectionCallBack(data) {
 	alert("Connection succesful");
+}
+
+function updateMailContentCallBack(data){
+	alert("Mail content updated");
 }

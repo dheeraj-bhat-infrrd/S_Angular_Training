@@ -19,7 +19,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -28,7 +27,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -47,7 +45,7 @@ public class LoginController {
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 	@Autowired
-	private UserManagementService userManagementService;
+	private SessionHelper sessionHelper;
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage() {
@@ -104,10 +102,8 @@ public class LoginController {
 				authenticationService.validateUser(user, password);
 				LOG.debug("Successfully executed authentication service to validate user while login");
 
-				
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
-				
 				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 				if (licenseDetails != null && !licenseDetails.isEmpty()) {
 					LicenseDetail licenseDetail = licenseDetails.get(0);
@@ -136,12 +132,6 @@ public class LoginController {
 				redirectTo = JspResolver.COMPANY_INFORMATION;
 			}
 			else {
-				// get the user's canonical settings
-				LOG.info("Fetching the user's canonical settings and setting it in session");
-				UserSettings userSettings = userManagementService.getCanonicalUserSettings(user, accountType);
-				session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-				// Set the session variables
-				setSettingVariablesInSession(session);
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 					/**
@@ -161,9 +151,17 @@ public class LoginController {
 
 					redirectTo = getRedirectionFromProfileCompletionStage(userProfile.getProfileCompletionStage());
 
+					if (userProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)) {
+						// get the user's canonical settings
+						LOG.info("Fetching the user's canonical settings and setting it in session");
+						sessionHelper.getCanonicalSettings(session);
+						// Set the session variables
+						sessionHelper.setSettingVariablesInSession(session);
+					}
+
 				}
 			}
-			
+
 			LOG.info("User login successful");
 		}
 		catch (NonFatalException e) {
@@ -404,22 +402,68 @@ public class LoginController {
 		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
 	}
-	
-	private void setSettingVariablesInSession(HttpSession session){
+
+	/*private void setSettingVariablesInSession(HttpSession session) {
 		LOG.info("Settings related session values being set.");
-		if(session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null){
+		if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) {
 			// setting the logo name
-			UserSettings userSettings = (UserSettings)session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			// check if company has a logo
-			if(userSettings.getCompanySettings().getLogo() != null){
+			if (userSettings.getCompanySettings().getLogo() != null) {
 				LOG.debug("Settings logo image from company settings");
 				session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, userSettings.getCompanySettings().getLogo());
-			}else{
+			}
+			else {
 				LOG.debug("Could not find logo settings in company. Checking in lower heirarchy.");
-				//TODO: Check the lower level hierarchy for logo
+				// TODO: Check the lower level hierarchy for logo
+			}
+			// check for the mail content
+			String body = null;
+			FileContentReplacements replacements = new FileContentReplacements();
+			replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
+			if (userSettings.getCompanySettings().getMail_content() == null) {
+				LOG.debug("Setting default survey participation mail body.");
+				// set the mail contents
+				try {
+					body = fileOperations.replaceFileContents(replacements);
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
+				}
+				catch (InvalidInputException e) {
+					LOG.warn("Could not set mail content for survey participation");
+				}
+			}
+			else {
+				LOG.debug("Company already has mail body settings. Hence, setting the same");
+				if (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings()
+							.getMail_content().getTake_survey_mail().getMail_body());
+				}
+				else {
+					try {
+						body = fileOperations.replaceFileContents(replacements);
+						session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+					}
+					catch (InvalidInputException e) {
+						LOG.warn("Could not set mail content for survey participation");
+					}
+				}
+				if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
+					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings()
+							.getMail_content().getTake_survey_reminder_mail().getMail_body());
+				}
+				else {
+					try {
+						body = fileOperations.replaceFileContents(replacements);
+						session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
+					}
+					catch (InvalidInputException e) {
+						LOG.warn("Could not set mail content for survey participation reminder");
+					}
+				}
 			}
 		}
-	}
+	}*/
 
 }
 
