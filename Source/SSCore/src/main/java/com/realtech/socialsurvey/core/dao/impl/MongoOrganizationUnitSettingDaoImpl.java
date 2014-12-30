@@ -27,6 +27,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
+	public static final String KEY_MAIL_CONTENT = "mail_content";
 	
 	private static final String KEY_IDENTIFIER = "iden";
 	
