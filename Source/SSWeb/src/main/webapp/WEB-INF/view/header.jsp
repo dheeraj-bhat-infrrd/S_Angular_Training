@@ -75,8 +75,10 @@
 				<div class="float-left user-info-seperator"></div>
 				<div class="float-left user-info-logo"></div>
 			</div>
+			<c:if test="${displaylogo != null}">
 			<div id="header-menu-icn"
-				class="header-menu-icn icn-menu float-right hide"
-				style="background: url(${pageContext.request.contextPath}/resources/images/userInfoLogo.png) no-repeat center; background-size: 100% auto;"></div>
+				class="header-menu-icn icn-menu float-right"
+				style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+			</c:if>
 		</div>
 	</div>
