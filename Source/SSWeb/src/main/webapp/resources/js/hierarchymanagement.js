@@ -259,10 +259,9 @@ function updateRegionCallBack(data) {
 
 
 // Region Delete popup overlay
-var regionIdDelete = null;
 function deleteRegionPopup(regionId) {
-   	regionIdDelete = regionId;
-	var urlCheck = "./hasbranchesregion.do?regionId=" + regionId;
+	$('#regionid-to-delete-hidden').val(regionId);
+	var urlCheck = "./checkbranchesinregion.do?regionId=" + regionId;
 	console.log("Check for deactivation url : " + urlCheck);
 	callAjaxPOST(urlCheck, deleteRegionCheckCallBack, true);
 }
@@ -280,10 +279,9 @@ function deleteRegionCheckCallBack(response) {
 
 
 // Branch Delete popup overlay
-var branchIdDelete = null;
 function deleteBranchPopup(branchId) {
-	branchIdDelete = branchId;
-	var urlCheck = "./hasusersbranch.do?branchId=" + branchId;
+	$('#branchid-to-delete-hidden').val(branchId);
+	var urlCheck = "./checkusersinbranch.do?branchId=" + branchId;
 	console.log("Check for deactivation url : " + urlCheck);
 	callAjaxPOST(urlCheck, deleteBranchCheckCallBack, true);
 }
@@ -320,12 +318,15 @@ $('#overlay-continue').click(function(){
 	if ($('#overlay-continue').attr("disabled") != "disabled") {
 		$('#overlay-confirm').hide();
 		$("#serverSideerror").html('');
-		if(regionIdDelete != null) {
+		
+		var regionIdDelete = $('#regionid-to-delete-hidden').val();
+		var branchIdDelete = $('#branchid-to-delete-hidden').val();
+		if(regionIdDelete != "") {
 			deleteRegion(regionIdDelete);
-			regionIdDelete = null;
-		} else if(branchIdDelete != null) {
+			$('#regionid-to-delete-hidden').val('');
+		} else if(branchIdDelete != "") {
 			deleteBranch(branchIdDelete);
-			branchIdDelete = null;
+			$('#branchid-to-delete-hidden').val('');
 		}
 	}
 });
@@ -333,12 +334,9 @@ $('#overlay-cancel').click(function(){
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
 	}
-	if(regionIdDelete != null) {
-		regionIdDelete = null;
-	} else if(branchIdDelete != null) {
-		branchIdDelete = null;
-	}
 	$('#overlay-confirm').hide();
+	$('#regionid-to-delete-hidden').val('');
+	$('#branchid-to-delete-hidden').val('');
 	$("#serverSideerror").html('');
 });
 

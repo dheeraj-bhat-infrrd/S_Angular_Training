@@ -33,7 +33,7 @@ public interface HierarchyManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<Branch> getAllBranchesForRegion(long regionId) throws InvalidInputException;
+	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException;
 	
 	/**
 	 * Method to fetch UserProfiles mapped to a branch
@@ -42,7 +42,25 @@ public interface HierarchyManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<UserProfile> getAllUserProfilesForBranch(long branchId) throws InvalidInputException;
+	public List<UserProfile> getAllUserProfilesInBranch(long branchId) throws InvalidInputException;
+
+	/**
+	 * Method to fetch count of branches mapped to a region
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCountBranchesInRegion(long regionId) throws InvalidInputException;
+	
+	/**
+	 * Method to fetch count of UserProfiles mapped to a branch
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCountUsersInBranch(long branchId) throws InvalidInputException;
 
 	/**
 	 * Method to fetch all regions of a company
