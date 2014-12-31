@@ -5,7 +5,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.BasicQuery;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -21,6 +26,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	public static final String KEY_CRM_INFO = "crm_info";
+	public static final String KEY_MAIL_CONTENT = "mail_content";
+	
+	private static final String KEY_IDENTIFIER = "iden";
+	
 	
 	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 	
@@ -62,6 +72,31 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			LOG.info("Creating "+AGENT_SETTINGS_COLLECTION);
 			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
 		}
+	}
+
+	@Override
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsById(long identifier, String collectionName) {
+		LOG.info("Fetch organization unit settings from "+collectionName+" for id: "+identifier);
+		OrganizationUnitSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER,identifier)), OrganizationUnitSettings.class, collectionName);
+		return settings;
+	}
+
+	@Override
+	public AgentSettings fetchAgentSettingsById(long identifier) {
+		LOG.info("Fetch agent settings from for id: "+identifier);
+		AgentSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER,identifier)), AgentSettings.class, AGENT_SETTINGS_COLLECTION);
+		return settings;
+	}
+	
+	@Override
+	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings, String collectionName){
+		LOG.info("Updating unit setting in "+collectionName+" with "+unitSettings+" for key: "+keyToUpdate+" wtih value: "+updatedRecord);
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").is(unitSettings.getId()));
+		Update update =  new Update().set(keyToUpdate, updatedRecord);
+		LOG.debug("Updating the unit settings");
+		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
+		LOG.info("Updated the unit setting");
 	}
 
 }
