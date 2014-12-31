@@ -55,9 +55,9 @@ public interface CommonConstants {
 	public static final int STATUS_NOT_VERIFIED = 2;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
-	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
-	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
-	public static final int SANDBOX_MODE_TRUE=1;
+	public static final int YES = 1;
+	public static final int NO = 0;
+	public static final int SANDBOX_MODE_TRUE = 1;
 	public static final int IS_OWNER = 1;
 	public static final int IS_NOT_OWNER = 0;
 
@@ -86,6 +86,7 @@ public interface CommonConstants {
 	 */
 	public static final String USER_IN_SESSION = "user";
 	public static final String ACCOUNT_TYPE_IN_SESSION = "accounttype";
+	public static final String CANONICAL_USERSETTINGS_IN_SESSION = "cannonicalusersettings";
 	public static final String COMPANY_NAME = "companyName";
 	public static final String ADDRESS = "address";
 	public static final String ZIPCODE = "zipCode";
@@ -95,7 +96,9 @@ public interface CommonConstants {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
-	
+	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
+	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
+	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
 
 	/**
 	 * other constants
@@ -117,4 +120,11 @@ public interface CommonConstants {
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
+
+	// settings constants
+	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
+	
+	// mail content
+	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
+	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
 }
