@@ -205,10 +205,9 @@
 <div class="overlay-disable hide" id="overlay-confirm">
 	<div class="overlay-disable-wrapper">
 		<div class="ol-header" id="overlay-header"></div>
-		<div id="serverSideerror" class="validation-msg-wrapper">
-			<!--Use this container to input all the messages from server-->
-			<jsp:include page="messageheader.jsp" />
-		</div>
+		<div id="serverSideerror" class="validation-msg-wrapper"></div>
+		<input type="hidden" name="regionid-to-delete-hidden" id="regionid-to-delete-hidden" />
+		<input type="hidden" name="branchid-to-delete-hidden" id="branchid-to-delete-hidden" />
 		<div class="ol-content">
 			<div class="ol-txt" id="overlay-txt"></div>
 			<div class="clearfix">
