@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -28,23 +29,32 @@ public interface UserManagementService {
 
 	public void inviteUserToRegister(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
 			UserAlreadyExistsException, UndeliveredEmailException;
-	
+
 	public void removeExistingUser(User admin, long userIdToBeDeactivated) throws InvalidInputException;
 
 	public void unassignBranchAdmin(User admin, long branchId, long userIdToRemove) throws InvalidInputException;
 
 	public void unassignRegionAdmin(User admin, long regionId, long userIdToRemove) throws InvalidInputException;
-	
+
 	public User getUserByEmailId(User admin, String emailId) throws InvalidInputException, NoRecordsFetchedException;
 
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException;
-	
+
 	public boolean isUserAdditionAllowed(User user) throws NoRecordsFetchedException;
-	
+
 	public User getUserByUserId(long userId);
 
-	// JIRA SS-42 BY RM05 EOC
+	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException;
+
+	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException;
 	
+	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException;
+
+	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
+	
+	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException;
+	// JIRA SS-42 BY RM05 EOC
+
 	/**
 	 * Sends invitation to corporate to register
 	 * 
