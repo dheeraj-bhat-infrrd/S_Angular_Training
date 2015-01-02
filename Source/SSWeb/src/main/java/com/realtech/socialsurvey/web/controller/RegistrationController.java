@@ -251,7 +251,7 @@ public class RegistrationController {
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.LOGIN;
 
 	}
 
