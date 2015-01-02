@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:if test="${not empty message.message || not empty param.message}">
-<div class="${message.type.name}">
+<div class="${message.type.name}" id="common-message-header">
 	<div class="error-wrapper clearfix">
         <div class="float-left msg-err-icn"></div>
         <div class="float-left msg-err-txt-area">
@@ -11,6 +11,5 @@
             </div>
         </div>
     </div>
-	<input id="redirectUrl" type = "hidden" value ="${redirectTo}">
 </div>
 </c:if>
