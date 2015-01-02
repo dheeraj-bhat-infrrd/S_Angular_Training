@@ -220,7 +220,7 @@ public class LoginController {
 			}
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId, user.getDisplayName());
+				authenticationService.sendResetPasswordLink(emailId, user.getFirstName()+" "+user.getLastName());
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);

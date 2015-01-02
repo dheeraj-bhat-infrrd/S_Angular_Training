@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -10,12 +12,14 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -38,11 +42,25 @@ public class UserManagementController {
 	@Autowired
 	private UserManagementService userManagementService;
 
+
+	@Autowired
+	private AuthenticationService authenticationService;
+	
+	private static final int BATCH_SIZE = 20;
+
 	// JIRA SS-42 BY RM05 BOC
 
+	@RequestMapping(value = "/showusermangementpage", method = RequestMethod.GET)
+	public String initUserManagementPage() {
+		LOG.info("User Management page started");
+		return JspResolver.USER_MANAGEMENT;
+	}
+
+	/*
+	 * Method to send invitation to a new user to join.
+	 */
 	@RequestMapping(value = "/invitenewuser", method = RequestMethod.POST)
-	public String inviteNewUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
-			UserAlreadyExistsException {
+	public String inviteNewUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a new user by existing admin called.");
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
@@ -55,6 +73,7 @@ public class UserManagementController {
 			try {
 				if (userManagementService.isUserAdditionAllowed(user)) {
 					userManagementService.inviteUserToRegister(user, firstName, lastName, emailId);
+					authenticationService.sendResetPasswordLink(emailId, firstName+" "+lastName);
 				}
 				else {
 					throw new InvalidInputException("Limit for maximum users has already reached.", DisplayMessageConstants.MAX_USERS_LIMIT_REACHED);
@@ -80,14 +99,20 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	@RequestMapping(value = "/finduserbyuserid", method = RequestMethod.POST)
-	public String findUserByUserId(Model model, HttpServletRequest request) throws NonFatalException {
+	/*
+	 * Method to fetch list of branches a user is assigned to.
+	 */
+	@RequestMapping(value = "/finduserandbranchesbyuserid", method = RequestMethod.POST)
+	public String findUserAndAssignedBranchesByUserId(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
-			if (userIdStr == null || userIdStr.isEmpty()) {
+			if (userIdStr == null) {
 				LOG.error("Invalid user id passed in method findUserByUserId().");
 				throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+			}
+			else if (userIdStr.isEmpty()) {
+				return JspResolver.USER_DETAILS;
 			}
 			long userId = 0;
 			try {
@@ -98,18 +123,52 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			User user = userManagementService.getUserByUserId(userId);
+			List<Branch> branches = userManagementService.getBranchesAssignedToUser(user);
 			model.addAttribute("searchedUser", user);
+
+			// Adding assigned branches to the model attribute as assignedBranches
+			model.addAttribute("assignedBranches", branches);
+
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.info("Method to fetch user by user id , findUserByUserId() finished.");
-		return JspResolver.MESSAGE_HEADER;
+		// return user details page on success
+		return JspResolver.USER_DETAILS;
 	}
 
+	/*
+	 * Method to fetch list of all the users who belong to the same as that of current user. Current
+	 * user is company admin who can assign different roles to other users.
+	 */
+	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.POST)
+	public String findUsersForCompany(Model model, HttpServletRequest request) {
+		LOG.info("Method to fetch user by user, findUserByUserId() started.");
+		try {
+			if (model.asMap().get("allUsersList") == null)
+
+				getAllUsersForCompany(model, request);
+			else
+				getNextListOfUsers(model, request);
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
+		// return user details page on success
+		return JspResolver.USER_LIST;
+	}
+
+	/*
+	 * Method to find a user on the basis of email id provided.
+	 */
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
-	public String findUserByEmail(Model model, HttpServletRequest request) throws InvalidInputException {
+	public String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
 		try {
 
@@ -122,8 +181,8 @@ public class UserManagementController {
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			if (user == null) {
-				LOG.error("No user found in current session in deactivateExistingUser().");
-				throw new InvalidInputException("No user found in current session in deactivateExistingUser().");
+				LOG.error("No user found in current session in findUserByEmail().");
+				throw new InvalidInputException("No user found in current session in findUserByEmail().");
 			}
 
 			try {
@@ -147,9 +206,11 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to remove an existing user. Soft delete is done.
+	 */
 	@RequestMapping(value = "/removeexistinguser", method = RequestMethod.POST)
-	public String removeExistingUser(Model model, HttpServletRequest request) throws InvalidInputException, UndeliveredEmailException,
-			UserAlreadyExistsException {
+	public String removeExistingUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to deactivate an existing user called.");
 		try {
 			long userIdToRemove = 0;
@@ -186,6 +247,41 @@ public class UserManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/*
+	 * Method to assign a user to a branch.
+	 */
+	@RequestMapping(value = "/assignusertobranch", method = RequestMethod.POST)
+	public String assignUserToBranch(Model model, HttpServletRequest request) throws NonFatalException {
+		User admin = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		String branchIdStr = request.getParameter("branchId");
+		if (userIdStr == null || userIdStr.isEmpty()) {
+			LOG.error("Invalid user id passed in method assignUserToBranch().");
+			throw new InvalidInputException("Invalid user id passed in method assignUserToBranch().");
+		}
+		if (branchIdStr == null || branchIdStr.isEmpty()) {
+			LOG.error("Invalid branch id passed in method assignUserToBranch().");
+			throw new InvalidInputException("Invalid branch id passed in method assignUserToBranch().");
+		}
+
+		LOG.info("Method to assign user to branch is called for user " + userIdStr);
+		long userId = 0;
+		long branchId = 0;
+		try {
+			userId = Long.parseLong(userIdStr);
+			branchId = Long.parseLong(branchIdStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception while parsing user Id or branch id", e);
+			throw new NonFatalException("Number format execption while parsing user id or branch id", DisplayMessageConstants.GENERAL_ERROR, e);
+		}
+
+		userManagementService.assignUserToBranch(admin, userId, branchId);
+
+		LOG.info("Method to assign user to branch is called for user " + userIdStr);
+		return JspResolver.MESSAGE_HEADER;
+	}
+
 	/**
 	 * Method to assign a user as branch admin
 	 * 
@@ -202,12 +298,16 @@ public class UserManagementController {
 			String isAssign = request.getParameter("isAssign");
 
 			if (branch == null || branch.isEmpty()) {
-				LOG.error("Null or empty value passed for branch in assignBranchAdmin()");
-				throw new InvalidInputException("Null or empty value passed for branch in assignBranchAdmin()");
+				LOG.error("Null or empty value passed for branch in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for branch in assignOrUnassignBranchAdmin()");
 			}
 			if (userToAssign == null || userToAssign.isEmpty()) {
-				LOG.error("Null or empty value passed for user id in assignBranchAdmin()");
-				throw new InvalidInputException("Null or empty value passed for user id in assignBranchAdmin()");
+				LOG.error("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
+			}
+			if (isAssign == null || isAssign.isEmpty()) {
+				LOG.error("Null or empty value passed for check field isAssign in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
 			}
 
 			long branchId = 0l;
@@ -282,7 +382,7 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		//TODO add success message.
+		// TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning branch admin. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
@@ -297,10 +397,9 @@ public class UserManagementController {
 	 * @param model
 	 * @param request
 	 * @return
-	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/unassignregionadmin", method = RequestMethod.POST)
-	public String unassignRegionAdmin(Model model, HttpServletRequest request) throws InvalidInputException {
+	public String unassignRegionAdmin(Model model, HttpServletRequest request) {
 
 		LOG.info("Method to remove region admin called");
 
@@ -314,8 +413,8 @@ public class UserManagementController {
 				throw new InvalidInputException("Null or empty value passed for region id in removeRegionAdmin()");
 			}
 			if (userIdToRemove == null || userIdToRemove.isEmpty()) {
-				LOG.error("Null or empty value passed for user id in assignRegionAdmin()");
-				throw new InvalidInputException("Null or empty value passed for user id in removeRegionAdmin()");
+				LOG.error("Null or empty value passed for user id in unassignRegionAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in unassignRegionAdmin()");
 			}
 
 			long regionId = 0l;
@@ -336,13 +435,161 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		//TODO add success message.
+		// TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning region admin.Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to remove region admin");
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to activate or deactivate a user.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updateuser", method = RequestMethod.POST)
+	public String updateUser(Model model, HttpServletRequest request) {
+
+		LOG.info("Method to activate or deactivate a user, activateOrDecativateUser() called.");
+		try {
+
+			String isAssign = request.getParameter("isAssign");
+			if (isAssign == null || isAssign.isEmpty()) {
+				LOG.error("Null or empty value passed for check field isAssign in assignOrUnassignBranchAdmin()");
+				throw new InvalidInputException("Null or empty value passed for user id in assignOrUnassignBranchAdmin()");
+			}
+			long userIdToUpdate = 0;
+			try {
+				userIdToUpdate = Long.parseLong(request.getParameter("userIdToUpdate"));
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception while parsing user Id", e);
+				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			if (userIdToUpdate < 0) {
+				LOG.error("Invalid user Id found to update in updateUser().");
+				throw new InvalidInputException("Invalid user Id found to update in updateUser().");
+			}
+
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (user == null) {
+				LOG.error("No user found in current session in updateUser().");
+				throw new InvalidInputException("No user found in current session in updateUser().");
+			}
+			try {
+				if (isAssign.equalsIgnoreCase("YES"))
+					// Set the given user as active.
+					userManagementService.updateUser(user, userIdToUpdate, true);
+				else if (isAssign.equalsIgnoreCase("NO"))
+					// Set the given user as inactive.
+					userManagementService.updateUser(user, userIdToUpdate, false);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while removing user. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to activate or deactivate a user, updateUser() finished.");
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	/**
+	 * Method to get list of all the branches, current user is admin of.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	@RequestMapping(value = "/fetchBranches", method = RequestMethod.POST)
+	public String getBranchesForUser(Model model, HttpServletRequest request) {
+		
+		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		try{
+		if (user == null) {
+			LOG.error("Invalid user passed in method getBranchesForUser().");
+			throw new InvalidInputException("Invalid user id passed in method getBranchesForUser().");
+		}
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.",user.getFirstName());
+		List<Branch> branches = userManagementService.getBranchesForUser(user);
+		model.addAttribute("branches", branches);
+		}catch(NonFatalException nonFatalException) {
+			LOG.error("NonFatalException in getBranchesForUser(). Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finisheded.",user.getFirstName());
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/*
+	 * Method to get list of all users from database for the company to which current user belongs
+	 * to.
+	 */
+	private void getAllUsersForCompany(Model model, HttpServletRequest request) throws NonFatalException {
+		LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+	//	String userIdStr = request.getParameter(CommonConstants.USER_ID);
+		if (user == null) {
+			LOG.error("Invalid user id passed in method findUserByUserId().");
+			throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
+		}
+		/*long userId = 0;
+		try {
+			userId = Long.parseLong(userIdStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception while parsing user Id", e);
+			throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
+		}*/
+		List<User> allUsers = userManagementService.getUsersForCompany(user);
+		int maxIndex = BATCH_SIZE;
+		if (allUsers.size() <= BATCH_SIZE) {
+			maxIndex = allUsers.size();
+			model.addAttribute("hasMoreUsers", false);
+		}
+		else {
+			model.addAttribute("hasMoreUsers", true);
+		}
+		List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, maxIndex);
+		session.setAttribute("allUsersList", allUsers);
+		session.setAttribute("currentIndex", BATCH_SIZE);
+		model.addAttribute("usersList", users);
+		LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company.");
+	}
+
+	/*
+	 * Method to iterate over the list of all the users which is fetched from database. It returns
+	 * same number of users as that of configured for maximum batch size.
+	 */
+	private void getNextListOfUsers(Model model, HttpServletRequest request) {
+		LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company.");
+		Map<String, Object> modelMap = model.asMap();
+		HttpSession session = request.getSession(false);
+		int currentIndex = (Integer) session.getAttribute("currentIndex");
+		@SuppressWarnings("unchecked") List<User> allUsers = (List<User>) modelMap.get("allUsersList");
+		int maxIndex = currentIndex + BATCH_SIZE;
+		if (allUsers.size() <= maxIndex) {
+			maxIndex = allUsers.size();
+			model.addAttribute("hasMoreUsers", false);
+		}
+		else {
+			maxIndex = currentIndex + BATCH_SIZE;
+			model.addAttribute("hasMoreUsers", true);
+		}
+		List<User> users = allUsers.subList(currentIndex, maxIndex);
+		currentIndex = maxIndex;
+		model.addAttribute("usersList", users);
+		session.setAttribute("currentIndex", currentIndex);
+		LOG.debug("Method getNextListOfUsers() finished to fetch next set of users for same company.");
 	}
 }
 // JIRA SS-37 BY RM02 EOC
