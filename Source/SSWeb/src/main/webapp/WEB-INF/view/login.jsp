@@ -92,10 +92,10 @@
             	//hide the server error
             	$("#serverSideerror").hide();
             	
-            	//check if login password is valid
+            	/* //check if login password is valid
             	if(!validatePassword('login-pwd')){
             		return false;
-            	}
+            	} */
             	if (!validate) {
             		$('#jsError').show();
             		return false;

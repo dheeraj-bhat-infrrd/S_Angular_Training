@@ -99,7 +99,7 @@ public class LoginController {
 				authenticationService.validateUser(user, password);
 				LOG.debug("Successfully executed authentication service to validate user while login");
 
-				HttpSession session = request.getSession(true);
+				HttpSession session = request.getSession(false);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
 				AccountType accountType = null;
@@ -220,7 +220,7 @@ public class LoginController {
 			}
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId, user.getFirstName()+" "+user.getLastName());
+				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName());
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
@@ -239,15 +239,32 @@ public class LoginController {
 		return JspResolver.FORGOT_PASSWORD;
 	}
 
+	//RM-06 : BOC
 	/**
 	 * Controller method to display the reset password page
 	 */
 	@RequestMapping(value = "/resetpassword")
-	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams) {
+	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams,Model model) {
 		LOG.info("Forgot Password Page started with encrypter url : " + encryptedUrlParams);
+		try {
+			try {
+				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting url parameters. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 		return JspResolver.RESET_PASSWORD;
 	}
-
+	//RM-06 : EOC
+	
 	/**
 	 * Controller method to set a new password from the reset password link
 	 */

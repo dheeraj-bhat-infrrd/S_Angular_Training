@@ -86,7 +86,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 	 * Method to get count of active and unauthorized users belonging to a company.
 	 */
 	@Override
-	public int getUsersCountForCompany(Company company){
+	public long getUsersCountForCompany(Company company){
 		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() started.");
 		
 		Criteria criteria = getSession().createCriteria(User.class);
@@ -103,7 +103,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		}
 		
 		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished.");
-		return (int) criteria.setProjection(Projections.rowCount()).uniqueResult();
+		return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
 	}
 	
 	/*
@@ -119,9 +119,10 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
 			Criterion criterion = Restrictions.or(
 					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED));
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
 			criteria.add(criterion);
-			criteria.addOrder(Order.asc("displayName"));
+			criteria.addOrder(Order.asc("firstName"));
 		}
 		catch (HibernateException hibernateException) {
 			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);

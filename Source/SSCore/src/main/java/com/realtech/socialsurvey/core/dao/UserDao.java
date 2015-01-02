@@ -14,7 +14,7 @@ public interface UserDao extends GenericDao<User, Long> {
 
 	public List<User> fetchUsersBySimilarEmailId(User user, String emailId);
 	
-	public int getUsersCountForCompany(Company company);
+	public long getUsersCountForCompany(Company company);
 	
 	public List<User> getUsersForCompany(Company company);
 
