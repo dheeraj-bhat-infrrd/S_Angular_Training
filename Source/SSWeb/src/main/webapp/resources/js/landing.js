@@ -1,7 +1,6 @@
 /**
  * js functions for landing page
  */
-
 /**
  * function to change the content of page through ajax
  * 
@@ -18,4 +17,13 @@ function showMainContent(url) {
  */
 function showMainContentCallBack(data) {
 	$("#main-content").html(data);
+	if(dashboardLink=="dashboard"){
+		
+	}else if(dashboardLink=="company"){
+		
+	}else if(dashboardLink=="buildSurvey"){
+		
+	}else if(dashboardLink=="userManagement"){
+		initUserManagementPage();
+	}
 }

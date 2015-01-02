@@ -11,6 +11,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -18,6 +19,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
+@Component("userProfile")
 public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implements UserProfileDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserProfileDaoImpl.class);
@@ -30,11 +32,11 @@ public class UserProfileDaoImpl extends GenericDaoImpl<UserProfile, Long> implem
 	public void deactivateAllUserProfilesForUser(User admin, User userToBeDeactivated) {
 
 		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName());
-		Query query = getSession().getNamedQuery("UserProfile.updateByUser");
+		Query query = getSession().getNamedQuery("UserProfile.updateProfileByUser");
 		// Setting status for user profile as inactive.
 		query.setParameter(0, CommonConstants.STATUS_INACTIVE);
 		query.setParameter(1, String.valueOf(admin.getUserId()));
-		query.setParameter(2, String.valueOf(new Timestamp(System.currentTimeMillis())));
+		query.setParameter(2, new Timestamp(System.currentTimeMillis()));
 		query.setParameter(3, userToBeDeactivated);
 		query.executeUpdate();
 		LOG.info("Method deactivateUserProfileByUser called to deactivate user : " + userToBeDeactivated.getFirstName());

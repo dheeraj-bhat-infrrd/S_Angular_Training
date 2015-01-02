@@ -22,4 +22,5 @@ public interface JspResolver {
 	public static final String USER_MANAGEMENT="usermanagement";
 	public static final String USER_DETAILS="userdetails";
 	public static final String USER_LIST="userslist";
+	public static final String USER_ID_ON_INVITE="useridoninvite";
 }
