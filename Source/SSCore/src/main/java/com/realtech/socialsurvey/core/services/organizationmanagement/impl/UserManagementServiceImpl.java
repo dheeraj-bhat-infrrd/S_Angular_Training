@@ -13,11 +13,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 /**
@@ -38,6 +44,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<UserProfile, Long> userProfileDao;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -197,4 +209,164 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Successfully completed method to update user status");
 	}
+
+	@Override
+	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException {
+		if (user == null) {
+			throw new InvalidInputException("User is not set.");
+		}
+		if (accountType == null) {
+			throw new InvalidInputException("Invalid account type.");
+		}
+		UserSettings canonicalUserSettings = new UserSettings();
+		Map<Long, AgentSettings> agentSettings = null;
+		Map<Long, OrganizationUnitSettings> branchesSettings = null;
+		Map<Long, OrganizationUnitSettings> regionsSettings = null;
+		LOG.info("Getting the canonical settings for the user: " + user.toString());
+		// get the settings according to the profile and account type
+		LOG.info("Getting the company settings for the user");
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+		canonicalUserSettings.setCompanySettings(companySettings);
+
+		switch (accountType) {
+			case INDIVIDUAL:
+			case TEAM:
+				LOG.debug("Individual/ Team account type");
+				// get the agent profile as well
+				LOG.debug("Gettings agent settings");
+				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+				canonicalUserSettings.setAgentSettings(agentSettings);
+				break;
+			case COMPANY:
+				LOG.debug("Company account type");
+				// get the agent settings. If the user is not an agent then there would agent
+				// settings would be null
+				LOG.debug("Gettings agent settings");
+				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+				canonicalUserSettings.setAgentSettings(agentSettings);
+				// get the branches profiles and then resolve the parent organization unit.
+				LOG.debug("Gettings branch settings for user profiles");
+				branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
+				canonicalUserSettings.setBranchSettings(branchesSettings);
+				break;
+			case ENTERPRISE:
+				LOG.debug("Company account type");
+				// get the agent settings. If the user is not an agent then there would agent
+				// settings would be null
+				LOG.debug("Gettings agent settings");
+				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+				canonicalUserSettings.setAgentSettings(agentSettings);
+				// get the branches profiles and then resolve the parent organization unit.
+				LOG.debug("Gettings branch settings for user profiles");
+				branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
+				canonicalUserSettings.setBranchSettings(branchesSettings);
+				// get the regions profiles and then resolve the parent organization unit.
+				LOG.debug("Gettings region settings for user profiles");
+				regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);
+				canonicalUserSettings.setRegionSettings(regionsSettings);
+				break;
+			default:
+				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
+		}
+		return canonicalUserSettings;
+	}
+
+	private Map<Long, OrganizationUnitSettings> getRegionSettingsForUserProfile(List<UserProfile> userProfiles,
+			Map<Long, OrganizationUnitSettings> branchesSettings) throws InvalidInputException {
+		LOG.debug("Getting regions settings for the user profile list");
+		Map<Long, OrganizationUnitSettings> regionsSettings = organizationManagementService.getRegionSettingsForUserProfiles(userProfiles);
+		// if branches settings is not null, the resolve the settings of region associated with the
+		// user's branch profiles
+		if (branchesSettings != null && branchesSettings.size() > 0) {
+			LOG.debug("Resolving regions settings for branch profiles");
+			for (UserProfile userProfile : userProfiles) {
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					// get the branch profile if it is not present in the branch settings
+					if (userProfile.getRegionId() > 0l) {
+						if (regionsSettings == null) {
+							// there were no branch profiles associated with the profile.
+							LOG.debug("No regions associated with the profile");
+							regionsSettings = new HashMap<Long, OrganizationUnitSettings>();
+						}
+						if (!regionsSettings.containsKey(userProfile.getRegionId())) {
+							OrganizationUnitSettings regionSetting = organizationManagementService.getRegionSettings(userProfile.getBranchId());
+							regionsSettings.put(userProfile.getRegionId(), regionSetting);
+						}
+					}
+				}
+			}
+		}
+		return regionsSettings;
+	}
+
+	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles,
+			Map<Long, AgentSettings> agentSettings) throws InvalidInputException {
+		LOG.debug("Getting branches settings for the user profile list");
+		Map<Long, OrganizationUnitSettings> branchesSettings = organizationManagementService.getBranchSettingsForUserProfiles(userProfiles);
+		// if agent settings is not null, the resolve the settings of branch associated with the
+		// user's agent profiles
+		if (agentSettings != null && agentSettings.size() > 0) {
+			LOG.debug("Resolving branches settings for agent profiles");
+			for (UserProfile userProfile : userProfiles) {
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					// get the branch profile if it is not present in the branch settings
+					if (userProfile.getBranchId() > 0l) {
+						if (branchesSettings == null) {
+							// there were no branch profiles associated with the profile.
+							LOG.debug("No branches associated with the profile");
+							branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
+						}
+						if (!branchesSettings.containsKey(userProfile.getBranchId())) {
+							OrganizationUnitSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
+							branchesSettings.put(userProfile.getBranchId(), branchSetting);
+						}
+					}
+				}
+			}
+		}
+		return branchesSettings;
+	}
+
+	@Override
+	public AgentSettings getUserSettings(long agentId) throws InvalidInputException {
+		LOG.info("Getting agent settings for agent id: " + agentId);
+		if (agentId <= 0l) {
+			throw new InvalidInputException("Invalid agent id for fetching user settings");
+		}
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
+		return agentSettings;
+	}
+
+	@Override
+	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
+		Map<Long, AgentSettings> agentSettings = null;
+		if (userProfiles != null && userProfiles.size() > 0) {
+			LOG.info("Get agent settings for the user profiles: " + userProfiles.toString());
+			agentSettings = new HashMap<Long, AgentSettings>();
+			AgentSettings agentSetting = null;
+			// get the agent profiles and get the settings for each of them.
+			for (UserProfile userProfile : userProfiles) {
+				agentSetting = new AgentSettings();
+				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					LOG.debug("Getting settings for " + userProfile);
+					// get the agent id and get the profile
+					if (userProfile.getAgentId() > 0l) {
+						agentSetting = getUserSettings(userProfile.getAgentId());
+						if (agentSetting != null) {
+							agentSettings.put(userProfile.getAgentId(), agentSetting);
+						}
+					}
+					else {
+						LOG.warn("Not a valid agent id for user profile: " + userProfile + ". Skipping the record");
+					}
+				}
+			}
+		}
+		else {
+			throw new InvalidInputException("User profiles are not set");
+		}
+
+		return agentSettings;
+	}
+
 }

@@ -8,6 +8,7 @@ public class CRMInfo {
 	private String crm_source;
 	private String crm_username;
 	private String crm_password;
+	private String url;
 	private boolean connection_successful;
 
 	public String getCrm_source() {
@@ -34,6 +35,14 @@ public class CRMInfo {
 		this.crm_password = crm_password;
 	}
 
+	public String getUrl() {
+		return url;
+	}
+
+	public void setUrl(String url) {
+		this.url = url;
+	}
+
 	public boolean isConnection_successful() {
 		return connection_successful;
 	}
@@ -41,10 +50,10 @@ public class CRMInfo {
 	public void setConnection_successful(boolean connection_successful) {
 		this.connection_successful = connection_successful;
 	}
-	
+
 	@Override
-	public String toString(){
-		return "crm_source: "+crm_source+"\t crm_username: "+crm_username+"\t connection_successful: "+connection_successful;
+	public String toString() {
+		return "crm_source: " + crm_source + "\t crm_username: " + crm_username + "\t connection_successful: " + connection_successful;
 	}
 
 }
