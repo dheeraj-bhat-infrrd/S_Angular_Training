@@ -253,6 +253,48 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Check for associated branches for the region
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkbranchesinregion", method = RequestMethod.POST)
+	public String checkBranchesInRegion(Model model, HttpServletRequest request) {
+		LOG.info("Fetching all the branches for current region");
+		String messageToReturn = null;
+		
+		try {
+			long regionId = 0l;
+			try {
+				regionId = Long.parseLong(request.getParameter("regionId"));
+				LOG.debug("Calling service to get the count of branches in region");
+				long branchCount = hierarchyManagementService.getCountBranchesInRegion(regionId);
+				LOG.debug("Successfully executed service to get the count of branches in region : " + branchCount);
+				
+				if (branchCount > 0l) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				} else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("REGION_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the branch count in method checkBranchesInRegion");
+				throw new InvalidInputException("Error occurred while fetching the branch count in method checkBranchesInRegion",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching branch count for region. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+	
+	/**
 	 * Deactivates a branch status
 	 * 
 	 * @param model
@@ -292,6 +334,48 @@ public class HierarchyManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	/**
+	 * Check for associated user profiles for the branch
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkusersinbranch", method = RequestMethod.POST)
+	public String checkUsersInBranch(Model model, HttpServletRequest request) {
+		LOG.info("Fetching count of users for current branch");
+		String messageToReturn = null;
+
+		try {
+			long branchId = 0l;
+			try {
+				branchId = Long.parseLong(request.getParameter("branchId"));
+				LOG.debug("Calling service to get the count of users in branch");
+				long usersCount = hierarchyManagementService.getCountUsersInBranch(branchId);
+				LOG.debug("Successfully executed service to get the count of users in branch : " + usersCount);
+				
+				if (usersCount > 0l) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("USER_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				} else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the users count in method checkUsersInBranch");
+				throw new InvalidInputException("Error occurred while fetching the users count in method checkUsersInBranch",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching users count for branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+	
 	/**
 	 * Method to add a new region
 	 * 
