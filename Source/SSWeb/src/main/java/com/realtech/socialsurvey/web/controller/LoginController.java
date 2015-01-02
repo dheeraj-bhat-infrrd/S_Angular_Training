@@ -74,7 +74,6 @@ public class LoginController {
 		String loginName = request.getParameter("loginName");
 		String password = request.getParameter("password");
 		User user = null;
-		UserProfile userProfile = null;
 		String redirectTo = null;
 
 		try {
