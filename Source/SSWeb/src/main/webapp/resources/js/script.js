@@ -480,3 +480,93 @@ function validateAddress1(elementId){
 function validateAddress2(elementId){
 	return true;
 }
+
+//Function to validate Branch name
+function validateBranchName(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid branch name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter branch name.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).next('.input-error-2').html('Please enter a valid branch name.');
+				$('#'+elementId).next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).next('.input-error-2').html('Please enter branch name.');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Region name
+function validateRegionName(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid region name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter region name.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).next('.input-error-2').html('Please enter a valid region name.');
+				$('#'+elementId).next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).next('.input-error-2').html('Please enter region name.');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Company/Enterprise Address 1
+function validateCompanyEnterpriseAddress1(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+				return true;
+		}else{
+			$('#overlay-toast').html('Please enter address.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+				$('#'+elementId).next('.input-error-2').hide();
+				return true;
+		}else{
+			$('#'+elementId).next('.input-error-2').html('Please enter address.');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
+}
