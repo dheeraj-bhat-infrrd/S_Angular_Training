@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -44,6 +45,8 @@ public class LoginController {
 	private URLGenerator urlGenerator;
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage() {
@@ -138,17 +141,27 @@ public class LoginController {
 					 * Company->region->branch->agent
 					 */
 					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
-
-					try {
+					List<UserProfile> userProfiles = null;
+					UserProfile highestUserProfile  = null;
+					//fetch the list of all user profiles for user
+					try{
+						userProfiles  = userManagementService.getAllUserProfilesForUser(user);
+						highestUserProfile = userManagementService.getHighestUserProfile(userProfiles);
+					}catch(InvalidInputException e){
+						LOG.error("No user profiles found for the user");
+						return JspResolver.ERROR_PAGE;
+					}
+					
+					/*try {
 						LOG.debug("Calling service for fetching company admin user profile");
 						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
 					}
 					catch (InvalidInputException e) {
 						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
-					}
+					}*/
 
-					redirectTo = getRedirectionFromProfileCompletionStage(userProfile.getProfileCompletionStage());
+					redirectTo = getRedirectionFromProfileCompletionStage(highestUserProfile.getProfileCompletionStage());
 
 				}
 			}
