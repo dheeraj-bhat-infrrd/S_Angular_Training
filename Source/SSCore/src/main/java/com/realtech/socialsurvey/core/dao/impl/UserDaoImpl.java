@@ -123,6 +123,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
 			criteria.add(criterion);
 			criteria.addOrder(Order.asc("firstName"));
+			criteria.addOrder(Order.asc("lastName"));
 		}
 		catch (HibernateException hibernateException) {
 			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);
