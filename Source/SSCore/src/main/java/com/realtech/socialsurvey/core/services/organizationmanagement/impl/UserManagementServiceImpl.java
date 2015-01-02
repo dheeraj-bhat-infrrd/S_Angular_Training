@@ -850,34 +850,74 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			LOG.error("No profile found for user : " + user.getUserId());
 			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
 		}
-		int minProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-		UserProfile minUserProfile = null;
-		for (UserProfile userProfile : userProfiles) {
-			if ((userProfile.getProfilesMaster().getProfileId() < minProfilesMasterId)
-					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
-				minProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
-				minUserProfile = userProfile;
-			}
-		}
+		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		UserProfile highestUserProfile = null;
+		//get the highest  user profile for the user
+		highestUserProfile = getHighestUserProfile(userProfiles);
 		queries.clear();
-		if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
 		}
-		else if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
+			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
 		}
-		else if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 			queries.put("companyId", user.getCompany().getCompanyId());
-			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
-			queries.put("branch", branchDao.findById(Branch.class, minUserProfile.getBranchId()));
+			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
+			queries.put("branch", branchDao.findById(Branch.class, highestUserProfile.getBranchId()));
 		}
 		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
 	}
+	
+	/*
+	 * Method to fetch all the user profiles for the user
+	 */
+	@Override
+	@Transactional
+	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException{
+		if(user == null){
+			LOG.error("User object passed was be null");
+			throw new InvalidInputException("User object passed was be null");
+		}
+		LOG.info("Method getAllUserProfilesForUser() called to fetch the list of user profiles for the user");
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.USER_COLUMN, user);
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		LOG.info("Method getAllUserProfilesForUser() finised successfully");
+		return userProfiles;
+	}
 
+	/*
+	 * Method to get highest user profile for the user
+	 * company->region->branch->agent
+	 */
+	@Override
+	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException{
+		if(userProfiles == null){
+			LOG.error("No user profiles passed");
+			throw new InvalidInputException("List of user profiles passed is null");
+		}
+		LOG.info("Method getHighestUserProfile() called to fetch the highest user profile for the user");
+		
+		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		UserProfile highestUserProfile = null;
+		for (UserProfile userProfile : userProfiles) {
+			if ((userProfile.getProfilesMaster().getProfileId() < highestProfilesMasterId)
+					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
+				highestProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
+				highestUserProfile = userProfile;
+			}
+		}
+		LOG.info("Method getHighestUserProfile() finished successfully");
+		return highestUserProfile;
+	}
+	
 	/**
 	 * Method to generate and send verification link
 	 * 
