@@ -5,6 +5,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -77,5 +78,13 @@ public interface UserManagementService {
 	public void updateProfileCompletionStage(User user, int profilesMasterId, String profileCompletionStage) throws InvalidInputException;
 
 	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException;
+	
+	//JIRA SS-42 by RM-06:BOC
+	
+	public List<UserProfile> getAllUserProfilesForUser(User user);
+	
+	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles);
+	
+	//JIRA SS-42 by RM-06:BOC
 }
 // JIRA SS-34 BY RM02 BOC

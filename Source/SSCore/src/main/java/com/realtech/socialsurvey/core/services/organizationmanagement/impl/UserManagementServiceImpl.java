@@ -851,9 +851,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
 		}
 		int minProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-		UserProfile minUserProfile = null;
+		UserProfile highestUserProfile = null;
 		//get the highest  user profile for the user
-		minUserProfile = getHighestUserProfile(userProfiles);
+		highestUserProfile = getHighestUserProfile(userProfiles);
 		queries.clear();
 		if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
@@ -861,33 +861,48 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		else if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
+			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
 		}
 		else if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 			queries.put("companyId", user.getCompany().getCompanyId());
-			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
-			queries.put("branch", branchDao.findById(Branch.class, minUserProfile.getBranchId()));
+			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
+			queries.put("branch", branchDao.findById(Branch.class, highestUserProfile.getBranchId()));
 		}
 		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
+	}
+	
+	/*
+	 * Method to fetch all the user profiles for the user
+	 */
+	@Override
+	@Transactional
+	public List<UserProfile> getAllUserProfilesForUser(User user) {
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.USER_COLUMN, user);
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		return userProfiles;
 	}
 
 	/*
 	 * Method to get highest user profile for the user
 	 * company->region->branch->agent
 	 */
+	@Override
 	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles){
 		int minProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-		UserProfile minUserProfile = null;
+		UserProfile highestUserProfile = null;
 		for (UserProfile userProfile : userProfiles) {
 			if ((userProfile.getProfilesMaster().getProfileId() < minProfilesMasterId)
 					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
 				minProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
-				minUserProfile = userProfile;
+				highestUserProfile = userProfile;
 			}
 		}
-		return minUserProfile;
+		return highestUserProfile;
 	}
 	
 	/**
