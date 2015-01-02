@@ -231,7 +231,7 @@ public class LoginController {
 
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getStackTrace(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.FORGOT_PASSWORD;
 		}
