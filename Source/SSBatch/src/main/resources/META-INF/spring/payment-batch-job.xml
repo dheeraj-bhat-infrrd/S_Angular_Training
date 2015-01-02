@@ -27,7 +27,7 @@
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
-	<bean id="customItemProcessor" class="com.realtech.socialsurvey.processor.CustomItemProcessor" />	
+	<bean id="customItemProcessor" class="com.realtech.socialsurvey.batch.processor.CustomItemProcessor" />	
 
 
 

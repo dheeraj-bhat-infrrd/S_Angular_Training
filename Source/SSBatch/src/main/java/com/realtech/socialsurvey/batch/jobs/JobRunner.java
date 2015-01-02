@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.jobs;
+package com.realtech.socialsurvey.batch.jobs;
 //JIRA: SS-61: By RM03
 
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey;
+package com.realtech.socialsurvey.batch;
 
 // JIRA: SS-61: By RM03
 

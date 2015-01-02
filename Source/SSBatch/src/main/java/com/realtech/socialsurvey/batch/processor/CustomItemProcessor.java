@@ -1,4 +1,4 @@
-package com.realtech.socialsurvey.processor;
+package com.realtech.socialsurvey.batch.processor;
 //JIRA: SS-61: By RM03
 
 import java.sql.Timestamp;
