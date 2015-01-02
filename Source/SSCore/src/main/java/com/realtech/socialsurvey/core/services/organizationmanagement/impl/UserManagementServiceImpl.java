@@ -852,13 +852,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		int minProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		UserProfile minUserProfile = null;
-		for (UserProfile userProfile : userProfiles) {
-			if ((userProfile.getProfilesMaster().getProfileId() < minProfilesMasterId)
-					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
-				minProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
-				minUserProfile = userProfile;
-			}
-		}
+		//get the highest  user profile for the user
+		minUserProfile = getHighestUserProfile(userProfiles);
 		queries.clear();
 		if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
@@ -878,6 +873,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return branches;
 	}
 
+	/*
+	 * Method to get highest user profile for the user
+	 * company->region->branch->agent
+	 */
+	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles){
+		int minProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		UserProfile minUserProfile = null;
+		for (UserProfile userProfile : userProfiles) {
+			if ((userProfile.getProfilesMaster().getProfileId() < minProfilesMasterId)
+					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
+				minProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
+				minUserProfile = userProfile;
+			}
+		}
+		return minUserProfile;
+	}
+	
 	/**
 	 * Method to generate and send verification link
 	 * 
