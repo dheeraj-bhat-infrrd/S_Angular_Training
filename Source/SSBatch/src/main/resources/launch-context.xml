@@ -26,9 +26,9 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="jobRunner" class="com.realtech.socialsurvey.jobs.JobRunner" />
+	<bean id="jobRunner" class="com.realtech.socialsurvey.batch.jobs.JobRunner" />
 
-	<!-- Run every 5 seconds -->
+	<!-- Run every 10 seconds -->
 	<task:scheduled-tasks>
 		<!-- <task:scheduled ref="runScheduler" method="run" fixed-delay="10000" 
 			/> -->

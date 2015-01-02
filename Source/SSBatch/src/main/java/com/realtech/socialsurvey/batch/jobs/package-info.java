@@ -2,4 +2,4 @@
  * This is the package for spring batch job runners.
  */
 
-package com.realtech.socialsurvey.jobs;
+package com.realtech.socialsurvey.batch.jobs;
