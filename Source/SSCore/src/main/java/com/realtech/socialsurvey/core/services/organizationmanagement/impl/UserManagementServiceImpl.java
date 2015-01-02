@@ -24,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -84,6 +85,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<Branch, Long> branchDao;
+	
+	@Autowired
+	private GenericDao<Region, Long> regionDao;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -174,7 +178,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.debug("Creating new user with emailId : " + emailId + " and verification status : " + status);
-		User user = createUser(company, encryptedPassword, emailId, firstName, lastName, status);
+		User user = createUser(company, encryptedPassword, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE, status,
+				CommonConstants.ADMIN_USER_NAME);
 		user = userDao.save(user);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
@@ -290,7 +295,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new UserAlreadyExistsException("User with User ID : " + emailId + " already exists");
 		}
 
-		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_NOT_VERIFIED);
+		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_ACTIVE,
+				CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME);
 		user = userDao.save(user);
 
 		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
@@ -302,6 +308,30 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		sendVerificationLink(user);
 		LOG.info("Method to add a new user, inviteUserToRegister() finished for email id : " + emailId);
+	}
+
+	@Override
+	@Transactional
+	public User inviteNewUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
+			UserAlreadyExistsException, UndeliveredEmailException {
+		if (firstName == null || firstName.isEmpty()) {
+			throw new InvalidInputException("First name is either null or empty in inviteUserToRegister().");
+		}
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("Email Id is either null or empty in inviteUserToRegister().");
+		}
+		LOG.info("Method to add a new user, inviteUserToRegister() called for email id : " + emailId);
+
+		if (userExists(emailId)) {
+			throw new UserAlreadyExistsException("User with User ID : " + emailId + " already exists");
+		}
+
+		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
+				CommonConstants.STATUS_NOT_VERIFIED, String.valueOf(admin.getUserId()));
+		user = userDao.save(user);
+		sendVerificationLink(user);
+		LOG.info("Method to add a new user, inviteUserToRegister() finished for email id : " + emailId);
+		return user;
 	}
 
 	/*
@@ -722,6 +752,42 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to assign user to a branch finished for user : " + admin.getUserId());
 	}
 
+	@Override
+	@Transactional
+	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException {
+
+		if (admin == null) {
+			throw new InvalidInputException("No admin user present.");
+		}
+		LOG.info("Method to unassign user from a branch called for user : " + admin.getUserId());
+		User user = userDao.findById(User.class, userId);
+
+		if (user == null) {
+			throw new InvalidInputException("No user present for the specified userId");
+		}
+
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.USER_COLUMN, user);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		UserProfile userProfile = null;
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			LOG.error("No user profile present for the user with user Id " + userId + " with the branch " + branchId);
+			throw new InvalidInputException("No user profile present for the user with user Id " + userId + " with the branch " + branchId);
+		}
+		else {
+			userProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+			if (userProfile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				userProfile.setStatus(CommonConstants.STATUS_INACTIVE);
+				userProfile.setModifiedBy(String.valueOf(admin.getUserId()));
+				userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			}
+		}
+		userProfileDao.saveOrUpdate(userProfile);
+		LOG.info("Method to unassign user from a branch finished for user : " + admin.getUserId());
+
+	}
+
 	/*
 	 * Method to update the given user as active or inactive.
 	 */
@@ -768,12 +834,39 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
 		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
 		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
-		List<Long> branchIds = userProfileDao.getBranchesForAdmin(user, profilesMasters);
-		if (branchIds == null || branchIds.isEmpty()) {
-			LOG.error("No branch found for user : " + user.getUserId());
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.USER_COLUMN, user);
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			LOG.error("No profile found for user : " + user.getUserId());
 			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
 		}
-		List<Branch> branches = branchDao.findByColumnForMultipleValues(Branch.class, "branchId", branchIds);
+		int minProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		UserProfile minUserProfile = null;
+		for (UserProfile userProfile : userProfiles) {
+			if ((userProfile.getProfilesMaster().getProfileId() < minProfilesMasterId)
+					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)){
+				minProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
+				minUserProfile = userProfile;
+			}
+		}
+		queries.clear();
+		if(minProfilesMasterId==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID){
+			// Fetch all the branches of company
+			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		}
+		else if(minProfilesMasterId==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID){
+			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
+		}
+		else if(minProfilesMasterId==CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID){
+			queries.put("companyId", user.getCompany().getCompanyId());
+			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
+			queries.put("branch", branchDao.findById(Branch.class, minUserProfile.getBranchId()));
+		}
+		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
 	}
@@ -947,7 +1040,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @param displayName
 	 * @return
 	 */
-	private User createUser(Company company, String password, String emailId, String firstName, String lastName, int status) {
+	private User createUser(Company company, String password, String emailId, String firstName, String lastName, int isAtleastOneProfileComplete,
+			int status, String createdBy) {
 		LOG.debug("Method createUser called for email-id : " + emailId + " and status : " + status);
 		User user = new User();
 		user.setCompany(company);
@@ -957,13 +1051,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setFirstName(firstName);
 		user.setLastName(lastName);
 		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
-		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+		user.setIsAtleastOneUserprofileComplete(isAtleastOneProfileComplete);
 		user.setStatus(status);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 		user.setCreatedOn(currentTimestamp);
 		user.setModifiedOn(currentTimestamp);
-		user.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
-		user.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
+		user.setCreatedBy(createdBy);
+		user.setModifiedBy(createdBy);
 		LOG.debug("Method createUser finished for email-id : " + emailId);
 		return user;
 	}

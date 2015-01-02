@@ -15,13 +15,14 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+	<div class="overlay-loader hide"></div>
     <div id="header-slider-wrapper" class="header-slider-wrapper">
         <div class="header-slider">
             <div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
-                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
-                <div class="header-links-item"><a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
-                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
-                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.usermanagement.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="true" data-link="dashboard" href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="company" href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="buildSurvey" href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
+                <div class="header-links-item"><a  class="header-links-item-a"data-isClicked="false" data-link="userManagement" href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key"/></a></div>
             </div>
         </div>
     </div>
@@ -30,10 +31,10 @@
         <div class="container clearfix header-container">
             <div class="header-logo float-left"></div>
             <div id="header-links" class="header-links float-left clearfix">
-                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
-                <div class="header-links-item"><a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
-                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
-                <div class="header-links-item"><a href="javascript:showMainContent('')"><spring:message code="label.header.usermanagement.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="true" data-link="dashboard" href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="company" href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="buildSurvey" href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
+                <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="userManagement" href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key"/></a></div>
             </div>
             <div class="header-user-info float-right clearfix">
                 <div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>

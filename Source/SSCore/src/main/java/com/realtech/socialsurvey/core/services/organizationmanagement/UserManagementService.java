@@ -30,6 +30,9 @@ public interface UserManagementService {
 	public void inviteUserToRegister(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
 			UserAlreadyExistsException, UndeliveredEmailException;
 
+	public User inviteNewUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
+	UserAlreadyExistsException, UndeliveredEmailException;
+	
 	public void removeExistingUser(User admin, long userIdToBeDeactivated) throws InvalidInputException;
 
 	public void unassignBranchAdmin(User admin, long branchId, long userIdToRemove) throws InvalidInputException;
@@ -49,6 +52,8 @@ public interface UserManagementService {
 	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException;
 	
 	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException;
+	
+	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException;
 
 	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
 	

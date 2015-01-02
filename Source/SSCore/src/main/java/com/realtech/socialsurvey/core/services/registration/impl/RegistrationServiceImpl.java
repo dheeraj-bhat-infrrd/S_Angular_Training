@@ -188,7 +188,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
-			emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getDisplayName());
+			emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName());
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
@@ -339,7 +339,7 @@ public class RegistrationServiceImpl implements RegistrationService {
 		user.setLoginName(emailId);
 		user.setLoginPassword(password);
 		user.setEmailId(emailId);
-		user.setDisplayName(displayName);
+		//user.setDisplayName(displayName);
 		user.setSource(CommonConstants.DEFAULT_SOURCE_APPLICATION);
 		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 		user.setStatus(status);
