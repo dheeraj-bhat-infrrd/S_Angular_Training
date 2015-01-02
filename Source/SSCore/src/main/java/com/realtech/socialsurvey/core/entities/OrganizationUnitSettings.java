@@ -82,12 +82,12 @@ public class OrganizationUnitSettings {
 		this.crm_info = crm_info;
 	}
 
-	public MailContentSettings getMail_content_settings() {
+	public MailContentSettings getMail_content() {
 		return mail_content;
 	}
 
-	public void setMail_content_settings(MailContentSettings mail_content_settings) {
-		this.mail_content = mail_content_settings;
+	public void setMail_content(MailContentSettings mail_content) {
+		this.mail_content = mail_content;
 	}
 
 	public Licenses getLicenses() {

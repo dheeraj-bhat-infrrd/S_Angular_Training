@@ -354,7 +354,7 @@ public class OrganizationManagementController {
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
 			}
 			// update the mail content settings in session
-			companySettings.setMail_content_settings(updatedMailContentSettings);
+			companySettings.setMail_content(updatedMailContentSettings);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}

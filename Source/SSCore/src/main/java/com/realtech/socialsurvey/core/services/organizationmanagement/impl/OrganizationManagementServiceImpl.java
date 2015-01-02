@@ -551,7 +551,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Invalid mail category.");
 		}
 		LOG.debug("Updating "+mailCategory+" for settings: "+companySettings.toString()+" with mail body: "+mailBody);
-		MailContentSettings originalContentSettings = companySettings.getMail_content_settings();
+		MailContentSettings originalContentSettings = companySettings.getMail_content();
 		MailContentSettings mailContentSettings = new MailContentSettings();
 		MailContent mailContent = new MailContent();
 		mailContent.setMail_body(mailBody);

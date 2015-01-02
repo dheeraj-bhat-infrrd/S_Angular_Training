@@ -45,6 +45,9 @@ public class PaymentController {
 
 	@Autowired
 	private MessageUtils messageUtils;
+	
+	@Autowired
+	private SessionHelper sessionHelper;
 
 	/**
 	 * Method used to display the Braintree form to get card details.
@@ -112,6 +115,10 @@ public class PaymentController {
 					
 					LOG.debug("Adding account type in session");
 					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+					// get the settings
+					sessionHelper.getCanonicalSettings(session);
+					// set the session variable
+					sessionHelper.setSettingVariablesInSession(session);
 				}
 				catch (InvalidInputException e) {
 					throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
