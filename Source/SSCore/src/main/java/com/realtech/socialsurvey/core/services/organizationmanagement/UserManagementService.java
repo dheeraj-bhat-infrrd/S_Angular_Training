@@ -81,9 +81,9 @@ public interface UserManagementService {
 	
 	//JIRA SS-42 by RM-06:BOC
 	
-	public List<UserProfile> getAllUserProfilesForUser(User user);
+	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException;
 	
-	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles);
+	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException;
 	
 	//JIRA SS-42 by RM-06:BOC
 }
