@@ -85,7 +85,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<Branch, Long> branchDao;
-	
+
 	@Autowired
 	private GenericDao<Region, Long> regionDao;
 
@@ -310,6 +310,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to add a new user, inviteUserToRegister() finished for email id : " + emailId);
 	}
 
+	/*
+	 * Method to invite new user
+	 */
 	@Override
 	@Transactional
 	public User inviteNewUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
@@ -320,7 +323,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (emailId == null || emailId.isEmpty()) {
 			throw new InvalidInputException("Email Id is either null or empty in inviteUserToRegister().");
 		}
-		LOG.info("Method to add a new user, inviteUserToRegister() called for email id : " + emailId);
+		LOG.info("Method to add a new user, inviteNewUser() called for email id : " + emailId);
 
 		if (userExists(emailId)) {
 			throw new UserAlreadyExistsException("User with User ID : " + emailId + " already exists");
@@ -330,7 +333,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				CommonConstants.STATUS_NOT_VERIFIED, String.valueOf(admin.getUserId()));
 		user = userDao.save(user);
 		sendVerificationLink(user);
-		LOG.info("Method to add a new user, inviteUserToRegister() finished for email id : " + emailId);
+		LOG.info("Method to add a new user, inviteNewUser() finished for email id : " + emailId);
 		return user;
 	}
 
@@ -752,6 +755,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to assign user to a branch finished for user : " + admin.getUserId());
 	}
 
+	/*
+	 * Method to unassign a user from branch
+	 */
+
 	@Override
 	@Transactional
 	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException {
@@ -847,21 +854,21 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		UserProfile minUserProfile = null;
 		for (UserProfile userProfile : userProfiles) {
 			if ((userProfile.getProfilesMaster().getProfileId() < minProfilesMasterId)
-					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)){
+					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
 				minProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
 				minUserProfile = userProfile;
 			}
 		}
 		queries.clear();
-		if(minProfilesMasterId==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID){
+		if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
 		}
-		else if(minProfilesMasterId==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID){
+		else if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
 			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
 		}
-		else if(minProfilesMasterId==CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID){
+		else if (minProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 			queries.put("companyId", user.getCompany().getCompanyId());
 			queries.put("region", regionDao.findById(Region.class, minUserProfile.getRegionId()));
 			queries.put("branch", branchDao.findById(Branch.class, minUserProfile.getBranchId()));
