@@ -54,6 +54,12 @@ public class UserManagementController {
 		LOG.info("User Management page started");
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		if(user.getStatus() != CommonConstants.STATUS_ACTIVE){
+			LOG.error("Inactive or unauthorized users can not access user management page");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 		List<Branch> branches = null;
 		try {
 			try {
