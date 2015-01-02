@@ -75,6 +75,7 @@ public class LoginController {
 		String password = request.getParameter("password");
 		User user = null;
 		String redirectTo = null;
+		AccountType accountType = null;
 
 		try {
 			validateLoginFormParameters(loginName, password);
@@ -104,7 +105,6 @@ public class LoginController {
 				HttpSession session = request.getSession(false);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
-				AccountType accountType = null;
 				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 				if (licenseDetails != null && !licenseDetails.isEmpty()) {
 					LicenseDetail licenseDetail = licenseDetails.get(0);
@@ -150,6 +150,14 @@ public class LoginController {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}
+					//If account type is individual set user management tab as not authorized
+ 					if(accountType.getName() == "Individual"){
+						model.addAttribute("userManagementNotAccessible", "true");
+					}
+					//if user is an agent set user management not accessible
+ 					else if(highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+					      model.addAttribute("userManagementNotAccessible", "true");
+					 }
 					
 					/*try {
 						LOG.debug("Calling service for fetching company admin user profile");
