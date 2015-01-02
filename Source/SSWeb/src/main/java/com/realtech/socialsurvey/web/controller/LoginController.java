@@ -150,14 +150,10 @@ public class LoginController {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}
-					//If account type is individual set user management tab as not authorized
- 					if(accountType.getName() == "Individual"){
+					//If account type is individual or user is an agent set user management tab as not authorized
+ 					if(accountType.getValue() == 1 || highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
 						model.addAttribute("userManagementNotAccessible", "true");
 					}
-					//if user is an agent set user management not accessible
- 					else if(highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
-					      model.addAttribute("userManagementNotAccessible", "true");
-					 }
 					
 					/*try {
 						LOG.debug("Calling service for fetching company admin user profile");
