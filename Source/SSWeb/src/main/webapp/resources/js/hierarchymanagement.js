@@ -129,6 +129,14 @@ function showRegionsCallBack(data) {
 	$("#existing-regions").html(data);
 	populateRegionsSelector();
 	
+	if($("#enable-branches-form").length > 0) {
+		$("#add-branch-form :input").prop("disabled", false);
+		$("#branch-actions").children().attr("disabled", false);
+	} else {
+		$("#add-branch-form :input").prop("disabled", true);
+		$("#branch-actions").children().attr("disabled", true);
+	}
+	
 	// bind the click event of branches with edit
 	$(".region-element").click(function() {
 		populateUpdateRegionForm(this);
@@ -247,3 +255,185 @@ function updateRegionCallBack(data) {
 	$(".create-branch-dd input[type='text']").val("");
 	$(".create-branch-dd input[type='hidden']").val("");
 }
+
+
+
+// Region Delete popup overlay
+function deleteRegionPopup(regionId) {
+	$('#regionid-to-delete-hidden').val(regionId);
+	var urlCheck = "./checkbranchesinregion.do?regionId=" + regionId;
+	console.log("Check for deactivation url : " + urlCheck);
+	callAjaxPOST(urlCheck, deleteRegionCheckCallBack, true);
+}
+function deleteRegionCheckCallBack(response) {
+	$("#serverSideerror").html(response);
+
+	var success = "Selected Region could be deleted";
+	var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Region", "Are you Sure?");
+	} else {
+		createPopupInfo("Remove Region");
+	}
+}
+
+
+// Branch Delete popup overlay
+function deleteBranchPopup(branchId) {
+	$('#branchid-to-delete-hidden').val(branchId);
+	var urlCheck = "./checkusersinbranch.do?branchId=" + branchId;
+	console.log("Check for deactivation url : " + urlCheck);
+	callAjaxPOST(urlCheck, deleteBranchCheckCallBack, true);
+}
+function deleteBranchCheckCallBack(response) {
+	$("#serverSideerror").html(response);
+	
+	var success = "Selected Branch could be deleted";
+	var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Branch", "Are you Sure?");
+	} else {
+		createPopupInfo("Remove Branch");
+	}
+}
+
+
+// Pop-up Overlay modifications
+function createPopupConfirm(header, body) {
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$('#overlay-header').html(header);
+	$('#overlay-txt').html(body);
+
+	$('#overlay-confirm').show();
+}
+function createPopupInfo(header) {
+	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-header').html(header);
+	
+   	$('#overlay-confirm').show();
+}
+$('#overlay-continue').click(function(){
+	if ($('#overlay-continue').attr("disabled") != "disabled") {
+		$('#overlay-confirm').hide();
+		$("#serverSideerror").html('');
+		
+		var regionIdDelete = $('#regionid-to-delete-hidden').val();
+		var branchIdDelete = $('#branchid-to-delete-hidden').val();
+		if(regionIdDelete != "") {
+			deleteRegion(regionIdDelete);
+			$('#regionid-to-delete-hidden').val('');
+		} else if(branchIdDelete != "") {
+			deleteBranch(branchIdDelete);
+			$('#branchid-to-delete-hidden').val('');
+		}
+	}
+});
+$('#overlay-cancel').click(function(){
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$('#overlay-confirm').hide();
+	$('#regionid-to-delete-hidden').val('');
+	$('#branchid-to-delete-hidden').val('');
+	$("#serverSideerror").html('');
+});
+
+
+// Branch details validation
+var isBranchValid;
+$('#branch-name-txt').blur(function() {
+	validateBranchName(this.id);
+});
+$('#branch-address1-txt').blur(function() {
+	validateCompanyEnterpriseAddress1(this.id);
+});
+$('#branch-address2-txt').blur(function() {
+	validateAddress2(this.id);
+});
+
+function validateBranchInformation(elementId) {
+	isBranchValid = true;
+	var isFocussed = false;
+	
+	if(!validateBranchName('branch-name-txt')){
+		isBranchValid = false;
+		if(!isFocussed){
+			$('#branch-name-txt').focus();
+			isFocussed=true;
+		}
+	}
+	if(!validateCompanyEnterpriseAddress1('branch-address1-txt')){
+		isBranchValid = false;
+		if(!isFocussed){
+			$('#branch-address1-txt').focus();
+			isFocussed=true;
+		}
+	}
+	if(!validateAddress2('branch-address2-txt')){
+		isBranchValid = false;
+		if(!isFocussed){
+			$('#branch-address2-txt').focus();
+			isFocussed=true;
+		}
+	}
+	return isBranchValid;
+}
+
+$("#branch-save-icon").click(function() {
+	if ($("#branch-save-icon").attr("disabled") != "disabled") {
+		console.log("submitting branch information form");
+		if (validateBranchInformation('add-branch-form')) {
+			addOrUpdateBranch("add-branch-form");
+		}
+	}
+});
+
+
+// Region details validation
+var isRegionValid;
+$('#region-name-txt').blur(function() {
+	validateRegionName(this.id);
+});
+$('#region-address1-txt').blur(function() {
+	validateCompanyEnterpriseAddress1(this.id);
+});
+$('#region-address2-txt').blur(function() {
+	validateAddress2(this.id);
+});
+
+function validateRegionInformation(elementId) {
+	isRegionValid = true;
+	var isFocussed = false;
+	
+	if(!validateRegionName('region-name-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-name-txt').focus();
+			isFocussed=true;
+		}
+	}
+	if(!validateCompanyEnterpriseAddress1('region-address1-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-address1-txt').focus();
+			isFocussed=true;
+		}
+	}
+	if(!validateAddress2('region-address2-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-address2-txt').focus();
+			isFocussed=true;
+		}
+	}
+	return isRegionValid;
+}
+
+$("#region-save-icon").click(function(e) {
+	console.log("submitting region information form");
+	if(validateRegionInformation('enterprise-branch-region')){
+		addOrUpdateRegion("add-region-form");
+	}
+});

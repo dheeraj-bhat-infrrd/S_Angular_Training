@@ -218,6 +218,7 @@
 <script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script>
     $(document).ready(function(){
+    	$(document).attr("title", "Settings");
     	$('#survey-participation-mailcontent').ckeditor();
     	$('#survey-participation-reminder-mailcontent').ckeditor();
         $('#st-settings-location-on').click(function(){
