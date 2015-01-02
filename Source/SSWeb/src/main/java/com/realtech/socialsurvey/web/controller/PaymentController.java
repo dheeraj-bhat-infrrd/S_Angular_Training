@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
-//JIRA: SS-15: By RM03
+
+// JIRA: SS-15: By RM03
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -44,6 +45,9 @@ public class PaymentController {
 
 	@Autowired
 	private MessageUtils messageUtils;
+	
+	@Autowired
+	private SessionHelper sessionHelper;
 
 	/**
 	 * Method used to display the Braintree form to get card details.
@@ -106,19 +110,33 @@ public class PaymentController {
 				AccountType accountType = null;
 				try {
 					LOG.debug("Calling sevices for adding account type of company");
-					accountType = organizationManagementService.addAccountTypeForCompanyAndUpdateStage(user, strAccountType);
+					accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
 					LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
+					
+					LOG.debug("Adding account type in session");
+					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+					// get the settings
+					sessionHelper.getCanonicalSettings(session);
+					// set the session variable
+					sessionHelper.setSettingVariablesInSession(session);
 				}
 				catch (InvalidInputException e) {
 					throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
 							DisplayMessageConstants.GENERAL_ERROR, e);
 				}
 				try {
+					/**
+					 * For each account type, only the company admin's profile completion stage is
+					 * updated, all the other profiles created by default need no action so their
+					 * profile completion stage is marked completed at the time of insert
+					 */
+					LOG.debug("Calling sevices for updating profile completion stage");
 					registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 							CommonConstants.DASHBOARD_STAGE);
+					LOG.debug("Successfully executed sevices for updating profile completion stage");
 				}
 				catch (InvalidInputException e) {
-					LOG.error("PaymentController subscribeForPlan() : InvalidInputException : " + e.getMessage(), e);
+					LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
 					throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 				}
 				model.addAttribute("message",
