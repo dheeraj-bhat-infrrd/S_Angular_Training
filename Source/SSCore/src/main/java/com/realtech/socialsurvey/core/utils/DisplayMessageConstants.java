@@ -44,6 +44,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_LOGO_SIZE = "INVALID_LOGO_SIZE";
 	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
 	public static final String MAX_USERS_LIMIT_REACHED = "MAX_USERS_LIMIT_REACHED";
+	public static final String USER_MANAGEMENT_NOT_AUTHORIZED = "USER_MANAGEMENT_NOT_AUTHORIZED";
 	
 	
 	// success message constants
