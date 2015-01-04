@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.util.List;
-import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -654,10 +653,9 @@ public class UserManagementController {
 	 */
 	private void getNextListOfUsers(Model model, HttpServletRequest request) {
 		LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company.");
-		Map<String, Object> modelMap = model.asMap();
 		HttpSession session = request.getSession(false);
 		int currentIndex = (Integer) session.getAttribute("currentIndex");
-		@SuppressWarnings("unchecked") List<User> allUsers = (List<User>) modelMap.get("allUsersList");
+		@SuppressWarnings("unchecked") List<User> allUsers = (List<User>) session.getAttribute("allUsersList");
 		int maxIndex = currentIndex + BATCH_SIZE;
 		if (allUsers.size() <= maxIndex) {
 			maxIndex = allUsers.size();
