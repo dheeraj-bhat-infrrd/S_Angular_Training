@@ -57,14 +57,7 @@
 					<div class="um-item-row-left text-right">
 						<spring:message code="label.assignto.key" />
 					</div>
-					<c:choose>
-						<c:when test="${not empty assignedBranches}">
-							<div class="um-item-row-icon icn-tick"></div>
-						</c:when>
-						<c:otherwise>
-							<div class="um-item-row-icon icn-save"></div>
-						</c:otherwise>
-					</c:choose>
+						<div class="um-item-row-icon icn-tick"></div>
 					<div class="hm-item-row-right um-item-row-right">
 						<input type="text" class="um-item-row-txt" id="um-assignto"
 							placeholder='<spring:message code="label.assignto.key" />'>

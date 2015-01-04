@@ -22,7 +22,7 @@
                 <div class="header-links-item"><a class="header-links-item-a" data-isClicked="true" data-link="dashboard" href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
                 <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="company" href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
                 <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="buildSurvey" href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
-                <c:if test="${not empty userManagementNotAccessible}">
+                <c:if test="${empty userManagementNotAccessible}">
                 	<div class="header-links-item"><a  class="header-links-item-a"data-isClicked="false" data-link="userManagement" href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key"/></a></div>
                 </c:if>
             </div>
@@ -36,7 +36,7 @@
                 <div class="header-links-item"><a class="header-links-item-a" data-isClicked="true" data-link="dashboard" href="javascript:showMainContent('')"><spring:message code="label.header.dashboard.key"/></a></div>
                 <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="company" href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key"/></a></div>
                 <div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="buildSurvey" href="javascript:showMainContent('')"><spring:message code="label.header.buildsurvey.key"/></a></div>
-                <c:if test="${not empty userManagementNotAccessible}">
+                <c:if test="${empty userManagementNotAccessible}">
                 	<div class="header-links-item"><a class="header-links-item-a" data-isClicked="false" data-link="userManagement" href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key"/></a></div>
                 </c:if>
             </div>
