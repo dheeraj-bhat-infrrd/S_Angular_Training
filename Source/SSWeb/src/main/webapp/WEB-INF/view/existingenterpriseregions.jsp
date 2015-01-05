@@ -13,10 +13,11 @@
 </div>
 <c:choose>
 	<c:when test = "${not empty regions}">
+		<input type="hidden" id="enable-branches-form" value="true">
 		<c:forEach var="region" items="${regions}">
 			<div class="hm-sub-item clearfix">
 			    <div class="float-left hm-sub-item-left region-element" data-regionid = "${region.regionId}">${region.region}</div>
-			    <div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick="javascript:deleteRegion('${region.regionId}')"></div>
+			    <div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick="deleteRegionPopup('${region.regionId}')"></div>
 			</div>
 		</c:forEach>
 	</c:when>
@@ -24,4 +25,3 @@
 		<spring:message code="label.noregionexist.key"/>
 	</c:otherwise>
 </c:choose>
-		                       

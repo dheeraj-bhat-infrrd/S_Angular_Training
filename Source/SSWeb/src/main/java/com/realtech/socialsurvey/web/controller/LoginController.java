@@ -216,9 +216,9 @@ public class LoginController {
 		User user = null;
 		// check if form parameters passed are null
 		try {
-			if (emailId == null || emailId.isEmpty()) {
-				LOG.error("Emaild passed can not be null or empty");
-				throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
+			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+				LOG.error("Invalid email id passed");
+				throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 			}
 			try {
 				// verify if the user exists with the registered emailId
@@ -354,13 +354,13 @@ public class LoginController {
 	 */
 	private void validateResetPasswordFormParameters(String emailId, String password, String confirmPassword) throws InvalidInputException {
 		LOG.debug("Validating reset password form paramters");
-		if (emailId == null || emailId.isEmpty()) {
-			LOG.error("Emaild passed can not be null or empty");
-			throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+			LOG.error("Invalid email id passed");
+			throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty()) {
-			LOG.error("Password can not be null or empty");
-			throw new InvalidInputException("Password can not be null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+			LOG.error("Invalid password");
+			throw new InvalidInputException("Invalid password", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (confirmPassword == null || confirmPassword.isEmpty()) {
 			LOG.error("Confirm Password can not be null or empty");
