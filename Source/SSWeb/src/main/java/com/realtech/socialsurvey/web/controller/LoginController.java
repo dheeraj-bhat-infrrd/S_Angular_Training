@@ -141,14 +141,12 @@ public class LoginController {
 					 * Company->region->branch->agent
 					 */
 					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
-					List<UserProfile> userProfiles = null;
 					UserProfile highestUserProfile = null;
-					// fetch the list of all user profiles for user
+					// fetch the highest user profile for user
 					try {
-						userProfiles = userManagementService.getAllUserProfilesForUser(user);
-						highestUserProfile = userManagementService.getHighestUserProfile(userProfiles);
+						highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
 					}
-					catch (InvalidInputException e) {
+					catch (NoRecordsFetchedException e) {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}
