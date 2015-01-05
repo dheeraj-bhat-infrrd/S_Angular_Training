@@ -44,7 +44,7 @@
 	                                    </div>
 	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
 		                                    <!-- check the encompass username -->
-		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null &&  cannonicalusersettings.companySettings.crm_info.crm_username != null}">
+		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.crm_username != null}">
 		                                    	<c:set var="encomapssusername" value="${cannonicalusersettings.companySettings.crm_info.crm_username }"/>
 		                                    </c:if>
 		                                    <input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encomapssusername}">
@@ -60,7 +60,7 @@
 	                                    </div>
 	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
 	                                    	<!-- check the encompass password -->
-		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null &&  cannonicalusersettings.companySettings.crm_info.crm_password != null}">
+		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.crm_password != null}">
 		                                    	<c:set var="encomapsspassword" value="${cannonicalusersettings.companySettings.crm_info.crm_password }"/>
 		                                    </c:if>
 	                                        <input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encomapsspassword}">
@@ -76,7 +76,7 @@
 	                                    </div>
 	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
 	                                    	<!-- check the encompass password -->
-		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null &&  cannonicalusersettings.companySettings.crm_info.url != null}">
+		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.url != null}">
 		                                    	<c:set var="encomapssurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
 		                                    </c:if>
 	                                        <input id="encompass-url" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
@@ -95,11 +95,13 @@
             <div class="um-header margin-top-25">Score Post Settings</div>
             <div class="clearfix st-score-wrapper">
                 <div class="float-left st-score-txt">Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle </div>
+            	<form id="rating-settings-form">
+            	<input type="hidden" name="ratingcategory" id="ratingcategory">
                 <div class="clearfix float-right st-score-rt">
                     <div class="float-left score-rt-post score-rt-auto bord-rt-dc">
                         <div class="st-score-rt-top">Set auto post score</div>
                         <div class="st-score-rt-line2 clearfix">
-                            <div class="st-rating-wrapper float-left clearfix">
+                            <div class="st-rating-wrapper float-left clearfix" id="rating-auto-post-parent">
                                 <div class="rating-star icn-full-star"></div>
                                 <div class="rating-star icn-full-star"></div>
                                 <div class="rating-star icn-half-star"></div>
@@ -107,14 +109,19 @@
                                 <div class="rating-star icn-no-star"></div>
                             </div>
                             <div class="st-rating-txt float-left">
-                                <input class="st-rating-input"/>
+	                            <!-- set the auto rating -->
+		                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.auto_post_score != null}">
+		                          	<c:set var="autopostscore" value="${cannonicalusersettings.companySettings.survey_settings.auto_post_score}"/>
+								</c:if>
+				            	<input type="hidden" name="rating-auto-post-hidden" id="rating-auto-post-hidden" value="${autopostscore}">
+                                <select class="st-rating-input" name="rating-auto-post" id="rating-auto-post"></select>
                             </div>
                         </div>
                     </div>
                     <div class="float-left score-rt-post score-rt-post-OR score-rt-min">
                         <div class="st-score-rt-top">Minimum score to post to profile</div>
                         <div class="st-score-rt-line2 clearfix">
-                            <div class="st-rating-wrapper float-left clearfix">
+                            <div class="st-rating-wrapper float-left clearfix" id="rating-min-post-parent">
                                 <div class="rating-star icn-full-star"></div>
                                 <div class="rating-star icn-full-star"></div>
                                 <div class="rating-star icn-half-star"></div>
@@ -122,11 +129,17 @@
                                 <div class="rating-star icn-no-star"></div>
                             </div>
                             <div class="st-rating-txt float-left">
-                                <input class="st-rating-input"/>
+                            <!-- set the min rating -->
+		                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.show_survey_above_score != null}">
+		                          	<c:set var="minpostscore" value="${cannonicalusersettings.companySettings.survey_settings.show_survey_above_score}"/>
+								</c:if>
+				            	<input type="hidden" name="rating-min-post-hidden" id="rating-min-post-hidden" value="${minpostscore}">
+                                <select class="st-rating-input" name="rating-min-post" id="rating-min-post"></select>
                             </div>
                         </div>
                     </div>
                 </div>
+                </form>
             </div>
         </div>
         <div class="um-top-container">
@@ -177,10 +190,17 @@
         </div>
         <div class="um-top-container border-0">
             <div class="um-header margin-top-25">Other Settings</div>
+            <form id="other-settings-form">
             <div class="st-others-wrapper clearfix">
+	            <input type="hidden" name="othercategory" id="othercategory">
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12 st-settings-tab">
                     <div class="clearfix st-settings-item-wrapper">
                         <div class="float-left st-settings-check-wrapper">
+                            <!-- set the min rating -->
+		                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.isLocationEnabled != null}">
+		                    	<c:set var="islocationenabled" value="${cannonicalusersettings.companySettings.isLocationEnabled}"/>
+							</c:if>
+                            <input type="hidden" name="other-location" id="other-location" value="${islocationenabled}">
                             <div id="st-settings-location-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
                             <div id="st-settings-location-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
                         </div>
@@ -209,6 +229,7 @@
                     <div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
                 </div>
             </div>
+            </form>
         </div>
     </div>
 </div>
@@ -221,14 +242,52 @@
     	$(document).attr("title", "Settings");
     	$('#survey-participation-mailcontent').ckeditor();
     	$('#survey-participation-reminder-mailcontent').ckeditor();
-        $('#st-settings-location-on').click(function(){
+    	
+    	// Setting values to User settings
+    	autoAppendRatingDropdown('#rating-auto-post', '#rating-auto-post-hidden');
+    	autoAppendRatingDropdown('#rating-min-post', '#rating-min-post-hidden');
+    	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
+
+    	$('#rating-auto-post').change(function() {
+    		$('#ratingcategory').val('rating-auto-post');
+
+    		var rating = $('#rating-auto-post').val();
+    		var ratingParent = $('#rating-auto-post-parent');
+
+    		changeRatingPattern(rating, ratingParent);
+    		updatePostScore("rating-settings-form");
+    		$('#rating-auto-post-hidden').val(rating);
+    	});
+		$('#rating-min-post').change(function() {
+    		$('#ratingcategory').val('rating-min-post');
+    		
+    		var rating = $('#rating-min-post').val();
+    		var ratingParent = $('#rating-min-post-parent');
+    		changeRatingPattern(rating, ratingParent);
+    		
+    		updatePostScore("rating-settings-form");
+    		$('#rating-min-post-hidden').val(rating);
+    	});
+
+    	$('#st-settings-location-on').click(function(){
+    		$('#other-location').val('false');
+    		$('#othercategory').val('enable-location');
+    		
             $('#st-settings-location-off').show();
             $(this).hide();
+            
+            updateOtherSettings("other-settings-form");
         });
-        $('#st-settings-location-off').click(function(){
-            $('#st-settings-location-on').show();
+    	$('#st-settings-location-off').click(function(){
+            $('#other-location').val('true');
+    		$('#othercategory').val('enable-location');
+
+    		$('#st-settings-location-on').show();
             $(this).hide();
+            
+            updateOtherSettings("other-settings-form");
         });
+        
         $('#st-settings-account-on').click(function(){
             $('#st-settings-account-off').show();
             $(this).hide();
@@ -238,6 +297,7 @@
             $(this).hide();
             $('.overlay-disable').show();
         });
+        
         $('#st-settings-payment-on').click(function(){
             $('#st-settings-payment-off').show();
             $(this).hide();
@@ -253,11 +313,11 @@
             $('.overlay-disable').hide();
         });
        $('#encompass-save').click(function(){
-    	   alert("saving encompass details")
+    	   alert("saving encompass details");
     	   saveEncompassDetails("encompass-form");
        }); 
        $('#encompass-testconnection').click(function(){
-    	   alert("testing encompass connection")
+    	   alert("testing encompass connection");
     	   testEncompassConnection("encompass-form");
        });
        $('#save-participation-mail-content').click(function(){
@@ -269,8 +329,4 @@
     	   saveSurveyParticipationReminderMailBodyContent("mail-body-settings-form");
        });
     });
-    
-    
-    
 </script>
-

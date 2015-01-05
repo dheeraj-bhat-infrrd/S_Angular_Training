@@ -24,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -536,6 +537,67 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Updating comapnySettings: " + companySettings+" with crm info: "+crmInfo);
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CRM_INFO, crmInfo, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the record successfully");
+	}
+	
+	@Override
+	public SurveySettings updateAutoPostScore(OrganizationUnitSettings companySettings, float ratingAutoPost) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if (ratingAutoPost == 0f) {
+			throw new InvalidInputException("ratingAutoPost cannot be 0.");
+		}
+		SurveySettings originalSurveySettings = companySettings.getSurvey_settings();
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setAuto_post_score(ratingAutoPost);
+
+		if(originalSurveySettings != null){
+			LOG.info("Original MinPost Score" + originalSurveySettings.getShow_survey_above_score());
+			surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
+			surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
+			surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+		}
+		
+		LOG.info("Updating comapnySettings: " + companySettings+" with surveySettings: "+surveySettings);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the record successfully");
+		return surveySettings;
+	}
+	
+	@Override
+	public SurveySettings updateMinimumPostScore(OrganizationUnitSettings companySettings, float ratingMinPost) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		if (ratingMinPost == 0f) {
+			throw new InvalidInputException("ratingMinPost cannot be 0.");
+		}
+		SurveySettings originalSurveySettings = companySettings.getSurvey_settings();
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setShow_survey_above_score(ratingMinPost);
+
+		if(originalSurveySettings != null){
+			LOG.info("Original AutoPost Score" + originalSurveySettings.getAuto_post_score());
+			surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
+			surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
+			surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+		}
+		
+		LOG.info("Updating comapnySettings: " + companySettings+" with surveySettings: "+surveySettings);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the record successfully");
+		return surveySettings;
+	}
+
+	@Override
+	public void updateLocationEnabled(OrganizationUnitSettings companySettings, boolean isLocationEnabled) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+
+		LOG.info("Updating companySettings: " + companySettings+" with locationEnabled: "+isLocationEnabled);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCATION_ENABLED, isLocationEnabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated the record successfully");
 	}
 	
