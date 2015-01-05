@@ -25,13 +25,6 @@
     </div>
 </div>
 
-<style>
-.error-msg {
-	width:auto !important;
-	margin-top:5px !important;
-}
-</style>
-
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
     	<form id="encompass-form">
@@ -48,13 +41,13 @@
 	                                        <div class="um-item-row-icon margin-left-0"></div>
 	                                        <div class="um-item-row-icon margin-left-0"></div>
 	                                    </div>
-	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
+	                                    <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 		                                    <!-- check the encompass username -->
 		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.crm_username != null}">
 		                                    	<c:set var="encomapssusername" value="${cannonicalusersettings.companySettings.crm_info.crm_username }"/>
 		                                    </c:if>
 		                                    <input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encomapssusername}">
-		                                    <div id="encompass-username-error" class="input-error-2 error-msg"></div>
+		                                    <div id="encompass-username-error" class="hm-item-err-2"></div>
 	                                    </div>
 	                                </div>
 	                            </div>
@@ -65,13 +58,13 @@
 	                                        <div class="um-item-row-icon margin-left-0"></div>
 	                                        <div class="um-item-row-icon margin-left-0"></div>
 	                                    </div>
-	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
+	                                    <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 	                                    	<!-- check the encompass password -->
 		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.crm_password != null}">
 		                                    	<c:set var="encomapsspassword" value="${cannonicalusersettings.companySettings.crm_info.crm_password }"/>
 		                                    </c:if>
 	                                        <input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encomapsspassword}">
-		                                    <div id="encompass-password-error" class="input-error-2 error-msg"></div>
+		                                    <div id="encompass-password-error" class="hm-item-err-2"></div>
 	                                    </div>
 	                                </div>
 	                            </div>
@@ -82,13 +75,13 @@
 	                                        <div id="encompass-testconnection" class="um-item-row-icon icn-spanner margin-left-0"></div>
 	                                        <div id="encompass-save" class="um-item-row-icon icn-blue-tick margin-left-0"></div>
 	                                    </div>
-	                                    <div class="hm-item-row-right um-item-row-right margin-right-10">
+	                                    <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 	                                    	<!-- check the encompass password -->
 		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.url != null}">
 		                                    	<c:set var="encomapssurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
 		                                    </c:if>
 	                                        <input id="encompass-url" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
-		                                    <div id="encompass-url-error" class="input-error-2 error-msg"></div>
+		                                    <div id="encompass-url-error" class="hm-item-err-2"></div>
 	                                    </div>
 	                                </div>
 	                            </div>
@@ -260,8 +253,14 @@ $(document).ready(function(){
 	
 	// Setting values to User settings
 	autoAppendRatingDropdown('#rating-auto-post', '#rating-auto-post-hidden');
+	changeRatingPattern($('#rating-auto-post').val(), $('#rating-auto-post-parent'));
+	
 	autoAppendRatingDropdown('#rating-min-post', '#rating-min-post-hidden');
+	changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
+	
 	autoAppendReminderDropdown('#reminder-interval', '#reminder-interval-hidden');
+	
 	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
+	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 });
 </script>

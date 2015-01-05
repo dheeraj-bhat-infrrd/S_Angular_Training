@@ -594,16 +594,16 @@ function validateEncompassUserName(elementId){
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (usernameRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).next('.input-error-2').hide();
+				$('#'+elementId).next('.hm-item-err-2').hide();
 				return true;
 			} else {
-				$('#'+elementId).next('.input-error-2').html('Please enter a valid user name.');
-				$('#'+elementId).next('.input-error-2').show();
+				$('#'+elementId).next('.hm-item-err-2').html('Please enter a valid user name.');
+				$('#'+elementId).next('.hm-item-err-2').show();
 				return false;
 			}
 		} else {
-			$('#'+elementId).next('.input-error-2').html('Please enter user name.');
-			$('#'+elementId).next('.input-error-2').show();
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter user name.');
+			$('#'+elementId).next('.hm-item-err-2').show();
 			return false;
 		}
 	}
@@ -636,21 +636,21 @@ function validateEncompassPassword(elementId) {
 		if (password != "") {
 			//check if password length is proper
 			if(password.length < minPwdLength || password.length > maxPwdLength){
-				$('#'+elementId).next('.input-error-2').html('Password must be between 6-15 characters.');
-				$('#'+elementId).next('.input-error-2').show();
+				$('#'+elementId).next('.hm-item-err-2').html('Password must be between 6-15 characters.');
+				$('#'+elementId).next('.hm-item-err-2').show();
 				return false;
 			}
 			else if (passwordRegex.test(password) == true) {
-				$('#'+elementId).next('.input-error-2').hide();
+				$('#'+elementId).next('.hm-item-err-2').hide();
 				return true;
 			}else {
-				$('#'+elementId).next('.input-error-2').html('Password must contain one special character.');
-				$('#'+elementId).next('.input-error-2').show();
+				$('#'+elementId).next('.hm-item-err-2').html('Password must contain one special character.');
+				$('#'+elementId).next('.hm-item-err-2').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).next('.input-error-2').html('Please enter password.');
-			$('#'+elementId).next('.input-error-2').show();
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter password.');
+			$('#'+elementId).next('.hm-item-err-2').show();
 			return false;
 		}
 	}
@@ -675,16 +675,16 @@ function validateURL(elementId){
 	}else{
 	   	if ($('#'+elementId).val() != "") {
 			if (urlRegEx.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).next('.input-error-2').hide();
+				$('#'+elementId).next('.hm-item-err-2').hide();
 				return true;
 			} else {
-				$('#'+elementId).next('.input-error-2').html('Please enter a valid url.');
-				$('#'+elementId).next('.input-error-2').show();
+				$('#'+elementId).next('.hm-item-err-2').html('Please enter a valid url.');
+				$('#'+elementId).next('.hm-item-err-2').show();
 				return false;
 			}
 		} else {
-			$('#'+elementId).next('.input-error-2').html('Please enter url.');
-			$('#'+elementId).next('.input-error-2').show();
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter url.');
+			$('#'+elementId).next('.hm-item-err-2').show();
 			return false;
 		}
 	}
