@@ -23,5 +23,7 @@ public final class EmailTemplateConstants {
 	public static final String RETRIES_EXHAUSTED_MAIL_BODY = "RetriesExhaustedMailBody.html";
 	public static final String RETRIES_EXHAUSTED_MAIL_SUBJECT = "RetriesExhaustedMailSubject.txt";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
+	public static final String EMAIL_SENDING_FAILURE_MAIL_BODY="EmailSendingFailureMailBody.html";
+	public static final String EMAIL_SENDING_FAILURE_MAIL_SUBJECT="EmailSendingFailureMailSubject.txt";
 
 }

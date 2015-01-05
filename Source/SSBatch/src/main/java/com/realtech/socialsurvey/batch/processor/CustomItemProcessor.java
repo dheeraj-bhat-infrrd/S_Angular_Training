@@ -4,6 +4,7 @@ package com.realtech.socialsurvey.batch.processor;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,19 +22,18 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.RetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 
 /**
  * This is the custom item processor class that processes the LicenseDetail table.
  */
 @Component
-public class CustomItemProcessor implements ItemProcessor<LicenseDetail, LicenseDetail> {
+public class CustomItemProcessor implements ItemProcessor<LicenseDetail, Map<String, Object>> {
 
 	private Timestamp now = new Timestamp(System.currentTimeMillis());
 
@@ -50,19 +50,21 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 	private GenericDao<Company, Integer> companyDao;
 
 	@Autowired
-	Payment paymentGateway;
+	private Payment paymentGateway;
 
 	@Value("${ADMIN_EMAIL_ID}")
-	String recipientMailId;
+	private String recipientMailId;
 
 	@Value("${MAX_PAYMENT_RETRIES}")
-	int maxPaymentRetries;
+	private int maxPaymentRetries;
 
 	@Autowired
-	EmailServices emailServices;
+	private EmailServices emailServices;
 
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
+	
+	private Map<String, Object> writerObjectsMap;
 
 	private static final Logger LOG = LoggerFactory.getLogger(CustomItemProcessor.class);
 
@@ -126,19 +128,11 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		return existingTransaction;
 	}
 
-	private boolean removeTransactionAndUpdateLicenseDetail(LicenseDetail licenseDetail, RetriedTransaction retriedTransaction)
-			throws InvalidInputException {
-
-		boolean status = false;
+	private void updateLicenseDetail(LicenseDetail licenseDetail) throws InvalidInputException {
 
 		if (licenseDetail == null) {
 			LOG.error("Parameter given to removeTransactionAndUpdateLicenseDetail is null!");
 			throw new InvalidInputException("Parameter given to removeTransactionAndUpdateLicenseDetail is null!");
-		}
-
-		if (retriedTransaction == null) {
-			LOG.error("Second parameter given to removeTransactionAndUpdateLicenseDetail is null!");
-			throw new InvalidInputException("Second parameter given to removeTransactionAndUpdateLicenseDetail is null!");
 		}
 
 		LOG.debug("Updating License detail entity with id : " + licenseDetail.getLicenseId() + " to show that it isnt due on subscription");
@@ -148,12 +142,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		licenseDetail.setIsSubscriptionDue(CommonConstants.SUBSCRIPTION_NOT_DUE);
 		licenseDetail.setModifiedOn(now);
 
-		LOG.debug("Deleteing Retried Transaction entity with id : " + retriedTransaction.getRetryId() + "from the table.");
-		retriedTransactionDao.delete(retriedTransaction);
-
 		LOG.debug("All changes for License Id : " + licenseDetail.getLicenseId() + " made successfully");
-
-		return status;
 
 	}
 
@@ -177,8 +166,29 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		}
 
 	}
+	
+	private void sendEmailSendingFailureMail(String destinationMailId,String displayName,Exception e) {
 
-	private Transaction retryChargeAndSendMail(LicenseDetail licenseDetail) throws InvalidInputException, RetryUnsuccessfulException,
+		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
+		String stackTrace = ExceptionUtils.getFullStackTrace(e);
+		// replace all dollars in the stack trace with \$
+		stackTrace = stackTrace.replace("$", "\\$");
+
+		try {
+			emailServices.sendEmailSendingFailureMail(recipientMailId, destinationMailId, displayName, stackTrace);;
+			LOG.debug("Failure mail sent to admin.");
+		}
+		catch (InvalidInputException e1) {
+			LOG.error("CustomItemProcessor : sendEmailSendingFailureMail : InvalidInputException caught when sending Exception mail. Message : " + e1.getMessage());
+		}
+		catch (UndeliveredEmailException e1) {
+			LOG.error("CustomItemProcessor : sendEmailSendingFailureMail : UndeliveredEmailException caught when sending Exception mail. Message : " + e1.getMessage());
+
+		}
+
+	}
+
+	private Transaction retryChargeAndSendMail(LicenseDetail licenseDetail) throws InvalidInputException, PaymentRetryUnsuccessfulException,
 			NoRecordsFetchedException {
 
 		if (licenseDetail == null) {
@@ -190,7 +200,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		Transaction transaction = null;
 		
 		//Retrying the subscription charge.
-		transaction = paymentGateway.retrySubscriptionCharge(licenseDetail.getSubscriptionId());
+		//transaction = paymentGateway.retrySubscriptionCharge(licenseDetail.getSubscriptionId());
 
 		LOG.debug("Retry successful. Sending email.");
 
@@ -204,10 +214,11 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 		}
 		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : InvalidInputException caught when sending Fatal Exception mail. Message : " + e1.getMessage());
+			sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
 		}
 		catch (UndeliveredEmailException e1) {
 			LOG.error("CustomItemProcessor : UndeliveredEmailException caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-
+			sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
 		}
 
 		LOG.info("Returning transaction");
@@ -216,12 +227,14 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 	}
 
 	@Transactional
-	public LicenseDetail process(LicenseDetail licenseDetail) {
+	public Map<String, Object> process(LicenseDetail licenseDetail) {
 		
 		LOG.info("Processing the record with License Detail Id : " + licenseDetail.getLicenseId() );
 		Calendar thisDay = Calendar.getInstance();
 		thisDay.add(Calendar.DATE, retryDays);
-
+		int proceed = 1;
+		writerObjectsMap = new HashMap<String, Object>();
+		
 		if (licenseDetail.getPaymentRetries() <= maxPaymentRetries) {
 
 			try {
@@ -236,40 +249,53 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 
 					LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settling.");
 					// Check if the transaction is settling
-					if (paymentGateway.checkTransactionSettling(existingTransaction.getTransactionId())) {
+					if (paymentGateway.checkTransactionSettling(existingTransaction.getTransactionId()) && proceed == CommonConstants.STATUS_ACTIVE) {
 
 						LOG.info("Transaction is settling. So updating License Detail with new retry time.");
 						licenseDetail.setNextRetryTime(new Timestamp(thisDay.getTimeInMillis()));
 						licenseDetail.setModifiedOn(now);
-						return licenseDetail;
+						writerObjectsMap.put(CommonConstants.CASE_KEY, CommonConstants.CASE_SETTLING);
+						writerObjectsMap.put(CommonConstants.LICENSE_DETAIL_OBJECT_KEY, licenseDetail);
+						proceed = CommonConstants.STATUS_INACTIVE;
 					}
 
-					LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settled.");
-					// Check if the transaction has been settled
-					if (paymentGateway.checkTransactionSettled(existingTransaction.getTransactionId())) {
+					if(proceed == CommonConstants.STATUS_ACTIVE){
+						LOG.info("Checking if transaction with id : " + existingTransaction.getTransactionId() + "is settled.");
+						// Check if the transaction has been settled
+						if (paymentGateway.checkTransactionSettled(existingTransaction.getTransactionId())) {
 
-						LOG.info("Transaction has been settled to updating LicenseDetail to show that it isnt due and removing record from RetriedTransaction.");
-						removeTransactionAndUpdateLicenseDetail(licenseDetail, existingTransaction);
-						return licenseDetail;
+							LOG.info("Transaction has been settled to updating LicenseDetail to show that it isnt due and removing record from RetriedTransaction.");
+							updateLicenseDetail(licenseDetail);
+							
+							writerObjectsMap.put(CommonConstants.CASE_KEY, CommonConstants.CASE_SETTLED);
+							writerObjectsMap.put(CommonConstants.LICENSE_DETAIL_OBJECT_KEY, licenseDetail);
+							writerObjectsMap.put(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY, existingTransaction);
+							proceed = CommonConstants.STATUS_INACTIVE;
+							
+						}
 					}
+					
+					if(proceed == CommonConstants.STATUS_ACTIVE){						
+						// So it isnt settling or settled so. We need to retry charge with existing
+						// transaction.
+						LOG.info("Transaction is not settling or settled so retrying charge!");
+						Transaction transaction = retryChargeAndSendMail(licenseDetail);
 
-					// So it isnt settling or settled so. We need to retry charge with existing
-					// transaction.
-					LOG.info("Transaction is not settling or settled so retrying charge!");
-					Transaction transaction = retryChargeAndSendMail(licenseDetail);
+						LOG.info("Updating Retried Transaction record with new retry details.");
+						existingTransaction.setTransactionId(transaction.getId());
+						existingTransaction.setAmount(transaction.getAmount().floatValue());
+						existingTransaction.setModifiedOn(now);
 
-					LOG.info("Updating Retried Transaction table with new retry details.");
-					existingTransaction.setTransactionId(transaction.getId());
-					existingTransaction.setAmount(transaction.getAmount().floatValue());
-					existingTransaction.setModifiedOn(now);
-
-					retriedTransactionDao.saveOrUpdate(existingTransaction);
-
-					LOG.info("Updating License Detail entity to reflect changes of new retry.");
-					licenseDetail.setPaymentRetries(licenseDetail.getPaymentRetries() + CommonConstants.PAYMENT_INCREMENT);
-					licenseDetail.setNextRetryTime(new Timestamp(thisDay.getTimeInMillis()));
-					licenseDetail.setModifiedOn(now);
-
+						LOG.info("Updating License Detail entity to reflect changes of new retry.");
+						licenseDetail.setPaymentRetries(licenseDetail.getPaymentRetries() + CommonConstants.PAYMENT_INCREMENT);
+						licenseDetail.setNextRetryTime(new Timestamp(thisDay.getTimeInMillis()));
+						licenseDetail.setModifiedOn(now);	
+						
+						writerObjectsMap.put(CommonConstants.CASE_KEY, CommonConstants.CASE_GENERAL);
+						writerObjectsMap.put(CommonConstants.LICENSE_DETAIL_OBJECT_KEY, licenseDetail);
+						writerObjectsMap.put(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY, existingTransaction);
+						proceed = CommonConstants.STATUS_INACTIVE;
+					}
 				}
 				else {
 
@@ -280,7 +306,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 
 					transaction = retryChargeAndSendMail(licenseDetail);
 
-					LOG.info("Updating Retried Transaction table with the new transaction details.");
+					LOG.info("Updating Retried Transaction record with the new transaction details.");
 
 					retriedTransaction.setTransactionId(transaction.getId());
 					retriedTransaction.setAmount(transaction.getAmount().floatValue());
@@ -292,14 +318,16 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 					retriedTransaction.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
 					retriedTransaction.setModifiedOn(now);
 
-					retriedTransactionDao.saveOrUpdate(retriedTransaction);
-
-					LOG.info("RetriedTransaction table updated.");
-					LOG.info("Updating LicenseDetails table with payment retries and the next retry time.");
+					LOG.info("Updating LicenseDetails entity with payment retries and the next retry time.");
 
 					licenseDetail.setPaymentRetries(licenseDetail.getPaymentRetries() + CommonConstants.PAYMENT_INCREMENT);
 					licenseDetail.setNextRetryTime(new Timestamp(thisDay.getTimeInMillis()));
 					licenseDetail.setModifiedOn(now);
+					
+					writerObjectsMap.put(CommonConstants.CASE_KEY, CommonConstants.CASE_GENERAL);
+					writerObjectsMap.put(CommonConstants.LICENSE_DETAIL_OBJECT_KEY, licenseDetail);
+					writerObjectsMap.put(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY, retriedTransaction);
+					proceed = CommonConstants.STATUS_INACTIVE;
 
 				}
 
@@ -314,14 +342,8 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
 				return null;
 			}
-			catch (RetryUnsuccessfulException e) {
+			catch (PaymentRetryUnsuccessfulException e) {
 				LOG.error("RetryUnsuccessfulException caught : Message : " + e.getMessage());
-				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
-				return null;
-			}
-			catch (DatabaseException e) {
-				LOG.error("Database Exception caught : Message : " + e.getMessage());
-				sendFailureMail(e);
 				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
 				return null;
 			}
@@ -348,12 +370,11 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 				user = getCorporateAdmin(company);
 
 				// Block the user by setting the status of that company to 0
-				LOG.info("Blocking the user by changing status in the Company table.");
+				LOG.info("Blocking the user by changing status in the Company entity");
 				company.setStatus(CommonConstants.STATUS_INACTIVE);
 				company.setModifiedOn(now);
-				companyDao.merge(company);
 
-				LOG.info("Updating LicenseDetails table with payment retries and the next retry time.");
+				LOG.info("Updating LicenseDetails record with payment retries and the next retry time.");
 				licenseDetail.setNextRetryTime(new Timestamp(thisDay.getTimeInMillis()));
 				licenseDetail.setModifiedOn(now);
 
@@ -361,15 +382,25 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 				LOG.info("Sending a mail regarding the blocking of subscription to the user.");
 				try {
 					emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getDisplayName());
+					LOG.info("Mail successfully sent.");
 				}
 				catch (InvalidInputException e1) {
 					LOG.error("CustomItemProcessor : InvalidInputException caught when sending Fatal Exception mail. Message : " + e1.getMessage());
+					sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
+
 				}
 				catch (UndeliveredEmailException e1) {
 					LOG.error("CustomItemProcessor : UndeliveredEmailException caught when sending Fatal Exception mail. Message : "
 							+ e1.getMessage());
-				}
+					sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
 
+				}
+				LOG.info("Mail sent. Preparing map to be sent to the writer.");
+				writerObjectsMap.put(CommonConstants.CASE_KEY, CommonConstants.CASE_RETRIES_EXCEEDED);
+				writerObjectsMap.put(CommonConstants.LICENSE_DETAIL_OBJECT_KEY, licenseDetail);
+				writerObjectsMap.put(CommonConstants.COMPANY_OBJECT_KEY, company);
+				proceed = CommonConstants.STATUS_INACTIVE;
+				
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught : Message : " + e.getMessage());
@@ -381,19 +412,12 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, License
 				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
 				return null;
 			}
-			catch (DatabaseException e) {
-				LOG.error("Database Exception caught : Message : " + e.getMessage());
-				sendFailureMail(e);
-				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
-				return null;
-			}
 
 		}
 
 		LOG.info("Successfully processed License detail object with id : " + licenseDetail.getLicenseId());
 
-		return licenseDetail;
+		return writerObjectsMap;
 
 	}
-
 }

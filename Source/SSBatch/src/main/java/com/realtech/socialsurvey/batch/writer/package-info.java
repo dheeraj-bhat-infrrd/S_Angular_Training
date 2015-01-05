@@ -1,5 +1,4 @@
 /**
- * This is the package for custom spring item writers.
+ * Contains all the batch custom writers.
  */
-
 package com.realtech.socialsurvey.batch.writer;

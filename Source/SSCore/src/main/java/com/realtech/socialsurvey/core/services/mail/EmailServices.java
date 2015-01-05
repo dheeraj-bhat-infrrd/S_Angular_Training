@@ -20,7 +20,10 @@ public interface EmailServices {
 	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
 	UndeliveredEmailException;
 
-	void sendRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException, UndeliveredEmailException;
+	public void sendRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException, UndeliveredEmailException;
 
-	void sendRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
+	public void sendRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
+	
+	public void sendEmailSendingFailureMail(String recipientMailId,String destinationMailId,String displayName,String stackTrace) throws InvalidInputException, UndeliveredEmailException;
+
 }
