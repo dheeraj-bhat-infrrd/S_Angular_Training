@@ -67,6 +67,7 @@
     <script>
     	var isForgotPasswordFormValid;
         $(document).ready(function(){
+        	$(document).attr("title", "Forgot Password");
         	isForgotPasswordFormValid=false;
             adjustOnResize();
             
