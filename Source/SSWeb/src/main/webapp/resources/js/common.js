@@ -23,7 +23,7 @@ function callAjaxGET(url, callBackFunction, isAsync) {
 		async : isAsync,
 		success : callBackFunction,
 		error : function(e) {
-			console.error("error : " + e);
+			redirectErrorpage();
 		}
 	});
 }
@@ -47,7 +47,35 @@ function callAjaxPOST(url, callBackFunction, isAsync) {
 		async : isAsync,
 		success : callBackFunction,
 		error : function(e) {
-			console.error("error : " + e);
+			redirectErrorpage();
+		}
+	});
+}
+
+/**
+ * Generic function to be used for making ajax get calls with datatype text and formdata
+ * 
+ * @param url
+ * @param callBackFunction
+ * @param isAsync
+ */
+function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
+	console.log("ajax post called for url :" + url);
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+		url : url,
+		type : "POST",
+		dataType : "text",
+		contentType : false,
+		processData : false,
+		cache : false,
+		data : formData,
+		async : isAsync,
+		success : callBackFunction,
+		error : function(e) {
+			redirectErrorpage();
 		}
 	});
 }
@@ -71,11 +99,14 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 		data : payLoad,
 		success : callBackFunction,
 		error : function(e) {
-			console.error("error : " + e);
+			redirectErrorpage();
 		}
 	});
 }
 
-function getMainContent(url,whereToDisplay) {
-	
+/**
+ * Generic function to be used for making form submission with ajax post
+ */
+function redirectErrorpage(){
+	window.location = "errorpage.do";
 }
