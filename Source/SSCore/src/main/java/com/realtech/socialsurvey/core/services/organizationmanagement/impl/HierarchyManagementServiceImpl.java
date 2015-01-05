@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
@@ -37,6 +38,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	private GenericDao<Region, Long> regionDao;
 
 	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
+
+	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
 	/**
@@ -53,13 +57,15 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			LOG.error("Company object passed can not be null");
 			throw new InvalidInputException("Invalid Company passed");
 		}
-
-		LOG.info("Fetching the list of branches for company :" + company.getCompany());
-		List<Branch> branchList = branchDao.findByColumn(Branch.class, CommonConstants.COMPANY_COLUMN, company);
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());		
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
 	}
-
+	
 	/**
 	 * Fetch list of regions in a company
 	 * 
@@ -76,7 +82,12 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Fetching the list of regions for company :" + company.getCompany());
-		List<Region> regionList = regionDao.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, company);
+
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
 		LOG.info("Region list fetched for the company " + company);
 		return regionList;
 	}
@@ -143,6 +154,114 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	}
 
 	/**
+	 * Fetch list of branches in a company for a Region
+	 * 
+	 * @param regionId
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
+		
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
+		
+		LOG.info("Branch list fetched for the region " + region);
+		return branchList;
+	}
+	
+	/**
+	 * Method to fetch count of branches in a company for a Region
+	 * 
+	 * @param regionId
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public long getCountBranchesInRegion(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
+		
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
+		
+		LOG.info("Branch list fetched for the region " + region);
+		return branchCount;
+	}
+
+	/**
+	 * Method to fetch UserProfiles associated with a branch
+	 * 
+	 * @param company
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<UserProfile> getAllUserProfilesInBranch(long branchId) throws InvalidInputException {
+		if (branchId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllUserProfilesForBranch");
+		}
+		LOG.info("Fetching the list of users for branch :" + branchId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<UserProfile> userList = userProfileDao.findByKeyValue(UserProfile.class, queries);
+
+		LOG.info("Users list fetched for the branch " + branchId);
+		return userList;
+	}
+	
+	/**
+	 * Method to fetch count of UserProfiles associated with a branch
+	 * 
+	 * @param company
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public long getCountUsersInBranch(long branchId) throws InvalidInputException {
+		if (branchId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllUserProfilesForBranch");
+		}
+		LOG.info("Fetching the list of users for branch :" + branchId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long usersCount = userProfileDao.findNumberOfRowsByKeyValue(UserProfile.class, queries);
+
+		LOG.info("Users list fetched for the branch " + branchId);
+		return usersCount;
+	}
+
+	/**
 	 * Method to check if branches allowed to be added have succeeded the max limit for a user and
 	 * account type
 	 * 
@@ -156,10 +275,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	public boolean isBranchAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
 		LOG.info("Method to check if further branch addition is allowed, called for user : " + user);
 		if (user == null) {
-			throw new InvalidInputException("User is null in isMaxBranchAdditionExceeded");
+			throw new InvalidInputException("User is null in isBranchAdditionAllowed");
 		}
 		if (accountType == null) {
-			throw new InvalidInputException("Account type is null in isMaxBranchAdditionExceeded");
+			throw new InvalidInputException("Account type is null in isBranchAdditionAllowed");
 		}
 		boolean isBranchAdditionAllowed = true;
 		switch (accountType) {
@@ -181,10 +300,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 				isBranchAdditionAllowed = true;
 				break;
 			default:
-				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
+				throw new InvalidInputException("Account type is invalid in isBranchAdditionAllowed");
 		}
-		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isMaxBranchAdditionExceeded is :"
-				+ isBranchAdditionAllowed);
+		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isBranchAdditionAllowed is :" + isBranchAdditionAllowed);
+
 		return isBranchAdditionAllowed;
 	}
 
@@ -202,10 +321,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
 		LOG.info("Method to check if further region addition is allowed called for user : " + user);
 		if (user == null) {
-			throw new InvalidInputException("User is null in isMaxRegionAdditionExceeded");
+			throw new InvalidInputException("User is null in isRegionAdditionAllowed");
 		}
 		if (accountType == null) {
-			throw new InvalidInputException("Account type is null in isMaxRegionAdditionExceeded");
+			throw new InvalidInputException("Account type is null in isRegionAdditionAllowed");
 		}
 		boolean isRegionAdditionAllowed = true;
 		switch (accountType) {
@@ -230,8 +349,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			default:
 				throw new InvalidInputException("Account type is invalid in isRegionAdditionAllowed");
 		}
-		LOG.info("Returning from isRegionAdditionAllowed for user : " + user.getUserId() + " isRegionAdditionAllowed is :"
-				+ isRegionAdditionAllowed);
+		LOG.info("Returning from isRegionAdditionAllowed for user : " + user.getUserId() + " isRegionAdditionAllowed is :" + isRegionAdditionAllowed);
 		return isRegionAdditionAllowed;
 	}
 
@@ -269,7 +387,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			LOG.debug("Selecting the default region for company");
 			Map<String, Object> queries = new HashMap<String, Object>();
 			queries.put(CommonConstants.COMPANY, user.getCompany());
-			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES);
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.YES);
 			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
 			if (regions != null && !regions.isEmpty()) {
 				region = regions.get(0);
@@ -279,7 +397,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("No region is present in db for the company while adding branch");
 		}
 
-		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.STATUS_INACTIVE);
+		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.NO);
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
@@ -304,10 +422,130 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 		LOG.info("Method add new region called for regionName : " + regionName);
 
-		Region region = organizationManagementService.addRegion(user, CommonConstants.STATUS_INACTIVE, regionName);
+		Region region = organizationManagementService.addRegion(user, CommonConstants.NO, regionName);
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
 	}
+
+	/**
+	 * Method to update a branch
+	 */
+	@Override
+	@Transactional
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update branch");
+		}
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null in update branch");
+		}
+		if (branchAddress == null || branchAddress.isEmpty()) {
+			throw new InvalidInputException("Branch address is null in update branch");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in update branch");
+		}
+
+		LOG.info("Method update branch called for branchId:" + branchId + " ,regionId:" + regionId + " branchName : " + branchName
+				+ " ,branchAddress:" + branchAddress);
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			throw new InvalidInputException("No branch present for the required id in database while updating branch");
+		}
+		LOG.debug("Checking if the region of branch is changed");
+
+		/**
+		 * In case of branch attached to default region, regionId is 0 hence perform update only
+		 * when the regionId is not the default one
+		 */
+		if (regionId > 0l && regionId != branch.getRegion().getRegionId()) {
+			Region region = regionDao.findById(Region.class, regionId);
+			if (region == null) {
+				throw new InvalidInputException("No region present for the required id in database while updating branch");
+			}
+			branch.setRegion(region);
+		}
+		branch.setBranch(branchName);
+		branch.setModifiedBy(String.valueOf(user.getUserId()));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		// TODO update address details
+		branchDao.update(branch);
+		LOG.info("Method to update branch completed successfully");
+	}
+
+	/**
+	 * Method to update a region
+	 */
+	@Override
+	@Transactional
+	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update region");
+		}
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null in update region");
+		}
+		if (regionAddress == null || regionAddress.isEmpty()) {
+			throw new InvalidInputException("Region address is null in update region");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in update region");
+		}
+		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress:" + regionAddress);
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			throw new InvalidInputException("No region present for the required id in database while updating region");
+		}
+		region.setRegion(regionName);
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		region.setModifiedBy(String.valueOf(user.getUserId()));
+		// TODO update address
+		regionDao.update(region);
+		LOG.info("Method to update region completed successfully");
+	}
+
+	/**
+	 * Method to check whether a user can view region based on his profiles
+	 * 
+	 * @param userProfiles
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	private boolean isRegionViewAllowed(List<UserProfile> userProfiles) {
+		// TODO implement this
+		return true;
+	}
+
+	/**
+	 * Method to check whether a user can view branch based on his profiles
+	 * 
+	 * @param userProfiles
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	private boolean isBranchViewAllowed(List<UserProfile> userProfiles) {
+		// TODO implement this
+		return true;
+	}
+
+	/**
+	 * Method to check whether a user has privileges to build hierarchy
+	 */
+	@Override
+	public boolean canBuildHierarchy(User user, AccountType accountType) {
+		// TODO implement this
+		return true;
+	}
+
+	/**
+	 * Method to check whether a user has privileges to edit company information
+	 */
+	@Override
+	public boolean canEditCompany(User user, AccountType accountType) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
 }
 // JIRA SS-37 BY RM02 EOC

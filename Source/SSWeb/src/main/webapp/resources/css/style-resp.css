@@ -29,6 +29,10 @@
     .login-footer-wrapper,.footer-copyright{
         display: none;
     }
+    .login-footer-wrapper.login-footer-txt.clearfix.margin-0-auto.margin-bottom-50.col-xs-12{
+        display: block;
+        color: #555;
+    }
     .registration-wrapper-min-height, .invitation-min-height, .login-wrapper-min-height, .company-wrapper-min-height{
         min-height: 450px;
     }
@@ -52,7 +56,7 @@
         border-bottom: 1px solid #D3DEE0;
     }
     .forgot-pwd-mobile, .have-account-mobile{
-        display: block !important;
+/*        display: block !important;*/
         padding-left: 25px;
     }
     #reg-form, #login-form, #inv-form, #payment-form{
@@ -65,6 +69,9 @@
     }
     .login-link{
         color: #555 !important;
+    }
+    .validation-msg-wrapper{
+        margin-top: 0;
     }
     .payment-option-tab{
         width: 100%;
@@ -80,6 +87,9 @@
     .hm-item-row{
         width: 100%;
         margin-bottom: -1px;
+    }
+    .item-row-OR{
+        width: 100%;
     }
     .hm-bottom-panel-item{
         padding: 0 15px;
@@ -185,13 +195,16 @@
         float: none;
         margin: 0 -10px;
     }
+    .um-item-row-right {
+        margin: 0 -15px;
+    }
     .hm-item-row-txt, .um-item-row-txt{
         width: 100%;
         box-shadow: none;
         border-radius: 0;
         border-left: 0;
         border-right: 0;
-        padding: 10px 10px 10px 50px;
+        padding: 10px 50px 10px 50px;
     }
     .hm-dd-wrapper{
         width: 100%;
@@ -250,6 +263,62 @@
     .um-top-tag-wrapper{
         margin-top: 25px;
     }
+    .um-top-status-title{
+        margin-right: 15px;
+    }
+    .col-email,.col-loanoff{
+        display: none !important;
+    }
+    .um-bottom-content{
+        padding: 0 !important;
+    }
+    .st-score-txt, .st-score-rt{
+        width: 100%;
+        padding: 10px;
+    }
+    .st-score-txt{
+        height: auto;
+        margin-bottom: 20px;
+    }
+    .score-rt-post {
+        width: 260px;
+        height: 110px;
+        padding: 0 !important;
+        float: none;
+        border: 0;
+        margin: 0 auto;
+    }
+    .st-bottom-wrapper{
+        margin-top: 25px !important;
+        padding: 0px 15px;
+    }
+    .st-rating-wrapper{
+        margin-right: 9px !important;
+    }
+    .st-rating-input{
+        width: 50px;
+    }
+    .st-header-txt-lft{
+        font-size: 14px;
+    }
+    .st-check-main, .st-check-wrapper{
+        margin-top: 15px;
+    }
+    .st-check-main{
+        float: none;
+    }
+    .st-check-txt-OR{
+        line-height: 25px;
+        font-size: 14px;
+        width: 178px;
+        margin-top: 15px;
+    }
+    .st-settings-check-wrapper{
+        margin-top: 15px;
+    }
+    .input-error-2{
+        display: none !important;
+    }
 }
 
 
@@ -289,6 +358,9 @@
     .create-branch-dd{
         display: block !important;
     }
+    .overlay-toast{
+        display: none !important;
+    }
 }
 
 
@@ -318,6 +390,12 @@
     .hm-item-row{
         width: 100%
     }
+    .item-row-OR{
+        width: 375px;
+    }
+    .overflow-hidden {
+        overflow: hidden;
+    }
     .hm-item-row-left{
         width: 90px;
         font-size: 13px;
@@ -331,7 +409,7 @@
         font-size: 13px;
     }
     .um-item-row-txt{
-        width: 190px;
+        width: 165px;
         font-size: 13px;
     }
     .hm-left-item{
@@ -346,6 +424,16 @@
     .hm-sub-header-left{
         font-size: 18px;
     }
+    .st-score-txt, .st-score-rt{
+        width: 100%;
+    }
+    .score-rt-post-OR {
+        padding-left: 55px;
+    }
+    #st-chg-payment-info{
+        width: 150px;
+        line-height: 20px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -353,8 +441,26 @@
     .hm-item-row{
         width: 100%
     }
+    .item-row-OR{
+        width: 465px;
+    }
     .hm-item-row-txt, .hm-dd-wrapper, .um-item-row-txt{
-        width: 280px;
+        width: 260px;
+    }
+    .um-item-row-txt-OR{
+        width: 240px;
+    }
+    .st-score-txt{
+        width: 310px;
+    }
+    .st-score-rt {
+        width: 600px;
+    }
+    .score-rt-post{
+        padding: 0px 0px 20px 0px;
+    }
+    .score-rt-post-OR {
+        padding-left: 15px;
     }
 }
 

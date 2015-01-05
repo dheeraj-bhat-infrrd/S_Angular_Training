@@ -14,6 +14,9 @@
 	<!-- <value>6LdlHOsSAAAAACe2WYaGCjU2sc95EZqCI9wLcLXY</value> -->
 	<!-- </property> -->
 	<!-- </bean> -->
+	<bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+	</bean>
 
 	<!-- Define the MongoTemplate which handles connectivity with MongoDB -->
 
