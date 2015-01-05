@@ -869,7 +869,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		UserProfile highestUserProfile = null;
-		//get the highest  user profile for the user
+		// get the highest user profile for the user
 		highestUserProfile = getHighestUserProfile(userProfiles);
 		queries.clear();
 		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
@@ -889,14 +889,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
 	}
-	
+
 	/*
 	 * Method to fetch all the user profiles for the user
 	 */
 	@Override
-	@Transactional
-	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException{
-		if(user == null){
+	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException {
+		if (user == null) {
 			LOG.error("User object passed was be null");
 			throw new InvalidInputException("User object passed was be null");
 		}
@@ -911,19 +910,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	/*
-	 * Method to get highest user profile for the user
-	 * company->region->branch->agent
+	 * Method to get highest user profile for the user company->region->branch->agent
 	 */
 	@Override
-	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException{
-		if(userProfiles == null){
-			LOG.error("No user profiles passed");
-			throw new InvalidInputException("List of user profiles passed is null");
+	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException {
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			LOG.error("User profiles passed was either null or empty");
+			throw new InvalidInputException("User profiles passed was either null or empty");
 		}
 		LOG.info("Method getHighestUserProfile() called to fetch the highest user profile for the user");
-		
+
 		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-		UserProfile highestUserProfile = null;
+		UserProfile highestUserProfile = userProfiles.get(0);
 		for (UserProfile userProfile : userProfiles) {
 			if ((userProfile.getProfilesMaster().getProfileId() < highestProfilesMasterId)
 					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
@@ -934,7 +932,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method getHighestUserProfile() finished successfully");
 		return highestUserProfile;
 	}
-	
+
+	/*
+	 * Method to get the highest user profile for the user
+	 */
+	@Override
+	@Transactional
+	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException,InvalidInputException {
+		if (user == null) {
+			LOG.error("No user passed");
+			throw new InvalidInputException("No user passed");
+		}
+		LOG.info("Method getHighestUserProfileForUser() called to fetch the highest user profile for the user");
+		List<UserProfile> userProfiles = getAllUserProfilesForUser(user);
+		UserProfile highestUserProfile = getHighestUserProfile(userProfiles);
+		if (highestUserProfile == null) {
+			LOG.error("No user profile found for the user");
+			throw new NoRecordsFetchedException("No user profile found for the user");
+		}
+		LOG.info("Method getHighestUserProfileForUser() finished successfully");
+		return highestUserProfile;
+	}
+
 	/**
 	 * Method to generate and send verification link
 	 * 
@@ -1214,7 +1233,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	// JIRA: SS-27: By RM05: EOC
-	
+
 	@Override
 	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException {
 		if (user == null) {
