@@ -146,7 +146,7 @@ public class LoginController {
 					try {
 						highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
 					}
-					catch (InvalidInputException e) {
+					catch (NoRecordsFetchedException e) {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}

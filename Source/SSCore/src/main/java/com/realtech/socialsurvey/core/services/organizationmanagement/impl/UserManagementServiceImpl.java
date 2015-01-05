@@ -938,7 +938,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Override
 	@Transactional
-	public UserProfile getHighestUserProfileForUser(User user) throws InvalidInputException {
+	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException,InvalidInputException {
 		if (user == null) {
 			LOG.error("No user passed");
 			throw new InvalidInputException("No user passed");
@@ -948,7 +948,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		UserProfile highestUserProfile = getHighestUserProfile(userProfiles);
 		if (highestUserProfile == null) {
 			LOG.error("No user profile found for the user");
-			throw new InvalidInputException("No user profile found for the user");
+			throw new NoRecordsFetchedException("No user profile found for the user");
 		}
 		LOG.info("Method getHighestUserProfileForUser() finished successfully");
 		return highestUserProfile;
