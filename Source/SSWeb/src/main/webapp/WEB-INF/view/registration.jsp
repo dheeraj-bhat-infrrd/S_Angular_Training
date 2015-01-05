@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div id="overlay-toast" class="overlay-toast"></div>
     <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 registration-wrapper-min-height">
 		<div class="container login-container">
@@ -48,11 +49,13 @@
 								data-non-empty="true" name="firstname" value="${firstname}"
 								placeholder='<spring:message code="label.firstname.key" />'>
 						</div>
+                        <div id="reg-page-firstname" class="input-error-2 margin-0-auto"></div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-lname"></div>
 							<input class="float-left login-wrapper-txt" id="reg-lname" name="lastname" value="${lastname}"
 								placeholder='<spring:message code="label.lastname.key" />'>
 						</div>
+                        <div id="reg-page-lastname" class="input-error-2 margin-0-auto"></div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
 							<c:choose>
@@ -66,16 +69,19 @@
 								</c:otherwise>
 							</c:choose>
 						</div>
+                        <div id="reg-page-email" class="input-error-2 margin-0-auto"></div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-password"></div>
 							<input type="password" class="float-left login-wrapper-txt"
 								id="reg-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
 						</div>
-                            <div class="login-input-wrapper margin-0-auto clearfix">
+                        <div id="reg-page-password" class="input-error-2 margin-0-auto"></div>
+                        <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-confirm-password"></div>
 							<input type="password" class="float-left login-wrapper-txt" id="reg-conf-pwd" data-non-empty="true" name="confirmpassword"
 								placeholder='<spring:message code="label.confirmpassword.key" />'>
 						</div>
+                        <div id="reg-page-conf-password" class="input-error-2 margin-0-auto"></div>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reg-submit">
 							<spring:message code="label.submit.key" />
 						</div>
@@ -94,9 +100,11 @@
 					</div>
 				</div>
 				<div class="footer-copyright text-center">
-					<spring:message code="label.copyright.key" />
-					&copy;
-					<spring:message code="label.copyrightposttext.key" />
+					<spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
 				</div>
 			</div>
 		</div>
@@ -108,7 +116,9 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 
 	<script>
+		var isRegistrationFormValid;
 		$(document).ready(function() {
+			isRegistrationFormValid=false;
 //			adjustOnResize();
 //			$(window).resize(adjustOnResize);
 
@@ -124,27 +134,22 @@
 
 			function submitRegistrationForm() {
 				console.log("submitting registration form");
-				showOverlay();
-				$('#registration-form').submit();
+				if(validateRegistrationForm('reg-form')){
+					$('#registration-form').submit();
+					showOverlay();
+				}
 			}
+			
+			$('input').keypress(function(e){
+	        	// detect enter
+	        	if (e.which==13){
+	        		e.preventDefault();
+	        		submitRegistrationForm();
+	        	}
+			});
 
 			$('#reg-submit').click(function(e) {
-				if (validateRegistrationForm('reg-form')) {					
-					/* === Validate passwords ===
-					if($('#reg-pwd').val() != $('#reg-conf-pwd').val()) {
-						$('#reg-pwd').parent().addClass('input-error');
-						$('#reg-conf-pwd').parent().addClass('input-error');
-						$('#jsError').show();
-		                $('#jsErrTxt').html('Passwords do not match');
-						return false;
-					}else {
-						$('#jsError').hide();
-						$('#reg-pwd').parent().removeClass('input-error');
-						$('#reg-conf-pwd').parent().removeClass('input-error');
-					}
-					===== FORM VALIDATED ===== */
-					submitRegistrationForm();
-				}
+				submitRegistrationForm();
 			});
 			
 			/* ==Functions to trigger form validation of various input elements== */
@@ -171,20 +176,64 @@
 			function validateRegistrationForm(id) {
 				//hide the server error
             	$("#serverSideerror").hide();
-            	
-				//Validate form input elements
-				if(!validateFirstName('reg-fname'))
-					return false;
-				if(!validateLastName('reg-lname'))
-					return false;
-				if(!validateEmailId('reg-email'))
-					return false;
-				if(!validatePassword('reg-pwd'))
-					return false;
-				if(!validateConfirmPassword('reg-pwd', 'reg-conf-pwd'))
-            		return false;
-            	
-            	return true;
+            	isRegistrationFormValid = true;
+            	var isFocussed = false;
+            	var isSmallScreen = false;
+            	if($(window).width()<768){
+            		isSmallScreen = true;
+            	}
+            	//Validate form input elements
+				if(!validateFirstName('reg-fname')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-fname').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validateLastName('reg-lname')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-lname').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validateEmailId('reg-email')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-email').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validatePassword('reg-pwd')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+				if(!validateConfirmPassword('reg-pwd', 'reg-conf-pwd')){
+					isRegistrationFormValid = false;
+					if(!isFocussed){
+            			$('#reg-conf-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isRegistrationFormValid;
+            		}
+				}
+            	return isRegistrationFormValid;
 			}
 
 		});
