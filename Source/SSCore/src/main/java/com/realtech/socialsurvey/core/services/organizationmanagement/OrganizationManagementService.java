@@ -81,21 +81,13 @@ public interface OrganizationManagementService {
 	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException;
 	
 	/**
-	 * Updates the SurveyAutoPost in the settings
+	 * Updates the SurveySettings in the UserSettings
 	 * @param companySettings
 	 * @param surveySettings
 	 * @throws InvalidInputException
 	 */
-	public SurveySettings updateAutoPostScore(OrganizationUnitSettings companySettings, float ratingAutoPost) throws InvalidInputException;
+	public boolean updateSurveySettings(OrganizationUnitSettings companySettings, SurveySettings surveySettings) throws InvalidInputException;
 	
-	/**
-	 * Updates the SurveyMinimumPost in the settings
-	 * @param companySettings
-	 * @param surveySettings
-	 * @throws InvalidInputException
-	 */
-	public SurveySettings updateMinimumPostScore(OrganizationUnitSettings companySettings, float ratingMinPost) throws InvalidInputException;
-
 	/**
 	 * Updates the LocationEnbling in the settings
 	 * @param companySettings

@@ -25,6 +25,12 @@
     </div>
 </div>
 
+<style>
+.error-msg {
+	width:auto !important;
+	margin-top:5px !important;
+}
+</style>
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
@@ -48,6 +54,7 @@
 		                                    	<c:set var="encomapssusername" value="${cannonicalusersettings.companySettings.crm_info.crm_username }"/>
 		                                    </c:if>
 		                                    <input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encomapssusername}">
+		                                    <div id="encompass-username-error" class="input-error-2 error-msg"></div>
 	                                    </div>
 	                                </div>
 	                            </div>
@@ -64,6 +71,7 @@
 		                                    	<c:set var="encomapsspassword" value="${cannonicalusersettings.companySettings.crm_info.crm_password }"/>
 		                                    </c:if>
 	                                        <input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encomapsspassword}">
+		                                    <div id="encompass-password-error" class="input-error-2 error-msg"></div>
 	                                    </div>
 	                                </div>
 	                            </div>
@@ -80,13 +88,12 @@
 		                                    	<c:set var="encomapssurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
 		                                    </c:if>
 	                                        <input id="encompass-url" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
+		                                    <div id="encompass-url-error" class="input-error-2 error-msg"></div>
 	                                    </div>
 	                                </div>
 	                            </div>
 	                        </div>
-	                        
 	                    </div>
-	                    
 	                </div>
 	            </div>
 	        </div>
@@ -174,14 +181,22 @@
 	                <div class="float-left"><spring:message code="label.reminder.interval.key" /></div>
 	                <div class="clearfix float-left">
 	                    <div class="float-left st-input-reminder">
-	                        <input class="st-rating-input"/>
-	                    </div>
+							<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.survey_reminder_interval_in_days != null}">
+								<c:set var="reminderinterval" value="${cannonicalusersettings.companySettings.survey_settings.survey_reminder_interval_in_days}" />
+							</c:if>
+				            <input type="hidden" name="reminder-interval-hidden" id="reminder-interval-hidden" value="${reminderinterval}">
+                            <select class="st-rating-input" name="reminder-interval" id="reminder-interval"></select>
+						</div>
 	                    <div class="float-left"><spring:message code="label.days.key" /></div>
 	                </div>
 	                <div class="clearfix st-check-main float-left">
 	                    <div class="float-left st-check-wrapper">
-	                        <div id="st-checkbox-on" class="st-checkbox st-checkbox-on"></div>
-	                        <div id="st-checkbox-off" class="st-checkbox st-checkbox-off hide"></div>
+		                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.isReminderNotNeeded != null}">
+		                    	<c:set var="isremindernotneeded" value="${cannonicalusersettings.companySettings.survey_settings.isReminderNotNeeded}"/>
+							</c:if>
+                            <input type="hidden" name="reminder-needed-hidden" id="reminder-needed-hidden" value="${isremindernotneeded}">
+	                        <div id="st-reminder-on" class="st-checkbox st-checkbox-on"></div>
+	                        <div id="st-reminder-off" class="st-checkbox st-checkbox-off hide"></div>
 	                    </div>
 	                    <div class="float-left st-check-txt-OR">Click here if you do not want to send any reminder</div>
 	                </div>
@@ -238,95 +253,15 @@
 <script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
 <script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script>
-    $(document).ready(function(){
-    	$(document).attr("title", "Settings");
-    	$('#survey-participation-mailcontent').ckeditor();
-    	$('#survey-participation-reminder-mailcontent').ckeditor();
-    	
-    	// Setting values to User settings
-    	autoAppendRatingDropdown('#rating-auto-post', '#rating-auto-post-hidden');
-    	autoAppendRatingDropdown('#rating-min-post', '#rating-min-post-hidden');
-    	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
-
-    	$('#rating-auto-post').change(function() {
-    		$('#ratingcategory').val('rating-auto-post');
-
-    		var rating = $('#rating-auto-post').val();
-    		var ratingParent = $('#rating-auto-post-parent');
-
-    		changeRatingPattern(rating, ratingParent);
-    		updatePostScore("rating-settings-form");
-    		$('#rating-auto-post-hidden').val(rating);
-    	});
-		$('#rating-min-post').change(function() {
-    		$('#ratingcategory').val('rating-min-post');
-    		
-    		var rating = $('#rating-min-post').val();
-    		var ratingParent = $('#rating-min-post-parent');
-    		changeRatingPattern(rating, ratingParent);
-    		
-    		updatePostScore("rating-settings-form");
-    		$('#rating-min-post-hidden').val(rating);
-    	});
-
-    	$('#st-settings-location-on').click(function(){
-    		$('#other-location').val('false');
-    		$('#othercategory').val('enable-location');
-    		
-            $('#st-settings-location-off').show();
-            $(this).hide();
-            
-            updateOtherSettings("other-settings-form");
-        });
-    	$('#st-settings-location-off').click(function(){
-            $('#other-location').val('true');
-    		$('#othercategory').val('enable-location');
-
-    		$('#st-settings-location-on').show();
-            $(this).hide();
-            
-            updateOtherSettings("other-settings-form");
-        });
-        
-        $('#st-settings-account-on').click(function(){
-            $('#st-settings-account-off').show();
-            $(this).hide();
-        });
-        $('#st-settings-account-off').click(function(){
-            $('#st-settings-account-on').show();
-            $(this).hide();
-            $('.overlay-disable').show();
-        });
-        
-        $('#st-settings-payment-on').click(function(){
-            $('#st-settings-payment-off').show();
-            $(this).hide();
-        });
-        $('#st-settings-payment-off').click(function(){
-            $('#st-settings-payment-on').show();
-            $(this).hide();
-        });
-        
-        $('#ol-btn-cancel').click(function(){
-            $('#st-settings-account-off').show();
-            $('#st-settings-account-on').hide();
-            $('.overlay-disable').hide();
-        });
-       $('#encompass-save').click(function(){
-    	   alert("saving encompass details");
-    	   saveEncompassDetails("encompass-form");
-       }); 
-       $('#encompass-testconnection').click(function(){
-    	   alert("testing encompass connection");
-    	   testEncompassConnection("encompass-form");
-       });
-       $('#save-participation-mail-content').click(function(){
-    	   alert("saving participation details");
-    	   saveSurveyParticipationMailBodyContent("mail-body-settings-form");
-       });
-       $('#save-participation-reminder-mail-content').click(function(){
-    	   alert("saving participation reminder details");
-    	   saveSurveyParticipationReminderMailBodyContent("mail-body-settings-form");
-       });
-    });
+$(document).ready(function(){
+	$(document).attr("title", "Settings");
+	$('#survey-participation-mailcontent').ckeditor();
+	$('#survey-participation-reminder-mailcontent').ckeditor();
+	
+	// Setting values to User settings
+	autoAppendRatingDropdown('#rating-auto-post', '#rating-auto-post-hidden');
+	autoAppendRatingDropdown('#rating-min-post', '#rating-min-post-hidden');
+	autoAppendReminderDropdown('#reminder-interval', '#reminder-interval-hidden');
+	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
+});
 </script>
