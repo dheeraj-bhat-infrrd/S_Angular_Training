@@ -71,7 +71,15 @@
 				<!-- To be removed: EOC -->
 			</div>
 			<div class="header-user-info float-right clearfix">
-				<div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>
+				<div class="float-left user-info-initial">
+                    <span>${fn:substring(user.loginName, 0, 1)}</span>
+                    <div class="initial-dd-wrapper hide blue-arrow-bot">
+                        <div class="initial-dd-item">Profile Settings</div>
+                        <div class="initial-dd-item">Account Settings</div>
+                        <div class="initial-dd-item">Change Password</div>
+                        <div class="initial-dd-item">Log Out</div>
+                    </div>
+                </div>
 				<div class="float-left user-info-seperator"></div>
 				<div class="float-left user-info-logo"></div>
 			</div>

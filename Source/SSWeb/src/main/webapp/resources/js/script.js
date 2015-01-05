@@ -572,3 +572,8 @@ function validateCompanyEnterpriseAddress1(elementId){
 		}
 	}
 }
+
+
+$('.user-info-initial').click(function(){
+    $('.initial-dd-wrapper').slideToggle(200);
+});
