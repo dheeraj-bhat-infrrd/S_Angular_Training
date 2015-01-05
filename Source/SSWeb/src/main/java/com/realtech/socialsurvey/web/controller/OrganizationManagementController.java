@@ -366,10 +366,11 @@ public class OrganizationManagementController {
 	
 	@RequestMapping(value = "/updatesurveysettings", method = RequestMethod.POST)
 	public String updateSurveySettings(Model model, HttpServletRequest request) {
-		LOG.info("Updating Survey Settings Post score");
+		LOG.info("Updating Survey Settings");
 		HttpSession session = request.getSession(false);
 		String ratingCategory = request.getParameter("ratingcategory");
-		SurveySettings updatedSurveySettings = null;
+		SurveySettings originalSurveySettings = null;
+		SurveySettings surveySettings = null;
 		double autopostRating;
 		double minPostRating;
 
@@ -383,7 +384,17 @@ public class OrganizationManagementController {
 					LOG.warn("Auto Post rating score is 0.");
 					throw new InvalidInputException("Auto Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				updatedSurveySettings = organizationManagementService.updateAutoPostScore(companySettings, (float) autopostRating);
+				
+				originalSurveySettings = companySettings.getSurvey_settings();
+				surveySettings = new SurveySettings();
+				surveySettings.setAuto_post_score((float)autopostRating);
+				if(originalSurveySettings != null){
+					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
+					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
+					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+					surveySettings.setReminderNotNeeded(originalSurveySettings.getIsReminderNotNeeded());
+				}
+				LOG.info("Updating Survey Settings Post score");
 			}
 
 			else if (ratingCategory != null && ratingCategory.equals("rating-min-post")) {
@@ -392,13 +403,87 @@ public class OrganizationManagementController {
 					LOG.warn("Minimum Post rating score is 0.");
 					throw new InvalidInputException("Mimimum Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				updatedSurveySettings = organizationManagementService.updateMinimumPostScore(companySettings, (float) (minPostRating));
+				
+				originalSurveySettings = companySettings.getSurvey_settings();
+				surveySettings = new SurveySettings();
+				surveySettings.setShow_survey_above_score((float)minPostRating);
+				if(originalSurveySettings != null){
+					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
+					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
+					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+					surveySettings.setReminderNotNeeded(originalSurveySettings.getIsReminderNotNeeded());
+				}
+				LOG.info("Updating Survey Settings Min score");
 			}
 
-			// set the updated settings value in session
-			companySettings.setSurvey_settings(updatedSurveySettings);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			if(organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
+				companySettings.setSurvey_settings(surveySettings);
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				LOG.info("Updated Survey Settings");
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while updating survey settings. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	@RequestMapping(value = "/updatesurveyremindersettings", method = RequestMethod.POST)
+	public String updateSurveyReminderSettings(Model model, HttpServletRequest request) {
+		LOG.info("Updating Survey Reminder Settings");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		SurveySettings originalSurveySettings = null;
+		SurveySettings surveySettings = null;
+		int reminderInterval;
+		Boolean isReminderNeeded;
+		
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+
+			if (mailCategory != null && mailCategory.equals("reminder-interval")) {
+				reminderInterval = Integer.parseInt(request.getParameter("reminder-interval"));
+				if (reminderInterval == 0) {
+					LOG.warn("Reminder Interval is 0.");
+					throw new InvalidInputException("Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				
+				originalSurveySettings = companySettings.getSurvey_settings();
+				surveySettings = new SurveySettings();
+				surveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
+				if(originalSurveySettings != null){
+					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
+					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
+					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
+					surveySettings.setReminderNotNeeded(originalSurveySettings.getIsReminderNotNeeded());
+				}
+				LOG.info("Updating Survey Settings Reminder Interval");
+			}
+
+			else if (mailCategory != null && mailCategory.equals("reminder-needed")) {
+				isReminderNeeded = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
+				
+				originalSurveySettings = companySettings.getSurvey_settings();
+				surveySettings = new SurveySettings();
+				surveySettings.setReminderNotNeeded(isReminderNeeded);
+				if(originalSurveySettings != null){
+					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
+					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
+					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
+					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
+				}
+				LOG.info("Updating Survey Settings Reminder Needed");
+			}
+
+			if(organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
+				companySettings.setSurvey_settings(surveySettings);
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				LOG.info("Updated Survey Settings");
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while updating survey settings. Reason : " + e.getMessage(), e);
@@ -409,7 +494,7 @@ public class OrganizationManagementController {
 	
 	@RequestMapping(value = "/updateothersettings", method = RequestMethod.POST)
 	public String updateOtherSettings(Model model, HttpServletRequest request) {
-		LOG.info("Updating Survey Settings Post score");
+		LOG.info("Updating Location Settings");
 		HttpSession session = request.getSession(false);
 		String otherCategory = request.getParameter("othercategory");
 		Boolean isEnabled;
@@ -426,6 +511,7 @@ public class OrganizationManagementController {
 				companySettings.setLocationEnabled(isEnabled);
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.LOCATION_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				LOG.info("Updated Location Settings");
 			}
 		}
 		catch (NonFatalException e) {
