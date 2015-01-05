@@ -38,6 +38,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	private GenericDao<Region, Long> regionDao;
 
 	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
+
+	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
 	/**
@@ -62,7 +65,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
 	}
-
+	
 	/**
 	 * Fetch list of regions in a company
 	 * 
@@ -148,6 +151,114 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		regionDao.update(region);
 		LOG.info("Region status for region ID :" + regionId + "/t successfully updated to " + status);
+	}
+
+	/**
+	 * Fetch list of branches in a company for a Region
+	 * 
+	 * @param regionId
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
+		
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
+		
+		LOG.info("Branch list fetched for the region " + region);
+		return branchList;
+	}
+	
+	/**
+	 * Method to fetch count of branches in a company for a Region
+	 * 
+	 * @param regionId
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public long getCountBranchesInRegion(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
+		
+		Map<String,Object> queries = new HashMap<String,Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
+		
+		LOG.info("Branch list fetched for the region " + region);
+		return branchCount;
+	}
+
+	/**
+	 * Method to fetch UserProfiles associated with a branch
+	 * 
+	 * @param company
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<UserProfile> getAllUserProfilesInBranch(long branchId) throws InvalidInputException {
+		if (branchId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllUserProfilesForBranch");
+		}
+		LOG.info("Fetching the list of users for branch :" + branchId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<UserProfile> userList = userProfileDao.findByKeyValue(UserProfile.class, queries);
+
+		LOG.info("Users list fetched for the branch " + branchId);
+		return userList;
+	}
+	
+	/**
+	 * Method to fetch count of UserProfiles associated with a branch
+	 * 
+	 * @param company
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public long getCountUsersInBranch(long branchId) throws InvalidInputException {
+		if (branchId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllUserProfilesForBranch");
+		}
+		LOG.info("Fetching the list of users for branch :" + branchId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long usersCount = userProfileDao.findNumberOfRowsByKeyValue(UserProfile.class, queries);
+
+		LOG.info("Users list fetched for the branch " + branchId);
+		return usersCount;
 	}
 
 	/**

@@ -9,12 +9,20 @@
     </div>
 </div>
 
+<style>
+.error-msg {
+	width:auto !important;
+	margin-top:5px !important;
+}
+</style>
+
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
         <c:choose>
 	     	<c:when test="${isBranchAdditionAllowed && not isRegionAdditionAllowed}">   
+		        <input type="hidden" id="enable-branches-form" value="true">
 		        <div class="hm-content clearfix padding-001">
-		            <div class="hm-top-panel padding-001">
+		            <div class="hm-top-panel padding-001" id="company-branch">
 		                <div class="hm-top-panel-header">
 		                    <div class="hm-item-header padding-0150 clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn-type2 dd-icn hide"></div>
@@ -31,7 +39,9 @@
 			                                    <div class="hm-item-row-left text-right"><spring:message code="label.branchname.key"/></div>
 			                                    <div class="hm-item-row-right">
 			                                        <input type="text" name="branchName" id="branch-name-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
+			                                        <div id="branch-name-error" class="input-error-2 error-msg"></div>
 			                                    </div>
+			                                    
 			                                </div>
 			                            </div>
 			                            <div class="clearfix">
@@ -39,7 +49,8 @@
 			                                    <div class="hm-item-row clearfix">
 			                                        <div class="hm-item-row-left text-right"><spring:message code="label.address1.key"/></div>
 			                                        <div class="hm-item-row-right">
-			                                            <input type="text" name= "branchAddress1" class="hm-item-row-txt" placeholder='<spring:message code="label.address1.key"/>'>
+			                                            <input type="text" name="branchAddress1" id="branch-address1-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.address1.key"/>'>
+			                                        <div id="branch-address1-error" class="input-error-2 error-msg"></div>
 			                                        </div>
 			                                    </div>
 			                                </div>
@@ -47,14 +58,15 @@
 			                                    <div class="hm-item-row clearfix">
 			                                        <div class="hm-item-row-left text-right"><spring:message code="label.address2.key"/></div>
 			                                        <div class="hm-item-row-right">
-			                                            <input type="text" name= "branchAddress2" class="hm-item-row-txt" placeholder='<spring:message code="label.address2.key"/>'>
+			                                            <input type="text" name="branchAddress2" id="branch-address2-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.address2.key"/>'>
+			                                        <div id="branch-address2-error" class="input-error-2 error-msg"></div>
 			                                        </div>
 			                                    </div>
 			                                </div>
 			                            </div>
 			                        </div>
 			                        <div class="hm-btn-outer margin-bottom-25 margin-top-5 clearfix hm-item-row-right-btn-save">
-			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
+			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix error-msg">
 			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
 			                            </div>
@@ -70,8 +82,8 @@
 		        </div>
 	        </c:when>
 	         <c:when test="${isRegionAdditionAllowed && isBranchAdditionAllowed}">   
-        		<input type="hidden" id = "show-regions-flag" value="true">
-		        <div class="hm-content clearfix padding-001 margin-top-2-resp">
+        		<input type="hidden" id="show-regions-flag" value="true">
+		        <div class="hm-content clearfix padding-001 margin-top-2-resp" id="enterprise-branch-region">
 		            <div class="float-left hm-content-left padding-right-0 col-lg-6 col-md-6 col-sm-6 col-xs-12">
 		                <div class="hm-left-item">
 		                    <div class="hm-item-header clearfix">
@@ -85,19 +97,22 @@
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.newregion.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="regionName" id = "region-name-txt" placeholder='<spring:message code="label.newregion.key"/>'>
+			                                    <input type="text" class="hm-item-row-txt" name="regionName" id="region-name-txt" placeholder='<spring:message code="label.newregion.key"/>'>
+				                                <div id="region-name-error" class="input-error-2 error-msg"></div>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.address1.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="regionAddress1" placeholder='<spring:message code="label.address1.key"/>'>
+			                                    <input type="text" class="hm-item-row-txt" id="region-address1-txt" name="regionAddress1" placeholder='<spring:message code="label.address1.key"/>'>
+				                                <div id="region-address1-error" class="input-error-2 error-msg"></div>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.address2.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="regionAddress2" placeholder='<spring:message code="label.address2.key"/>'>
+			                                    <input type="text" class="hm-item-row-txt" id="region-address2-txt" name="regionAddress2" placeholder='<spring:message code="label.address2.key"/>'>
+				                                <div id="region-address2-error" class="input-error-2 error-msg"></div>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
@@ -131,6 +146,7 @@
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.branchname.key"/></div>
 			                                <div class="hm-item-row-right">
 			                                    <input type="text" id="branch-name-txt" class="hm-item-row-txt" name="branchName" placeholder='<spring:message code="label.newbranch.key"/>'>
+				                                <div id="branch-name-error" class="input-error-2 error-msg"></div>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
@@ -148,18 +164,20 @@
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.address1.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="branchAddress1" placeholder='<spring:message code="label.address1.key"/>'>
+			                                    <input type="text" class="hm-item-row-txt" id="branch-address1-txt" name="branchAddress1" placeholder='<spring:message code="label.address1.key"/>'>
+				                                <div id="branch-address1-error" class="input-error-2 error-msg"></div>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-left text-right"><spring:message code="label.address2.key"/></div>
 			                                <div class="hm-item-row-right">
-			                                    <input type="text" class="hm-item-row-txt" name="branchAddress2" placeholder='<spring:message code="label.address2.key"/>'>
+			                                    <input type="text" class="hm-item-row-txt" id="branch-address2-txt" name="branchAddress2" placeholder='<spring:message code="label.address2.key"/>'>
+				                                <div id="branch-address2-error" class="input-error-2 error-msg"></div>
 			                                </div>
 			                            </div>
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-right hm-item-row-right-btn-save">
-			                                    <div class="clearfix hm-btn-wrapper">
+			                                    <div class="clearfix hm-btn-wrapper" id="branch-actions">
 			                                        <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                        <div class="float-left icn-save cursor-pointer" id="branch-save-icon"></div>
 			                                    </div>
@@ -182,8 +200,28 @@
 		    	</div>
        		</c:when>
         </c:choose>
-    </div>
+	</div>
 </div>
+<div class="overlay-disable hide" id="overlay-confirm">
+	<div class="overlay-disable-wrapper">
+		<div class="ol-header" id="overlay-header"></div>
+		<div id="serverSideerror" class="validation-msg-wrapper"></div>
+		<input type="hidden" name="regionid-to-delete-hidden" id="regionid-to-delete-hidden" />
+		<input type="hidden" name="branchid-to-delete-hidden" id="branchid-to-delete-hidden" />
+		<div class="ol-content">
+			<div class="ol-txt" id="overlay-txt"></div>
+			<div class="clearfix">
+				<div class="float-left ol-btn-wrapper">
+					<div id="overlay-continue" class="ol-btn">Continue</div>
+				</div>
+				<div class="float-left ol-btn-wrapper">
+					<div id="overlay-cancel" class="ol-btn">Cancel</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/hierarchymanagement.js"></script>
 <script>
 	$(document).ready(function() {
@@ -191,16 +229,9 @@
 		if($("#show-regions-flag").length > 0) {
 			showRegions();
 		}
-
-		$('#selected-region-txt').click(function(){
-		   $('#hm-dd-wrapper-bottom').slideToggle(200);
-		});
 		
-	});
-	$("#branch-save-icon").click(function(){
-		addOrUpdateBranch("add-branch-form");
-	});
-	$("#region-save-icon").click(function(e) {
-		addOrUpdateRegion("add-region-form");
+		$('#selected-region-txt').click(function(){
+			$('#hm-dd-wrapper-bottom').slideToggle(200);
+		});
 	});
 </script>

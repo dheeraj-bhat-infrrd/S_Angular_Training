@@ -76,6 +76,8 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
+	public static final String REGION_COLUMN = "region";
+	public static final String BRANCH_ID_COLUMN = "branchId";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -123,4 +125,14 @@ public interface CommonConstants {
 	// mail content
 	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
 	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
+	
+	//regular expressions
+	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$";
+	public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
+	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
+	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]$";
+	public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
+	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
+	
 }

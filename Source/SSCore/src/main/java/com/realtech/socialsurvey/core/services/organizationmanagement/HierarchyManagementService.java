@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
@@ -24,6 +25,42 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException;
+
+	/**
+	 * Method to fetch branches mapped to a region
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException;
+	
+	/**
+	 * Method to fetch UserProfiles mapped to a branch
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<UserProfile> getAllUserProfilesInBranch(long branchId) throws InvalidInputException;
+
+	/**
+	 * Method to fetch count of branches mapped to a region
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCountBranchesInRegion(long regionId) throws InvalidInputException;
+	
+	/**
+	 * Method to fetch count of UserProfiles mapped to a branch
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCountUsersInBranch(long branchId) throws InvalidInputException;
 
 	/**
 	 * Method to fetch all regions of a company
