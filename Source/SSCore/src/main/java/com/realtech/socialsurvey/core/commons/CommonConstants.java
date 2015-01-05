@@ -103,6 +103,19 @@ public interface CommonConstants {
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	
+	/**
+	 * Batch Constants
+	 */
+	public static final String CASE_NONE = "None";
+	public static final String CASE_SETTLING = "Settling";
+	public static final String CASE_SETTLED = "Settled";
+	public static final String CASE_GENERAL = "General";
+	public static final String CASE_RETRIES_EXCEEDED = "RetriesExceeded";
+	public static final String CASE_KEY = "Case";
+	public static final String LICENSE_DETAIL_OBJECT_KEY = "LicenseDetailObject";
+	public static final String RETRIED_TRANSACTION_OBJECT_KEY = "RetriedTransactionObject";
+	public static final String COMPANY_OBJECT_KEY = "CompanyObject";
 
 	/**
 	 * other constants
