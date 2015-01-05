@@ -62,8 +62,9 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 				LOG.debug("Creating the directory to store file");
 				String rootPath = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.LOGO_HOME_DIRECTORY);
 				File dir = new File(rootPath);
-				if (!dir.exists())
-					dir.mkdirs();
+				if (!dir.exists() && !dir.mkdirs()) {
+					throw new FatalException("Directory for Logo upload can not be created. Reason: Permission denied"); 
+				}
 
 				// Create the file on server
 				LOG.debug("Creating the file on server");

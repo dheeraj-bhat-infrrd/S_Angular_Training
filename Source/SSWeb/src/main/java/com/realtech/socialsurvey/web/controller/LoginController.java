@@ -47,6 +47,7 @@ public class LoginController {
 	private OrganizationManagementService organizationManagementService;
 	@Autowired
 	private UserManagementService userManagementService;
+	private SessionHelper sessionHelper;
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage() {
@@ -96,13 +97,13 @@ public class LoginController {
 			if (user.getStatus() == CommonConstants.STATUS_INACTIVE) {
 				throw new InvalidInputException("User not active in login", DisplayMessageConstants.USER_INACTIVE);
 			}
-
+			HttpSession session = request.getSession(true);
 			try {
 				LOG.debug("Calling authentication service to validate user while login");
 				authenticationService.validateUser(user, password);
 				LOG.debug("Successfully executed authentication service to validate user while login");
 
-				HttpSession session = request.getSession(false);
+				// HttpSession session = request.getSession(false);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
 				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
@@ -141,33 +142,46 @@ public class LoginController {
 					 */
 					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
 					List<UserProfile> userProfiles = null;
-					UserProfile highestUserProfile  = null;
-					//fetch the list of all user profiles for user
-					try{
-						userProfiles  = userManagementService.getAllUserProfilesForUser(user);
+					UserProfile highestUserProfile = null;
+					// fetch the list of all user profiles for user
+					try {
+						userProfiles = userManagementService.getAllUserProfilesForUser(user);
 						highestUserProfile = userManagementService.getHighestUserProfile(userProfiles);
-					}catch(InvalidInputException e){
+					}
+					catch (InvalidInputException e) {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}
-					//If account type is individual or user is an agent set user management tab as not authorized
- 					if(accountType.getValue() == 1 || highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID){
+					// If account type is individual or user is an agent set user management tab as
+					// not authorized
+					if (accountType.getValue() == 1
+							|| highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						model.addAttribute("userManagementNotAccessible", "true");
 					}
-					
-					/*try {
-						LOG.debug("Calling service for fetching company admin user profile");
-						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
-					}
-					catch (InvalidInputException e) {
-						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
-						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
-					}*/
+
+					/*
+					 * try { LOG.debug("Calling service for fetching company admin user profile");
+					 * userProfile = authenticationService.getCompanyAdminProfileForUser(user); }
+					 * catch (InvalidInputException e) {
+					 * LOG.error("Invalid Input exception in validating User. Reason " +
+					 * e.getMessage(), e); throw new InvalidInputException(e.getMessage(),
+					 * DisplayMessageConstants.INVALID_USER, e); }
+					 */
 
 					redirectTo = getRedirectionFromProfileCompletionStage(highestUserProfile.getProfileCompletionStage());
 
+					if ((highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID)
+							&& (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE))) {
+						// get the user's canonical settings
+						LOG.info("Fetching the user's canonical settings and setting it in session");
+						sessionHelper.getCanonicalSettings(session);
+						// Set the session variables
+						sessionHelper.setSettingVariablesInSession(session);
+					}
+
 				}
 			}
+
 			LOG.info("User login successful");
 		}
 		catch (NonFatalException e) {
@@ -222,9 +236,9 @@ public class LoginController {
 		User user = null;
 		// check if form parameters passed are null
 		try {
-			if (emailId == null || emailId.isEmpty()) {
-				LOG.error("Emaild passed can not be null or empty");
-				throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
+			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+				LOG.error("Invalid email id passed");
+				throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 			}
 			try {
 				// verify if the user exists with the registered emailId
@@ -255,12 +269,12 @@ public class LoginController {
 		return JspResolver.FORGOT_PASSWORD;
 	}
 
-	//RM-06 : BOC
+	// RM-06 : BOC
 	/**
 	 * Controller method to display the reset password page
 	 */
 	@RequestMapping(value = "/resetpassword")
-	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams,Model model) {
+	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams, Model model) {
 		LOG.info("Forgot Password Page started with encrypter url : " + encryptedUrlParams);
 		try {
 			try {
@@ -279,8 +293,9 @@ public class LoginController {
 		}
 		return JspResolver.RESET_PASSWORD;
 	}
-	//RM-06 : EOC
-	
+
+	// RM-06 : EOC
+
 	/**
 	 * Controller method to set a new password from the reset password link
 	 */
@@ -377,13 +392,13 @@ public class LoginController {
 	 */
 	private void validateResetPasswordFormParameters(String emailId, String password, String confirmPassword) throws InvalidInputException {
 		LOG.debug("Validating reset password form paramters");
-		if (emailId == null || emailId.isEmpty()) {
-			LOG.error("Emaild passed can not be null or empty");
-			throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+			LOG.error("Invalid email id passed");
+			throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty()) {
-			LOG.error("Password can not be null or empty");
-			throw new InvalidInputException("Password can not be null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+			LOG.error("Invalid password");
+			throw new InvalidInputException("Invalid password", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (confirmPassword == null || confirmPassword.isEmpty()) {
 			LOG.error("Confirm Password can not be null or empty");
@@ -425,6 +440,46 @@ public class LoginController {
 		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
 	}
+
+	/*
+	 * private void setSettingVariablesInSession(HttpSession session) {
+	 * LOG.info("Settings related session values being set."); if
+	 * (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) { //
+	 * setting the logo name UserSettings userSettings = (UserSettings)
+	 * session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION); // check if company
+	 * has a logo if (userSettings.getCompanySettings().getLogo() != null) {
+	 * LOG.debug("Settings logo image from company settings");
+	 * session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION,
+	 * userSettings.getCompanySettings().getLogo()); } else {
+	 * LOG.debug("Could not find logo settings in company. Checking in lower heirarchy."); // TODO:
+	 * Check the lower level hierarchy for logo } // check for the mail content String body = null;
+	 * FileContentReplacements replacements = new FileContentReplacements();
+	 * replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER +
+	 * EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY); if
+	 * (userSettings.getCompanySettings().getMail_content() == null) {
+	 * LOG.debug("Setting default survey participation mail body."); // set the mail contents try {
+	 * body = fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * body); } catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation"); } } else {
+	 * LOG.debug("Company already has mail body settings. Hence, setting the same"); if
+	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION,
+	 * userSettings.getCompanySettings() .getMail_content().getTake_survey_mail().getMail_body()); }
+	 * else { try { body = fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body); }
+	 * catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation"); } } if
+	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null)
+	 * { session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * userSettings.getCompanySettings()
+	 * .getMail_content().getTake_survey_reminder_mail().getMail_body()); } else { try { body =
+	 * fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * body); } catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation reminder"); } } } } }
+	 */
 
 }
 

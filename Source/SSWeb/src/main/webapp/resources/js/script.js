@@ -8,6 +8,8 @@ var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z]*$/;
+var lastNameRegEx = /^[a-zA-Z ]*$/;
+var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
 
@@ -231,7 +233,7 @@ function validateFirstName(elementId){
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter first name.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter first name.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
@@ -242,7 +244,7 @@ function validateFirstName(elementId){
 function validateLastName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid last name.');
@@ -254,7 +256,7 @@ function validateLastName(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).parent().next('.input-error-2').hide();
 				return true;
 			}else {
@@ -282,12 +284,12 @@ function validatePassword(elementId) {
 			else if (passwordRegex.test(password) == true) {
 				return true;
 			}else {
-				$('#overlay-toast').html('Passwords must contain one special charcter.');
+				$('#overlay-toast').html('Password must contain one special character.');
 				showToast();
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter Password.');
+			$('#overlay-toast').html('Please enter password.');
 			showToast();
 			return false;
 		}
@@ -303,12 +305,12 @@ function validatePassword(elementId) {
 				$('#'+elementId).parent().next('.input-error-2').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Passwords must contain one special charcter.');
+				$('#'+elementId).parent().next('.input-error-2').html('Password must contain one special character.');
 				$('#'+elementId).parent().next('.input-error-2').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('please enter Password.');
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter password.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
 		}
@@ -356,7 +358,7 @@ function validateConfirmPassword(pwdId, confirmPwdId){
 function validateCompany(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid company name.');
@@ -364,13 +366,13 @@ function validateCompany(elementId){
 				return false;
 			}
 		}else{
-			$('#overlay-toast').html('please enter company name.');
+			$('#overlay-toast').html('Please enter company name.');
 			showToast();
 			return false;
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).parent().next('.input-error-2').hide();
 				return true;
 			}else {
@@ -447,6 +449,74 @@ function validatePhoneNumber(elementId) {
 				return false;
 			}
 		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter company name.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate the zipcode
+function validateZipcode(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (zipcodeRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid zipcode.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter zipcode.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (zipcodeRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid zipcode.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).parent().next('.input-error-2').html('Please enter zipcode.');
+			$('#'+elementId).parent().next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate the phone number
+function validatePhoneNumber(elementId) {
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (phoneRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid phone number.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter phone number.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (phoneRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).parent().next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid phone number.');
+				$('#'+elementId).parent().next('.input-error-2').show();
+				return false;
+			}
+		}else{
 			$('#'+elementId).parent().next('.input-error-2').html('Please enter phone number.');
 			$('#'+elementId).parent().next('.input-error-2').show();
 			return false;
@@ -479,4 +549,94 @@ function validateAddress1(elementId){
 //Function to validate Address 2
 function validateAddress2(elementId){
 	return true;
+}
+
+//Function to validate Branch name
+function validateBranchName(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid branch name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter branch name.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).next('.input-error-2').html('Please enter a valid branch name.');
+				$('#'+elementId).next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).next('.input-error-2').html('Please enter branch name.');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Region name
+function validateRegionName(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid region name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter region name.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (nameRegex.test($('#'+elementId).val()) == true) {
+				$('#'+elementId).next('.input-error-2').hide();
+				return true;
+			}else {
+				$('#'+elementId).next('.input-error-2').html('Please enter a valid region name.');
+				$('#'+elementId).next('.input-error-2').show();
+				return false;
+			}
+		}else{
+			$('#'+elementId).next('.input-error-2').html('Please enter region name.');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate Company/Enterprise Address 1
+function validateCompanyEnterpriseAddress1(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+				return true;
+		}else{
+			$('#overlay-toast').html('Please enter address.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+				$('#'+elementId).next('.input-error-2').hide();
+				return true;
+		}else{
+			$('#'+elementId).next('.input-error-2').html('Please enter address.');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+	}
 }

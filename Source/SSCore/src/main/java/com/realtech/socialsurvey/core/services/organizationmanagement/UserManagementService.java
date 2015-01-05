@@ -2,10 +2,13 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -85,6 +88,31 @@ public interface UserManagementService {
 	
 	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException;
 	
-	//JIRA SS-42 by RM-06:BOC
+	//JIRA SS-42 by RM-06:EOC
+	
+	/**
+	 * Gets the user settings according to the heirarchy
+	 * @param user
+	 * @param accountType
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException;
+	
+	/**
+	 * Gets user settings
+	 * @param agentId
+	 * @return agentSettings
+	 * @throws InvalidInputException
+	 */
+	public AgentSettings getUserSettings(long agentId) throws InvalidInputException;
+	
+	/**
+	 * Get all the agent settings linked to the user profile
+	 * @param userProfiles
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

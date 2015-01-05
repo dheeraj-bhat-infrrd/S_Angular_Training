@@ -62,7 +62,7 @@ public class HierarchyManagementController {
 				isRegionAdditionAllowed = hierarchyManagementService.isRegionAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException while checking for max region addition",
+				throw new InvalidInputException("InvalidInputException while checking for max region addition. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
@@ -71,7 +71,7 @@ public class HierarchyManagementController {
 				isBranchAdditionAllowed = hierarchyManagementService.isBranchAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException while checking for max region addition",
+				throw new InvalidInputException("InvalidInputException while checking for max region addition. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
@@ -101,6 +101,8 @@ public class HierarchyManagementController {
 		LOG.info("Fetching all the branches for current user");
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		String jspToReturn = null;
 
 		try {
 			try {
@@ -108,7 +110,17 @@ public class HierarchyManagementController {
 				List<Branch> branches = hierarchyManagementService.getAllBranchesForCompany(user.getCompany());
 				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
 
-				// TODO : set the branch in list in either model attribute or send it back as JSON
+				model.addAttribute("branches", branches);
+				/**
+				 * UI for enterprise branches and regions is different hence deciding which jsp to
+				 * return
+				 */
+				if (accountType == AccountType.ENTERPRISE) {
+					jspToReturn = JspResolver.EXISTING_ENTERPRISE_BRANCHES;
+				}
+				else {
+					jspToReturn = JspResolver.EXISTING_BRANCHES;
+				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Error occurred while fetching the branch list in method getAllBranchesForCompany");
@@ -119,8 +131,9 @@ public class HierarchyManagementController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching all branches. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return jspToReturn;
 	}
 
 	/**
@@ -143,20 +156,58 @@ public class HierarchyManagementController {
 				List<Region> regions = hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
 				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
 
-				// TODO : set the region in list in either model attribute or send it back as JSON
+				model.addAttribute("regions", regions);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Error occurred while fetching the regions list in method getAllRegionsForCompany");
-				throw new InvalidInputException("Error occurred while fetching the region list in method getAllBranchesForCompany",
+				throw new InvalidInputException("Error occurred while fetching the region list in method getAllRegionsForCompany",
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching all regions. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.info("Successfully fetched the list of regions");
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.EXISTING_ENTERPRISE_REGIONS;
+	}
+
+	/**
+	 * Method to fetch all regions for selector
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/fetchregionsselector", method = RequestMethod.GET)
+	public String fetchRegionsSelector(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchRegionsSelector called in HierarchyManagementController ");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+		try {
+			try {
+				LOG.debug("Calling service to get the list of regions in company");
+				List<Region> regions = hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
+				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
+
+				model.addAttribute("regions", regions);
+
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the regions list in method fetchRegionsSelector");
+				throw new InvalidInputException("Error occurred while fetching the region list in method fetchRegionsSelector",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetchRegionsSelector. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Successfully fetched the list of regions");
+		return JspResolver.REGIONS_AUTOCOMPLETE;
 	}
 
 	/**
@@ -202,6 +253,48 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Check for associated branches for the region
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkbranchesinregion", method = RequestMethod.POST)
+	public String checkBranchesInRegion(Model model, HttpServletRequest request) {
+		LOG.info("Fetching all the branches for current region");
+		String messageToReturn = null;
+		
+		try {
+			long regionId = 0l;
+			try {
+				regionId = Long.parseLong(request.getParameter("regionId"));
+				LOG.debug("Calling service to get the count of branches in region");
+				long branchCount = hierarchyManagementService.getCountBranchesInRegion(regionId);
+				LOG.debug("Successfully executed service to get the count of branches in region : " + branchCount);
+				
+				if (branchCount > 0l) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				} else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("REGION_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the branch count in method checkBranchesInRegion");
+				throw new InvalidInputException("Error occurred while fetching the branch count in method checkBranchesInRegion",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching branch count for region. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+	
+	/**
 	 * Deactivates a branch status
 	 * 
 	 * @param model
@@ -242,6 +335,48 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Check for associated user profiles for the branch
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkusersinbranch", method = RequestMethod.POST)
+	public String checkUsersInBranch(Model model, HttpServletRequest request) {
+		LOG.info("Fetching count of users for current branch");
+		String messageToReturn = null;
+
+		try {
+			long branchId = 0l;
+			try {
+				branchId = Long.parseLong(request.getParameter("branchId"));
+				LOG.debug("Calling service to get the count of users in branch");
+				long usersCount = hierarchyManagementService.getCountUsersInBranch(branchId);
+				LOG.debug("Successfully executed service to get the count of users in branch : " + usersCount);
+				
+				if (usersCount > 0l) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("USER_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				} else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the users count in method checkUsersInBranch");
+				throw new InvalidInputException("Error occurred while fetching the users count in method checkUsersInBranch",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching users count for branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+	
+	/**
 	 * Method to add a new region
 	 * 
 	 * @param model
@@ -256,12 +391,8 @@ public class HierarchyManagementController {
 			String regionAddress1 = request.getParameter("regionAddress1");
 			String regionAddress2 = request.getParameter("regionAddress2");
 
-			if (regionName == null || regionName.isEmpty()) {
-				throw new InvalidInputException("Region name is invalid while adding region", DisplayMessageConstants.INVALID_REGION_NAME);
-			}
-			if (regionAddress1 == null || regionAddress2.isEmpty()) {
-				throw new InvalidInputException("Region address is invalid while adding region", DisplayMessageConstants.INVALID_REGION_ADDRESS);
-			}
+			validateRegionForm(regionName, regionAddress1);
+			
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
@@ -302,12 +433,8 @@ public class HierarchyManagementController {
 			String branchAddress2 = request.getParameter("branchAddress2");
 			String strRegionId = request.getParameter("regionId");
 
-			if (branchName == null || branchName.isEmpty()) {
-				throw new InvalidInputException("Branch name is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
-			}
-			if (branchAddress1 == null || branchAddress1.isEmpty()) {
-				throw new InvalidInputException("Branch address is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_ADDRESS);
-			}
+			validateBranchForm(branchName, branchAddress1);
+
 			long regionId = 0l;
 			try {
 				/**
@@ -331,6 +458,9 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to add a new branch");
 				hierarchyManagementService.addNewBranch(user, regionId, branchName);
 				LOG.debug("Successfully executed service to add a new branch");
+
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException occured while adding new branch.REason : " + e.getMessage(),
@@ -344,6 +474,126 @@ public class HierarchyManagementController {
 		LOG.info("Successfully comppleted controller to add a branch");
 		return JspResolver.MESSAGE_HEADER;
 
+	}
+
+	/**
+	 * Method to update a branch
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updatebranch", method = RequestMethod.POST)
+	public String updateBranch(Model model, HttpServletRequest request) {
+		LOG.info("Method updateBranch called in HierarchyManagementController");
+		String strBranchId = request.getParameter("branchId");
+		String branchName = request.getParameter("branchName");
+		String strRegionId = request.getParameter("regionId");
+		String branchAddress1 = request.getParameter("branchAddress1");
+		String branchAddress2 = request.getParameter("branchAddress2");
+		try {
+			validateBranchForm(branchName, branchAddress1);
+			long regionId = 0l;
+			try {
+				/**
+				 * parse the regionId if a region is selected for the branch
+				 */
+				if (strRegionId != null && !strRegionId.isEmpty()) {
+					regionId = Long.parseLong(strRegionId);
+				}
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing regionId in update branch.Reason : " + e.getMessage(),
+						DisplayMessageConstants.INVALID_REGION_SELECTED, e);
+			}
+
+			long branchId = 0l;
+			try {
+				branchId = Long.parseLong(strBranchId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing branchId in update branch.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+			String address = getCompleteAddress(branchAddress1, branchAddress2);
+			// TODO store address in database
+			LOG.info("Address " + address + " is yet to be stored");
+
+			try {
+				LOG.debug("Calling service to update branch with Id : " + branchId);
+				hierarchyManagementService.updateBranch(branchId, regionId, branchName, address, user);
+				LOG.debug("Successfully executed service to update a branch");
+
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_UPDATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException occured while updating branch.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while updating branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to update branch completed successfully");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to update a region
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updateregion", method = RequestMethod.POST)
+	public String updateRegion(Model model, HttpServletRequest request) {
+		LOG.info("Method updateRegion called in HierarchyManagementController");
+		String regionName = request.getParameter("regionName");
+		String strRegionId = request.getParameter("regionId");
+		String regionAddress1 = request.getParameter("regionAddress1");
+		String regionAddress2 = request.getParameter("regionAddress2");
+		try {
+			validateRegionForm(regionName, regionAddress1);
+			long regionId = 0l;
+			try {
+				regionId = Long.parseLong(strRegionId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing regionId in update region.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+			String address = getCompleteAddress(regionAddress1, regionAddress2);
+			// TODO store address in database
+			LOG.info("Address " + address + " is yet to be stored");
+
+			try {
+				LOG.debug("Calling service to update region with Id : " + regionId);
+				hierarchyManagementService.updateRegion(regionId, regionName, address, user);
+				LOG.debug("Successfully executed service to update a region");
+
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_UPDATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException occured while updating region.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while updating region. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to update region completed successfully");
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -364,6 +614,42 @@ public class HierarchyManagementController {
 		}
 		LOG.debug("Returning complete address" + address);
 		return address;
+	}
+
+	/**
+	 * Method to validate branch addition/updation form
+	 * 
+	 * @param branchName
+	 * @param branchAddress1
+	 * @throws InvalidInputException
+	 */
+	private void validateBranchForm(String branchName, String branchAddress1) throws InvalidInputException {
+		LOG.debug("Validating branch add/update form");
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is invalid while updating branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
+		}
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
+			throw new InvalidInputException("Branch address is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_ADDRESS);
+		}
+		LOG.debug("Successsfully validated branch add/update form");
+	}
+
+	/**
+	 * Method to validate add/update region form
+	 * 
+	 * @param regionName
+	 * @param regionAddress1
+	 * @throws InvalidInputException
+	 */
+	private void validateRegionForm(String regionName, String regionAddress1) throws InvalidInputException {
+		LOG.debug("Validating region add/update form");
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is invalid while adding region", DisplayMessageConstants.INVALID_REGION_NAME);
+		}
+		if (regionAddress1 == null || regionAddress1.isEmpty()) {
+			throw new InvalidInputException("Region address is invalid while adding region", DisplayMessageConstants.INVALID_REGION_ADDRESS);
+		}
+		LOG.debug("Validating region add/update form");
 	}
 }
 // JIRA SS-37 BY RM02 EOC

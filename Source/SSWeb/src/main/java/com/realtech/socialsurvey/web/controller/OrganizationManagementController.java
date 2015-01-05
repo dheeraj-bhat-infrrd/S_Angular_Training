@@ -15,7 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -62,12 +66,12 @@ public class OrganizationManagementController {
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
 		String logoName = "";
-		
+
 		LOG.debug("Overriding Logo image name in Session");
 		if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME) != null) {
 			request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
 		}
-		
+
 		try {
 			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
@@ -83,7 +87,7 @@ public class OrganizationManagementController {
 		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
 		return JspResolver.MESSAGE_HEADER;
 	}
-	
+
 	/**
 	 * Method to call service for adding company information for a user
 	 * 
@@ -106,14 +110,20 @@ public class OrganizationManagementController {
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			/*String logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
-			session.removeAttribute(CommonConstants.LOGO_NAME);*/
-			
+			String logoName = null;
+			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
+				logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
+			}
+			session.removeAttribute(CommonConstants.LOGO_NAME);
+
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
 			companyDetails.put(CommonConstants.ADDRESS, address);
 			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
+			if (logoName != null) {
+				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
+			}
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
@@ -148,9 +158,7 @@ public class OrganizationManagementController {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
-		String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
-		String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
-		if (companyName == null || companyName.isEmpty()) {
+		if (companyName == null || companyName.isEmpty() || !companyName.matches(CommonConstants.COMPANY_NAME_REGEX)) {
 			throw new InvalidInputException("Company name is null or empty while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_NAME);
 		}
@@ -158,10 +166,10 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
 
-		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(ZIPCODE_REGEX)) {
+		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(CommonConstants.ZIPCODE_REGEX)) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
-		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(PHONENUMBER_REGEX)) {
+		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 		}
@@ -204,7 +212,7 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			
+
 			LOG.debug("Initialising payment gateway");
 			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
@@ -220,6 +228,135 @@ public class OrganizationManagementController {
 		}
 		return JspResolver.PAYMENT;
 
+	}
+
+	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
+	public String showCompanySettings(Model model, HttpServletRequest request) {
+		LOG.info("Method showCompanySettings of UserManagementController called");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		try {
+			LOG.debug("Getting company settings");
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+			LOG.debug("Showing company settings: " + companySettings.toString());
+			// setting the object in settings
+			session.setAttribute("companysettings", companySettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		return JspResolver.COMPANY_SETTINGS;
+	}
+
+	@RequestMapping(value = "/saveencompassdetails", method = RequestMethod.POST)
+	public String saveEncompassDetails(Model model, HttpServletRequest request) {
+		LOG.info("Saving encompass details");
+		HttpSession session = request.getSession(false);
+		// test connection
+		// set the request attribute so that test method throws an exception in case connection
+		// fails
+		request.setAttribute("saveencompassdetails", "true");
+		try {
+			testEncompassConnection(model, request);
+			// save the details
+			CRMInfo crmInfo = new CRMInfo();
+			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
+			crmInfo.setCrm_username(request.getParameter("encompass-username"));
+			crmInfo.setCrm_password(request.getParameter("encompass-password"));
+			crmInfo.setUrl(request.getParameter("encompass-url"));
+			crmInfo.setConnection_successful(true);
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
+			// set the updated settings value in session
+			companySettings.setCrm_info(crmInfo);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/testencompassconnection", method = RequestMethod.POST)
+	public String testEncompassConnection(Model model, HttpServletRequest request) throws NonFatalException {
+		LOG.info("Testing connections");
+		try {
+			// validate the parameters
+			if (validateEncompassParameters(request)) {
+				// TODO: code to test connection
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+		}
+		catch (NonFatalException e) {
+			if (request.getAttribute("saveencompassdetails") != null) {
+				throw e;
+			}
+			else {
+				LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			}
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private boolean validateEncompassParameters(HttpServletRequest request) throws InvalidInputException {
+		LOG.debug("Validating encompass parameters");
+		String userName = request.getParameter("encompass-username");
+		String password = request.getParameter("encompass-password");
+		String url = request.getParameter("encompass-url");
+		if (userName == null || userName.isEmpty() || password == null || password.isEmpty() || url == null || url.isEmpty()) {
+			LOG.warn("Encompass validation failed");
+			throw new InvalidInputException("All fields not set for encompass", DisplayMessageConstants.GENERAL_ERROR);
+		}
+		LOG.debug("Encompass validation passed.");
+		return true;
+	}
+
+	@RequestMapping(value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+	public String setSurveyParticipationMailBody(Model model, HttpServletRequest request) {
+		LOG.info("Saving survey participation mail body");
+		HttpSession session = request.getSession(false);
+		String mailCategory = request.getParameter("mailcategory");
+		String mailBody = null;
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+			MailContentSettings updatedMailContentSettings = null;
+			if(mailCategory != null && mailCategory.equals("participationmail")){
+				mailBody = request.getParameter("survey-participation-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
+			}else{
+				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
+				if (mailBody == null || mailBody.isEmpty()) {
+					LOG.warn("Survey participation reminder mail body is blank.");
+					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+				// set the value back in session
+				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+			}
+			// update the mail content settings in session
+			companySettings.setMail_content(updatedMailContentSettings);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

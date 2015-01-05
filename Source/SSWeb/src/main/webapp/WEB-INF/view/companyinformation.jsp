@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+	<div id="overlay-toast" class="overlay-toast"></div>
     <div class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 company-wrapper-min-height">
 		<div class="container login-container margin-top-25 margin-bottom-25">
@@ -44,6 +45,7 @@
 							<div class="float-left login-wrapper-icon icn-company"></div>
 							<input class="float-left login-wrapper-txt" id="com-company" data-non-empty="true" name="company" placeholder='<spring:message code="label.company.key"/>'>
 						</div>
+						<div id="com-page-company" class="input-error-2 margin-0-auto"></div>
 						<div class="login-input-wrapper margin-0-auto clearfix pos-relative input-file-company">
                             <div class="clearfix file-decoy">
                                 <div class="float-left login-wrapper-icon icn-lname input-file-icn-left" id="input-file-icn-left"></div>
@@ -60,6 +62,7 @@
 							<div class="float-left login-wrapper-icon icn-address"></div>
 							<input class="float-left login-wrapper-txt" id="com-address1" data-non-empty="true" name="address1" placeholder='<spring:message code="label.address1.key"/>'>
 						</div>
+						<div id="com-page-address1" class="input-error-2 margin-0-auto"></div>
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-address"></div>
 							<input class="float-left login-wrapper-txt" id="com-address2" name="address2" placeholder='<spring:message code="label.address2.key"/>'>
@@ -68,10 +71,12 @@
 							<div class="float-left login-wrapper-icon icn-zip"></div>
 							<input class="float-left login-wrapper-txt" id="com-zipcode" data-non-empty="true" data-zipcode = "true" name="zipcode" placeholder='<spring:message code="label.zipcode.key"/>'>
 						</div>
+						<div id="com-page-zipcode" class="input-error-2 margin-0-auto"></div>
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-contact"></div>
 							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" data-phone = "true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
 						</div>
+						<div id="com-page-contactno" class="input-error-2 margin-0-auto"></div>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="company-info-submit">
                             <spring:message code="label.done.key" />
 						</div>
@@ -89,9 +94,11 @@
 					</div>
 				</div>
 				<div class="footer-copyright text-center">
-					<spring:message code="label.copyright.key" />
-					&copy;
-					<spring:message code="label.copyrightposttext.key" />
+					<spring:message code="label.copyright.key"/> 
+					&copy; 
+					<spring:message code="label.footer.socialsurvey.key"/> 
+					<span class="center-dot">.</span> 
+					<spring:message code="label.allrightscopyright.key"/>
 				</div>
                 
 			</div>
@@ -104,7 +111,9 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 
 	<script>
+		var isCompanyInfoPageValid;
 		$(document).ready(function() {
+			isCompanyInfoPageValid=false;
 //			adjustOnResize();
 
 //			$(window).resize(adjustOnResize);
@@ -118,21 +127,13 @@
 					$('.login-row').css('margin-top', offset + 'px');
 				}
 			}
-			
-			function submitCompanyInfoForm() {
-				console.log("submitting company information form");
-				$('#company-info-form').submit();
-			}
             
             $('#icn-file').click(function(){
                 $('#com-logo').trigger('click');
             });
             
             $('#company-info-submit').click(function() {
-            	if (validateForm('company-info-div')) {
-            		/* ===== FORM VALIDATED ===== */
-					submitCompanyInfoForm();
-				}
+            	submitCompanyInfoForm();
             });
             
             $('#com-logo').change(function(){
@@ -141,24 +142,115 @@
             });
 			
 		});
-	</script>
-	<script>
+		$('#com-company').blur(function() {
+			validateCompany(this.id);
+		});
+        
+		$('#com-address1').blur(function() {
+			validateAddress1(this.id);
+		});
+		
+		$('#com-address2').blur(function() {
+			validateAddress2(this.id);
+		});
+		$('#com-zipcode').blur(function() {
+			validateZipcode(this.id);
+		});
+		
+		$('#com-contactno').blur(function() {
+			validatePhoneNumber(this.id);
+		});
+		
+		function validateCompanyInformationForm(elementId) {
+			//hide the server error
+        	$("#serverSideerror").hide();
+			isCompanyInfoPageValid = true;
+			var isFocussed = false;
+        	var isSmallScreen = false;
+        	if($(window).width()<768){
+        		isSmallScreen = true;
+        	}
+        	
+			if(!validateCompany('com-company')){
+				isCompanyInfoPageValid = false;
+				if(!isFocussed){
+        			$('#com-company').focus();
+        			isFocussed=true;
+        		}
+        		if(isSmallScreen){
+        			return isCompanyInfoPageValid;
+        		}
+			}
+			if(!validateAddress1('com-address1')){
+				isCompanyInfoPageValid = false;
+				if(!isFocussed){
+        			$('#com-address1').focus();
+        			isFocussed=true;
+        		}
+        		if(isSmallScreen){
+        			return isCompanyInfoPageValid;
+        		}
+			}
+			if(!validateAddress2('com-address2')){
+				isCompanyInfoPageValid = false;
+				if(!isFocussed){
+        			$('#com-address2').focus();
+        			isFocussed=true;
+        		}
+        		if(isSmallScreen){
+        			return isCompanyInfoPageValid;
+        		}
+			}
+			if(!validateZipcode('com-zipcode')){
+				isCompanyInfoPageValid = false;
+				if(!isFocussed){
+        			$('#com-zipcode').focus();
+        			isFocussed=true;
+        		}
+        		if(isSmallScreen){
+        			return isCompanyInfoPageValid;
+        		}
+			}
+			if(!validatePhoneNumber('com-contactno')){
+				isCompanyInfoPageValid = false;
+				if(!isFocussed){
+        			$('#com-contactno').focus();
+        			isFocussed=true;
+        		}
+        		if(isSmallScreen){
+        			return isCompanyInfoPageValid;
+        		}
+			}
+			return isCompanyInfoPageValid;
+		}
+		
+		function submitCompanyInfoForm() {
+			console.log("submitting company information form");
+			if(validateCompanyInformationForm('company-info-div')){
+				$('#company-info-form').submit();
+			}
+		}
+		function uploadImageSuccessCallback(response) {
+			$("#serverSideerror").html(response);
+			var success = "Logo has been uploaded successfully";
+			var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+			if (success != successMsg) {
+				$('#com-logo').val('');
+				$('#com-logo-decoy').val('');
+			}
+		}
+		$('input').keypress(function(e){
+        	// detect enter
+        	if (e.which==13){
+        		e.preventDefault();
+        		submitCompanyInfoForm();
+        	}
+		});
 		$("#com-logo").on("change", function() {
 			var formData = new FormData();
 			formData.append("logo", $('#com-logo').prop("files")[0]);
 			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
-			$.ajax({
-				url : "./uploadcompanylogo.do",
-				type : "POST",
-				dataType : 'text',
-				contentType : false,
-				processData : false,
-				cache : false,
-				data : formData,
-				success : function(response) {
-					$("#serverSideerror").html(response);
-				}
-			});
+			callAjaxPOSTWithTextData("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
 		});
 	</script>
 </body>
