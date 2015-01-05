@@ -752,6 +752,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			}
 		}
 		userProfileDao.saveOrUpdate(userProfile);
+		if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.info("Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName());
+			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(user);
+		}
 		LOG.info("Method to assign user to a branch finished for user : " + admin.getUserId());
 	}
 
@@ -974,7 +979,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName + " lastName : " + lastName);
 
 		String queryParam = extractUrlQueryParam(url);
-		if (doesUserWithEmailIdExists(emailId)) {
+		if (userWithEmailIdExists(emailId)) {
 			throw new UserAlreadyExistsException("user with specified email id already exists");
 		}
 
@@ -1178,7 +1183,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	/*
 	 * Method to tell whether email id is already present in users table.
 	 */
-	private boolean doesUserWithEmailIdExists(String emailId) {
+	private boolean userWithEmailIdExists(String emailId) {
 		LOG.debug("Method isEmailIdAlreadyPresent started.");
 		try {
 			Map<String, Object> columns = new HashMap<>();

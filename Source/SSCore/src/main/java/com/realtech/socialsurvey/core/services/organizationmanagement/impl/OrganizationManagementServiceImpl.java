@@ -238,7 +238,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method addIndividual started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_REGION_NAME);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -286,7 +286,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_REGION_NAME);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -320,7 +320,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method addCompany started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		Region region = addRegion(user, CommonConstants.IS_DEFAULT_BY_SYSTEM_YES, CommonConstants.DEFAULT_REGION_NAME);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
