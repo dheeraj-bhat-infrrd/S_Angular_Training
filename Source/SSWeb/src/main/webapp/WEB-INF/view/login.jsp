@@ -111,20 +111,6 @@
             function validateLoginForm(id){
             	//hide the server error
             	$("#serverSideerror").hide();
-<<<<<<< HEAD
-            	
-            	/* //check if login password is valid
-            	if(!validatePassword('login-pwd')){
-            		return false;
-            	} */
-            	if (!validate) {
-            		$('#jsError').show();
-            		return false;
-            	} else {
-            		$('#jsError').hide();
-            		/* Form validated. */
-            		return true;
-=======
             	isLoginFormValid=true;
             	var isFocussed = false;
             	var isSmallScreen = false;
@@ -140,7 +126,6 @@
             		if(isSmallScreen){
             			return isLoginFormValid;
             		}
->>>>>>> master
             	}
             	if(!validateLoginPassword('login-pwd')){
             		isLoginFormValid = false;
