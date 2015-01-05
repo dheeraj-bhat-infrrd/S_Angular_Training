@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -358,6 +359,77 @@ public class OrganizationManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	@RequestMapping(value = "/updatesurveysettings", method = RequestMethod.POST)
+	public String updateSurveySettings(Model model, HttpServletRequest request) {
+		LOG.info("Updating Survey Settings Post score");
+		HttpSession session = request.getSession(false);
+		String ratingCategory = request.getParameter("ratingcategory");
+		SurveySettings updatedSurveySettings = null;
+		double autopostRating;
+		double minPostRating;
+
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+
+			if (ratingCategory != null && ratingCategory.equals("rating-auto-post")) {
+				autopostRating = Double.parseDouble(request.getParameter("rating-auto-post"));
+				if (autopostRating == 0) {
+					LOG.warn("Auto Post rating score is 0.");
+					throw new InvalidInputException("Auto Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				updatedSurveySettings = organizationManagementService.updateAutoPostScore(companySettings, (float) autopostRating);
+			}
+
+			else if (ratingCategory != null && ratingCategory.equals("rating-min-post")) {
+				minPostRating = Double.parseDouble(request.getParameter("rating-min-post"));
+				if (minPostRating == 0) {
+					LOG.warn("Minimum Post rating score is 0.");
+					throw new InvalidInputException("Mimimum Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				updatedSurveySettings = organizationManagementService.updateMinimumPostScore(companySettings, (float) (minPostRating));
+			}
+
+			// set the updated settings value in session
+			companySettings.setSurvey_settings(updatedSurveySettings);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while updating survey settings. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	@RequestMapping(value = "/updateothersettings", method = RequestMethod.POST)
+	public String updateOtherSettings(Model model, HttpServletRequest request) {
+		LOG.info("Updating Survey Settings Post score");
+		HttpSession session = request.getSession(false);
+		String otherCategory = request.getParameter("othercategory");
+		Boolean isEnabled;
+
+		try {
+			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+					.getCompanySettings();
+
+			if (otherCategory != null && otherCategory.equals("enable-location")) {
+				isEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
+				organizationManagementService.updateLocationEnabled(companySettings, isEnabled);
+
+				// set the updated settings value in session
+				companySettings.setLocationEnabled(isEnabled);
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.LOCATION_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while updating location settings. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;

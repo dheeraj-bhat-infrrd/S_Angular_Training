@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -79,6 +80,30 @@ public interface OrganizationManagementService {
 	 */
 	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException;
 	
+	/**
+	 * Updates the SurveyAutoPost in the settings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public SurveySettings updateAutoPostScore(OrganizationUnitSettings companySettings, float ratingAutoPost) throws InvalidInputException;
+	
+	/**
+	 * Updates the SurveyMinimumPost in the settings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public SurveySettings updateMinimumPostScore(OrganizationUnitSettings companySettings, float ratingMinPost) throws InvalidInputException;
+
+	/**
+	 * Updates the LocationEnbling in the settings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public void updateLocationEnabled(OrganizationUnitSettings companySettings, boolean isLocationEnabled) throws InvalidInputException;
+
 	/**
 	 * Updates the mail body content for company settings
 	 * @param companySettings
