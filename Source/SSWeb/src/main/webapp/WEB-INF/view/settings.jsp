@@ -221,6 +221,10 @@
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="clearfix st-settings-item-wrapper">
                         <div class="float-left st-settings-check-wrapper">
+		                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.isAccountDisabled != null}">
+		                    	<c:set var="isaccountdisabled" value="${cannonicalusersettings.companySettings.isAccountDisabled}"/>
+							</c:if>
+                            <input type="hidden" name="other-account" id="other-account" value="${isaccountdisabled}">
                             <div id="st-settings-account-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
                             <div id="st-settings-account-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
                         </div>
@@ -266,6 +270,7 @@ $(document).ready(function(){
 	});
 	
 	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
+	autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 });
 </script>

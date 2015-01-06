@@ -99,6 +99,14 @@ public interface OrganizationManagementService {
 	public void updateLocationEnabled(OrganizationUnitSettings companySettings, boolean isLocationEnabled) throws InvalidInputException;
 
 	/**
+	 * Updates the AccountDisabled in the settings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public void updateAccountDisabled(OrganizationUnitSettings companySettings, boolean isAccountDisabled) throws InvalidInputException;
+	
+	/**
 	 * Updates the mail body content for company settings
 	 * @param companySettings
 	 * @param mailBody

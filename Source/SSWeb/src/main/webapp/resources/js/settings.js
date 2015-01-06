@@ -249,19 +249,6 @@ $('#st-settings-location-off').click(function(){
 });
 
 
-$('#st-settings-account-on').click(function(){
-	$('#othercategory').val('other-account');
-	$('#st-settings-account-off').show();
-	$(this).hide();
-});
-$('#st-settings-account-off').click(function(){
-	$('#othercategory').val('other-account');
-	$('#st-settings-account-on').show();
-	$(this).hide();
-	createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
-});
-
-
 $('#st-settings-payment-on').click(function(){
 	$('#st-settings-payment-off').show();
 	$(this).hide();
@@ -272,6 +259,19 @@ $('#st-settings-payment-off').click(function(){
 });
 
 
+$('#st-settings-account-on').click(function(){
+	$('#othercategory').val('other-account');
+	$('#other-location').val('false');
+	
+	createPopupConfirm("Enable Account", "Do you want to Continue?");
+});
+$('#st-settings-account-off').click(function(){
+	$('#othercategory').val('other-account');
+	$('#other-location').val('true');
+
+	createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
+});
+
 function createPopupConfirm(header, body) {
 	$('#overlay-header').html(header);
 	$('#overlay-text').html(body);
@@ -281,14 +281,15 @@ function createPopupConfirm(header, body) {
 	$('#overlay-confirm').show();
 }
 $('#overlay-continue').click(function(){
+	$('#st-settings-account-off').toggle();
+	$('#st-settings-account-on').toggle();
+
 	$('#overlay-confirm').hide();
 	$("#overlay-text").html('');
 	
-	// Call disable account service
+	updateOtherSettings("other-settings-form");
 });
 $('#overlay-cancel').click(function(){
-	$('#st-settings-account-off').show();
-	$('#st-settings-account-on').hide();
 	$('#overlay-confirm').hide();
 	$("#overlay-text").html('');
 });
