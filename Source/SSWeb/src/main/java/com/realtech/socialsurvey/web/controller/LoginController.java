@@ -55,6 +55,12 @@ public class LoginController {
 		LOG.info("Login Page started");
 		return JspResolver.LOGIN;
 	}
+	
+	@RequestMapping(value = "/landing")
+	public String initLandingPage() {
+		LOG.info("Login Page started");
+		return JspResolver.LANDING;
+	}
 
 	@RequestMapping(value = "/forgotPassword")
 	public String initForgotPassword() {

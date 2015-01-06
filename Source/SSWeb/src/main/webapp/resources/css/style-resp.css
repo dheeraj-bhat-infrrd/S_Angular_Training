@@ -217,6 +217,10 @@
     }
     .footer-text{
         font-size: 10px;
+        line-height: 50px;
+    }
+    .footer-main-wrapper{
+        height: 50px;
     }
     .hm-top-panel-content{
         margin-top: -1px;
@@ -534,6 +538,9 @@
     .tweet-panel-item, .posts-panel-item{
         margin-bottom: 0;
     }
+    .err-header-wrapper{
+        height: 50px;
+    }
 }
 
 
@@ -574,7 +581,7 @@
         display: block !important;
     }
     .overlay-toast{
-        display: none !important;
+        display: none;
     }
 }
 
