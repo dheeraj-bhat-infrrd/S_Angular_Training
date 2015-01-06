@@ -60,6 +60,9 @@ public interface CommonConstants {
 	public static final int SANDBOX_MODE_TRUE = 1;
 	public static final int IS_OWNER = 1;
 	public static final int IS_NOT_OWNER = 0;
+	public static final int SUBSCRIPTION_DUE = 1;
+	public static final int SUBSCRIPTION_NOT_DUE = 0;
+
 
 	/**
 	 * Hibernate entities and column name constants
@@ -76,6 +79,8 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
+	public static final String IS_OWNER_COLUMN = "isOwner";
+	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String BRANCH_ID_COLUMN = "branchId";
 
@@ -94,9 +99,23 @@ public interface CommonConstants {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
+	public static final String JOB_PARAMETER_NAME = "date";
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	
+	/**
+	 * Batch Constants
+	 */
+	public static final String CASE_NONE = "None";
+	public static final String CASE_SETTLING = "Settling";
+	public static final String CASE_SETTLED = "Settled";
+	public static final String CASE_GENERAL = "General";
+	public static final String CASE_RETRIES_EXCEEDED = "RetriesExceeded";
+	public static final String CASE_KEY = "Case";
+	public static final String LICENSE_DETAIL_OBJECT_KEY = "LicenseDetailObject";
+	public static final String RETRIED_TRANSACTION_OBJECT_KEY = "RetriedTransactionObject";
+	public static final String COMPANY_OBJECT_KEY = "CompanyObject";
 
 	/**
 	 * other constants
@@ -108,6 +127,7 @@ public interface CommonConstants {
 	public static final int NO_LIMIT = -1;
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
+	public static final int PAYMENT_INCREMENT = 1;
 
 	/**
 	 * Logo related config
