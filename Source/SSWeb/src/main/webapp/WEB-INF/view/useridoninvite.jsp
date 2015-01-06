@@ -3,3 +3,6 @@
 <c:if test="${not empty userId }">
 	<input type="hidden" value="${userId }" id="mh-userId">
 </c:if>
+<c:if test="${not empty existingUserId }">
+	<input type="hidden" value="${existingUserId }" id="mh-existing-userId">
+</c:if>
