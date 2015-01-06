@@ -13,6 +13,8 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 
 public interface OrganizationManagementService {
 
@@ -105,4 +107,6 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException;
+
+	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 }
