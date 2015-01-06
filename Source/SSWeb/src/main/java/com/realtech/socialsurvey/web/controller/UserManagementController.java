@@ -53,7 +53,7 @@ public class UserManagementController {
 		LOG.info("User Management page started");
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		if(user.getStatus() != CommonConstants.STATUS_ACTIVE){
+		if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
 			LOG.error("Inactive or unauthorized users can not access user management page");
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
@@ -96,8 +96,17 @@ public class UserManagementController {
 			User user = null;
 			try {
 				if (userManagementService.isUserAdditionAllowed(admin)) {
-					user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
-					authenticationService.sendResetPasswordLink(emailId, firstName + " " + lastName);
+					try {
+						user = userManagementService.getUserByEmailId(admin, emailId);
+						LOG.debug("User already exists with the email id : " + emailId);
+						model.addAttribute("existingUserId", user.getUserId());
+						throw new UserAlreadyExistsException("User already exists with the email id : " + emailId);
+					}
+					catch (NoRecordsFetchedException noRecordsFetchedException) {
+						LOG.debug("No records exist with the email id passed, inviting the new user");
+						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
+						authenticationService.sendResetPasswordLink(emailId, firstName + " " + lastName);
+					}
 				}
 				else {
 					throw new InvalidInputException("Limit for maximum users has already reached.", DisplayMessageConstants.MAX_USERS_LIMIT_REACHED);
@@ -109,7 +118,7 @@ public class UserManagementController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
 			}
-			catch (NonFatalException e) {
+			catch (UserAlreadyExistsException e) {
 				throw new UserAlreadyExistsException(e.getMessage(), DisplayMessageConstants.EMAILID_ALREADY_TAKEN, e);
 			}
 			model.addAttribute("userId", user.getUserId());
