@@ -368,3 +368,9 @@
 .st-checkbox-off {
     background: url(../images/check-no.png) no-repeat center;
 }
+
+.lp-con-icn {
+    height: 44px;
+    width: 36px;
+    margin-right: 10px;
+}

@@ -8,6 +8,8 @@ var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z]*$/;
+var lastNameRegEx = /^[a-zA-Z ]*$/;
+var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
 
@@ -106,11 +108,11 @@ function detectBrowser(){
 
 function moveFileBtn(){
     if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
-        $('#com-logo').css('left',($('#input-file-icn-left').width() - 101) + 'px')
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 101) + 'px');
     }else if(is_firefox){
-        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px');
     }else{
-        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px');
     }
 }
 
@@ -242,7 +244,7 @@ function validateFirstName(elementId){
 function validateLastName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid last name.');
@@ -254,7 +256,7 @@ function validateLastName(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).parent().next('.input-error-2').hide();
 				return true;
 			}else {
@@ -356,7 +358,7 @@ function validateConfirmPassword(pwdId, confirmPwdId){
 function validateCompany(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid company name.');
@@ -370,7 +372,7 @@ function validateCompany(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).parent().next('.input-error-2').hide();
 				return true;
 			}else {
@@ -570,3 +572,8 @@ function validateCompanyEnterpriseAddress1(elementId){
 		}
 	}
 }
+
+
+$('.user-info-initial').click(function(){
+    $('.initial-dd-wrapper').slideToggle(200);
+});

@@ -3,7 +3,7 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<!DOCTYPE">
+<!DOCTYPE html>
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
@@ -71,14 +71,25 @@
 				<!-- To be removed: EOC -->
 			</div>
 			<div class="header-user-info float-right clearfix">
-				<div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>
+				<div class="float-left user-info-initial">
+                    <span>${fn:substring(user.loginName, 0, 1)}</span>
+                    <div class="initial-dd-wrapper hide blue-arrow-bot">
+                        <div class="initial-dd-item">Profile Settings</div>
+                        <div class="initial-dd-item">Account Settings</div>
+                        <div class="initial-dd-item">Change Password</div>
+                        <div class="initial-dd-item">Log Out</div>
+                    </div>
+                </div>
+<!--
 				<div class="float-left user-info-seperator"></div>
 				<div class="float-left user-info-logo"></div>
-			</div>
-			<c:if test="${displaylogo != null}">
-			<div id="header-menu-icn"
-				class="header-menu-icn icn-menu float-right"
-				style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
-			</c:if>
+				<div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>
+-->
+				<c:if test="${displaylogo != null}">
+					<div class="float-left user-info-seperator"></div>
+					<div class="float-left user-info-logo" style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+				</c:if>
+			</div>			
+			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
