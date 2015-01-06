@@ -91,5 +91,14 @@ public interface OrganizationManagementService {
 	 */
 	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException;
 
+	/**
+	 * Adds a Disabled Account record into the database
+	 * @param companyId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
 	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+	
+	public void deleteDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException;
 }
