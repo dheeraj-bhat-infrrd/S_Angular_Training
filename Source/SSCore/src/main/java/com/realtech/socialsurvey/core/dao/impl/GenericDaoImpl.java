@@ -241,5 +241,20 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
 	}
+
+	@Override
+	public void merge(T entity) {
+		
+		try {
+			getSession().merge(entity);
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in merge().", hibernateException);
+			throw new DatabaseException("HibernateException caught in merge().", hibernateException);
+		}
+		
+	}
+	
+	
 }
 // JIRA: SS-8: By RM05: EOC

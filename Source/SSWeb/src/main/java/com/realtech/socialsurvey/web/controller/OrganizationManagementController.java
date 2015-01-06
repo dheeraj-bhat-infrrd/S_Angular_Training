@@ -217,8 +217,16 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
+			
+			User user = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+			
+			LOG.debug("Checking if payment has already been made.");
 
-			LOG.debug("Initialising payment gateway");
+			if(gateway.checkIfPaymentMade(user.getCompany())){
+				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
+				return JspResolver.PAYMENT_ALREADY_MADE;
+			}
+			
 			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
