@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -30,9 +31,12 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 
 @Component
@@ -69,6 +73,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private RegistrationService registrationService;
+	
+	@Autowired
+	private GenericDao<DisabledAccount, Long> disabledAccountDao;
+	
+	@Autowired
+	private Payment gateway;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -598,6 +608,54 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Updated company settings mail content");
 		return mailContentSettings;
 	}
+
+	@Override
+	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
+		
+		if(companyId <= 0){
+			LOG.error("Invalid companyId has been given.");
+			throw new InvalidInputException("Invalid companyId has been given.");
+		}
+		
+		LOG.info("Adding the disabled account to the database for company id : " + companyId);
+		
+		List<LicenseDetail> licenseDetails = null;
+		
+		//Fetching the company entity from database
+		LOG.info("Fetching the company record from the database");
+		Company company = companyDao.findById(Company.class, companyId);
+		
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put("company", company);
+		
+		//Fetching the license details for the company
+		LOG.info("Fetching the License Detail record from the database");
+		licenseDetails = licenceDetailDao.findByKeyValue(LicenseDetail.class, queries);
+		
+		if(licenseDetails == null || licenseDetails.isEmpty()){
+			LOG.error("No license detail records have been found for company id : " + companyId);
+			throw new NoRecordsFetchedException("No license detail records have been found for company id : " + companyId);
+		}
+		
+		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
+		
+		LOG.info("Preparing the DisabledAccount entity to be saved in the database.");
+		DisabledAccount disabledAccount = new DisabledAccount();
+		disabledAccount.setCompany(company);
+		disabledAccount.setLicenseDetail(licenseDetail);
+		disabledAccount.setDisableDate(gateway.getDisableDate(licenseDetail.getSubscriptionId()));
+		disabledAccount.setStatus(CommonConstants.STATUS_ACTIVE);
+		disabledAccount.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
+		disabledAccount.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		disabledAccount.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
+		disabledAccount.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		LOG.info("Adding the Disabled Account entity to the database");
+		disabledAccountDao.save(disabledAccount);
+		LOG.info("Added Disabled Account entity to the database.");
+		
+	}
+	
+	
 
 }
 
