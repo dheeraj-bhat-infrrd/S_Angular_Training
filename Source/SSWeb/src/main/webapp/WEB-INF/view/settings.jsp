@@ -1,16 +1,18 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div class="overlay-disable hide">
+<div id="overlay-toast" class="overlay-toast"></div>
+
+<div class="overlay-disable hide" id="overlay-confirm">
     <div class="overlay-disable-wrapper">
-        <div class="ol-header">Disable Account</div>
+        <div id="overlay-header" class="ol-header">Disable Account</div>
         <div class="ol-content">
-            <div class="ol-txt">Are you sure?</div>
+            <div id="overlay-text" class="ol-txt"></div>
             <div class="clearfix">
                 <div class="float-left ol-btn-wrapper">
-                    <div id="ol-btn-continue" class="ol-btn">Continue</div>
+                    <div id="overlay-continue" class="ol-btn">Continue</div>
                 </div>
                 <div class="float-left ol-btn-wrapper">
-                    <div id="ol-btn-cancel" class="ol-btn">Cancel</div>
+                    <div id="overlay-cancel" class="ol-btn">Cancel</div>
                 </div>
             </div>
         </div>
@@ -113,8 +115,8 @@
 		                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.auto_post_score != null}">
 		                          	<c:set var="autopostscore" value="${cannonicalusersettings.companySettings.survey_settings.auto_post_score}"/>
 								</c:if>
-				            	<input type="hidden" name="rating-auto-post-hidden" id="rating-auto-post-hidden" value="${autopostscore}">
-                                <select class="st-rating-input" name="rating-auto-post" id="rating-auto-post"></select>
+				            	<input type="text" name="rating-auto-post" id="rating-auto-post" class="st-item-row-txt cursor-pointer" autocomplete="off" value="${autopostscore}">
+                                <div class="st-dd-wrapper hide" id="st-dd-wrapper-auto-post"></div>
                             </div>
                         </div>
                     </div>
@@ -133,8 +135,8 @@
 		                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.show_survey_above_score != null}">
 		                          	<c:set var="minpostscore" value="${cannonicalusersettings.companySettings.survey_settings.show_survey_above_score}"/>
 								</c:if>
-				            	<input type="hidden" name="rating-min-post-hidden" id="rating-min-post-hidden" value="${minpostscore}">
-                                <select class="st-rating-input" name="rating-min-post" id="rating-min-post"></select>
+				            	<input type="text" name="rating-min-post" id="rating-min-post" class="st-item-row-txt cursor-pointer" autocomplete="off" value="${minpostscore}">
+			                    <div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
                             </div>
                         </div>
                     </div>
@@ -177,19 +179,19 @@
 							<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.survey_reminder_interval_in_days != null}">
 								<c:set var="reminderinterval" value="${cannonicalusersettings.companySettings.survey_settings.survey_reminder_interval_in_days}" />
 							</c:if>
-				            <input type="hidden" name="reminder-interval-hidden" id="reminder-interval-hidden" value="${reminderinterval}">
-                            <select class="st-rating-input" name="reminder-interval" id="reminder-interval"></select>
+				            <input class="st-rating-input" name="reminder-interval" id="reminder-interval" value="${reminderinterval}">
+		                    <div id="reminder-interval-error" class="hm-item-err-2"></div>
 						</div>
 	                    <div class="float-left"><spring:message code="label.days.key" /></div>
 	                </div>
 	                <div class="clearfix st-check-main float-left">
 	                    <div class="float-left st-check-wrapper">
-		                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.isReminderNotNeeded != null}">
-		                    	<c:set var="isremindernotneeded" value="${cannonicalusersettings.companySettings.survey_settings.isReminderNotNeeded}"/>
+		                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.isReminderDisabled != null}">
+		                    	<c:set var="isreminderdisabled" value="${cannonicalusersettings.companySettings.survey_settings.isReminderDisabled}"/>
 							</c:if>
-                            <input type="hidden" name="reminder-needed-hidden" id="reminder-needed-hidden" value="${isremindernotneeded}">
-	                        <div id="st-reminder-on" class="st-checkbox st-checkbox-on"></div>
-	                        <div id="st-reminder-off" class="st-checkbox st-checkbox-off hide"></div>
+                            <input type="hidden" name="reminder-needed-hidden" id="reminder-needed-hidden" value="${isreminderdisabled}">
+	                        <div id="st-reminder-on" class="st-checkbox st-checkbox-on hide"></div>
+	                        <div id="st-reminder-off" class="st-checkbox st-checkbox-off"></div>
 	                    </div>
 	                    <div class="float-left st-check-txt-OR">Click here if you do not want to send any reminder</div>
 	                </div>
@@ -251,16 +253,48 @@ $(document).ready(function(){
 	$('#survey-participation-mailcontent').ckeditor();
 	$('#survey-participation-reminder-mailcontent').ckeditor();
 	
-	// Setting values to User settings
-	autoAppendRatingDropdown('#rating-auto-post', '#rating-auto-post-hidden');
+	autoAppendRatingDropdown('#st-dd-wrapper-auto-post', "st-dd-item st-dd-item-auto-post");
 	changeRatingPattern($('#rating-auto-post').val(), $('#rating-auto-post-parent'));
+	$('#rating-auto-post').click(function(){
+		$('#st-dd-wrapper-auto-post').slideToggle(200);
+	});
 	
-	autoAppendRatingDropdown('#rating-min-post', '#rating-min-post-hidden');
+	autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
 	changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
-	
-	autoAppendReminderDropdown('#reminder-interval', '#reminder-interval-hidden');
+	$('#rating-min-post').click(function(){
+		$('#st-dd-wrapper-min-post').slideToggle(200);
+	});
 	
 	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
 	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 });
 </script>
+
+<style>
+.st-item-row-txt {
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    width: 75px;
+    height: 50px;
+    padding: 0 10px;
+}
+
+.st-dd-wrapper {
+    position: absolute;
+    width: 75px;
+    background-color: #fff;
+    padding: 8px;
+    border: 1px solid #dcdcdc;
+}
+
+.st-dd-item {
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 36px;
+    cursor: pointer;
+}
+
+.st-dd-item:last-child {
+    border-bottom: 0;
+}
+</style>

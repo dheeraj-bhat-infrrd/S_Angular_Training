@@ -2,25 +2,25 @@
 function saveEncompassDetails(formid) {
 	if (validateEncompassInput(formid)) {
 		var url = "./saveencompassdetails.do";
-		console.log("saving encompass details");
 		callAjaxFormSubmit(url, saveEncompassDetailsCallBack, formid);
 	}
 }
 
-function saveEncompassDetailsCallBack(data) {
-	console.log("Encompass Details saved");
+function saveEncompassDetailsCallBack(response) {
+	$("#overlay-toast").html(response);
+	showToast();
 }
 
 function testEncompassConnection(formid) {
 	if (validateEncompassInput(formid)) {
-		console.log("testing encompass connection");
 		var url = "./testencompassconnection.do";
 		callAjaxFormSubmit(url, testEncompassConnectionCallBack, formid);
 	}
 }
 
-function testEncompassConnectionCallBack(data) {
-	console.log("Connection successful");
+function testEncompassConnectionCallBack(response) {
+	$("#overlay-toast").html(response);
+	showToast();
 }
 
 var isEncompassValid;
@@ -59,14 +59,15 @@ function updateMailContent(formid){
 	callAjaxFormSubmit(url, updateMailContentCallBack, formid);
 }
 
-function updateMailContentCallBack(data){
-	console.log("Mail content updated");
+function updateMailContentCallBack(response){
+	$("#overlay-toast").html(response);
+	showToast();
 }
 
 
 // Mail Reminder
 function autoAppendReminderDropdown(reminderId, reminderDefault) {
-	autoAppendDropdown(reminderId, reminderDefault, 15, 1);
+	autoAppendDropdown(reminderId, 15, 1);
 }
 
 function updateReminderSettings(formid) {
@@ -74,22 +75,25 @@ function updateReminderSettings(formid) {
 	callAjaxFormSubmit(url, updateReminderSettingsCallBack, formid);
 }
 
-function updateReminderSettingsCallBack(data){
-	console.log("Reminder Settings Updated");
+function updateReminderSettingsCallBack(response){
+	$("#overlay-toast").html(response);
+	showToast();
 }
 
 
 // Ratings Settings
-function autoAppendRatingDropdown(ratingId, ratingDefault) {
-	autoAppendDropdown(ratingId, ratingDefault, 5, 0.5);
+function autoAppendRatingDropdown(ratingId, classes) {
+	autoAppendDropdown(ratingId, classes, 5, 0.5);
 }
 
 function updatePostScore(formid) {
 	var url = "./updatesurveysettings.do";
 	callAjaxFormSubmit(url, updatePostScoreCallBack, formid);
 }
-function updatePostScoreCallBack() {
+function updatePostScoreCallBack(response) {
 	$('#ratingcategory').val('');
+	$("#overlay-toast").html(response);
+	showToast();
 }
 
 function changeRatingPattern(rating, ratingParent) {
@@ -127,19 +131,20 @@ function updateOtherSettings(formid) {
 	var url = "./updateothersettings.do";
 	callAjaxFormSubmit(url, updateOtherSettingsCallBack, formid);
 }
-function updateOtherSettingsCallBack() {
+function updateOtherSettingsCallBack(response) {
 	$('#othercategory').val('');
+	$("#overlay-toast").html(response);
+	showToast();
 }
 
 
 // Generic functions
-function autoAppendDropdown(elementId, elementDefault, maxVal, minVal) {
+function autoAppendDropdown(elementId, classes, maxVal, minVal) {
 	var value = 0;
 	while (maxVal - value >= minVal) {
-		$(elementId).append($('<option/>').val(maxVal - value).text(maxVal - value));
+		$(elementId).append($('<div/>').addClass(classes).text(maxVal - value));
 		value += minVal;
 	}
-	$(elementId).val(parseFloat($(elementDefault).val()));
 }
 
 $('#encompass-username').blur(function() {
@@ -162,17 +167,22 @@ $('#encompass-testconnection').click(function(){
 	}
 });
 
+$('body').on('click','.st-dd-item-auto-post',function(){
+	$('#rating-auto-post').val($(this).html());
+	$('#st-dd-wrapper-auto-post').slideToggle(200);
 
-$('#rating-auto-post').change(function() {
 	$('#ratingcategory').val('rating-auto-post');
 	var rating = $('#rating-auto-post').val();
 	var ratingParent = $('#rating-auto-post-parent');
 
 	changeRatingPattern(rating, ratingParent);
 	updatePostScore("rating-settings-form");
-	$('#rating-auto-post-hidden').val(rating);
 });
-$('#rating-min-post').change(function() {
+
+$('body').on('click','.st-dd-item-min-post',function(){
+	$('#rating-min-post').val($(this).html());
+	$('#st-dd-wrapper-min-post').slideToggle(200);
+	
 	$('#ratingcategory').val('rating-min-post');
 	
 	var rating = $('#rating-min-post').val();
@@ -180,28 +190,23 @@ $('#rating-min-post').change(function() {
 	changeRatingPattern(rating, ratingParent);
 	
 	updatePostScore("rating-settings-form");
-	$('#rating-min-post-hidden').val(rating);
 });
 
 
 $('#save-participation-mail-content').click(function(){
-	console.log("saving participation details");
 	$('#mailcategory').val('participationmail');
 	updateMailContent("mail-body-settings-form");
 });
 $('#save-participation-reminder-mail-content').click(function(){
-	console.log("saving participation reminder details");
 	$('#mailcategory').val('');
 	updateMailContent("mail-body-settings-form");
 });
 
 $('#reminder-interval').change(function() {
 	$('#mailcategory').val('reminder-interval');
-
-	var reminder = $('#rating-auto-post').val();
-	updateReminderSettings("mail-body-settings-form");
-
-	$('#reminder-interval-hidden').val(reminder);
+	if(validateReminderInterval('reminder-interval')) {
+		updateReminderSettings("mail-body-settings-form");
+	}
 });
 
 $('#st-reminder-on').click(function(){
@@ -225,8 +230,8 @@ $('#st-reminder-off').click(function(){
 
 
 $('#st-settings-location-on').click(function(){
+	$('#othercategory').val('other-location');
 	$('#other-location').val('false');
-	$('#othercategory').val('enable-location');
 	
 	$('#st-settings-location-off').show();
 	$(this).hide();
@@ -234,8 +239,8 @@ $('#st-settings-location-on').click(function(){
 	updateOtherSettings("other-settings-form");
 });
 $('#st-settings-location-off').click(function(){
+	$('#othercategory').val('other-location');
 	$('#other-location').val('true');
-	$('#othercategory').val('enable-location');
 
 	$('#st-settings-location-on').show();
 	$(this).hide();
@@ -245,13 +250,15 @@ $('#st-settings-location-off').click(function(){
 
 
 $('#st-settings-account-on').click(function(){
+	$('#othercategory').val('other-account');
 	$('#st-settings-account-off').show();
 	$(this).hide();
 });
 $('#st-settings-account-off').click(function(){
+	$('#othercategory').val('other-account');
 	$('#st-settings-account-on').show();
 	$(this).hide();
-	$('.overlay-disable').show();
+	createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
 });
 
 
@@ -265,8 +272,23 @@ $('#st-settings-payment-off').click(function(){
 });
 
 
-$('#ol-btn-cancel').click(function(){
+function createPopupConfirm(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Ok");
+	$('#overlay-cancel').html("Cancel");
+
+	$('#overlay-confirm').show();
+}
+$('#overlay-continue').click(function(){
+	$('#overlay-confirm').hide();
+	$("#overlay-text").html('');
+	
+	// Call disable account service
+});
+$('#overlay-cancel').click(function(){
 	$('#st-settings-account-off').show();
 	$('#st-settings-account-on').hide();
-	$('.overlay-disable').hide();
+	$('#overlay-confirm').hide();
+	$("#overlay-text").html('');
 });

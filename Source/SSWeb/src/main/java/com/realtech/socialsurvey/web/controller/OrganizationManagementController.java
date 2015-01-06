@@ -13,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
@@ -243,6 +244,13 @@ public class OrganizationManagementController {
 
 	}
 
+	/**
+	 * Method to show Company settings on edit company
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
 	public String showCompanySettings(Model model, HttpServletRequest request) {
 		LOG.info("Method showCompanySettings of UserManagementController called");
@@ -263,17 +271,24 @@ public class OrganizationManagementController {
 		return JspResolver.COMPANY_SETTINGS;
 	}
 
+	/**
+	 * Method to save encompass details / CRM info
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/saveencompassdetails", method = RequestMethod.POST)
+	@ResponseBody
 	public String saveEncompassDetails(Model model, HttpServletRequest request) {
 		LOG.info("Saving encompass details");
 		HttpSession session = request.getSession(false);
-		// test connection
-		// set the request attribute so that test method throws an exception in case connection
-		// fails
 		request.setAttribute("saveencompassdetails", "true");
+		String message;
+
 		try {
 			testEncompassConnection(model, request);
-			// save the details
+		
 			CRMInfo crmInfo = new CRMInfo();
 			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
 			crmInfo.setCrm_username(request.getParameter("encompass-username"));
@@ -283,28 +298,36 @@ public class OrganizationManagementController {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
 			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
+			
 			// set the updated settings value in session
 			companySettings.setCrm_info(crmInfo);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 
+	/**
+	 * Method to test encompass details / CRM info
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/testencompassconnection", method = RequestMethod.POST)
+	@ResponseBody
 	public String testEncompassConnection(Model model, HttpServletRequest request) throws NonFatalException {
 		LOG.info("Testing connections");
+		String message;
 		try {
 			// validate the parameters
-			if (validateEncompassParameters(request)) {
+			if (!validateEncompassParameters(request)) {
 				// TODO: code to test connection
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 		}
 		catch (NonFatalException e) {
 			if (request.getAttribute("saveencompassdetails") != null) {
@@ -312,12 +335,18 @@ public class OrganizationManagementController {
 			}
 			else {
 				LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
-				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			}
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 
+	/**
+	 * Method to validate encompass details / CRM info
+	 * 
+	 * @param request
+	 * @return
+	 */
 	private boolean validateEncompassParameters(HttpServletRequest request) throws InvalidInputException {
 		LOG.debug("Validating encompass parameters");
 		String userName = request.getParameter("encompass-username");
@@ -331,12 +360,22 @@ public class OrganizationManagementController {
 		return true;
 	}
 
+	/**
+	 * Method to save survey Mailbody content
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/savesurveyparticipationmail", method = RequestMethod.POST)
+	@ResponseBody
 	public String setSurveyParticipationMailBody(Model model, HttpServletRequest request) {
 		LOG.info("Saving survey participation mail body");
 		HttpSession session = request.getSession(false);
 		String mailCategory = request.getParameter("mailcategory");
 		String mailBody = null;
+		String message;
+		
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
@@ -350,7 +389,9 @@ public class OrganizationManagementController {
 				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
 				// set the value back in session
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
-			}else{
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			}
+			else {
 				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
 				if (mailBody == null || mailBody.isEmpty()) {
 					LOG.warn("Survey participation reminder mail body is blank.");
@@ -359,20 +400,27 @@ public class OrganizationManagementController {
 				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
 				// set the value back in session
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 			// update the mail content settings in session
 			companySettings.setMail_content(updatedMailContentSettings);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while saving survey participation mail body. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 	
+	/**
+	 * Method to update Survey Settings
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/updatesurveysettings", method = RequestMethod.POST)
+	@ResponseBody
 	public String updateSurveySettings(Model model, HttpServletRequest request) {
 		LOG.info("Updating Survey Settings");
 		HttpSession session = request.getSession(false);
@@ -381,6 +429,7 @@ public class OrganizationManagementController {
 		SurveySettings surveySettings = null;
 		double autopostRating;
 		double minPostRating;
+		String message = "";
 
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
@@ -400,9 +449,10 @@ public class OrganizationManagementController {
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
-					surveySettings.setReminderNotNeeded(originalSurveySettings.getIsReminderNotNeeded());
+					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
 				}
 				LOG.info("Updating Survey Settings Post score");
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
 			else if (ratingCategory != null && ratingCategory.equals("rating-min-post")) {
@@ -419,34 +469,42 @@ public class OrganizationManagementController {
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
-					surveySettings.setReminderNotNeeded(originalSurveySettings.getIsReminderNotNeeded());
+					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
 				}
 				LOG.info("Updating Survey Settings Min score");
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
 			if(organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
 				companySettings.setSurvey_settings(surveySettings);
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 				LOG.info("Updated Survey Settings");
 			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while updating survey settings. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 	
+	/**
+	 * Method to update Survey Reminder Settings
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/updatesurveyremindersettings", method = RequestMethod.POST)
+	@ResponseBody
 	public String updateSurveyReminderSettings(Model model, HttpServletRequest request) {
 		LOG.info("Updating Survey Reminder Settings");
 		HttpSession session = request.getSession(false);
 		String mailCategory = request.getParameter("mailcategory");
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
-		int reminderInterval;
-		Boolean isReminderNeeded;
+		Integer reminderInterval;
+		Boolean isReminderDisabled;
+		String message = "";
 		
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
@@ -466,17 +524,18 @@ public class OrganizationManagementController {
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
-					surveySettings.setReminderNotNeeded(originalSurveySettings.getIsReminderNotNeeded());
+					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
 				}
 				LOG.info("Updating Survey Settings Reminder Interval");
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
 			else if (mailCategory != null && mailCategory.equals("reminder-needed")) {
-				isReminderNeeded = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
+				isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
 				
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
-				surveySettings.setReminderNotNeeded(isReminderNeeded);
+				surveySettings.setReminderDisabled(isReminderDisabled);
 				if(originalSurveySettings != null){
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
@@ -484,49 +543,71 @@ public class OrganizationManagementController {
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
 				}
 				LOG.info("Updating Survey Settings Reminder Needed");
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
 			if(organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
 				companySettings.setSurvey_settings(surveySettings);
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 				LOG.info("Updated Survey Settings");
 			}
 		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL, DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while updating survey settings. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 	
+	/**
+	 * Method to update Other Company Settings
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/updateothersettings", method = RequestMethod.POST)
+	@ResponseBody
 	public String updateOtherSettings(Model model, HttpServletRequest request) {
 		LOG.info("Updating Location Settings");
 		HttpSession session = request.getSession(false);
 		String otherCategory = request.getParameter("othercategory");
-		Boolean isEnabled;
-
+		Boolean isLocationEnabled;
+		Boolean isAccountDisabled;
+		String message = "";
+		
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
 
-			if (otherCategory != null && otherCategory.equals("enable-location")) {
-				isEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
-				organizationManagementService.updateLocationEnabled(companySettings, isEnabled);
+			if (otherCategory != null && otherCategory.equals("other-location")) {
+				isLocationEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
+				organizationManagementService.updateLocationEnabled(companySettings, isLocationEnabled);
 
 				// set the updated settings value in session
-				companySettings.setLocationEnabled(isEnabled);
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.LOCATION_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				companySettings.setLocationEnabled(isLocationEnabled);
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.LOCATION_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				LOG.info("Updated Location Settings");
+			}
+			
+			else if (otherCategory != null && otherCategory.equals("other-account")) {
+				isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-location"));
+				// TODO call service to update status
+
+				// set the updated settings value in session
+				companySettings.setAccountDisabled(isAccountDisabled);
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 				LOG.info("Updated Location Settings");
 			}
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while updating location settings. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			LOG.error("NonFatalException while updating other settings. Reason : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

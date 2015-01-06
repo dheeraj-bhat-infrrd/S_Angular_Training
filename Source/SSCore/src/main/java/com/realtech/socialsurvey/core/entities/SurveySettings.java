@@ -9,7 +9,7 @@ public class SurveySettings {
 	private float show_survey_above_score;
 	private int survey_reminder_interval_in_days;
 	private int max_number_of_survey_reminders;
-	private boolean isReminderNotNeeded;
+	private boolean isReminderDisabled;
 
 	public float getAuto_post_score() {
 		return auto_post_score;
@@ -43,12 +43,12 @@ public class SurveySettings {
 		this.max_number_of_survey_reminders = max_number_of_survey_reminders;
 	}
 
-	public boolean getIsReminderNotNeeded() {
-		return isReminderNotNeeded;
+	public boolean getIsReminderDisabled() {
+		return isReminderDisabled;
 	}
 
-	public void setReminderNotNeeded(boolean isReminderNotNeeded) {
-		this.isReminderNotNeeded = isReminderNotNeeded;
+	public void setReminderDisabled(boolean isReminderDisabled) {
+		this.isReminderDisabled = isReminderDisabled;
 	}
 
 	@Override
