@@ -113,7 +113,7 @@ public class UserManagementController {
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
-						authenticationService.sendResetPasswordLink(emailId, firstName + " " + lastName);
+						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName);
 					}
 				}
 				else {
@@ -691,7 +691,7 @@ public class UserManagementController {
 				LOG.error("Password and confirm password fields do not match");
 				throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 			}
-			// Decrypte Url parameters
+			// Decrypting URL parameters
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
 			}
