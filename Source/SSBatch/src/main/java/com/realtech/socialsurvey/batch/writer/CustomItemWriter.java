@@ -141,9 +141,7 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 	@Override
 	public void write(List<? extends Map<String, Object>> items) throws Exception {
 		
-		LicenseDetail licenseDetail = null;
-		RetriedTransaction retriedTransaction = null;
-		Company company = null;
+		String writeCase = null;
 		
 		//Iterate through all the map objects check the case and call appropriate write methods.
 		LOG.info("Custom Writer called to write objects.");
@@ -152,8 +150,8 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 			try {
 				
 				//Check if the case key exists
-				String writeCase = (String) writerObjectMap.get(CommonConstants.CASE_KEY);
-				if(writeCase == null || writeCase.isEmpty()){
+				if(writerObjectMap.get(CommonConstants.CASE_KEY) == null){
+					writeCase = (String) writerObjectMap.get(CommonConstants.CASE_KEY);
 					LOG.error("Case Key is empty or null. PLease check if case is passed!");
 					throw new InvalidInputException("Case Key is empty or null. PLease check if case is passed!");
 				}
@@ -163,52 +161,45 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 					case CommonConstants.CASE_SETTLING:
 						LOG.info("Case Settling");
 						//Check if license detail object is passed.
-						licenseDetail = (LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY);
-						if(licenseDetail == null){
+						if(writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY) == null){
 							LOG.error("Required License Detail object has not been passed in the map. Please check.");
 							throw new InvalidInputException("Required License Detail object has not been passed in the map. Please check.");
 						}
 						//Updating the database for the case settling.
-						updateSettling(licenseDetail);
+						updateSettling((LicenseDetail)writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY));
 						break;
 
 					case CommonConstants.CASE_SETTLED:
 						LOG.info("Case Settled");
 						//Check if License Detail object and Retried Transaction objects have been passed in the map.
-						licenseDetail = (LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY);
-						retriedTransaction = (RetriedTransaction) writerObjectMap.get(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY);
-						if(licenseDetail == null | retriedTransaction == null ){
+						if(writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY) == null | writerObjectMap.get(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY) == null ){
 							LOG.error("Required objects have not been passed in the map. Please check.");
 							throw new InvalidInputException("Required objects have not been passed in the map. Please check.");
 						}
 						//Updating the database for case settled.
-						updateSettled(licenseDetail,retriedTransaction);
+						updateSettled((LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY),(RetriedTransaction) writerObjectMap.get(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY));
 						break;
 
 					case CommonConstants.CASE_GENERAL:
 						LOG.info("General Case!");
 						//Check if License Detail object and Retried Transaction objects have been passed in the map.
-						licenseDetail = (LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY);
-						retriedTransaction = (RetriedTransaction) writerObjectMap.get(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY);
-						if(licenseDetail == null | retriedTransaction == null ){
+						if(writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY) == null | writerObjectMap.get(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY) == null ){
 							LOG.error("Required objects have not been passed in the map. Please check.");
 							throw new InvalidInputException("Required objects have not been passed in the map. Please check.");
 						}
 						//Updating the database for the case general.
-						generalUpdate(licenseDetail,retriedTransaction);
+						generalUpdate((LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY),(RetriedTransaction) writerObjectMap.get(CommonConstants.RETRIED_TRANSACTION_OBJECT_KEY));
 						break;
 
 					case CommonConstants.CASE_RETRIES_EXCEEDED:
 						LOG.info("Case Retries Exceeded!");
 						//Check if License Detail object and Company objects have been passed in the map.
-						licenseDetail = (LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY);
-						company = (Company) writerObjectMap.get(CommonConstants.COMPANY_OBJECT_KEY);
-						if(licenseDetail == null | company == null ){
+						if(writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY) == null | writerObjectMap.get(CommonConstants.COMPANY_OBJECT_KEY) == null ){
 							LOG.error("Required objects have not been passed in the map. Please check.");
 							throw new InvalidInputException("Required objects have not been passed in the map. Please check.");
 						}
 						//Updating the database for retries exceeded.
-						updateRetriesExceeded(licenseDetail,company);
+						updateRetriesExceeded((LicenseDetail) writerObjectMap.get(CommonConstants.LICENSE_DETAIL_OBJECT_KEY),(Company) writerObjectMap.get(CommonConstants.COMPANY_OBJECT_KEY));
 						break;
 
 					default:
