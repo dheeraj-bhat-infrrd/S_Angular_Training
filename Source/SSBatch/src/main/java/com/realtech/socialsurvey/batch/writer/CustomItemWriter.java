@@ -140,9 +140,7 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 	@Transactional
 	@Override
 	public void write(List<? extends Map<String, Object>> items) throws Exception {
-		
-		String writeCase = null;
-		
+				
 		//Iterate through all the map objects check the case and call appropriate write methods.
 		LOG.info("Custom Writer called to write objects.");
 		for (Map<String, Object> writerObjectMap : items) {
@@ -151,12 +149,11 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 				
 				//Check if the case key exists
 				if(writerObjectMap.get(CommonConstants.CASE_KEY) == null){
-					writeCase = (String) writerObjectMap.get(CommonConstants.CASE_KEY);
 					LOG.error("Case Key is empty or null. PLease check if case is passed!");
 					throw new InvalidInputException("Case Key is empty or null. PLease check if case is passed!");
 				}
 				
-				switch (writeCase) {
+				switch ((String) writerObjectMap.get(CommonConstants.CASE_KEY)) {
 
 					case CommonConstants.CASE_SETTLING:
 						LOG.info("Case Settling");
