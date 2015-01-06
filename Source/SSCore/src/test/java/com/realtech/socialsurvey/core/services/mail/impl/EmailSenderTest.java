@@ -46,11 +46,11 @@ public class EmailSenderTest {
 	@Mock
 	Transport mockTransport;
 
+
 	@BeforeClass
-	public static void before() throws Exception {
+	public static void setUp() throws Exception{
 		InitializeJNDI.initializeJNDIforTest();
 	}
-
 	@Before
 	public void intitialize() throws Exception {
 		testEmailEntity = new EmailEntity();
