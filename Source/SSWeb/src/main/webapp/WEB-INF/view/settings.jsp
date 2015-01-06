@@ -152,7 +152,7 @@
 	                <div class="st-header-txt-lft-rt clearfix margin-top-25">
 	                    <div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
 	                    <div class="float-right clearfix st-header-txt-rt">
-	                        <div class="float-left st-header-txt-rt-icn icn-pen"></div>
+	                        <div id="edit-participation-mail-content" class="float-left st-header-txt-rt-icn icn-pen"></div>
 	                        <div id="save-participation-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
 	                    </div>
 	                </div>
@@ -164,7 +164,7 @@
 	                <div class="st-header-txt-lft-rt clearfix margin-top-25">
 	                    <div class="float-left st-header-txt-lft"><spring:message code="label.header.reminder.mailer.content.key" /></div>
 	                    <div class="float-right clearfix st-header-txt-rt">
-	                        <div class="float-left st-header-txt-rt-icn icn-pen"></div>
+	                        <div id="edit-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-pen"></div>
 	                        <div id="save-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
 	                    </div>
 	                </div>
@@ -254,8 +254,14 @@
 <script>
 $(document).ready(function(){
 	$(document).attr("title", "Settings");
+	
 	$('#survey-participation-mailcontent').ckeditor();
+	$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
+	$('#save-participation-mail-content').attr("disabled", true);
+	
 	$('#survey-participation-reminder-mailcontent').ckeditor();
+	$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
+	$('#save-participation-reminder-mail-content').attr("disabled", true);
 	
 	autoAppendRatingDropdown('#st-dd-wrapper-auto-post', "st-dd-item st-dd-item-auto-post");
 	changeRatingPattern($('#rating-auto-post').val(), $('#rating-auto-post-parent'));
