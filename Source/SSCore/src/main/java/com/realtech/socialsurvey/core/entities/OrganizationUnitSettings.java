@@ -14,6 +14,7 @@ public class OrganizationUnitSettings {
 	private float profile_completion;
 	private String logo;
 	private boolean isLocationEnabled;
+	private boolean isAccountDisabled;
 	private ContactDetailsSettings contact_details;
 	private CRMInfo crm_info;
 	private MailContentSettings mail_content;
@@ -64,6 +65,14 @@ public class OrganizationUnitSettings {
 
 	public void setLocationEnabled(boolean isLocationEnabled) {
 		this.isLocationEnabled = isLocationEnabled;
+	}
+
+	public boolean getIsAccountDisabled() {
+		return isAccountDisabled;
+	}
+
+	public void setAccountDisabled(boolean isAccountDisabled) {
+		this.isAccountDisabled = isAccountDisabled;
 	}
 
 	public ContactDetailsSettings getContact_details() {

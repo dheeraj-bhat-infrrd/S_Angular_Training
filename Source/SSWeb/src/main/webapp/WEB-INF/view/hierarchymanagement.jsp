@@ -4,7 +4,10 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left"><spring:message code="label.buildcompanyhierarchy.key"/></div>
-            <div class="float-right hm-header-row-right"><spring:message code="label.editcompany.key"/></div>
+            <div class="float-right hm-header-row-right">
+            	<a href="javascript:showMainContent('./showcompanysettings.do')">
+            	<spring:message code="label.editcompany.key"/></a>
+            </div>
         </div>
     </div>
 </div>
@@ -204,7 +207,6 @@
 <div class="overlay-disable hide" id="overlay-confirm">
 	<div class="overlay-disable-wrapper">
 		<div class="ol-header" id="overlay-header"></div>
-		<div id="serverSideerror" class="validation-msg-wrapper"></div>
 		<input type="hidden" name="regionid-to-delete-hidden" id="regionid-to-delete-hidden" />
 		<input type="hidden" name="branchid-to-delete-hidden" id="branchid-to-delete-hidden" />
 		<div class="ol-content">

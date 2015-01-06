@@ -63,12 +63,6 @@
 					<a href="javascript:showMainContent('')"><spring:message
 							code="label.header.usermanagement.key" /></a>
 				</div>
-				<!-- To be removed: BOC -->
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message
-							code="label.settings.company.key" /></a>
-				</div>
-				<!-- To be removed: EOC -->
 			</div>
 			<div class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
