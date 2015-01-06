@@ -108,11 +108,11 @@ function detectBrowser(){
 
 function moveFileBtn(){
     if (navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1){
-        $('#com-logo').css('left',($('#input-file-icn-left').width() - 101) + 'px')
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 101) + 'px');
     }else if(is_firefox){
-        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px');
     }else{
-        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px')
+        $('#com-logo').css('left',($('#input-file-icn-left').width() - 97) + 'px');
     }
 }
 

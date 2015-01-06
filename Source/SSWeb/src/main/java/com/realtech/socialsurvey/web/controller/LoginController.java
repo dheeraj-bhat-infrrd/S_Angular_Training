@@ -47,6 +47,7 @@ public class LoginController {
 	private OrganizationManagementService organizationManagementService;
 	@Autowired
 	private UserManagementService userManagementService;
+	@Autowired
 	private SessionHelper sessionHelper;
 
 	@RequestMapping(value = "/login")

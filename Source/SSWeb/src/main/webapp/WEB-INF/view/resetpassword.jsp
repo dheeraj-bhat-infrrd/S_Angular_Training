@@ -78,6 +78,7 @@
     <script>
     	var isResetFormValid;
         $(document).ready(function(){
+        	$(document).attr("title", "Reset Password");
             adjustOnResize();
             isResetFormValid = false;
             $(window).resize(adjustOnResize);
