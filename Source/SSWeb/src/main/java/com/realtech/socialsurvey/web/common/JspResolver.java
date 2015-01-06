@@ -28,4 +28,5 @@ public interface JspResolver {
 	public static final String EXISTING_ENTERPRISE_BRANCHES = "existingenterprisebranches";
 	public static final String REGIONS_AUTOCOMPLETE = "regionsautocomplete";
 	public static final String COMPANY_SETTINGS = "settings";
+	public static final String COMPLETE_REGISTRATION = "completeregistration";
 }

@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.sql.Timestamp;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.User;
@@ -19,6 +23,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -43,6 +48,9 @@ public class UserManagementController {
 
 	@Autowired
 	private AuthenticationService authenticationService;
+	
+	@Autowired
+	private URLGenerator urlGenerator;
 
 	private static final int BATCH_SIZE = 20;
 
@@ -619,6 +627,114 @@ public class UserManagementController {
 		}
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finisheded.", user.getFirstName());
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to show registration completion page to the user. User can update first name, last
+	 * name here. User must update the password for completion of registration.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
+	public String showCompleteRegistrationPage(@RequestParam("q") String encryptedUrlParams, Model model) {
+
+		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
+
+		try {
+			try {
+				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
+				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
+				model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			LOG.info("Method showCompleteRegistrationPage() to complete registration of user finished.");
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException in showCompleteRegistrationPage(). Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		return JspResolver.COMPLETE_REGISTRATION;
+	}
+
+	/**
+	 * Method to complete registration of the user.
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
+	public String completeRegistration(Model model, HttpServletRequest request) {
+
+		LOG.info("Method completeRegistration() to complete registration of user started.");
+
+		try {
+			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
+			String lastName = request.getParameter(CommonConstants.FIRST_NAME);
+			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
+			String password = request.getParameter("password");
+			String confirmPassword = request.getParameter("confirmPassword");
+			String encryptedUrlParameters = request.getParameter("q");
+			Map<String, String> urlParams = new HashMap<>();
+			User user = null;
+			// check if password and confirm password field match
+			if (!password.equals(confirmPassword)) {
+				LOG.error("Password and confirm password fields do not match");
+				throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
+			}
+			// Decrypte Url parameters
+			try {
+				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting Url. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			// check if email ID entered matches with the one in the encrypted url
+			if (!urlParams.get("emailId").equals(emailId)) {
+				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
+				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
+			}
+
+			// update user's password
+			try {
+				// fetch user object with email Id
+				user = authenticationService.getUserWithEmailId(emailId);
+				user.setFirstName(firstName);
+				user.setLastName(lastName);
+				user.setModifiedBy(String.valueOf(user.getUserId()));
+				user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
+			}
+			try {
+				// change user's password
+				authenticationService.changePassword(user, password);
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Method completeRegistration() to complete registration of user finished.");
+		return JspResolver.LOGIN;
 	}
 
 	/*
