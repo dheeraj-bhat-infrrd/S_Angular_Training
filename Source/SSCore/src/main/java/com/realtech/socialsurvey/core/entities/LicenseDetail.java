@@ -68,7 +68,11 @@ public class LicenseDetail implements Serializable {
 	// bi-directional many-to-one association to RetriedTransaction
 	@OneToMany(mappedBy = "licenseDetail", fetch = FetchType.LAZY)
 	private List<RetriedTransaction> retriedTransactions;
-
+	
+	// bi-directional many-to-one association to DisabledAccount
+	@OneToMany(mappedBy = "licenseDetail", fetch = FetchType.LAZY)
+	private List<DisabledAccount> disabledAccounts;
+	
 	public List<RetriedTransaction> getRetriedTransactions() {
 		return retriedTransactions;
 	}
