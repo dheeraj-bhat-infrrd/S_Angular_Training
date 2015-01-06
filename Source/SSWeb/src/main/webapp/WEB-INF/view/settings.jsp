@@ -253,11 +253,11 @@
             $('.overlay-disable').hide();
         });
        $('#encompass-save').click(function(){
-    	   alert("saving encompass details")
+    	   alert("saving encompass details");
     	   saveEncompassDetails("encompass-form");
        }); 
        $('#encompass-testconnection').click(function(){
-    	   alert("testing encompass connection")
+    	   alert("testing encompass connection");
     	   testEncompassConnection("encompass-form");
        });
        $('#save-participation-mail-content').click(function(){

@@ -225,6 +225,7 @@
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/hierarchymanagement.js"></script>
 <script>
 	$(document).ready(function() {
+		$(document).attr("title", "Build Hierarchy");
 		showBranches();
 		if($("#show-regions-flag").length > 0) {
 			showRegions();

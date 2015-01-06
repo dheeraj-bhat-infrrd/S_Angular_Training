@@ -82,11 +82,14 @@
                 </div>
 				<div class="float-left user-info-seperator"></div>
 				<div class="float-left user-info-logo"></div>
+				<div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>
+				<c:if test="${displaylogo != null}">
+					<div class="float-left user-info-seperator"></div>
+					<div class="float-left user-info-logo" style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+				</c:if>
 			</div>
-			<c:if test="${displaylogo != null}">
+			
 			<div id="header-menu-icn"
-				class="header-menu-icn icn-menu float-right"
-				style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
-			</c:if>
+				class="header-menu-icn icn-menu float-right"></div>
 		</div>
 	</div>
