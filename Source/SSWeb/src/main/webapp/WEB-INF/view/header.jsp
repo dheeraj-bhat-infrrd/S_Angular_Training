@@ -72,24 +72,32 @@
 			</div>
 			<div class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
-                    <span>${fn:substring(user.loginName, 0, 1)}</span>
-                    <div class="initial-dd-wrapper hide blue-arrow-bot">
-                        <div class="initial-dd-item">Profile Settings</div>
-                        <div class="initial-dd-item">Account Settings</div>
-                        <div class="initial-dd-item">Change Password</div>
-                        <div class="initial-dd-item">Log Out</div>
-                    </div>
-                </div>
-<!--
-				<div class="float-left user-info-seperator"></div>
-				<div class="float-left user-info-logo"></div>
-				<div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>
--->
+					<span>${fn:substring(user.loginName, 0, 1)}</span>
+					<div class="initial-dd-wrapper hide blue-arrow-bot">
+						<div class="initial-dd-item" id="profile-setting">
+						<spring:message code="label.profilesetting.key"/>
+						</div>
+						<div class="initial-dd-item" id="account-setting">
+						<spring:message code="label.accountsetting.key"/>
+						</div>
+						<div class="initial-dd-item" id="change-password">
+						<spring:message code="label.changepassword.key"/>
+						</div>
+						<div class="initial-dd-item" id="logout-section">
+							<spring:message code="label.logout.key" />
+						</div>
+					</div>
+				</div>
+
+
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
-					<div class="float-left user-info-logo" style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+					<div class="float-left user-info-logo"
+						style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
+
 			</div>			
 			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
+	
