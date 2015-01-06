@@ -49,6 +49,7 @@
 				<value>com.realtech.socialsurvey.core.entities.Company</value>
 				<value>com.realtech.socialsurvey.core.entities.CompanyInvitationLicenseKey
 				</value>
+				<value>com.realtech.socialsurvey.core.entities.DisabledAccount</value>
 				<value>com.realtech.socialsurvey.core.entities.LicenseDetail</value>
 				<value>com.realtech.socialsurvey.core.entities.OrganizationLevelSetting
 				</value>

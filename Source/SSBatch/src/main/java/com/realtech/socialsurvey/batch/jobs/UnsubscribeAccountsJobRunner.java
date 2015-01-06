@@ -17,12 +17,12 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 /**
- * Initiates the payment retries batch job.
+ * Initiates the unsubscribe accounts batch job.
  */
 @Component
-public class PaymentRetriesJobRunner {
+public class UnsubscribeAccountsJobRunner {
 	
-	private static final Logger LOG = LoggerFactory.getLogger(PaymentRetriesJobRunner.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsJobRunner.class);
 
 	@Autowired
 	private JobLauncher jobLauncher;
@@ -41,7 +41,7 @@ public class PaymentRetriesJobRunner {
 
 		try {
 
-			LOG.info("Running the payment retries job from the task scheduler!");
+			LOG.info("Running the unsubscribe accounts job from the task scheduler!");
 
 			JobParameters param = new JobParametersBuilder()
 					.addString(CommonConstants.JOB_PARAMETER_NAME, String.valueOf(System.currentTimeMillis())).toJobParameters();
