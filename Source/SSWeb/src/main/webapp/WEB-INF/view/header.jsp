@@ -80,16 +80,16 @@
                         <div class="initial-dd-item">Log Out</div>
                     </div>
                 </div>
+<!--
 				<div class="float-left user-info-seperator"></div>
 				<div class="float-left user-info-logo"></div>
 				<div class="float-left user-info-initial">${fn:substring(user.loginName, 0, 1)}</div>
+-->
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo" style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
-			</div>
-			
-			<div id="header-menu-icn"
-				class="header-menu-icn icn-menu float-right"></div>
+			</div>			
+			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
