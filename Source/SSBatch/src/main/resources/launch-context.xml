@@ -26,13 +26,18 @@
 		<property name="jobRepository" ref="jobRepository" />
 	</bean>
 
-	<bean id="jobRunner" class="com.realtech.socialsurvey.batch.jobs.JobRunner" />
+	<bean id="paymentRetriesJobRunner" class="com.realtech.socialsurvey.batch.jobs.PaymentRetriesJobRunner">
+		<property name="job" ref="paymentRetries" />
+	</bean>
+	
+	<bean id="unsubscribeAccountsJobRunner" class="com.realtech.socialsurvey.batch.jobs.UnsubscribeAccountsJobRunner">
+		<property name="job" ref="unsubscribeAccounts" />
+	</bean>
 
 	<!-- Run every 10 seconds -->
 	<task:scheduled-tasks>
-		<!-- <task:scheduled ref="runScheduler" method="run" fixed-delay="10000" 
-			/> -->
-		<task:scheduled ref="jobRunner" method="run" cron="*/10 * * * * *" />
+		<task:scheduled ref="paymentRetriesJobRunner" method="run" cron="*/20 * * * * *" />
+		<task:scheduled ref="unsubscribeAccountsJobRunner" method="run" cron="*/20 * * * * *" />
 	</task:scheduled-tasks>
 
 
