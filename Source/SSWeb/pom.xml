@@ -20,7 +20,7 @@
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>
 		<servlet.version>2.5</servlet.version>
-
+		<dev.deployment.path>/user/local/share/jboss/jboss-as-7.1.1.Final/standalone/deployments</dev.deployment.path>
 
 		<!-- Spring -->
 		<spring-framework.version>3.2.4.RELEASE</spring-framework.version>
@@ -131,7 +131,7 @@
 			<artifactId>recaptcha4j</artifactId>
 			<version>0.0.7</version>
 		</dependency>
-		
+
 		<!-- Dependency for Fileupload -->
 		<dependency>
 			<groupId>commons-fileupload</groupId>
@@ -141,8 +141,14 @@
 	</dependencies>
 
 	<build>
-
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<outputDirectory>${dev.deployment.path}</outputDirectory>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -185,6 +191,17 @@
 		</plugins>
 	</build>
 
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<build>
+				<!-- <filters>
+					<filter>src/main/resources/filler.dev.properties</filter>
+				</filters> -->
+			</build>
+		</profile>
+	</profiles>
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Codehaus</id>
