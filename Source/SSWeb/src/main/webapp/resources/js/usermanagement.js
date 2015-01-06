@@ -148,6 +148,11 @@ function inviteUser(){
 				var userId = $('#mh-userId').val();
 				$('#um-emailid').closest('.row').attr("id",userId);
 			}else{
+				var userId = $('#mh-existing-userId').val();
+				if(userId != undefined || userId != ""){
+					paintUserDetailsForm(userId);
+					return;
+				}
 				alert("user invite not successful");
 			}
 		},
