@@ -427,8 +427,6 @@ public class OrganizationManagementController {
 		String ratingCategory = request.getParameter("ratingcategory");
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
-		double autopostRating;
-		double minPostRating;
 		String message = "";
 
 		try {
@@ -436,7 +434,7 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 
 			if (ratingCategory != null && ratingCategory.equals("rating-auto-post")) {
-				autopostRating = Double.parseDouble(request.getParameter("rating-auto-post"));
+				double autopostRating = Double.parseDouble(request.getParameter("rating-auto-post"));
 				if (autopostRating == 0) {
 					LOG.warn("Auto Post rating score is 0.");
 					throw new InvalidInputException("Auto Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
@@ -456,7 +454,7 @@ public class OrganizationManagementController {
 			}
 
 			else if (ratingCategory != null && ratingCategory.equals("rating-min-post")) {
-				minPostRating = Double.parseDouble(request.getParameter("rating-min-post"));
+				double minPostRating = Double.parseDouble(request.getParameter("rating-min-post"));
 				if (minPostRating == 0) {
 					LOG.warn("Minimum Post rating score is 0.");
 					throw new InvalidInputException("Mimimum Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
@@ -502,8 +500,6 @@ public class OrganizationManagementController {
 		String mailCategory = request.getParameter("mailcategory");
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
-		Integer reminderInterval;
-		Boolean isReminderDisabled;
 		String message = "";
 		
 		try {
@@ -511,7 +507,7 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 
 			if (mailCategory != null && mailCategory.equals("reminder-interval")) {
-				reminderInterval = Integer.parseInt(request.getParameter("reminder-interval"));
+				Integer reminderInterval = Integer.parseInt(request.getParameter("reminder-interval"));
 				if (reminderInterval == 0) {
 					LOG.warn("Reminder Interval is 0.");
 					throw new InvalidInputException("Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR);
@@ -531,7 +527,7 @@ public class OrganizationManagementController {
 			}
 
 			else if (mailCategory != null && mailCategory.equals("reminder-needed")) {
-				isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
+				Boolean isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
 				
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
@@ -575,8 +571,6 @@ public class OrganizationManagementController {
 		LOG.info("Updating Location Settings");
 		HttpSession session = request.getSession(false);
 		String otherCategory = request.getParameter("othercategory");
-		Boolean isLocationEnabled;
-		Boolean isAccountDisabled;
 		String message = "";
 		
 		try {
@@ -584,7 +578,7 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 
 			if (otherCategory != null && otherCategory.equals("other-location")) {
-				isLocationEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
+				Boolean isLocationEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
 				organizationManagementService.updateLocationEnabled(companySettings, isLocationEnabled);
 
 				// set the updated settings value in session
@@ -594,14 +588,14 @@ public class OrganizationManagementController {
 			}
 			
 			else if (otherCategory != null && otherCategory.equals("other-account")) {
-				isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-location"));
+				Boolean isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-account"));
 				
 				// Calling services to update DB
 				organizationManagementService.updateAccountDisabled(companySettings, isAccountDisabled);
 				if(isAccountDisabled) {
 					organizationManagementService.addDisabledAccount(companySettings.getIden());
 				} else {
-					//organizationManagementService.removeDisabledAccount(companySettings.getIden());
+					organizationManagementService.deleteDisabledAccount(companySettings.getIden());
 				}
 
 				// set the updated settings value in session
