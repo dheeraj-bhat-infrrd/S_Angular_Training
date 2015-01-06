@@ -575,6 +575,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 	
 	@Override
+	public void updateAccountDisabled(OrganizationUnitSettings companySettings, boolean isAccountDisabled) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+
+		LOG.info("Updating companySettings: " + companySettings + " with AccountDisabled: "+isAccountDisabled);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the isAccountDisabled successfully");
+	}
+
+	@Override
 	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException{
 		if(companySettings == null){
 			throw new InvalidInputException("Company settings cannot be null.");
@@ -610,6 +621,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	@Override
+	@Transactional
 	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
 		
 		if(companyId <= 0){
@@ -652,11 +664,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Adding the Disabled Account entity to the database");
 		disabledAccountDao.save(disabledAccount);
 		LOG.info("Added Disabled Account entity to the database.");
-		
 	}
-	
-	
-
 }
-
 // JIRA: SS-27: By RM05: EOC

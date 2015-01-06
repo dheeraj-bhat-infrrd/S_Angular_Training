@@ -595,7 +595,14 @@ public class OrganizationManagementController {
 			
 			else if (otherCategory != null && otherCategory.equals("other-account")) {
 				isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-location"));
-				// TODO call service to update status
+				
+				// Calling services to update DB
+				organizationManagementService.updateAccountDisabled(companySettings, isAccountDisabled);
+				if(isAccountDisabled) {
+					organizationManagementService.addDisabledAccount(companySettings.getIden());
+				} else {
+					//organizationManagementService.removeDisabledAccount(companySettings.getIden());
+				}
 
 				// set the updated settings value in session
 				companySettings.setAccountDisabled(isAccountDisabled);
