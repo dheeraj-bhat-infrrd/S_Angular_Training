@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.payment;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
@@ -50,7 +51,7 @@ public interface Payment {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException;
+	public boolean subscribe(User user,Company company, Long planId, String nonce) throws InvalidInputException, PaymentException;
 	
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
@@ -104,4 +105,13 @@ public interface Payment {
 	 * @throws InvalidInputException
 	 */
 	public boolean checkIfPaymentMade(Company company) throws InvalidInputException;
+	
+	/**
+	 * Returns the disable date timestamp for a subscription id.
+	 * @param subscriptionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	public Timestamp getDisableDate(String subscriptionId) throws NoRecordsFetchedException, PaymentException;
 }
