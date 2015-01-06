@@ -893,6 +893,29 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
 	}
+	
+	/**
+	 * Sends an email to user with the link to complete registration.
+	 * User has to provide password to set. Also, user can choose to change name.
+	 * 
+	 * @param emailId
+	 * @throws InvalidInputException
+	 */
+	@Override
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException {
+
+		LOG.info("Method to send profile completion link to the user started.");
+		Map<String, String> urlParams = new HashMap<String, String>();
+		urlParams.put(CommonConstants.EMAIL_ID, emailId);
+		urlParams.put(CommonConstants.FIRST_NAME, firstName);
+		urlParams.put(CommonConstants.LAST_NAME, lastName);
+
+		LOG.info("Generating URL");
+		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE);
+
+		// Send reset password link to the user email ID
+		emailServices.sendRegistrationCompletionEmail(url, emailId, firstName+" "+lastName);
+	}
 
 	/*
 	 * Method to fetch all the user profiles for the user

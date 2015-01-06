@@ -120,7 +120,8 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Successfully sent reset password mail");
 	}
-
+	
+	
 	/**
 	 * Method to prepare email entity required to send email
 	 * 
@@ -225,6 +226,50 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Successfully sent verification mail");
 	}
+	
+	//JIRA SS-42 by RM-05 : BOC
+	/**
+	 * Sends a link to new user to complete registration.
+	 * 
+	 * @param url
+	 * @param recipientMailId
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	@Override
+	public void sendRegistrationCompletionEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException {
+		LOG.info("Method to send Email to complete registration link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
+
+		// check if the passed parameters are null or empty
+
+		if (url == null || url.isEmpty()) {
+			LOG.error("URL generated can not be null or empty");
+			throw new InvalidInputException("URL generated can not be null or empty");
+		}
+
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipients Email Id can not be null or empty");
+			throw new InvalidInputException("Recipients Email Id can not be null or empty");
+		}
+
+		if (name == null || name.isEmpty()) {
+			LOG.error("Recipients Name can not be null or empty");
+			throw new InvalidInputException("Recipients Name can not be null or empty");
+		}
+		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY;
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(name, url));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent mail for registraion completion.");
+	}
+
+	//JIRA SS-42 by RM-05 : EOC
 	
 	/**
 	 * Method to prepare email entity for verification mail
