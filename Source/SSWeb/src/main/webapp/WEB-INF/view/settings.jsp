@@ -274,32 +274,3 @@ $(document).ready(function(){
 	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 });
 </script>
-
-<style>
-.st-item-row-txt {
-    border: 1px solid #e3e3e3;
-    border-radius: 3px;
-    box-shadow: 0px 2px 2px 0px #e3e3e3;
-    width: 75px;
-    height: 50px;
-    padding: 0 10px;
-}
-
-.st-dd-wrapper {
-    position: absolute;
-    width: 75px;
-    background-color: #fff;
-    padding: 8px;
-    border: 1px solid #dcdcdc;
-}
-
-.st-dd-item {
-    border-bottom: 1px solid #dcdcdc;
-    line-height: 36px;
-    cursor: pointer;
-}
-
-.st-dd-item:last-child {
-    border-bottom: 0;
-}
-</style>

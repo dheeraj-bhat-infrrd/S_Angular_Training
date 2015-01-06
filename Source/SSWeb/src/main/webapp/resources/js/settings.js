@@ -261,13 +261,13 @@ $('#st-settings-payment-off').click(function(){
 
 $('#st-settings-account-on').click(function(){
 	$('#othercategory').val('other-account');
-	$('#other-location').val('false');
+	$('#other-account').val('false');
 	
 	createPopupConfirm("Enable Account", "Do you want to Continue?");
 });
 $('#st-settings-account-off').click(function(){
 	$('#othercategory').val('other-account');
-	$('#other-location').val('true');
+	$('#other-account').val('true');
 
 	createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
 });
@@ -288,8 +288,10 @@ $('#overlay-continue').click(function(){
 	$("#overlay-text").html('');
 	
 	updateOtherSettings("other-settings-form");
+	$('#othercategory').val('');
 });
 $('#overlay-cancel').click(function(){
 	$('#overlay-confirm').hide();
 	$("#overlay-text").html('');
+	$('#othercategory').val('');
 });

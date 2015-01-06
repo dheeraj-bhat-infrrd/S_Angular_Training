@@ -680,6 +680,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		
 		//Fetching the disabled account entity for the company
 		LOG.info("Fetching the Disabled Account from the database");
