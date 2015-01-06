@@ -588,8 +588,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
 		
 		if(companyId <= 0){
-			LOG.error("Invalid companyId has been given.");
-			throw new InvalidInputException("Invalid companyId has been given.");
+			LOG.error("addDisabledAccount : Invalid companyId has been given.");
+			throw new InvalidInputException("addDisabledAccount : Invalid companyId has been given.");
 		}
 		
 		LOG.info("Adding the disabled account to the database for company id : " + companyId);
@@ -601,7 +601,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Company company = companyDao.findById(Company.class, companyId);
 		
 		HashMap<String, Object> queries = new HashMap<>();
-		queries.put("company", company);
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		
 		//Fetching the license details for the company
 		LOG.info("Fetching the License Detail record from the database");
@@ -627,6 +627,44 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Adding the Disabled Account entity to the database");
 		disabledAccountDao.save(disabledAccount);
 		LOG.info("Added Disabled Account entity to the database.");
+		
+	}
+	
+	public void deleteDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException{
+		
+		if(companyId <= 0){
+			LOG.error("addDisabledAccount : Invalid companyId has been given.");
+			throw new InvalidInputException("addDisabledAccount : Invalid companyId has been given.");
+		}
+		
+		LOG.info("Deleting the Disabled Account pertaining to company id : " + companyId);
+		
+		List<DisabledAccount> disabledAccounts = null;
+		
+		//Fetching the company entity from database
+		LOG.info("Fetching the company record from the database");
+		Company company = companyDao.findById(Company.class, companyId);
+		
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		
+		//Fetching the disabled account entity for the company
+		LOG.info("Fetching the Disabled Account from the database");
+		disabledAccounts = disabledAccountDao.findByKeyValue(DisabledAccount.class, queries);
+		
+		if(disabledAccounts == null || disabledAccounts.isEmpty()){
+			LOG.error("No disabled account records have been found for company id : " + companyId);
+			throw new NoRecordsFetchedException("No disabled account records have been found for company id : " + companyId);
+		}
+		
+		DisabledAccount disabledAccount = disabledAccounts.get(CommonConstants.INITIAL_INDEX);
+		
+		//Perform soft delete of the record in the database
+		LOG.info("Removing the disabled account record with id : " + disabledAccount.getId() + "from the database.");
+		disabledAccount.setStatus(CommonConstants.STATUS_INACTIVE);
+		disabledAccountDao.update(disabledAccount);
+		
+		LOG.info("Record successfully deleted from the database!");
 		
 	}
 	
