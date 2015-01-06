@@ -1626,3 +1626,63 @@ button.paypal.is-active {
 .initial-dd-item:last-child{
     border-bottom: 0;
 }
+
+.err-line-1 {
+    text-transform: uppercase;
+    font-size: 22px;
+}
+
+.err-line-2 {
+    font-size: 74px;
+    font-weight: bold !important;
+    margin: 20px;
+}
+
+.err-line-3 {
+    font-size: 14px;
+}
+
+.err-header-row {
+    line-height: 78px;
+    font-size: 20px;
+}
+
+.error-main-wrapper {
+    max-width: 600px;
+    padding: 100px 15px;
+}
+
+.err-header-wrapper {
+    height: 78px;
+}
+
+.err-wrapper-main {
+    position: relative;
+}
+
+.st-item-row-txt {
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    width: 75px;
+    height: 50px;
+    padding: 0 10px;
+}
+
+.st-dd-wrapper {
+    position: absolute;
+    width: 75px;
+    background-color: #fff;
+    padding: 8px;
+    border: 1px solid #dcdcdc;
+}
+
+.st-dd-item {
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 36px;
+    cursor: pointer;
+}
+
+.st-dd-item:last-child {
+    border-bottom: 0;
+}
