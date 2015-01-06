@@ -57,7 +57,7 @@
 					<div class="um-item-row-left text-right">
 						<spring:message code="label.assignto.key" />
 					</div>
-						<div class="um-item-row-icon icn-tick"></div>
+						<div class="um-item-row-icon icn-save"></div>
 					<div class="hm-item-row-right um-item-row-right">
 						<input type="text" class="um-item-row-txt" id="um-assignto"
 							placeholder='<spring:message code="label.assignto.key" />'>

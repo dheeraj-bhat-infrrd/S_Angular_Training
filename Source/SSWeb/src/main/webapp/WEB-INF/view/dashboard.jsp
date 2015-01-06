@@ -1,4 +1,3 @@
-<jsp:include page="header.jsp" />
 <div id="page-main-content">
 	<div class="hm-header-main-wrapper">
 		<div class="container">
@@ -8,4 +7,8 @@
 		</div>
 	</div>
 </div>
-<jsp:include page="footer.jsp" />
+<script>
+    $(document).ready(function(){
+    	$(document).attr("title", "Dashboard");
+    });
+</script>

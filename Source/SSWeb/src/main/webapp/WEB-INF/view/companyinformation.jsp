@@ -113,6 +113,7 @@
 	<script>
 		var isCompanyInfoPageValid;
 		$(document).ready(function() {
+		$(document).attr("title", "Company Information");
 			isCompanyInfoPageValid=false;
 //			adjustOnResize();
 

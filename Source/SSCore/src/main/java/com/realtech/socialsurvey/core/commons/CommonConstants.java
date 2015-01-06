@@ -133,7 +133,7 @@ public interface CommonConstants {
 	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$";
 	public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
 	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
-	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]$";
+	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
 	public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
 	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
