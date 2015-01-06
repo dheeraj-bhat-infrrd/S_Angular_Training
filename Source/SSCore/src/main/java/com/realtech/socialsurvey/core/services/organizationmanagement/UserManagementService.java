@@ -62,6 +62,8 @@ public interface UserManagementService {
 	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
 
 	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException;
+	
+	void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException;
 
 	// JIRA SS-42 BY RM05 EOC
 
@@ -116,5 +118,6 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
+
 }
 // JIRA SS-34 BY RM02 BOC
