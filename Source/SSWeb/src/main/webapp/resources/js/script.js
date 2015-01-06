@@ -10,8 +10,6 @@ var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z]*$/;
 var lastNameRegEx = /^[a-zA-Z ]*$/;
 var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
-var usernameRegex = /^[a-zA-Z]*$/;
-var urlRegEx = /(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
 
@@ -579,30 +577,17 @@ function validateCompanyEnterpriseAddress1(elementId){
 function validateEncompassUserName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (usernameRegex.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid user name.');
-				showToast();
-				return false;
-			}
+			return true;
 		} else {
-			$('#overlay-toast').html('Please enter user name.');
+			$('#overlay-toast').html('Please enter user name');
 			showToast();
 			return false;
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (usernameRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).next('.hm-item-err-2').hide();
-				return true;
-			} else {
-				$('#'+elementId).next('.hm-item-err-2').html('Please enter a valid user name.');
-				$('#'+elementId).next('.hm-item-err-2').show();
-				return false;
-			}
+			return true;
 		} else {
-			$('#'+elementId).next('.hm-item-err-2').html('Please enter user name.');
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter user name');
 			$('#'+elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -611,45 +596,19 @@ function validateEncompassUserName(elementId){
 
 //function to validate a password in form
 function validateEncompassPassword(elementId) {
-	var password = $('#'+elementId).val();
 	if($(window).width()<768){
-		if (password != "") {
-			//check if password length is proper
-			if(password.length < minPwdLength || password.length > maxPwdLength){
-				$('#overlay-toast').html('Password must be between 6-15 characters.');
-				showToast();
-				return false;
-			}
-			else if (passwordRegex.test(password) == true) {
-				return true;
-			}else {
-				$('#overlay-toast').html('Password must contain one special character.');
-				showToast();
-				return false;
-			}
+		if ($('#'+elementId).val() != "") {
+			return true;
 		}else{
-			$('#overlay-toast').html('Please enter password.');
+			$('#overlay-toast').html('Please enter password');
 			showToast();
 			return false;
 		}
 	}else{
-		if (password != "") {
-			//check if password length is proper
-			if(password.length < minPwdLength || password.length > maxPwdLength){
-				$('#'+elementId).next('.hm-item-err-2').html('Password must be between 6-15 characters.');
-				$('#'+elementId).next('.hm-item-err-2').show();
-				return false;
-			}
-			else if (passwordRegex.test(password) == true) {
-				$('#'+elementId).next('.hm-item-err-2').hide();
-				return true;
-			}else {
-				$('#'+elementId).next('.hm-item-err-2').html('Password must contain one special character.');
-				$('#'+elementId).next('.hm-item-err-2').show();
-				return false;
-			}
+		if ($('#'+elementId).val() != "") {
+			return true;
 		}else{
-			$('#'+elementId).next('.hm-item-err-2').html('Please enter password.');
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter password');
 			$('#'+elementId).next('.hm-item-err-2').show();
 			return false;
 		}
@@ -660,32 +619,23 @@ function validateEncompassPassword(elementId) {
 function validateURL(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (urlRegEx.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				$('#overlay-toast').html('Please enter a valid url.');
-				showToast();
-				return false;
-			}
+			return true;
 		} else {
-			$('#overlay-toast').html('Please enter url.');
+			$('#overlay-toast').html('Please enter url');
 			showToast();
 			return false;
 		}
 	}else{
 	   	if ($('#'+elementId).val() != "") {
-			if (urlRegEx.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).next('.hm-item-err-2').hide();
-				return true;
-			} else {
-				$('#'+elementId).next('.hm-item-err-2').html('Please enter a valid url.');
-				$('#'+elementId).next('.hm-item-err-2').show();
-				return false;
-			}
+			return true;
 		} else {
-			$('#'+elementId).next('.hm-item-err-2').html('Please enter url.');
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter url');
 			$('#'+elementId).next('.hm-item-err-2').show();
 			return false;
 		}
 	}
 }
+
+$('.user-info-initial').click(function(){
+    $('.initial-dd-wrapper').slideToggle(200);
+});
