@@ -1,5 +1,3 @@
-<jsp:include page="header.jsp"/>
-
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -111,6 +109,8 @@
         </div>
     </div>
 </div>
-
-
-<jsp:include page="footer.jsp"/>
+<script>
+    $(document).ready(function(){
+    	$(document).attr("title", "User Management");
+    });
+</script>
