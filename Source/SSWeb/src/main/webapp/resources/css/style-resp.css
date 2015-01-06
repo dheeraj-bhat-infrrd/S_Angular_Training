@@ -534,6 +534,9 @@
     .tweet-panel-item, .posts-panel-item{
         margin-bottom: 0;
     }
+    .err-header-wrapper{
+        height: 50px;
+    }
 }
 
 
@@ -574,7 +577,7 @@
         display: block !important;
     }
     .overlay-toast{
-        display: none !important;
+        display: none;
     }
 }
 
