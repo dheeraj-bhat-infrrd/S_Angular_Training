@@ -39,6 +39,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
@@ -95,6 +96,22 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 */
 	public BraintreeGateway getGatewayInstance() {
 		return gateway;
+	}
+	
+	@Override
+	public void afterPropertiesSet() {
+
+		LOG.info("BraintreePaymentImpl : afterPropertiesSet() : Executing method ");
+		if (gateway == null) {
+			if (sandboxMode == CommonConstants.SANDBOX_MODE_TRUE) {
+				LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey);
+				gateway = new BraintreeGateway(Environment.SANDBOX, merchantId, publicKey, privateKey);
+			}
+			else {
+				LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey);
+				gateway = new BraintreeGateway(Environment.PRODUCTION, merchantId, publicKey, privateKey);
+			}
+		}
 	}
 
 	/**
@@ -323,7 +340,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 */
 	@Override
 	@Transactional
-	public boolean subscribe(User user, Company company, Long planId, String nonce) throws InvalidInputException, PaymentException {
+	public boolean subscribe(User user, Company company, long planId, String nonce) throws InvalidInputException, PaymentException {
 
 		boolean result = false;
 		String subscriptionId = null;
@@ -724,12 +741,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @return
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
+	 * @throws InvalidInputException 
 	 */
 	@Override
-	public Timestamp getDisableDate(String subscriptionId) throws NoRecordsFetchedException, PaymentException{
+	public Timestamp getDisableDate(String subscriptionId) throws NoRecordsFetchedException, PaymentException, InvalidInputException{
 		
 		if(subscriptionId == null || subscriptionId.isEmpty()){
 			LOG.error("Parameter given to getDisableDate is null or empty");
+			throw new InvalidInputException("Parameter given to getDisableDate is null or empty");
 		}
 		LOG.info("Fetching the disable date for the subscription id : " + subscriptionId);
 		Timestamp disableDate = null;
@@ -753,21 +772,31 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("Returning the billing date : " + disableDate.toString());		
 		return disableDate;
 	}
-
+	
+	/**
+	 * Unsubscribes the user from the payment gateway
+	 * @param subscriptionId
+	 * @throws SubscriptionCancellationUnsuccessfulException 
+	 * @throws InvalidInputException 
+	 */
 	@Override
-	public void afterPropertiesSet() {
-
-		LOG.info("BraintreePaymentImpl : afterPropertiesSet() : Executing method ");
-		if (gateway == null) {
-			if (sandboxMode == CommonConstants.SANDBOX_MODE_TRUE) {
-				LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey);
-				gateway = new BraintreeGateway(Environment.SANDBOX, merchantId, publicKey, privateKey);
-			}
-			else {
-				LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey);
-				gateway = new BraintreeGateway(Environment.PRODUCTION, merchantId, publicKey, privateKey);
-			}
+	public void unsubscribe(String subscriptionId) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException {
+		
+		if(subscriptionId == null || subscriptionId.isEmpty()){
+			LOG.error("Parameter given to unsubscribe is null or empty");
+			throw new InvalidInputException("Parameter given to unsubscribe is null or empty");
 		}
+		LOG.info("Cancelling the subscription with id : " + subscriptionId);
+		
+		Result<Subscription> result = gateway.subscription().cancel(subscriptionId);
+		
+		if(result.isSuccess()){
+			LOG.info("Subscription cancelletion successful!");
+		}
+		else{
+			LOG.error("Subscription cancellation unsuccessful : Message : " + result.getMessage());
+			throw new SubscriptionCancellationUnsuccessfulException("Subscription cancellation unsuccessful : Message : " + result.getMessage());
+		}		
 	}
 
 }

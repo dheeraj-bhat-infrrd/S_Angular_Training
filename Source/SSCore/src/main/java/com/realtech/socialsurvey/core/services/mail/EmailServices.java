@@ -25,5 +25,6 @@ public interface EmailServices {
 	public void sendRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
 	
 	public void sendEmailSendingFailureMail(String recipientMailId,String destinationMailId,String displayName,String stackTrace) throws InvalidInputException, UndeliveredEmailException;
-
+	
+	public void sendAccountDisabledMail(String recipientMailId,String displayName) throws InvalidInputException, UndeliveredEmailException;
 }

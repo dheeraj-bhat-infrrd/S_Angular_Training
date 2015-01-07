@@ -76,6 +76,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we update the License Detail table and delete the record from the Retried Transactions table.
+		LOG.info("Updating the database for license detail object with id : " + licenseDetail.getLicenseId() + " and retried transaction object with id : " + retriedTransaction.getRetryId());
 		LOG.debug("Updating License Detail table.");
 		licenseDetailDao.update(licenseDetail);
 		LOG.debug("Delete record from Retried Transaction");
@@ -91,7 +92,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we just update the License Details table.
-		LOG.debug("Updating License Detail Table.");
+		LOG.debug("Updating License Detail object with id : " + licenseDetail.getLicenseId() );
 		licenseDetailDao.update(licenseDetail);
 
 		LOG.debug("Update Successful!");
@@ -110,6 +111,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we need to update both the License Details and the Retried Transactions table.
+		LOG.info("Updating the database for license detail object with id : " + licenseDetail.getLicenseId() + " and retried transaction object with id : " + retriedTransaction.getRetryId());
 		LOG.debug("Updating Retried Transaction table.");
 		retriedTransactionDao.saveOrUpdate(retriedTransaction);
 		LOG.debug("Updating License Detail table.");
@@ -130,6 +132,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we update the License Details and the Company table.
+		LOG.info("Updating the database for license detail object with id : " + licenseDetail.getLicenseId() + " and company object with id : " + company.getCompanyId());
 		LOG.debug("Updating License Details table.");
 		licenseDetailDao.update(licenseDetail);
 		LOG.debug("Updating company table");
@@ -142,7 +145,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 	public void write(List<? extends Map<String, Object>> items) throws Exception {
 				
 		//Iterate through all the map objects check the case and call appropriate write methods.
-		LOG.info("Custom Writer called to write objects.");
+		LOG.info("Payment Retries Writer called to write objects.");
 		for (Map<String, Object> writerObjectMap : items) {
 
 			try {
@@ -213,7 +216,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 			}
 
 		}
-
+		LOG.info("All objects written by Payment Retries Writer.");
 	}
 
 }
