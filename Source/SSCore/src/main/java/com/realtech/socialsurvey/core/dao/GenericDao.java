@@ -43,6 +43,9 @@ public interface GenericDao<T, ID extends Serializable> {
 	public long findNumberOfRows(Class<T> dataClass);
 
 	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries);
+
+	public void merge(T entity);
+
 }
 
 // JIRA: SS-8: By RM05: EOC

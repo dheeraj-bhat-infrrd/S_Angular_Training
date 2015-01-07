@@ -3,12 +3,15 @@ package com.realtech.socialsurvey.core.services.payment;
 import java.math.BigDecimal;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
+import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 
 /**
  * Handles the payment options for the application
@@ -47,7 +50,7 @@ public interface Payment {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, int planId, String nonce) throws NonFatalException;
+	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException;
 	
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
@@ -66,5 +69,39 @@ public interface Payment {
 	 * @throws NoRecordsFetchedException 
 	 */
 	public void updateRetriesForPayment(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
-		
+	
+	/**
+	 * Retries payment for a particular subscription id and returns the Transaction object.
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws PaymentRetryUnsuccessfulException 
+	 */
+	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, PaymentRetryUnsuccessfulException;
+	
+	/**
+	 * Checks if the status of a particular transaction is settling.
+	 * @param transactionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public boolean checkTransactionSettling(String transactionId) throws NoRecordsFetchedException, InvalidInputException;
+	
+	/**
+	 * Checks if the status of a particular transaction is settled.
+	 * @param transactionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public boolean checkTransactionSettled(String transactionId) throws NoRecordsFetchedException, InvalidInputException; 
+
+	/**
+	 * Checks if the payment is made for a particular company.
+	 * @param company
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public boolean checkIfPaymentMade(Company company) throws InvalidInputException;
 }

@@ -16,14 +16,17 @@ function showMainContent(url) {
  * @param data
  */
 function showMainContentCallBack(data) {
-	$("#main-content").html(data);
-	if(dashboardLink=="dashboard"){
-		
-	}else if(dashboardLink=="company"){
-		
-	}else if(dashboardLink=="buildSurvey"){
-		
-	}else if(dashboardLink=="userManagement"){
-		initUserManagementPage();
-	}
+	$("#main-content").html(data);	
+}
+/**
+ * function for logout
+ */
+function logoutuser(){
+	console.log('Logging out user');
+	callAjaxGET("./logout.do", logoutCallBack, true);
+}
+
+function logoutCallBack(data){
+	console.log("redirecting to login page");
+	window.location="login.do";
 }
