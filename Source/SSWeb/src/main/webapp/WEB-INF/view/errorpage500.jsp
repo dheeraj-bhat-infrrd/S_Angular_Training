@@ -37,7 +37,7 @@
         </div>
 
         <div class="error-main-wrapper container">
-            <div class="err-line-1 text-center">OOPS !!! There seeme to be an internal error with the page your are trying to access</div>
+            <div class="err-line-1 text-center">OOPS !!! There seems to be an internal error with the page your are trying to access</div>
             <div class="err-line-2 text-center">500</div>
             <div class="err-line-3 text-center"><em>Lorem ipsumm dore eit lewht njbskjlhjn jb hhtreke Lorem ipsumm dore eit lewht njbskjlhjn jb hhtreke</em></div>
         </div>
