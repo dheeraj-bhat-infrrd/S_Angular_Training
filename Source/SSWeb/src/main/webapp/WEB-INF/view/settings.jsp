@@ -2,17 +2,18 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div id="overlay-toast" class="overlay-toast"></div>
 
+<!-- Html text will be dynamically updated -->
 <div class="overlay-disable hide" id="overlay-confirm">
     <div class="overlay-disable-wrapper">
-        <div id="overlay-header" class="ol-header">Disable Account</div>
+        <div id="overlay-header" class="ol-header"></div>
         <div class="ol-content">
             <div id="overlay-text" class="ol-txt"></div>
             <div class="clearfix">
                 <div class="float-left ol-btn-wrapper">
-                    <div id="overlay-continue" class="ol-btn">Continue</div>
+                    <div id="overlay-continue" class="ol-btn"></div>
                 </div>
                 <div class="float-left ol-btn-wrapper">
-                    <div id="overlay-cancel" class="ol-btn">Cancel</div>
+                    <div id="overlay-cancel" class="ol-btn"></div>
                 </div>
             </div>
         </div>
