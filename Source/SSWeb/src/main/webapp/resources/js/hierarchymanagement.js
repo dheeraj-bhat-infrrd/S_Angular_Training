@@ -267,6 +267,7 @@ function deleteRegionPopup(regionId) {
 }
 function deleteRegionCheckCallBack(response) {
 	$("#overlay-txt").html(response);
+	$('.msg-err-icn').remove();
 
 	var success = "Selected Region could be deleted";
 	var successMsg = $("#overlay-txt").find('.success-message').text().trim();
@@ -287,7 +288,7 @@ function deleteBranchPopup(branchId) {
 }
 function deleteBranchCheckCallBack(response) {
 	$("#overlay-txt").html(response);
-	
+	$('.msg-err-icn').remove();
 	var success = "Selected Branch could be deleted";
 	var successMsg = $("#overlay-txt").find('.success-message').text().trim();
 	if (success == successMsg) {
@@ -303,6 +304,7 @@ function createPopupConfirm(header, body) {
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
 	}
+	$('#overlay-continue').removeClass("btn-disabled");
 	$('#overlay-header').html(header);
 	$('#overlay-txt').html(body);
 
@@ -310,6 +312,7 @@ function createPopupConfirm(header, body) {
 }
 function createPopupInfo(header) {
 	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-continue').addClass("btn-disabled");
 	$('#overlay-header').html(header);
 	
    	$('#overlay-confirm').show();

@@ -195,33 +195,49 @@ $('body').on('click','.st-dd-item-min-post',function(){
 
 $('#edit-participation-mail-content').click(function(){
 	$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(false);
-	if ($('#save-participation-mail-content').attr("disabled") == "disabled") {
-		$('#save-participation-mail-content').removeAttr("disabled");
-	}
+	
+	$('#save-participation-mail-content').show();
+	$('#save-participation-mail-content-disabled').hide();
+	
+	$('#edit-participation-mail-content-disabled').show();
+	$(this).hide();
 });
 $('#save-participation-mail-content').click(function(){
-	if ($('#save-participation-mail-content').attr("disabled") != "disabled") {
-		$('#mailcategory').val('participationmail');
-		updateMailContent("mail-body-settings-form");
-		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
-		$('#save-participation-mail-content').attr("disabled", true);
-	}
+	$('#mailcategory').val('participationmail');
+	updateMailContent("mail-body-settings-form");
+	
+	$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
+	
+	$(this).hide();
+	$('#save-participation-mail-content-disabled').show();
+
+	$('#edit-participation-mail-content').show();
+	$('#edit-participation-mail-content-disabled').hide();
 });
+
 
 $('#edit-participation-reminder-mail-content').click(function(){
 	$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(false);
-	if ($('#save-participation-reminder-mail-content').attr("disabled") == "disabled") {
-		$('#save-participation-reminder-mail-content').removeAttr("disabled");
-	}
+	
+	$('#save-participation-reminder-mail-content').show();
+	$('#save-participation-reminder-mail-content-disabled').hide();
+	
+	$('#edit-participation-reminder-mail-content-disabled').show();
+	$(this).hide();
 });
 $('#save-participation-reminder-mail-content').click(function(){
-	if ($('#save-participation-reminder-mail-content').attr("disabled") != "disabled") {
-		$('#mailcategory').val('');
-		updateMailContent("mail-body-settings-form");
-		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
-		$('#save-participation-reminder-mail-content').attr("disabled", true);
-	}
+	$('#mailcategory').val('participationmail');
+	updateMailContent("mail-body-settings-form");
+	
+	$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
+	
+	$(this).hide();
+	$('#save-participation-reminder-mail-content-disabled').show();
+
+	$('#edit-participation-reminder-mail-content').show();
+	$('#edit-participation-reminder-mail-content-disabled').hide();
 });
+
 
 $('#reminder-interval').change(function() {
 	$('#mailcategory').val('reminder-interval');

@@ -9,10 +9,10 @@
             <div id="overlay-text" class="ol-txt"><!-- Populated by javascript --></div>
             <div class="clearfix">
                 <div class="float-left ol-btn-wrapper">
-                    <div id="overlay-continue" class="ol-btn"><!-- Populated by javascript --></div>
+                    <div id="overlay-continue" class="ol-btn cursor-pointer"><!-- Populated by javascript --></div>
                 </div>
                 <div class="float-left ol-btn-wrapper">
-                    <div id="overlay-cancel" class="ol-btn"><!-- Populated by javascript --></div>
+                    <div id="overlay-cancel" class="ol-btn cursor-pointer"><!-- Populated by javascript --></div>
                 </div>
             </div>
         </div>
@@ -74,8 +74,8 @@
 	                                <div class="hm-item-row item-row-OR clearfix">
 	                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.url.key" /></div>
 	                                    <div class="clearfix float-right st-url-icons">
-	                                        <div id="encompass-testconnection" class="um-item-row-icon icn-spanner margin-left-0"></div>
-	                                        <div id="encompass-save" class="um-item-row-icon icn-blue-tick margin-left-0"></div>
+	                                        <div id="encompass-testconnection" class="um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
+	                                        <div id="encompass-save" class="um-item-row-icon icn-blue-tick margin-left-0 cursor-pointer"></div>
 	                                    </div>
 	                                    <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 	                                    	<!-- check the encompass password -->
@@ -152,8 +152,11 @@
 	                <div class="st-header-txt-lft-rt clearfix margin-top-25">
 	                    <div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
 	                    <div class="float-right clearfix st-header-txt-rt">
-	                        <div id="edit-participation-mail-content" class="float-left st-header-txt-rt-icn icn-pen"></div>
-	                        <div id="save-participation-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
+	                        <div id="edit-participation-mail-content" class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
+	                        <div id="edit-participation-mail-content-disabled" class="float-left st-header-txt-rt-icn icn-pen hide"></div>
+	                        
+	                        <div id="save-participation-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
+	                        <div id="save-participation-mail-content-disabled" class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
 	                    </div>
 	                </div>
 	                <div class="st-header-txt-wrapper">
@@ -164,8 +167,11 @@
 	                <div class="st-header-txt-lft-rt clearfix margin-top-25">
 	                    <div class="float-left st-header-txt-lft"><spring:message code="label.header.reminder.mailer.content.key" /></div>
 	                    <div class="float-right clearfix st-header-txt-rt">
-	                        <div id="edit-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-pen"></div>
-	                        <div id="save-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20"></div>
+	                        <div id="edit-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-pen cursor-pointer icn-pen-blue"></div>
+	                        <div id="edit-participation-reminder-mail-content-disabled" class="float-left st-header-txt-rt-icn icn-pen hide"></div>
+	                        
+	                        <div id="save-participation-reminder-mail-content" class="float-left st-header-txt-rt-icn icn-blue-tick margin-left-20 cursor-pointer hide"></div>
+	                        <div id="save-participation-reminder-mail-content-disabled" class="float-left st-header-txt-rt-icn margin-left-20 icn-grey-tick"></div>
 	                    </div>
 	                </div>
 	                <div class="st-header-txt-wrapper">
@@ -257,11 +263,9 @@ $(document).ready(function(){
 	
 	$('#survey-participation-mailcontent').ckeditor();
 	$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
-	$('#save-participation-mail-content').attr("disabled", true);
 	
 	$('#survey-participation-reminder-mailcontent').ckeditor();
 	$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
-	$('#save-participation-reminder-mail-content').attr("disabled", true);
 	
 	autoAppendRatingDropdown('#st-dd-wrapper-auto-post', "st-dd-item st-dd-item-auto-post");
 	changeRatingPattern($('#rating-auto-post').val(), $('#rating-auto-post-parent'));

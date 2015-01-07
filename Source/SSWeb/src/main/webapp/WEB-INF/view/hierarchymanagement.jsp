@@ -4,10 +4,9 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left"><spring:message code="label.buildcompanyhierarchy.key"/></div>
-            <div class="float-right hm-header-row-right">
-            	<a href="javascript:showMainContent('./showcompanysettings.do')">
-            	<spring:message code="label.editcompany.key"/></a>
-            </div>
+            <a class="float-right hm-header-row-right hm-rt-btn-lnk" href="javascript:showMainContent('./showcompanysettings.do')">
+            	<spring:message code="label.editcompany.key"/>
+            </a>
         </div>
     </div>
 </div>
@@ -213,10 +212,10 @@
 			<div class="ol-txt" id="overlay-txt"></div>
 			<div class="clearfix">
 				<div class="float-left ol-btn-wrapper">
-					<div id="overlay-continue" class="ol-btn">Continue</div>
+					<div id="overlay-continue" class="ol-btn cursor-pointer">Continue</div>
 				</div>
 				<div class="float-left ol-btn-wrapper">
-					<div id="overlay-cancel" class="ol-btn">Cancel</div>
+					<div id="overlay-cancel" class="ol-btn cursor-pointer">Cancel</div>
 				</div>
 			</div>
 		</div>
