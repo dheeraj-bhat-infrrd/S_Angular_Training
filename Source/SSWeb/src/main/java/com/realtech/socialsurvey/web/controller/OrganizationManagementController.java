@@ -294,7 +294,8 @@ public class OrganizationManagementController {
 			testEncompassConnection(model, request);
 			
 			// Encrypting the password
-			String cipherPassword = encryptionHelper.encryptAES(request.getParameter("encompass-password"),"");
+			String plainPassword = request.getParameter("encompass-password");
+			String cipherPassword = encryptionHelper.encryptAES(plainPassword, "");
 
 			CRMInfo crmInfo = new CRMInfo();
 			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
@@ -306,7 +307,8 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
 			
-			// set the updated settings value in session
+			// set the updated settings value in session with plain password
+			crmInfo.setCrm_password(plainPassword);
 			companySettings.setCrm_info(crmInfo);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 		}

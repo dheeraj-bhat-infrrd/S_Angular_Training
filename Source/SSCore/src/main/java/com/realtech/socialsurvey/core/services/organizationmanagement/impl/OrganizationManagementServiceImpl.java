@@ -38,6 +38,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {
@@ -80,6 +81,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Autowired
 	private Payment gateway;
 
+	@Autowired
+	private EncryptionHelper encryptionHelper;
+	
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -446,6 +450,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		long companyId = user.getCompany().getCompanyId();
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		
+		// Decrypting the encompass password
+		if(companySettings != null && companySettings.getCrm_info() != null) {
+			CRMInfo crmInfo = companySettings.getCrm_info();
+			
+			String encryptedPassword = crmInfo.getCrm_password();
+			String decryptedPassword = encryptionHelper.decryptAES(encryptedPassword, "");
+			
+			crmInfo.setCrm_password(decryptedPassword);
+		}
 		return companySettings;
 	}
 
