@@ -29,4 +29,5 @@ public interface JspResolver {
 	public static final String REGIONS_AUTOCOMPLETE = "regionsautocomplete";
 	public static final String COMPANY_SETTINGS = "settings";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
+	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
 }

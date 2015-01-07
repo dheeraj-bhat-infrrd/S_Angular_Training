@@ -1,4 +1,3 @@
-var dashboardLink = "dashboard";
 var userManagementUserListStartIndex = 0;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
@@ -288,15 +287,3 @@ function activateOrDeactivateUser(isActive, userId){
 		}
 	});
 }
-
-/*
-*Onclick function for link to select tab
-*/
-$('.header-links-item-a').click(function(){
-	$('#header-links').find('.header-links-item').find('.header-links-item-a').each(function(){
-		$(this).attr("data-isclicked","false");
-	});
-	$(this).attr("data-isclicked","true");
-	dashboardLink = $(this).data('link');
-	
-});

@@ -6,6 +6,7 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -31,6 +32,9 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Autowired
 	private PropertyFileReader propertyReader;
+	
+	@Value("${MAX_PAYMENT_RETRIES}")
+	private int maxPaymentRetries;
 
 	/**
 	 * Method to send registration invite mail to a single recipient
@@ -55,7 +59,7 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("Firstname is empty or null for sending registration invite mail ");
 		}
 
-		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.REGISTRATION_INVITATION_MAIL_SUBJECT;
 
@@ -108,7 +112,7 @@ public class EmailServicesImpl implements EmailServices {
 			LOG.error("Recipients Name can not be null or empty");
 			throw new InvalidInputException("Recipients Name can not be null or empty");
 		}
-		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_SUBJECT;
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RESET_PASSWORD_MAIL_BODY);
@@ -128,7 +132,7 @@ public class EmailServicesImpl implements EmailServices {
 	 * @param recipientMailId
 	 * @return
 	 */
-	private EmailEntity prepareEmailEntityForRegistrationInvite(String recipientMailId) {
+	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId) {
 		LOG.debug("Preparing email entity for registration invitation for recipientMailId " + recipientMailId);
 		List<String> recipients = new ArrayList<String>();
 		recipients.add(recipientMailId);
@@ -167,7 +171,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.debug("Executing sendSubscriptionChargeUnsuccessfulEmail() with parameters : " + recipientMailId + ", " + name + ", " + retryDays);
 
-		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SUBSCRIPTION_UNSUCCESSFUL_MAIL_SUBJECT;
 
@@ -256,7 +260,7 @@ public class EmailServicesImpl implements EmailServices {
 			LOG.error("Recipients Name can not be null or empty");
 			throw new InvalidInputException("Recipients Name can not be null or empty");
 		}
-		EmailEntity emailEntity = prepareEmailEntityForRegistrationInvite(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY;
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.COMPLETE_REGISTRATION_MAIL_BODY);
@@ -291,6 +295,136 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.debug("Prepared email entity for verification mail");
 		return emailEntity;
+	}
+
+	@Override
+	public void sendFatalExceptionEmail(String recipientMailId,String stackTrace) throws InvalidInputException, UndeliveredEmailException {
+		
+		LOG.info("Sending FatalException email to the admin.");
+		
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending fatal exception mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending fatal exception mail ");
+		}
+		
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.FATAL_EXCEPTION_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(stackTrace));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent fatal exception mail");
+		
+	}
+	
+	@Override
+	public void sendEmailSendingFailureMail(String recipientMailId,String destinationMailId,String displayName,String stackTrace) throws InvalidInputException, UndeliveredEmailException{
+		
+		LOG.info("Sending email to the admin on failure of sending mail to customer");
+		
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+		}
+		
+		if (destinationMailId == null || destinationMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+		}
+		
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+		}
+		
+		if (stackTrace == null || stackTrace.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sendEmailSendingFailureMail ");
+		}
+		
+		
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.EMAIL_SENDING_FAILURE_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.EMAIL_SENDING_FAILURE_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,destinationMailId,stackTrace));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent EmailSendingFailureMail");
+		
+		
+	}
+	
+	@Override
+	public void sendRetryChargeEmail(String recipientMailId,String displayName,String retries) throws InvalidInputException, UndeliveredEmailException {
+			
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending retry charge mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending retry charge mail ");
+		}
+		
+		LOG.info("Sending retry charge email to : " + recipientMailId);
+
+		
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,retries,String.valueOf(maxPaymentRetries)));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent retry charge mail");
+		
+	}
+	
+	@Override
+	public void sendRetryExhaustedEmail(String recipientMailId,String displayName) throws InvalidInputException, UndeliveredEmailException {
+			
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
+		}
+		
+		LOG.info("Sending retries exhausted email to : " + recipientMailId);
+
+		
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRIES_EXHAUSTED_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent retries exhausted mail");
+		
 	}
 
 }

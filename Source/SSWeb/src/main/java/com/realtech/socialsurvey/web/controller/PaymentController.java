@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -104,6 +105,11 @@ public class PaymentController {
 			catch (InvalidInputException e) {
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			catch (PaymentException e){
+				LOG.error("PaymentController subscribeForPlan() : Payment Exception thrown : " + e.getMessage(), e);
+				throw new PaymentException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+
 			}
 			if (status) {
 				LOG.info("Subscription Successful!");

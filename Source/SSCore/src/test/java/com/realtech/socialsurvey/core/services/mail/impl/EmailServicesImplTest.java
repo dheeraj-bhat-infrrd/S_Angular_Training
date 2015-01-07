@@ -1,10 +1,12 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
+import org.junit.BeforeClass;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.rules.TestRule;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import com.realtech.socialsurvey.core.commons.InitializeJNDI;
+import com.realtech.socialsurvey.core.commons.SpringContextRule;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -14,16 +16,22 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 /**
  * Test cases for EmailServices
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration("file:src/main/resources/sscore-beans.xml")
 public class EmailServicesImplTest {
 
+	@Rule
+	public TestRule springRule = new SpringContextRule(new String[]{"file:src/main/resources/sscore-beans.xml"}, this);
+	
 	@Autowired
 	EmailServices emailServices;
 
+	@BeforeClass
+	public static void setUp() throws Exception{
+		InitializeJNDI.initializeJNDIforTest();
+	}
+	
 	@Test
 	public void testSendRegistrationInviteMail() throws InvalidInputException, UndeliveredEmailException {
-		emailServices.sendRegistrationInviteMail("http://localhost:8080/socialsurvey", "bhumika@raremile.com", "bhumika", "mishra");
+		emailServices.sendRegistrationInviteMail("http://localhost:8080/socialsurvey", "nishit@raremile.com", "nishit", "kannan");
 	}
 
 	@Test(expected = InvalidInputException.class)

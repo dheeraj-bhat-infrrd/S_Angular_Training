@@ -74,6 +74,6 @@
 </style>
 <script>
 	$(document).ready(function(){ 
-				
+		initUserManagementPage();		
 	});
 </script>
