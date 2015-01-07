@@ -33,7 +33,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUns
  * This is the custom item processor class that processes the LicenseDetail table.
  */
 @Component
-public class CustomItemProcessor implements ItemProcessor<LicenseDetail, Map<String, Object>> {
+public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail, Map<String, Object>> {
 
 	private Timestamp now = new Timestamp(System.currentTimeMillis());
 
@@ -66,7 +66,7 @@ public class CustomItemProcessor implements ItemProcessor<LicenseDetail, Map<Str
 	
 	private Map<String, Object> writerObjectsMap;
 
-	private static final Logger LOG = LoggerFactory.getLogger(CustomItemProcessor.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PaymentRetriesItemProcessor.class);
 
 	private User getCorporateAdmin(Company company) throws InvalidInputException, NoRecordsFetchedException {
 
