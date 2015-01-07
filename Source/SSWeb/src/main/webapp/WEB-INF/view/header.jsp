@@ -48,7 +48,7 @@
 			<div class="header-logo float-left"></div>
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
+					<a href="#"><spring:message
 							code="label.header.dashboard.key" /></a>
 				</div>
 				<div class="header-links-item">
@@ -56,11 +56,11 @@
 							code="label.header.company.key" /></a>
 				</div>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
+					<a href="#"><spring:message
 							code="label.header.buildsurvey.key" /></a>
 				</div>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
+					<a href="#"><spring:message
 							code="label.header.usermanagement.key" /></a>
 				</div>
 				<!-- To be removed: BOC -->
