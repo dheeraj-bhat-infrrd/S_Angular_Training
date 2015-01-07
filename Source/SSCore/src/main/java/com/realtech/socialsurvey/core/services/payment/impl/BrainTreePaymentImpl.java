@@ -57,7 +57,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private GenericDao<LicenseDetail, Long> licenseDetailDao;
 
 	@Autowired
-	private GenericDao<AccountsMaster, Long> accountsMasterDao;
+	private GenericDao<AccountsMaster, Integer> accountsMasterDao;
 
 	@Autowired
 	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
@@ -105,7 +105,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param userId
 	 * @throws InvalidInputException
 	 */
-	private void updateLicenseTable(Long accountsMasterId, Company company, long userId, String subscriptionId) throws InvalidInputException {
+	private void updateLicenseTable(int accountsMasterId, Company company, long userId, String subscriptionId) throws InvalidInputException {
 
 		if (accountsMasterId <= 0) {
 			LOG.error("updateLicenseTable : first parameter is invalid");
@@ -323,7 +323,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 */
 	@Override
 	@Transactional
-	public boolean subscribe(User user, Company company, Long planId, String nonce) throws InvalidInputException, PaymentException {
+	public boolean subscribe(User user, Company company, int planId, String nonce) throws InvalidInputException, PaymentException {
 
 		boolean result = false;
 		String subscriptionId = null;
