@@ -8,4 +8,8 @@
 	$('#logout-section').click(function(e) {
 		logoutuser();
 	});
+	
+	$('#company-setting').click(function(e) {
+		showMainContent('./showcompanysettings.do');
+	});
 	</script>
