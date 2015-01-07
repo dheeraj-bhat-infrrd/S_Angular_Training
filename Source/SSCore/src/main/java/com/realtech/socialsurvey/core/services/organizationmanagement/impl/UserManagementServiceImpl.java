@@ -878,6 +878,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		queries.clear();
 		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
+			LOG.info("IN getBranchesForUser() for company {}"+user.getCompany().getCompany()); 
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
 		}
 		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -885,7 +886,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
 		}
 		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-			queries.put("companyId", user.getCompany().getCompanyId());
+			queries.put("company", user.getCompany());
 			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
 			queries.put("branch", branchDao.findById(Branch.class, highestUserProfile.getBranchId()));
 		}
@@ -893,16 +894,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
 	}
-	
+
 	/**
-	 * Sends an email to user with the link to complete registration.
-	 * User has to provide password to set. Also, user can choose to change name.
+	 * Sends an email to user with the link to complete registration. User has to provide password
+	 * to set. Also, user can choose to change name.
 	 * 
 	 * @param emailId
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException {
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException,
+			UndeliveredEmailException {
 
 		LOG.info("Method to send profile completion link to the user started.");
 		Map<String, String> urlParams = new HashMap<String, String>();
@@ -914,7 +916,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE);
 
 		// Send reset password link to the user email ID
-		emailServices.sendRegistrationCompletionEmail(url, emailId, firstName+" "+lastName);
+		emailServices.sendRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
 	}
 
 	/*
@@ -965,7 +967,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Override
 	@Transactional
-	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException,InvalidInputException {
+	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException {
 		if (user == null) {
 			LOG.error("No user passed");
 			throw new InvalidInputException("No user passed");
@@ -1225,17 +1227,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	private boolean userExists(String userName) {
 		LOG.debug("Method to check if user exists called for username : " + userName);
+		boolean isUserPresent = false;
 		try {
-			List<User> users = userDao.findByColumn(User.class, CommonConstants.USER_LOGIN_NAME_COLUMN, userName);
-			if (!users.isEmpty() && users != null)
-				return true;
+			userDao.getActiveUser(userName);
+			isUserPresent = true;
 		}
-		catch (DatabaseException databaseException) {
-			LOG.error("Exception caught in method userExists() while trying to fetch list of users with same username.", databaseException);
-			return false;
+		catch (NoRecordsFetchedException e) {
+			LOG.debug("No user found with the user name " + userName);
+			return isUserPresent;
 		}
 		LOG.debug("Method to check if user exists finished for username : " + userName);
-		return false;
+		return isUserPresent;
 	}
 
 	/*

@@ -90,6 +90,7 @@ public class PaymentController {
 			// Get the user object from the session and the company object from it
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			Company company = user.getCompany();
+			AccountType accountType = null;
 
 			int accountTypeValue = 0;
 			try {
@@ -106,19 +107,18 @@ public class PaymentController {
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			catch (PaymentException e){
+			catch (PaymentException e) {
 				LOG.error("PaymentController subscribeForPlan() : Payment Exception thrown : " + e.getMessage(), e);
 				throw new PaymentException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 
 			}
 			if (status) {
 				LOG.info("Subscription Successful!");
-				AccountType accountType = null;
 				try {
 					LOG.debug("Calling sevices for adding account type of company");
 					accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
 					LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
-					
+
 					LOG.debug("Adding account type in session");
 					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 					// get the settings
@@ -152,6 +152,9 @@ public class PaymentController {
 				LOG.info("Subscription Unsuccessful!");
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			}
+			if (accountType.getValue() == 1) {
+				model.addAttribute("userManagementNotAccessible", "true");
 			}
 		}
 		catch (NonFatalException e) {

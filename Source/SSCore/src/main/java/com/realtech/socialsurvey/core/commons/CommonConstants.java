@@ -107,6 +107,7 @@ public interface CommonConstants {
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	public static final String LOGIN_NAME="loginName";
 	
 	/**
 	 * Batch Constants
