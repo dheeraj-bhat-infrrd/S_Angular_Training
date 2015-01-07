@@ -282,5 +282,6 @@ $(document).ready(function(){
 	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
 	autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
+	autoSetReminderIntervalStatus();
 });
 </script>

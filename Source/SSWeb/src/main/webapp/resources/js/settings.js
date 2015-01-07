@@ -226,7 +226,7 @@ $('#edit-participation-reminder-mail-content').click(function(){
 	$(this).hide();
 });
 $('#save-participation-reminder-mail-content').click(function(){
-	$('#mailcategory').val('participationmail');
+	$('#mailcategory').val('participationremindermail');
 	updateMailContent("mail-body-settings-form");
 	
 	$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
@@ -245,6 +245,13 @@ $('#reminder-interval').change(function() {
 		updateReminderSettings("mail-body-settings-form");
 	}
 });
+function autoSetReminderIntervalStatus() {
+	if($('#reminder-needed-hidden').val() == 'true') {
+		$('#reminder-interval').attr("disabled", true);
+	} else if($('#reminder-needed-hidden').val() == 'false') {
+		$('#reminder-interval').removeAttr("disabled");
+	}
+}
 
 $('#st-reminder-on').click(function(){
 	$('#mailcategory').val('reminder-needed');
@@ -252,7 +259,8 @@ $('#st-reminder-on').click(function(){
 	$('#reminder-needed-hidden').val('false');
 	$('#st-reminder-off').show();
 	$(this).hide();
-	
+
+	$('#reminder-interval').removeAttr("disabled");
 	updateReminderSettings("mail-body-settings-form");
 });
 $('#st-reminder-off').click(function(){
@@ -262,6 +270,7 @@ $('#st-reminder-off').click(function(){
 	$('#st-reminder-on').show();
 	$(this).hide();
 	
+	$('#reminder-interval').attr("disabled", true);
 	updateReminderSettings("mail-body-settings-form");
 });
 
