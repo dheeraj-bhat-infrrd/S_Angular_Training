@@ -49,7 +49,7 @@ public class UserManagementController {
 
 	@Autowired
 	private AuthenticationService authenticationService;
-	
+
 	@Autowired
 	private URLGenerator urlGenerator;
 
@@ -102,7 +102,7 @@ public class UserManagementController {
 
 			HttpSession session = request.getSession(false);
 			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			AccountType accountType  = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			User user = null;
 			try {
 				if (userManagementService.isUserAdditionAllowed(admin)) {
@@ -116,12 +116,12 @@ public class UserManagementController {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName);
-						
-						//If account type is team assign user to default branch
-						if(accountType.getValue()  == 2){
+
+						// If account type is team assign user to default branch
+						if (accountType.getValue() == 2) {
 							List<Branch> branchList = userManagementService.getBranchesForUser(admin);
 							Branch defaultBranch = branchList.get(CommonConstants.INITIAL_INDEX);
-							//assign new user to default branch in case of team account type
+							// assign new user to default branch in case of team account type
 							userManagementService.assignUserToBranch(admin, user.getUserId(), defaultBranch.getBranchId());
 						}
 					}
@@ -160,9 +160,9 @@ public class UserManagementController {
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
 			HttpSession session = request.getSession(false);
-			AccountType accountType  = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			Long accountTypeVal = accountType.getValue();
-			model.addAttribute("accounttypeval",accountTypeVal);
+			model.addAttribute("accounttypeval", accountTypeVal);
 			if (userIdStr == null) {
 				LOG.error("Invalid user id passed in method findUserByUserId().");
 				throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
@@ -700,6 +700,28 @@ public class UserManagementController {
 			String encryptedUrlParameters = request.getParameter("q");
 			Map<String, String> urlParams = new HashMap<>();
 			User user = null;
+			
+			//check if any parameter passed is null
+			if(firstName == null || firstName.isEmpty()){
+				LOG.error("First name passed was null or empty");
+				throw new InvalidInputException("First name passed was null or empty", DisplayMessageConstants.INVALID_FIRSTNAME);
+			}
+			if(lastName == null || lastName.isEmpty()){
+				LOG.error("Last name passed was null or empty");
+				throw new InvalidInputException("Last name passed was null or empty", DisplayMessageConstants.INVALID_LASTNAME);
+			}
+			if(emailId == null || emailId.isEmpty()){
+				LOG.error("EmailId passed was null or empty");
+				throw new InvalidInputException("EmailId passed was null or empty", DisplayMessageConstants.INVALID_EMAILID);
+			}
+			if(password == null || password.isEmpty()){
+				LOG.error("Password passed was null or empty");
+				throw new InvalidInputException("Password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+			}
+			if(confirmPassword == null || confirmPassword.isEmpty()){
+				LOG.error("Confirm password passed was null or empty");
+				throw new InvalidInputException("Confirm password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+			}
 			// check if password and confirm password field match
 			if (!password.equals(confirmPassword)) {
 				LOG.error("Password and confirm password fields do not match");

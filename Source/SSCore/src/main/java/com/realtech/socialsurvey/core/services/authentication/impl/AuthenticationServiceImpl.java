@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -35,11 +36,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
 
-	private static final String USER_NAME = "loginName";
 	private static final String USER = "user";
-	private static final String EMAIL_ID = "emailId";
 	private static final String NAME = "name";
-
 	@Autowired
 	private URLGenerator urlGenerator;
 
@@ -50,7 +48,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private EmailServices emailServices;
 
 	@Autowired
-	private GenericDao<User, Integer> userDao;
+	private UserDao userDao;
 
 	@Autowired
 	private GenericDao<UserProfile, Integer> userProfileDao;
@@ -96,13 +94,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User getUserWithLoginName(String userName) throws NoRecordsFetchedException {
 		LOG.info("Fetching user object with userId : " + userName);
-		List<User> users = userDao.findByColumn(User.class, USER_NAME, userName);
-		// Check if user list returned is null or empty
-		if (users == null || users.isEmpty()) {
-			LOG.error("No Record found for the UserID : " + userName);
-			throw new NoRecordsFetchedException("No Record found for the user name : " + userName);
-		}
-		return users.get(0);
+		User user = userDao.getActiveUser(userName);
+		LOG.info("User found with the login name " + userName);
+		return user;
 	}
 
 	/**
@@ -130,7 +124,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException {
 		LOG.info("Verify whether the User is registered with the emailId");
-		List<User> users = userDao.findByColumn(User.class, EMAIL_ID, emailId);
+		List<User> users = userDao.findByColumn(User.class, CommonConstants.EMAIL_ID, emailId);
 		if (users == null || users.isEmpty()) {
 			LOG.error("No User object found with the passed emailId : " + emailId);
 			throw new InvalidInputException("Email ID not registered with us");
@@ -150,7 +144,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		LOG.info("Send a reset password link to the user");
 		Map<String, String> urlParams = new HashMap<String, String>();
-		urlParams.put(EMAIL_ID, emailId);
+		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 		urlParams.put(NAME, name);
 
 		LOG.info("Generating URL");
@@ -171,7 +165,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User getUserWithEmailId(String emailId) throws InvalidInputException {
 		LOG.info("Fetching user object with emailId : " + emailId);
-		List<User> users = userDao.findByColumn(User.class, EMAIL_ID, emailId);
+		List<User> users = userDao.findByColumn(User.class, CommonConstants.EMAIL_ID, emailId);
 		// Check if user list returned is null or empty
 		if (users == null || users.isEmpty()) {
 			LOG.error("No Record found for the UserID : " + emailId);

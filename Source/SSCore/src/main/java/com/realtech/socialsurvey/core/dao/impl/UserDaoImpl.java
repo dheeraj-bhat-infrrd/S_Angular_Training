@@ -86,39 +86,37 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 	 * Method to get count of active and unauthorized users belonging to a company.
 	 */
 	@Override
-	public long getUsersCountForCompany(Company company){
+	public long getUsersCountForCompany(Company company) {
 		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() started.");
-		
+
 		Criteria criteria = getSession().createCriteria(User.class);
 		try {
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY,company));
+			criteria.add(Restrictions.eq(CommonConstants.COMPANY, company));
 
-			Criterion criterion = Restrictions.or(
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
 					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED));
 			criteria.add(criterion);
 		}
 		catch (HibernateException hibernateException) {
 			throw new DatabaseException("Exception caught in getUsersCountForCompany() ", hibernateException);
 		}
-		
+
 		LOG.info("Method to get count of active and unauthorized users belonging to a company, getUsersCountForCompany() finished.");
 		return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
 	}
-	
+
 	/*
 	 * Method to get list of active and unauthorized users belonging to a company.
 	 */
 	@SuppressWarnings("unchecked")
 	@Override
-	public List<User> getUsersForCompany(Company company){
-		LOG.info("Method getUsersForCompany called to fetch list of users of company : " +company.getCompany());
+	public List<User> getUsersForCompany(Company company) {
+		LOG.info("Method getUsersForCompany called to fetch list of users of company : " + company.getCompany());
 		Criteria criteria = getSession().createCriteria(User.class);
 		try {
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY,company));
+			criteria.add(Restrictions.eq(CommonConstants.COMPANY, company));
 
-			Criterion criterion = Restrictions.or(
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
 					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
 					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
 			criteria.add(criterion);
@@ -128,8 +126,34 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		catch (HibernateException hibernateException) {
 			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);
 		}
-		LOG.info("Method getUsersForCompany finished to fetch list of users of company : " +company.getCompany());
+		LOG.info("Method getUsersForCompany finished to fetch list of users of company : " + company.getCompany());
 		return (List<User>) criteria.list();
+	}
+
+	/*
+	 * Method to check if any user exist with the email-id and is still active in a company
+	 */
+	@Override
+	public User getActiveUser(String emailId) throws NoRecordsFetchedException {
+		LOG.debug("Method checkIfAnyActiveUserExists() called to check if any active user present with the Email id : " + emailId);
+		Criteria criteria = getSession().createCriteria(User.class);
+		try {
+			criteria.add(Restrictions.eq(CommonConstants.LOGIN_NAME, emailId));
+			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED),
+					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_TEMPORARILY_INACTIVE));
+			criteria.add(criterion);
+		}
+		catch (HibernateException hibernateException) {
+			throw new DatabaseException("Exception caught in getUsersForCompany() ", hibernateException);
+		}
+		@SuppressWarnings("unchecked") List<User> users = criteria.list();
+		if (users == null || users.isEmpty()) {
+			LOG.debug("No active users found with the emaild id " + emailId);
+			throw new NoRecordsFetchedException("No active user found for the emailid");
+		}
+		LOG.debug("Method checkIfAnyActiveUserExists() successfull, active user with the emailId " + emailId);
+		return users.get(CommonConstants.INITIAL_INDEX);
 	}
 }
 // JIRA SS-42 By RM-05 EOC
