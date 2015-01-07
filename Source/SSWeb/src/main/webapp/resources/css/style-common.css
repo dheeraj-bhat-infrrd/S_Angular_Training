@@ -1686,3 +1686,32 @@ button.paypal.is-active {
 .st-dd-item:last-child {
     border-bottom: 0;
 }
+
+.complete-reg-main-wrapper{
+    min-height: 900px;
+}
+
+.hm-rt-btn-lnk{
+    color: #fff !important;
+}
+
+.icn-pen-blue{
+    background: url(../images/pen-blue.png) no-repeat center;
+}
+
+.icn-grey-tick{
+    background: url(../images/icnSave-Grey.png) no-repeat center;
+}
+
+.btn-disabled{
+    background-color: #999 !important;
+    color: #fff !important;
+}
+
+.header-links-item a{
+    color: #555 !important;
+}
+
+.header-links-item a:hover{
+    color: #555 !important;
+}

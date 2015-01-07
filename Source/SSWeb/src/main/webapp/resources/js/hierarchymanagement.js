@@ -266,10 +266,11 @@ function deleteRegionPopup(regionId) {
 	callAjaxPOST(urlCheck, deleteRegionCheckCallBack, true);
 }
 function deleteRegionCheckCallBack(response) {
-	$("#serverSideerror").html(response);
+	$("#overlay-txt").html(response);
+	$('.msg-err-icn').remove();
 
 	var success = "Selected Region could be deleted";
-	var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+	var successMsg = $("#overlay-txt").find('.success-message').text().trim();
 	if (success == successMsg) {
 		createPopupConfirm("Remove Region", "Are you Sure?");
 	} else {
@@ -286,10 +287,10 @@ function deleteBranchPopup(branchId) {
 	callAjaxPOST(urlCheck, deleteBranchCheckCallBack, true);
 }
 function deleteBranchCheckCallBack(response) {
-	$("#serverSideerror").html(response);
-	
+	$("#overlay-txt").html(response);
+	$('.msg-err-icn').remove();
 	var success = "Selected Branch could be deleted";
-	var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+	var successMsg = $("#overlay-txt").find('.success-message').text().trim();
 	if (success == successMsg) {
 		createPopupConfirm("Remove Branch", "Are you Sure?");
 	} else {
@@ -303,6 +304,7 @@ function createPopupConfirm(header, body) {
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
 	}
+	$('#overlay-continue').removeClass("btn-disabled");
 	$('#overlay-header').html(header);
 	$('#overlay-txt').html(body);
 
@@ -310,6 +312,7 @@ function createPopupConfirm(header, body) {
 }
 function createPopupInfo(header) {
 	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-continue').addClass("btn-disabled");
 	$('#overlay-header').html(header);
 	
    	$('#overlay-confirm').show();
@@ -317,7 +320,7 @@ function createPopupInfo(header) {
 $('#overlay-continue').click(function(){
 	if ($('#overlay-continue').attr("disabled") != "disabled") {
 		$('#overlay-confirm').hide();
-		$("#serverSideerror").html('');
+		$("#overlay-txt").html('');
 		
 		var regionIdDelete = $('#regionid-to-delete-hidden').val();
 		var branchIdDelete = $('#branchid-to-delete-hidden').val();
@@ -337,7 +340,7 @@ $('#overlay-cancel').click(function(){
 	$('#overlay-confirm').hide();
 	$('#regionid-to-delete-hidden').val('');
 	$('#branchid-to-delete-hidden').val('');
-	$("#serverSideerror").html('');
+	$("#overlay-txt").html('');
 });
 
 
