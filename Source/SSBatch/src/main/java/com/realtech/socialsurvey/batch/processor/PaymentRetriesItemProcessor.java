@@ -38,16 +38,10 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 	private Timestamp now = new Timestamp(System.currentTimeMillis());
 
 	@Autowired
-	private GenericDao<RetriedTransaction, Integer> retriedTransactionDao;
+	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
 
 	@Autowired
-	private GenericDao<LicenseDetail, Integer> licenseDetailDao;
-
-	@Autowired
-	private GenericDao<User, Integer> userDao;
-
-	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
 	private Payment paymentGateway;

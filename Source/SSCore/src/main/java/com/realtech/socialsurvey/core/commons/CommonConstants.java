@@ -116,6 +116,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_OBJECT_KEY = "LicenseDetailObject";
 	public static final String RETRIED_TRANSACTION_OBJECT_KEY = "RetriedTransactionObject";
 	public static final String COMPANY_OBJECT_KEY = "CompanyObject";
+	public static final String DISABLED_ACCOUNT_OBJECT_KEY = "DisabledAccountObject";
 
 	/**
 	 * other constants

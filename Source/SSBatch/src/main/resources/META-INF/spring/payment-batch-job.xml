@@ -19,7 +19,7 @@
 	</batch:job>
 	
 	<bean id="paymentRetriesItemReader"	class="org.springframework.batch.item.database.HibernateCursorItemReader">
-		<property name="queryString" value= "from LicenseDetail as l inner join fetch l.company where l.isSubscriptionDue=1 and l.status=1 and l.nextRetryTime &lt; current_timestamp" />
+		<property name="queryString" value= "from LicenseDetail as l inner join fetch l.company where l.isSubscriptionDue=1 and l.status=1 and l.nextRetryTime &lt; current_timestamp and l.company.status=1" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 
@@ -39,13 +39,11 @@
 	</batch:job>
 	
 	<bean id="unsubscribeAccountsItemReader" class="org.springframework.batch.item.database.HibernateCursorItemReader">
-		<property name="queryString" value= "from DisabledAccount as d inner join fetch d.company inner join fetch d.licenseDetail where d.status=1 and d.disableDate &lt; current_timestamp" />
+		<property name="queryString" value= "from DisabledAccount as d inner join fetch d.company inner join fetch d.licenseDetail where d.status=1 and d.disableDate &lt; current_timestamp and d.company.status=1" />
 		<property name="sessionFactory" ref="sessionFactory" />
 	</bean>
 	
-	<bean id="unsubscribeAccountsItemWriter" class="org.springframework.batch.item.database.HibernateItemWriter" >
-		<property name="sessionFactory" ref="sessionFactory" />
-	</bean>
+	<bean id="unsubscribeAccountsItemWriter" class="com.realtech.socialsurvey.batch.writer.UnsubscribeAccountsItemWriter"/>
 
 	<bean id="unsubscribeAccountsItemProcessor" class="com.realtech.socialsurvey.batch.processor.UnsubscribeAccountsItemProcessor" />	
 		

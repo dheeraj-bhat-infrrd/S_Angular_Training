@@ -91,7 +91,7 @@ public class PaymentController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			Company company = user.getCompany();
 
-			Long accountTypeValue = 0l;
+			long accountTypeValue = 0l;
 			try {
 				accountTypeValue = Long.parseLong(strAccountType);
 			}
