@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -82,6 +83,30 @@ public interface OrganizationManagementService {
 	public void updateCRMDetails(OrganizationUnitSettings companySettings, CRMInfo crmInfo) throws InvalidInputException;
 	
 	/**
+	 * Updates the SurveySettings in the UserSettings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public boolean updateSurveySettings(OrganizationUnitSettings companySettings, SurveySettings surveySettings) throws InvalidInputException;
+	
+	/**
+	 * Updates the LocationEnbling in the settings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public void updateLocationEnabled(OrganizationUnitSettings companySettings, boolean isLocationEnabled) throws InvalidInputException;
+
+	/**
+	 * Updates the AccountDisabled in the settings
+	 * @param companySettings
+	 * @param surveySettings
+	 * @throws InvalidInputException
+	 */
+	public void updateAccountDisabled(OrganizationUnitSettings companySettings, boolean isAccountDisabled) throws InvalidInputException;
+	
+	/**
 	 * Updates the mail body content for company settings
 	 * @param companySettings
 	 * @param mailBody
@@ -92,13 +117,20 @@ public interface OrganizationManagementService {
 	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException;
 
 	/**
-	 * Adds a Disabled Account record into the database
+	 * Adds a Disabled Account record in the database
 	 * @param companyId
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 */
-	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+	public void addDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 	
-	public void deleteDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException;
+	/**
+	 * Soft deletes a Disabled Account record in the database
+	 * @param companyId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException;
 }

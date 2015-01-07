@@ -115,8 +115,9 @@ public interface Payment {
 	 * @throws PaymentException
 	 * @throws InvalidInputException 
 	 */
-	public Timestamp getDisableDate(String subscriptionId) throws NoRecordsFetchedException, PaymentException, InvalidInputException;
-	
+	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException, InvalidInputException;
+
+
 	/**
 	 * Unsubscribes the user from the payment gateway
 	 * @param subscriptionId
@@ -124,4 +125,5 @@ public interface Payment {
 	 * @throws InvalidInputException 
 	 */
 	public void unsubscribe(String subscriptionId) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException;
+
 }
