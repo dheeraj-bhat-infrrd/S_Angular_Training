@@ -1686,3 +1686,7 @@ button.paypal.is-active {
 .st-dd-item:last-child {
     border-bottom: 0;
 }
+
+.complete-reg-main-wrapper{
+    min-height: 900px;
+}
