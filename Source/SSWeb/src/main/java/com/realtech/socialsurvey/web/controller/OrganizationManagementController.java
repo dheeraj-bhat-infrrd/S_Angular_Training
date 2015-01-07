@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -61,6 +62,9 @@ public class OrganizationManagementController {
 	@Autowired
 	private ImageUploadService logoUploadService;
 
+	@Autowired
+	private EncryptionHelper encryptionHelper;
+	
 	/**
 	 * Method to upload logo image for a company
 	 * 
@@ -288,11 +292,14 @@ public class OrganizationManagementController {
 
 		try {
 			testEncompassConnection(model, request);
-		
+			
+			// Encrypting the password
+			String cipherPassword = encryptionHelper.encryptAES(request.getParameter("encompass-password"),"");
+
 			CRMInfo crmInfo = new CRMInfo();
 			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
 			crmInfo.setCrm_username(request.getParameter("encompass-username"));
-			crmInfo.setCrm_password(request.getParameter("encompass-password"));
+			crmInfo.setCrm_password(cipherPassword);
 			crmInfo.setUrl(request.getParameter("encompass-url"));
 			crmInfo.setConnection_successful(true);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
@@ -374,7 +381,7 @@ public class OrganizationManagementController {
 		HttpSession session = request.getSession(false);
 		String mailCategory = request.getParameter("mailcategory");
 		String mailBody = null;
-		String message;
+		String message = "";
 		
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
@@ -391,7 +398,8 @@ public class OrganizationManagementController {
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
 				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
-			else {
+			
+			else if(mailCategory != null && mailCategory.equals("participationremindermail")){
 				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
 				if (mailBody == null || mailBody.isEmpty()) {
 					LOG.warn("Survey participation reminder mail body is blank.");
