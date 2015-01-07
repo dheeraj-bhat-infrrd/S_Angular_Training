@@ -18,7 +18,8 @@
 					</div>
 					<div class="um-item-row-icon"></div>
 					<div class="hm-item-row-right um-item-row-right">
-						<input type="text" id="um-fname" name="firstName" value="${firstName }" class="um-item-row-txt"
+						<input type="text" id="um-fname" name="firstName"
+							value="${firstName }" class="um-item-row-txt"
 							placeholder='<spring:message code="label.firstname.key"/>'>
 					</div>
 				</div>
@@ -30,7 +31,8 @@
 					</div>
 					<div class="um-item-row-icon"></div>
 					<div class="hm-item-row-right um-item-row-right">
-						<input type="text" id="um-lname" name="lastName" value="${lastName }" class="um-item-row-txt"
+						<input type="text" id="um-lname" name="lastName"
+							value="${lastName }" class="um-item-row-txt"
 							placeholder='<spring:message code="label.lastname.key" />'>
 					</div>
 				</div>
@@ -49,37 +51,44 @@
 						</c:otherwise>
 					</c:choose>
 					<div class="hm-item-row-right um-item-row-right">
-						<input type="text" id="um-emailid" name="emailId" value="${emailId }" class="um-item-row-txt"
+						<input type="text" id="um-emailid" name="emailId"
+							value="${emailId }" class="um-item-row-txt"
 							placeholder='<spring:message code="label.emailid.key" />'>
 					</div>
 				</div>
-				<div class="hm-item-row clearfix" id="um-assignto-con">
-					<div class="um-item-row-left text-right">
-						<spring:message code="label.assignto.key" />
-					</div>
+				<c:if test="${accounttypeval ne 2 }">
+					<div class="hm-item-row clearfix" id="um-assignto-con">
+						<div class="um-item-row-left text-right">
+							<spring:message code="label.assignto.key" />
+						</div>
 						<div class="um-item-row-icon icn-save"></div>
-					<div class="hm-item-row-right um-item-row-right">
-						<input type="text" class="um-item-row-txt" id="um-assignto"
-							placeholder='<spring:message code="label.assignto.key" />'>
+						<div class="hm-item-row-right um-item-row-right">
+							<input type="text" class="um-item-row-txt" id="um-assignto"
+								placeholder='<spring:message code="label.assignto.key" />'>
+						</div>
 					</div>
-				</div>
+				</c:if>
 			</div>
 		</div>
 		<!-- Populate all the assigned branches to the user -->
-		<c:choose>
-			<c:when test="${not empty assignedBranches}">
-				<div class="clearfix um-top-tag-wrapper margin-bottom-25" id="um-assigned-brach-container">
-					<c:forEach items="${assignedBranches}" var="branch">
-						<div class="um-tag-row float-left" id="branch-to-unassign-${branch.branchId}">
-							<div class="um-tag-item-wrapper clearfix">
-								<div class="um-tag-item-txt float-left">${branch.branch}</div>
-								<div class="um-tag-item-icn float-left"></div>
+		<c:if test="${accounttypeval ne 2 }">
+			<c:choose>
+				<c:when test="${not empty assignedBranches}">
+					<div class="clearfix um-top-tag-wrapper margin-bottom-25"
+						id="um-assigned-brach-container">
+						<c:forEach items="${assignedBranches}" var="branch">
+							<div class="um-tag-row float-left"
+								id="branch-to-unassign-${branch.branchId}">
+								<div class="um-tag-item-wrapper clearfix">
+									<div class="um-tag-item-txt float-left">${branch.branch}</div>
+									<div class="um-tag-item-icn float-left"></div>
+								</div>
 							</div>
-						</div>
-					</c:forEach>
-				</div>
-			</c:when>
-		</c:choose>
+						</c:forEach>
+					</div>
+				</c:when>
+			</c:choose>
+		</c:if>
 	</div>
 	<c:if test="${not empty searchedUser}">
 		<div class="clearfix um-top-status-wrapper margin-bottom-25">
@@ -111,37 +120,39 @@
 						class="um-top-status-text um-status-icon icn-status-red float-left cursor-pointer"></div>
 				</c:when>
 			</c:choose>
-			<div id="icon-user-delete" class="um-top-status-text um-status-icon icn-person-remove float-left cursor-pointer"></div>
+			<div id="icon-user-delete"
+				class="um-top-status-text um-status-icon icn-person-remove float-left cursor-pointer"></div>
 		</div>
 	</c:if>
 	<div class="um-bottom-row cleafix"></div>
 </div>
 <script>
-	
-	$('#icon-user-delete').click(function(){
+	$('#icon-user-delete').click(function() {
 		var userId = $(this).closest('.row').attr("id");
 		console.log("user id to delete : " + userId);
 		deleteUser(userId);
 	});
-	$('#icn-status-green').click(function(){
+	$('#icn-status-green').click(function() {
 		var userId = $(this).closest('.row').attr("id");
-		activateOrDeactivateUser(false,userId);
+		activateOrDeactivateUser(false, userId);
 	});
-	$('#icn-status-red').click(function(){
+	$('#icn-status-red').click(function() {
 		var userId = $(this).closest('.row').attr("id");
-		activateOrDeactivateUser(true,userId);
+		activateOrDeactivateUser(true, userId);
 	});
-	$('.um-tag-item-icn').click(function() {
-		var branchIdToUnassign = $(this).parent().parent().attr("id");
-		branchIdToUnassign = branchIdToUnassign.substr("branch-to-unassign-".length);
-		var userId = $(this).closest('.row').attr("id");
-		unassignUserFromBranch(userId, branchIdToUnassign);
-	});
-	
-	$('#um-assignto').click(function(){
+	$('.um-tag-item-icn').click(
+			function() {
+				var branchIdToUnassign = $(this).parent().parent().attr("id");
+				branchIdToUnassign = branchIdToUnassign
+						.substr("branch-to-unassign-".length);
+				var userId = $(this).closest('.row').attr("id");
+				unassignUserFromBranch(userId, branchIdToUnassign);
+			});
+
+	$('#um-assignto').click(function() {
 		$(this).parent().find('.um-branch-list').toggle();
 	});
-	
+
 	$(document).ready(function() {
 		var branchListHtml = $('#branch-list').html();
 		console.log(branchListHtml);
