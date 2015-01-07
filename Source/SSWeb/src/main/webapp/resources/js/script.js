@@ -641,6 +641,13 @@ function validateCompanyEnterpriseAddress1(elementId){
 	}
 }
 
-$('.user-info-initial').click(function(){
+
+$('.user-info-initial').click(function(e){
+    e.stopPropagation();
     $('.initial-dd-wrapper').slideToggle(200);
+});
+
+
+$('body').click(function(){
+    $('.initial-dd-wrapper').slideUp(200);
 });

@@ -24,22 +24,20 @@
 			<div id="header-links-slider"
 				class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
-							code="label.header.dashboard.key" /></a>
+					<a href="#"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
 							code="label.header.company.key" /></a>
 				</div>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
-							code="label.header.buildsurvey.key" /></a>
+					<a href="#"><spring:message code="label.header.buildsurvey.key" /></a>
 				</div>
 				<c:if test="${empty userManagementNotAccessible}">
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
-							code="label.header.usermanagement.key" /></a>
-				</div>
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
+								code="label.header.usermanagement.key" /></a>
+					</div>
 				</c:if>
 			</div>
 		</div>
@@ -50,22 +48,20 @@
 			<div class="header-logo float-left"></div>
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
-							code="label.header.dashboard.key" /></a>
+					<a href="#"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
 							code="label.header.company.key" /></a>
 				</div>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
-							code="label.header.buildsurvey.key" /></a>
+					<a href="#"><spring:message code="label.header.buildsurvey.key" /></a>
 				</div>
 				<c:if test="${empty userManagementNotAccessible}">
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
-							code="label.header.usermanagement.key" /></a>
-				</div>
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
+								code="label.header.usermanagement.key" /></a>
+					</div>
 				</c:if>
 				<!-- To be removed: BOC -->
 				<div class="header-links-item">
@@ -79,13 +75,13 @@
 					<span>${fn:substring(user.loginName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
 						<div class="initial-dd-item" id="profile-setting">
-						<spring:message code="label.profilesetting.key"/>
+							<spring:message code="label.profilesetting.key" />
 						</div>
 						<div class="initial-dd-item" id="account-setting">
-						<spring:message code="label.accountsetting.key"/>
+							<spring:message code="label.accountsetting.key" />
 						</div>
 						<div class="initial-dd-item" id="change-password">
-						<spring:message code="label.changepassword.key"/>
+							<spring:message code="label.changepassword.key" />
 						</div>
 						<div class="initial-dd-item" id="logout-section">
 							<spring:message code="label.logout.key" />
@@ -100,8 +96,8 @@
 						style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 
-			</div>			
-			<div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
+			</div>
+			<div id="header-menu-icn"
+				class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
-	
