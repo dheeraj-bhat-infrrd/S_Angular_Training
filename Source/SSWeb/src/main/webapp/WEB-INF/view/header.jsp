@@ -24,7 +24,7 @@
 			<div id="header-links-slider"
 				class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
+					<a href="#"><spring:message
 							code="label.header.dashboard.key" /></a>
 				</div>
 				<div class="header-links-item">
@@ -32,11 +32,11 @@
 							code="label.header.company.key" /></a>
 				</div>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
+					<a href="#"><spring:message
 							code="label.header.buildsurvey.key" /></a>
 				</div>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('')"><spring:message
+					<a href="#"><spring:message
 							code="label.header.usermanagement.key" /></a>
 				</div>
 			</div>
