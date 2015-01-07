@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -101,6 +102,7 @@ public class UserManagementController {
 
 			HttpSession session = request.getSession(false);
 			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			AccountType accountType  = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			User user = null;
 			try {
 				if (userManagementService.isUserAdditionAllowed(admin)) {
@@ -114,6 +116,14 @@ public class UserManagementController {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName);
+						
+						//If account type is team assign user to default branch
+						if(accountType.getValue()  == 2){
+							List<Branch> branchList = userManagementService.getBranchesForUser(admin);
+							Branch defaultBranch = branchList.get(CommonConstants.INITIAL_INDEX);
+							//assign new user to default branch in case of team account type
+							userManagementService.assignUserToBranch(admin, user.getUserId(), defaultBranch.getBranchId());
+						}
 					}
 				}
 				else {
@@ -149,6 +159,10 @@ public class UserManagementController {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
+			HttpSession session = request.getSession(false);
+			AccountType accountType  = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			Long accountTypeVal = accountType.getValue();
+			model.addAttribute("accounttypeval",accountTypeVal);
 			if (userIdStr == null) {
 				LOG.error("Invalid user id passed in method findUserByUserId().");
 				throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
