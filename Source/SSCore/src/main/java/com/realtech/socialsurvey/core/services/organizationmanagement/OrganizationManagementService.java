@@ -123,7 +123,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 */
-	public void addDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+	public void addDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 	
 	/**
 	 * Soft deletes a Disabled Account record in the database
@@ -132,5 +132,5 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 */
-	public void deleteDisabledAccount(Long companyId) throws InvalidInputException, NoRecordsFetchedException;
+	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException;
 }

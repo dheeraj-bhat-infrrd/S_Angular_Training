@@ -507,7 +507,7 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 
 			if (mailCategory != null && mailCategory.equals("reminder-interval")) {
-				Integer reminderInterval = Integer.parseInt(request.getParameter("reminder-interval"));
+				int reminderInterval = Integer.parseInt(request.getParameter("reminder-interval"));
 				if (reminderInterval == 0) {
 					LOG.warn("Reminder Interval is 0.");
 					throw new InvalidInputException("Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR);
@@ -527,7 +527,7 @@ public class OrganizationManagementController {
 			}
 
 			else if (mailCategory != null && mailCategory.equals("reminder-needed")) {
-				Boolean isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
+				boolean isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
 				
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
@@ -578,7 +578,7 @@ public class OrganizationManagementController {
 					.getCompanySettings();
 
 			if (otherCategory != null && otherCategory.equals("other-location")) {
-				Boolean isLocationEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
+				boolean isLocationEnabled = Boolean.parseBoolean(request.getParameter("other-location"));
 				organizationManagementService.updateLocationEnabled(companySettings, isLocationEnabled);
 
 				// set the updated settings value in session
@@ -588,7 +588,7 @@ public class OrganizationManagementController {
 			}
 			
 			else if (otherCategory != null && otherCategory.equals("other-account")) {
-				Boolean isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-account"));
+				boolean isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-account"));
 				
 				// Calling services to update DB
 				organizationManagementService.updateAccountDisabled(companySettings, isAccountDisabled);

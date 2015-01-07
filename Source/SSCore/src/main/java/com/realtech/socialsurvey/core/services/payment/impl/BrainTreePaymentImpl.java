@@ -720,13 +720,15 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	
 	/**
 	 * Returns the disable date timestamp for a subscription id.
+	 * Set the disable date to a day before the billing date
+	 * 
 	 * @param subscriptionId
 	 * @return
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 */
 	@Override
-	public Timestamp getDisableDate(String subscriptionId) throws NoRecordsFetchedException, PaymentException{
+	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException{
 		
 		if(subscriptionId == null || subscriptionId.isEmpty()){
 			LOG.error("Parameter given to getDisableDate is null or empty");
@@ -746,7 +748,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new PaymentException("getDisableDate(): Unexpected Exception occured while fetching disable date for subscription id : " + subscriptionId);		
 		}
 		
-		//We have to set the disable date to a day before the billing date. So we subtract the a day from the billing date.
+		// Set the disable date to a day before the billing date. So we subtract the a day from the billing date.
 		billingDate.add(Calendar.DATE, -1);
 		disableDate = new Timestamp(billingDate.getTimeInMillis());
 		
@@ -769,5 +771,4 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 		}
 	}
-
 }

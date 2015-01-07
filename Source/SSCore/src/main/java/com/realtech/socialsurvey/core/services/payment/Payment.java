@@ -113,5 +113,5 @@ public interface Payment {
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 */
-	public Timestamp getDisableDate(String subscriptionId) throws NoRecordsFetchedException, PaymentException;
+	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException;
 }

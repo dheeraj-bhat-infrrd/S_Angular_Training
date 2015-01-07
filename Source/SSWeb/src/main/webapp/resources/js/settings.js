@@ -204,6 +204,7 @@ $('#save-participation-mail-content').click(function(){
 		$('#mailcategory').val('participationmail');
 		updateMailContent("mail-body-settings-form");
 		$('#survey-participation-mailcontent').ckeditorGet().setReadOnly(true);
+		$('#save-participation-mail-content').attr("disabled", true);
 	}
 });
 
@@ -218,6 +219,7 @@ $('#save-participation-reminder-mail-content').click(function(){
 		$('#mailcategory').val('');
 		updateMailContent("mail-body-settings-form");
 		$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
+		$('#save-participation-reminder-mail-content').attr("disabled", true);
 	}
 });
 
