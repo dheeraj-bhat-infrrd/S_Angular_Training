@@ -44,13 +44,13 @@
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-fname"></div>
 							<input class="float-left login-wrapper-txt" id="complete-reg-fname"
-								data-non-empty="true" name="firstname" value="${firstname}"
+								data-non-empty="true" name="firstname" value="${firstName}"
 								placeholder='<spring:message code="label.firstname.key" />'>
 						</div>
                         <div id="complete-reg-page-firstname" class="input-error-2 margin-0-auto"></div>
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-lname"></div>
-							<input class="float-left login-wrapper-txt" id="complete-reg-lname" name="lastname" value="${lastname}"
+							<input class="float-left login-wrapper-txt" id="complete-reg-lname" name="lastname" value="${lastName}"
 								placeholder='<spring:message code="label.lastname.key" />'>
 						</div>
                         <div id="complete-reg-page-lastname" class="input-error-2 margin-0-auto"></div>
@@ -108,7 +108,7 @@
             function submitCompleteRegistrationForm() {
             	console.log("submitting complete registration form");
             	if(validateCompleteRegistrationForm('reset-pwd-form')){
-                	$('#reset-pwd-form').submit();
+                	$('#complet-registration-form').submit();
                 }
             }
             
