@@ -34,35 +34,52 @@ public interface UserManagementService {
 	public void inviteUserToRegister(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
 			UserAlreadyExistsException, UndeliveredEmailException;
 
+	// Method to invite a new user to register.
+	// Corporate Admin can send requests to new users to join the company.
 	public User inviteNewUser(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
 			UserAlreadyExistsException, UndeliveredEmailException;
-
+	
+	// Method to remove an existing user. Soft deletion is done.
 	public void removeExistingUser(User admin, long userIdToBeDeactivated) throws InvalidInputException;
 
+	// Method to remove profile of a branch admin.
 	public void unassignBranchAdmin(User admin, long branchId, long userIdToRemove) throws InvalidInputException;
 
+	// Method to remove profile of a region admin.
 	public void unassignRegionAdmin(User admin, long regionId, long userIdToRemove) throws InvalidInputException;
 
+	// Method to return users with provided email id.
 	public User getUserByEmailId(User admin, String emailId) throws InvalidInputException, NoRecordsFetchedException;
 
+	// Method to return users whose email id matches with the provided email id.
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException;
 
+	// Method to check if new users can be added to the current compeny or limit for the same is exhausted.
 	public boolean isUserAdditionAllowed(User user) throws NoRecordsFetchedException;
 
+	// Method to get User object for the given user id.
 	public User getUserByUserId(long userId);
 
+	// Method to get list of the branches assigned to the given user.
 	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException;
 
+	// Method to return list of users belonging to the same company as that of user passed.
 	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException;
 
+	// Method to assign a user to a particular branch.
 	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException;
 
+	// Method to unassign a user from branch.
 	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException;
 
+	// Method to update status of the given user as active or inactive.
 	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
 
+	// Method to get list of all the branches, current user is admin of.
 	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException;
 	
+	/* Sends an email to user with the link to complete registration.
+	 User has to provide password to set. Also, user can choose to change name.*/
 	void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException;
 
 	// JIRA SS-42 BY RM05 EOC
