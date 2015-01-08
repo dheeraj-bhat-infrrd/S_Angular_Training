@@ -19,19 +19,19 @@ import com.amazonaws.services.s3.model.PutObjectResult;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.upload.AmazonUploadService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 @Component
-public class AmazonUploadServiceImpl implements AmazonUploadService {
+public class CloudUploadServiceImpl implements FileUploadService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(AmazonUploadServiceImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(CloudUploadServiceImpl.class);
 
 	@Autowired
 	private PropertyFileReader propertyFileReader;
-	
+
 	@Autowired
 	private EncryptionHelper encryptionHelper;
 
@@ -47,28 +47,26 @@ public class AmazonUploadServiceImpl implements AmazonUploadService {
 				File convFile = new File(fileLocal.getOriginalFilename());
 				fileLocal.transferTo(convFile);
 				uploadUtils.validateFile(convFile);
-				
+
 				String endpoint = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ENDPOINT);
 				String bucket = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_BUCKET);
 				String envPrefix = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ENV_PREFIX);
-				
+
 				StringBuilder amazonFileName = new StringBuilder(envPrefix).append("-");
-				amazonFileName.append(encryptionHelper.encryptSHA512(logoName+(System.currentTimeMillis())));
+				amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
 				amazonFileName.append(logoName.substring(logoName.lastIndexOf(".")));
-				
+
 				PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, amazonFileName.toString(), convFile);
 				ObjectMetadata metadata = new ObjectMetadata();
 				metadata.setCacheControl("public");
 				putObjectRequest.setMetadata(metadata);
 				putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 				AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
-				
+
 				PutObjectResult result = s3Client.putObject(putObjectRequest);
 				LOG.info("Amazon Upload Etag: " + result.getETag());
-				
-				String fileUrl = endpoint + "/" + bucket + "/" + amazonFileName.toString();
-				LOG.info("Amazon file URL: " + fileUrl);
-				return fileUrl;
+				LOG.info("Amazon file URL: " + amazonFileName.toString());
+				return amazonFileName.toString();
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
@@ -95,9 +93,9 @@ public class AmazonUploadServiceImpl implements AmazonUploadService {
 		AmazonS3 s3Client = new AmazonS3Client(credentials);
 		s3Client.setRegion(region);
 		s3Client.setEndpoint(endpoint);
-		
+
 		if (!s3Client.doesBucketExist(bucket)) {
-			throw new FatalException("Bucket for Logo upload does not exists"); 
+			throw new FatalException("Bucket for Logo upload does not exists");
 		}
 		LOG.debug("Returning Amazon S3 Client");
 		return s3Client;
