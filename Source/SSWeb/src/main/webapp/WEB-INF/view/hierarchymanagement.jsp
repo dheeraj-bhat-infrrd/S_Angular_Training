@@ -203,24 +203,6 @@
         </c:choose>
 	</div>
 </div>
-<div class="overlay-disable hide" id="overlay-confirm">
-	<div class="overlay-disable-wrapper">
-		<div class="ol-header" id="overlay-header"></div>
-		<input type="hidden" name="regionid-to-delete-hidden" id="regionid-to-delete-hidden" />
-		<input type="hidden" name="branchid-to-delete-hidden" id="branchid-to-delete-hidden" />
-		<div class="ol-content">
-			<div class="ol-txt" id="overlay-txt"></div>
-			<div class="clearfix">
-				<div class="float-left ol-btn-wrapper">
-					<div id="overlay-continue" class="ol-btn cursor-pointer">Continue</div>
-				</div>
-				<div class="float-left ol-btn-wrapper">
-					<div id="overlay-cancel" class="ol-btn cursor-pointer">Cancel</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/hierarchymanagement.js"></script>
 <script>
