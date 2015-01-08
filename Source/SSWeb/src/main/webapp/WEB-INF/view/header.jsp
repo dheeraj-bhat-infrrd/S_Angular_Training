@@ -105,7 +105,7 @@
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo"
-						style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+						style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 
 			</div>			

@@ -1,18 +1,17 @@
 package com.realtech.socialsurvey.core.services.upload;
 
-import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 /**
- * Holds methods to upload image to the application
+ * Holds methods to upload file to the application server
  */
-public interface ImageUploadService {
+public interface FileUploadService {
 
 	/**
 	 * uploads image to server path specified
 	 * 
-	 * @throws IOException
+	 * @throws InvalidInputException
 	 */
-	public String imageUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException;
+	public String fileUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException;
 }
