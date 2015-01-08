@@ -29,7 +29,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.upload.AmazonUploadService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -60,7 +60,7 @@ public class OrganizationManagementController {
 	private Payment gateway;
 
 	@Autowired
-	private AmazonUploadService fileUploadService;
+	private FileUploadService fileUploadService;
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
@@ -75,15 +75,15 @@ public class OrganizationManagementController {
 	@RequestMapping(value = "/uploadcompanylogo", method = RequestMethod.POST)
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
-		String logoUrl = "";
+		String logoName = "";
 
 		LOG.debug("Overriding Logo image name in Session");
-		if (request.getSession(false).getAttribute(CommonConstants.LOGO_URL) != null) {
-			request.getSession(false).removeAttribute(CommonConstants.LOGO_URL);
+		if (request.getSession(false).getAttribute(CommonConstants.LOGO_NAME) != null) {
+			request.getSession(false).removeAttribute(CommonConstants.LOGO_NAME);
 		}
 
 		try {
-			logoUrl = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
+			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
@@ -92,7 +92,7 @@ public class OrganizationManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.debug("Setting Logo image name to Session");
-		request.getSession(false).setAttribute(CommonConstants.LOGO_URL, logoUrl);
+		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
 
 		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
 		return JspResolver.MESSAGE_HEADER;
@@ -120,19 +120,19 @@ public class OrganizationManagementController {
 
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			String logoUrl = null;
-			if (session.getAttribute(CommonConstants.LOGO_URL) != null) {
-				logoUrl = session.getAttribute(CommonConstants.LOGO_URL).toString();
+			String logoName = null;
+			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
+				logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
 			}
-			session.removeAttribute(CommonConstants.LOGO_URL);
+			session.removeAttribute(CommonConstants.LOGO_NAME);
 
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
 			companyDetails.put(CommonConstants.ADDRESS, address);
 			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
-			if (logoUrl != null) {
-				companyDetails.put(CommonConstants.LOGO_URL, logoUrl);
+			if (logoName != null) {
+				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
 			}
 
 			LOG.debug("Calling services to add company details");

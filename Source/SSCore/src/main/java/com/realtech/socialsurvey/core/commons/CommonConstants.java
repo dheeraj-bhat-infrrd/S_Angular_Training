@@ -138,7 +138,7 @@ public interface CommonConstants {
 	public static final String MAX_LOGO_HEIGHT_PIXELS = "MAX_LOGO_HEIGHT_PIXELS";
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
-	public static final String LOGO_URL = "logoUrl";
+	public static final String LOGO_NAME = "logoName";
 
 	/**
 	 * Amazon Details
