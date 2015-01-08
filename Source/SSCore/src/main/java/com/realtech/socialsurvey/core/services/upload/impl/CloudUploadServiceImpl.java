@@ -73,7 +73,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 
 				PutObjectResult result = s3Client.putObject(putObjectRequest);
 				LOG.info("Amazon Upload Etag: " + result.getETag());
-				LOG.info("Amazon file URL: " + amazonFileName.toString());
+				LOG.info("Amazon file Name: " + amazonFileName.toString());
 				return amazonFileName.toString();
 			}
 			catch (IOException e) {
