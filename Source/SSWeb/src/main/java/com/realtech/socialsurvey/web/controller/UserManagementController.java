@@ -66,7 +66,6 @@ public class UserManagementController {
 			LOG.error("Inactive or unauthorized users can not access user management page");
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
 		}
 		List<Branch> branches = null;
 		try {
@@ -84,7 +83,6 @@ public class UserManagementController {
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
 		}
 		return JspResolver.USER_MANAGEMENT;
 	}

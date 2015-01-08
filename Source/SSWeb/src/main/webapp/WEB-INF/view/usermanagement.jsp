@@ -1,6 +1,9 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page isELIgnored="false"%>
+<div id="server-message" class="hide">
+	<jsp:include page="messageheader.jsp"></jsp:include>
+</div>
 <div class="overlay-disable hide">
     <div class="overlay-disable-wrapper">
         <div class="ol-header">Disable Account</div>
@@ -89,7 +92,11 @@
 	}
 </style>
 <script>
-	$(document).ready(function(){ 
+	$(document).ready(function(){
+		if($('#server-message>div').hasClass("error-message")){
+			var errorMessage = $('#server-message').text();
+			alert(errorMessage);
+		}
 		initUserManagementPage();		
 	});
 </script>
