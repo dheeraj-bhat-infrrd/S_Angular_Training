@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -31,10 +32,18 @@ public class SessionHelper {
 	
 	@Autowired
 	private FileOperations fileOperations;
+	
 	@Autowired
 	private UserManagementService userManagementService;
+	
 	@Autowired
 	private PropertyFileReader propertyFileReader;
+
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
 
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException{
 		LOG.info("Getting canonical settings");
@@ -64,11 +73,7 @@ public class SessionHelper {
 		// check if company has a logo
 		if (userSettings.getCompanySettings().getLogo() != null) {
 			LOG.debug("Settings logo image from company settings");
-			
-			String endpoint = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ENDPOINT);
-			String bucket = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_BUCKET);
 			String logoUrl = endpoint + "/" + bucket + "/" + userSettings.getCompanySettings().getLogo();
-			
 			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
 		}
 		else {
