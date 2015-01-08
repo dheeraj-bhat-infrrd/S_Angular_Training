@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.auth.BasicAWSCredentials;
@@ -16,13 +17,11 @@ import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
-import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 @Component
 public class CloudUploadServiceImpl implements FileUploadService {
@@ -30,13 +29,25 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	private static final Logger LOG = LoggerFactory.getLogger(CloudUploadServiceImpl.class);
 
 	@Autowired
-	private PropertyFileReader propertyFileReader;
-
-	@Autowired
 	private EncryptionHelper encryptionHelper;
 
 	@Autowired
 	private UploadUtils uploadUtils;
+
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
+
+	@Value("${AMAZON_ENV_PREFIX}")
+	private String envPrefix;
+
+	@Value("${AMAZON_ACCESS_KEY}")
+	private String accessKey;
+
+	@Value("${AMAZON_SECRET_KEY}")
+	private String secretKey;
 
 	@Override
 	public String fileUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException {
@@ -47,10 +58,6 @@ public class CloudUploadServiceImpl implements FileUploadService {
 				File convFile = new File(fileLocal.getOriginalFilename());
 				fileLocal.transferTo(convFile);
 				uploadUtils.validateFile(convFile);
-
-				String endpoint = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ENDPOINT);
-				String bucket = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_BUCKET);
-				String envPrefix = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ENV_PREFIX);
 
 				StringBuilder amazonFileName = new StringBuilder(envPrefix).append("-");
 				amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
@@ -84,9 +91,6 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	 */
 	private AmazonS3 createAmazonClient(String endpoint, String bucket) {
 		LOG.debug("Creating Amazon S3 Client");
-		String accessKey = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ACCESS_KEY);
-		String secretKey = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_SECRET_KEY);
-
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		Region region = Region.getRegion(Regions.US_WEST_1);
 
