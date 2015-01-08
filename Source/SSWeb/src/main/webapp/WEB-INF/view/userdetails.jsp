@@ -21,6 +21,7 @@
 						<input type="text" id="um-fname" name="firstName"
 							value="${firstName }" class="um-item-row-txt"
 							placeholder='<spring:message code="label.firstname.key"/>'>
+						<div id="um-fname-error" class="input-error-2 error-msg"></div>
 					</div>
 				</div>
 			</div>
@@ -34,6 +35,7 @@
 						<input type="text" id="um-lname" name="lastName"
 							value="${lastName }" class="um-item-row-txt"
 							placeholder='<spring:message code="label.lastname.key" />'>
+						<div id="um-lname-error" class="input-error-2 error-msg"></div>
 					</div>
 				</div>
 			</div>
@@ -54,7 +56,9 @@
 						<input type="text" id="um-emailid" name="emailId"
 							value="${emailId }" class="um-item-row-txt"
 							placeholder='<spring:message code="label.emailid.key" />'>
+						<div id="um-emailid-error" class="input-error-2 error-msg"></div>
 					</div>
+
 				</div>
 				<c:if test="${accounttypeval ne 2 }">
 					<div class="hm-item-row clearfix" id="um-assignto-con">
@@ -126,27 +130,85 @@
 	</c:if>
 	<div class="um-bottom-row cleafix"></div>
 </div>
+<style>
+.error-msg {
+	width: auto !important;
+	margin-top: 5px !important;
+}
+
+.hm-item-row-right {
+	min-height: 90px;
+}
+
+.hm-item-row {
+	margin: 0 auto;
+}
+</style>
 <script>
+	$('#um-fname').blur(function() {
+		validateUserFirstName();
+	});
+	$('#um-fname').blur(function() {
+		validateUserLastName();
+	});
+	$('#um-fname').blur(function() {
+		validateUserEmailId();
+	});
+	$('#um-assignto').keyup(function() {
+		$(this).removeAttr("brachid");
+	});
 	$('#icon-user-delete').click(function() {
 		var userId = $(this).closest('.row').attr("id");
 		console.log("user id to delete : " + userId);
-		deleteUser(userId);
+		var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
+		if(userId == adminId){
+			alert("Can not delete the admin account");
+			return false;
+		}
+		$('.overlay-disable').show();
+		$('.ol-header').html("Delete User");
+		$('.ol-txt').html("Are you sure you want to delete user??");
+		$('#ol-btn-continue').attr("onclick", "deleteUser('" + userId + "');");
 	});
-	$('#icn-status-green').click(function() {
-		var userId = $(this).closest('.row').attr("id");
-		activateOrDeactivateUser(false, userId);
-	});
-	$('#icn-status-red').click(function() {
-		var userId = $(this).closest('.row').attr("id");
-		activateOrDeactivateUser(true, userId);
-	});
+	$('#icn-status-green')
+			.click(
+					function() {
+						var userId = $(this).closest('.row').attr("id");
+						$('.overlay-disable').show();
+						$('.ol-header').html("Deactivate User");
+						$('.ol-txt').html(
+								"Are you sure you want to deactivate user??");
+						$('#ol-btn-continue').attr(
+								"onclick",
+								"activateOrDeactivateUser(" + false + ", "
+										+ userId + ");");
+					});
+	$('#icn-status-red').click(
+			function() {
+				var userId = $(this).closest('.row').attr("id");
+				$('.overlay-disable').show();
+				$('.ol-header').html("Activate User");
+				$('.ol-txt').html("Are you sure you want to activate user??");
+				$('#ol-btn-continue').attr(
+						"onclick",
+						"activateOrDeactivateUser(" + true + ", " + userId
+								+ ");");
+			});
 	$('.um-tag-item-icn').click(
 			function() {
 				var branchIdToUnassign = $(this).parent().parent().attr("id");
 				branchIdToUnassign = branchIdToUnassign
 						.substr("branch-to-unassign-".length);
 				var userId = $(this).closest('.row').attr("id");
-				unassignUserFromBranch(userId, branchIdToUnassign);
+				$('.overlay-disable').show();
+				$('.ol-header').html("Remove user from branch");
+				$('.ol-txt').html(
+						"Are you sure you want to remove user from branch??");
+				$('#ol-btn-continue').attr(
+						"onclick",
+						"unassignUserFromBranch(" + userId + ","
+								+ branchIdToUnassign + ");");
+
 			});
 
 	$('#um-assignto').click(function() {
