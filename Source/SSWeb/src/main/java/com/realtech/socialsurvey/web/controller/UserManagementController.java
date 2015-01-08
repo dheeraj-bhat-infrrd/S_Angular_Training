@@ -108,7 +108,7 @@ public class UserManagementController {
 				if (userManagementService.isUserAdditionAllowed(admin)) {
 					try {
 						user = userManagementService.getUserByEmailId(admin, emailId);
-						LOG.debug("User already exists with the email id : " + emailId);
+						LOG.debug("User already exists in the company with the email id : " + emailId);
 						model.addAttribute("existingUserId", user.getUserId());
 						throw new UserAlreadyExistsException("User already exists with the email id : " + emailId);
 					}
