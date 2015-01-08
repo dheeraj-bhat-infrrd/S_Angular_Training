@@ -306,17 +306,33 @@ $('#st-settings-payment-off').click(function(){
 
 
 $('#st-settings-account-on').click(function(){
-	$('#othercategory').val('other-account');
 	$('#other-account').val('false');
-	
 	createPopupConfirm("Enable Account", "Do you want to Continue?");
+	overlayAccount();
 });
 $('#st-settings-account-off').click(function(){
-	$('#othercategory').val('other-account');
 	$('#other-account').val('true');
-
 	createPopupConfirm("Disable Account", "You will not be able to access the application after your billing cycle.<br/> Do you want to Continue?");
+	overlayAccount();
 });
+function overlayAccount(){
+	$('#othercategory').val('other-account');
+
+	$('#overlay-continue').click(function(){
+		$('#st-settings-account-off').toggle();
+		$('#st-settings-account-on').toggle();
+
+		overlayRevert();
+		updateOtherSettings("other-settings-form");
+		$('#othercategory').val('');
+		$('#overlay-continue').unbind('click');
+	});
+	$('#overlay-cancel').click(function(){
+		$('#overlay-continue').unbind('click');
+		overlayRevert();
+		$('#othercategory').val('');
+	});
+}
 
 function createPopupConfirm(header, body) {
 	$('#overlay-header').html(header);
@@ -324,20 +340,15 @@ function createPopupConfirm(header, body) {
 	$('#overlay-continue').html("Ok");
 	$('#overlay-cancel').html("Cancel");
 
-	$('#overlay-confirm').show();
+	$('#overlay-main').show();
 }
-$('#overlay-continue').click(function(){
-	$('#st-settings-account-off').toggle();
-	$('#st-settings-account-on').toggle();
-
-	$('#overlay-confirm').hide();
+function overlayRevert() {
+	$('#overlay-main').hide();
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$("#overlay-header").html('');
 	$("#overlay-text").html('');
-	
-	updateOtherSettings("other-settings-form");
-	$('#othercategory').val('');
-});
-$('#overlay-cancel').click(function(){
-	$('#overlay-confirm').hide();
-	$("#overlay-text").html('');
-	$('#othercategory').val('');
-});
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
+}
