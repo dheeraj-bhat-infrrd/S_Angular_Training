@@ -260,89 +260,106 @@ function updateRegionCallBack(data) {
 
 // Region Delete popup overlay
 function deleteRegionPopup(regionId) {
-	$('#regionid-to-delete-hidden').val(regionId);
 	var urlCheck = "./checkbranchesinregion.do?regionId=" + regionId;
-	console.log("Check for deactivation url : " + urlCheck);
-	callAjaxPOST(urlCheck, deleteRegionCheckCallBack, true);
+	callAjaxPOST(urlCheck, function(response) {
+		deleteRegionCheckCallBack(response, regionId);
+	}, true);
 }
-function deleteRegionCheckCallBack(response) {
-	$("#overlay-txt").html(response);
+function deleteRegionCheckCallBack(response, regionId) {
+	$('#overlay-text').html(response);
 	$('.msg-err-icn').remove();
 
 	var success = "Selected Region could be deleted";
-	var successMsg = $("#overlay-txt").find('.success-message').text().trim();
+	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
-		createPopupConfirm("Remove Region", "Are you Sure?");
+		createPopupConfirm("Remove Region");
+		
+		$('#overlay-continue').click(function(){
+			if ($('#overlay-continue').attr("disabled") != "disabled") {
+				if(regionId != null) {
+					overlayRevert();
+					deleteRegion(regionId);
+					regionId = null;
+				}
+				$('#overlay-continue').unbind('click');
+			}
+		});
 	} else {
 		createPopupInfo("Remove Region");
+		regionId = null;
 	}
 }
 
 
 // Branch Delete popup overlay
 function deleteBranchPopup(branchId) {
-	$('#branchid-to-delete-hidden').val(branchId);
 	var urlCheck = "./checkusersinbranch.do?branchId=" + branchId;
-	console.log("Check for deactivation url : " + urlCheck);
-	callAjaxPOST(urlCheck, deleteBranchCheckCallBack, true);
+	callAjaxPOST(urlCheck, function(response) {
+		deleteBranchCheckCallBack(response, branchId);
+	}, true);
 }
-function deleteBranchCheckCallBack(response) {
-	$("#overlay-txt").html(response);
+function deleteBranchCheckCallBack(response, branchId) {
+	$("#overlay-text").html(response);
 	$('.msg-err-icn').remove();
 	var success = "Selected Branch could be deleted";
-	var successMsg = $("#overlay-txt").find('.success-message').text().trim();
+	var successMsg = $("#overlay-text").find('.success-message').text().trim();
 	if (success == successMsg) {
-		createPopupConfirm("Remove Branch", "Are you Sure?");
+		createPopupConfirm("Remove Branch");
+		
+		$('#overlay-continue').click(function(){
+			if ($('#overlay-continue').attr("disabled") != "disabled") {
+				if(branchId != null) {
+					overlayRevert();
+					deleteBranch(branchId);
+					branchId = null;
+				}
+				$('#overlay-continue').unbind('click');
+			}
+		});
 	} else {
 		createPopupInfo("Remove Branch");
+		branchId = null;
 	}
 }
 
 
 // Pop-up Overlay modifications
-function createPopupConfirm(header, body) {
+$('#overlay-cancel').click(function(){
+	$('#overlay-continue').unbind('click');
+	overlayRevert();
+	branchId = null;
+	regionId = null;
+});
+function createPopupConfirm(header) {
+	$('#overlay-header').html(header);
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
 	}
 	$('#overlay-continue').removeClass("btn-disabled");
-	$('#overlay-header').html(header);
-	$('#overlay-txt').html(body);
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
 
-	$('#overlay-confirm').show();
+	$('#overlay-main').show();
 }
 function createPopupInfo(header) {
+	$('#overlay-header').html(header);
 	$('#overlay-continue').attr("disabled", true);
 	$('#overlay-continue').addClass("btn-disabled");
-	$('#overlay-header').html(header);
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
 	
-   	$('#overlay-confirm').show();
+   	$('#overlay-main').show();
 }
-$('#overlay-continue').click(function(){
-	if ($('#overlay-continue').attr("disabled") != "disabled") {
-		$('#overlay-confirm').hide();
-		$("#overlay-txt").html('');
-		
-		var regionIdDelete = $('#regionid-to-delete-hidden').val();
-		var branchIdDelete = $('#branchid-to-delete-hidden').val();
-		if(regionIdDelete != "") {
-			deleteRegion(regionIdDelete);
-			$('#regionid-to-delete-hidden').val('');
-		} else if(branchIdDelete != "") {
-			deleteBranch(branchIdDelete);
-			$('#branchid-to-delete-hidden').val('');
-		}
-	}
-});
-$('#overlay-cancel').click(function(){
+function overlayRevert() {
+	$('#overlay-main').hide();
 	if ($('#overlay-continue').attr("disabled") == "disabled") {
 		$('#overlay-continue').removeAttr("disabled");
 	}
-	$('#overlay-confirm').hide();
-	$('#regionid-to-delete-hidden').val('');
-	$('#branchid-to-delete-hidden').val('');
-	$("#overlay-txt").html('');
-});
-
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
+}
 
 // Branch details validation
 var isBranchValid;
