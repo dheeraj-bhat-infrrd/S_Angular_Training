@@ -18,6 +18,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 /**
  * Manipulates the values in session
@@ -32,7 +33,9 @@ public class SessionHelper {
 	private FileOperations fileOperations;
 	@Autowired
 	private UserManagementService userManagementService;
-	
+	@Autowired
+	private PropertyFileReader propertyFileReader;
+
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException{
 		LOG.info("Getting canonical settings");
 		User user = (User)session.getAttribute(CommonConstants.USER_IN_SESSION);
@@ -61,7 +64,12 @@ public class SessionHelper {
 		// check if company has a logo
 		if (userSettings.getCompanySettings().getLogo() != null) {
 			LOG.debug("Settings logo image from company settings");
-			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, userSettings.getCompanySettings().getLogo());
+			
+			String endpoint = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_ENDPOINT);
+			String bucket = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.AMAZON_BUCKET);
+			String logoUrl = endpoint + "/" + bucket + "/" + userSettings.getCompanySettings().getLogo();
+			
+			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
 		}
 		else {
 			LOG.debug("Could not find logo settings in company. Checking in lower heirarchy.");
