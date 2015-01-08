@@ -875,6 +875,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		UserProfile highestUserProfile = null;
 		// get the highest user profile for the user
 		highestUserProfile = getHighestUserProfile(userProfiles);
+		highestProfilesMasterId = highestUserProfile.getProfilesMaster().getProfileId();
 		queries.clear();
 		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
