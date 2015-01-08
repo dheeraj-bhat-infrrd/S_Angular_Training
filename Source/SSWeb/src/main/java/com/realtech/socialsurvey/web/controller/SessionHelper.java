@@ -6,6 +6,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -18,6 +19,7 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.FileOperations;
+import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 /**
  * Manipulates the values in session
@@ -30,9 +32,19 @@ public class SessionHelper {
 	
 	@Autowired
 	private FileOperations fileOperations;
+	
 	@Autowired
 	private UserManagementService userManagementService;
 	
+	@Autowired
+	private PropertyFileReader propertyFileReader;
+
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
+
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException{
 		LOG.info("Getting canonical settings");
 		User user = (User)session.getAttribute(CommonConstants.USER_IN_SESSION);
@@ -61,7 +73,8 @@ public class SessionHelper {
 		// check if company has a logo
 		if (userSettings.getCompanySettings().getLogo() != null) {
 			LOG.debug("Settings logo image from company settings");
-			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, userSettings.getCompanySettings().getLogo());
+			String logoUrl = endpoint + "/" + bucket + "/" + userSettings.getCompanySettings().getLogo();
+			session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, logoUrl);
 		}
 		else {
 			LOG.debug("Could not find logo settings in company. Checking in lower heirarchy.");

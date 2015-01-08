@@ -29,7 +29,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.registration.RegistrationService;
-import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -60,7 +60,7 @@ public class OrganizationManagementController {
 	private Payment gateway;
 
 	@Autowired
-	private ImageUploadService logoUploadService;
+	private FileUploadService fileUploadService;
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
@@ -83,7 +83,7 @@ public class OrganizationManagementController {
 		}
 
 		try {
-			logoName = logoUploadService.imageUploadHandler(fileLocal, request.getParameter("logo_name"));
+			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
