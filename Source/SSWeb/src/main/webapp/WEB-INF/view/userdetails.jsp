@@ -49,7 +49,7 @@
 							<div class="um-item-row-icon icn-tick"></div>
 						</c:when>
 						<c:otherwise>
-							<div class="um-item-row-icon icn-save"></div>
+							<div class="um-item-row-icon icn-save cursor-pointer"></div>
 						</c:otherwise>
 					</c:choose>
 					<div class="hm-item-row-right um-item-row-right">
@@ -65,7 +65,7 @@
 						<div class="um-item-row-left text-right">
 							<spring:message code="label.assignto.key" />
 						</div>
-						<div class="um-item-row-icon icn-save"></div>
+						<div class="um-item-row-icon icn-save cursor-pointer"></div>
 						<div class="hm-item-row-right um-item-row-right">
 							<input type="text" class="um-item-row-txt" id="um-assignto"
 								placeholder='<spring:message code="label.assignto.key" />'>
@@ -217,7 +217,10 @@
 
 	$(document).ready(function() {
 		var branchListHtml = $('#branch-list').html();
-		console.log(branchListHtml);
+		console.log($('#branch-list > div').html);
+		if($('#branch-list > div > div').length == 0) {
+			$('#um-assignto').prop("disabled",true);
+		}
 		$('#um-assignto').parent().append(branchListHtml);
 	});
 </script>

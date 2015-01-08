@@ -110,6 +110,7 @@ function unassignUserFromBranch(userId, branchId) {
 			}
 		},
 		complete : function() {
+			$('#ol-btn-cancel').click();
 			hideOverlay();
 			if (success) {
 				console.log("User successfully unassigned from branch "
@@ -156,7 +157,7 @@ function inviteUser() {
 			}
 			if (success) {
 				$('#um-emailid').parent().parent().find('.um-item-row-icon')
-						.removeClass('icn-save');
+						.removeClass('icn-save').removeClass('cursor-pointer');
 				$('#um-emailid').parent().parent().find('.um-item-row-icon')
 						.addClass('icn-tick');
 				var userId = $('#mh-userId').val();
@@ -167,7 +168,7 @@ function inviteUser() {
 					paintUserDetailsForm(userId);
 					return;
 				}
-				alert("user invite not successful");
+				alert("User invite not successful");
 			}
 		},
 		complete : function() {
@@ -200,7 +201,7 @@ function deleteUser(userId) {
 			}
 		},
 		complete : function() {
-			$('.overlay-disable').hide();
+			$('#ol-btn-cancel').click();
 			hideOverlay();
 			if (success) {
 				alert("User deleted");
@@ -360,7 +361,7 @@ function validateUserEmailId(elementId) {
 				return false;
 			}
 		} else {
-			$('#overlay-toast').html('please enter email id.');
+			$('#overlay-toast').html('Please enter email id.');
 			showToast();
 			return false;
 		}
@@ -377,7 +378,7 @@ function validateUserEmailId(elementId) {
 			}
 		} else {
 			$('#' + elementId).next('.input-error-2').html(
-					'please enter email id.');
+					'Please enter email id.');
 			$('#' + elementId).next('.input-error-2').show();
 			return false;
 		}
