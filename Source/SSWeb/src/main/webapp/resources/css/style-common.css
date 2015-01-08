@@ -288,6 +288,10 @@ a, a:hover, a:visited{
     margin: -18px auto 0;
 }
 
+.btn-payment-sel:hover{
+    background-color: #7AB400
+}
+
 .payment-details-wrapper {
     padding: 25px;
 }
@@ -363,14 +367,6 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .overlay-payment{
-	position: fixed;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 999999999;
-    min-height: 480px;
-    background-color: rgba(255,255,255,0.7);
 }
 
 .btn-payment{
@@ -400,6 +396,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .header-main-wrapper {
     border-top: 5px solid #5cc7ef;
     background-color: #F9F9FB;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 99;
 }
 
 .header-logo {
@@ -499,6 +499,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-header-main-wrapper {
     background-color: #26bdef;
+    margin-top: 83px;
 }
 
 .hm-item-header {
@@ -629,6 +630,9 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-sub-item-left {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     color: #505050;
     font-family: 'OpenSansLight';
     font-size: 14px;
@@ -1714,4 +1718,60 @@ button.paypal.is-active {
 
 .header-links-item a:hover{
     color: #555 !important;
+}
+.prof-edit-wrapper {
+    display: inline-block;
+    margin-left: 20px;
+}
+
+.prof-edditable {
+    border: 0;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.prof-edditable-sin{
+    border: 0;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.prof-name-edit {
+    background-color: #f1f1f1;
+    border: 1px solid #dcdcdc;
+}
+
+
+.overlay-prof {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 999999999;
+    min-height: 480px;
+    background-color: rgba(255,255,255,0.7);
+}
+
+.center-dot {
+    display: inline-block;
+    width: 11px;
+    height: 17px;
+    background: url(../images/white-dot.png) no-repeat center;
+    background-position: 0px 5px;
+}
+
+.overlay-main {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 999999999;
+    min-height: 480px;
+    background-color: rgba(255,255,255,0.7);
 }
