@@ -14,6 +14,8 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 
 /**
  * Handles the payment options for the application
@@ -52,7 +54,7 @@ public interface Payment {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, long planId, String nonce) throws InvalidInputException, PaymentException;
+	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException;
 	
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
@@ -125,5 +127,17 @@ public interface Payment {
 	 * @throws InvalidInputException 
 	 */
 	public void unsubscribe(String subscriptionId) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException;
+	
+	/**
+	 * Upgrades the plan for a particular subscription.
+	 * @param company
+	 * @param newAccountsMasterId
+	 * @throws InvalidInputException 
+	 * @throws NoRecordsFetchedException 
+	 * @throws SubscriptionPastDueException 
+	 * @throws PaymentException 
+	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 */
+	public void upgradePlanForSubscription(Company company,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
 
 }
