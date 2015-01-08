@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 public class CloudUploadServiceImpl implements FileUploadService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CloudUploadServiceImpl.class);
+	private static final String CACHE_PUBLIC = "public";
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
@@ -65,7 +66,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 
 				PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, amazonFileName.toString(), convFile);
 				ObjectMetadata metadata = new ObjectMetadata();
-				metadata.setCacheControl("public");
+				metadata.setCacheControl(CACHE_PUBLIC);
 				putObjectRequest.setMetadata(metadata);
 				putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 				AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
