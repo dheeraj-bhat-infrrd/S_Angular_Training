@@ -5,6 +5,7 @@ package com.realtech.socialsurvey.core.services.payment.impl;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -40,10 +41,13 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 /**
@@ -58,7 +62,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private GenericDao<LicenseDetail, Long> licenseDetailDao;
 
 	@Autowired
-	private GenericDao<AccountsMaster, Long> accountsMasterDao;
+	private GenericDao<AccountsMaster, Integer> accountsMasterDao;
 
 	@Autowired
 	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
@@ -122,26 +126,26 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param userId
 	 * @throws InvalidInputException
 	 */
-	private void updateLicenseTable(Long accountsMasterId, Company company, long userId, String subscriptionId) throws InvalidInputException {
+	private void updateLicenseTable(int accountsMasterId, Company company, User	user, String subscriptionId) throws InvalidInputException {
 
 		if (accountsMasterId <= 0) {
-			LOG.error("updateLicenseTable : first parameter is invalid");
-			throw new InvalidInputException("updateLicenseTable : first parameter is invalid");
+			LOG.error("updateLicenseTable : accountsMasterId parameter is invalid");
+			throw new InvalidInputException("updateLicenseTable : accountsMasterId parameter is invalid");
 		}
 
 		if (company == null) {
-			LOG.error("updateLicenseTable : second parameter is null or invalid");
-			throw new InvalidInputException("updateLicenseTable : second parameter is null or invalid");
+			LOG.error("updateLicenseTable : company parameter is null or invalid");
+			throw new InvalidInputException("updateLicenseTable : company parameter is null or invalid");
 		}
 
-		if (userId <= 0) {
-			LOG.error("updateLicenseTable : third parameter is invalid");
-			throw new InvalidInputException("updateLicenseTable : third parameter is invalid");
+		if (user == null) {
+			LOG.error("updateLicenseTable : userId parameter is null or invalid");
+			throw new InvalidInputException("updateLicenseTable : userId parameter is null or invalid");
 		}
 
 		if (subscriptionId == null || subscriptionId.isEmpty()) {
-			LOG.error("updateLicenseTable : fourth parameter is null or invalid");
-			throw new InvalidInputException("updateLicenseTable : fourth parameter is null or invalid");
+			LOG.error("updateLicenseTable : subscriptionId parameter is null or invalid");
+			throw new InvalidInputException("updateLicenseTable : subscriptionId parameter is null or invalid");
 		}
 
 		AccountsMaster accountsMaster = accountsMasterDao.findById(AccountsMaster.class, accountsMasterId);
@@ -151,15 +155,15 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		LOG.debug("BrainTreePaymentImpl : updateLicenseTable() : Executing method.");
-		LOG.debug("Parameters provided : accountsMasterId : " + accountsMasterId + ", company : " + company.toString() + ", userId : " + userId);
+		LOG.debug("Parameters provided : accountsMasterId : " + accountsMasterId + ", company : " + company.toString() + ", userId : " + user.getUserId());
 
 		LOG.debug("Updating LicenseDetail Table");
 		LicenseDetail licenseDetail = new LicenseDetail();
 		licenseDetail.setSubscriptionId(subscriptionId);
 		licenseDetail.setAccountsMaster(accountsMaster);
 		licenseDetail.setCompany(company);
-		licenseDetail.setCreatedBy(String.valueOf(userId));
-		licenseDetail.setModifiedBy(String.valueOf(userId));
+		licenseDetail.setCreatedBy(String.valueOf(user.getUserId()));
+		licenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
 		licenseDetail.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		licenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
@@ -169,6 +173,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
 		licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
 		licenseDetailDao.save(licenseDetail);
+		LOG.debug("License detail table updated. Updating the company entity.");
+		company.setLicenseDetails(Arrays.asList(licenseDetail));
+		LOG.debug("Company entity updated.");
 		LOG.debug("LicenseDetail table updated");
 	}
 
@@ -188,13 +195,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private boolean addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException {
 
 		if (company == null) {
-			LOG.error("addCustomerWithPayment : first parameter is null!");
-			throw new InvalidInputException("addCustomerWithPayment : first parameter is null!");
+			LOG.error("addCustomerWithPayment : company parameter is null!");
+			throw new InvalidInputException("addCustomerWithPayment : company parameter is null!");
 		}
 
 		if (nonce == null || nonce.isEmpty()) {
-			LOG.error("addCustomerWithPayment : second parameter is null or empty!");
-			throw new InvalidInputException("addCustomerWithPayment : parameter is null or empty!");
+			LOG.error("addCustomerWithPayment : nonce parameter is null or empty!");
+			throw new InvalidInputException("addCustomerWithPayment : nonce parameter is null or empty!");
 		}
 
 		LOG.debug("BrainTreePaymentImpl : addCustomerWithPayment() : Executing method.");
@@ -237,8 +244,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		Customer customer = null;
 
 		if (customerId == null || customerId.isEmpty()) {
-			LOG.error("containsCustomer : parameter is null or empty!");
-			throw new InvalidInputException("containsCustomer : parameter is null or empty!");
+			LOG.error("containsCustomer : customerId parameter is null or empty!");
+			throw new InvalidInputException("containsCustomer : customerId parameter is null or empty!");
 		}
 
 		LOG.debug("BrainTreePaymentImpl : containsCustomer() : Executing method.");
@@ -279,13 +286,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		Customer customer = null;
 
 		if (customerId == null || customerId.isEmpty()) {
-			LOG.error("subscribeCustomer : first parameter is null or empty!");
-			throw new InvalidInputException("subscribeCustomer : first parameter is null or empty!");
+			LOG.error("subscribeCustomer : customerId parameter is null or empty!");
+			throw new InvalidInputException("subscribeCustomer : customerId parameter is null or empty!");
 		}
 
 		if (planId == null || planId.isEmpty()) {
-			LOG.error("subscribeCustomer : second parameter is null or empty!");
-			throw new InvalidInputException("subscribeCustomer : second parameter is null or empty!");
+			LOG.error("subscribeCustomer : planId parameter is null or empty!");
+			throw new InvalidInputException("subscribeCustomer : planId parameter is null or empty!");
 		}
 
 		LOG.debug("BrainTreePaymentImpl : subscribeCustomer() : Executing method.");
@@ -333,31 +340,36 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * 
 	 * @param user
 	 * @param company
-	 * @param planId
+	 * @param accountsMasterId
 	 * @param nonce
 	 * @throws InvalidInputException
 	 * @throws PaymentException
 	 */
 	@Override
 	@Transactional
-	public boolean subscribe(User user, Company company, long planId, String nonce) throws InvalidInputException, PaymentException {
+	public boolean subscribe(User user, Company company, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException {
 
 		boolean result = false;
 		String subscriptionId = null;
-
-		if (company == null) {
-			LOG.error("subscribe : first parameter is null!");
-			throw new InvalidInputException("subscribe : first parameter is null!");
+		
+		if (user == null) {
+			LOG.error("subscribe : user parameter is null!");
+			throw new InvalidInputException("subscribe : user parameter is null!");
 		}
 
-		if (planId <= 0) {
-			LOG.error("subscribe : second parameter is invalid! parameter value : " + String.valueOf(planId));
-			throw new InvalidInputException("subscribe : second parameter is invalid!parameter value : " + String.valueOf(planId));
+		if (company == null) {
+			LOG.error("subscribe : company parameter is null!");
+			throw new InvalidInputException("subscribe : company parameter is null!");
+		}
+
+		if (accountsMasterId <= 0) {
+			LOG.error("subscribe : accountsMasterId parameter is invalid! parameter value : " + String.valueOf(accountsMasterId));
+			throw new InvalidInputException("subscribe : accountsMasterId parameter is invalid!parameter value : " + String.valueOf(accountsMasterId));
 		}
 
 		if (nonce == null || nonce.isEmpty()) {
-			LOG.error("subscribe : third parameter is null or empty!");
-			throw new InvalidInputException("subscribe : third parameter is null or empty!");
+			LOG.error("subscribe : nonce parameter is null or empty!");
+			throw new InvalidInputException("subscribe : nonce parameter is null or empty!");
 		}
 
 		LOG.info("Making a subscription!");
@@ -367,8 +379,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.debug("Fetching the planId string using property file");
 		// Get the plan name used in Braintree
 
-		String planIdString = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(planId));
-		if (planIdString == null) {
+		String braintreePlanName = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(accountsMasterId));
+		if (braintreePlanName == null) {
 			LOG.error("Invalid Plan ID provided for subscription.");
 			throw new InvalidInputException("Invalid Plan ID provided for subscription.");
 		}
@@ -380,7 +392,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		if (customer != null) {
 			LOG.debug("Customer found in vault. Making subscription.");
 			// If he does just subscribe the customer
-			subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), planIdString);
+			subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanName);
 		}
 		else {
 			LOG.debug("Customer does not exist in the vault.Adding customer to vault.");
@@ -391,14 +403,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 			else {
 				LOG.info("Customer Added. Making subscription.");
-				subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), planIdString);
+				subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanName);
 			}
 		}
 
 		if (subscriptionId != null) {
 			result = true;
 			LOG.info("Subscription successful. Updating the license table.");
-			updateLicenseTable(planId, company, user.getUserId(), subscriptionId);
+			updateLicenseTable(accountsMasterId, company, user, subscriptionId);
 			LOG.info("LicenseDetail table update done!");
 		}
 		else {
@@ -437,8 +449,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	public String getClientTokenWithCustomerId(String customerId) throws InvalidInputException {
 
 		if (customerId == null || customerId.isEmpty()) {
-			LOG.error("getClientTokenWithCustomerId : parameter is null or empty!");
-			throw new InvalidInputException("getClientTokenWithCustomerId : parameter is null or empty!");
+			LOG.error("getClientTokenWithCustomerId : customerId parameter is null or empty!");
+			throw new InvalidInputException("getClientTokenWithCustomerId : customerId parameter is null or empty!");
 		}
 		LOG.info("Making API call to fetch client token for customer ID!");
 		LOG.debug("BrainTreePaymentImpl : getClientTokenWithCustomerId() : Executing method.");
@@ -466,13 +478,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		String transactionId = null;
 
 		if (paymentMethodToken == null || paymentMethodToken.isEmpty()) {
-			LOG.error("makePayment() : first parameter is null or invalid!");
-			throw new InvalidInputException("makePayment() : first parameter is null or invalid!");
+			LOG.error("makePayment() : paymentMethodToken parameter is null or invalid!");
+			throw new InvalidInputException("makePayment() : paymentMethodToken parameter is null or invalid!");
 		}
 
 		if (amount == null || amount.equals(0)) {
-			LOG.error("makePayment() : second parameter is null or invalid!");
-			throw new InvalidInputException("makePayment() : second parameter is null or invalid!");
+			LOG.error("makePayment() : amount parameter is null or invalid!");
+			throw new InvalidInputException("makePayment() : amount parameter is null or invalid!");
 		}
 
 		LOG.debug("Executing makePayment with parameters : paymentMethodToken : " + paymentMethodToken + " , amount" + amount);
@@ -501,7 +513,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @return boolean value
 	 */
 	public void updateRetriesForPayment(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException {
-
+		
+		if (subscription == null) {
+			LOG.error("subscription parameter to retryPaymentAndUpdateLicenseTable() is null");
+			throw new InvalidInputException("subscription parameter to retryPaymentAndUpdateLicenseTable() is null");
+		}
+		
 		LOG.info("Updating the license table with the next retry time!");
 
 		LicenseDetail licenseDetail = null;
@@ -513,18 +530,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		Calendar now = Calendar.getInstance();
 		now.add(Calendar.DATE, retryDays);
 
-		if (subscription == null) {
-			LOG.error("Parameter to retryPaymentAndUpdateLicenseTable() is null");
-			throw new InvalidInputException("Parameter to retryPaymentAndUpdateLicenseTable() is null");
-		}
-
 		LOG.debug("Executing retryPaymentAndUpdateLicenseTable with parameter : " + subscription.toString());
 
 		String subscriptionId = subscription.getId();
 
 		// Checking if the notification is the first one. If not LicenseDetails table isnt updated
 		// again.
-		licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, "subscriptionId", subscriptionId);
+		licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN, subscriptionId);
 
 		if (licenseDetails.isEmpty() || licenseDetails == null) {
 			LOG.error("Subscription details not found in the LicenseDetail table.");
@@ -537,8 +549,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		// Getting the list of corporate admins from user profiles table
 		Map<String, Object> queries = new HashMap<>();
-		queries.put("company", licenseDetail.getCompany());
-		queries.put("isOwner", CommonConstants.IS_OWNER);
+		queries.put(CommonConstants.COMPANY_COLUMN, licenseDetail.getCompany());
+		queries.put(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER);
 		users = userDao.findByKeyValue(User.class, queries);
 
 		if (users.isEmpty() || users == null) {
@@ -559,7 +571,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		licenseDetail.setIsSubscriptionDue(CommonConstants.SUBSCRIPTION_DUE);
 		licenseDetail.setNextRetryTime(new Timestamp(now.getTimeInMillis()));
 		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		licenseDetailDao.saveOrUpdate(licenseDetail);
+		licenseDetailDao.update(licenseDetail);
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
@@ -580,8 +592,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	public Transaction retrySubscriptionCharge(String subscriptionId) throws InvalidInputException, PaymentRetryUnsuccessfulException {
 
 		if (subscriptionId == null || subscriptionId.isEmpty()) {
-			LOG.error("Parameter to retrySubscriptionCharge() is empty or null!");
-			throw new InvalidInputException("Parameter to retrySubscriptionCharge() is empty or null!");
+			LOG.error("subscriptionId parameter to retrySubscriptionCharge() is empty or null!");
+			throw new InvalidInputException("subscriptionId parameter to retrySubscriptionCharge() is empty or null!");
 		}
 
 		Result<Transaction> retryResult = null;
@@ -629,8 +641,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		if (transactionId == null || transactionId.isEmpty()) {
 
-			LOG.error("Parameter to checkTransactionSettling is null or empty");
-			throw new InvalidInputException("Parameter to checkTransactionSettling is null or empty");
+			LOG.error("transactionId parameter to checkTransactionSettling is null or empty");
+			throw new InvalidInputException("transactionId parameter to checkTransactionSettling is null or empty");
 
 		}
 
@@ -669,8 +681,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		if (transactionId == null || transactionId.isEmpty()) {
 
-			LOG.error("Parameter to checkTransactionSettled is null or empty");
-			throw new InvalidInputException("Parameter to checkTransactionSettled is null or empty");
+			LOG.error("transactionId parameter to checkTransactionSettled is null or empty");
+			throw new InvalidInputException("transactionId parameter to checkTransactionSettled is null or empty");
 
 		}
 
@@ -708,8 +720,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	public boolean checkIfPaymentMade(Company company) throws InvalidInputException {
 
 		if (company == null) {
-			LOG.error("Argument given to checkIfPaymentMade is null or invalid");
-			throw new InvalidInputException("Argument given to checkIfPaymentMade is null or invalid");
+			LOG.error("company parameter given to checkIfPaymentMade is null or invalid");
+			throw new InvalidInputException("company parameter given to checkIfPaymentMade is null or invalid");
 		}
 
 		LOG.info("Checking if the payment is made for comapny with id : " + company.getCompanyId());
@@ -717,11 +729,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		List<LicenseDetail> licenseDetails = new ArrayList<LicenseDetail>();
 
-		HashMap<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.COMPANY_COLUMN, company);
-
 		LOG.info("Querying the LicenseDetails table to check if payment is made.");
-		licenseDetails = licenseDetailDao.findByKeyValue(LicenseDetail.class, queries);
+		licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.COMPANY_COLUMN, company);
 
 		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.info("Payment has not been made for company with id : " + company.getCompanyId());
@@ -749,8 +758,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException, InvalidInputException{
 		
 		if(subscriptionId == null || subscriptionId.isEmpty()){
-			LOG.error("Parameter given to getDisableDate is null or empty");
-			throw new InvalidInputException("Parameter given to getDisableDate is null or empty");
+			LOG.error("subscriptionId parameter given to getDisableDate is null or empty");
+			throw new InvalidInputException("subscriptionId parameter given to getDisableDate is null or empty");
 		}
 		LOG.info("Fetching the disable date for the subscription id : " + subscriptionId);
 		Timestamp disableDate = null;
@@ -785,8 +794,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	public void unsubscribe(String subscriptionId) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException {
 		
 		if(subscriptionId == null || subscriptionId.isEmpty()){
-			LOG.error("Parameter given to unsubscribe is null or empty");
-			throw new InvalidInputException("Parameter given to unsubscribe is null or empty");
+			LOG.error("subscriptionId parameter given to unsubscribe is null or empty");
+			throw new InvalidInputException("subscriptionId parameter given to unsubscribe is null or empty");
 		}
 		LOG.info("Cancelling the subscription with id : " + subscriptionId);
 		
@@ -800,4 +809,143 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new SubscriptionCancellationUnsuccessfulException("Subscription cancellation unsuccessful : Message : " + result.getMessage());
 		}		
 	}
+	
+	/**
+	 * Makes a braintree api call to upgrade a subscription.
+	 * @param subscriptionId
+	 * @param amount
+	 * @param braintreePlanId
+	 * @throws PaymentException 
+	 * @throws InvalidInputException 
+	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 * @throws NoRecordsFetchedException 
+	 */
+	private void upgradeSubscription(String subscriptionId, float amount,String braintreePlanId) throws PaymentException, InvalidInputException, SubscriptionUpgradeUnsuccessfulException, NoRecordsFetchedException{
+		
+		if( subscriptionId == null || subscriptionId.isEmpty()){
+			LOG.error("upgradeSubscription : subscriptionId parameter is null or empty");
+			throw new InvalidInputException("upgradeSubscription : subscriptionId parameter is null or empty");
+		}
+		
+		if( amount < 0){
+			LOG.error("upgradeSubscription : amount parameter is invalid");
+			throw new InvalidInputException("upgradeSubscription : amount parameter is invalid");
+		}
+		
+		if( braintreePlanId == null || braintreePlanId.isEmpty()){
+			LOG.error("upgradeSubscription : braintreePlanId parameter is null or empty");
+			throw new InvalidInputException("upgradeSubscription : braintreePlanId parameter is null or empty");
+		}
+				
+		LOG.debug("Creating the subscription request object");
+		SubscriptionRequest updateRequest = new SubscriptionRequest()
+		  .price(new BigDecimal(String.valueOf(amount)))
+		  .planId(braintreePlanId)
+		  .options()
+		    .prorateCharges(true)
+		    .revertSubscriptionOnProrationFailure(false)
+		    .done();
+		
+		
+		Result<Subscription> result = null;
+		try{
+			LOG.debug("Making api call to upgrade the subscription");
+			result = gateway.subscription().update(subscriptionId, updateRequest);
+		}
+		catch( NotFoundException e){
+			LOG.error("upgradeSubscription : NotFoundException has occured");
+			throw new NoRecordsFetchedException("upgradeSubscription : NotFoundException has occured");
+		}
+		catch(UnexpectedException e){
+			LOG.error("upgradeSubscription : UexpectedException has occured");
+			throw new PaymentException("upgradeSubscription : UexpectedException has occured");
+		}
+		
+		if(result.isSuccess()){
+			LOG.debug("Subscription upgrade successful! ");
+		}
+		else{
+			LOG.debug("Subscription upgrade unsuccessful, message : " + result.getMessage());
+			throw new SubscriptionUpgradeUnsuccessfulException("Subscription upgrade unsuccessful, message : " + result.getMessage(),DisplayMessageConstants.SUBSCRIPTION_UPGRADE_UNSUCCESSFUL);
+		}		
+	}
+	
+	/**
+	 * Upgrades the plan for a particular subscription.
+	 * @param company
+	 * @param newAccountsMasterId
+	 * @throws InvalidInputException 
+	 * @throws NoRecordsFetchedException 
+	 * @throws SubscriptionPastDueException 
+	 * @throws PaymentException 
+	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 */
+	@Transactional
+	@Override
+	public void upgradePlanForSubscription(Company company, int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException {
+		
+		if( company == null ){
+			LOG.error("upgradePlanForSubscription : company parameter given is null.");
+			throw new InvalidInputException("upgradePlanForSubscription : company parameter given is null.");
+		}
+		
+		if( newAccountsMasterId < 0 ){
+			LOG.error("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
+			throw new InvalidInputException("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
+		}
+		
+		//Fetching the new accounts master record
+		LOG.info("Fetching the new accounts master record from the database.");
+		AccountsMaster newAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, newAccountsMasterId);
+		if (newAccountsMaster == null) {
+			LOG.error("upgradePlanForSubscription : null returned by dao for accountsMaster");
+			throw new InvalidInputException("upgradePlanForSubscription : null returned by dao for accountsMaster");
+		}
+		LOG.info("Accounts master record fetched.");
+		
+		//Fetching the license detail record for the company as it holds all the current subscription details.
+		LOG.info("Fetching the License Detail record for the company with id : " + company.getCompanyId());
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		List<LicenseDetail> licenseDetails = licenseDetailDao.findByKeyValue(LicenseDetail.class, queries);
+		
+		if(licenseDetails == null || licenseDetails.isEmpty()){
+			LOG.error("upgradePlanForSubscription : No records fetched for the company ");
+			throw new NoRecordsFetchedException("upgradePlanForSubscription : No records fetched for the company ");
+		}
+		
+		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
+		LOG.info("License Detail record fetched.");
+		
+		//Checking if the subscription is passed due and throwing an exception if it is due.
+		LOG.info("Checking if subscription is due");
+		if(licenseDetail.getIsSubscriptionDue() == CommonConstants.STATUS_ACTIVE){
+			LOG.error("upgradePlanForSubscription : Upgrade not possible as subscription is due.");
+			throw new SubscriptionPastDueException("upgradePlanForSubscription : Upgrade not possible as subscription is due.",DisplayMessageConstants.SUBSCRIPTION_PAST_DUE);
+		}
+		
+		//Getting the braintree id for the new plan
+		String braintreePlanId = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(newAccountsMasterId));
+		if (braintreePlanId == null) {
+			LOG.error("Invalid Plan ID provided for subscription.");
+			throw new InvalidInputException("Invalid Plan ID provided for subscription.");
+		}
+		
+		//Making API call to Braintree to update subscription.
+		LOG.info("Subscription isnt due. So upgrading the subscription");
+		upgradeSubscription(licenseDetail.getSubscriptionId(), newAccountsMaster.getAmount(),braintreePlanId);
+		LOG.info("Subscription upgraded at braintree");
+		
+		//Updating license detail table.
+		LOG.info("Updating the License Detail table to show changes");
+		licenseDetail.setAccountsMaster(newAccountsMaster);
+		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		licenseDetailDao.update(licenseDetail);
+		LOG.info("License Detail Table updated.Updating the company object to reflect the change.");
+		company.setLicenseDetails(Arrays.asList(licenseDetail));
+		LOG.info("Company entity updated");
+		
+		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
+		
+	}	
 }

@@ -27,18 +27,24 @@
 					<a href="#"><spring:message
 							code="label.header.dashboard.key" /></a>
 				</div>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
-							code="label.header.company.key" /></a>
-				</div>
-				<div class="header-links-item">
-					<a href="#"><spring:message
-							code="label.header.buildsurvey.key" /></a>
-				</div>
-				<div class="header-links-item">
-					<a href="#"><spring:message
-							code="label.header.usermanagement.key" /></a>
-				</div>
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 2}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
+								code="label.header.company.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${highestrole == 2}">
+					<div class="header-links-item">
+						<a href="#"><spring:message
+								code="label.header.buildsurvey.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1}">
+					<div class="header-links-item">
+						<a href="#"><spring:message
+								code="label.header.usermanagement.key" /></a>
+					</div>
+				</c:if>
 			</div>
 		</div>
 	</div>
@@ -51,23 +57,35 @@
 					<a href="#"><spring:message
 							code="label.header.dashboard.key" /></a>
 				</div>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
-							code="label.header.company.key" /></a>
-				</div>
-				<div class="header-links-item">
-					<a href="#"><spring:message
-							code="label.header.buildsurvey.key" /></a>
-				</div>
-				<div class="header-links-item">
-					<a href="#"><spring:message
-							code="label.header.usermanagement.key" /></a>
-				</div>
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 2}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
+								code="label.header.company.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${highestrole == 2}">
+					<div class="header-links-item">
+						<a href="#"><spring:message
+								code="label.header.buildsurvey.key" /></a>
+					</div>
+				</c:if>
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1}">
+					<div class="header-links-item">
+						<a href="#"><spring:message
+								code="label.header.usermanagement.key" /></a>
+					</div>
+				</c:if>
 			</div>
 			<div class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
-					<span>${fn:substring(user.loginName, 0, 1)}</span>
+					<span>${fn:substring(user.displayName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
+						<c:if test="${highestrole == 2}">
+							<!-- show the company settings only of the user has company admin as a role -->
+							<div class="initial-dd-item" id="company-setting">
+							<spring:message code="label.settings.company.key"/>
+							</div>
+						</c:if>
 						<div class="initial-dd-item" id="profile-setting">
 						<spring:message code="label.profilesetting.key"/>
 						</div>

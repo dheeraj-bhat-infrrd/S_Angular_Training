@@ -91,9 +91,9 @@ public class PaymentController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			Company company = user.getCompany();
 
-			long accountTypeValue = 0l;
+			int accountTypeValue = 0;
 			try {
-				accountTypeValue = Long.parseLong(strAccountType);
+				accountTypeValue = Integer.parseInt(strAccountType);
 			}
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
