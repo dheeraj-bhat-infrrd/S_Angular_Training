@@ -239,8 +239,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
 		companySettings.setIden(company.getCompanyId());
-		if (organizationalDetails.get(CommonConstants.LOGO_NAME) != null) {
-			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_NAME));
+		if (organizationalDetails.get(CommonConstants.LOGO_URL) != null) {
+			companySettings.setLogo(organizationalDetails.get(CommonConstants.LOGO_URL));
 		}
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
