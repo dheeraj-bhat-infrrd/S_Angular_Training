@@ -28,7 +28,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
-	
+	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
+	public static final String KEY_LOCATION_ENABLED = "isLocationEnabled";
+	public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
+
 	private static final String KEY_IDENTIFIER = "iden";
 	
 	

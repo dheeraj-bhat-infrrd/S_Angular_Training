@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.payment;
 
 import java.math.BigDecimal;
+import java.sql.Timestamp;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
@@ -104,4 +105,13 @@ public interface Payment {
 	 * @throws InvalidInputException
 	 */
 	public boolean checkIfPaymentMade(Company company) throws InvalidInputException;
+	
+	/**
+	 * Returns the disable date timestamp for a subscription id.
+	 * @param subscriptionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException;
 }

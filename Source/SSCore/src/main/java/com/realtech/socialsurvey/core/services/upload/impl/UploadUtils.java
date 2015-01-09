@@ -1,8 +1,6 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -15,94 +13,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.upload.ImageUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
-import com.realtech.socialsurvey.core.utils.EncryptionHelper;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 @Component
-public class ImageUploadServiceImpl implements ImageUploadService {
-
-	private static final Logger LOG = LoggerFactory.getLogger(ImageUploadServiceImpl.class);
+public final class UploadUtils {
+	private static final Logger LOG = LoggerFactory.getLogger(MessageUtils.class);
 
 	@Autowired
 	private PropertyFileReader propertyFileReader;
-	
-	@Autowired
-	private EncryptionHelper encryptionHelper;
 
-	@Override
-	public String imageUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException {
-		LOG.info("Method imageUploadHandler inside ImageUploadServiceImpl called");
-
-		BufferedOutputStream stream = null;
-		if (!fileLocal.isEmpty()) {
-			try {
-				byte[] bytes = fileLocal.getBytes();
-
-				File convFile = new File(fileLocal.getOriginalFilename());
-				fileLocal.transferTo(convFile);
-
-				LOG.debug("Validating uploaded image");
-				if (!imageFormat(convFile)) {
-					throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT);
-				}
-				if (!imageSize(convFile)) {
-					throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE);
-				}
-				if (!imageDimension(convFile)) {
-					throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS);
-				}
-
-				// Creating the directory to store file
-				LOG.debug("Creating the directory to store file");
-				String rootPath = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.LOGO_HOME_DIRECTORY);
-				File dir = new File(rootPath);
-				if (!dir.exists() && !dir.mkdirs()) {
-					throw new FatalException("Directory for Logo upload can not be created. Reason: Permission denied"); 
-				}
-
-				// Create the file on server
-				LOG.debug("Creating the file on server");
-				String logoFormat = logoName.substring(logoName.lastIndexOf("."));
-				String logoNameHash = encryptionHelper.encryptSHA512(logoName+(System.currentTimeMillis()));
-				File serverFile = new File(dir.getAbsolutePath() + File.separator + logoNameHash + logoFormat);
-				stream = new BufferedOutputStream(new FileOutputStream(serverFile));
-				stream.write(bytes);
-
-				LOG.debug("Server File Location=" + serverFile.getAbsolutePath());
-				LOG.info("Method imageUploadHandler inside ImageUploadServiceImpl completed successfully");
-				return logoNameHash + logoFormat;
-			}
-			catch (IOException e) {
-				LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
-				throw new FatalException("IOException occured while reading file. Reason : " + e.getMessage(), e);
-			}
-			finally {
-				try {
-					if (stream != null) {
-						stream.close();
-					}
-				}
-				catch (IOException e) {
-					LOG.error("IOException occured while closing the BufferedOutputStream. Reason : " + e.getMessage(), e);
-				}
-			}
+	/**
+	 * Method to validate File
+	 */
+	public void validateFile(File convFile) throws InvalidInputException {
+		LOG.debug("Validating uploaded image");
+		if (!imageFormat(convFile)) {
+			throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT);
 		}
-		else {
-			LOG.error("Method imageUploadHandler inside ImageUploadServiceImpl failed to upload");
-			throw new InvalidInputException("Upload failed: " + logoName + " because the file was empty", DisplayMessageConstants.INVALID_LOGO_FILE);
+		if (!imageSize(convFile)) {
+			throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE);
 		}
+		if (!imageDimension(convFile)) {
+			throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS);
+		}
+		LOG.debug("Validated uploaded image");
 	}
-
+	
 	/**
 	 * Method to validate logo image size for a company
 	 */
-	private boolean imageSize(File logo) {
+	public boolean imageSize(File logo) {
 		LOG.debug("Validation imageSize method inside ImageUploadServiceImpl called");
 		double maxPixels = Double.parseDouble(propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE,
 				CommonConstants.MAX_LOGO_SIZE_BYTES));
@@ -114,7 +59,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 	/**
 	 * Method to validate logo image format for a company
 	 */
-	private boolean imageFormat(File logo) {
+	public boolean imageFormat(File logo) {
 		LOG.debug("Validation imageFormat method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
@@ -163,7 +108,7 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 	/**
 	 * Method to validate logo image dimension for a company
 	 */
-	private boolean imageDimension(File logo) {
+	public boolean imageDimension(File logo) {
 		LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
@@ -203,7 +148,6 @@ public class ImageUploadServiceImpl implements ImageUploadService {
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
-				// throw new FatalException("IOException occured while closing the ImageReader/ImageInputStream. Reason : " + e.getMessage(), e);
 			}
 		}
 	}

@@ -54,16 +54,16 @@ import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 	@Autowired
-	private GenericDao<LicenseDetail, Integer> licenseDetailDao;
+	private GenericDao<LicenseDetail, Long> licenseDetailDao;
 
 	@Autowired
 	private GenericDao<AccountsMaster, Integer> accountsMasterDao;
 
 	@Autowired
-	private GenericDao<RetriedTransaction, Integer> retriedTransactionDao;
+	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
 
 	@Autowired
-	private GenericDao<User, Integer> userDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
 	private PropertyFileReader propertyFileReader;
@@ -166,7 +166,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 *            payment nonce String given by Braintree
 	 * @return Success or Failure of the operation.
 	 * @throws InvalidInputException
-	 * @throws PaymentException 
+	 * @throws PaymentException
 	 */
 	private boolean addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException {
 
@@ -189,12 +189,15 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		Result<Customer> result = null;
 
 		// Requesting Braintree to create a new customer object
-		try{
+		try {
 			result = gateway.customer().create(request);
 
-		}catch(UnexpectedException e){
-			LOG.error("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId() + " to the vault");
-			throw new PaymentException("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId() + " to the vault");
+		}
+		catch (UnexpectedException e) {
+			LOG.error("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
+					+ " to the vault");
+			throw new PaymentException("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
+					+ " to the vault");
 		}
 
 		LOG.debug("addCustomerWithPayment : adding user " + Long.toString(company.getCompanyId()) + " : Status : " + result.isSuccess()
@@ -210,7 +213,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 *            a String
 	 * @return True or False based on existence.
 	 * @throws InvalidInputException
-	 * @throws PaymentException 
+	 * @throws PaymentException
 	 */
 	private Customer containsCustomer(String customerId) throws InvalidInputException, PaymentException {
 
@@ -232,7 +235,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		catch (NotFoundException e) {
 			LOG.error("Customer " + customerId + " Not Found!");
 		}
-		catch (UnexpectedException e){
+		catch (UnexpectedException e) {
 			LOG.error("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId);
 			throw new PaymentException("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId);
 		}
@@ -249,8 +252,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param planId
 	 *            a String
 	 * @return Success or Failure of the operation.
-	 * @throws InvalidInputException 
-	 * @throws PaymentException 
+	 * @throws InvalidInputException
+	 * @throws PaymentException
 	 * @throws NonFatalException
 	 */
 	private String subscribeCustomer(String customerId, String planId) throws InvalidInputException, PaymentException {
@@ -275,16 +278,17 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		customer = containsCustomer(customerId);
 		if (customer != null) {
 			String paymentToken;
-			
+
 			paymentToken = customer.getPaymentMethods().get(CommonConstants.INITIAL_INDEX).getToken();
 
 			// Make a subscription request
 			SubscriptionRequest request = new SubscriptionRequest().planId(planId).paymentMethodToken(paymentToken);
 			Result<Subscription> result = null;
-			
-			try{
+
+			try {
 				result = gateway.subscription().create(request);
-			}catch(UnexpectedException e){
+			}
+			catch (UnexpectedException e) {
 				LOG.error("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId);
 				throw new PaymentException("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId);
 			}
@@ -314,12 +318,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param company
 	 * @param planId
 	 * @param nonce
-	 * @throws InvalidInputException 
-	 * @throws PaymentException 
+	 * @throws InvalidInputException
+	 * @throws PaymentException
 	 */
 	@Override
 	@Transactional
-	public boolean subscribe(User user, Company company, int planId, String nonce) throws InvalidInputException, PaymentException{
+	public boolean subscribe(User user, Company company, int planId, String nonce) throws InvalidInputException, PaymentException {
 
 		boolean result = false;
 		String subscriptionId = null;
@@ -353,10 +357,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		// Check if the customer already exists in the vault.
-		
+
 		Customer customer = containsCustomer(String.valueOf(company.getCompanyId()));
-			
-		if ( customer != null ) {
+
+		if (customer != null) {
 			LOG.debug("Customer found in vault. Making subscription.");
 			// If he does just subscribe the customer
 			subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), planIdString);
@@ -373,7 +377,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), planIdString);
 			}
 		}
-		
+
 		if (subscriptionId != null) {
 			result = true;
 			LOG.info("Subscription successful. Updating the license table.");
@@ -605,7 +609,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 */
 	public boolean checkTransactionSettling(String transactionId) throws NoRecordsFetchedException, InvalidInputException {
-		
+
 		if (transactionId == null || transactionId.isEmpty()) {
 
 			LOG.error("Parameter to checkTransactionSettling is null or empty");
@@ -645,7 +649,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 */
 	public boolean checkTransactionSettled(String transactionId) throws NoRecordsFetchedException, InvalidInputException {
-			
+
 		if (transactionId == null || transactionId.isEmpty()) {
 
 			LOG.error("Parameter to checkTransactionSettled is null or empty");
@@ -713,6 +717,44 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		return status;
 	}
+	
+	/**
+	 * Returns the disable date timestamp for a subscription id.
+	 * Set the disable date to a day before the billing date
+	 * 
+	 * @param subscriptionId
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	@Override
+	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException{
+		
+		if(subscriptionId == null || subscriptionId.isEmpty()){
+			LOG.error("Parameter given to getDisableDate is null or empty");
+		}
+		LOG.info("Fetching the disable date for the subscription id : " + subscriptionId);
+		Timestamp disableDate = null;
+		Calendar billingDate = null;
+		
+		try{
+			billingDate = gateway.subscription().find(subscriptionId).getNextBillingDate();
+		}catch (NotFoundException e) {
+			LOG.error("Subscription details not found in the Braintree vault for id :" + subscriptionId);
+			throw new NoRecordsFetchedException("Subscription details not found in the Braintree vault for id :" + subscriptionId);
+		}
+		catch (UnexpectedException e){
+			LOG.error("getDisableDate(): Unexpected Exception occured while fetching disable date for subscription id : " + subscriptionId);
+			throw new PaymentException("getDisableDate(): Unexpected Exception occured while fetching disable date for subscription id : " + subscriptionId);		
+		}
+		
+		// Set the disable date to a day before the billing date. So we subtract the a day from the billing date.
+		billingDate.add(Calendar.DATE, -1);
+		disableDate = new Timestamp(billingDate.getTimeInMillis());
+		
+		LOG.info("Returning the billing date : " + disableDate.toString());		
+		return disableDate;
+	}
 
 	@Override
 	public void afterPropertiesSet() {
@@ -729,5 +771,4 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 		}
 	}
-
 }
