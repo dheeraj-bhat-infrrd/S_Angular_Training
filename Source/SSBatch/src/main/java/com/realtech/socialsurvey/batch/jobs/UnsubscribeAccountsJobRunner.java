@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.batch.jobs;
-//JIRA: SS-61: By RM03
+
+// JIRA: SS-61: By RM03
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,41 +17,43 @@ import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 
 /**
- * Initiates the batch job.
- *
+ * Initiates the unsubscribe accounts batch job.
  */
 @Component
-public class JobRunner {
+public class UnsubscribeAccountsJobRunner {
 	
+	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsJobRunner.class);
+
 	@Autowired
 	private JobLauncher jobLauncher;
-	
-	@Autowired
-	private Job job;
-	
-	private static final Logger LOG = LoggerFactory.getLogger(JobRunner.class);
 
-	
-	public void run(){
-		
+	private Job job;
+
+	public Job getJob() {
+		return job;
+	}
+
+	public void setJob(Job job) {
+		this.job = job;
+	}
+
+	public void run() {
+
 		try {
-			
-			LOG.info("Running the jobs from the task scheduler!");
-			
-			JobParameters param = new JobParametersBuilder().addString(CommonConstants.JOB_PARAMETER_NAME, String.valueOf(System.currentTimeMillis())).toJobParameters();
-			
+
+			LOG.info("Running the unsubscribe accounts job from the task scheduler!");
+
+			JobParameters param = new JobParametersBuilder()
+					.addString(CommonConstants.JOB_PARAMETER_NAME, String.valueOf(System.currentTimeMillis())).toJobParameters();
+
 			LOG.info("Starting job execution.");
 			jobLauncher.run(job, param);
 		}
-		catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) 
-		{	
+		catch (JobExecutionAlreadyRunningException | JobRestartException | JobInstanceAlreadyCompleteException | JobParametersInvalidException e) {
 			LOG.error("Execution error caught! Message : " + e.getMessage());
-			
+
 		}
-		
-		
+
 	}
-	
-	
 
 }

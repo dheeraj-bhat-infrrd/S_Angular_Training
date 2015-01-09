@@ -10,6 +10,7 @@ var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
 var nameRegex = /^[a-zA-Z]*$/;
 var lastNameRegEx = /^[a-zA-Z ]*$/;
 var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
+var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
 
@@ -573,7 +574,97 @@ function validateCompanyEnterpriseAddress1(elementId){
 	}
 }
 
+//Function to validate the username
+function validateEncompassUserName(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter user name');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter user name');
+			$('#'+elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
 
-$('.user-info-initial').click(function(){
+//function to validate a password in form
+function validateEncompassPassword(elementId) {
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		}else{
+			$('#overlay-toast').html('Please enter password');
+			showToast();
+			return false;
+		}
+	}else{
+		if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		}else{
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter password');
+			$('#'+elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
+//Function to validate the url
+function validateURL(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter url');
+			showToast();
+			return false;
+		}
+	}else{
+	   	if ($('#'+elementId).val() != "") {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter url');
+			$('#'+elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	}
+}
+
+function validateReminderInterval(elementId) {
+	if ($('#'+elementId).val() != "") {
+		if (numberRegEx.test($('#'+elementId).val())) {
+			$('#'+elementId).next('.hm-item-err-2').hide();
+			return true;
+		} else {
+			$('#'+elementId).next('.hm-item-err-2').html('Please enter a valid number.');
+			$('#'+elementId).next('.hm-item-err-2').show();
+			return false;
+		}
+	} else {
+		$('#'+elementId).next('.hm-item-err-2').html('Please enter number');
+		$('#'+elementId).next('.hm-item-err-2').show();
+		return false;
+	}
+}
+
+$('.user-info-initial').click(function(e){
+    e.stopPropagation();
     $('.initial-dd-wrapper').slideToggle(200);
+});
+
+$('body').click(function(){
+    $('.initial-dd-wrapper').slideUp(200);
 });

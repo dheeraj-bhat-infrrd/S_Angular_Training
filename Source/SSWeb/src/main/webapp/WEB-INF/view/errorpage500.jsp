@@ -23,7 +23,7 @@
                 <div class="header-user-info float-right clearfix">
                     <c:if test="${displaylogo != null}">
                         <div class="float-left user-info-seperator"></div>
-                        <div class="float-left user-info-logo" style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+                        <div class="float-left user-info-logo" style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
                     </c:if>
                 </div>			
             </div>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="error-main-wrapper container">
-            <div class="err-line-1 text-center">OOPS !!! There seeme to be an internal error with the page your are trying to access</div>
+            <div class="err-line-1 text-center">OOPS !!! There seems to be an internal error with the page your are trying to access</div>
             <div class="err-line-2 text-center">500</div>
             <div class="err-line-3 text-center"><em>Lorem ipsumm dore eit lewht njbskjlhjn jb hhtreke Lorem ipsumm dore eit lewht njbskjlhjn jb hhtreke</em></div>
         </div>

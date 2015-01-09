@@ -14,13 +14,14 @@ public class OrganizationUnitSettings {
 	private float profile_completion;
 	private String logo;
 	private boolean isLocationEnabled;
+	private boolean isAccountDisabled;
 	private ContactDetailsSettings contact_details;
 	private CRMInfo crm_info;
 	private MailContentSettings mail_content;
 	private Licenses licenses;
 	private List<Association> associations;
 	private List<Achievement> achievements;
-	private SurveySettings survey_setings;
+	private SurveySettings survey_settings;
 	private String createdBy;
 	private String modifiedBy;
 	private long createdOn;
@@ -58,12 +59,20 @@ public class OrganizationUnitSettings {
 		this.logo = logo;
 	}
 
-	public boolean isLocationEnabled() {
+	public boolean getIsLocationEnabled() {
 		return isLocationEnabled;
 	}
 
 	public void setLocationEnabled(boolean isLocationEnabled) {
 		this.isLocationEnabled = isLocationEnabled;
+	}
+
+	public boolean getIsAccountDisabled() {
+		return isAccountDisabled;
+	}
+
+	public void setAccountDisabled(boolean isAccountDisabled) {
+		this.isAccountDisabled = isAccountDisabled;
 	}
 
 	public ContactDetailsSettings getContact_details() {
@@ -114,12 +123,12 @@ public class OrganizationUnitSettings {
 		this.achievements = achievements;
 	}
 
-	public SurveySettings getSurvey_setings() {
-		return survey_setings;
+	public SurveySettings getSurvey_settings() {
+		return survey_settings;
 	}
 
-	public void setSurvey_setings(SurveySettings survey_setings) {
-		this.survey_setings = survey_setings;
+	public void setSurvey_settings(SurveySettings survey_settings) {
+		this.survey_settings = survey_settings;
 	}
 
 	public String getCreatedBy() {
@@ -161,7 +170,7 @@ public class OrganizationUnitSettings {
 				+ (crm_info != null ? crm_info.toString() : "null") + "\t licenses: " + (licenses != null ? licenses.toString() : "null")
 				+ "\t associations: " + (associations != null ? associations.toString() : "") + "\t achievements: "
 				+ (achievements != null ? achievements.toString() : "null") + "\t survey_setings: "
-				+ (survey_setings != null ? survey_setings.toString() : "");
+				+ (survey_settings != null ? survey_settings.toString() : "");
 	}
 
 }
