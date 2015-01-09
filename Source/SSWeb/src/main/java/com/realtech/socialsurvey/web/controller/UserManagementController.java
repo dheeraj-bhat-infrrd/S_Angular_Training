@@ -113,7 +113,7 @@ public class UserManagementController {
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
-						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName);
+						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == 2) {
@@ -692,7 +692,7 @@ public class UserManagementController {
 
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
-			String lastName = request.getParameter(CommonConstants.FIRST_NAME);
+			String lastName = request.getParameter(CommonConstants.LAST_NAME);
 			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirmPassword");
