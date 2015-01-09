@@ -159,16 +159,7 @@
 	});
 	$('#icon-user-delete').click(function() {
 		var userId = $(this).closest('.row').attr("id");
-		console.log("user id to delete : " + userId);
-		var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
-		if(userId == adminId){
-			alert("Can not delete the admin account");
-			return false;
-		}
-		$('.overlay-disable').show();
-		$('.ol-header').html("Delete User");
-		$('.ol-txt').html("Are you sure you want to delete user??");
-		$('#ol-btn-continue').attr("onclick", "deleteUser('" + userId + "');");
+		confirmDeleteUser(userId);
 	});
 	$('#icn-status-green')
 			.click(
@@ -220,6 +211,7 @@
 		console.log($('#branch-list > div').html);
 		if($('#branch-list > div > div').length == 0) {
 			$('#um-assignto').prop("disabled",true);
+			$('#um-assignto').attr("placeholder","Please add a branch");
 		}
 		$('#um-assignto').parent().append(branchListHtml);
 	});
