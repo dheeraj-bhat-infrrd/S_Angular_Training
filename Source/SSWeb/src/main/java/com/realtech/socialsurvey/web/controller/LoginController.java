@@ -4,11 +4,9 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -58,7 +55,7 @@ public class LoginController {
 		LOG.info("Login Page started");
 		return JspResolver.LOGIN;
 	}
-	
+
 	@RequestMapping(value = "/landing")
 	public String initLandingPage() {
 		LOG.info("Login Page started");
@@ -331,11 +328,18 @@ public class LoginController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
-
+			long companyId = 0;
+			try{
+				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));	
+			}
+			catch(NumberFormatException|NullPointerException e){
+				LOG.error("Invalid company id found in URL parameters. Reason " + e.getStackTrace(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 			// update user's password
 			try {
 				// fetch user object with email Id
-				user = authenticationService.getUserWithEmailId(emailId);
+				user = authenticationService.getUserWithEmailIdAndCompanyId(emailId, companyId);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
@@ -362,15 +366,16 @@ public class LoginController {
 
 		return JspResolver.LOGIN;
 	}
+
 	/**
 	 * method for logging out
 	 * 
-	 * @param 
+	 * @param
 	 * @param request
 	 * @param response
-	 * @return 
+	 * @return
 	 */
-	
+
 	@RequestMapping(value = "/logout")
 	public String initLogoutPage(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("logging out");
@@ -379,6 +384,7 @@ public class LoginController {
 				messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		return JspResolver.LOGIN;
 	}
+
 	/**
 	 * Verify the login Form Parameters
 	 * 
