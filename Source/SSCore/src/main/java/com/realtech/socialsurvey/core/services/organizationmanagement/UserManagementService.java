@@ -106,6 +106,8 @@ public interface UserManagementService {
 	//JIRA SS-42 by RM-06:BOC
 	
 	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException;
+
+	public boolean userExists(String userName);
 	
 	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException;
 	

@@ -6,7 +6,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Complete Registration</title>
+    <title><spring:message code="label.completeregistration.title.key"></spring:message></title>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
@@ -22,7 +22,7 @@
             	<form id="complet-registration-form" method="POST" action="./completeregistration.do">
 	                <div id="reset-pwd-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
-	                    <div class="login-txt text-center font-24 margin-bot-20">Set new password</div>
+	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.completeregistration.title.key"></spring:message></div>
 	                    <div id="serverSideerror" class="validation-msg-wrapper" >
                             <!--Use this container to input all the messages from server-->
                             <jsp:include page="messageheader.jsp"/>
