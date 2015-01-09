@@ -23,16 +23,16 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 /**
  * This is the custom item writer for the paymentRetries job.
  */
-public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
+public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>> {
 
 	@Autowired
-	private GenericDao<LicenseDetail, Integer> licenseDetailDao;
+	private GenericDao<LicenseDetail, Long> licenseDetailDao;
 
 	@Autowired
-	private GenericDao<RetriedTransaction, Integer> retriedTransactionDao;
+	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
 
 	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
 	private EmailServices emailServices;
@@ -40,7 +40,7 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 	@Value("${ADMIN_EMAIL_ID}")
 	private String recipientMailId;
 
-	private static final Logger LOG = LoggerFactory.getLogger(CustomItemWriter.class);
+	private static final Logger LOG = LoggerFactory.getLogger(PaymentRetriesItemWriter.class);
 
 	private void sendFailureMail(Exception e) {
 
@@ -131,9 +131,9 @@ public class CustomItemWriter implements ItemWriter<Map<String, Object>> {
 		
 		//For this case we update the License Details and the Company table.
 		LOG.debug("Updating License Details table.");
-		licenseDetailDao.saveOrUpdate(licenseDetail);
+		licenseDetailDao.update(licenseDetail);
 		LOG.debug("Updating company table");
-		companyDao.saveOrUpdate(company);
+		companyDao.merge(company);
 		LOG.debug("Update Successful!");
 	}
 
