@@ -1,9 +1,17 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * The persistent class for the COMPANY database table.
@@ -74,6 +82,10 @@ public class Company implements Serializable {
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
+
+	// bi-directional many-to-one association to RemovedUser
+	@OneToMany(mappedBy = "company")
+	private List<RemovedUser> removedUsers;
 
 	public Company() {}
 
@@ -325,4 +337,25 @@ public class Company implements Serializable {
 		return userProfile;
 	}
 
+	public List<RemovedUser> getRemovedUsers() {
+		return this.removedUsers;
+	}
+
+	public void setRemovedUsers(List<RemovedUser> removedUsers) {
+		this.removedUsers = removedUsers;
+	}
+
+	public RemovedUser addRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().add(removedUser);
+		removedUser.setCompany(this);
+
+		return removedUser;
+	}
+
+	public RemovedUser removeRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().remove(removedUser);
+		removedUser.setCompany(null);
+
+		return removedUser;
+	}
 }
