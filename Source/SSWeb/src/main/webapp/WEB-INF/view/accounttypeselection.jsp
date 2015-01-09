@@ -13,8 +13,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>    
 <body>
- <div class="overlay-loader hide"></div>
- <div class="overlay-payment hide">
+ <div class="overlay-loader overlay hide"></div>
+ <div class="overlay-payment overlay-main hide">
  	<div id="payment-section" class="payment-section">
 		<!-- Payment page comes here through ajax  -->
 	</div>
@@ -92,46 +92,45 @@
 	<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-    <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
     <script>
-    function selectAccountType(accountType,paymentAmount) {
-		console.log("selecting and saving account type");
-		$('#account-type').val(accountType);
-		var url = "./addaccounttype.do";
-		
-		/* show the progress icon */
-    	showOverlay();
-    	
-		var $form = $("#account-type-selection-form");
-    	var payLoad = $form.serialize();
-    	$.ajax({
-    		url : url,
-    		type : "POST",
-    		data : payLoad,
-    		success : function(data) {
-    			selectAccountTypeCallBack(data,accountType,paymentAmount);
-    		},
-    		error : function(e) {
-    			console.error("error : " + e);
-    		}
-    	});
-	}
+        function selectAccountType(accountType,paymentAmount) {
+            console.log("selecting and saving account type");
+            $('#account-type').val(accountType);
+            var url = "./addaccounttype.do";
 
-	function selectAccountTypeCallBack(data,accountType,paymentAmount) {
-		console.log("callback for selectAccountType called");
-		
-		/* hide the progress icon */
-    	hideOverlay();
-		
-		/* Replace the contents of account selection with payment page with selected account type contents*/
-		$("#payment-section").html(data);		
-		showPayment();
-		var selectedAccountType = $("#account-type-"+accountType).html();
-		$("#pu-acc-type-val").html(selectedAccountType);
-		$("#pu-acc-amount-val").html(paymentAmount);
-		
-		console.log("callback for selectAccountType finished");
-	}
+            /* show the progress icon */
+            showOverlay();
+
+            var $form = $("#account-type-selection-form");
+            var payLoad = $form.serialize();
+            $.ajax({
+                url : url,
+                type : "POST",
+                data : payLoad,
+                success : function(data) {
+                    selectAccountTypeCallBack(data,accountType,paymentAmount);
+                },
+                error : function(e) {
+                    console.error("error : " + e);
+                }
+            });
+        }
+
+        function selectAccountTypeCallBack(data,accountType,paymentAmount) {
+            console.log("callback for selectAccountType called");
+
+            /* hide the progress icon */
+            hideOverlay();
+
+            /* Replace the contents of account selection with payment page with selected account type contents*/
+            $("#payment-section").html(data);		
+            showPayment();
+            var selectedAccountType = $("#account-type-"+accountType).html();
+            $("#pu-acc-type-val").html(selectedAccountType);
+            $("#pu-acc-amount-val").html(paymentAmount);
+
+            console.log("callback for selectAccountType finished");
+        }
         $(document).ready(function(){
             adjustOnResize();
             $(window).resize(adjustOnResize);
@@ -148,5 +147,6 @@
             }            
         });
     </script>
+    <script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 </body>
 </html>
