@@ -82,6 +82,10 @@ public class Company implements Serializable {
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
+	
+	// bi-directional many-to-one association to DisabledAccount
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+	private List<DisabledAccount> disabledAccounts;
 
 	// bi-directional many-to-one association to RemovedUser
 	@OneToMany(mappedBy = "company")

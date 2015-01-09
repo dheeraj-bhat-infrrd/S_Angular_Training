@@ -18,20 +18,26 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
 public class OrganizationManagementServiceImpl implements OrganizationManagementService {
@@ -64,7 +70,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private UserManagementService userManagementService;
+	
+	@Autowired
+	private GenericDao<DisabledAccount, Long> disabledAccountDao;
+	
+	@Autowired
+	private Payment gateway;
 
+	@Autowired
+	private EncryptionHelper encryptionHelper;
+	
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -440,6 +455,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		long companyId = user.getCompany().getCompanyId();
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		
+		// Decrypting the encompass password
+		if(companySettings != null && companySettings.getCrm_info() != null) {
+			CRMInfo crmInfo = companySettings.getCrm_info();
+			
+			String encryptedPassword = crmInfo.getCrm_password();
+			String decryptedPassword = encryptionHelper.decryptAES(encryptedPassword, "");
+			
+			crmInfo.setCrm_password(decryptedPassword);
+		}
 		return companySettings;
 	}
 
@@ -546,9 +571,43 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	@Override
-	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory)
-			throws InvalidInputException {
+	public boolean updateSurveySettings(OrganizationUnitSettings companySettings, SurveySettings surveySettings) throws InvalidInputException {
 		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+		
+		LOG.info("Updating comapnySettings: " + companySettings+" with surveySettings: "+surveySettings);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the record successfully");
+		
+		return true;
+	}
+	
+	@Override
+	public void updateLocationEnabled(OrganizationUnitSettings companySettings, boolean isLocationEnabled) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+
+		LOG.info("Updating companySettings: " + companySettings+" with locationEnabled: "+isLocationEnabled);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCATION_ENABLED, isLocationEnabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the record successfully");
+	}
+	
+	@Override
+	public void updateAccountDisabled(OrganizationUnitSettings companySettings, boolean isAccountDisabled) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("Company settings cannot be null.");
+		}
+
+		LOG.info("Updating companySettings: " + companySettings + " with AccountDisabled: "+isAccountDisabled);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updated the isAccountDisabled successfully");
+	}
+
+	@Override
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException{
+		if(companySettings == null){
 			throw new InvalidInputException("Company settings cannot be null.");
 		}
 		if (mailBody == null || mailBody.isEmpty()) {
@@ -584,6 +643,82 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return mailContentSettings;
 	}
 
-}
+	@Override
+	@Transactional
+	public void addDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
+		LOG.info("Adding the disabled account to the database for company id : " + companyId);
+		if(companyId <= 0){
+			LOG.error("addDisabledAccount : Invalid companyId has been given.");
+			throw new InvalidInputException("addDisabledAccount : Invalid companyId has been given.");
+		}
+		List<LicenseDetail> licenseDetails = null;
+		
+		// Fetching the company entity from database
+		LOG.info("Fetching the company record from the database");
+		Company company = companyDao.findById(Company.class, companyId);
+		
+		// Fetching the license details for the company
+		LOG.info("Fetching the License Detail record from the database");
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		licenseDetails = licenceDetailDao.findByKeyValue(LicenseDetail.class, queries);
+		
+		if(licenseDetails == null || licenseDetails.isEmpty()){
+			LOG.error("No license detail records have been found for company id : " + companyId);
+			throw new NoRecordsFetchedException("No license detail records have been found for company id : " + companyId);
+		}
+		
+		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
+		
+		LOG.debug("Preparing the DisabledAccount entity to be saved in the database.");
+		DisabledAccount disabledAccount = new DisabledAccount();
+		disabledAccount.setCompany(company);
+		disabledAccount.setLicenseDetail(licenseDetail);
+		disabledAccount.setDisableDate(gateway.getDateForCompanyDeactivation(licenseDetail.getSubscriptionId()));
+		disabledAccount.setStatus(CommonConstants.STATUS_ACTIVE);
+		disabledAccount.setCreatedBy(CommonConstants.ADMIN_USER_NAME);
+		disabledAccount.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		disabledAccount.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
+		disabledAccount.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		
+		LOG.info("Adding the Disabled Account entity to the database");
+		disabledAccountDao.save(disabledAccount);
+		LOG.info("Added Disabled Account entity to the database.");
+	}
 
+	@Override
+	@Transactional
+	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Deleting the Disabled Account pertaining to company id : " + companyId);
+		if(companyId <= 0){
+			LOG.error("addDisabledAccount : Invalid companyId has been given.");
+			throw new InvalidInputException("addDisabledAccount : Invalid companyId has been given.");
+		}
+		List<DisabledAccount> disabledAccounts = null;
+		
+		//Fetching the company entity from database
+		LOG.info("Fetching the company record from the database");
+		Company company = companyDao.findById(Company.class, companyId);
+		
+		//Fetching the disabled account entity for the company
+		LOG.info("Fetching the Disabled Account from the database");
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		disabledAccounts = disabledAccountDao.findByKeyValue(DisabledAccount.class, queries);
+		
+		if(disabledAccounts == null || disabledAccounts.isEmpty()){
+			LOG.error("No disabled account records have been found for company id : " + companyId);
+			throw new NoRecordsFetchedException("No disabled account records have been found for company id : " + companyId);
+		}
+		
+		DisabledAccount disabledAccount = disabledAccounts.get(CommonConstants.INITIAL_INDEX);
+		disabledAccount.setStatus(CommonConstants.STATUS_INACTIVE);
+		LOG.info("Removing the disabled account record with id : " + disabledAccount.getId() + "from the database.");
+		
+		//Perform soft delete of the record in the database
+		disabledAccountDao.update(disabledAccount);
+		LOG.info("Record successfully deleted from the database!");
+	}
+}
 // JIRA: SS-27: By RM05: EOC

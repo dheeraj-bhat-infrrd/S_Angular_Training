@@ -107,6 +107,7 @@ public interface CommonConstants {
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
 	public static final String LOGIN_NAME="loginName";
+	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	
 	/**
 	 * Batch Constants
@@ -143,6 +144,15 @@ public interface CommonConstants {
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
 
+	/**
+	 * Amazon Details
+	 */
+	public static final String AMAZON_ACCESS_KEY = "AMAZON_ACCESS_KEY";
+	public static final String AMAZON_SECRET_KEY = "AMAZON_SECRET_KEY";
+	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
+	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
+	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
+	
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
 	
