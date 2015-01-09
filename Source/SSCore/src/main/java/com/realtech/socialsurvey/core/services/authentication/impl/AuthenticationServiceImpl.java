@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -52,6 +53,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	@Autowired
 	private GenericDao<UserProfile, Integer> userProfileDao;
+	
+	@Autowired
+	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
@@ -95,6 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public User getUserWithLoginName(String userName) throws NoRecordsFetchedException {
 		LOG.info("Fetching user object with userId : " + userName);
 		User user = userDao.getActiveUser(userName);
+		userManagementService.setProfilesOfUser(user);
 		LOG.info("User found with the login name " + userName);
 		return user;
 	}
@@ -163,9 +168,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 */
 	@Override
 	@Transactional
-	public User getUserWithEmailId(String emailId) throws InvalidInputException {
+	public User getUserWithEmailIdAndCompanyId(String emailId, long companyId) throws InvalidInputException {
 		LOG.info("Fetching user object with emailId : " + emailId);
-		List<User> users = userDao.findByColumn(User.class, CommonConstants.EMAIL_ID, emailId);
+		Map<String, Object> queries = new HashMap<>();
+		Company company = companyDao.findById(Company.class, companyId);
+		queries.put(CommonConstants.EMAIL_ID, emailId);
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		List<User> users = userDao.findByKeyValue(User.class, queries);
 		// Check if user list returned is null or empty
 		if (users == null || users.isEmpty()) {
 			LOG.error("No Record found for the UserID : " + emailId);

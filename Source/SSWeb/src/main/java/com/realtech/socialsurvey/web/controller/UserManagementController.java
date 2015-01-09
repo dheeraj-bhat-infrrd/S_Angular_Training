@@ -660,6 +660,7 @@ public class UserManagementController {
 		try {
 			try {
 				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
@@ -698,30 +699,37 @@ public class UserManagementController {
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirmPassword");
 			String encryptedUrlParameters = request.getParameter("q");
+			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
 			User user = null;
-			
-			//check if any parameter passed is null
-			if(firstName == null || firstName.isEmpty()){
+
+			// check if any parameter passed is null
+			if (firstName == null || firstName.isEmpty()) {
 				LOG.error("First name passed was null or empty");
 				throw new InvalidInputException("First name passed was null or empty", DisplayMessageConstants.INVALID_FIRSTNAME);
 			}
-			if(lastName == null || lastName.isEmpty()){
+			if (lastName == null || lastName.isEmpty()) {
 				LOG.error("Last name passed was null or empty");
 				throw new InvalidInputException("Last name passed was null or empty", DisplayMessageConstants.INVALID_LASTNAME);
 			}
-			if(emailId == null || emailId.isEmpty()){
+			if (emailId == null || emailId.isEmpty()) {
 				LOG.error("EmailId passed was null or empty");
 				throw new InvalidInputException("EmailId passed was null or empty", DisplayMessageConstants.INVALID_EMAILID);
 			}
-			if(password == null || password.isEmpty()){
+			if (password == null || password.isEmpty()) {
 				LOG.error("Password passed was null or empty");
 				throw new InvalidInputException("Password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
 			}
-			if(confirmPassword == null || confirmPassword.isEmpty()){
+			if (companyIdStr == null || companyIdStr.isEmpty()) {
+				LOG.error("Company Id passed was null or empty");
+				throw new InvalidInputException("Company Id passed was null or empty", DisplayMessageConstants.INVALID_COMPANY_NAME);
+			}
+
+			if (confirmPassword == null || confirmPassword.isEmpty()) {
 				LOG.error("Confirm password passed was null or empty");
 				throw new InvalidInputException("Confirm password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
 			}
+
 			// check if password and confirm password field match
 			if (!password.equals(confirmPassword)) {
 				LOG.error("Password and confirm password fields do not match");
@@ -741,11 +749,19 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
+			long companyId = 0;
+			try {
+				companyId = Long.parseLong(companyIdStr);
+			}
+			catch (NumberFormatException exception) {
+				LOG.error("NumberFormat exception. Reason : " + exception.getStackTrace());
+				throw new InvalidInputException("NumberFormat exception. Reason : " + exception.getStackTrace());
+			}
 
 			// update user's password
 			try {
 				// fetch user object with email Id
-				user = authenticationService.getUserWithEmailId(emailId);
+				user = authenticationService.getUserWithEmailIdAndCompanyId(emailId, companyId);
 				user.setFirstName(firstName);
 				user.setLastName(lastName);
 				user.setModifiedBy(String.valueOf(user.getUserId()));

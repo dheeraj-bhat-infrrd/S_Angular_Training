@@ -30,12 +30,11 @@ public interface CommonConstants {
 	/**
 	 * Profile master constants
 	 */
-	public static final int PROFILES_MASTER_NO_PROFILE_ID = 1;
-	public static final int PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID = 2;
-	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 3;
-	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 4;
-	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 5;
-
+	public static final int PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID = 1;
+	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 2;
+	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
+	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
+	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
 	 */
