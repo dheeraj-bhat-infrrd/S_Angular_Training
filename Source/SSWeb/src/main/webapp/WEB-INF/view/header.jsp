@@ -19,6 +19,8 @@
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+	<div id="overlay-toast" class="overlay-toast"></div>
+    <div class="overlay-loader hide"></div>
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider"

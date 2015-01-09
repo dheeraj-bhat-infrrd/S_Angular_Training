@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:if test="${not empty usersList }">
 	<c:forEach items="${usersList }" var="user">
-		<tr id="${user.userId }" class="um-user-row">
+		<tr id="um-user-${user.userId }" class="um-user-row">
 			<td class="col-username um-table-content">${user.firstName} <span>${user.lastName }</span></td>
 			<td class="col-email um-table-content">${user.emailId }</td>
 			<td class="col-loanoff um-table-content clearfix">
@@ -31,7 +31,9 @@
 <script>
 $('.um-user-row').click(function(){
 	console.log("user row clicked");
-	paintUserDetailsForm(this.id);
+	var userId = this.id;
+	userId = userId.substr("um-user-".length);
+	paintUserDetailsForm(userId);
 });
 $(document).ready(function(){
 	var hasMoreUsers = ${hasMoreUsers};
