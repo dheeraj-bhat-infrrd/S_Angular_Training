@@ -23,18 +23,26 @@
 			</c:choose>
 			</td>
 			<td class="col-remove um-table-content clearfix">
-				<div class="tm-table-remove-icn icn-remove-user float-left"></div>
+				<div class="tm-table-remove-icn icn-remove-user float-left cursor-pointer"></div>
 			</td>
 		</tr>
 	</c:forEach>
 </c:if>
 <script>
-$('.um-user-row').click(function(){
-	console.log("user row clicked");
-	var userId = this.id;
-	userId = userId.substr("um-user-".length);
-	paintUserDetailsForm(userId);
-});
+if(isUserManagementAuthorized){
+	$('.um-user-row').click(function(){
+		console.log("user row clicked");
+		var userId = this.id;
+		userId = userId.substr("um-user-".length);
+		paintUserDetailsForm(userId);
+	});
+	$('.tm-table-remove-icn').click(function(event){
+		event.stopPropagation();
+		var userId = $(this).closest('.um-user-row').attr("id");
+		userId = userId.substr("um-user-".length);
+		confirmDeleteUser(userId);
+	});
+}
 $(document).ready(function(){
 	var hasMoreUsers = ${hasMoreUsers};
 	if(!hasMoreUsers){

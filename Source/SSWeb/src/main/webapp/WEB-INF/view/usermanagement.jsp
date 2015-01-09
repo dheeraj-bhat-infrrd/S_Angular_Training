@@ -1,25 +1,6 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page isELIgnored="false"%>
-<div id="server-message" class="hide">
-	<jsp:include page="messageheader.jsp"></jsp:include>
-</div>
-<div class="overlay-disable hide">
-    <div class="overlay-disable-wrapper">
-        <div class="ol-header">Disable Account</div>
-        <div class="ol-content">
-            <div class="ol-txt">Are you sure?</div>
-            <div class="clearfix">
-                <div class="float-left ol-btn-wrapper">
-                    <div id="ol-btn-continue" class="ol-btn">Continue</div>
-                </div>
-                <div class="float-left ol-btn-wrapper">
-                    <div id="ol-btn-cancel" class="ol-btn">Cancel</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row clearfix">
@@ -28,6 +9,9 @@
 			</div>
 		</div>
 	</div>
+</div>
+<div id="server-message" class="hide">
+	<jsp:include page="usermanagementmessageheader.jsp"></jsp:include>
 </div>
 <div id="message-header" class="hide"></div>
 <div id="hm-main-content-wrapper" data-admin-id="${user.userId }"
@@ -94,8 +78,9 @@
 <script>
 	$(document).ready(function(){
 		if($('#server-message>div').hasClass("error-message")){
-			var errorMessage = $('#server-message').text();
-			alert(errorMessage);
+			isUserManagementAuthorized = false;
+			$('#server-message').show();
+			//var errorMessage = $('#server-message p').text();
 		}
 		initUserManagementPage();		
 	});
