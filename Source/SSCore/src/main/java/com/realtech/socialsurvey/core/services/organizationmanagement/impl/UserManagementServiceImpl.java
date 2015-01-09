@@ -415,7 +415,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (emailId == null || emailId.isEmpty()) {
 			throw new InvalidInputException("Email id is null or empty in getUsersByEmailId()");
 		}
-
 		User user = userDao.fetchUserByEmailId(admin, emailId);
 		LOG.info("Method to fetch list of users on the basis of email id is finished.");
 		return user;
@@ -1276,7 +1275,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @param userName
 	 * @return
 	 */
-	private boolean userExists(String userName) {
+	@Override
+	public boolean userExists(String userName) {
 		LOG.debug("Method to check if user exists called for username : " + userName);
 		boolean isUserPresent = false;
 		try {

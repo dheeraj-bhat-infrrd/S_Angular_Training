@@ -164,15 +164,6 @@ public class LoginController {
 						model.addAttribute("userManagementNotAccessible", "true");
 					}
 
-					/*
-					 * try { LOG.debug("Calling service for fetching company admin user profile");
-					 * userProfile = authenticationService.getCompanyAdminProfileForUser(user); }
-					 * catch (InvalidInputException e) {
-					 * LOG.error("Invalid Input exception in validating User. Reason " +
-					 * e.getMessage(), e); throw new InvalidInputException(e.getMessage(),
-					 * DisplayMessageConstants.INVALID_USER, e); }
-					 */
-
 					redirectTo = getRedirectionFromProfileCompletionStage(highestUserProfile.getProfileCompletionStage());
 
 					if ((highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID)

@@ -34,10 +34,6 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		try {
 			criteria.add(Restrictions.ilike(CommonConstants.EMAIL_ID, "%" + emailId + "%"));
 			criteria.add(Restrictions.eq(CommonConstants.COMPANY, user.getCompany()));
-
-			Criterion criterion = Restrictions.or(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE),
-					Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_NOT_VERIFIED));
-			criteria.add(criterion);
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("Exception caught in fetchUserByEmailId() ", hibernateException);
