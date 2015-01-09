@@ -34,7 +34,7 @@
 
 		<!-- Test -->
 		<junit.version>4.11</junit.version>
-
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<dependencies>
@@ -178,7 +178,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<pluginRepositories>
 		<pluginRepository>
 			<id>Codehaus</id>
