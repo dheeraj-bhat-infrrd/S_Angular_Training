@@ -126,32 +126,37 @@ function searchBranches(branchPattern) {
  */
 function searchBranchesCallBack(data) {
 	console.log("search branches callback : "+data);
-	var text =  $.parseJSON(data);
-	if(text != null) {
-		var searchResult = text.response.docs;
-		if(searchResult != null) {
-			var len = searchResult.length;
-			var htmlData = "";
-			console.log("searchResult is "+searchResult);
-			if(len > 0) {
-				$.each(searchResult,function(i,branch) {
-					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
-					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
-				});
-			}
-			else {
-				htmlData = 'No branches are added yet';
-			}
-			$("#existing-branches").html(htmlData);
-			
-			// bind the click event of branches with edit
-			$(".branch-element").click(function() {
-				populateUpdateBranchForm(this);
+	var searchResult =  $.parseJSON(data);
+	if(searchResult != null) {
+		var len = searchResult.length;
+		var htmlData = "";
+		console.log("searchResult is "+searchResult);
+		if(len > 0) {
+			$.each(searchResult,function(i,branch) {
+				htmlData = htmlData +'<div class="hm-sub-item clearfix">';
+				htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+				htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 			});
 		}
-	
+		else {
+			htmlData = 'No branches are added yet';
+		}
+		$("#existing-branches").html(htmlData);
+		
+		// bind the click event of branches with edit
+		$(".branch-element").click(function() {
+			populateUpdateBranchForm(this);
+		});
 	}
+}
+
+function searchBranchesForCompany(){
+	var url = "./searchbranches.do?branchPattern="+branchPattern;
+	callAjaxGET(url, searchBranchesForCompanyCallBack, true);
+}
+
+function searchBranchesForCompanyCallBack(data) {
+	
 }
 
 /**
@@ -472,29 +477,26 @@ function populateRegionsSelector(regionPattern) {
  */
 function populateRegionsSelectorCallBack(data) {
 	console.log("populateRegionsSelectorCallBack : "+data);
-	var text = $.parseJSON(data);
-	if(text != null) {
-		var searchResult = text.response.docs;
-		if(searchResult != null) {
-			var len = searchResult.length;
-			var htmlData = "";
-			console.log("searchResult is "+searchResult);
-			if(len > 0) {
-				$.each(searchResult,function(i,region) {
-						htmlData = htmlData +'<div class="hm-dd-item" data-regionid="'+region.regionId+'">'+region.regionName+'</div>';
-				});
-				
-				$("#hm-dd-wrapper-bottom").html(htmlData).slideDown(200);
-				
-				// bind the click event of selector
-				$('.hm-dd-item').click(function() {
-					$('#selected-region-txt').val($(this).html());
-					$('#selected-region-id-hidden').val($(this).data('regionid'));
-					$('#hm-dd-wrapper-bottom').slideToggle(200);
-				});				
-			}
+	var searchResult = $.parseJSON(data);
+	if(searchResult != null) {
+		var len = searchResult.length;
+		var htmlData = "";
+		console.log("searchResult is "+searchResult);
+		if(len > 0) {
+			$.each(searchResult,function(i,region) {
+					htmlData = htmlData +'<div class="hm-dd-item" data-regionid="'+region.regionId+'">'+region.regionName+'</div>';
+			});
+			
+			$("#hm-dd-wrapper-bottom").html(htmlData).slideDown(200);
+			
+			// bind the click event of selector
+			$('.hm-dd-item').click(function() {
+				$('#selected-region-txt').val($(this).html());
+				$('#selected-region-id-hidden').val($(this).data('regionid'));
+				$('#hm-dd-wrapper-bottom').slideToggle(200);
+			});				
 		}
-	}
+	}	
 }
 
 /**
@@ -513,41 +515,38 @@ function searchRegions(regionPattern){
  * @param data
  */
 function searchRegionsCallBack(data) {
-	var text =  $.parseJSON(data);
-	if(text != null) {
-		var searchResult = text.response.docs;
-		if(searchResult != null) {
-			var len = searchResult.length;
-			var htmlData = "";
-			console.log("searchResult is "+searchResult);
-			if(len > 0) {
-				htmlData = htmlData +'<input type="hidden" id="enable-branches-form" value="true">';
-				$.each(searchResult,function(i,region) {
-					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-						htmlData = htmlData + '<div class="float-left hm-sub-item-left region-element" data-regionid = '+region.regionId+'>'+region.regionName+'</div>';
-						htmlData = htmlData + '<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick=deleteRegionPopup('+region.regionId+')></div></div>';
-				});
-			}
-			else {
-				htmlData = 'No regions added yet';
-			}
-			
-			$("#existing-regions").html(htmlData);
-			
-			//validations for enabling branches form
-			if($("#enable-branches-form").length > 0) {
-				$("#add-branch-form :input").prop("disabled", false);
-				$("#branch-actions").children().attr("disabled", false);
-			} else {
-				$("#add-branch-form :input").prop("disabled", true);
-				$("#branch-actions").children().attr("disabled", true);
-			}
-			
-			// bind the click event of branches with edit
-			$(".region-element").click(function() {
-				populateUpdateRegionForm(this);
+	var searchResult =  $.parseJSON(data);
+	if(searchResult != null) {
+		var len = searchResult.length;
+		var htmlData = "";
+		console.log("searchResult is "+searchResult);
+		if(len > 0) {
+			htmlData = htmlData +'<input type="hidden" id="enable-branches-form" value="true">';
+			$.each(searchResult,function(i,region) {
+				htmlData = htmlData +'<div class="hm-sub-item clearfix">';
+					htmlData = htmlData + '<div class="float-left hm-sub-item-left region-element" data-regionid = '+region.regionId+'>'+region.regionName+'</div>';
+					htmlData = htmlData + '<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick=deleteRegionPopup('+region.regionId+')></div></div>';
 			});
 		}
+		else {
+			htmlData = 'No regions added yet';
+		}
+		
+		$("#existing-regions").html(htmlData);
+		
+		//validations for enabling branches form
+		if($("#enable-branches-form").length > 0) {
+			$("#add-branch-form :input").prop("disabled", false);
+			$("#branch-actions").children().attr("disabled", false);
+		} else {
+			$("#add-branch-form :input").prop("disabled", true);
+			$("#branch-actions").children().attr("disabled", true);
+		}
+		
+		// bind the click event of branches with edit
+		$(".region-element").click(function() {
+			populateUpdateRegionForm(this);
+		});
 	}
 }
 

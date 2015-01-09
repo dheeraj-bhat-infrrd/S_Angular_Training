@@ -20,6 +20,8 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 // JIRA SS-37 BY RM02 BOC
 
@@ -43,6 +45,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
+	@Autowired
+	private SolrSearchService solrSearchService;
+
 	/**
 	 * Fetch list of branches in a company
 	 * 
@@ -57,15 +62,15 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			LOG.error("Company object passed can not be null");
 			throw new InvalidInputException("Invalid Company passed");
 		}
-		LOG.info("Fetching the list of branches for company :" + company.getCompany());		
-		Map<String,Object> queries = new HashMap<String,Object>();
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
 	}
-	
+
 	/**
 	 * Fetch list of regions in a company
 	 * 
@@ -83,10 +88,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.info("Fetching the list of regions for company :" + company.getCompany());
 
-		Map<String,Object> queries = new HashMap<String,Object>();
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
+
 		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
 		LOG.info("Region list fetched for the company " + company);
 		return regionList;
@@ -172,16 +177,16 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("No region present with the region Id :" + regionId);
 		}
 		LOG.info("Fetching the list of branches for region :" + region);
-		
-		Map<String,Object> queries = new HashMap<String,Object>();
+
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
-		
+
 		LOG.info("Branch list fetched for the region " + region);
 		return branchList;
 	}
-	
+
 	/**
 	 * Method to fetch count of branches in a company for a Region
 	 * 
@@ -201,12 +206,12 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("No region present with the region Id :" + regionId);
 		}
 		LOG.info("Fetching the list of branches for region :" + region);
-		
-		Map<String,Object> queries = new HashMap<String,Object>();
+
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
-		
+
 		LOG.info("Branch list fetched for the region " + region);
 		return branchCount;
 	}
@@ -235,7 +240,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		LOG.info("Users list fetched for the branch " + branchId);
 		return userList;
 	}
-	
+
 	/**
 	 * Method to fetch count of UserProfiles associated with a branch
 	 * 
@@ -364,7 +369,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException {
+	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
 		}
@@ -398,6 +403,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.NO);
+		LOG.debug("Adding newly added branch to solr");
+		solrSearchService.addBranchToSolr(branch);
+		
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
@@ -410,10 +418,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param regionName
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegion(User user, String regionName) throws InvalidInputException {
+	public Region addNewRegion(User user, String regionName) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewRegion");
 		}
@@ -423,6 +432,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		LOG.info("Method add new region called for regionName : " + regionName);
 
 		Region region = organizationManagementService.addRegion(user, CommonConstants.NO, regionName);
+		
+		LOG.debug("Updating solr with newly inserted region");
+		solrSearchService.addRegionToSolr(region);
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
