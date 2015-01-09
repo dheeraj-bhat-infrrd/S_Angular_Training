@@ -80,8 +80,10 @@ public interface UserManagementService {
 	
 	/* Sends an email to user with the link to complete registration.
 	 User has to provide password to set. Also, user can choose to change name.*/
-	void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException;
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException;
 
+	// Method to set properties of a user based upon active profiles available for the user.
+	public void setProfilesOfUser(User user);
 	// JIRA SS-42 BY RM05 EOC
 
 	/**
@@ -105,14 +107,12 @@ public interface UserManagementService {
 	
 	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException;
 	
-	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException;
-	
 	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException;
 	
 	//JIRA SS-42 by RM-06:EOC
 	
 	/**
-	 * Gets the user settings according to the heirarchy
+	 * Gets the user settings according to the hierarchy
 	 * @param user
 	 * @param accountType
 	 * @return
