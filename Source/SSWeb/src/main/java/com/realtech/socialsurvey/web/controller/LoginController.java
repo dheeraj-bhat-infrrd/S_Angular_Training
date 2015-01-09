@@ -166,8 +166,7 @@ public class LoginController {
 
 					redirectTo = getRedirectionFromProfileCompletionStage(highestUserProfile.getProfileCompletionStage());
 
-					if ((highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID)
-							&& (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE))) {
+					if (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)){
 						// get the user's canonical settings
 						LOG.info("Fetching the user's canonical settings and setting it in session");
 						sessionHelper.getCanonicalSettings(session);
@@ -329,10 +328,10 @@ public class LoginController {
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
 			long companyId = 0;
-			try{
-				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));	
+			try {
+				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
 			}
-			catch(NumberFormatException|NullPointerException e){
+			catch (NumberFormatException | NullPointerException e) {
 				LOG.error("Invalid company id found in URL parameters. Reason " + e.getStackTrace(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
