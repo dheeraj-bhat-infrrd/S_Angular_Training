@@ -925,7 +925,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException,
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		LOG.info("Method to send profile completion link to the user started.");
@@ -933,6 +933,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
 		urlParams.put(CommonConstants.FIRST_NAME, firstName);
 		urlParams.put(CommonConstants.LAST_NAME, lastName);
+		urlParams.put(CommonConstants.COMPANY, String.valueOf(companyId));
 
 		LOG.info("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE);
