@@ -66,7 +66,6 @@ public class UserManagementController {
 			LOG.error("Inactive or unauthorized users can not access user management page");
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
 		}
 		List<Branch> branches = null;
 		try {
@@ -84,7 +83,6 @@ public class UserManagementController {
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
 		}
 		return JspResolver.USER_MANAGEMENT;
 	}
@@ -108,7 +106,7 @@ public class UserManagementController {
 				if (userManagementService.isUserAdditionAllowed(admin)) {
 					try {
 						user = userManagementService.getUserByEmailId(admin, emailId);
-						LOG.debug("User already exists with the email id : " + emailId);
+						LOG.debug("User already exists in the company with the email id : " + emailId);
 						model.addAttribute("existingUserId", user.getUserId());
 						throw new UserAlreadyExistsException("User already exists with the email id : " + emailId);
 					}
