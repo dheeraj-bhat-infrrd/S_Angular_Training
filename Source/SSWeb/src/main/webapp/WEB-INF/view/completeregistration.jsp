@@ -56,7 +56,7 @@
                         <div id="complete-reg-page-lastname" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
-	                        <input class="float-left login-wrapper-txt" id="complete-reg-user-id" data-non-empty="true" data-email = "true" name="emailId" value="${emailId }" disabled placeholder='<spring:message code="label.emailid.key"/>'>
+	                        <input class="float-left login-wrapper-txt" id="complete-reg-user-id" data-non-empty="true" data-email = "true" name="emailId" value="${emailId }" readonly="readonly" placeholder='<spring:message code="label.emailid.key"/>'>
 	                    </div>
 	                    <div id="complete-reg-page-username" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
@@ -72,6 +72,7 @@
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reset-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">
+	                <input type="hidden" value="${company}" name="companyId">
                	 </form>
                 <div class="footer-copyright text-center">
                 <spring:message code="label.copyright.key"/> 
