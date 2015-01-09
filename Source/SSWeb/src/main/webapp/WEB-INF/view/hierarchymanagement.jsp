@@ -216,5 +216,10 @@
 		$('#selected-region-txt').click(function(){
 			$('#hm-dd-wrapper-bottom').slideToggle(200);
 		});
+        
+        $(window).resize(function(){
+            $('.hm-sub-item-left').width($('.hm-sub-item').width() - 42);
+        });
+        
 	});
 </script>
