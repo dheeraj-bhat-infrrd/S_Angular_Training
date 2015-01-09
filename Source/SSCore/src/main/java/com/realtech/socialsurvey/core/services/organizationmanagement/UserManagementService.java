@@ -80,7 +80,7 @@ public interface UserManagementService {
 	
 	/* Sends an email to user with the link to complete registration.
 	 User has to provide password to set. Also, user can choose to change name.*/
-	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName) throws InvalidInputException, UndeliveredEmailException;
+	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId) throws InvalidInputException, UndeliveredEmailException;
 
 	// Method to set properties of a user based upon active profiles available for the user.
 	public void setProfilesOfUser(User user);
