@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * The persistent class for the users database table.
@@ -50,12 +51,16 @@ public class User implements Serializable {
 	@Column(name = "IS_OWNER")
 	private int isOwner;
 
+	@Transient
 	private boolean agent;
 
+	@Transient
 	private boolean branchAdmin;
 
+	@Transient
 	private boolean regionAdmin;
 
+	@Transient
 	private boolean companyAdmin;
 
 	public int getIsOwner() {
