@@ -1,6 +1,7 @@
 var userManagementUserListStartIndex = 0;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
+var isUserManagementAuthorized=true;
 
 function initUserManagementPage() {
 	paintUserDetailsForm("");
@@ -17,13 +18,13 @@ function selectBranch(element) {
 }
 
 $(document).on('click', '#um-assignto-con .icn-save', function() {
+	if(!isUserManagementAuthorized){
+		return false;
+	}
 	var branchId = $('#um-assignto').attr("brachId");
 	var userId = $(this).closest('.row').attr("id");
 	if (!validateUserInviteDetails()) {
 		return false;
-	}
-	if (branchId == "" || branchId == undefined) {
-		alert("select a valid branch");
 	}
 	if (userId == "" || userId == undefined) {
 		return false;
@@ -32,28 +33,24 @@ $(document).on('click', '#um-assignto-con .icn-save', function() {
 });
 
 $(document).on('click', '#um-emailid-con .icn-save', function() {
+	if(!isUserManagementAuthorized){
+		return false;
+	}
 	if (!validateUserInviteDetails()) {
 		return false;
 	}
 	inviteUser();
 });
 
-/*
- * $('.um-user-row').click(function(){ paintUserDetailsForm(this.id); });
- * 
- * $('#icon-user-delete').click(function(){ var userId =
- * $(this).closest('.row').attr("id"); deleteUser(userId); });
- */
-$(window)
-		.scroll(
-				function(event) {
-					// check if scroll position is at the bottom
-					if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)) {
-						if (!doStopAjaxRequestForUsersList) {
-							paintUserListInUserManagement();
-						}
-					}
-				});
+$(window).scroll(
+	function(event) {
+		// check if scroll position is at the bottom
+		if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)) {
+			if (!doStopAjaxRequestForUsersList) {
+				paintUserListInUserManagement();
+			}
+	}
+});
 /*
  * Function to assign branch to a user
  */
@@ -110,7 +107,7 @@ function unassignUserFromBranch(userId, branchId) {
 			}
 		},
 		complete : function() {
-			$('#ol-btn-cancel').click();
+			$('#overlay-cancel').click();
 			hideOverlay();
 			if (success) {
 				console.log("User successfully unassigned from branch "
@@ -180,6 +177,19 @@ function inviteUser() {
 	});
 }
 
+
+function confirmDeleteUser(userId) {
+	var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
+	if(userId == adminId){
+		alert("Can not delete the admin account");
+		return false;
+	}
+	$('.overlay-disable').show();
+	$('.ol-header').html("Delete User");
+	$('.ol-txt').html("Are you sure you want to delete user??<br>This action will remove all the user details.");
+	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
+}
+
 /*
  * Function to deactivate a user and remove from company
  */
@@ -201,7 +211,7 @@ function deleteUser(userId) {
 			}
 		},
 		complete : function() {
-			$('#ol-btn-cancel').click();
+			$('#overlay-cancel').click();
 			hideOverlay();
 			if (success) {
 				alert("User deleted");
@@ -230,6 +240,11 @@ function paintUserDetailsForm(userId) {
 		data : payload,
 		success : function(data) {
 			$('#user-details-container').html(data);
+		},
+		complete:function(){
+			if(!isUserManagementAuthorized){
+				$('input').prop("disabled",true);
+			}
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -287,7 +302,7 @@ function activateOrDeactivateUser(isActive, userId) {
 			}
 		},
 		complete : function() {
-			$('#ol-btn-cancel').click();
+			$('#overlay-cancel').click();
 			hideOverlay();
 			if (success) {
 				if (isActive) {
@@ -474,7 +489,7 @@ function validateAssignToBranchName() {
 	}
 }
 
-$(document).on('click', '#ol-btn-cancel', function() {
-	$('#ol-btn-continue').removeAttr("onclick");
+$(document).on('click', '#overlay-cancel', function() {
+	$('#overlay-continue').removeAttr("onclick");
 	$('.overlay-disable').hide();
 });
