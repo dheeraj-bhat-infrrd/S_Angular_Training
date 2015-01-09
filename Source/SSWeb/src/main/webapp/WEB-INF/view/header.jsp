@@ -106,7 +106,7 @@
 			</div>
 			<div class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
-					<span>${fn:substring(user.displayName, 0, 1)}</span>
+					<span>${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
 						<c:if test="${highestrole == 2}">
 							<!-- show the company settings only of the user has company admin as a role -->
