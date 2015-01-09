@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.UserProfileComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -28,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -97,6 +100,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
+	private GenericDao<RemovedUser, Long> removedUserDao;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
@@ -215,7 +221,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			LOG.debug("Invalidating registration link for emailId : " + emailId);
 			invalidateRegistrationInvite(emailId);
 		}
-
+		setProfilesOfUser(user);
 		LOG.info("Successfully executed method to add corporate admin for emailId : " + emailId);
 		return user;
 	}
@@ -348,7 +354,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
 				CommonConstants.STATUS_NOT_VERIFIED, String.valueOf(admin.getUserId()));
 		user = userDao.save(user);
-		sendVerificationLink(user);
+		/*
+		 * Commenting the code to send verification link as another link for invite will anyway be sent to the user.
+		 * That mail should be used to verify the email id of a user.
+		 */
+		//sendVerificationLink(user);
 		LOG.info("Method to add a new user, inviteNewUser() finished for email id : " + emailId);
 		return user;
 	}
@@ -371,12 +381,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		User userToBeDeactivated = userDao.findById(User.class, userIdToRemove);
 
+		userToBeDeactivated.setLoginName(userToBeDeactivated.getLoginName()+"_"+System.currentTimeMillis());
+		
 		userToBeDeactivated.setStatus(CommonConstants.STATUS_INACTIVE);
 		userToBeDeactivated.setModifiedBy(String.valueOf(admin.getUserId()));
 		userToBeDeactivated.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 
 		LOG.info("Deactivating user " + userToBeDeactivated.getFirstName());
 		userDao.update(userToBeDeactivated);
+		
+		//Create an entry into the RemovedUser table for keeping historical records of users.
+		RemovedUser removedUser = new RemovedUser();
+		removedUser.setCompany(userToBeDeactivated.getCompany());
+		removedUser.setUser(userToBeDeactivated);
+		removedUser.setCreatedBy(String.valueOf(admin.getUserId()));
+		removedUser.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		removedUserDao.save(removedUser);
 
 		// Marks all the user profiles for given user as inactive.
 		userProfileDao.deactivateAllUserProfilesForUser(admin, userToBeDeactivated);
@@ -874,12 +894,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 		UserProfile highestUserProfile = null;
 		// get the highest user profile for the user
-		highestUserProfile = getHighestUserProfile(userProfiles);
+		Collections.sort(userProfiles, new UserProfileComparator());
+		highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
 		highestProfilesMasterId = highestUserProfile.getProfilesMaster().getProfileId();
 		queries.clear();
+
 		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			// Fetch all the branches of company
-			LOG.info("IN getBranchesForUser() for company {}"+user.getCompany().getCompany()); 
+			LOG.info("IN getBranchesForUser() for company {}" + user.getCompany().getCompany());
 			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
 		}
 		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -921,6 +943,36 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	/*
+	 * Method to set properties of a user based upon active profiles available for the user.
+	 */
+	@Override
+	public void setProfilesOfUser(User user) {
+		LOG.debug("Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user started.");
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		for (UserProfile userProfile : userProfiles) {
+			if (userProfile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				switch (userProfile.getProfilesMaster().getProfileId()) {
+					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+						user.setCompanyAdmin(true);
+						continue;
+					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+						user.setRegionAdmin(true);
+						continue;
+					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+						user.setBranchAdmin(true);
+						continue;
+					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+						user.setAgent(true);
+						continue;
+					default:
+						LOG.error("Invalid profile id found for user {} in setProfilesOfUser().", user.getFirstName());
+				}
+			}
+		}
+		LOG.debug("Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished.");
+	}
+	
+	/*
 	 * Method to fetch all the user profiles for the user
 	 */
 	@Override
@@ -941,27 +993,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	/*
 	 * Method to get highest user profile for the user company->region->branch->agent
+	 * @Override public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws
+	 * InvalidInputException { if (userProfiles == null || userProfiles.isEmpty()) {
+	 * LOG.error("User profiles passed was either null or empty"); throw new
+	 * InvalidInputException("User profiles passed was either null or empty"); }
+	 * LOG.info("Method getHighestUserProfile() called to fetch the highest user profile for the user"
+	 * ); int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+	 * UserProfile highestUserProfile = userProfiles.get(0); for (UserProfile userProfile :
+	 * userProfiles) { if ((userProfile.getProfilesMaster().getProfileId() <
+	 * highestProfilesMasterId) && (userProfile.getProfilesMaster().getProfileId() !=
+	 * CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) { highestProfilesMasterId =
+	 * userProfile.getProfilesMaster().getProfileId(); highestUserProfile = userProfile; } }
+	 * LOG.info("Method getHighestUserProfile() finished successfully"); return highestUserProfile;
+	 * }
 	 */
-	@Override
-	public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws InvalidInputException {
-		if (userProfiles == null || userProfiles.isEmpty()) {
-			LOG.error("User profiles passed was either null or empty");
-			throw new InvalidInputException("User profiles passed was either null or empty");
-		}
-		LOG.info("Method getHighestUserProfile() called to fetch the highest user profile for the user");
-
-		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-		UserProfile highestUserProfile = userProfiles.get(0);
-		for (UserProfile userProfile : userProfiles) {
-			if ((userProfile.getProfilesMaster().getProfileId() < highestProfilesMasterId)
-					&& (userProfile.getProfilesMaster().getProfileId() != CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) {
-				highestProfilesMasterId = userProfile.getProfilesMaster().getProfileId();
-				highestUserProfile = userProfile;
-			}
-		}
-		LOG.info("Method getHighestUserProfile() finished successfully");
-		return highestUserProfile;
-	}
 
 	/*
 	 * Method to get the highest user profile for the user
@@ -975,7 +1020,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.info("Method getHighestUserProfileForUser() called to fetch the highest user profile for the user");
 		List<UserProfile> userProfiles = getAllUserProfilesForUser(user);
-		UserProfile highestUserProfile = getHighestUserProfile(userProfiles);
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			LOG.error("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
+			throw new NoRecordsFetchedException("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
+		}
+		Collections.sort(userProfiles, new UserProfileComparator());
+		UserProfile highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
 		if (highestUserProfile == null) {
 			LOG.error("No user profile found for the user");
 			throw new NoRecordsFetchedException("No user profile found for the user");
