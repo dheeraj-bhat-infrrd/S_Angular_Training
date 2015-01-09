@@ -250,6 +250,14 @@
 	            </filters>
 	        </build>
 	    </profile>
+	    <profile>
+	        <id>test</id>
+	        <build>
+	            <filters>
+	                <filter>src/main/resources/filler.test.properties</filter>
+	            </filters>
+	        </build>
+	    </profile>
 	</profiles>
 
 	<pluginRepositories>
