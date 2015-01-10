@@ -52,21 +52,20 @@
 				<div class="header-links-item">
 					<a href="#"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if
-					test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 2}">
+				<c:if test="">
 					<div class="header-links-item">
 						<a
 							href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
 								code="label.header.company.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 2}">
+				<c:if test="${highestrole == 1}">
 					<div class="header-links-item">
 						<a href="#"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${empty userManagementNotAccessible}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1 || highestrole != 4}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
 								code="label.header.usermanagement.key" /></a>
@@ -84,20 +83,20 @@
 					<a href="#"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if
-					test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 2}">
+					test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="header-links-item">
 						<a
 							href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
 								code="label.header.company.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 2}">
+				<c:if test="${highestrole == 1}">
 					<div class="header-links-item">
 						<a href="#"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${empty userManagementNotAccessible}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1 || highestrole != 4}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
 								code="label.header.usermanagement.key" /></a>
@@ -108,7 +107,7 @@
 				<div class="float-left user-info-initial">
 					<span>${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
-						<c:if test="${highestrole == 2}">
+						<c:if test="${highestrole == 1}">
 							<!-- show the company settings only of the user has company admin as a role -->
 							<div class="initial-dd-item" id="company-setting">
 								<spring:message code="label.settings.company.key" />
