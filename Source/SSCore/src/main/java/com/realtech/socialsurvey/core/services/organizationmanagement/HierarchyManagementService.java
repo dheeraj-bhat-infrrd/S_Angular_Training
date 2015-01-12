@@ -144,8 +144,9 @@ public interface HierarchyManagementService {
 	 * @param branchAddress
 	 * @param user
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException;
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to update a region
@@ -155,8 +156,9 @@ public interface HierarchyManagementService {
 	 * @param regionAddress
 	 * @param user
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
-	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException;
+	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to check whether a user has privileges to build hierarchy
