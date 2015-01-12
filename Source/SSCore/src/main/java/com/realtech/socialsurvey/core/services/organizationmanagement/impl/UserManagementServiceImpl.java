@@ -409,7 +409,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to fetch list of users on the basis of email id is called.");
 
 		if (admin == null) {
-			throw new InvalidInputException("Admin user is null in getUsersByEmailId()");
+			throw new InvalidInputException("Admin user is null in getUserByLoginName()");
 		}
 		if (loginName == null || loginName.isEmpty()) {
 			throw new InvalidInputException("Email id is null or empty in getUsersByEmailId()");
