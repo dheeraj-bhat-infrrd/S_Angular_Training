@@ -156,7 +156,35 @@ function searchBranchesForCompany(){
 }
 
 function searchBranchesForCompanyCallBack(data) {
-	
+	var searchResult =  $.parseJSON(data);
+	if(searchResult != null) {
+		var len = searchResult.length;
+		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30">';
+		console.log("searchResult is "+searchResult);
+		if(len > 0) {
+			$.each(searchResult,function(i,branch) {
+				if(i % 2 == 0) {
+					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
+					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
+				}
+			});
+			htmlData = ' </div>';
+			htmlData = ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30">';
+			$.each(searchResult,function(i,branch) {
+				if(i % 2 != 0) {
+					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
+					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
+				}
+			});
+			htmlData = ' </div>';
+		}
+		else {
+			htmlData = 'No branches are added yet';
+		}
+		$("#existing-branches").html(htmlData);
+	}
 }
 
 /**
@@ -582,6 +610,35 @@ $("#selected-region-txt").keyup(function() {
 		}, 500);
 	}
 	else {
+		$('#hm-dd-wrapper-bottom').slideUp(200);
+	}
+});
+
+$("#selected-region-txt").keyup(function() {
+	var text = $("#selected-region-txt").val();
+	if (text.length > 1) {
+		delay(function() {
+			populateRegionsSelector(text);
+		}, 500);
+	}
+	else {
+		$('#hm-dd-wrapper-bottom').slideUp(200);
+	}
+});
+
+//bindind arrow keys with region selector
+$("#selected-region-txt").keydown(function(e) {
+	console.log(" keydown event "+e);
+	if(e.which == 40) {
+		var text = $("#selected-region-txt").val();
+		if(text == undefined) {
+			text = "";
+		}
+		delay(function() {
+			populateRegionsSelector(text);
+		}, 500);
+	}	
+	else if(e.which == 38){
 		$('#hm-dd-wrapper-bottom').slideUp(200);
 	}
 });

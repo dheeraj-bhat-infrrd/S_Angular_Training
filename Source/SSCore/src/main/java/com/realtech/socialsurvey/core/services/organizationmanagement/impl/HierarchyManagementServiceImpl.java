@@ -451,10 +451,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 	/**
 	 * Method to update a branch
+	 * @throws SolrException 
 	 */
 	@Override
 	@Transactional
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException {
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update branch");
 		}
@@ -492,15 +493,19 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		// TODO update address details
 		branchDao.update(branch);
+		
+		LOG.debug("Updating branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
 		LOG.info("Method to update branch completed successfully");
 	}
 
 	/**
 	 * Method to update a region
+	 * @throws SolrException 
 	 */
 	@Override
 	@Transactional
-	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException {
+	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update region");
 		}
@@ -523,6 +528,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		// TODO update address
 		regionDao.update(region);
+		
+		LOG.debug("Updating region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+		
 		LOG.info("Method to update region completed successfully");
 	}
 
