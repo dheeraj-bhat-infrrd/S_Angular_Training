@@ -512,7 +512,7 @@ COMMENT = 'Holds the disabled account details for a company';
 -- CREATE SCRIPTS: 09 Jan 2015 : Adding REMOVED_USER table to ss_user
 
 CREATE TABLE `ss_user`.`REMOVED_USER` (
-  `REMOVED_USER_ID` INT unsigned NOT NULL,
+  `REMOVED_USER_ID` INT unsigned NOT NULL AUTO_INCREMENT,
   `USER_ID` INT UNSIGNED NOT NULL,
   `COMPANY_ID` INT UNSIGNED NOT NULL,
   `CREATED_ON` TIMESTAMP NOT NULL,

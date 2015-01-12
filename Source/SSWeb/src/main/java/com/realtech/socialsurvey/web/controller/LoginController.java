@@ -143,11 +143,7 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					/**
-					 * redirect user to complete the top priority profile. Priority
-					 * Company->region->branch->agent
-					 */
-					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
+					
 					UserProfile highestUserProfile = null;
 					// fetch the highest user profile for user
 					try {
@@ -157,16 +153,10 @@ public class LoginController {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}
-					// If account type is individual or user is an agent set user management tab as
-					// not authorized
-					if (accountType.getValue() == 1
-							|| highestUserProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-						model.addAttribute("userManagementNotAccessible", "true");
-					}
-
+					
 					redirectTo = getRedirectionFromProfileCompletionStage(highestUserProfile.getProfileCompletionStage());
 
-					if (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)){
+					if (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)) {
 						// get the user's canonical settings
 						LOG.info("Fetching the user's canonical settings and setting it in session");
 						sessionHelper.getCanonicalSettings(session);
@@ -174,6 +164,8 @@ public class LoginController {
 						sessionHelper.setSettingVariablesInSession(session);
 					}
 
+				}else{
+					//TODO: add logic for what happens when no user profile present
 				}
 			}
 

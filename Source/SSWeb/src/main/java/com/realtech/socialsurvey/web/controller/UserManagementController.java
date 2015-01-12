@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -52,6 +54,9 @@ public class UserManagementController {
 
 	@Autowired
 	private URLGenerator urlGenerator;
+	
+	@Autowired
+	private SessionHelper sessionHelper;
 
 	private static final int BATCH_SIZE = 20;
 
@@ -62,13 +67,17 @@ public class UserManagementController {
 		LOG.info("User Management page started");
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
-			LOG.error("Inactive or unauthorized users can not access user management page");
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
-		}
 		List<Branch> branches = null;
 		try {
+			if (user == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
+			if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
+				LOG.error("Inactive or unauthorized users can not access user management page");
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
+			}
 			try {
 				branches = userManagementService.getBranchesForUser(user);
 			}
@@ -93,19 +102,36 @@ public class UserManagementController {
 	@RequestMapping(value = "/invitenewuser", method = RequestMethod.POST)
 	public String inviteNewUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a new user by existing admin called.");
+		HttpSession session = request.getSession(false);
+		User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 		try {
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
 			String lastName = request.getParameter(CommonConstants.LAST_NAME);
 			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
 
-			HttpSession session = request.getSession(false);
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			// form parameter validations for inviting new user
+			if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
+				LOG.error("First name invalid");
+				throw new InvalidInputException("First name invalid", DisplayMessageConstants.INVALID_FIRSTNAME);
+			}
+			if (lastName != null && !lastName.isEmpty() && !lastName.matches(CommonConstants.LAST_NAME_REGEX)) {
+				LOG.error("Last name invalid");
+				throw new InvalidInputException("Last name invalid", DisplayMessageConstants.INVALID_LASTNAME);
+			}
+			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+				LOG.error("EmailId not valid");
+				throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
+			}
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			User user = null;
 			try {
 				if (userManagementService.isUserAdditionAllowed(admin)) {
 					try {
-						user = userManagementService.getUserByEmailId(admin, emailId);
+						user = userManagementService.getUserByLoginName(admin, emailId);
 						LOG.debug("User already exists in the company with the email id : " + emailId);
 						model.addAttribute("existingUserId", user.getUserId());
 						throw new UserAlreadyExistsException("User already exists with the email id : " + emailId);
@@ -158,6 +184,11 @@ public class UserManagementController {
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
 			HttpSession session = request.getSession(false);
+			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			Long accountTypeVal = accountType.getValue();
 			model.addAttribute("accounttypeval", accountTypeVal);
@@ -208,6 +239,11 @@ public class UserManagementController {
 		HttpSession session = request.getSession(false);
 		@SuppressWarnings("unchecked") List<User> usersList = (List<User>) session.getAttribute("allUsersList");
 		try {
+			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			if (usersList == null)
 
 				getAllUsersForCompany(model, request);
@@ -231,7 +267,6 @@ public class UserManagementController {
 	public String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
 		try {
-
 			String emailId = request.getParameter("emailId");
 			if (emailId == null || emailId.isEmpty()) {
 				LOG.error("Invalid email id passed in method findUserByEmail().");
@@ -246,7 +281,7 @@ public class UserManagementController {
 			}
 
 			try {
-				user = userManagementService.getUserByEmailId(user, emailId);
+				user = userManagementService.getUserByLoginName(user, emailId);
 				model.addAttribute("searchedUser", user);
 			}
 			catch (InvalidInputException invalidInputException) {
@@ -273,6 +308,7 @@ public class UserManagementController {
 	public String removeExistingUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to deactivate an existing user called.");
 		try {
+
 			long userIdToRemove = 0;
 			try {
 				userIdToRemove = Long.parseLong(request.getParameter("userIdToRemove"));
@@ -283,7 +319,8 @@ public class UserManagementController {
 			}
 			if (userIdToRemove < 0) {
 				LOG.error("Invalid user Id found to remove in removeExistingUser().");
-				throw new InvalidInputException("Invalid user Id found to remove in removeExistingUser().");
+				throw new InvalidInputException("Invalid user Id found to remove in removeExistingUser().",
+						DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
 
 			HttpSession session = request.getSession(false);
@@ -318,6 +355,10 @@ public class UserManagementController {
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		String branchIdStr = request.getParameter("branchId");
 		try {
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			if (userIdStr == null || userIdStr.isEmpty()) {
 				LOG.error("Invalid user id passed in method assignUserToBranch().");
 				throw new InvalidInputException("Invalid user id passed in method assignUserToBranch().");
@@ -358,6 +399,10 @@ public class UserManagementController {
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		String branchIdStr = request.getParameter("branchId");
 		try {
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			if (userIdStr == null || userIdStr.isEmpty()) {
 				LOG.error("Invalid user id passed in method unAssignUserFromBranch().");
 				throw new InvalidInputException("Invalid user id passed in method unAssignUserFromBranch().");
@@ -402,10 +447,15 @@ public class UserManagementController {
 	public String assignOrUnassignBranchAdmin(Model model, HttpServletRequest request) {
 		LOG.info("Method to assign or unassign branch admin called");
 		try {
+			HttpSession session = request.getSession(false);
+			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			String branch = request.getParameter("branchId");
 			String userToAssign = request.getParameter("userId");
 			String isAssign = request.getParameter("isAssign");
-
 			if (branch == null || branch.isEmpty()) {
 				LOG.error("Null or empty value passed for branch in assignOrUnassignBranchAdmin()");
 				throw new InvalidInputException("Null or empty value passed for branch in assignOrUnassignBranchAdmin()");
@@ -424,8 +474,6 @@ public class UserManagementController {
 			try {
 				branchId = Long.parseLong(branch);
 				userId = Long.parseLong(userToAssign);
-				HttpSession session = request.getSession(false);
-				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 				if (isAssign.equalsIgnoreCase("YES"))
 					// Assigns the given user as branch admin
 					userManagementService.assignBranchAdmin(admin, branchId, userId);
@@ -461,7 +509,12 @@ public class UserManagementController {
 		LOG.info("Method to assign region admin called");
 
 		try {
-
+			HttpSession session = request.getSession(false);
+			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			String region = request.getParameter("regionId");
 			String userToAssign = request.getParameter("userId");
 
@@ -476,13 +529,10 @@ public class UserManagementController {
 
 			long regionId = 0l;
 			long userId = 0l;
-			HttpSession session;
 
 			try {
 				regionId = Long.parseLong(region);
 				userId = Long.parseLong(userToAssign);
-				session = request.getSession(false);
-				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 				// Assigns the given user as region admin
 				userManagementService.assignRegionAdmin(admin, regionId, userId);
 			}
@@ -513,7 +563,12 @@ public class UserManagementController {
 		LOG.info("Method to remove region admin called");
 
 		try {
-
+			HttpSession session = request.getSession(false);
+			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			String region = request.getParameter("regionId");
 			String userIdToRemove = request.getParameter("userId");
 
@@ -528,13 +583,10 @@ public class UserManagementController {
 
 			long regionId = 0l;
 			long userId = 0l;
-			HttpSession session;
 
 			try {
 				regionId = Long.parseLong(region);
 				userId = Long.parseLong(userIdToRemove);
-				session = request.getSession(false);
-				User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
 				// Remove the given user from branch admin.
 				userManagementService.unassignRegionAdmin(admin, regionId, userId);
@@ -565,7 +617,12 @@ public class UserManagementController {
 
 		LOG.info("Method to activate or deactivate a user, activateOrDecativateUser() called.");
 		try {
-
+			HttpSession session = request.getSession(false);
+			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
 			String isAssign = request.getParameter("isAssign");
 			if (isAssign == null || isAssign.isEmpty()) {
 				LOG.error("Null or empty value passed for check field isAssign in assignOrUnassignBranchAdmin()");
@@ -584,19 +641,13 @@ public class UserManagementController {
 				throw new InvalidInputException("Invalid user Id found to update in updateUser().");
 			}
 
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-			if (user == null) {
-				LOG.error("No user found in current session in updateUser().");
-				throw new InvalidInputException("No user found in current session in updateUser().");
-			}
 			try {
 				if (isAssign.equalsIgnoreCase("YES"))
 					// Set the given user as active.
-					userManagementService.updateUser(user, userIdToUpdate, true);
+					userManagementService.updateUser(admin, userIdToUpdate, true);
 				else if (isAssign.equalsIgnoreCase("NO"))
 					// Set the given user as inactive.
-					userManagementService.updateUser(user, userIdToUpdate, false);
+					userManagementService.updateUser(admin, userIdToUpdate, false);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
@@ -623,21 +674,21 @@ public class UserManagementController {
 	@RequestMapping(value = "/fetchBranches", method = RequestMethod.POST)
 	public String getBranchesForUser(Model model, HttpServletRequest request) {
 
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User admin = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
 		try {
-			if (user == null) {
-				LOG.error("Invalid user passed in method getBranchesForUser().");
-				throw new InvalidInputException("Invalid user id passed in method getBranchesForUser().");
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
-			LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.", user.getFirstName());
-			List<Branch> branches = userManagementService.getBranchesForUser(user);
+			LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.", admin.getFirstName());
+			List<Branch> branches = userManagementService.getBranchesForUser(admin);
 			model.addAttribute("branches", branches);
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException in getBranchesForUser(). Reason : " + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finisheded.", user.getFirstName());
+		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finisheded.", admin.getFirstName());
 		return JspResolver.MESSAGE_HEADER;
 	}
 
@@ -692,7 +743,7 @@ public class UserManagementController {
 
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
-			String lastName = request.getParameter(CommonConstants.FIRST_NAME);
+			String lastName = request.getParameter(CommonConstants.LAST_NAME);
 			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirmPassword");
@@ -700,23 +751,23 @@ public class UserManagementController {
 			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
 			User user = null;
-
-			// check if any parameter passed is null
-			if (firstName == null || firstName.isEmpty()) {
-				LOG.error("First name passed was null or empty");
-				throw new InvalidInputException("First name passed was null or empty", DisplayMessageConstants.INVALID_FIRSTNAME);
+			
+			// form parameters validation
+			if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
+				LOG.error("First name invalid");
+				throw new InvalidInputException("First name invalid", DisplayMessageConstants.INVALID_FIRSTNAME);
 			}
-			if (lastName == null || lastName.isEmpty()) {
-				LOG.error("Last name passed was null or empty");
-				throw new InvalidInputException("Last name passed was null or empty", DisplayMessageConstants.INVALID_LASTNAME);
+			if (lastName != null && !lastName.isEmpty() && !lastName.matches(CommonConstants.LAST_NAME_REGEX)) {
+				LOG.error("Last name invalid");
+				throw new InvalidInputException("Last name invalid", DisplayMessageConstants.INVALID_LASTNAME);
 			}
-			if (emailId == null || emailId.isEmpty()) {
-				LOG.error("EmailId passed was null or empty");
-				throw new InvalidInputException("EmailId passed was null or empty", DisplayMessageConstants.INVALID_EMAILID);
+			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+				LOG.error("EmailId not valid");
+				throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
 			}
-			if (password == null || password.isEmpty()) {
-				LOG.error("Password passed was null or empty");
-				throw new InvalidInputException("Password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+			if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+				LOG.error("Password passed was invalid");
+				throw new InvalidInputException("Password passed was invalid", DisplayMessageConstants.INVALID_PASSWORD);
 			}
 			if (companyIdStr == null || companyIdStr.isEmpty()) {
 				LOG.error("Company Id passed was null or empty");
@@ -777,14 +828,51 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			AccountType accountType = null;
+			HttpSession session = request.getSession(true);
+			session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+
+			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+			if (licenseDetails != null && !licenseDetails.isEmpty()) {
+				LicenseDetail licenseDetail = licenseDetails.get(0);
+				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+			}
+			else {
+				LOG.debug("License details not found for the user's company");
+			}
+			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
+				
+				UserProfile highestUserProfile = null;
+				// fetch the highest user profile for user
+				try {
+					highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
+				}
+				catch (NoRecordsFetchedException e) {
+					LOG.error("No user profiles found for the user");
+					return JspResolver.ERROR_PAGE;
+				}
+				
+				if (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)) {
+					// get the user's canonical settings
+					LOG.info("Fetching the user's canonical settings and setting it in session");
+					sessionHelper.getCanonicalSettings(session);
+					// Set the session variables
+					sessionHelper.setSettingVariablesInSession(session);
+				}
+
+			}else{
+				//TODO: add logic for what happens when no user profile present
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			return JspResolver.COMPLETE_REGISTRATION;
 		}
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
-		return JspResolver.LOGIN;
+		return JspResolver.LANDING;
 	}
 
 	/*
@@ -822,6 +910,8 @@ public class UserManagementController {
 		LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company.");
 	}
 
+	
+	
 	/*
 	 * Method to iterate over the list of all the users which is fetched from database. It returns
 	 * same number of users as that of configured for maximum batch size.
