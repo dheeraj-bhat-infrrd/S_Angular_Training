@@ -183,6 +183,12 @@
 		    <version>8.0.15</version>
 		</dependency>
 		
+		<!-- Dependency for AmazonS3 Fileupload -->
+		<dependency>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<groupId>com.amazonaws</groupId>
+			<version>1.9.13</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -241,6 +247,14 @@
 	        <build>
 	            <filters>
 	                <filter>src/main/resources/filler.dev.properties</filter>
+	            </filters>
+	        </build>
+	    </profile>
+	    <profile>
+	        <id>test</id>
+	        <build>
+	            <filters>
+	                <filter>src/main/resources/filler.test.properties</filter>
 	            </filters>
 	        </build>
 	    </profile>

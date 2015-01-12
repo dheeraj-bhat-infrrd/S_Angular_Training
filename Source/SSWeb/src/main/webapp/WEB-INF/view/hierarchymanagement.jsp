@@ -11,12 +11,6 @@
     </div>
 </div>
 
-<style>
-.error-msg {
-	width:auto !important;
-	margin-top:5px !important;
-}
-</style>
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
@@ -67,7 +61,7 @@
 			                            </div>
 			                        </div>
 			                        <div class="hm-btn-outer margin-bottom-25 margin-top-5 clearfix hm-item-row-right-btn-save">
-			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix error-msg">
+			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
 			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
 			                            </div>
@@ -203,24 +197,6 @@
         </c:choose>
 	</div>
 </div>
-<div class="overlay-disable hide" id="overlay-confirm">
-	<div class="overlay-disable-wrapper">
-		<div class="ol-header" id="overlay-header"></div>
-		<input type="hidden" name="regionid-to-delete-hidden" id="regionid-to-delete-hidden" />
-		<input type="hidden" name="branchid-to-delete-hidden" id="branchid-to-delete-hidden" />
-		<div class="ol-content">
-			<div class="ol-txt" id="overlay-txt"></div>
-			<div class="clearfix">
-				<div class="float-left ol-btn-wrapper">
-					<div id="overlay-continue" class="ol-btn cursor-pointer">Continue</div>
-				</div>
-				<div class="float-left ol-btn-wrapper">
-					<div id="overlay-cancel" class="ol-btn cursor-pointer">Cancel</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
 
 <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/hierarchymanagement.js"></script>
 <script>
@@ -234,5 +210,10 @@
 		$('#selected-region-txt').click(function(){
 			$('#hm-dd-wrapper-bottom').slideToggle(200);
 		});
+        
+        $(window).resize(function(){
+            $('.hm-sub-item-left').width($('.hm-sub-item').width() - 42);
+        });
+        
 	});
 </script>

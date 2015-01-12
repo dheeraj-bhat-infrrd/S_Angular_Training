@@ -19,6 +19,22 @@
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
+    <div id="overlay-main" class="overlay-main hide">
+        <div class="overlay-disable-wrapper">
+            <div id="overlay-header" class="ol-header"><!-- Populated by javascript --></div>
+            <div class="ol-content">
+                <div id="overlay-text" class="ol-txt"><!-- Populated by javascript --></div>
+                <div class="clearfix">
+                    <div class="float-left ol-btn-wrapper">
+                        <div id="overlay-continue" class="ol-btn cursor-pointer"><!-- Populated by javascript --></div>
+                    </div>
+                    <div class="float-left ol-btn-wrapper">
+                        <div id="overlay-cancel" class="ol-btn cursor-pointer"><!-- Populated by javascript --></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 	<div id="header-slider-wrapper" class="header-slider-wrapper">
 		<div class="header-slider">
 			<div id="header-links-slider"
@@ -105,7 +121,7 @@
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo"
-						style="background: url(${pageContext.request.contextPath}/resources/logos/${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+						style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
 				</c:if>
 
 			</div>			
