@@ -80,9 +80,9 @@ public class PaymentController {
 		try {
 			boolean status = false;
 
-			String strAccountType = request.getParameter("accounttype");
+			String strAccountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			// Get the nonce from the request
-			String nonce = request.getParameter("payment_method_nonce");
+			String nonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 
 			// Extract the session
 			HttpSession session = request.getSession(false);
@@ -90,6 +90,10 @@ public class PaymentController {
 			// Get the user object from the session and the company object from it
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			Company company = user.getCompany();
+			
+			if(strAccountType == null || strAccountType.isEmpty()){
+				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
 
 			int accountTypeValue = 0;
 			try {
@@ -157,7 +161,7 @@ public class PaymentController {
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.PAYMENT;
+			return JspResolver.ACCOUNT_TYPE_SELECTION;
 		}
 		return JspResolver.LANDING;
 	}

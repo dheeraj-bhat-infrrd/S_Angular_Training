@@ -83,6 +83,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String BRANCH_ID_COLUMN = "branchId";
+	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -104,6 +105,7 @@ public interface CommonConstants {
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
+	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	
 	/**
 	 * Batch Constants

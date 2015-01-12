@@ -52,9 +52,10 @@ public interface Payment {
 	 * @param planId
 	 * @param nonce
 	 * @return
+	 * @throws NoRecordsFetchedException 
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException;
+	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException;
 	
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
