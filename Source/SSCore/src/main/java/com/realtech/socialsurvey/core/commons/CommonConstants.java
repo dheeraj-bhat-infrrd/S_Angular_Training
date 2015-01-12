@@ -143,6 +143,15 @@ public interface CommonConstants {
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
 
+	/**
+	 * Amazon Details
+	 */
+	public static final String AMAZON_ACCESS_KEY = "AMAZON_ACCESS_KEY";
+	public static final String AMAZON_SECRET_KEY = "AMAZON_SECRET_KEY";
+	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
+	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
+	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
+	
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
 	
