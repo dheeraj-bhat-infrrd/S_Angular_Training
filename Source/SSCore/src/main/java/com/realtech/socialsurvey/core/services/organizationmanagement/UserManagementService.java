@@ -49,7 +49,7 @@ public interface UserManagementService {
 	public void unassignRegionAdmin(User admin, long regionId, long userIdToRemove) throws InvalidInputException;
 
 	// Method to return users with provided email id.
-	public User getUserByEmailId(User admin, String emailId) throws InvalidInputException, NoRecordsFetchedException;
+	public User getUserByLoginName(User admin, String emailId) throws InvalidInputException, NoRecordsFetchedException;
 
 	// Method to return users whose email id matches with the provided email id.
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException;

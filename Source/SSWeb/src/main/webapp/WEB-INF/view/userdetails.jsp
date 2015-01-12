@@ -145,15 +145,7 @@
 }
 </style>
 <script>
-	$('#um-fname').blur(function() {
-		validateUserFirstName();
-	});
-	$('#um-fname').blur(function() {
-		validateUserLastName();
-	});
-	$('#um-fname').blur(function() {
-		validateUserEmailId();
-	});
+	
 	$('#um-assignto').keyup(function() {
 		$(this).removeAttr("brachid");
 	});
