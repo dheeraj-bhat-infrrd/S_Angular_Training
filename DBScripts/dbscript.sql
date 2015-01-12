@@ -532,3 +532,6 @@ CREATE TABLE `ss_user`.`REMOVED_USER` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB
 COMMENT = 'Holds the information of users which have been removed from the company.';
+
+ALTER TABLE `ss_user`.`removed_user` 
+CHANGE COLUMN `REMOVED_USER_ID` `REMOVED_USER_ID` INT(10) UNSIGNED NOT NULL AUTO_INCREMENT ;

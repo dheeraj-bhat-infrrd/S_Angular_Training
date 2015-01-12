@@ -165,11 +165,13 @@
 			.click(
 					function() {
 						var userId = $(this).closest('.row').attr("id");
-						$('.overlay-disable').show();
-						$('.ol-header').html("Deactivate User");
-						$('.ol-txt').html(
+						$('#overlay-main').show();
+						$('#overlay-continue').html("Deactivate");
+						$('#overlay-cancel').html("Cancel");
+						$('#overlay-header').html("Deactivate User");
+						$('#overlay-text').html(
 								"Are you sure you want to deactivate user??");
-						$('#ol-btn-continue').attr(
+						$('#overlay-continue').attr(
 								"onclick",
 								"activateOrDeactivateUser(" + false + ", "
 										+ userId + ");");
@@ -177,10 +179,12 @@
 	$('#icn-status-red').click(
 			function() {
 				var userId = $(this).closest('.row').attr("id");
-				$('.overlay-disable').show();
-				$('.ol-header').html("Activate User");
-				$('.ol-txt').html("Are you sure you want to activate user??");
-				$('#ol-btn-continue').attr(
+				$('#overlay-continue').html("Activate");
+				$('#overlay-cancel').html("Cancel");
+				$('#overlay-main').show();
+				$('#overlay-header').html("Activate User");
+				$('#overlay-text').html("Are you sure you want to activate user??");
+				$('#overlay-continue').attr(
 						"onclick",
 						"activateOrDeactivateUser(" + true + ", " + userId
 								+ ");");
@@ -191,11 +195,13 @@
 				branchIdToUnassign = branchIdToUnassign
 						.substr("branch-to-unassign-".length);
 				var userId = $(this).closest('.row').attr("id");
-				$('.overlay-disable').show();
-				$('.ol-header').html("Remove user from branch");
-				$('.ol-txt').html(
+				$('#overlay-continue').html("Confirm");
+				$('#overlay-cancel').html("Cancel");
+				$('#overlay-main').show();
+				$('#overlay-header').html("Remove user from branch");
+				$('#overlay-text').html(
 						"Are you sure you want to remove user from branch??");
-				$('#ol-btn-continue').attr(
+				$('#overlay-continue').attr(
 						"onclick",
 						"unassignUserFromBranch(" + userId + ","
 								+ branchIdToUnassign + ");");

@@ -184,9 +184,11 @@ function confirmDeleteUser(userId) {
 		alert("Can not delete the admin account");
 		return false;
 	}
-	$('.overlay-disable').show();
-	$('.ol-header').html("Delete User");
-	$('.ol-txt').html("Are you sure you want to delete user??<br>This action will remove all the user details.");
+	$('#overlay-main').show();
+	$('#overlay-continue').html("Delete");
+	$('#overlay-cancel').html("Cancel");
+	$('#overlay-header').html("Delete User");
+	$('#overlay-text').html("Are you sure you want to delete user??<br>This action will remove all the user details.");
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
@@ -214,7 +216,6 @@ function deleteUser(userId) {
 			$('#overlay-cancel').click();
 			hideOverlay();
 			if (success) {
-				alert("User deleted");
 				// paint blank user details form
 				$('#um-user-' + userId).remove();
 				paintUserDetailsForm("");
@@ -491,5 +492,5 @@ function validateAssignToBranchName() {
 
 $(document).on('click', '#overlay-cancel', function() {
 	$('#overlay-continue').removeAttr("onclick");
-	$('.overlay-disable').hide();
+	$('#overlay-main').hide();
 });
