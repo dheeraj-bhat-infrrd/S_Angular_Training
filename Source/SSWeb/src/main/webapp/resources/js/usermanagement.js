@@ -3,6 +3,17 @@ var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized=true;
 
+
+$(document).on('blur','#um-fname',function() {
+	validateUserFirstName(this.id);
+});
+$(document).on('blur','#um-lname',function() {
+	validateUserLastName(this.id);
+});
+$(document).on('blur','#um-emailid',function() {
+	validateUserEmailId(this.id);
+});
+
 function initUserManagementPage() {
 	paintUserDetailsForm("");
 	paintUserListInUserManagement();
@@ -153,19 +164,14 @@ function inviteUser() {
 				success = true;
 			}
 			if (success) {
-				$('#um-emailid').parent().parent().find('.um-item-row-icon')
-						.removeClass('icn-save').removeClass('cursor-pointer');
-				$('#um-emailid').parent().parent().find('.um-item-row-icon')
-						.addClass('icn-tick');
 				var userId = $('#mh-userId').val();
-				$('#um-emailid').closest('.row').attr("id", userId);
+				paintUserDetailsForm(userId);
 			} else {
 				var userId = $('#mh-existing-userId').val();
 				if (userId != undefined || userId != "") {
 					paintUserDetailsForm(userId);
 					return;
 				}
-				alert("User invite not successful");
 			}
 		},
 		complete : function() {

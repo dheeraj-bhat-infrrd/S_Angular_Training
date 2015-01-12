@@ -28,10 +28,10 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_REGISTRATION_INVITE = "INVALID_REGISTRATION_INVITE";
 	public static final String USERNAME_ALREADY_TAKEN = "USERNAME_ALREADY_TAKEN";
 	public static final String EMAILID_ALREADY_TAKEN = "EMAILID_ALREADY_TAKEN";
-	public static final String INVALID_USER_CREDENTIALS ="INVALID_USER_CREDENTIALS"	;
-	public static final String INVALID_USER ="INVALID_USER"	;
-	public static final String USER_INACTIVE ="USER_INACTIVE";
-	public static final String COMPANY_INACTIVE ="COMPANY_INACTIVE";
+	public static final String INVALID_USER_CREDENTIALS = "INVALID_USER_CREDENTIALS";
+	public static final String INVALID_USER = "INVALID_USER";
+	public static final String USER_INACTIVE = "USER_INACTIVE";
+	public static final String COMPANY_INACTIVE = "COMPANY_INACTIVE";
 	public static final String USER_NOT_PRESENT = "USER_NOT_PRESENT";
 	public static final String SUBSCRIPTION_UNSUCCESSFUL = "USER_SUBSCRIPTION_UNSUCCESSFUL";
 	public static final String INVALID_REGION_NAME = "INVALID_REGION_NAME";
@@ -45,10 +45,11 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
 	public static final String MAX_USERS_LIMIT_REACHED = "MAX_USERS_LIMIT_REACHED";
 	public static final String USER_MANAGEMENT_NOT_AUTHORIZED = "USER_MANAGEMENT_NOT_AUTHORIZED";
-	
+	public static final String NO_USER_IN_SESSION = "NO_USER_IN_SESSION";
+
 	public static final String INVALID_REGION_SELECTED = "INVALID_REGION_SELECTED";
 	public static final String INVALID_SURVEY_REMINDER_INTERVAL = "INVALID_SURVEY_REMINDER_INTERVAL";
-	
+
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
 	public static final String USER_REGISTRATION_SUCCESSFUL = "USER_REGISTRATION_SUCCESSFUL";
@@ -64,8 +65,8 @@ public final class DisplayMessageConstants {
 	public static final String USER_STATUS_UPDATE_SUCCESSFUL = "USER_STATUS_UPDATE_SUCCESSFUL";
 	public static final String BRANCH_UNASSIGN_SUCCESSFUL = "BRANCH_UNASSIGN_SUCCESSFUL";
 	public static final String BRANCH_ASSIGN_SUCCESSFUL = "BRANCH_ASSIGN_SUCCESSFUL";
-	public static final String BRANCH_ADDITION_SUCCESSFUL = "BRANCH_ADDITION_SUCCESSFUL";	
-	public static final String REGION_UPDATION_SUCCESSFUL = "REGION_UPDATION_SUCCESSFUL";	
+	public static final String BRANCH_ADDITION_SUCCESSFUL = "BRANCH_ADDITION_SUCCESSFUL";
+	public static final String REGION_UPDATION_SUCCESSFUL = "REGION_UPDATION_SUCCESSFUL";
 	public static final String BRANCH_UPDATION_SUCCESSFUL = "BRANCH_UPDATION_SUCCESSFUL";
 	public static final String ENCOMPASS_CONNECTION_SUCCESSFUL = "ENCOMPASS_CONNECTION_SUCCESSFUL";
 	public static final String ENCOMPASS_DATA_UPDATE_SUCCESSFUL = "ENCOMPASS_DATA_UPDATE_SUCCESSFUL";

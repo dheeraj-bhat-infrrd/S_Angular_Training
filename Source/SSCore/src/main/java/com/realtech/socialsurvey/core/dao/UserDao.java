@@ -10,7 +10,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
  */
 public interface UserDao extends GenericDao<User, Long> {
 
-	public User fetchUserByEmailId(User user, String emailId) throws NoRecordsFetchedException;
+	public User fetchUserByLoginName(User user, String emailId) throws NoRecordsFetchedException;
 
 	public List<User> fetchUsersBySimilarEmailId(User user, String emailId);
 

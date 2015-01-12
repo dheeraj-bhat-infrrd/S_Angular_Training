@@ -27,12 +27,12 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 	 * Method to fetch User by email id.
 	 */
 	@Override
-	public User fetchUserByEmailId(User user, String emailId) throws NoRecordsFetchedException {
+	public User fetchUserByLoginName(User user, String emailId) throws NoRecordsFetchedException {
 		LOG.info("Method to fetch the user by email id, fetchUserByEmailId() started.");
 
 		Criteria criteria = getSession().createCriteria(User.class);
 		try {
-			criteria.add(Restrictions.ilike(CommonConstants.EMAIL_ID, "%" + emailId + "%"));
+			criteria.add(Restrictions.eq(CommonConstants.LOGIN_NAME,emailId));
 			criteria.add(Restrictions.eq(CommonConstants.COMPANY, user.getCompany()));
 		}
 		catch (HibernateException hibernateException) {
