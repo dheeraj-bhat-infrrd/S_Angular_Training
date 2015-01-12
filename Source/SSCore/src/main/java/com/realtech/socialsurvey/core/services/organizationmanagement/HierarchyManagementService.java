@@ -79,8 +79,9 @@ public interface HierarchyManagementService {
 	 * @param branchId
 	 * @param status
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException;
+	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to update status of a region
@@ -89,8 +90,9 @@ public interface HierarchyManagementService {
 	 * @param regionId
 	 * @param status
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException;
+	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to check whether a branch addition is allowed for given account type and user

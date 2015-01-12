@@ -104,10 +104,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param branchId
 	 * @param status
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException {
+	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Update branch of id :" + branchId + " status to :" + status);
 		if (user == null) {
 			throw new InvalidInputException("User is null in updateRegionStatus");
@@ -127,6 +128,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		branchDao.update(branch);
+
+		LOG.debug("Updating document of the branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
 		LOG.info("Branch status for branch ID :" + branchId + "/t successfully updated to:" + status);
 	}
 
@@ -135,10 +139,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * 
 	 * @param regionId
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException {
+	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Method updateRegionStatus called for regionId : " + regionId + " and status : " + status);
 		if (user == null) {
 			throw new InvalidInputException("User is null in updateRegionStatus");
@@ -155,6 +160,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		regionDao.update(region);
+
+		LOG.debug("Updating document of the region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
 		LOG.info("Region status for region ID :" + regionId + "/t successfully updated to " + status);
 	}
 
@@ -404,8 +413,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.NO);
 		LOG.debug("Adding newly added branch to solr");
-		solrSearchService.addBranchToSolr(branch);
-		
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
@@ -432,9 +441,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		LOG.info("Method add new region called for regionName : " + regionName);
 
 		Region region = organizationManagementService.addRegion(user, CommonConstants.NO, regionName);
-		
+
 		LOG.debug("Updating solr with newly inserted region");
-		solrSearchService.addRegionToSolr(region);
+		solrSearchService.addOrUpdateRegionToSolr(region);
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;

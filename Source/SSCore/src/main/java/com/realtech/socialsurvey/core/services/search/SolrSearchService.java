@@ -41,13 +41,13 @@ public interface SolrSearchService {
 	 * @param region
 	 * @throws SolrException
 	 */
-	public void addRegionToSolr(Region region) throws SolrException;
+	public void addOrUpdateRegionToSolr(Region region) throws SolrException;
 
 	/**
 	 * Method to add a branch to solr
 	 * @param branch
 	 * @throws SolrException
 	 */
-	public void addBranchToSolr(Branch branch) throws SolrException;
+	public void addOrUpdateBranchToSolr(Branch branch) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
