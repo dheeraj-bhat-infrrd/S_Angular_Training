@@ -45,6 +45,8 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
 	public static final String INVALID_REGION_SELECTED = "INVALID_REGION_SELECTED";
 	public static final String INVALID_SURVEY_REMINDER_INTERVAL = "INVALID_SURVEY_REMINDER_INTERVAL";
+	public static final String SUBSCRIPTION_UPGRADE_UNSUCCESSFUL = "SUBSCRIPTION_UPGRADE_UNSUCCESSFUL";
+	public static final String SUBSCRIPTION_PAST_DUE = "SUBSCRIPTION_PAST_DUE";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
@@ -71,4 +73,5 @@ public final class DisplayMessageConstants {
 	public static final String LOCATION_SETTINGS_UPDATE_SUCCESSFUL = "LOCATION_SETTINGS_UPDATE_SUCCESSFUL";
 	public static final String ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL = "ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL";
 	public static final String USER_LOGOUT_SUCCESSFUL = "USER_LOGOUT_SUCCESSFUL";
+	public static final String SUBSCRIPTION_UPGRADE_SUCCESSFUL = "SUBSCRIPTION_UPGRADE_SUCCESSFUL";
 }

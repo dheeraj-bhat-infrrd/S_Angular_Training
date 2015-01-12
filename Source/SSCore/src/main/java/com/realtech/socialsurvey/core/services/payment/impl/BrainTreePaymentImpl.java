@@ -36,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -115,6 +116,32 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				LOG.info("Initialising gateway with keys: " + merchantId + " : " + publicKey + " : " + privateKey);
 				gateway = new BraintreeGateway(Environment.PRODUCTION, merchantId, publicKey, privateKey);
 			}
+		}
+	}
+	
+	private void cancelSubscription(String subscriptionId) throws NoRecordsFetchedException, PaymentException{
+		
+		LOG.info("Cancelling the subscription with id : " + subscriptionId);
+		
+		Result<Subscription> result = null;
+		
+		try{
+			LOG.debug("Cancelling the subscription.");
+			result = gateway.subscription().cancel(subscriptionId);
+		}catch (NotFoundException e) {
+			LOG.error("Subscription with id : " + subscriptionId + " not found in the vault.");
+			throw new NoRecordsFetchedException("Subscription with id : " + subscriptionId + " not found in the vault.");
+			
+		}catch (UnexpectedException e) {
+			LOG.error("Unexpected Exception occured when cancelling subscription with id : " + subscriptionId);
+			throw new PaymentException("Unexpected Exception occured when cancelling subscription with id : " + subscriptionId);
+		}
+		
+		if( result.isSuccess() ) {
+			LOG.info("Subscription cancellation successful id : " + subscriptionId);			
+		}
+		else{
+			LOG.info("Subsription cancellation for id : " + subscriptionId + " Unsuccessful.");
 		}
 	}
 
@@ -344,10 +371,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param nonce
 	 * @throws InvalidInputException
 	 * @throws PaymentException
+	 * @throws NoRecordsFetchedException 
 	 */
 	@Override
 	@Transactional
-	public boolean subscribe(User user, Company company, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException {
+	public boolean subscribe(User user, Company company, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException {
 
 		boolean result = false;
 		String subscriptionId = null;
@@ -410,12 +438,18 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		if (subscriptionId != null) {
 			result = true;
 			LOG.info("Subscription successful. Updating the license table.");
-			updateLicenseTable(accountsMasterId, company, user, subscriptionId);
-			LOG.info("LicenseDetail table update done!");
+			try{
+				updateLicenseTable(accountsMasterId, company, user, subscriptionId);
+				LOG.info("LicenseDetail table update done!");
+			}catch ( DatabaseException e){
+				LOG.info("Database update was unsuccessful so reverting the braintree subscription.");
+				cancelSubscription(subscriptionId);
+				LOG.info("Reverted the subscription.");
+				throw e;
+			}
 		}
 		else {
 			LOG.info("Subscription Unsuccessful!");
-
 		}
 
 		return result;
@@ -905,9 +939,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		
 		//Fetching the license detail record for the company as it holds all the current subscription details.
 		LOG.info("Fetching the License Detail record for the company with id : " + company.getCompanyId());
-		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		List<LicenseDetail> licenseDetails = licenseDetailDao.findByKeyValue(LicenseDetail.class, queries);
+		
+		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.COMPANY_COLUMN, company);
 		
 		if(licenseDetails == null || licenseDetails.isEmpty()){
 			LOG.error("upgradePlanForSubscription : No records fetched for the company ");
@@ -936,14 +969,32 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		upgradeSubscription(licenseDetail.getSubscriptionId(), newAccountsMaster.getAmount(),braintreePlanId);
 		LOG.info("Subscription upgraded at braintree");
 		
-		//Updating license detail table.
-		LOG.info("Updating the License Detail table to show changes");
-		licenseDetail.setAccountsMaster(newAccountsMaster);
-		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		licenseDetailDao.update(licenseDetail);
-		LOG.info("License Detail Table updated.Updating the company object to reflect the change.");
-		company.setLicenseDetails(Arrays.asList(licenseDetail));
-		LOG.info("Company entity updated");
+		try{
+			//Updating license detail table.
+			LOG.info("Updating the License Detail table to show changes");
+			licenseDetail.setAccountsMaster(newAccountsMaster);
+			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			licenseDetailDao.update(licenseDetail);
+			LOG.info("License Detail Table updated.Updating the company object to reflect the change.");
+			company.setLicenseDetails(Arrays.asList(licenseDetail));
+			LOG.info("Company entity updated");
+		}catch(DatabaseException e){
+			
+			LOG.error("Database exception caught while performing the update.Reverting the upgrade!");
+			
+			//Getting the braintree id for the old plan
+			String braintreeOldPlanId = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(licenseDetail.getAccountsMaster().getAccountsMasterId()));
+			if (braintreeOldPlanId == null) {
+				LOG.error("Invalid Plan ID provided for subscription.");
+				throw new InvalidInputException("Invalid Plan ID provided for subscription.");
+			}
+			//Reverting the account to the old plan
+			LOG.info("Reverting the subscription to the old plan");
+			upgradeSubscription(licenseDetail.getSubscriptionId(), licenseDetail.getAccountsMaster().getAmount(), braintreeOldPlanId);
+			throw e;
+			
+		}
+		
 		
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
 		
