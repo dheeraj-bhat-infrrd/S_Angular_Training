@@ -68,8 +68,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("regionName:" + regionPattern);
-			solrQuery.addFilterQuery("companyId:" + company.getCompanyId(), "status:" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.setQuery(CommonConstants.REGION_NAME_SOLR + ":" + regionPattern);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_COLUMN + ":"
+					+ CommonConstants.STATUS_ACTIVE);
 
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
@@ -111,8 +112,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
 			SolrQuery query = new SolrQuery();
-			query.setQuery("branchName:" + branchPattern);
-			query.addFilterQuery("companyId:" + company.getCompanyId(), "status:" + CommonConstants.STATUS_ACTIVE);
+			query.setQuery(CommonConstants.BRANCH_NAME_SOLR + ":" + branchPattern);
+			query.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_ACTIVE);
 
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(query);
@@ -133,33 +135,27 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * Method to add region into solr
 	 */
 	@Override
-	public void addRegionToSolr(Region region) throws SolrException {
-		LOG.info("Method to add region to solr called for region : " + region);
+	public void addOrUpdateRegionToSolr(Region region) throws SolrException {
+		LOG.info("Method to add or update region to solr called for region : " + region);
 		SolrServer solrServer;
 		try {
-			
+
 			// TODO change the solr instance and do not use deprecated class
 			solrServer = new CommonsHttpSolrServer(solrRegionUrl);
-			SolrInputDocument document = new SolrInputDocument();
-			document.addField(CommonConstants.REGION_ID_SOLR, region.getRegionId());
-			document.addField(CommonConstants.REGION_NAME_SOLR, region.getRegion());
-			document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
-			document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
-			document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
-			
+			SolrInputDocument document = getSolrDocumentFromRegion(region);
 			UpdateResponse response = solrServer.add(document);
-			LOG.debug("response is while adding region is : " + response);
+			LOG.debug("response is while adding/updating region is : " + response);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding/updating regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding/updating regions to solr. Reason : " + e.getMessage(), e);
 		}
 		catch (SolrServerException | IOException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding/updating regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding/updating regions to solr. Reason : " + e.getMessage(), e);
 		}
-		LOG.info("Method to add region to solr finshed for region : " + region);
+		LOG.info("Method to add or update region to solr finshed for region : " + region);
 
 	}
 
@@ -167,34 +163,69 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * Method to add branch into solr
 	 */
 	@Override
-	public void addBranchToSolr(Branch branch) throws SolrException {
-		LOG.info("Method to add branch to solr called for branch : " + branch);
+	public void addOrUpdateBranchToSolr(Branch branch) throws SolrException {
+		LOG.info("Method to add/update branch to solr called for branch : " + branch);
 		SolrServer solrServer;
 		try {
 			solrServer = new CommonsHttpSolrServer(solrBranchUrl);
-			//TODO remove deprecated class
-			SolrInputDocument document = new SolrInputDocument();
-			document.addField(CommonConstants.REGION_ID_SOLR, branch.getRegion().getRegionId());
-			document.addField(CommonConstants.REGION_NAME_SOLR, branch.getRegion().getRegion());
-			document.addField(CommonConstants.BRANCH_ID_SOLR, branch.getBranchId());
-			document.addField(CommonConstants.BRANCH_NAME_SOLR, branch.getBranch());
-			document.addField(CommonConstants.COMPANY_ID_SOLR, branch.getCompany().getCompanyId());
-			document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
-			document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
-			
+			// TODO remove deprecated class
+			SolrInputDocument document = getSolrDocumentFromBranch(branch);
+
 			UpdateResponse response = solrServer.add(document);
-			LOG.debug("response while adding branch is : " + response);
+			LOG.debug("response while adding/updating branch is : " + response);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
-			LOG.error("Exception while adding branch to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding branch to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding/updating branch to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding/updating branch to solr. Reason : " + e.getMessage(), e);
 		}
-		catch (SolrServerException | IOException  e) {
-			LOG.error("Exception while adding branch to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding branch to solr. Reason : " + e.getMessage(), e);
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while adding/updating branch to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding/updating branch to solr. Reason : " + e.getMessage(), e);
 		}
-		LOG.info("Method to add branch to solr finshed for branch : " + branch);
+		LOG.info("Method to add/update branch to solr finshed for branch : " + branch);
+	}
+
+	/**
+	 * Method to get solr input document from branch
+	 * 
+	 * @param branch
+	 * @return
+	 */
+	private SolrInputDocument getSolrDocumentFromBranch(Branch branch) {
+		LOG.debug("Method getSolrDocumentFromBranch called for branch " + branch);
+
+		SolrInputDocument document = new SolrInputDocument();
+		document.addField(CommonConstants.REGION_ID_SOLR, branch.getRegion().getRegionId());
+		document.addField(CommonConstants.REGION_NAME_SOLR, branch.getRegion().getRegion());
+		document.addField(CommonConstants.BRANCH_ID_SOLR, branch.getBranchId());
+		document.addField(CommonConstants.BRANCH_NAME_SOLR, branch.getBranch());
+		document.addField(CommonConstants.COMPANY_ID_SOLR, branch.getCompany().getCompanyId());
+		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
+		document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
+
+		LOG.debug("Method getSolrDocumentFromBranch finished for branch " + branch);
+		return document;
+	}
+
+	/**
+	 * Method to get solr document from a region
+	 * 
+	 * @param region
+	 * @return
+	 */
+	private SolrInputDocument getSolrDocumentFromRegion(Region region) {
+		LOG.debug("Method getSolrDocumentFromRegion called for region " + region);
+
+		SolrInputDocument document = new SolrInputDocument();
+		document.addField(CommonConstants.REGION_ID_SOLR, region.getRegionId());
+		document.addField(CommonConstants.REGION_NAME_SOLR, region.getRegion());
+		document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
+		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
+		document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
+
+		LOG.debug("Method getSolrDocumentFromRegion finished for region " + region);
+		return document;
 	}
 
 }

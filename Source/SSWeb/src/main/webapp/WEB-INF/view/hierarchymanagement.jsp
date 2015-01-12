@@ -11,12 +11,6 @@
     </div>
 </div>
 
-<style>
-.error-msg {
-	width:auto !important;
-	margin-top:5px !important;
-}
-</style>
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
@@ -67,7 +61,7 @@
 			                            </div>
 			                        </div>
 			                        <div class="hm-btn-outer margin-bottom-25 margin-top-5 clearfix hm-item-row-right-btn-save">
-			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix error-msg">
+			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
 			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
 			                            </div>
