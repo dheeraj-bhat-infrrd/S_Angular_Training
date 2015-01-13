@@ -31,7 +31,7 @@ public class LogoDeletionItemReader implements ItemReader<String>,InitializingBe
 	private String recipientMailId;
 	
 	@Autowired
-	CloudUploadServiceImpl cloudService;
+	private CloudUploadServiceImpl cloudService;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LogoDeletionItemReader.class);
 	
