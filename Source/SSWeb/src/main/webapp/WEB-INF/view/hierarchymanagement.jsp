@@ -83,8 +83,11 @@
 							            </div>
 							        </div>
 							    </div>
-                    			<div id="existing-branches">
+							    <div class="hm-bottom-panel-content clearfix">
+                    				<div id="existing-branches">
+                    			
                						<!-- Existing branches get populated here from solr  -->
+                    				</div>
                     			</div>
 	                    	</div>
 		                </div>
@@ -242,9 +245,15 @@
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Build Hierarchy");
-		showBranches();
+		
+		//for enterprise account type
 		if($("#show-regions-flag").length > 0) {
 			showRegions();
+			showBranches();
+		}
+		//company account type
+		else {
+			searchBranchesForCompany("");
 		}
 	});
 </script>
