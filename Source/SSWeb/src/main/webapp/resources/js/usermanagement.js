@@ -1,4 +1,4 @@
-var userManagementUserListStartIndex = 0;
+var UsersListStartIndex = 0;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized=true;
@@ -15,6 +15,7 @@ $(document).on('blur','#um-emailid',function() {
 });
 
 function initUserManagementPage() {
+	UsersListStartIndex = 0;
 	paintUserDetailsForm("");
 	paintUserListInUserManagement();
 }
@@ -264,12 +265,15 @@ function paintUserDetailsForm(userId) {
  * Function paint the user list in user management page
  */
 function paintUserListInUserManagement() {
+	var jsonData;
 	$.ajax({
-		url : "./findusersforcompany.do",
-		type : "POST",
-		dataType : "html",
+		url : "./findusersforcompany.do/"+UsersListStartIndex,
+		type : "GET",
+		dataType : "JSON",
 		success : function(data) {
-			paginateUserList(data);
+			var jsonData = data.responseJSON;
+			UsersListStartIndex += jsonData.length;
+			paintUsersList(jsonData);
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -502,18 +506,22 @@ $(document).on('click', '#overlay-cancel', function() {
 });
 
 function searchUsersByNameEmailLoginId(searchKey){
+	UsersListStartIndex = 0;
 	var payload = {
 		"searchKey" : searchKey
 	};
+	var success = false;
 	$.ajax({
 		url : "./finduserbyemail.do",
 		type : "GET",
 		dataType : "JSON",
 		data : payload,
 		success : function(data){
-			
+			success = true;
 		},complete:function(data){
-			paintUserListBySearchedData(data);
+			if(success){
+				paintUsersList(data.responseJSON);
+			}
 		},
 		error:function(){
 			
@@ -522,11 +530,11 @@ function searchUsersByNameEmailLoginId(searchKey){
 	
 }
 
-function paintUserListBySearchedData(data){
-	$('#um-user-list').find('tbody').html("");
-	console.log(JSON.stringify(data));
-	//var searchResult =  $.parseJSON(data);
-	var searchResult = data.responseJSON;
+function paintUsersList(data){
+	if(UsersListStartIndex == 0){
+		$('#um-user-list').find('tbody').html("");
+	}
+	var searchResult = data;
 	if(searchResult != null){
 		var len = searchResult.length;
 		if(len>0){
