@@ -44,6 +44,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	@Value("${SOLR_BRANCH_URL}")
 	private String solrBranchUrl;
 
+	@Value("${SOLR_USER_URL}")
 	private String solrUserUrl;
 
 	@Autowired
@@ -297,7 +298,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("loginName:" + pattern + "* OR firstName:" + pattern + "* OR lastName:" + pattern + "*");
+			solrQuery.setQuery("loginName:" + pattern + " OR firstName:" + pattern + " OR lastName:" + pattern);
 			solrQuery.addFilterQuery("companyId:" + companyId, "status:" + CommonConstants.STATUS_ACTIVE);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);

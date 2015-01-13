@@ -32,7 +32,7 @@
 			<div class="um-header">
 				<div class="float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
 				<div class="float-right">
-					<input type="text" placeholder="Search User" class="um-search-user" onchange="searchUsersByNameEmailLoginId(this.value)">
+					<input type="text" placeholder="Search User" class="um-search-user" onkeyup="searchUsersByNameEmailLoginId(this.value)">
 				</div>
 			</div>
 			<div class="clearfix um-panel-content um-bottom-content"
