@@ -150,7 +150,7 @@ function searchBranchesCallBack(data) {
 	}
 }
 
-function searchBranchesForCompany(){
+function searchBranchesForCompany(branchPattern){
 	var url = "./searchbranches.do?branchPattern="+branchPattern;
 	callAjaxGET(url, searchBranchesForCompanyCallBack, true);
 }
@@ -169,8 +169,8 @@ function searchBranchesForCompanyCallBack(data) {
 					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			htmlData = ' </div>';
-			htmlData = ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30">';
+			htmlData = htmlData + ' </div>';
+			htmlData = htmlData + ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30">';
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 != 0) {
 					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
@@ -178,12 +178,18 @@ function searchBranchesForCompanyCallBack(data) {
 					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			htmlData = ' </div>';
+			htmlData = htmlData + ' </div>';
 		}
 		else {
 			htmlData = 'No branches are added yet';
 		}
+		console.log(htmlData);
 		$("#existing-branches").html(htmlData);
+		
+		// bind the click event of branches with edit
+		$(".branch-element").click(function() {
+			populateUpdateBranchForm(this);
+		});
 	}
 }
 
