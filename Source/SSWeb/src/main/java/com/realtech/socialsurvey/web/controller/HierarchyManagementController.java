@@ -408,7 +408,7 @@ public class HierarchyManagementController {
 
 			LOG.debug("Calling service to add a new region");
 			try {
-				hierarchyManagementService.addNewRegion(user, regionName);
+				hierarchyManagementService.addNewRegion(user, regionName, regionAddress1, regionAddress2);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException occured while adding new region.REason : " + e.getMessage(),
@@ -462,7 +462,7 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to add a new branch");
-				hierarchyManagementService.addNewBranch(user, regionId, branchName);
+				hierarchyManagementService.addNewBranch(user, regionId, branchName, branchAddress1, branchAddress2);
 				LOG.debug("Successfully executed service to add a new branch");
 
 				model.addAttribute("message",

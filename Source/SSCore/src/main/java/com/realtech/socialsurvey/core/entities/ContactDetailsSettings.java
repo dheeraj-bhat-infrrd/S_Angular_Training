@@ -7,6 +7,8 @@ public class ContactDetailsSettings {
 
 	private String name;
 	private String address;
+	private String address1;
+	private String address2;
 	private String zipcode;
 	private String about_me;
 	private String title;
@@ -77,13 +79,28 @@ public class ContactDetailsSettings {
 	public void setSocial_links(SocialLinksSettings social_links) {
 		this.social_links = social_links;
 	}
+	
+	public String getAddress1() {
+		return address1;
+	}
+
+	public void setAddress1(String address1) {
+		this.address1 = address1;
+	}
+
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
 
 	@Override
 	public String toString() {
-		return "name: " + name + "\t address: " + address + "\t title: " + title + "\t mail_ids: "
-				+ (mail_ids != null ? mail_ids.toString() : "null") + "\t contact_numbers: "
-				+ (contact_numbers != null ? contact_numbers.toString() : "null") + "\t social_links: "
-				+ (social_links != null ? social_links.toString() : "null");
+		return "ContactDetailsSettings [name=" + name + ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", zipcode="
+				+ zipcode + ", title=" + title + ", mail_ids=" + mail_ids + ", contact_numbers=" + contact_numbers + ", social_links=" + social_links
+				+ "]";
 	}
 
 }
