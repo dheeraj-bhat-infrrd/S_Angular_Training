@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -100,6 +102,28 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.debug("Updating the unit settings");
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Updated the unit setting");
+	}
+	
+	/**
+	 * Fetchs the list of names of logos being used.
+	 * @return
+	 */
+	@Override
+	public List<String> fetchLogoList() {
+		
+		LOG.info("Fetching the list of logos being used");		
+		List<OrganizationUnitSettings> settingsList = mongoTemplate.findAll(OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
+		List<String> logoList = new ArrayList<>();
+		LOG.info("Preparing the list of logo names");
+		for(OrganizationUnitSettings settings : settingsList){
+			String logoName = settings.getLogo();
+			if ( logoName != null && !logoName.isEmpty()){
+				logoList.add(logoName);				
+			}
+		}
+		
+		LOG.info("Returning the list prepared!");
+		return logoList;
 	}
 
 }

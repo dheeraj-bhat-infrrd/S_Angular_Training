@@ -2,21 +2,28 @@ package com.realtech.socialsurvey.core.services.upload.impl;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
+import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ListObjectsRequest;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectResult;
+import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -60,7 +67,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 				fileLocal.transferTo(convFile);
 				uploadUtils.validateFile(convFile);
 
-				StringBuilder amazonFileName = new StringBuilder(envPrefix).append("-");
+				StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.HYPHEN);
 				amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
 				amazonFileName.append(logoName.substring(logoName.lastIndexOf(".")));
 
@@ -85,6 +92,70 @@ public class CloudUploadServiceImpl implements FileUploadService {
 			LOG.error("Method fileUploadHandler inside AmazonUploadServiceImpl failed to upload");
 			throw new InvalidInputException("Upload failed: " + logoName + " because the file was empty", DisplayMessageConstants.INVALID_LOGO_FILE);
 		}
+	}
+
+	/**
+	 * Method that returns a list of all the keys in a bucket.
+	 * @return
+	 */
+	public List<String> listAllOjectsInBucket() {
+		
+		List<String> fileList = new ArrayList<>();
+		LOG.info("Listing all objects in bucket : " + bucket);
+		
+		try{
+			LOG.info("Creating the Amazon Client");
+			AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
+			LOG.info("Creating the list objects request");
+			ListObjectsRequest request = new ListObjectsRequest();
+			request.setBucketName(bucket);
+			LOG.info("The environment prefix used is : " + envPrefix);
+			request.setPrefix(envPrefix);
+			ObjectListing listing = null;
+			LOG.info("Preparing the arraylist of all the keys currently in the bucket : " + bucket);
+			do {
+				listing = s3Client.listObjects(request);
+				for (S3ObjectSummary objectSummary : listing.getObjectSummaries()) {
+					fileList.add(objectSummary.getKey());
+				}
+				request.setMarker(listing.getNextMarker());
+			}
+			while (listing.isTruncated());	
+			LOG.info("List successfully created");
+		}catch (AmazonClientException e) {
+			LOG.error("Amazon Client Exception caught while fetching list of keys : message : " + e.getMessage());
+			throw new FatalException("Amazon Client Exception caught while fetching list of keys : message : " + e.getMessage(),e);
+		}
+		
+		LOG.info("Returning the list.");
+		return fileList;
+	}
+	
+	/**
+	 * Method to delete the object with a particular key from the S3 bucket.
+	 * @param key
+	 * @throws InvalidInputException
+	 */
+	public void deleteObjectFromBucket(String key) throws InvalidInputException{
+		
+		if(key == null || key.isEmpty()){
+			LOG.error("key parameter sent to deleteObjectFromBucket is null or empty!");
+			throw new InvalidInputException("key parameter sent to deleteObjectFromBucket is null or empty!");
+		}
+		
+		try{
+			
+			LOG.info("Creating the Amazon Client");
+			AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
+			LOG.info("Amazon Client created. Now sending a request to delete the object with key : " + key);
+			s3Client.deleteObject(bucket, key);
+			LOG.info("Object with key : " + key + " deleted from bucket : " + bucket);
+
+		}catch(AmazonClientException e){
+			LOG.error("AmazonClientException caught while deleting object with key : " + key);
+			throw new FatalException("AmazonClientException caught while deleting object with key : " + key);
+		}
+		
 	}
 
 	/**
