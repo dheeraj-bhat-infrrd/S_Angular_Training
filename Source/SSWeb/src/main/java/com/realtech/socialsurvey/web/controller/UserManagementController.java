@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -29,6 +31,7 @@ import com.realtech.socialsurvey.core.services.authentication.AuthenticationServ
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -57,6 +60,9 @@ public class UserManagementController {
 	
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	private static final int BATCH_SIZE = 20;
 
@@ -264,13 +270,14 @@ public class UserManagementController {
 	 * Method to find a user on the basis of email id provided.
 	 */
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
-	public String findUserByEmail(Model model, HttpServletRequest request) {
+	public @ResponseBody String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
+		String users = "";
 		try {
-			String emailId = request.getParameter("emailId");
-			if (emailId == null || emailId.isEmpty()) {
-				LOG.error("Invalid email id passed in method findUserByEmail().");
-				throw new InvalidInputException("Invalid email id passed in method findUserByEmail().");
+			String searchKey = request.getParameter("searchKey");
+			if (searchKey == null || searchKey.isEmpty()) {
+				LOG.error("Invalid search key passed in method findUserByEmail().");
+				throw new InvalidInputException("Invalid searchKey passed in method findUserByEmail().");
 			}
 
 			HttpSession session = request.getSession(false);
@@ -281,24 +288,25 @@ public class UserManagementController {
 			}
 
 			try {
-				user = userManagementService.getUserByLoginName(user, emailId);
-				model.addAttribute("searchedUser", user);
+				users = solrSearchService.searchUsersByLoginNameOrName(searchKey, user.getCompany().getCompanyId());
+				model.addAttribute("searchedUsers", users);
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_SEARCH_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
 			catch (InvalidInputException invalidInputException) {
 				throw new InvalidInputException(invalidInputException.getMessage(), invalidInputException);
 			}
-			catch (NoRecordsFetchedException e) {
-				LOG.error("Sorry! No matching email found in our database.", e);
-				throw new NoRecordsFetchedException("Sorry! No matching email found in our database.", e);
+			catch (MalformedURLException e) {
+				LOG.error("Sorry! No matching record found in our database.", e);
+				throw new NoRecordsFetchedException("Sorry! No matching record found in our database.", e);
 			}
 		}
-		// TODO add success message.
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user by email id id. Reason : " + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to find users by email id finished.");
-		return JspResolver.MESSAGE_HEADER;
+		return users;
 	}
 
 	/*
