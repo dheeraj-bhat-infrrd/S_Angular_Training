@@ -16,7 +16,7 @@ import com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImp
 public class LogoDeletionItemWriter implements ItemWriter<String>{
 	
 	@Autowired
-	CloudUploadServiceImpl cloudService;
+	private CloudUploadServiceImpl cloudService;
 	
 	@Autowired
 	private EmailServices emailServices;
