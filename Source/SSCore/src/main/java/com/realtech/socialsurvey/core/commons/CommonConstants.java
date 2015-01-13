@@ -26,6 +26,7 @@ public interface CommonConstants {
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
+	
 
 	/**
 	 * Profile master constants
@@ -151,6 +152,7 @@ public interface CommonConstants {
 	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
 	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
 	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
+	public static final String HYPHEN = "-";
 	
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";

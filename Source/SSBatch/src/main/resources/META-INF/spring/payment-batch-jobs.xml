@@ -46,5 +46,7 @@
 	<bean id="unsubscribeAccountsItemWriter" class="com.realtech.socialsurvey.batch.writer.UnsubscribeAccountsItemWriter"/>
 
 	<bean id="unsubscribeAccountsItemProcessor" class="com.realtech.socialsurvey.batch.processor.UnsubscribeAccountsItemProcessor" />	
+	
+	
 		
 </beans>
