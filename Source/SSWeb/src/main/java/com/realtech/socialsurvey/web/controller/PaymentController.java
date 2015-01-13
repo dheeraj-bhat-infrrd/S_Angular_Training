@@ -153,9 +153,6 @@ public class PaymentController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 			}
-			if (accountType.getValue() == 1) {
-				model.addAttribute("userManagementNotAccessible", "true");
-			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);

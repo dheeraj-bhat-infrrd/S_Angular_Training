@@ -23,35 +23,7 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDaoImpl.class);
 
-	/*
-	 * Method to fetch User by email id.
-	 */
-	@Override
-	public User fetchUserByEmailId(User user, String emailId) throws NoRecordsFetchedException {
-		LOG.info("Method to fetch the user by email id, fetchUserByEmailId() started.");
-
-		Criteria criteria = getSession().createCriteria(User.class);
-		try {
-			criteria.add(Restrictions.ilike(CommonConstants.EMAIL_ID, "%" + emailId + "%"));
-			criteria.add(Restrictions.eq(CommonConstants.COMPANY, user.getCompany()));
-		}
-		catch (HibernateException hibernateException) {
-			LOG.error("Exception caught in fetchUserByEmailId() ", hibernateException);
-			throw new DatabaseException("Exception caught in fetchUserByEmailId() ", hibernateException);
-		}
-
-		@SuppressWarnings("unchecked") List<User> users = (List<User>) criteria.list();
-
-		if (users == null || users.isEmpty()) {
-			LOG.error("Could not find any record in USER for : " + user.getFirstName());
-			throw new NoRecordsFetchedException("Could not find any record in License_Details for : " + user.getCompany().getCompany());
-		}
-
-		LOG.info("Method to fetch the user by email id, fetchUserByEmailId() finished.");
-
-		return users.get(CommonConstants.INITIAL_INDEX);
-	}
-
+	
 	/*
 	 * Method to return all the users that match email id passed.
 	 */

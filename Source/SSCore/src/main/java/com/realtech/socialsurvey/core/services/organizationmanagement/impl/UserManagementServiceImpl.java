@@ -354,11 +354,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
 				CommonConstants.STATUS_NOT_VERIFIED, String.valueOf(admin.getUserId()));
 		user = userDao.save(user);
-		/*
-		 * Commenting the code to send verification link as another link for invite will anyway be sent to the user.
-		 * That mail should be used to verify the email id of a user.
-		 */
-		//sendVerificationLink(user);
+		
 		LOG.info("Method to add a new user, inviteNewUser() finished for email id : " + emailId);
 		return user;
 	}
@@ -404,20 +400,29 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to deactivate user " + userToBeDeactivated.getFirstName() + " finished.");
 	}
 
+	/*
+	 * Method to get user with login name of a company
+	 */
 	@Transactional
 	@Override
-	public User getUserByEmailId(User admin, String emailId) throws InvalidInputException, NoRecordsFetchedException {
+	public User getUserByLoginName(User admin, String loginName) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method to fetch list of users on the basis of email id is called.");
 
 		if (admin == null) {
-			throw new InvalidInputException("Admin user is null in getUsersByEmailId()");
+			throw new InvalidInputException("Admin user is null in getUserByLoginName()");
 		}
-		if (emailId == null || emailId.isEmpty()) {
+		if (loginName == null || loginName.isEmpty()) {
 			throw new InvalidInputException("Email id is null or empty in getUsersByEmailId()");
 		}
-		User user = userDao.fetchUserByEmailId(admin, emailId);
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.LOGIN_NAME,loginName);
+		queries.put(CommonConstants.COMPANY, admin.getCompany());
+		List<User> users = userDao.findByKeyValue(User.class, queries);
+		if(users == null || users.isEmpty()){
+			throw new InvalidInputException("No users found with the login name : {}",loginName);
+		}
 		LOG.info("Method to fetch list of users on the basis of email id is finished.");
-		return user;
+		return users.get(CommonConstants.INITIAL_INDEX);
 	}
 
 	@Transactional
