@@ -169,4 +169,20 @@ public interface CommonConstants {
 	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
 	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
 	
+	/**
+	 * Solr document related constants 
+	 */
+	public static final String REGION_ID_SOLR = "regionId";
+	public static final String COMPANY_ID_SOLR = "companyId";
+	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
+	public static final String STATUS_SOLR = "status";
+	public static final String REGION_NAME_SOLR = "regionName";
+	public static final String BRANCH_ID_SOLR = "branchId";
+	public static final String BRANCH_NAME_SOLR = "branchName";
+	public static final String USER_ID_SOLR = "userId";
+	public static final String USER_FIRST_NAME_SOLR = "firstName";
+	public static final String USER_LAST_NAME_SOLR = "lastName";
+	public static final String USER_EMAIL_ID_SOLR = "emailId";
+	public static final String USER_IS_OWNER_SOLR = "isOwner";
+	
 }
