@@ -269,7 +269,7 @@ public class UserManagementController {
 	/*
 	 * Method to find a user on the basis of email id provided.
 	 */
-	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.POST)
+	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.GET)
 	public @ResponseBody String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
 		String users = "";
