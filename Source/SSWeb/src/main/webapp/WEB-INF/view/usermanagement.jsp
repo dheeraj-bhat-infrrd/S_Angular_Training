@@ -18,8 +18,11 @@
 	class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container">
 		<div class="um-top-container">
-			<div class="um-header">
-				<spring:message code="label.userdetails.key" />
+			<div class="um-header clearfix">
+				<div class="float-left">
+					<spring:message code="label.userdetails.key" />
+				</div>
+				
 			</div>
 			<div class="clearfix um-panel-content" id="user-details-container">
 				<!--User details content will be populated here through userdetails.jsp page-->
@@ -27,7 +30,10 @@
 		</div>
 		<div class="um-bottom-container">
 			<div class="um-header">
-				<spring:message code="label.usermanagement.head.browseruser.key" />
+				<div class="float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
+				<div class="float-right">
+					<input type="text" placeholder="Search User" class="um-search-user" onchange="searchUsersByNameEmailLoginId(this.value)">
+				</div>
 			</div>
 			<div class="clearfix um-panel-content um-bottom-content"
 				id="um-user-list-container">
