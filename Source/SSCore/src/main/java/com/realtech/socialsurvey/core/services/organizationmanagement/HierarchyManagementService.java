@@ -120,20 +120,27 @@ public interface HierarchyManagementService {
 	 * @param user
 	 * @param regionId
 	 * @param branchName
+	 * @param address1
+	 * @param address2
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException, SolrException;
+	public Branch addNewBranch(User user, long regionId, String branchName, String address1, String address2) throws InvalidInputException,
+			SolrException;
 
 	/**
 	 * Method to add a new region
 	 * 
 	 * @param user
 	 * @param regionName
+	 * @param address1
+	 * @param address2
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public Region addNewRegion(User user, String regionName) throws InvalidInputException, SolrException;
+	public Region addNewRegion(User user, String regionName, String address1, String address2) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to update a branch
@@ -144,9 +151,10 @@ public interface HierarchyManagementService {
 	 * @param branchAddress
 	 * @param user
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException, SolrException;
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException,
+			SolrException;
 
 	/**
 	 * Method to update a region
@@ -156,7 +164,7 @@ public interface HierarchyManagementService {
 	 * @param regionAddress
 	 * @param user
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException;
 
