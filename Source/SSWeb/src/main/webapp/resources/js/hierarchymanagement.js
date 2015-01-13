@@ -40,7 +40,13 @@ function addOrUpdateBranch(formId) {
  * function to display branches
  */
 function showBranches() {
-	searchBranches("");
+	if($("#account-type").val() == "company") {
+		searchBranchesForCompany("");
+	}
+	else {
+		searchBranches("");
+	}
+	
 }
 
 /**
