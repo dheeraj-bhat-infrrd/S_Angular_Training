@@ -68,6 +68,7 @@
 			                        </div>
 			                    </div>
 			                     <input type="hidden" name="branchId" id="branch-id-hidden"/>
+			                     <input type="hidden" name="accounttype" id="account-type" value="company"/>
 		                    </form>
 		                    <div class="hm-bottom-panel margin-bottom-25">
 							    <div class="hm-bottom-header">
