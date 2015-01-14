@@ -334,7 +334,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.addFilterQuery("companyId:" + companyId, "status:" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery("companyId:" + companyId, "status:(" + CommonConstants.STATUS_ACTIVE + " " + CommonConstants.STATUS_NOT_VERIFIED
+					+ " " + CommonConstants.STATUS_TEMPORARILY_INACTIVE + ")");
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 			LOG.debug("Querying solr for searching users");
@@ -393,77 +394,48 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to add region to solr finshed for region : " + user);
 	}
 
-	/*@Override
-	public String searchUsersByCompanyAndRegion(long companyId, long regionId, int startIndex, int noOfRows) throws InvalidInputException,
-			SolrException, MalformedURLException {
-		if (companyId < 0) {
-			throw new InvalidInputException("Pattern is null or empty while searching for Users");
-		}
-		if (regionId < 0) {
-			throw new InvalidInputException("Pattern is null or empty while searching for Users");
-		}
-
-		LOG.info("Method searchUsersByCompanyAndRegion() called for company id : {} and Region id : {}", companyId, regionId);
-		String usersResult = null;
-		QueryResponse response = null;
-		try {
-			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
-			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.addFilterQuery("companyId:" + companyId, "regionId:" + regionId, "status:" + CommonConstants.STATUS_ACTIVE);
-			solrQuery.setStart(startIndex);
-			solrQuery.setRows(noOfRows);
-			LOG.debug("Querying solr for searching users");
-			response = solrServer.query(solrQuery);
-			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
-			LOG.debug("User search result is : " + usersResult);
-		}
-		catch (SolrServerException e) {
-			LOG.error("SolrServerException while performing User search");
-			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
-		}
-
-		LOG.info("Method searchUsersByCompanyAndRegion() finished for company id : {} and Region id : {}", companyId, regionId);
-		return usersResult;
-	}
-
-	@Override
-	public String searchUsersByCompanyRegionAndBranch(long companyId, long regionId, long branchId, int startIndex, int noOfRows)
-			throws InvalidInputException, SolrException, MalformedURLException {
-		if (branchId < 0) {
-			throw new InvalidInputException("Pattern is null or empty while searching for Users");
-		}
-		if (companyId < 0) {
-			throw new InvalidInputException("Pattern is null or empty while searching for Users");
-		}
-		if (regionId < 0) {
-			throw new InvalidInputException("Pattern is null or empty while searching for Users");
-		}
-
-		LOG.info("Method searchUsersByCompanyAndRegion() called for company id : {} and Region id : {}", companyId, regionId);
-		String usersResult = null;
-		QueryResponse response = null;
-		try {
-			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
-			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.addFilterQuery("companyId:" + companyId, "regionId:" + regionId, "branchId:" + branchId, "status:"
-					+ CommonConstants.STATUS_ACTIVE);
-			solrQuery.setStart(startIndex);
-			solrQuery.setRows(noOfRows);
-			LOG.debug("Querying solr for searching users");
-			response = solrServer.query(solrQuery);
-			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
-			LOG.debug("User search result is : " + usersResult);
-		}
-		catch (SolrServerException e) {
-			LOG.error("SolrServerException while performing User search");
-			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
-		}
-		LOG.info("Method searchUsersByCompanyRegionAndBranch() finished for company id : {}, Region id : {} and branch id : {}", companyId, regionId);
-		return usersResult;
-	}
-*/
+	/*
+	 * @Override public String searchUsersByCompanyAndRegion(long companyId, long regionId, int
+	 * startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException
+	 * { if (companyId < 0) { throw new
+	 * InvalidInputException("Pattern is null or empty while searching for Users"); } if (regionId <
+	 * 0) { throw new InvalidInputException("Pattern is null or empty while searching for Users"); }
+	 * LOG
+	 * .info("Method searchUsersByCompanyAndRegion() called for company id : {} and Region id : {}",
+	 * companyId, regionId); String usersResult = null; QueryResponse response = null; try {
+	 * SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl); SolrQuery solrQuery = new
+	 * SolrQuery(); solrQuery.addFilterQuery("companyId:" + companyId, "regionId:" + regionId,
+	 * "status:" + CommonConstants.STATUS_ACTIVE); solrQuery.setStart(startIndex);
+	 * solrQuery.setRows(noOfRows); LOG.debug("Querying solr for searching users"); response =
+	 * solrServer.query(solrQuery); SolrDocumentList results = response.getResults(); usersResult =
+	 * JSONUtil.toJSON(results); LOG.debug("User search result is : " + usersResult); } catch
+	 * (SolrServerException e) { LOG.error("SolrServerException while performing User search");
+	 * throw new SolrException("Exception while performing search for user. Reason : " +
+	 * e.getMessage(), e); }
+	 * LOG.info("Method searchUsersByCompanyAndRegion() finished for company id : {} and Region id : {}"
+	 * , companyId, regionId); return usersResult; }
+	 * @Override public String searchUsersByCompanyRegionAndBranch(long companyId, long regionId,
+	 * long branchId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+	 * MalformedURLException { if (branchId < 0) { throw new
+	 * InvalidInputException("Pattern is null or empty while searching for Users"); } if (companyId
+	 * < 0) { throw new InvalidInputException("Pattern is null or empty while searching for Users");
+	 * } if (regionId < 0) { throw new
+	 * InvalidInputException("Pattern is null or empty while searching for Users"); }
+	 * LOG.info("Method searchUsersByCompanyAndRegion() called for company id : {} and Region id : {}"
+	 * , companyId, regionId); String usersResult = null; QueryResponse response = null; try {
+	 * SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl); SolrQuery solrQuery = new
+	 * SolrQuery(); solrQuery.addFilterQuery("companyId:" + companyId, "regionId:" + regionId,
+	 * "branchId:" + branchId, "status:" + CommonConstants.STATUS_ACTIVE);
+	 * solrQuery.setStart(startIndex); solrQuery.setRows(noOfRows);
+	 * LOG.debug("Querying solr for searching users"); response = solrServer.query(solrQuery);
+	 * SolrDocumentList results = response.getResults(); usersResult = JSONUtil.toJSON(results);
+	 * LOG.debug("User search result is : " + usersResult); } catch (SolrServerException e) {
+	 * LOG.error("SolrServerException while performing User search"); throw new
+	 * SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e); }
+	 * LOG.info(
+	 * "Method searchUsersByCompanyRegionAndBranch() finished for company id : {}, Region id : {} and branch id : {}"
+	 * , companyId, regionId); return usersResult; }
+	 */
 	/*
 	 * public static void main(String[] args) throws MalformedURLException { SolrSearchServiceImpl
 	 * solrSearchServiceImpl = new SolrSearchServiceImpl(); solrSearchServiceImpl.solrUserUrl =
