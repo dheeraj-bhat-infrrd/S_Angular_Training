@@ -55,7 +55,7 @@
 						<!-- User table list is populated here through userlist.jsp page -->
 					</tbody>
 				</table>
-				<div class="um-view-more"><span>View more</span></div>
+				<div id="um-view-more-users" class="um-view-more" onclick="paginateUsersList();"><span>View more</span></div>
 			</div>
 			
 			<div id="branch-list" class="hide">

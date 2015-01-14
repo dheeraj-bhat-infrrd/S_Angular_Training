@@ -2,6 +2,7 @@ var UsersListStartIndex = 0;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized=true;
+var batchSize = 20;
 
 
 $(document).on('blur','#um-fname',function() {
@@ -269,26 +270,32 @@ function paintUserListInUserManagement() {
 	var payload = {
 		"startIndex" : 	UsersListStartIndex
 	};
+	var success = false;
 	$.ajax({
 		url : "./findusersforcompany.do",
 		type : "GET",
 		data : payload,
 		dataType : "JSON",
 		success : function(data) {
-			
+			success = true;
 		},complete:function(data){
-			var jsonData = data.responseJSON;
-			UsersListStartIndex += jsonData.length;
-			paintUsersList(jsonData);
+			if(success){
+				var jsonData = data.responseJSON;
+				if(jsonData.length < batchSize){
+					doStopAjaxRequestForUsersList  = true;
+					$('#um-view-more-users').hide();
+				}
+				UsersListStartIndex += jsonData.length;
+				if(jsonData.length == 0){
+					return false;
+				}
+				paintUsersList(jsonData);
+			}
 		},
 		error : function(e) {
 			console.error("error : " + e);
 		}
 	});
-}
-
-function paginateUserList(data) {
-	$('#um-user-list').find('tbody').append(data);
 }
 
 /*
@@ -590,8 +597,14 @@ function paintUsersList(data){
 				$('#um-user-list').find('tbody').append(row);
 			});
 		}else{
-			$('#um-user-list').find('tbody').html("No results found");
+			$('#um-user-list').find('tbody').append("No results found");
 		}
 	}
 	//$('#um-user-list').find('tbody').html(data);
+}
+
+function paginateUsersList(){
+	if(!doStopAjaxRequestForUsersList){
+		paintUserListInUserManagement();
+	}
 }
