@@ -271,10 +271,12 @@ function paintUserListInUserManagement() {
 	};
 	$.ajax({
 		url : "./findusersforcompany.do",
-		type : "POST",
-		dataType : "JSON",
+		type : "GET",
 		data : payload,
+		dataType : "JSON",
 		success : function(data) {
+			
+		},complete:function(data){
 			var jsonData = data.responseJSON;
 			UsersListStartIndex += jsonData.length;
 			paintUsersList(jsonData);
