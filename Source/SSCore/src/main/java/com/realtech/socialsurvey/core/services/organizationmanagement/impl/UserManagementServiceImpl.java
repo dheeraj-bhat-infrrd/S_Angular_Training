@@ -419,7 +419,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		queries.put(CommonConstants.COMPANY, admin.getCompany());
 		List<User> users = userDao.findByKeyValue(User.class, queries);
 		if(users == null || users.isEmpty()){
-			throw new InvalidInputException("No users found with the login name : {}",loginName);
+			throw new NoRecordsFetchedException("No users found with the login name : {}",loginName);
 		}
 		LOG.info("Method to fetch list of users on the basis of email id is finished.");
 		return users.get(CommonConstants.INITIAL_INDEX);
