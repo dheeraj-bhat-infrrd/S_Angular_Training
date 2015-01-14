@@ -7,46 +7,50 @@
 			<td class="col-username um-table-content">${user.firstName} <span>${user.lastName }</span></td>
 			<td class="col-email um-table-content">${user.emailId }</td>
 			<td class="col-loanoff um-table-content clearfix">
-				<div class="float-left tm-table-tick-icn icn-right-tick"></div>
+				<c:if test="${user.agent == true }">
+					<div class="float-left tm-table-tick-icn icn-right-tick"></div>
+				</c:if>
 			</td>
 			<td class="col-status um-table-content clearfix">
-			<!-- Fill the details to show the user status -->
-			<c:choose>
-				<c:when test="${user.status eq 1 }">
-					<div class="tm-table-status-icn icn-green-col float-left"></div>
-					<div class="tm-table-status-icn icn-green-brown float-left hide"></div>
-				</c:when>
-				<c:when test="${user.status eq 3 }">
-					<div class="tm-table-status-icn icn-green-col float-left hide"></div>
-					<div class="tm-table-status-icn icn-green-brown float-left"></div>
-				</c:when>
-			</c:choose>
+				<!-- Fill the details to show the user status --> <c:choose>
+					<c:when test="${user.status eq 1 }">
+						<div class="tm-table-status-icn icn-green-col float-left"></div>
+					</c:when>
+					<c:when test="${user.status eq 3 }">
+						<div class="tm-table-status-icn icn-green-brown float-left"></div>
+					</c:when>
+				</c:choose>
 			</td>
 			<td class="col-remove um-table-content clearfix">
-				<div class="tm-table-remove-icn icn-remove-user float-left cursor-pointer"></div>
+				<div
+					class="tm-table-remove-icn icn-remove-user float-left cursor-pointer"></div>
 			</td>
 		</tr>
 	</c:forEach>
 </c:if>
 <script>
-if(isUserManagementAuthorized){
-	$('.um-user-row').click(function(){
-		console.log("user row clicked");
-		var userId = this.id;
-		userId = userId.substr("um-user-".length);
-		paintUserDetailsForm(userId);
-	});
-	$('.tm-table-remove-icn').click(function(event){
-		event.stopPropagation();
-		var userId = $(this).closest('.um-user-row').attr("id");
-		userId = userId.substr("um-user-".length);
-		confirmDeleteUser(userId);
-	});
-}
-$(document).ready(function(){
-	var hasMoreUsers = ${hasMoreUsers};
-	if(!hasMoreUsers){
-		doStopAjaxRequestForUsersList = true;
+	if (isUserManagementAuthorized) {
+		$('.um-user-row').click(function() {
+			console.log("user row clicked");
+			var userId = this.id;
+			userId = userId.substr("um-user-".length);
+			paintUserDetailsForm(userId);
+		});
+		$('.tm-table-remove-icn').click(function(event) {
+			event.stopPropagation();
+			var userId = $(this).closest('.um-user-row').attr("id");
+			userId = userId.substr("um-user-".length);
+			confirmDeleteUser(userId);
+		});
 	}
-});
+	$(document).ready(function() {
+		var hasMoreUsers = $
+		{
+			hasMoreUsers
+		}
+		;
+		if (!hasMoreUsers) {
+			doStopAjaxRequestForUsersList = true;
+		}
+	});
 </script>
