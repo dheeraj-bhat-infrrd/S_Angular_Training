@@ -1,9 +1,20 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * The persistent class for the region database table.
@@ -35,8 +46,14 @@ public class Region implements Serializable {
 	private Timestamp modifiedOn;
 
 	private String region;
-
+	
 	private int status;
+	
+	@Transient
+	private String address1;
+	
+	@Transient
+	private String address2;
 
 	// bi-directional many-to-one association to Branch
 	@OneToMany(mappedBy = "region", fetch = FetchType.LAZY)
@@ -120,6 +137,23 @@ public class Region implements Serializable {
 	public void setBranches(List<Branch> branches) {
 		this.branches = branches;
 	}
+	
+
+	public String getAddress1() {
+		return address1;
+	}
+
+	public void setAddress1(String address1) {
+		this.address1 = address1;
+	}
+
+	public String getAddress2() {
+		return address2;
+	}
+
+	public void setAddress2(String address2) {
+		this.address2 = address2;
+	}
 
 	public Branch addBranch(Branch branch) {
 		getBranches().add(branch);
@@ -142,5 +176,12 @@ public class Region implements Serializable {
 	public void setCompany(Company company) {
 		this.company = company;
 	}
+
+	@Override
+	public String toString() {
+		return "Region [regionId=" + regionId + ", isDefaultBySystem=" + isDefaultBySystem + ", region=" + region + ", status=" + status + "]";
+	}
+	
+	
 
 }
