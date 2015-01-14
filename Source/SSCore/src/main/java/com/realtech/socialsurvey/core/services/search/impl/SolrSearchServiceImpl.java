@@ -299,7 +299,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery("loginName:" + pattern + " OR firstName:" + pattern + " OR lastName:" + pattern);
-			solrQuery.addFilterQuery("companyId:" + companyId, "status:" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery("companyId:" + companyId);
+			solrQuery.addFilterQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -334,8 +336,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.addFilterQuery("companyId:" + companyId, "status:(" + CommonConstants.STATUS_ACTIVE + " " + CommonConstants.STATUS_NOT_VERIFIED
-					+ " " + CommonConstants.STATUS_TEMPORARILY_INACTIVE + ")");
+			solrQuery.setQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE + ")");
+			solrQuery.addFilterQuery("companyId:" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 			LOG.debug("Querying solr for searching users");

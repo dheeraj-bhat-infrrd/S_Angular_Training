@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -240,10 +239,11 @@ public class UserManagementController {
 	 * Method to fetch list of all the users who belong to the same as that of current user. Current
 	 * user is company admin who can assign different roles to other users.
 	 */
-	@RequestMapping(value = "/findusersforcompany/{startIndex}", method = RequestMethod.POST)
-	public String findUsersForCompany(@PathVariable int startIndex, Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.POST)
+	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		HttpSession session = request.getSession(false);
+		int startIndex = Integer.parseInt(request.getParameter("startIndex"));
 		String users = "";
 		/*
 		 * @SuppressWarnings("unchecked") List<User> usersList = (List<User>)
