@@ -40,6 +40,7 @@ public interface SolrSearchService {
 
 	/**
 	 * Method to add a region to solr
+	 * 
 	 * @param region
 	 * @throws SolrException
 	 */
@@ -47,15 +48,20 @@ public interface SolrSearchService {
 
 	/**
 	 * Method to add a branch to solr
+	 * 
 	 * @param branch
 	 * @throws SolrException
 	 */
 	public void addOrUpdateBranchToSolr(Branch branch) throws SolrException;
 
-	public String searchUsersByLoginNameAndCompany(String userNamePattern, Company company) throws InvalidInputException, SolrException, MalformedURLException;
+	public String searchUsersByLoginNameAndCompany(String userNamePattern, Company company) throws InvalidInputException, SolrException,
+			MalformedURLException;
 
 	public void addUserToSolr(User user) throws SolrException;
 
 	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
+	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+			MalformedURLException;
 }
 // JIRA:SS-62 BY RM 02 EOC
