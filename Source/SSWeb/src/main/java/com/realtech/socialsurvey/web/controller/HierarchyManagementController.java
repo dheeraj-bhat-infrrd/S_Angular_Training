@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -43,6 +46,8 @@ public class HierarchyManagementController {
 	private OrganizationManagementService organizationManagementService;
 	@Autowired
 	private SolrSearchService solrSearchService;
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -676,6 +681,42 @@ public class HierarchyManagementController {
 
 		LOG.info("Method to search branches completed successfully. Returning json : " + searchBranchJson);
 		return searchBranchJson;
+	}
+
+	/**
+	 * Method to fetch a region details based on id
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/fetchregiontoupdate", method = RequestMethod.GET)
+	public String fetchRegionToUpdate(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchRegionToUpdate called in controller");
+		String strRegionId = request.getParameter("regionId");
+		long regionId = 0l;
+		String regionToUpdateJson = null;
+		try {
+			try {
+				regionId = Long.parseLong(strRegionId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing regionId in fetchRegionToUpdate.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(regionId);
+			regionToUpdateJson = JSONUtil.toJSON(regionSettings);
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching Region To Update. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method fetchRegionToUpdate finished in controller");
+		return regionToUpdateJson;
+
 	}
 
 	/**

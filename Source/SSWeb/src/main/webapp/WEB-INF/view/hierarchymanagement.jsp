@@ -77,7 +77,7 @@
 							            <div class="float-right mobile-search-panel">
 							                <div class="clearfix hm-sub-search-wrapper">
 							                    <div class="float-left">
-							                        <input class="hm-sub-search-txt" placeholder='<spring:message code="label.searchbranch.key"/>'> 
+							                        <input id = "search-company-branch-txt" class="hm-sub-search-txt" placeholder='<spring:message code="label.searchbranch.key"/>'> 
 							                    </div>
 							                    <div class="float-left icn-search cursor-pointer hm-sub-height-adjust"></div>
 							                </div>
