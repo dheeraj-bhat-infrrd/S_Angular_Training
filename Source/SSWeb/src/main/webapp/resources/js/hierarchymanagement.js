@@ -89,13 +89,31 @@ function deleteBranchCallBack(data) {
  * @param obj
  */
 function populateUpdateBranchForm(obj) {
-	$('#branch-name-txt').val($(obj).html());
-	$("#selected-region-id-hidden").val($(obj).data('regionid'));
-	$("#branch-id-hidden").val($(obj).data('branchid'));
-	$('#selected-region-txt').val($(obj).data('regionname'));
-	$('#branch-address1-txt').val($(obj).data('address1'));
-	$('#branch-address2-txt').val($(obj).data('address2'));
-	window.scrollTo(200,0);
+	var branchId = $(obj).data('branchid');
+	var url = "./fetchbranchtoupdate.do?branchId="+branchId;
+	callAjaxGET(url, populateUpdateBranchFormCallBack, true);	
+}
+
+/**
+ * Call back method for populating the update branch form
+ * @param data
+ */
+function populateUpdateBranchFormCallBack(data) {
+	console.log("fetchbranchtoupdate" +data);
+	var branchsettings = $.parseJSON(data);
+	if(branchsettings != null) {
+		var contactDetails = branchsettings.contact_details;
+		console.log("contactDetails"+contactDetails);
+		if(contactDetails != null) {
+			$("#branch-id-hidden").val(branchsettings.iden);
+			$("#selected-region-id-hidden").val(branchsettings.regionId);
+			$('#selected-region-txt').val(branchsettings.regionName);
+			$('#branch-name-txt').val(contactDetails.name);
+			$("#branch-address1-txt").val(contactDetails.address1);
+			$("#branch-address2-txt").val(contactDetails.address2);
+			window.scrollTo(200,0);
+		}		
+	}
 }
 
 /**
@@ -143,7 +161,7 @@ function searchBranchesCallBack(data) {
 		if(len > 0) {
 			$.each(searchResult,function(i,branch) {
 				htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-				htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-address1="'+branch.address1+'" data-address2="'+branch.address2+'" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+				htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
 				htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 			});
 		}
@@ -174,7 +192,7 @@ function searchBranchesForCompanyCallBack(data) {
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 == 0) {
 					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-address1="'+branch.address1+'" data-address2="'+branch.address2+'" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
 					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
@@ -183,7 +201,7 @@ function searchBranchesForCompanyCallBack(data) {
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 != 0) {
 					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-address1="'+branch.address1+'" data-address2="'+branch.address2+'" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
 					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
@@ -271,12 +289,29 @@ function deleteRegionCallBack(data) {
  * @param obj
  */
 function populateUpdateRegionForm(obj) {
-	$('#region-name-txt').val($(obj).html());
-	$("#region-id-hidden").val($(obj).data('regionid'));
-	$("#region-address1-txt").val($(obj).data('address1'));
-	$("#region-address2-txt").val($(obj).data('address2'));
-	window.scrollTo(200,0);
-	
+	var regionId = $(obj).data('regionid');
+	var url = "./fetchregiontoupdate.do?regionId="+regionId;
+	callAjaxGET(url, populateUpdateRegionFormCallBack, true);	
+}
+
+/**
+ * Call back function for populating update region form
+ * @param data
+ */
+function populateUpdateRegionFormCallBack(data) {
+	var regionsettings = $.parseJSON(data);
+	if(regionsettings != null) {
+		console.log("regionsettings "+regionsettings);
+		var contactDetails = regionsettings.contact_details;
+		if(contactDetails != null) {
+			console.log("contactDetails "+contactDetails);
+			$("#region-id-hidden").val(regionsettings.iden);
+			$('#region-name-txt').val(contactDetails.name);
+			$("#region-address1-txt").val(contactDetails.address1);
+			$("#region-address2-txt").val(contactDetails.address2);
+			window.scrollTo(200,0);
+		}		
+	}
 }
 
 /**
@@ -571,7 +606,7 @@ function searchRegionsCallBack(data) {
 			htmlData = htmlData +'<input type="hidden" id="enable-branches-form" value="true">';
 			$.each(searchResult,function(i,region) {
 				htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData + '<div class="float-left hm-sub-item-left region-element" data-address1="'+region.address1+'" data-address2="'+region.address2+'" data-regionid = '+region.regionId+'>'+region.regionName+'</div>';
+					htmlData = htmlData + '<div class="float-left hm-sub-item-left region-element" data-regionid = '+region.regionId+'>'+region.regionName+'</div>';
 					htmlData = htmlData + '<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick=deleteRegionPopup('+region.regionId+')></div></div>';
 			});
 		}
