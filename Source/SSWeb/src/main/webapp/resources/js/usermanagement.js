@@ -266,10 +266,14 @@ function paintUserDetailsForm(userId) {
  */
 function paintUserListInUserManagement() {
 	var jsonData;
+	var payload = {
+		"startIndex" : 	UsersListStartIndex
+	};
 	$.ajax({
-		url : "./findusersforcompany.do/"+UsersListStartIndex,
-		type : "GET",
+		url : "./findusersforcompany.do",
+		type : "POST",
 		dataType : "JSON",
+		data : payload,
 		success : function(data) {
 			var jsonData = data.responseJSON;
 			UsersListStartIndex += jsonData.length;
