@@ -111,9 +111,7 @@
 						<div class="initial-dd-item" id="change-password">
 						<spring:message code="label.changepassword.key"/>
 						</div>
-						<div class="initial-dd-item">
-							<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
-						</div>
+						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
 					</div>
 				</div>
 
