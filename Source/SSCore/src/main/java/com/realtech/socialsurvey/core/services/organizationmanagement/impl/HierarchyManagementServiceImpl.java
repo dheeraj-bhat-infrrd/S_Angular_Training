@@ -388,8 +388,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, String branchName, String branchAddress1, String branchAddress2) throws InvalidInputException,
-			SolrException {
+	public Branch addNewBranch(User user, long regionId, String branchName, String branchAddress1, String branchAddress2)
+			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
 		}
@@ -537,15 +537,15 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException,
-			SolrException {
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress1, String branchAddress2, User user)
+			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update branch");
 		}
 		if (branchName == null || branchName.isEmpty()) {
 			throw new InvalidInputException("Branch name is null in update branch");
 		}
-		if (branchAddress == null || branchAddress.isEmpty()) {
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
 			throw new InvalidInputException("Branch address is null in update branch");
 		}
 		if (branchId <= 0l) {
@@ -553,7 +553,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Method update branch called for branchId:" + branchId + " ,regionId:" + regionId + " branchName : " + branchName
-				+ " ,branchAddress:" + branchAddress);
+				+ " ,branchAddress:" + branchAddress1);
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		if (branch == null) {
 			throw new InvalidInputException("No branch present for the required id in database while updating branch");
@@ -574,8 +574,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		branch.setBranch(branchName);
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		// TODO update address details
 		branchDao.update(branch);
+
+		LOG.debug("Update branch in mongo");
+		// TODO update in mongo
 
 		LOG.debug("Updating branch in solr");
 		solrSearchService.addOrUpdateBranchToSolr(branch);
@@ -589,20 +591,21 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException {
+	public void updateRegion(long regionId, String regionName, String regionAddress1, String regionAddress2, User user) throws InvalidInputException,
+			SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update region");
 		}
 		if (regionName == null || regionName.isEmpty()) {
 			throw new InvalidInputException("Region name is null in update region");
 		}
-		if (regionAddress == null || regionAddress.isEmpty()) {
+		if (regionAddress1 == null || regionAddress1.isEmpty()) {
 			throw new InvalidInputException("Region address is null in update region");
 		}
 		if (regionId <= 0l) {
 			throw new InvalidInputException("Region id is invalid in update region");
 		}
-		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress:" + regionAddress);
+		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress1:" + regionAddress1);
 		Region region = regionDao.findById(Region.class, regionId);
 		if (region == null) {
 			throw new InvalidInputException("No region present for the required id in database while updating region");
@@ -610,8 +613,12 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setRegion(regionName);
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		region.setModifiedBy(String.valueOf(user.getUserId()));
-		// TODO update address
+		region.setAddress1(regionAddress1);
+		region.setAddress2(regionAddress1);
 		regionDao.update(region);
+
+		LOG.debug("Updating region in mongo");
+		// TODO update in mongo
 
 		LOG.debug("Updating region in solr");
 		solrSearchService.addOrUpdateRegionToSolr(region);

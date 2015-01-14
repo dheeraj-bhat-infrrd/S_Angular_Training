@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 
 /**
@@ -81,6 +82,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsById(long identifier, String collectionName) {
 		LOG.info("Fetch organization unit settings from "+collectionName+" for id: "+identifier);
 		OrganizationUnitSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER,identifier)), OrganizationUnitSettings.class, collectionName);
+		return settings;
+	}
+	
+	@Override
+	public BranchSettings fetchBranchSettingsById(long identifier) {
+		LOG.info("Fetch branch settings for id: "+identifier);
+		BranchSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER,identifier)), BranchSettings.class, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		return settings;
 	}
 

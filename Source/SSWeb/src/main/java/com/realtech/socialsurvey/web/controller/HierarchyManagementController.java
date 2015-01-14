@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +11,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
@@ -408,7 +409,6 @@ public class HierarchyManagementController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
 			String address = getCompleteAddress(regionAddress1, regionAddress2);
-			// TODO store address in database
 			LOG.info("Address " + address + " is yet to be stored");
 
 			LOG.debug("Calling service to add a new region");
@@ -462,7 +462,6 @@ public class HierarchyManagementController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
 			String address = getCompleteAddress(branchAddress1, branchAddress2);
-			// TODO store address in database
 			LOG.info("Address " + address + " is yet to be stored");
 
 			try {
@@ -531,12 +530,11 @@ public class HierarchyManagementController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
 			String address = getCompleteAddress(branchAddress1, branchAddress2);
-			// TODO store address in database
 			LOG.info("Address " + address + " is yet to be stored");
 
 			try {
 				LOG.debug("Calling service to update branch with Id : " + branchId);
-				hierarchyManagementService.updateBranch(branchId, regionId, branchName, address, user);
+				hierarchyManagementService.updateBranch(branchId, regionId, branchName, branchAddress1, branchAddress2, user);
 				LOG.debug("Successfully executed service to update a branch");
 
 				model.addAttribute("message",
@@ -583,12 +581,11 @@ public class HierarchyManagementController {
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
 			String address = getCompleteAddress(regionAddress1, regionAddress2);
-			// TODO store address in database
 			LOG.info("Address " + address + " is yet to be stored");
 
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
-				hierarchyManagementService.updateRegion(regionId, regionName, address, user);
+				hierarchyManagementService.updateRegion(regionId, regionName, regionAddress1, regionAddress2, user);
 				LOG.debug("Successfully executed service to update a region");
 
 				model.addAttribute("message",
@@ -705,9 +702,10 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Error while parsing regionId in fetchRegionToUpdate.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			LOG.debug("Calling service to fetch region settings");
 			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(regionId);
-			regionToUpdateJson = JSONUtil.toJSON(regionSettings);
-
+			regionToUpdateJson = new Gson().toJson(regionSettings);
+			LOG.debug("Fetched region .regionToUpdateJson is :" + regionToUpdateJson);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching Region To Update. Reason : " + e.getMessage(), e);
@@ -716,6 +714,42 @@ public class HierarchyManagementController {
 
 		LOG.info("Method fetchRegionToUpdate finished in controller");
 		return regionToUpdateJson;
+
+	}
+
+	/**
+	 * Method to fetch branch along with settings for update
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/fetchbranchtoupdate", method = RequestMethod.GET)
+	public String fetchBranchToUpdate(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchBranchToUpdate called in controller");
+		String strBranchId = request.getParameter("branchId");
+		long branchId = 0l;
+		String branchToUpdateJson = null;
+		try {
+			try {
+				branchId = Long.parseLong(strBranchId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing branchId in fetchBranchToUpdate.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			LOG.debug("Calling service to fetch branch settings");
+			BranchSettings branchSettings = organizationManagementService.getBranchSettings(branchId);
+			branchToUpdateJson = new Gson().toJson(branchSettings);
+			LOG.debug("Fetched branch .branchToUpdateJson is :" + branchToUpdateJson);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching branch To Update. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method fetchBranchToUpdate finished in controller. Returning : " + branchToUpdateJson);
+		return branchToUpdateJson;
 
 	}
 
