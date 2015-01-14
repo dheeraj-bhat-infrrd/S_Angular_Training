@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -146,6 +145,8 @@ public class UserManagementController {
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
+						LOG.debug("Adding user {} to solr server.",user.getFirstName());
+						solrSearchService.addUserToSolr(user);
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
@@ -240,11 +241,14 @@ public class UserManagementController {
 	 * Method to fetch list of all the users who belong to the same as that of current user. Current
 	 * user is company admin who can assign different roles to other users.
 	 */
-	@RequestMapping(value = "/findusersforcompany/{startIndex}", method = RequestMethod.POST)
-	public String findUsersForCompany(@PathVariable int startIndex, Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/findusersforcompany/{startIndex}", method = RequestMethod.GET)
+	@ResponseBody
+	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		HttpSession session = request.getSession(false);
+		String startIndexStr = request.getParameter("startIndex");
 		String users = "";
+		int startIndex = 0;
 		/*
 		 * @SuppressWarnings("unchecked") List<User> usersList = (List<User>)
 		 * session.getAttribute("allUsersList");
@@ -255,11 +259,23 @@ public class UserManagementController {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
+			if(startIndexStr==null || startIndexStr.isEmpty()){
+				LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
+				throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
+			}
+			try{
+				startIndex = Integer.parseInt(startIndexStr);
+			}catch(NumberFormatException e){
+				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
+				//TODO return JSON for error.
+				return JspResolver.MESSAGE_HEADER;
+			}
 			try {
 				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, BATCH_SIZE);
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
+				//TODO return JSON for error.
 				return JspResolver.MESSAGE_HEADER;
 			}
 		}
