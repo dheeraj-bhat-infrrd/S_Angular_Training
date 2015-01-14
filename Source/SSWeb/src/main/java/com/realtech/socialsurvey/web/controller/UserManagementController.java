@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -57,14 +58,14 @@ public class UserManagementController {
 
 	@Autowired
 	private URLGenerator urlGenerator;
-	
+
 	@Autowired
 	private SessionHelper sessionHelper;
-	
+
 	@Autowired
 	private SolrSearchService solrSearchService;
 
-	private static final int BATCH_SIZE = 20;
+	private final int BATCH_SIZE = 20;
 
 	// JIRA SS-42 BY RM05 BOC
 
@@ -239,38 +240,44 @@ public class UserManagementController {
 	 * Method to fetch list of all the users who belong to the same as that of current user. Current
 	 * user is company admin who can assign different roles to other users.
 	 */
-	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.POST)
-	public String findUsersForCompany(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/findusersforcompany/{startIndex}", method = RequestMethod.POST)
+	public String findUsersForCompany(@PathVariable int startIndex, Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		HttpSession session = request.getSession(false);
-		@SuppressWarnings("unchecked") List<User> usersList = (List<User>) session.getAttribute("allUsersList");
+		String users = "";
+		/*
+		 * @SuppressWarnings("unchecked") List<User> usersList = (List<User>)
+		 * session.getAttribute("allUsersList");
+		 */
 		try {
 			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
-			if (usersList == null)
-
-				getAllUsersForCompany(model, request);
-			else
-				getNextListOfUsers(model, request);
+			try {
+				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, BATCH_SIZE);
+			}
+			catch (MalformedURLException e) {
+				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
+				return JspResolver.MESSAGE_HEADER;
+			}
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
 		// return user details page on success
-		return JspResolver.USER_LIST;
+		return users;
 	}
 
 	/*
 	 * Method to find a user on the basis of email id provided.
 	 */
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.GET)
-	public @ResponseBody String findUserByEmail(Model model, HttpServletRequest request) {
+	public @ResponseBody
+	String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
 		String users = "";
 		try {
@@ -759,7 +766,7 @@ public class UserManagementController {
 			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
 			User user = null;
-			
+
 			// form parameters validation
 			if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
 				LOG.error("First name invalid");
@@ -851,7 +858,7 @@ public class UserManagementController {
 				LOG.debug("License details not found for the user's company");
 			}
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-				
+
 				UserProfile highestUserProfile = null;
 				// fetch the highest user profile for user
 				try {
@@ -861,7 +868,7 @@ public class UserManagementController {
 					LOG.error("No user profiles found for the user");
 					return JspResolver.ERROR_PAGE;
 				}
-				
+
 				if (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)) {
 					// get the user's canonical settings
 					LOG.info("Fetching the user's canonical settings and setting it in session");
@@ -870,8 +877,9 @@ public class UserManagementController {
 					sessionHelper.setSettingVariablesInSession(session);
 				}
 
-			}else{
-				//TODO: add logic for what happens when no user profile present
+			}
+			else {
+				// TODO: add logic for what happens when no user profile present
 			}
 		}
 		catch (NonFatalException e) {
@@ -887,62 +895,41 @@ public class UserManagementController {
 	 * Method to get list of all users from database for the company to which current user belongs
 	 * to.
 	 */
-	private void getAllUsersForCompany(Model model, HttpServletRequest request) throws NonFatalException {
-		LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		// String userIdStr = request.getParameter(CommonConstants.USER_ID);
-		if (user == null) {
-			LOG.error("Invalid user id passed in method findUserByUserId().");
-			throw new InvalidInputException("Invalid user id passed in method findUserByUserId().");
-		}
-		/*
-		 * long userId = 0; try { userId = Long.parseLong(userIdStr); } catch (NumberFormatException
-		 * e) { LOG.error("Number format exception while parsing user Id", e); throw new
-		 * NonFatalException("Number format execption while parsing user id",
-		 * DisplayMessageConstants.GENERAL_ERROR, e); }
-		 */
-		List<User> allUsers = userManagementService.getUsersForCompany(user);
-		int maxIndex = BATCH_SIZE;
-		if (allUsers.size() <= BATCH_SIZE) {
-			maxIndex = allUsers.size();
-			model.addAttribute("hasMoreUsers", false);
-		}
-		else {
-			model.addAttribute("hasMoreUsers", true);
-		}
-		List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, maxIndex);
-		session.setAttribute("allUsersList", allUsers);
-		session.setAttribute("currentIndex", BATCH_SIZE);
-		model.addAttribute("usersList", users);
-		LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company.");
-	}
-
-	
-	
 	/*
-	 * Method to iterate over the list of all the users which is fetched from database. It returns
-	 * same number of users as that of configured for maximum batch size.
+	 * private void getAllUsersForCompany(Model model, HttpServletRequest request) throws
+	 * NonFatalException {
+	 * LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
+	 * HttpSession session = request.getSession(false); User user = (User)
+	 * session.getAttribute(CommonConstants.USER_IN_SESSION); // String userIdStr =
+	 * request.getParameter(CommonConstants.USER_ID); if (user == null) {
+	 * LOG.error("Invalid user id passed in method findUserByUserId()."); throw new
+	 * InvalidInputException("Invalid user id passed in method findUserByUserId()."); } long userId
+	 * = 0; try { userId = Long.parseLong(userIdStr); } catch (NumberFormatException e) {
+	 * LOG.error("Number format exception while parsing user Id", e); throw new
+	 * NonFatalException("Number format execption while parsing user id",
+	 * DisplayMessageConstants.GENERAL_ERROR, e); } List<User> allUsers =
+	 * userManagementService.getUsersForCompany(user); int maxIndex = BATCH_SIZE; if
+	 * (allUsers.size() <= BATCH_SIZE) { maxIndex = allUsers.size();
+	 * model.addAttribute("hasMoreUsers", false); } else { model.addAttribute("hasMoreUsers", true);
+	 * } List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, maxIndex);
+	 * session.setAttribute("allUsersList", allUsers); session.setAttribute("currentIndex",
+	 * BATCH_SIZE); model.addAttribute("usersList", users);
+	 * LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company."
+	 * ); } Method to iterate over the list of all the users which is fetched from database. It
+	 * returns same number of users as that of configured for maximum batch size. private void
+	 * getNextListOfUsers(Model model, HttpServletRequest request) {
+	 * LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company."
+	 * ); HttpSession session = request.getSession(false); int currentIndex = (Integer)
+	 * session.getAttribute("currentIndex");
+	 * @SuppressWarnings("unchecked") List<User> allUsers = (List<User>)
+	 * session.getAttribute("allUsersList"); int maxIndex = currentIndex + BATCH_SIZE; if
+	 * (allUsers.size() <= maxIndex) { maxIndex = allUsers.size();
+	 * model.addAttribute("hasMoreUsers", false); } else { maxIndex = currentIndex + BATCH_SIZE;
+	 * model.addAttribute("hasMoreUsers", true); } List<User> users = allUsers.subList(currentIndex,
+	 * maxIndex); currentIndex = maxIndex; model.addAttribute("usersList", users);
+	 * session.setAttribute("currentIndex", currentIndex);
+	 * LOG.debug("Method getNextListOfUsers() finished to fetch next set of users for same company."
+	 * ); }
 	 */
-	private void getNextListOfUsers(Model model, HttpServletRequest request) {
-		LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company.");
-		HttpSession session = request.getSession(false);
-		int currentIndex = (Integer) session.getAttribute("currentIndex");
-		@SuppressWarnings("unchecked") List<User> allUsers = (List<User>) session.getAttribute("allUsersList");
-		int maxIndex = currentIndex + BATCH_SIZE;
-		if (allUsers.size() <= maxIndex) {
-			maxIndex = allUsers.size();
-			model.addAttribute("hasMoreUsers", false);
-		}
-		else {
-			maxIndex = currentIndex + BATCH_SIZE;
-			model.addAttribute("hasMoreUsers", true);
-		}
-		List<User> users = allUsers.subList(currentIndex, maxIndex);
-		currentIndex = maxIndex;
-		model.addAttribute("usersList", users);
-		session.setAttribute("currentIndex", currentIndex);
-		LOG.debug("Method getNextListOfUsers() finished to fetch next set of users for same company.");
-	}
 }
 // JIRA SS-37 BY RM02 EOC
