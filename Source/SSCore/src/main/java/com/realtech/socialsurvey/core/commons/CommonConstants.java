@@ -175,4 +175,6 @@ public interface CommonConstants {
 	public static final String REGION_NAME_SOLR = "regionName";
 	public static final String BRANCH_ID_SOLR = "branchId";
 	public static final String BRANCH_NAME_SOLR = "branchName";
+	public static final String ADDRESS1 = "address1";
+	public static final String ADDRESS2 = "address2";
 }

@@ -488,7 +488,7 @@ function validateAddress2(elementId){
 function validateBranchName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid branch name.');
@@ -502,7 +502,7 @@ function validateBranchName(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).next('.input-error-2').hide();
 				return true;
 			}else {
@@ -522,7 +522,7 @@ function validateBranchName(elementId){
 function validateRegionName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid region name.');
@@ -536,7 +536,7 @@ function validateRegionName(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).next('.input-error-2').hide();
 				return true;
 			}else {
