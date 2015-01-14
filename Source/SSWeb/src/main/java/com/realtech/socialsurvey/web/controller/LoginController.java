@@ -174,7 +174,7 @@ public class LoginController {
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage() {
 		LOG.info("Dashboard Page started");
-		return JspResolver.LANDING;
+		return JspResolver.DASHBOARD;
 	}
 
 	/**
