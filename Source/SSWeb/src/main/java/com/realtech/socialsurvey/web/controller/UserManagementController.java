@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.UserManage
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.ErrorCodes;
+import com.realtech.socialsurvey.web.common.ErrorMessages;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 // JIRA SS-37 BY RM02 BOC
@@ -145,7 +149,7 @@ public class UserManagementController {
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
-						LOG.debug("Adding user {} to solr server.",user.getFirstName());
+						LOG.debug("Adding user {} to solr server.", user.getFirstName());
 						solrSearchService.addUserToSolr(user);
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
@@ -241,7 +245,7 @@ public class UserManagementController {
 	 * Method to fetch list of all the users who belong to the same as that of current user. Current
 	 * user is company admin who can assign different roles to other users.
 	 */
-	@RequestMapping(value = "/findusersforcompany/{startIndex}", method = RequestMethod.GET)
+	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.GET)
 	@ResponseBody
 	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
@@ -249,39 +253,38 @@ public class UserManagementController {
 		String startIndexStr = request.getParameter("startIndex");
 		String users = "";
 		int startIndex = 0;
-		/*
-		 * @SuppressWarnings("unchecked") List<User> usersList = (List<User>)
-		 * session.getAttribute("allUsersList");
-		 */
 		try {
 			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
-			if(startIndexStr==null || startIndexStr.isEmpty()){
+			if (startIndexStr == null || startIndexStr.isEmpty()) {
 				LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
 				throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
 			}
-			try{
+			try {
 				startIndex = Integer.parseInt(startIndexStr);
-			}catch(NumberFormatException e){
+			}
+			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
-				//TODO return JSON for error.
-				return JspResolver.MESSAGE_HEADER;
+				throw new NonFatalException("NumberFormatException while searching for user id", e);
 			}
 			try {
 				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, BATCH_SIZE);
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
-				//TODO return JSON for error.
-				return JspResolver.MESSAGE_HEADER;
+				throw new NonFatalException("MalformedURLException while searching for user id.", e);
 			}
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getMessage(), nonFatalException);
-			return JspResolver.MESSAGE_HEADER;
+			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(), nonFatalException);
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
+			String errorMessage = JSONUtil.toJSON(errorResponse);
+			return errorMessage;
 		}
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
 		// return user details page on success
@@ -312,9 +315,6 @@ public class UserManagementController {
 
 			try {
 				users = solrSearchService.searchUsersByLoginNameOrName(searchKey, user.getCompany().getCompanyId());
-				model.addAttribute("searchedUsers", users);
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_SEARCH_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
 			catch (InvalidInputException invalidInputException) {
 				throw new InvalidInputException(invalidInputException.getMessage(), invalidInputException);
@@ -326,7 +326,10 @@ public class UserManagementController {
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user by email id id. Reason : " + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
+			return JSONUtil.toJSON(errorResponse);
 		}
 		LOG.info("Method to find users by email id finished.");
 		return users;
