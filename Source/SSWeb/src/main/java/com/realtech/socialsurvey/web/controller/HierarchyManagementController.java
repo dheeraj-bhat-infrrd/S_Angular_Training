@@ -48,6 +48,8 @@ public class HierarchyManagementController {
 	private SolrSearchService solrSearchService;
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+	@Autowired
+	private SessionHelper sessionHelper;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -60,7 +62,8 @@ public class HierarchyManagementController {
 	public String showBuildHierarchyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildHierarchyPage called");
 		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		//User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		boolean isRegionAdditionAllowed = false;
 		boolean isBranchAdditionAllowed = false;

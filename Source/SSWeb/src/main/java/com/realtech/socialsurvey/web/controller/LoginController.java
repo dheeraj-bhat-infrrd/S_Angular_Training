@@ -4,11 +4,9 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -25,7 +22,6 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -76,57 +72,28 @@ public class LoginController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/userlogin", method = RequestMethod.POST)
+	@RequestMapping(value = "/userlogin", method = RequestMethod.GET)
 	public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Login controller called for user login");
-		String loginName = request.getParameter("loginName");
-		String password = request.getParameter("password");
 		User user = null;
 		UserProfile userProfile = null;
 		String redirectTo = null;
 		AccountType accountType = null;
 
 		try {
-			validateLoginFormParameters(loginName, password);
-
-			try {
-				user = authenticationService.getUserWithLoginName(loginName);
-			}
-			catch (NoRecordsFetchedException e) {
-				LOG.error("No Records Fetched Exception in fetching User. Reason " + e.getMessage(), e);
-				throw new NoRecordsFetchedException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
-			}
-			LOG.debug("Check if company status is active");
-			if (user.getCompany().getStatus() == CommonConstants.STATUS_INACTIVE) {
-				throw new InvalidInputException("Company is inactive in login", DisplayMessageConstants.COMPANY_INACTIVE);
-			}
-
-			LOG.debug("Checking if user is not in inactive mode");
-			if (user.getStatus() == CommonConstants.STATUS_INACTIVE) {
-				throw new InvalidInputException("User not active in login", DisplayMessageConstants.USER_INACTIVE);
-			}
+			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
-			try {
-				LOG.debug("Calling authentication service to validate user while login");
-				authenticationService.validateUser(user, password);
-				LOG.debug("Successfully executed authentication service to validate user while login");
+			session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
-				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
-
-				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
-				if (licenseDetails != null && !licenseDetails.isEmpty()) {
-					LicenseDetail licenseDetail = licenseDetails.get(0);
-					accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
-					LOG.debug("Adding account type in session");
-					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
-				}
-				else {
-					LOG.debug("License details not found for the user's company");
-				}
+			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+			if (licenseDetails != null && !licenseDetails.isEmpty()) {
+				LicenseDetail licenseDetail = licenseDetails.get(0);
+				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 			}
-			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER_CREDENTIALS, e);
+			else {
+				LOG.debug("License details not found for the user's company");
 			}
 
 			/**
@@ -351,24 +318,7 @@ public class LoginController {
 				messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		return JspResolver.LOGIN;
 	}
-	/**
-	 * Verify the login Form Parameters
-	 * 
-	 * @param loginName
-	 * @param password
-	 * @throws InvalidInputException
-	 */
-	private void validateLoginFormParameters(String loginName, String password) throws InvalidInputException {
-		LOG.debug("Validating Login form paramters loginName :" + loginName);
-		if (loginName == null || loginName.isEmpty()) {
-			throw new InvalidInputException("User name passed can not be null", DisplayMessageConstants.INVALID_USERNAME);
-		}
-		if (password == null || password.isEmpty()) {
-			throw new InvalidInputException("Password passed can not be null", DisplayMessageConstants.INVALID_PASSWORD);
-		}
-		LOG.debug("Login form parameters validated successfully");
-	}
-
+	
 	/**
 	 * validate reset form parameters
 	 * 

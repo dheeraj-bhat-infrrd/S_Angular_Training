@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -139,5 +140,14 @@ public class SessionHelper {
 			// get the first one. that one will be the highest
 			session.setAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION, userProfiles.get(0).getProfilesMaster().getProfileId());
 		}
+	}
+	
+	public User getCurrentUser() {
+		final Object sessionUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = null;
+		if (sessionUser instanceof User) {
+			user = (User) sessionUser;
+		}
+		return user;
 	}
 }
