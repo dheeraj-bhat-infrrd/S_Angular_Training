@@ -22,7 +22,6 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -299,7 +298,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery("loginName:" + pattern + " OR firstName:" + pattern + " OR lastName:" + pattern);
-			solrQuery.addFilterQuery("companyId:" + companyId, "status:" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery("companyId:" + companyId);
+			solrQuery.addFilterQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -334,8 +335,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.addFilterQuery("companyId:" + companyId, "status:(" + CommonConstants.STATUS_ACTIVE + " " + CommonConstants.STATUS_NOT_VERIFIED
-					+ " " + CommonConstants.STATUS_TEMPORARILY_INACTIVE + ")");
+			solrQuery.setQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery("companyId:" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 			LOG.debug("Querying solr for searching users");
@@ -373,14 +375,15 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
 			document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
-
 			if (user.getUserProfiles() != null)
-				for (UserProfile userProfile : user.getUserProfiles()) {
-					document.addField(CommonConstants.BRANCH_ID_SOLR, userProfile.getBranchId());
-					document.addField(CommonConstants.REGION_ID_SOLR, userProfile.getRegionId());
-					response = solrServer.add(document);
-				}
+			
+			/*for (UserProfile userProfile : user.getUserProfiles()) { 
+				if(userProfile.getRegionId()!=0)
+					
+			}*/
+			 
 			LOG.debug("response while adding region is {}." + response);
+//			solrServer.add(document);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
@@ -392,5 +395,18 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method to add region to solr finshed for region : " + user);
+	}
+
+	public static void main(String[] args) {
+		SolrSearchServiceImpl s = new SolrSearchServiceImpl();
+		s.solrUserUrl = "http://localhost:8983/solr/ss-users/";
+		try {
+			User user = new User();
+			s.addUserToSolr(user);
+		}
+		catch (SolrException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }
