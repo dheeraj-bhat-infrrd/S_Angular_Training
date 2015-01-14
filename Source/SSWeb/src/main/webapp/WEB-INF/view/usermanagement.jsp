@@ -84,6 +84,7 @@
 </style>
 <script>
 	$(document).ready(function(){
+		doStopAjaxRequestForUsersList = false;
 		if($('#server-message>div').hasClass("error-message")){
 			isUserManagementAuthorized = false;
 			$('#server-message').show();
