@@ -12,6 +12,12 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,7 +47,12 @@ public class RegistrationController {
 	private RegistrationService registrationService;
 	@Autowired
 	private MessageUtils messageUtils;
-
+	@Autowired
+	@Qualifier("authenticationManager")
+	private AuthenticationManager authenticationManager;
+	@Autowired
+	private UserDetailsService userDetailsSvc;
+	
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
 		LOG.info("Showing invitation page");
@@ -198,10 +209,26 @@ public class RegistrationController {
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 				LOG.debug("Adding newly registered user to session");
-				HttpSession session = request.getSession(true);
-				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
-				LOG.debug("Successfully added registered user to session");
+				try {
+					UserDetails userDetails = userDetailsSvc.loadUserByUsername(emailId);
+					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password,
+							userDetails.getAuthorities());
+					authenticationManager.authenticate(auth);
 
+					// redirect into secured main page if authentication successful
+					if (auth.isAuthenticated()) {
+						SecurityContextHolder.getContext().setAuthentication(auth);
+					}
+					LOG.debug("Successfully added registered user to session");
+
+					//TODO Remove after migrating to Principal
+					HttpSession session = request.getSession(true);
+					session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+				}
+				catch (Exception e) {
+					LOG.debug("Problem authenticating user" + emailId, e);
+				}
+				
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);

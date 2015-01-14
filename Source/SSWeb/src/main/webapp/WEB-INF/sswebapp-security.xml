@@ -7,13 +7,11 @@
 			http://www.springframework.org/schema/security
 			http://www.springframework.org/schema/security/spring-security.xsd">
 
-	<http use-expressions="true" auto-config="true" entry-point-ref="customEntryPoint">
+	<http use-expressions="true" auto-config="true" entry-point-ref="customEntryPoint"
+		authentication-manager-ref="authenticationManager">
 		<intercept-url pattern="/login.do" access="permitAll" />
 		<intercept-url pattern="/registration.do" access="permitAll" />
 		<intercept-url pattern="/register.do" access="permitAll" />
-		<intercept-url pattern="/uploadcompanylogo.do" access="permitAll" />
-		<intercept-url pattern="/addcompanyinformation.do"
-			access="permitAll" />
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
 		<intercept-url pattern="/resetPassword.do" access="permitAll" />
 
