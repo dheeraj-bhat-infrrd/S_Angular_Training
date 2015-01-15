@@ -14,6 +14,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 // JIRA SS-34 BY RM02 BOC
 /**
@@ -67,7 +68,7 @@ public interface UserManagementService {
 	public List<User> getUsersForCompany(User user) throws InvalidInputException, NoRecordsFetchedException;
 
 	// Method to assign a user to a particular branch.
-	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException;
+	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException, SolrException;
 
 	// Method to unassign a user from branch.
 	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException;

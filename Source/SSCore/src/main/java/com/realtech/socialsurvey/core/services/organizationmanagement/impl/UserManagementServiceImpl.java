@@ -47,6 +47,8 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 /**
@@ -70,6 +72,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
+	
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	@Resource
 	@Qualifier("userInvite")
@@ -760,7 +765,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Transactional
 	@Override
-	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException {
+	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException, SolrException {
 
 		if (admin == null) {
 			throw new InvalidInputException("No admin user present.");
@@ -797,6 +802,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 			userDao.update(user);
 		}
+		setProfilesOfUser(user);
+		solrSearchService.addUserToSolr(user);
 		LOG.info("Method to assign user to a branch finished for user : " + admin.getUserId());
 	}
 
