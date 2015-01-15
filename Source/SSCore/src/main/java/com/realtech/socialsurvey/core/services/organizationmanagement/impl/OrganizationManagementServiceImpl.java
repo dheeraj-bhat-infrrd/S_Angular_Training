@@ -37,6 +37,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -72,6 +74,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private UserManagementService userManagementService;
 	
 	@Autowired
+	private SolrSearchService solrSearchService;
+	
+	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
 	
 	@Autowired
@@ -83,16 +88,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
+	 * @throws SolrException 
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
-
+		
 		LOG.debug("Calling method for updating company for user profiles");
 		updateCompanyForUserProfile(user, company);
 
@@ -109,7 +115,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException {
+	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException, SolrException {
 		LOG.info("Method addAccountTypeForCompany started for user : " + user.getLoginName());
 		if (strAccountType == null || strAccountType.isEmpty()) {
 			throw new InvalidInputException("account type is null or empty while adding account type fro company");
@@ -139,6 +145,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			default:
 				throw new InvalidInputException("Account type is not valid");
 		}
+		user = userDao.findById(User.class, user.getUserId());
+		userManagementService.setProfilesOfUser(user);
+		solrSearchService.addUserToSolr(user);
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
@@ -211,7 +220,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		user = userDao.findById(User.class, user.getUserId());
-		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+//		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+		List<UserProfile> userProfiles = user.getUserProfiles();
 		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {
 				userProfile.setCompany(company);

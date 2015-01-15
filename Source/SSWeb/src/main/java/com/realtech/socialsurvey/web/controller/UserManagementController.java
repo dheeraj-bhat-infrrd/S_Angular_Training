@@ -847,6 +847,7 @@ public class UserManagementController {
 				user = authenticationService.getUserWithEmailIdAndCompanyId(emailId, companyId);
 				user.setFirstName(firstName);
 				user.setLastName(lastName);
+				user.setStatus(CommonConstants.STATUS_ACTIVE);
 				user.setModifiedBy(String.valueOf(user.getUserId()));
 				user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			}
