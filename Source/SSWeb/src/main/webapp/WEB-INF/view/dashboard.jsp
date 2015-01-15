@@ -1,5 +1,5 @@
-<jsp:include page="header.jsp"/>
-
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -9,7 +9,7 @@
 </div>
 
 <div class="container">
-    <img src="../../SSWeb-1.0/resources/images/dash.png" class="container">
+    <img src="${pageContext.request.contextPath}/resources/images/dash.png" class="container">
 </div>
 
 <jsp:include page="scripts.jsp"/>
