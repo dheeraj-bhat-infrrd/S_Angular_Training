@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -41,6 +42,8 @@ public class RegistrationController {
 	private UserManagementService userManagementService;
 	@Autowired
 	private MessageUtils messageUtils;
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
@@ -196,7 +199,8 @@ public class RegistrationController {
 				LOG.debug("Registering user with emailId : " + emailId);
 				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
-
+				solrSearchService.addUserToSolr(user);
+				LOG.debug("Added newly added user {} to solr",user.getFirstName());
 				LOG.debug("Adding newly registered user to session");
 				HttpSession session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
