@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.services.search.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.noggit.JSONUtil;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
@@ -22,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -373,17 +376,23 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
-			document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
+			if (user.getCompany() != null)
+				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
+			List<Long> branches = new ArrayList<>();
+			List<Long> regions = new ArrayList<>();
 			if (user.getUserProfiles() != null)
-			
-			/*for (UserProfile userProfile : user.getUserProfiles()) { 
-				if(userProfile.getRegionId()!=0)
-					
-			}*/
-			 
+				for (UserProfile userProfile : user.getUserProfiles()) {
+					if (userProfile.getRegionId() != 0)
+						regions.add(userProfile.getRegionId());
+					if (userProfile.getBranchId() != 0)
+						branches.add(userProfile.getBranchId());
+				}
+			document.addField("branches", branches);
+			document.addField("regions", regions);
+			document.addField("isAgent", user.isAgent());
 			LOG.debug("response while adding region is {}." + response);
-//			solrServer.add(document);
+			solrServer.add(document);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
