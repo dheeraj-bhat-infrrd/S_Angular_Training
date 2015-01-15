@@ -12,7 +12,7 @@
     <img src="${pageContext.request.contextPath}/resources/images/dash.png" class="container">
 </div>
 
-<jsp:include page="scripts.jsp"/>
+<!-- <jsp:include page="scripts.jsp"/> -->
 
 <script>
     $(document).ready(function(){
