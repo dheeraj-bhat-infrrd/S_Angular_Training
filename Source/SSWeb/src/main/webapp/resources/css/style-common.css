@@ -1642,11 +1642,15 @@ button.paypal.is-active {
     padding: 0 15px;
     font-size: 12px;
     cursor: pointer;
-    border-bottom: 1px solid #dcdcdc
+    border-bottom: 1px solid #dcdcdc;
+    color: #666;
+    display: inline-block;
+    width: 100%;
 }
 .initial-dd-item:hover {
     color: #fff;
     background-color: #5cc7ef;
+    border-top: 1px solid #5cc7ef;
 }
 
 .initial-dd-item:last-child{
