@@ -55,16 +55,20 @@ $(document).on('click', '#um-emailid-con .icn-save', function() {
 	inviteUser();
 });
 
-/*$(window).scroll(
-	function(event) {
-		// check if scroll position is at the bottom
-		if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)) {
-			if (!doStopAjaxRequestForUsersList) {
-				paintUserListInUserManagement();
-			}
-	}
-});*/
-/*
+if (isUserManagementAuthorized) {
+	$(document).on('click','.um-user-row',function() {
+		console.log("user row clicked");
+		var userId = this.id;
+		userId = userId.substr("um-user-".length);
+		paintUserDetailsForm(userId);
+	});
+	$(document).on('click','.tm-table-remove-icn',function(event) {
+		event.stopPropagation();
+		var userId = $(this).closest('.um-user-row').attr("id");
+		userId = userId.substr("um-user-".length);
+		confirmDeleteUser(userId);
+	});
+}/*
  * Function to assign branch to a user
  */
 function assignUserToBranch(userId, branchId) {
@@ -277,7 +281,8 @@ function paintUserListInUserManagement() {
 		data : payload,
 		dataType : "JSON",
 		success : function(data) {
-			success = true;
+			if(data.errCode == undefined)
+				success = true;
 		},complete:function(data){
 			if(success){
 				var jsonData = data.responseJSON;
@@ -530,7 +535,8 @@ function searchUsersByNameEmailLoginId(searchKey){
 		dataType : "JSON",
 		data : payload,
 		success : function(data){
-			success = true;
+			if(data.errCode == undefined)
+				success = true;
 		},complete:function(data){
 			if(success){
 				paintUsersList(data.responseJSON);
