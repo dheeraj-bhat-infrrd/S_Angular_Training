@@ -234,7 +234,7 @@
 		function uploadImageSuccessCallback(response) {
 			$("#serverSideerror").html(response);
 			var success = "Logo has been uploaded successfully";
-			var successMsg = $("#serverSideerror").find('.success-message').text().trim();
+			var successMsg = $("#serverSideerror").find('.display-message').text().trim();
 			if (success != successMsg) {
 				$('#com-logo').val('');
 				$('#com-logo-decoy').val('');
