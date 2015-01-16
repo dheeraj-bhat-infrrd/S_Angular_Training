@@ -641,6 +641,14 @@
         width: 100%;
         float: none;
     }
+    .icn-address-mobile{
+        display: block;
+    }
+    .cp-err{
+        padding-left: 0;
+        line-height: 22px;
+        margin-top: 12px;
+    }
 }
 
 
@@ -684,6 +692,9 @@
         display: none;
     }
     .header-slider-wrapper{
+        display: none;
+    }
+    .icn-address-mobile{
         display: none;
     }
 }
@@ -796,6 +807,9 @@
     .sb-q-item-txt {
         width: 76%;
     }
+    .cp-err{
+        padding-left: 141px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -842,6 +856,9 @@
 	}
     .sb-q-item-txt{
         width: 81%;
+    }
+    .cp-err{
+        padding-left: 183px;
     }
 }
 
