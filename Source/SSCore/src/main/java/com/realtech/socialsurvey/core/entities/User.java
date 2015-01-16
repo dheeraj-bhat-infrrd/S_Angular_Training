@@ -1,20 +1,32 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * The persistent class for the users database table.
- * 
  */
 @Entity
 @Table(name = "USERS")
 @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
-public class User implements Serializable {
+public class User implements UserDetails, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -39,14 +51,6 @@ public class User implements Serializable {
 	
 	@Column(name = "IS_OWNER")
 	private int isOwner;
-
-	public int getIsOwner() {
-		return isOwner;
-	}
-
-	public void setIsOwner(int isOwner) {
-		this.isOwner = isOwner;
-	}
 
 	@Column(name = "LAST_LOGIN")
 	private Timestamp lastLogin;
@@ -78,9 +82,6 @@ public class User implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
-
-	public User() {
-	}
 
 	public long getUserId() {
 		return this.userId;
@@ -120,6 +121,14 @@ public class User implements Serializable {
 
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
+	}
+
+	public int getIsOwner() {
+		return isOwner;
+	}
+
+	public void setIsOwner(int isOwner) {
+		this.isOwner = isOwner;
 	}
 
 	public Timestamp getLastLogin() {
@@ -225,4 +234,57 @@ public class User implements Serializable {
 		this.company = company;
 	}
 
+	@Transient
+	private boolean accountNonExpired = true;
+	@Transient
+	private boolean accountNonLocked = true;
+	@Transient
+	private boolean credentialsNonExpired = true;
+	@Transient
+	private boolean enabled = true;
+	@Transient
+	private GrantedAuthority[] authorities;
+
+	public User() {
+		this.authorities = new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_USER") };
+	}
+
+	public void setAuthorities(GrantedAuthority[] authorities) {
+		this.authorities = authorities.clone();
+	}
+
+	public String getUsername() {
+		return emailId;
+	}
+
+	public boolean isAccountNonExpired() {
+		return accountNonExpired;
+	}
+
+	public boolean isAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	public boolean isCredentialsNonExpired() {
+		return credentialsNonExpired;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	@Override
+	public String toString() {
+		return "UserVO [id=" + userId + ", displayName=" + displayName + ", email=" + emailId + "]";
+	}
+
+	@Override
+	public String getPassword() {
+		return null;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
+	}
 }

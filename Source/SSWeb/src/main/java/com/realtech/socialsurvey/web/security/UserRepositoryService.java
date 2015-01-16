@@ -19,7 +19,6 @@ public class UserRepositoryService implements UserDetailsService {
 
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		LOG.info("Method: loadUserByUsername called.");
-		UserVO userVO = null;
 		User user = null;
 		try {
 			LOG.info("auth service : " + authenticationService);
@@ -29,16 +28,7 @@ public class UserRepositoryService implements UserDetailsService {
 		catch (NoRecordsFetchedException e) {
 			throw new UsernameNotFoundException("User not found in the system");
 		}
-
-		if (user != null) {
-			userVO = new UserVO();
-			userVO.setId(user.getUserId());
-			userVO.setEmail(user.getEmailId());
-			userVO.setPassword(user.getLoginPassword());
-			userVO.setDisplayName(user.getDisplayName());
-			userVO.setIsOwner(user.getIsOwner());
-		}
 		LOG.info("Method: loadUserByUsername finished.");
-		return userVO;
+		return user;
 	}
 }

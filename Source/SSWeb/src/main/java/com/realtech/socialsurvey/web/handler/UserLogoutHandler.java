@@ -7,9 +7,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
-public class MyLogoutHandler implements LogoutHandler {
+public class UserLogoutHandler implements LogoutHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyLogoutHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserLogoutHandler.class);
 
 	public void logout(HttpServletRequest request, HttpServletResponse response, Authentication user) {
 		LOG.info("Inside logout method of MyLogoutHandler");

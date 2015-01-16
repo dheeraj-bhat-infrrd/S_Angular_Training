@@ -88,7 +88,7 @@ public class PaymentController {
 			HttpSession session = request.getSession(false);
 
 			// Get the user object from the session and the company object from it
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 			Company company = user.getCompany();
 
 			int accountTypeValue = 0;
