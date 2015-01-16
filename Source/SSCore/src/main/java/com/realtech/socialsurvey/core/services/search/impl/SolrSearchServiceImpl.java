@@ -410,16 +410,22 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to add region to solr finshed for region : " + user);
 	}
 
-	public static void main(String[] args) {
-		SolrSearchServiceImpl s = new SolrSearchServiceImpl();
-		s.solrUserUrl = "http://localhost:8983/solr/ss-users/";
+	/*
+	 * Method to remove a user from Solr
+	 */
+	@Override
+	public void removeUserFromSolr(long userIdToRemove) throws SolrException {
+		LOG.info("Method removeUserFromSolr() to remove user id {} from solr started.", userIdToRemove);
 		try {
-			User user = new User();
-			s.addUserToSolr(user);
+			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
+			solrServer.deleteById(String.valueOf(userIdToRemove));
+			solrServer.commit();
 		}
-		catch (SolrException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
 		}
+		LOG.info("Method removeUserFromSolr() to remove user id {} from solr finished successfully.", userIdToRemove);
 	}
+
 }
