@@ -322,44 +322,52 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     margin: 0 auto 25px;
 }
 
-.error-message{
-    padding: 10px;
+.error-message .msg-icn{
+    background: url(../images/icn-err-msg.png) no-repeat center;
 }
 
-.success-message{
-    padding: 10px;
+.success-message .msg-icn{
+	background: url(../images/icnTick.png) no-repeat center;
+}
+
+.display-message{
+	padding: 10px;
+}
+
+.msg-icn{
+	width: 50px;
+    height: 50px;
+    margin-right: 10px;
 }
 
 .msg-err-icn {
     width: 50px;
     height: 50px;
-    background: url(../images/icn-err-msg.png) no-repeat center;
     margin-right: 10px;
 }
 
 .msg-success-icn {
     width: 50px;
     height: 50px;
-    background: url(../images/icnTick.png) no-repeat center;
     margin-right: 10px;
 }
 
-.msg-err-txt-area{
+.msg-txt-area{
     width: 81%;
 }
 
-.err-msg-area {
+.msg-area {
     height: 50px;
     position: relative;
 }
 
-.err-msg-con {
+.msg-con {
     position: absolute;
     height: 50px;
     display: table;
 }
 
-.err-msg-con p{
+.msg-con p{
   display: table-cell; 
   vertical-align: middle; 
   text-align: center; 
