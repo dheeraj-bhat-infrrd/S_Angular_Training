@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.registration.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -145,6 +146,10 @@ public class RegistrationServiceImpl implements RegistrationService {
 		UserProfile userProfile = createUserProfile(user, company, emailId, CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID,
 				CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_COMPANY_STAGE,
 				CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		// add the company admin profile with the user object
+		List<UserProfile> userProfiles = new ArrayList<UserProfile>();
+		userProfiles.add(userProfile);
+		user.setUserProfiles(userProfiles);
 		userProfileDao.save(userProfile);
 
 		/**

@@ -4,7 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.BasicQuery;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -28,7 +30,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
-	
+	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
+	public static final String KEY_LOCATION_ENABLED = "isLocationEnabled";
+	public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
+
 	private static final String KEY_IDENTIFIER = "iden";
 	
 	
@@ -59,18 +64,22 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		if(!mongoTemplate.collectionExists(COMPANY_SETTINGS_COLLECTION)){
 			LOG.info("Creating "+COMPANY_SETTINGS_COLLECTION);
 			mongoTemplate.createCollection(COMPANY_SETTINGS_COLLECTION);
+			createIndexOnIden(COMPANY_SETTINGS_COLLECTION);
 		}
 		if(!mongoTemplate.collectionExists(REGION_SETTINGS_COLLECTION)){
 			LOG.info("Creating "+REGION_SETTINGS_COLLECTION);
 			mongoTemplate.createCollection(REGION_SETTINGS_COLLECTION);
+			createIndexOnIden(REGION_SETTINGS_COLLECTION);
 		}
 		if(!mongoTemplate.collectionExists(BRANCH_SETTINGS_COLLECTION)){
 			LOG.info("Creating "+BRANCH_SETTINGS_COLLECTION);
 			mongoTemplate.createCollection(BRANCH_SETTINGS_COLLECTION);
+			createIndexOnIden(BRANCH_SETTINGS_COLLECTION);
 		}
 		if(!mongoTemplate.collectionExists(AGENT_SETTINGS_COLLECTION)){
 			LOG.info("Creating "+AGENT_SETTINGS_COLLECTION);
 			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
+			createIndexOnIden(AGENT_SETTINGS_COLLECTION);
 		}
 	}
 
@@ -97,6 +106,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.debug("Updating the unit settings");
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Updated the unit setting");
+	}
+	
+	// creates index on field 'iden'
+	private void createIndexOnIden(String collectionName){
+		LOG.debug("Creating unique index on 'iden' for "+collectionName);
+		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
+		LOG.debug("Index created");
 	}
 
 }

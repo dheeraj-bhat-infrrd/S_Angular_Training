@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -20,6 +24,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -39,6 +44,10 @@ public class HierarchyManagementController {
 	private HierarchyManagementService hierarchyManagementService;
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	@Autowired
+	private SolrSearchService solrSearchService;
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -253,6 +262,49 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Check for associated branches for the region
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkbranchesinregion", method = RequestMethod.POST)
+	public String checkBranchesInRegion(Model model, HttpServletRequest request) {
+		LOG.info("Fetching all the branches for current region");
+		String messageToReturn = null;
+
+		try {
+			long regionId = 0l;
+			try {
+				regionId = Long.parseLong(request.getParameter("regionId"));
+				LOG.debug("Calling service to get the count of branches in region");
+				long branchCount = hierarchyManagementService.getCountBranchesInRegion(regionId);
+				LOG.debug("Successfully executed service to get the count of branches in region : " + branchCount);
+
+				if (branchCount > 0l) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+				else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("REGION_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the branch count in method checkBranchesInRegion");
+				throw new InvalidInputException("Error occurred while fetching the branch count in method checkBranchesInRegion",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching branch count for region. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+
+	/**
 	 * Deactivates a branch status
 	 * 
 	 * @param model
@@ -293,6 +345,49 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Check for associated user profiles for the branch
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/checkusersinbranch", method = RequestMethod.POST)
+	public String checkUsersInBranch(Model model, HttpServletRequest request) {
+		LOG.info("Fetching count of users for current branch");
+		String messageToReturn = null;
+
+		try {
+			long branchId = 0l;
+			try {
+				branchId = Long.parseLong(request.getParameter("branchId"));
+				LOG.debug("Calling service to get the count of users in branch");
+				long usersCount = hierarchyManagementService.getCountUsersInBranch(branchId);
+				LOG.debug("Successfully executed service to get the count of users in branch : " + usersCount);
+
+				if (usersCount > 0l) {
+					model.addAttribute("message", messageUtils.getDisplayMessage("USER_MAPPING_EXISTS", DisplayMessageType.ERROR_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+				else {
+					model.addAttribute("message", messageUtils.getDisplayMessage("BRANCH_CAN_DELETE", DisplayMessageType.SUCCESS_MESSAGE));
+					messageToReturn = JspResolver.MESSAGE_HEADER;
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Error occurred while fetching the users count in method checkUsersInBranch");
+				throw new InvalidInputException("Error occurred while fetching the users count in method checkUsersInBranch",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching users count for branch. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			messageToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		return messageToReturn;
+	}
+
+	/**
 	 * Method to add a new region
 	 * 
 	 * @param model
@@ -308,7 +403,7 @@ public class HierarchyManagementController {
 			String regionAddress2 = request.getParameter("regionAddress2");
 
 			validateRegionForm(regionName, regionAddress1);
-			
+
 			HttpSession session = request.getSession(false);
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
@@ -318,7 +413,7 @@ public class HierarchyManagementController {
 
 			LOG.debug("Calling service to add a new region");
 			try {
-				hierarchyManagementService.addNewRegion(user, regionName);
+				hierarchyManagementService.addNewRegion(user, regionName, regionAddress1, regionAddress2);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException occured while adding new region.REason : " + e.getMessage(),
@@ -372,7 +467,7 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to add a new branch");
-				hierarchyManagementService.addNewBranch(user, regionId, branchName);
+				hierarchyManagementService.addNewBranch(user, regionId, branchName, branchAddress1, branchAddress2);
 				LOG.debug("Successfully executed service to add a new branch");
 
 				model.addAttribute("message",
@@ -510,6 +605,118 @@ public class HierarchyManagementController {
 		}
 		LOG.info("Method to update region completed successfully");
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to fetch regions from solr for a given pattern, if no pattern is provided fetches all
+	 * the regions for logged in user's company
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/searchregions", method = RequestMethod.GET)
+	public String searchRegions(Model model, HttpServletRequest request) {
+		LOG.info("Method to search region called in controller");
+		String regionPattern = request.getParameter("regionPattern");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		String searchRegionJson = null;
+		try {
+			if (regionPattern == null || regionPattern.isEmpty()) {
+				regionPattern = "*";
+			}
+			try {
+				LOG.debug("Calling solr search service to get the regions");
+				searchRegionJson = solrSearchService.searchRegions(regionPattern, user.getCompany());
+				LOG.debug("Calling solr search service to get the regions");
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while searching regions. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method to search region completed successfully. Returning json : " + searchRegionJson);
+		return searchRegionJson;
+	}
+
+	/**
+	 * Method to fetch branches from solr for a given pattern, if no pattern is provided fetches all
+	 * the branches for logged in user's company
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/searchbranches", method = RequestMethod.GET)
+	public String searchBranches(Model model, HttpServletRequest request) {
+		LOG.info("Method to search branches called in controller");
+		String branchPattern = request.getParameter("branchPattern");
+		HttpSession session = request.getSession(false);
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		String searchBranchJson = null;
+		try {
+			if (branchPattern == null || branchPattern.isEmpty()) {
+				branchPattern = "*";
+			}
+			try {
+				LOG.debug("Calling solr search service to get the branches");
+				searchBranchJson = solrSearchService.searchBranches(branchPattern, user.getCompany());
+				LOG.debug("Calling solr search service to get the branches");
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while searching branches. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method to search branches completed successfully. Returning json : " + searchBranchJson);
+		return searchBranchJson;
+	}
+
+	/**
+	 * Method to fetch a region details based on id
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/fetchregiontoupdate", method = RequestMethod.GET)
+	public String fetchRegionToUpdate(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchRegionToUpdate called in controller");
+		String strRegionId = request.getParameter("regionId");
+		long regionId = 0l;
+		String regionToUpdateJson = null;
+		try {
+			try {
+				regionId = Long.parseLong(strRegionId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing regionId in fetchRegionToUpdate.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			OrganizationUnitSettings regionSettings = organizationManagementService.getRegionSettings(regionId);
+			regionToUpdateJson = JSONUtil.toJSON(regionSettings);
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching Region To Update. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method fetchRegionToUpdate finished in controller");
+		return regionToUpdateJson;
+
 	}
 
 	/**

@@ -8,8 +8,10 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
  * Services for managing hierarchy
@@ -24,6 +26,42 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException;
+
+	/**
+	 * Method to fetch branches mapped to a region
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException;
+
+	/**
+	 * Method to fetch UserProfiles mapped to a branch
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<UserProfile> getAllUserProfilesInBranch(long branchId) throws InvalidInputException;
+
+	/**
+	 * Method to fetch count of branches mapped to a region
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCountBranchesInRegion(long regionId) throws InvalidInputException;
+
+	/**
+	 * Method to fetch count of UserProfiles mapped to a branch
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public long getCountUsersInBranch(long branchId) throws InvalidInputException;
 
 	/**
 	 * Method to fetch all regions of a company
@@ -41,8 +79,9 @@ public interface HierarchyManagementService {
 	 * @param branchId
 	 * @param status
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException;
+	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to update status of a region
@@ -51,8 +90,9 @@ public interface HierarchyManagementService {
 	 * @param regionId
 	 * @param status
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException;
+	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to check whether a branch addition is allowed for given account type and user
@@ -80,20 +120,27 @@ public interface HierarchyManagementService {
 	 * @param user
 	 * @param regionId
 	 * @param branchName
+	 * @param address1
+	 * @param address2
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException;
+	public Branch addNewBranch(User user, long regionId, String branchName, String address1, String address2) throws InvalidInputException,
+			SolrException;
 
 	/**
 	 * Method to add a new region
 	 * 
 	 * @param user
 	 * @param regionName
+	 * @param address1
+	 * @param address2
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public Region addNewRegion(User user, String regionName) throws InvalidInputException;
+	public Region addNewRegion(User user, String regionName, String address1, String address2) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to update a branch
@@ -104,8 +151,10 @@ public interface HierarchyManagementService {
 	 * @param branchAddress
 	 * @param user
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException;
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException,
+			SolrException;
 
 	/**
 	 * Method to update a region
@@ -115,8 +164,9 @@ public interface HierarchyManagementService {
 	 * @param regionAddress
 	 * @param user
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
-	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException;
+	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to check whether a user has privileges to build hierarchy

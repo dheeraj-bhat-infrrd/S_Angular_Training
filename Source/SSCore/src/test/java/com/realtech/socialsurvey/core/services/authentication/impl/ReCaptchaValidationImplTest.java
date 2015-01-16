@@ -15,7 +15,6 @@ import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(ReCaptchaValidationImpl.class)
-//@ContextConfiguration("file:src/main/resources/sscore-beans.xml")
 public class ReCaptchaValidationImplTest {
 
 	@Autowired

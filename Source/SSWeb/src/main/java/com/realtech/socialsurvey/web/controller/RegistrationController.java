@@ -201,7 +201,7 @@ public class RegistrationController {
 				HttpSession session = request.getSession(true);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 				LOG.debug("Successfully added registered user to session");
-				
+
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
@@ -290,24 +290,22 @@ public class RegistrationController {
 	 */
 	private void validateFormParameters(String firstName, String lastName, String emailId) throws InvalidInputException {
 		LOG.debug("Validating invitation form parameters");
-		String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-		String ALPHA_REGEX = "[a-zA-Z]+";
-
+		
 		// check if first name is null or empty and only contains alphabets
-		if (firstName == null || firstName.isEmpty() || !firstName.matches(ALPHA_REGEX)) {
+		if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
 			throw new InvalidInputException("Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME);
 		}
 
 		// check if last name only contains alphabets
 		if (lastName != null && !lastName.isEmpty()) {
-			if (!(lastName.matches(ALPHA_REGEX))) {
+			if (!(lastName.matches(CommonConstants.LAST_NAME_REGEX))) {
 				throw new InvalidInputException("Last name is invalid in registration", DisplayMessageConstants.INVALID_LASTNAME);
 			}
 		}
 
 		// check if email Id isEmpty, null or whether it matches the regular
 		// expression or not
-		if (emailId == null || emailId.isEmpty() || !emailId.matches(EMAIL_REGEX)) {
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 			throw new InvalidInputException("Email address is invalid in registration", DisplayMessageConstants.INVALID_EMAILID);
 		}
 		LOG.debug("Invitation form parameters validated successfully");
@@ -328,13 +326,14 @@ public class RegistrationController {
 	private void validateRegistrationForm(String firstName, String lastName, String emailId, String password, String confirmPassword)
 			throws InvalidInputException {
 		LOG.debug("Validating registration form parameters");
+
 		/**
 		 * call the invitation form parameters validation as the form parameters and validation
 		 * criteria are same
 		 */
 		validateFormParameters(firstName, lastName, emailId);
-
-		if (password == null || password.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
+		
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX) || confirmPassword == null || confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (!password.equals(confirmPassword)) {

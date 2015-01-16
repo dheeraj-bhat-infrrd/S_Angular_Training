@@ -48,6 +48,17 @@ public class LicenseDetail implements Serializable {
 
 	@Column(name = "PAYMENT_RETRIES")
 	private int paymentRetries;
+	
+	@Column(name = "IS_SUBSCRIPTION_DUE")
+	private int isSubscriptionDue;
+
+	public int getIsSubscriptionDue() {
+		return isSubscriptionDue;
+	}
+
+	public void setIsSubscriptionDue(int isSubscriptionDue) {
+		this.isSubscriptionDue = isSubscriptionDue;
+	}
 
 	private int status;
 
@@ -57,7 +68,11 @@ public class LicenseDetail implements Serializable {
 	// bi-directional many-to-one association to RetriedTransaction
 	@OneToMany(mappedBy = "licenseDetail", fetch = FetchType.LAZY)
 	private List<RetriedTransaction> retriedTransactions;
-
+	
+	// bi-directional many-to-one association to DisabledAccount
+	@OneToMany(mappedBy = "licenseDetail", fetch = FetchType.LAZY)
+	private List<DisabledAccount> disabledAccounts;
+	
 	public List<RetriedTransaction> getRetriedTransactions() {
 		return retriedTransactions;
 	}
