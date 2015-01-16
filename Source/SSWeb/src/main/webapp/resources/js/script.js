@@ -666,5 +666,8 @@ $('.user-info-initial').click(function(e){
 });
 
 $('body').click(function(){
-    $('.initial-dd-wrapper').slideUp(200);
+//    $('.initial-dd-wrapper').slideUp(200);
+    if($('.initial-dd-wrapper').css('display') == "block"){
+        $('.initial-dd-wrapper').slideUp(200);
+    }
 });
