@@ -44,12 +44,12 @@
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
 	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" name="loginName" data-email="true" placeholder='<spring:message code="label.username.key"/>'>
 	                    </div>
-                        <div id="login-page-username" class="input-error-2 margin-0-auto"></div>
+                        <div id="login-page-username" class="login-reg-err margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
 	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key"/>'>
 	                    </div>
-                        <div id="login-page-password" class="input-error-2 margin-0-auto"></div>
+                        <div id="login-page-password" class="login-reg-err margin-0-auto"></div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="login-submit"><spring:message code="label.login.button.key"/></div>
 	                    <div class="hide forgot-pwd-mobile"><a class="login-link" href="./forgotPassword.do"><spring:message code="label.forgotpassword.key" />?</a></div>
 	                </div>
@@ -159,16 +159,16 @@
             	}else{
 	            	if ($('#'+elementId).val() != "") {
 	    				if (emailRegex.test($('#'+elementId).val()) == true) {
-	    					$('#'+elementId).parent().next('.input-error-2').hide();
+	    					$('#'+elementId).parent().next('.login-reg-err').hide();
 	    					return true;
 	    				}else {
-	    					$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid user name.');
-	    					$('#'+elementId).parent().next('.input-error-2').show();
+	    					$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid user name.');
+	    					$('#'+elementId).parent().next('.login-reg-err').show();
 	    					return false;
 	    				}
 	    			}else{
-	    				$('#'+elementId).parent().next('.input-error-2').html('Please enter user name.');
-	    				$('#'+elementId).parent().next('.input-error-2').show();
+	    				$('#'+elementId).parent().next('.login-reg-err').html('Please enter user name.');
+	    				$('#'+elementId).parent().next('.login-reg-err').show();
 	    				return false;
 	    			}
             	}
@@ -185,11 +185,11 @@
 	    			}
             	}else{
 	            	if ($('#'+elementId).val() != "") {
-	    					$('#'+elementId).parent().next('.input-error-2').hide();
+	    					$('#'+elementId).parent().next('.login-reg-err').hide();
 	    					return true;
 	    			}else{
-	    				$('#'+elementId).parent().next('.input-error-2').html('Please enter password.');
-	    				$('#'+elementId).parent().next('.input-error-2').show();    
+	    				$('#'+elementId).parent().next('.login-reg-err').html('Please enter password.');
+	    				$('#'+elementId).parent().next('.login-reg-err').show();    
 	    				return false;
 	    			}
             	}
