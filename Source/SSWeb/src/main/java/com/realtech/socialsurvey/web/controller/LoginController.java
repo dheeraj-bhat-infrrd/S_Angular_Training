@@ -83,7 +83,6 @@ public class LoginController {
 		try {
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
-			session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {

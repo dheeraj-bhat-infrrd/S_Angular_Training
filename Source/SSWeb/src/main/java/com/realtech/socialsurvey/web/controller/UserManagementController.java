@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +32,8 @@ public class UserManagementController {
 	private MessageUtils messageUtils;
 	@Autowired
 	private AuthenticationService authenticationService;
+	@Autowired
+	private SessionHelper sessionHelper;
 
 	/**
 	 * Method to assign a user as branch admin
@@ -51,8 +52,7 @@ public class UserManagementController {
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
 				userId = Long.parseLong(request.getParameter("userId"));
-				HttpSession session = request.getSession(false);
-				User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+				User user = sessionHelper.getCurrentUser();
 				// TODO call service to assign branch admin
 
 			}
@@ -116,8 +116,7 @@ public class UserManagementController {
 			validateChangePasswordFormParameters(oldPassword, newPassword, confirmNewPassword);
 
 			// get user in session
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 
 			// check if old password entered matches with the one in the encrypted
 			try {

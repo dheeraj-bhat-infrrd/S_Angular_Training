@@ -65,6 +65,9 @@ public class OrganizationManagementController {
 	@Autowired
 	private EncryptionHelper encryptionHelper;
 	
+	@Autowired
+	private SessionHelper sessionHelper;
+
 	/**
 	 * Method to upload logo image for a company
 	 * 
@@ -119,7 +122,7 @@ public class OrganizationManagementController {
 			String address = getCompleteAddress(address1, address2);
 
 			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 			String logoName = null;
 			if (session.getAttribute(CommonConstants.LOGO_NAME) != null) {
 				logoName = session.getAttribute(CommonConstants.LOGO_NAME).toString();
@@ -223,10 +226,9 @@ public class OrganizationManagementController {
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
 			
-			User user = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 			
 			LOG.debug("Checking if payment has already been made.");
-
 			if(gateway.checkIfPaymentMade(user.getCompany())){
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
@@ -259,11 +261,12 @@ public class OrganizationManagementController {
 	public String showCompanySettings(Model model, HttpServletRequest request) {
 		LOG.info("Method showCompanySettings of UserManagementController called");
 		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		try {
 			LOG.debug("Getting company settings");
 			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 			LOG.debug("Showing company settings: " + companySettings.toString());
+
 			// setting the object in settings
 			session.setAttribute("companysettings", companySettings);
 		}

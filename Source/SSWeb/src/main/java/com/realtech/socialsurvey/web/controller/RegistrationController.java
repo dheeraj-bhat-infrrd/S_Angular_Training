@@ -8,23 +8,15 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -48,10 +40,7 @@ public class RegistrationController {
 	@Autowired
 	private MessageUtils messageUtils;
 	@Autowired
-	@Qualifier("authenticationManager")
-	private AuthenticationManager authenticationManager;
-	@Autowired
-	private UserDetailsService userDetailsSvc;
+	private SessionHelper sessionHelper;
 	
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
@@ -144,7 +133,6 @@ public class RegistrationController {
 			model.addAttribute("isDirectRegistration", false);
 
 			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
@@ -189,7 +177,6 @@ public class RegistrationController {
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
-
 			boolean isDirectRegistration = false;
 			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
 				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
@@ -205,30 +192,8 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
-
-				LOG.debug("Adding newly registered user to session");
-				try {
-					UserDetails userDetails = userDetailsSvc.loadUserByUsername(emailId);
-					UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password,
-							userDetails.getAuthorities());
-					authenticationManager.authenticate(auth);
-
-					// redirect into secured main page if authentication successful
-					if (auth.isAuthenticated()) {
-						SecurityContextHolder.getContext().setAuthentication(auth);
-					}
-					LOG.debug("Successfully added registered user to session");
-
-					//TODO Remove after migrating to Principal
-					HttpSession session = request.getSession(true);
-					session.setAttribute(CommonConstants.USER_IN_SESSION, user);
-				}
-				catch (Exception e) {
-					LOG.debug("Problem authenticating user" + emailId, e);
-				}
-				
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
@@ -239,13 +204,13 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			sessionHelper.loginOnRegistration(emailId, password);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			/**
-			 * Adding the attributes required in page after reloading
-			 */
+
+			// Adding the attributes required in page after reloading
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", originalEmailId);
@@ -253,7 +218,6 @@ public class RegistrationController {
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
-
 	}
 
 	/**
@@ -279,7 +243,6 @@ public class RegistrationController {
 		}
 		LOG.info("Method to verify account finished");
 		return JspResolver.MESSAGE_HEADER;
-
 	}
 
 	/**
@@ -336,7 +299,6 @@ public class RegistrationController {
 			throw new InvalidInputException("Email address is invalid in registration", DisplayMessageConstants.INVALID_EMAILID);
 		}
 		LOG.debug("Invitation form parameters validated successfully");
-
 	}
 
 	/**

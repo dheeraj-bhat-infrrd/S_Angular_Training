@@ -11,9 +11,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
-public class MyLoginHandler extends SavedRequestAwareAuthenticationSuccessHandler {
+public class UserLoginHandler extends SavedRequestAwareAuthenticationSuccessHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MyLoginHandler.class);
+	private static final Logger LOG = LoggerFactory.getLogger(UserLoginHandler.class);
 
 	@Override
 	public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authUser) throws IOException,
