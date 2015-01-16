@@ -50,7 +50,8 @@
 			<div id="header-links-slider"
 				class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a href="#"><spring:message code="label.header.dashboard.key" /></a>
+					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
+							code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if test="">
 					<div class="header-links-item">
@@ -80,7 +81,8 @@
 			<div class="header-logo float-left"></div>
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
-					<a href="#"><spring:message code="label.header.dashboard.key" /></a>
+					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
+							code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if
 					test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">

@@ -184,5 +184,6 @@ public interface CommonConstants {
 	public static final String USER_LAST_NAME_SOLR = "lastName";
 	public static final String USER_EMAIL_ID_SOLR = "emailId";
 	public static final String USER_IS_OWNER_SOLR = "isOwner";
-	
+	public static final String ADDRESS1 = "address1";
+	public static final String ADDRESS2 = "address2";
 }

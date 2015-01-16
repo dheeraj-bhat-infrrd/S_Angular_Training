@@ -8,6 +8,9 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -40,7 +43,6 @@ public interface SolrSearchService {
 
 	/**
 	 * Method to add a region to solr
-	 * 
 	 * @param region
 	 * @throws SolrException
 	 */
@@ -48,7 +50,6 @@ public interface SolrSearchService {
 
 	/**
 	 * Method to add a branch to solr
-	 * 
 	 * @param branch
 	 * @throws SolrException
 	 */

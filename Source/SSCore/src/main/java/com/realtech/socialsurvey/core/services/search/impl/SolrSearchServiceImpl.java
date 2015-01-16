@@ -210,6 +210,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, branch.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
+		document.addField(CommonConstants.ADDRESS1, branch.getAddress1());
+		document.addField(CommonConstants.ADDRESS2, branch.getAddress2());
 
 		LOG.debug("Method getSolrDocumentFromBranch finished for branch " + branch);
 		return document;
@@ -230,6 +232,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
+		document.addField(CommonConstants.ADDRESS1, region.getAddress1());
+		document.addField(CommonConstants.ADDRESS2, region.getAddress2());
 
 		LOG.debug("Method getSolrDocumentFromRegion finished for region " + region);
 		return document;
