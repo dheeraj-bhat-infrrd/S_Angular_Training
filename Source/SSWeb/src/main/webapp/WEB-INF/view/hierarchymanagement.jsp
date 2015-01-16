@@ -10,7 +10,7 @@
         </div>
     </div>
 </div>
- 
+
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
@@ -23,10 +23,10 @@
 		                    <div class="hm-item-header padding-0150 clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn-type2 dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createbranch.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right"></div>
+		                        <div class="hm-item-header-right icn-plus float-right hm-dd-pls-btn"></div>
 		                    </div>
 		                </div>
-		                <div class="create-branch-dd">
+		                <div class="create-branch-dd hm-dd-main-content">
 		                	<form id="add-branch-form"> 
 			                    <div class="hm-top-panel-content clearfix">
 			                        <div class="clearfix">
@@ -103,9 +103,9 @@
 		                    <div class="hm-item-header clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createregion.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right"></div>
+		                        <div class="hm-item-header-right icn-plus hm-dd-pls-btn float-right"></div>
 		                    </div>
-		                    <div class="create-branch-dd">
+		                    <div class="create-branch-dd hm-dd-main-content">
 		                    	<form id="add-region-form">
 			                        <div class="hm-item-content">
 			                            <div class="hm-item-row clearfix">
@@ -164,9 +164,9 @@
 		                    <div class="hm-item-header clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createbranch.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right"></div>
+		                        <div class="hm-item-header-right icn-plus float-right hm-dd-pls-btn"></div>
 		                    </div>
-	                    <div class="create-branch-dd">
+	                    <div class="create-branch-dd hm-dd-main-content">
 	                    	<form id="add-branch-form">
 		                        <div class="hm-item-content">
 		                            <div class="hm-item-row clearfix">
