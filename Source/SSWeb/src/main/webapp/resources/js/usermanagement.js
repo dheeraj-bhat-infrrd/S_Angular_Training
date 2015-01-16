@@ -572,7 +572,7 @@ function paintUsersList(data){
 				var col3 = $('<td>').attr({
 					"class" : "col-loanoff um-table-content clearfix"
 				});
-				if(user.agent){
+				if(user.isAgent=="true"){
 					var colImage = $('<div>').attr({
 						"class" : "float-left tm-table-tick-icn icn-right-tick"
 					});
