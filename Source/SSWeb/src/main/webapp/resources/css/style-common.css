@@ -1261,8 +1261,19 @@ button.paypal.is-active {
     margin-top: -15px;
     margin-bottom: 10px;
     padding: 0;
+    margin-top: 6px;
+    margin-bottom: -15px;
+}
+
+.login-reg-err {
+    display: none;
+    font-size: 13px;
+    color: #ef1835;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    padding: 0;
     width: 100%;
-    padding-left: 218px;
+    padding-left: 50px;
 }
 
 .cp-err{
@@ -1273,6 +1284,8 @@ button.paypal.is-active {
     margin-top: -15px;
     margin-bottom: 10px;
     padding: 0;
+    padding-left: 218px;
+    width: 100%;
 }
 
 .input-error-pg {
