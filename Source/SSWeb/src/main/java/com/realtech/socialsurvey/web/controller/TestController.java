@@ -33,37 +33,43 @@ public class TestController {
 	private AuthenticationService authenticationService;
 	@Autowired
 	private MessageUtils messageUtils;
-	
+
 	@Autowired
 	private CaptchaValidation captchaValidation;
 
-	private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
+	private static final Logger LOG = LoggerFactory
+			.getLogger(TestController.class);
 
 	@RequestMapping(value = "/testpage")
 	public String testpage(HttpServletRequest request) {
 		LOG.info("Method testpage called");
-		return "errorpage";
+		return "surveyBuilder";
 	}
-	
+
 	@RequestMapping(value = "/jumptodashboard")
-	public String jumpToDashboard(Model model, HttpServletRequest req, HttpServletResponse response) {
+	public String jumpToDashboard(Model model, HttpServletRequest req,
+			HttpServletResponse response) {
 		LOG.info("Jumping to Dashboard with ");
 		// Login with the hardcoded user id
 		User user = null;
 		HttpSession session = req.getSession(true);
 		try {
 			try {
-				user = authenticationService.getUserWithLoginName("nishit@raremile.com");
+				user = authenticationService
+						.getUserWithLoginName("nishit@raremile.com");
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+			} catch (NoRecordsFetchedException e) {
+				LOG.error("Invalid Input exception in fetching User. Reason "
+						+ e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(),
+						DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
-			catch (NoRecordsFetchedException e) {
-				LOG.error("Invalid Input exception in fetching User. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
-			}
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		} catch (NonFatalException e) {
+			LOG.error(
+					"NonFatalException while logging in. Reason : "
+							+ e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(
+					e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
 		return JspResolver.LANDING;
@@ -100,19 +106,21 @@ public class TestController {
 	}
 
 	@RequestMapping("/validat")
-	public String validate(@RequestParam("recaptcha_challenge_field") String challangeField,
-			@RequestParam("recaptcha_response_field") String responseField, ServletRequest servletRequest) {
+	public String validate(
+			@RequestParam("recaptcha_challenge_field") String challangeField,
+			@RequestParam("recaptcha_response_field") String responseField,
+			ServletRequest servletRequest) {
 
 		String remoteAddress = servletRequest.getRemoteAddr();
-		
+
 		try {
-			captchaValidation.isCaptchaValid(remoteAddress, challangeField, responseField);
-		}
-		catch (InvalidInputException e) {
+			captchaValidation.isCaptchaValid(remoteAddress, challangeField,
+					responseField);
+		} catch (InvalidInputException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 		return "test";
 	}
 }

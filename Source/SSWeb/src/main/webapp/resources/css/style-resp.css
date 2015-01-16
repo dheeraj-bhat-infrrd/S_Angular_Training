@@ -701,7 +701,7 @@
     .header-slider-wrapper{
         display: none;
     }
-    .icn-address-mobile{
+    .icn-address-mobile, .hm-dd-pls-btn{
         display: none;
     }
 }
