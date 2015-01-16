@@ -71,7 +71,9 @@ public class UserManagementController {
 	private final int BATCH_SIZE = 20;
 
 	// JIRA SS-42 BY RM05 BOC
-
+	/*
+	 * Method to show the User Management Page to a user on clicking UserManagement link.
+	 */
 	@RequestMapping(value = "/showusermangementpage", method = RequestMethod.GET)
 	public String initUserManagementPage(Model model, HttpServletRequest request) {
 		LOG.info("User Management page started");
@@ -369,6 +371,8 @@ public class UserManagementController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
 			}
+			LOG.debug("Removing user {} from solr.",userIdToRemove);
+			solrSearchService.removeUserFromSolr(userIdToRemove);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
