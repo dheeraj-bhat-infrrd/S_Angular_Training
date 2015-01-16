@@ -666,12 +666,14 @@ $('.user-info-initial').click(function(e){
 });
 
 $('body').click(function(){
-    $('.initial-dd-wrapper').slideUp(200);
+    if($('.initial-dd-wrapper').css('display') == "block"){
+        $('.initial-dd-wrapper').slideUp(200);
+    }
 });
 
 $(window).resize(function(){
-	   if($(window).width() > 767){
-	       $('#header-slider-wrapper').removeClass('rt-panel-slide');
-	       $('body').removeClass('body-no-scroll');
-	   }
-	});
+   if($(window).width() > 767){
+       $('#header-slider-wrapper').removeClass('rt-panel-slide');
+       $('body').removeClass('body-no-scroll');
+   }
+});
