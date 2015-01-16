@@ -162,23 +162,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	/**
 	 * Fetch a user object with the email ID
 	 * 
-	 * @param emailId
+	 * @param loginName
 	 * @return User object
 	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional
-	public User getUserWithEmailIdAndCompanyId(String emailId, long companyId) throws InvalidInputException {
-		LOG.info("Fetching user object with emailId : " + emailId);
+	public User getUserWithLoginNameAndCompanyId(String loginName, long companyId) throws InvalidInputException {
+		LOG.info("Fetching user object with emailId : " + loginName);
 		Map<String, Object> queries = new HashMap<>();
 		Company company = companyDao.findById(Company.class, companyId);
-		queries.put(CommonConstants.EMAIL_ID, emailId);
+		queries.put(CommonConstants.USER_LOGIN_NAME_COLUMN, loginName);
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		List<User> users = userDao.findByKeyValue(User.class, queries);
 		// Check if user list returned is null or empty
 		if (users == null || users.isEmpty()) {
-			LOG.error("No Record found for the UserID : " + emailId);
-			throw new InvalidInputException("No Record found for the UserID : " + emailId);
+			LOG.error("No Record found for the UserID : " + loginName);
+			throw new InvalidInputException("No Record found for the UserID : " + loginName);
 		}
 		return users.get(0);
 	}
