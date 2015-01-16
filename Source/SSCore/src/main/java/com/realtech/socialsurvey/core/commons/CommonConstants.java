@@ -60,6 +60,9 @@ public interface CommonConstants {
 	public static final int SANDBOX_MODE_TRUE = 1;
 	public static final int IS_OWNER = 1;
 	public static final int IS_NOT_OWNER = 0;
+	public static final int SUBSCRIPTION_DUE = 1;
+	public static final int SUBSCRIPTION_NOT_DUE = 0;
+
 
 	/**
 	 * Hibernate entities and column name constants
@@ -76,10 +79,13 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
+	public static final String IS_OWNER_COLUMN = "isOwner";
+	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
+	public static final String REGION_COLUMN = "region";
+	public static final String BRANCH_ID_COLUMN = "branchId";
 	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
 	public static final String SURVEY_COLUMN = "survey";
 	public static final String SURVEY_COMPANY_COLUMN = "company";
-	
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -96,9 +102,24 @@ public interface CommonConstants {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
+	public static final String JOB_PARAMETER_NAME = "date";
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
+	
+	/**
+	 * Batch Constants
+	 */
+	public static final String CASE_NONE = "None";
+	public static final String CASE_SETTLING = "Settling";
+	public static final String CASE_SETTLED = "Settled";
+	public static final String CASE_GENERAL = "General";
+	public static final String CASE_RETRIES_EXCEEDED = "RetriesExceeded";
+	public static final String CASE_KEY = "Case";
+	public static final String LICENSE_DETAIL_OBJECT_KEY = "LicenseDetailObject";
+	public static final String RETRIED_TRANSACTION_OBJECT_KEY = "RetriedTransactionObject";
+	public static final String COMPANY_OBJECT_KEY = "CompanyObject";
 
 	/**
 	 * other constants
@@ -110,6 +131,7 @@ public interface CommonConstants {
 	public static final int NO_LIMIT = -1;
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
+	public static final int PAYMENT_INCREMENT = 1;
 
 	/**
 	 * Logo related config
@@ -121,10 +143,41 @@ public interface CommonConstants {
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
 
+	/**
+	 * Amazon Details
+	 */
+	public static final String AMAZON_ACCESS_KEY = "AMAZON_ACCESS_KEY";
+	public static final String AMAZON_SECRET_KEY = "AMAZON_SECRET_KEY";
+	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
+	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
+	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
+	
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
 	
 	// mail content
 	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
 	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
+	
+	//regular expressions
+	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$";
+	public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
+	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
+	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
+	public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
+	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
+	
+	/**
+	 * Solr document related constants 
+	 */
+	public static final String REGION_ID_SOLR = "regionId";
+	public static final String COMPANY_ID_SOLR = "companyId";
+	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
+	public static final String STATUS_SOLR = "status";
+	public static final String REGION_NAME_SOLR = "regionName";
+	public static final String BRANCH_ID_SOLR = "branchId";
+	public static final String BRANCH_NAME_SOLR = "branchName";
+	public static final String ADDRESS1 = "address1";
+	public static final String ADDRESS2 = "address2";
 }

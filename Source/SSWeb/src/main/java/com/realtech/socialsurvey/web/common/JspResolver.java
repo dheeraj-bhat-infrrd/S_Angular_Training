@@ -7,7 +7,7 @@ public interface JspResolver {
 
 	public static final String CORPORATE_INVITATION = "corporateinvitation";
 	public static final String INVITATION = "invitation";
-	public static final String ERROR_PAGE = "errorpage";
+	public static final String ERROR_PAGE = "errorpage500";
 	public static final String MESSAGE_HEADER = "messageheader";
 	public static final String LOGIN = "login";
 	public static final String FORGOT_PASSWORD = "forgotpassword";
@@ -24,4 +24,6 @@ public interface JspResolver {
 	public static final String EXISTING_ENTERPRISE_BRANCHES = "existingenterprisebranches";
 	public static final String REGIONS_AUTOCOMPLETE = "regionsautocomplete";
 	public static final String COMPANY_SETTINGS = "settings";
+	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
+	public static final String CHANGE_PASSWORD = "changepassword";
 }

@@ -9,6 +9,7 @@ public class SurveySettings {
 	private float show_survey_above_score;
 	private int survey_reminder_interval_in_days;
 	private int max_number_of_survey_reminders;
+	private boolean isReminderDisabled;
 
 	public float getAuto_post_score() {
 		return auto_post_score;
@@ -42,11 +43,18 @@ public class SurveySettings {
 		this.max_number_of_survey_reminders = max_number_of_survey_reminders;
 	}
 
+	public boolean getIsReminderDisabled() {
+		return isReminderDisabled;
+	}
+
+	public void setReminderDisabled(boolean isReminderDisabled) {
+		this.isReminderDisabled = isReminderDisabled;
+	}
+
 	@Override
 	public String toString() {
 		return "auto_post_score: " + auto_post_score + "\t show_survey_above_score: " + show_survey_above_score
 				+ "\t survey_reminder_interval_in_days: " + survey_reminder_interval_in_days + "\t max_number_of_survey_reminders: "
 				+ max_number_of_survey_reminders;
 	}
-
 }

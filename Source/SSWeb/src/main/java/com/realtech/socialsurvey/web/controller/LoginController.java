@@ -4,9 +4,11 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -51,6 +54,12 @@ public class LoginController {
 	public String initLoginPage() {
 		LOG.info("Login Page started");
 		return JspResolver.LOGIN;
+	}
+	
+	@RequestMapping(value = "/landing")
+	public String initLandingPage() {
+		LOG.info("Login Page started");
+		return JspResolver.LANDING;
 	}
 
 	@RequestMapping(value = "/forgotPassword")
@@ -198,7 +207,7 @@ public class LoginController {
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage() {
 		LOG.info("Dashboard Page started");
-		return JspResolver.LANDING;
+		return JspResolver.DASHBOARD;
 	}
 
 	/**
@@ -216,9 +225,9 @@ public class LoginController {
 		User user = null;
 		// check if form parameters passed are null
 		try {
-			if (emailId == null || emailId.isEmpty()) {
-				LOG.error("Emaild passed can not be null or empty");
-				throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
+			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+				LOG.error("Invalid email id passed");
+				throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 			}
 			try {
 				// verify if the user exists with the registered emailId
@@ -325,7 +334,23 @@ public class LoginController {
 
 		return JspResolver.LOGIN;
 	}
-
+	/**
+	 * method for logging out
+	 * 
+	 * @param 
+	 * @param request
+	 * @param response
+	 * @return 
+	 */
+	
+	@RequestMapping(value = "/logout")
+	public String initLogoutPage(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("logging out");
+		request.getSession(false).invalidate();
+		model.addAttribute("message",
+				messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		return JspResolver.LOGIN;
+	}
 	/**
 	 * Verify the login Form Parameters
 	 * 
@@ -354,13 +379,13 @@ public class LoginController {
 	 */
 	private void validateResetPasswordFormParameters(String emailId, String password, String confirmPassword) throws InvalidInputException {
 		LOG.debug("Validating reset password form paramters");
-		if (emailId == null || emailId.isEmpty()) {
-			LOG.error("Emaild passed can not be null or empty");
-			throw new InvalidInputException("Emaild passed can not be null or empty", DisplayMessageConstants.INVALID_EMAILID);
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+			LOG.error("Invalid email id passed");
+			throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty()) {
-			LOG.error("Password can not be null or empty");
-			throw new InvalidInputException("Password can not be null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+			LOG.error("Invalid password");
+			throw new InvalidInputException("Invalid password", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (confirmPassword == null || confirmPassword.isEmpty()) {
 			LOG.error("Confirm Password can not be null or empty");
