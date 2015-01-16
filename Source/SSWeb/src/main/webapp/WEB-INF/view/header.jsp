@@ -67,7 +67,7 @@
 
 	<div class="header-main-wrapper">
 		<div class="container clearfix header-container">
-			<div class="header-logo float-left" id="header-logo"></div>
+			<div class="header-logo float-left" id="header-logo" style="cursor: pointer;"></div>
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
