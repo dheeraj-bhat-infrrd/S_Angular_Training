@@ -848,7 +848,7 @@ public class UserManagementController {
 			// update user's password
 			try {
 				// fetch user object with email Id
-				user = authenticationService.getUserWithEmailIdAndCompanyId(emailId, companyId);
+				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 				user.setFirstName(firstName);
 				user.setLastName(lastName);
 				user.setStatus(CommonConstants.STATUS_ACTIVE);

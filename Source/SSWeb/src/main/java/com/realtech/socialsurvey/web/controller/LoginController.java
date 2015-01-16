@@ -330,7 +330,7 @@ public class LoginController {
 			// update user's password
 			try {
 				// fetch user object with email Id
-				user = authenticationService.getUserWithEmailIdAndCompanyId(emailId, companyId);
+				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
