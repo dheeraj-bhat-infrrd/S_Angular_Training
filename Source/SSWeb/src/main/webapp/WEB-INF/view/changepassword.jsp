@@ -35,8 +35,9 @@
 												data-non-empty="true"
 												class="hm-item-row-txt cp-item-row-txt"
 												placeholder='Current Password'>
-											<div id="" class="input-error-2 error-msg"></div>
+											
 										</div>
+										<div id="" class="error-msg cp-err"></div>
 									</div>
 								</div>
 								<div class="clearfix">
@@ -51,8 +52,9 @@
 													data-non-empty="true"
 													class="hm-item-row-txt cp-item-row-txt"
 													placeholder='New Password'>
-												<div id="" class="input-error-2 error-msg"></div>
+												
 											</div>
+											<div id="" class="error-msg cp-err"></div>
 										</div>
 									</div>
 									<div
@@ -66,8 +68,9 @@
 													id="confnw-pwd" data-non-empty="true"
 													class="hm-item-row-txt cp-item-row-txt"
 													placeholder='Confirm New Password'>
-												<div id="" class="input-error-2 error-msg"></div>
+												
 											</div>
+											<div id="" class="error-msg cp-err"></div>
 										</div>
 									</div>
 								</div>
