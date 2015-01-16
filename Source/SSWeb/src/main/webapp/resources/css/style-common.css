@@ -209,6 +209,10 @@ a, a:hover, a:visited{
     background: url(../images/address-1.png) no-repeat center;
 }
 
+.icn-address-mobile {
+    background: url(../images/address-1.png) no-repeat center;
+}
+
 .icn-zip {
     background: url(../images/zip.png) no-repeat center;
 }
@@ -734,7 +738,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .dd-icn {
     height: 44px;
     width: 35px;
-    background-color: #f1f1f1;
+    background: url(../images/sb-dd-icn.png) no-repeat center;
 }
 
 .dd-icn-height-adjust {
@@ -1251,6 +1255,17 @@ button.paypal.is-active {
 }
 
 .input-error-2 {
+    display: none;
+    font-size: 13px;
+    color: #ef1835;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    padding: 0;
+    width: 100%;
+    padding-left: 218px;
+}
+
+.cp-err{
     display: none;
     font-size: 13px;
     width: 365px;
