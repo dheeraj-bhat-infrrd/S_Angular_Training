@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
 import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 
 /**
@@ -53,11 +52,15 @@ public interface OrganizationUnitSettingsDao {
 			String collectionName);
 
 	/**
-	 * Method to fetch branch settings
+	 * Updates a particular key of organization unit settings based on criteria specified
 	 * 
-	 * @param identifier
-	 * @return
+	 * @param keyToUpdate
+	 * @param updatedRecord
+	 * @param criteriaKey
+	 * @param criteriaValue
+	 * @param collectionName
 	 */
-	public BranchSettings fetchBranchSettingsById(long identifier);
+	public void updateKeyOrganizationUnitSettingsByCriteria(String keyToUpdate, Object updatedRecord, String criteriaKey, Object criteriaValue,
+			String collectionName);
 
 }

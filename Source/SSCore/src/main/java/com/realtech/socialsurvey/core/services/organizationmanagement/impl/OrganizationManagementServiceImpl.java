@@ -503,17 +503,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (userProfiles != null && userProfiles.size() > 0) {
 			LOG.info("Get branch settings for the user profiles: " + userProfiles.toString());
 			branchSettings = new HashMap<Long, OrganizationUnitSettings>();
-			OrganizationUnitSettings branchSetting = null;
+			BranchSettings branchSetting = null;
 			// get the branch profiles and get the settings for each of them.
 			for (UserProfile userProfile : userProfiles) {
-				branchSetting = new OrganizationUnitSettings();
+				branchSetting = new BranchSettings();
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 					LOG.debug("Getting settings for " + userProfile);
 					// get the branch id and get the profile
 					if (userProfile.getBranchId() > 0l) {
 						branchSetting = getBranchSettings(userProfile.getBranchId());
-						if (branchSetting != null) {
-							branchSettings.put(userProfile.getBranchId(), branchSetting);
+						if (branchSetting != null && branchSetting.getOrganizationUnitSettings() != null) {
+							branchSettings.put(userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings());
 						}
 					}
 					else {
@@ -548,12 +548,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional
 	@Override
 	public BranchSettings getBranchSettings(long branchId) throws InvalidInputException, NoRecordsFetchedException {
+		OrganizationUnitSettings organizationUnitSettings = null;
 		BranchSettings branchSettings = null;
 		if (branchId <= 0l) {
 			throw new InvalidInputException("Invalid branch id. :" + branchId);
 		}
 		LOG.info("Get the branch settings for branch id: " + branchId);
-		branchSettings = organizationUnitSettingsDao.fetchBranchSettingsById(branchId);
+		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		branchSettings = new BranchSettings();
+		branchSettings.setOrganizationUnitSettings(organizationUnitSettings);
 
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		if (branch == null) {
@@ -576,7 +581,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Branch belongs to default region");
 		}
 
-		LOG.info("Successfully fetched the branch settings for branch id: " + branchId);
+		LOG.info("Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings);
 		return branchSettings;
 	}
 

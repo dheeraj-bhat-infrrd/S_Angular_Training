@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -318,8 +319,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
 						}
 						if (!branchesSettings.containsKey(userProfile.getBranchId())) {
-							OrganizationUnitSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
-							branchesSettings.put(userProfile.getBranchId(), branchSetting);
+							BranchSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
+							branchesSettings.put(userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings());
 						}
 					}
 				}

@@ -40,7 +40,7 @@ function addOrUpdateBranch(formId) {
  * function to display branches
  */
 function showBranches() {
-	if($("#account-type").val() == "company") {
+	if($("#account-type").attr('account-type') == "company") {
 		searchBranchesForCompany("");
 	}
 	else {
@@ -102,10 +102,11 @@ function populateUpdateBranchFormCallBack(data) {
 	console.log("fetchbranchtoupdate" +data);
 	var branchsettings = $.parseJSON(data);
 	if(branchsettings != null) {
-		var contactDetails = branchsettings.contact_details;
+		var organizationUnitSettings = branchsettings.organizationUnitSettings;
+		var contactDetails = organizationUnitSettings.contact_details;
 		console.log("contactDetails"+contactDetails);
 		if(contactDetails != null) {
-			$("#branch-id-hidden").val(branchsettings.iden);
+			$("#branch-id-hidden").val(organizationUnitSettings.iden);
 			$("#selected-region-id-hidden").val(branchsettings.regionId);
 			$('#selected-region-txt').val(branchsettings.regionName);
 			$('#branch-name-txt').val(contactDetails.name);
@@ -763,3 +764,16 @@ var delay = (function() {
 		timer = setTimeout(callback, ms);
 	};
 })();
+
+$('.dd-icn-plus').click(function(){
+	$(this).hide();
+	$('.dd-icn-minus').show();
+	$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+});
+
+$('.dd-icn-minus').click(function(){
+	$(this).hide();
+	$('.dd-icn-plus').show();
+	$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+});
+
