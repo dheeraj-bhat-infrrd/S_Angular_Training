@@ -23,7 +23,8 @@
 		                    <div class="hm-item-header padding-0150 clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn-type2 dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createbranch.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right hm-dd-pls-btn"></div>
+		                        <div class="hm-item-header-right icn-plus dd-icn-plus float-right hm-dd-pls-btn"></div>
+								<div class="hm-item-header-right icn-remove dd-icn-minus hide float-right hm-dd-pls-btn"></div>
 		                    </div>
 		                </div>
 		                <div class="create-branch-dd hm-dd-main-content">
@@ -68,7 +69,7 @@
 			                        </div>
 			                    </div>
 			                     <input type="hidden" name="branchId" id="branch-id-hidden"/>
-			                     <input type="hidden" name="accounttype" id="account-type" value="company"/>
+			                     <input type="hidden" id="account-type" account-type="company"/>
 		                    </form>
 		                    <div class="hm-bottom-panel margin-bottom-25">
 							    <div class="hm-bottom-header">
@@ -103,7 +104,8 @@
 		                    <div class="hm-item-header clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createregion.key"/></div>
-		                        <div class="hm-item-header-right icn-plus hm-dd-pls-btn float-right"></div>
+		                        <div class="hm-item-header-right icn-plus dd-icn-plus float-right hm-dd-pls-btn"></div>
+								<div class="hm-item-header-right icn-remove dd-icn-minus hide float-right hm-dd-pls-btn"></div>
 		                    </div>
 		                    <div class="create-branch-dd hm-dd-main-content">
 		                    	<form id="add-region-form">
@@ -164,7 +166,8 @@
 		                    <div class="hm-item-header clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createbranch.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right hm-dd-pls-btn"></div>
+		                        <div class="hm-item-header-right icn-plus dd-icn-plus float-right hm-dd-pls-btn"></div>
+								<div class="hm-item-header-right icn-remove dd-icn-minus hide float-right hm-dd-pls-btn"></div>
 		                    </div>
 	                    <div class="create-branch-dd hm-dd-main-content">
 	                    	<form id="add-branch-form">

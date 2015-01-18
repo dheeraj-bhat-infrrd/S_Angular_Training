@@ -2152,3 +2152,13 @@ button.paypal.is-active {
 .sb-q-txt-2 {
     margin: 10px 0 10px 10px;
 }
+
+.mob-hm-address{
+    background: url(../images/address-1.png) no-repeat;
+    background-position: 10px center;
+}
+
+.mob-hm-person{
+    background: url(../images/address-1.png) no-repeat;
+    background-position: 10px center;
+}

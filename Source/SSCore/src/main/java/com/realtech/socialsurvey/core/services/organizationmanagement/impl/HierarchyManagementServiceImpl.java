@@ -454,15 +454,46 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		organizationSettings.setModifiedBy(branch.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
 
-		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
-		contactSettings.setName(branch.getBranch());
-		contactSettings.setAddress1(branch.getAddress1());
-		contactSettings.setAddress2(branch.getAddress2());
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
 
 		organizationSettings.setContact_details(contactSettings);
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		LOG.info("Method to insert branch settings finished for branch : " + branch);
+	}
+
+	/**
+	 * Method to form ContactDetailsSettings object from branch
+	 * 
+	 * @param branch
+	 * @return
+	 */
+	private ContactDetailsSettings getContactDetailsSettingsFromBranch(Branch branch) {
+		LOG.debug("Method getContactDetailsSettingsFromBranch called for branch :" + branch);
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(branch.getBranch());
+		contactSettings.setAddress1(branch.getAddress1());
+		contactSettings.setAddress2(branch.getAddress2());
+
+		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
+		return contactSettings;
+	}
+
+	/**
+	 * Method to form ContactDetailsSettings object from region
+	 * 
+	 * @param region
+	 * @return
+	 */
+	private ContactDetailsSettings getContactDetailsSettingsFromRegion(Region region) {
+		LOG.debug("Method getContactDetailsSettingsFromRegion called for branch :" + region);
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(region.getRegion());
+		contactSettings.setAddress1(region.getAddress1());
+		contactSettings.setAddress2(region.getAddress2());
+
+		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
+		return contactSettings;
 	}
 
 	/**
@@ -518,10 +549,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		organizationSettings.setModifiedBy(region.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
 
-		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
-		contactSettings.setName(region.getRegion());
-		contactSettings.setAddress1(region.getAddress1());
-		contactSettings.setAddress2(region.getAddress2());
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
 
 		organizationSettings.setContact_details(contactSettings);
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
@@ -572,12 +600,17 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			branch.setRegion(region);
 		}
 		branch.setBranch(branchName);
+		branch.setAddress1(branchAddress1);
+		branch.setAddress2(branchAddress2);
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		branchDao.update(branch);
-
+		
 		LOG.debug("Update branch in mongo");
-		// TODO update in mongo
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 
 		LOG.debug("Updating branch in solr");
 		solrSearchService.addOrUpdateBranchToSolr(branch);
@@ -618,7 +651,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		regionDao.update(region);
 
 		LOG.debug("Updating region in mongo");
-		// TODO update in mongo
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 
 		LOG.debug("Updating region in solr");
 		solrSearchService.addOrUpdateRegionToSolr(region);
