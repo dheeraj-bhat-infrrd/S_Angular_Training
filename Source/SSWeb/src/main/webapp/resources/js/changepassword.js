@@ -1,27 +1,3 @@
-var is_chrome = navigator.userAgent.indexOf('Chrome') > -1;
-var is_explorer = navigator.userAgent.indexOf('MSIE') > -1;
-var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
-var is_safari = navigator.userAgent.indexOf("Safari") > -1;
-var is_Opera = navigator.userAgent.indexOf("Presto") > -1;
-var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
-var minPwdLength = 6;
-var maxPwdLength = 15;
-
-function showOverlay() {
-	$('.overlay-loader').show();
-}
-
-function hideOverlay() {
-	$('.overlay-loader').hide();
-}
-
-// show Toast
-function showToast() {
-	$('#overlay-toast').fadeIn();
-	setTimeout(function() {
-		$('#overlay-toast').fadeOut();
-	}, 3000);
-}
 // function to validate current password
 function validateCurrentPassword(elementId) {
 	var oldpassword = $('#' + elementId).val();
