@@ -647,7 +647,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		region.setAddress1(regionAddress1);
-		region.setAddress2(regionAddress1);
+		region.setAddress2(regionAddress2);
 		regionDao.update(region);
 
 		LOG.debug("Updating region in mongo");
