@@ -325,8 +325,15 @@
         margin-top: 15px;
     }
     .input-error-2{
-        display: none !important;
+        display: none;
     }
+    .login-reg-err{
+        margin: 0;
+        line-height: 38px;
+        border-bottom: 1px solid #dcdcdc;
+        width: 100%;
+        padding-left: 50px;
+    }    
     .prof-map-wrapper{
         display: none;
     }
@@ -694,7 +701,7 @@
     .header-slider-wrapper{
         display: none;
     }
-    .icn-address-mobile{
+    .icn-address-mobile, .hm-dd-pls-btn{
         display: none;
     }
 }
