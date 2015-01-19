@@ -30,4 +30,5 @@ public interface JspResolver {
 	public static final String COMPANY_SETTINGS = "settings";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
+	public static final String CHANGE_PASSWORD = "changepassword";
 }

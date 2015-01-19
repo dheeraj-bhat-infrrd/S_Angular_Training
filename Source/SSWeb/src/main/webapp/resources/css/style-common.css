@@ -1,11 +1,11 @@
 @font-face{
-	font-family:'OpenSansLight';
-	src:url('../fonts/OpenSans-Light.ttf') format('truetype');
+    font-family:'OpenSansLight';
+    src:url('../fonts/OpenSans-Light.ttf') format('truetype');
 }
 
 @font-face{
-	font-family:'OpenSans';
-	src:url('../fonts/OpenSans-Regular.ttf') format('truetype');
+    font-family:'OpenSans';
+    src:url('../fonts/OpenSans-Regular.ttf') format('truetype');
 }
 
 *{
@@ -22,8 +22,8 @@ body {
 }
 
 input,textarea{
-	outline: none;
-	resize: none !important;
+    outline: none;
+    resize: none !important;
 }
 
 input:-webkit-autofill {
@@ -46,12 +46,12 @@ input:-webkit-autofill {
 }
 
 .clearfix:after,.clearfix:before {
-	visibility: hidden;
-	display: block;
-	font-size: 0;
-	content: " ";
-	clear: both;
-	height: 0;
+    visibility: hidden;
+    display: block;
+    font-size: 0;
+    content: " ";
+    clear: both;
+    height: 0;
 }
 
 a, a:hover, a:visited{
@@ -59,15 +59,15 @@ a, a:hover, a:visited{
 }
 
 .float-left{
-	float: left;
+    float: left;
 }
 
 .float-right {
-	float: right;
+    float: right;
 }
 
 .hide{
-	display: none;
+    display: none;
 }
 
 .show{
@@ -209,6 +209,10 @@ a, a:hover, a:visited{
     background: url(../images/address-1.png) no-repeat center;
 }
 
+.icn-address-mobile {
+    background: url(../images/address-1.png) no-repeat center;
+}
+
 .icn-zip {
     background: url(../images/zip.png) no-repeat center;
 }
@@ -318,44 +322,52 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     margin: 0 auto 25px;
 }
 
-.error-message{
+.error-message.msg-icn{
+    background: url(../images/icn-err-msg.png) no-repeat center;
+}
+
+.success-message.msg-icn{
+    background: url(../images/icnTick.png) no-repeat center;
+}
+
+.display-message{
     padding: 10px;
 }
 
-.success-message{
-    padding: 10px;
+.msg-icn{
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
 }
 
 .msg-err-icn {
     width: 50px;
     height: 50px;
-    background: url(../images/icn-err-msg.png) no-repeat center;
     margin-right: 10px;
 }
 
 .msg-success-icn {
     width: 50px;
     height: 50px;
-    background: url(../images/icnTick.png) no-repeat center;
     margin-right: 10px;
 }
 
-.msg-err-txt-area{
+.msg-txt-area{
     width: 81%;
 }
 
-.err-msg-area {
+.msg-area {
     height: 50px;
     position: relative;
 }
 
-.err-msg-con {
+.msg-con {
     position: absolute;
     height: 50px;
     display: table;
 }
 
-.err-msg-con p{
+.msg-con p{
   display: table-cell; 
   vertical-align: middle; 
   text-align: center; 
@@ -734,7 +746,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .dd-icn {
     height: 44px;
     width: 35px;
-    background-color: #f1f1f1;
+    background: url(../images/sb-dd-icn.png) no-repeat center;
 }
 
 .dd-icn-height-adjust {
@@ -1197,42 +1209,42 @@ button.paypal.is-active {
 }
 
 .arrow_box {
-	position: relative;
-	background: #fff;
-	border: 1px solid #ef1835;
+    position: relative;
+    background: #fff;
+    border: 1px solid #ef1835;
 }
 
 .arrow_box:after, .arrow_box:before {
-	top: 100%;
-	left: 50%;
-	border: solid transparent;
-	content: " ";
-	height: 0;
-	width: 0;
-	position: absolute;
-	pointer-events: none;
+    top: 100%;
+    left: 50%;
+    border: solid transparent;
+    content: " ";
+    height: 0;
+    width: 0;
+    position: absolute;
+    pointer-events: none;
 }
 
 .arrow_box:after {
-	border-color: rgba(255, 255, 255, 0);
-	border-top-color: #fff;
-	border-width: 14px;
-	margin-left: -14px;
+    border-color: rgba(255, 255, 255, 0);
+    border-top-color: #fff;
+    border-width: 14px;
+    margin-left: -14px;
 }
 .arrow_box:before {
-	border-color: rgba(239, 24, 53, 0);
-	border-top-color: #ef1835;
-	border-width: 15px;
-	margin-left: -15px;
+    border-color: rgba(239, 24, 53, 0);
+    border-top-color: #ef1835;
+    border-width: 15px;
+    margin-left: -15px;
 }
 
 .blue-arrow-bot {
-	position: relative;
-	background: #5cc7ef;
+    position: relative;
+    background: #5cc7ef;
 }
 
 .blue-arrow-bot:after {
-	top: 0%;
+    top: 0%;
     left: 127px;
     border: solid transparent;
     content: " ";
@@ -1253,11 +1265,35 @@ button.paypal.is-active {
 .input-error-2 {
     display: none;
     font-size: 13px;
+    color: #ef1835;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    padding: 0;
+    margin-top: 6px;
+    margin-bottom: -15px;
+}
+
+.login-reg-err {
+    display: none;
+    font-size: 13px;
+    color: #ef1835;
+    margin-top: -15px;
+    margin-bottom: 10px;
+    padding: 0;
+    width: 100%;
+    padding-left: 50px;
+}
+
+.cp-err{
+    display: none;
+    font-size: 13px;
     width: 365px;
     color: #ef1835;
     margin-top: -15px;
     margin-bottom: 10px;
     padding: 0;
+    padding-left: 218px;
+    width: 100%;
 }
 
 .input-error-pg {
@@ -1803,19 +1839,19 @@ button.paypal.is-active {
 }
 
 .cp-item-row{
-	width: 100%;
+    width: 100%;
 }
 
 .cp-item-row-left{
-	width: 200px;
+    width: 200px;
 }
 
 .border-bottom-0 {
-	border-bottom: 0;
+    border-bottom: 0;
 }
 
 .cp-btn-save{
-	margin: 0 auto;
+    margin: 0 auto;
 }
 
 .sb-questions-wrapper {
@@ -2115,4 +2151,14 @@ button.paypal.is-active {
 
 .sb-q-txt-2 {
     margin: 10px 0 10px 10px;
+}
+
+.mob-hm-address{
+    background: url(../images/address-1.png) no-repeat;
+    background-position: 10px center;
+}
+
+.mob-hm-person{
+    background: url(../images/address-1.png) no-repeat;
+    background-position: 10px center;
 }
