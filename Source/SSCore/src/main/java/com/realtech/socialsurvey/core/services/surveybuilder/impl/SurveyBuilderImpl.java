@@ -34,6 +34,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
 
 	@Autowired
+	private GenericDao<Company, Long> companyDao;
+
+	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
 
 	@Autowired
@@ -46,9 +49,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
 
 	@Autowired
-	private GenericDao<Company, Long> companyDao;
-
-	@Autowired
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
 
 	/**
@@ -56,14 +56,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	 * 
 	 * @throws InvalidInputException
 	 */
-	@Transactional
 	@Override
-	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions, String surveyName) throws InvalidInputException {
+	@Transactional
+	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException {
 		LOG.info("Method createNewSurvey() started.");
-		if (surveyName == null || surveyName.equals("")) {
-			LOG.error("Invalid argument. Null value is passed for surveyName.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for surveyName.");
-		}
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
@@ -74,7 +70,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 
 		Company company = user.getCompany();
-		Survey survey = addSurvey(surveyName, company, user);
+		Survey survey = addSurvey(company.getCompany(), company, user);
 		mapSurveyToCompany(survey, company, user);
 		if (surveyQuestions != null) {
 			for (SurveyQuestionDetails surveyQuestionDetails : surveyQuestions) {
@@ -92,8 +88,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	 * 
 	 * @throws InvalidInputException
 	 */
-	@Transactional
 	@Override
+	@Transactional
 	public void addSurveyToCompany(Survey survey, Company company, User user) throws InvalidInputException {
 		LOG.info("Method addSurveyToCompany() started.");
 		if (survey == null) {
