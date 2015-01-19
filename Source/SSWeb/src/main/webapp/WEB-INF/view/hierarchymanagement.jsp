@@ -185,6 +185,7 @@
 		                                <div class="hm-item-row-right pos-relative">
 		                                    <input class="hm-item-row-txt cursor-pointer" type="text" id="selected-region-txt" autocomplete="off">
 		                                    <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
+		                                    <div id="selected-region-error" class="input-error-2 error-msg"></div>
 		                                    <input type="hidden" name="branchId" id="branch-id-hidden"/>
 		                                    <div class="hm-dd-wrapper hide" id="hm-dd-wrapper-bottom">
 		                                        <!-- Regions are populated here through ajax from regionsautocomplete.jsp -->

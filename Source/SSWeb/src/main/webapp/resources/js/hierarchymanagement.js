@@ -28,8 +28,11 @@ function addBranchCallBack(data) {
  */
 function displayMessage(data) {
 	$("#temp-message").html(data);
-	$("#overlay-toast").html($("#display-msg-div").html());
-	showToast();
+	var displayMessageDiv = $("#display-msg-div");
+	if($(displayMessageDiv).hasClass("success-message")) {
+		$("#overlay-toast").html($(displayMessageDiv).html());
+		showToast();
+	}	
 	$("#temp-message").html("");
 }
 
@@ -474,6 +477,30 @@ $('#branch-address1-txt').blur(function() {
 $('#branch-address2-txt').blur(function() {
 	validateAddress2(this.id);
 });
+$('#selected-region-txt').blur(function(){
+	validateRegionSelector('selected-region-id-hidden');
+});
+
+function validateRegionSelector(elementId) {
+	console.log("elementId" + $('#'+elementId).val()+ elementId);
+	if($(window).width()<768){
+		if ($('#'+elementId).val() == "") {
+			$('#overlay-toast').html('Please select a region');
+			showToast();
+			return false;
+		}
+		return true;
+	}else{
+		if ($('#'+elementId).val() == "") {
+			$('#'+elementId).next('.input-error-2').html('Please select a region');
+			$('#'+elementId).next('.input-error-2').show();
+			return false;
+		}
+		
+		$('#'+elementId).next('.input-error-2').hide();
+		return true;
+	}
+}
 
 function validateBranchInformation(elementId) {
 	isBranchValid = true;
@@ -500,6 +527,15 @@ function validateBranchInformation(elementId) {
 			isFocussed=true;
 		}
 	}
+	if($('#selected-region-id-hidden').length > 0){
+		if(!validateRegionSelector('selected-region-id-hidden')){
+			isRegionValid = false;
+			if(!isFocussed){
+				$('#selected-region-txt').focus();
+				isFocussed=true;
+			}
+		}
+	} 
 	return isBranchValid;
 }
 
