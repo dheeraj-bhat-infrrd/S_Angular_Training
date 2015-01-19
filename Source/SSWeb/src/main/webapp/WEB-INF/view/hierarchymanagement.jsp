@@ -1,5 +1,6 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<div id="overlay-toast" class="overlay-toast"></div>
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -10,7 +11,7 @@
         </div>
     </div>
 </div>
-
+<div id="temp-message" class="hide"></div>
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">

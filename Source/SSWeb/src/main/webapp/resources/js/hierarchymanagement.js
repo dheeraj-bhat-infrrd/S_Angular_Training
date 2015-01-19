@@ -17,9 +17,20 @@ function addBranch(formId) {
  * @param data
  */
 function addBranchCallBack(data) {
-	console.log("Added branch successfully");
+	displayMessage(data);
 	showBranches();
 	$(".create-branch-dd input[type='text']").val("");
+}
+
+/**
+ * function to display success/failure message to user after an action
+ * @param data
+ */
+function displayMessage(data) {
+	$("#temp-message").html(data);
+	$("#overlay-toast").html($("#display-msg-div").html());
+	showToast();
+	$("#temp-message").html("");
 }
 
 function addOrUpdateBranch(formId) {
@@ -80,6 +91,7 @@ function deleteBranch(branchId) {
  * @param data
  */
 function deleteBranchCallBack(data) {
+	displayMessage(data);	
 	showBranches();
 }
 
@@ -99,12 +111,10 @@ function populateUpdateBranchForm(obj) {
  * @param data
  */
 function populateUpdateBranchFormCallBack(data) {
-	console.log("fetchbranchtoupdate" +data);
 	var branchsettings = $.parseJSON(data);
 	if(branchsettings != null) {
 		var organizationUnitSettings = branchsettings.organizationUnitSettings;
 		var contactDetails = organizationUnitSettings.contact_details;
-		console.log("contactDetails"+contactDetails);
 		if(contactDetails != null) {
 			$("#branch-id-hidden").val(organizationUnitSettings.iden);
 			$("#selected-region-id-hidden").val(branchsettings.regionId);
@@ -133,6 +143,7 @@ function updateBranch(formId) {
  * @param data
  */
 function updateBranchCallBack(data) {
+	displayMessage(data);
 	showBranches();
 	$(".create-branch-dd input[type='text']").val("");
 	$(".create-branch-dd input[type='hidden']").val("");
@@ -243,7 +254,7 @@ function addRegion(formId) {
  * @param data
  */
 function addRegionCallBack(data) {
-	console.log("Added region successfully");
+	displayMessage(data);
 	showRegions();
 	$(".create-branch-dd input[type='text']").val("");
 }
@@ -281,6 +292,7 @@ function deleteRegion(regionId) {
  * @param data
  */
 function deleteRegionCallBack(data) {
+	displayMessage(data);
 	showRegions();
 }
 
@@ -302,7 +314,6 @@ function populateUpdateRegionForm(obj) {
 function populateUpdateRegionFormCallBack(data) {
 	var regionsettings = $.parseJSON(data);
 	if(regionsettings != null) {
-		console.log("regionsettings "+regionsettings);
 		var contactDetails = regionsettings.contact_details;
 		if(contactDetails != null) {
 			console.log("contactDetails "+contactDetails);
@@ -331,6 +342,7 @@ function updateRegion(formId) {
  * @param data
  */
 function updateRegionCallBack(data) {
+	displayMessage(data);
 	showRegions();
 	$(".create-branch-dd input[type='text']").val("");
 	$(".create-branch-dd input[type='hidden']").val("");
@@ -683,7 +695,7 @@ $("#selected-region-txt").keydown(function(e) {
 		if(text == undefined) {
 			text = "";
 		}
-		if ( !$("#hm-dd-wrapper-bottom").css("display","block")){
+		if (!($("#hm-dd-wrapper-bottom").css("display") =="block")){
 			console.log("inside hasclass hide : "+$("#hm-dd-wrapper-bottom"));
 			delay(function() {
 				populateRegionsSelector(text);
