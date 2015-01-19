@@ -51,7 +51,7 @@
 				</c:if>
 				<c:if test="${highestrole == 2}">
 					<div class="header-links-item">
-						<a href="#"><spring:message
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
@@ -81,7 +81,7 @@
 				</c:if>
 				<c:if test="${highestrole == 2}">
 					<div class="header-links-item">
-						<a href="#"><spring:message
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
