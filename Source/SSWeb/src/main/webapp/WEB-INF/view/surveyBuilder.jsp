@@ -76,19 +76,78 @@
                             <div class="sb-q-chk sb-q-chk-yes hide"></div>
                         </div>
                         <div class="float-left sb-q-item-txt">
-                            <div class="sb-q-txt-1">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
+                            <div class="sb-q-txt-1" q-type="rating">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
+                            <textarea class="sb-q-txt-1 sb-txt-ar"></textarea>
                             <div class="sb-q-txt-2 clearfix">
                                 <div class="float-left sb-stars icn-full-star"></div>
+                                <div class="float-left sb-stars sb-icn-smiles hide"></div>
+                                <div class="float-left sb-stars sb-icn-scale hide"></div>
+<!--
                                 <div class="float-left sb-stars icn-full-star"></div>
                                 <div class="float-left sb-stars icn-full-star"></div>
                                 <div class="float-left sb-stars icn-half-star"></div>
                                 <div class="float-left sb-stars icn-no-star"></div>
+-->
+                            </div>
+                            <div class="sb-ans-rat-wrapper">
+                                <div class="sb-dd-wrapper">
+                                    <div type="smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-ans">Smiles</div>
+                                    <div type="star" class="sb-icn-star sb-dd-item sb-dd-item-ans">Star</div>
+                                    <div type="scale" class="sb-icn-scale sb-dd-item sb-dd-item-ans">Scale</div>
+                                </div>
                             </div>
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
                             <div class="float-left sb-q-btn sb-btn-reorder"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
+                            <div class="float-left sb-q-btn sb-btn-save hide"></div>
+                        </div>
+                    </div>
+                    <div class="sb-item-row clearfix">
+                        <div class="float-left sb-q-item-no">(1)</div>
+                        <div class="float-left sb-q-item-chk">
+                            <div class="sb-q-chk sb-q-chk-no"></div>
+                            <div class="sb-q-chk sb-q-chk-yes hide"></div>
+                        </div>
+                        <div class="float-left sb-q-item-txt">
+                            <div class="sb-q-txt-1" q-type="objective">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
+                            <textarea class="sb-q-txt-1 sb-txt-ar"></textarea>
+                            <div class="sb-ans-mc-wrapper">
+                                <div class="sb-ans-mc-item q-ans-obj-1">Answer 1</div>
+                                <div class="sb-ans-mc-item q-ans-obj-2">Answer 2</div>
+                                <div class="sb-ans-mc-item q-ans-obj-3">Answer 3</div>
+                                <div class="sb-ans-mc-item q-ans-obj-4">Answer 4</div>
+                                <div class="sb-ans-mc-item q-ans-obj-5">Answer 5</div>
+                                <input class="q-ans-obj-txt q-ans-obj-1-txt">
+                                <input class="q-ans-obj-txt q-ans-obj-2-txt">
+                                <input class="q-ans-obj-txt q-ans-obj-3-txt">
+                                <input class="q-ans-obj-txt q-ans-obj-4-txt">
+                                <input class="q-ans-obj-txt q-ans-obj-5-txt">
+                            </div> 
+                        </div>
+                        <div class="float-right sb-q-item-btns clearfix">
+                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-delete"></div>
+                            <div class="float-left sb-q-btn sb-btn-edit"></div>
+                            <div class="float-left sb-q-btn sb-btn-save hide"></div>
+                        </div>
+                    </div>
+                    <div class="sb-item-row clearfix">
+                        <div class="float-left sb-q-item-no">(1)</div>
+                        <div class="float-left sb-q-item-chk">
+                            <div class="sb-q-chk sb-q-chk-no"></div>
+                            <div class="sb-q-chk sb-q-chk-yes hide"></div>
+                        </div>
+                        <div class="float-left sb-q-item-txt">
+                            <div class="sb-q-txt-1" q-type="descriptive">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
+                            <textarea class="sb-q-txt-1 sb-txt-ar"></textarea>
+                        </div>
+                        <div class="float-right sb-q-item-btns clearfix">
+                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-delete"></div>
+                            <div class="float-left sb-q-btn sb-btn-edit"></div>
+                            <div class="float-left sb-q-btn sb-btn-save hide"></div>
                         </div>
                     </div>
                 </div>
@@ -125,6 +184,66 @@
         $('.sb-q-chk-yes').click(function(){
             $(this).hide();
             $(this).parent().find('.sb-q-chk-no').show();
+        });
+        
+        var selectedRating = ""
+        $('.sb-btn-edit').click(function(){
+            $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html());
+            
+            if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1').html());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2').html());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3').html());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4').html());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5').html());
+                $('.sb-ans-mc-item').hide();
+                $('.q-ans-obj-txt').show();
+            }else if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "rating"){
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-rat-wrapper').show();
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-2').hide();
+            }
+            
+            $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').hide();
+            $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').show();
+            $(this).next('.sb-btn-save').show();
+            $(this).hide();
+        });
+        
+        $('.sb-btn-save').click(function(){
+            $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val());
+            
+            if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1-txt').val());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2-txt').val());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3-txt').val());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4-txt').val());
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5-txt').val());
+                $('.sb-ans-mc-item').show();
+                $('.q-ans-obj-txt').hide();
+            }else if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "rating"){
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-rat-wrapper').hide();
+                $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-2').show();
+            }
+            
+            if(selectedRating == "smiles"){
+                $('.sb-q-txt-2').find('.sb-stars').hide();
+                $('.sb-q-txt-2').find('.sb-icn-smiles').show();
+            }else if(selectedRating == "star"){
+                $('.sb-q-txt-2').find('.sb-stars').hide();
+                $('.sb-q-txt-2').find('.icn-full-star').show();
+            }else if(selectedRating == "scale"){
+                $('.sb-q-txt-2').find('.sb-stars').hide();
+                $('.sb-q-txt-2').find('.sb-icn-scale').show();
+            }
+            
+            $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').show();
+            $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').hide();
+            $(this).prev('.sb-btn-edit').show();
+            $(this).hide();
+        });
+        
+        $('body').on('click','.sb-dd-item-ans',function(){
+            selectedRating = $(this).attr('type');
         });
         
     });
