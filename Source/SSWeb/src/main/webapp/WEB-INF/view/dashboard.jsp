@@ -16,7 +16,7 @@
 
 <script>
     $(document).ready(function(){
-        
+    	$(document).attr("title", "Dashboard"); 
         
     });
 </script>
