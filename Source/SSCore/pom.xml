@@ -193,14 +193,9 @@
 
 		<!-- Dependency for solr java api -->
 		<dependency>
-			<artifactId>solr-solrj</artifactId>
-			<groupId>org.apache.solr</groupId>
-			<version>1.4.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.solr</groupId>
 			<artifactId>solr-solrj</artifactId>
-			<version>3.6.0</version>
+			<version>4.9.0</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
