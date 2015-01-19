@@ -567,17 +567,23 @@ function populateRegionsSelectorCallBack(data) {
 		console.log("searchResult is "+searchResult);
 		if(len > 0) {
 			$.each(searchResult,function(i,region) {
-					htmlData = htmlData +'<div class="hm-dd-item" data-regionid="'+region.regionId+'">'+region.regionName+'</div>';
+					htmlData = htmlData +'<div class="hm-dd-item hm-dd-item-keys hm-dd-hover" data-regionid="'+region.regionId+'">'+region.regionName+'</div>';
 			});
 			
-			$("#hm-dd-wrapper-bottom").html(htmlData).slideDown(200);
+			$("#hm-dd-wrapper-bottom").html(htmlData).slideToggle(200);
 			
 			// bind the click event of selector
 			$('.hm-dd-item').click(function() {
 				$('#selected-region-txt').val($(this).html());
 				$('#selected-region-id-hidden').val($(this).data('regionid'));
 				$('#hm-dd-wrapper-bottom').slideToggle(200);
-			});				
+			});	
+			
+			//bind the hover event
+			$(".hm-dd-hover").hover(function() {
+				$(".hm-dd-item-keys").removeClass("hm-dd-item-keys-selected");
+			});
+			
 		}
 	}	
 }
@@ -642,7 +648,7 @@ $("#region-save-icon").click(function(e) {
 
 $('#selected-region-txt').click(function(){
 	populateRegionsSelector("");
-	$('#hm-dd-wrapper-bottom').slideToggle(200);
+	//$('#hm-dd-wrapper-bottom').slideToggle(200);
 });
 
 $("#selected-region-txt").focus(function() {
@@ -664,21 +670,9 @@ $("#selected-region-txt").keyup(function() {
 			populateRegionsSelector(text);
 		}, 500);
 	}
-	else {
+	/*else {
 		$('#hm-dd-wrapper-bottom').slideUp(200);
-	}
-});
-
-$("#selected-region-txt").keyup(function() {
-	var text = $("#selected-region-txt").val();
-	if (text.length > 1) {
-		delay(function() {
-			populateRegionsSelector(text);
-		}, 500);
-	}
-	else {
-		$('#hm-dd-wrapper-bottom').slideUp(200);
-	}
+	}*/
 });
 
 //bindind arrow keys with region selector
@@ -689,12 +683,43 @@ $("#selected-region-txt").keydown(function(e) {
 		if(text == undefined) {
 			text = "";
 		}
-		delay(function() {
-			populateRegionsSelector(text);
-		}, 500);
+		if ( !$("#hm-dd-wrapper-bottom").css("display","block")){
+			console.log("inside hasclass hide : "+$("#hm-dd-wrapper-bottom"));
+			delay(function() {
+				populateRegionsSelector(text);
+			}, 500);
+		}else {
+			var current = $("#hm-dd-wrapper-bottom").find(".hm-dd-item-keys-selected");
+			console.log("inside else current : "+current + current.length);
+			if(current.length > 0) {
+				$(current).removeClass("hm-dd-item-keys-selected");
+				$(current).next().addClass("hm-dd-item-keys-selected");
+			}
+			else {
+				console.log("inside first child addtion" +$("#hm-dd-wrapper-bottom :first-child"));
+				$("#hm-dd-wrapper-bottom :first-child").addClass("hm-dd-item-keys-selected");
+			}
+			$("#hm-dd-wrapper-bottom").show();
+		}
+		
 	}	
 	else if(e.which == 38){
-		$('#hm-dd-wrapper-bottom').slideUp(200);
+		var current = $("#hm-dd-wrapper-bottom").find(".hm-dd-item-keys-selected");
+		if(current.length > 0) {
+			$(current).removeClass("hm-dd-item-keys-selected");
+			$(current).prev().addClass("hm-dd-item-keys-selected");
+		}else {
+			$('#hm-dd-wrapper-bottom').slideUp(200);
+		}
+	}else if(e.which == 13) {
+		var selectedItem = $("#hm-dd-wrapper-bottom").find(".hm-dd-item-keys-selected");
+		if(selectedItem.length == 0) {
+			selectedItem = $("#hm-dd-wrapper-bottom :first-child");
+		}
+		$('#selected-region-txt').val($(selectedItem).html());
+		$('#selected-region-id-hidden').val($(selectedItem).data('regionid'));
+		$('#hm-dd-wrapper-bottom').slideToggle(200);
+		
 	}
 });
 
