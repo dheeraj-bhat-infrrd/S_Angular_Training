@@ -4,16 +4,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
-import org.apache.noggit.JSONUtil;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +34,6 @@ import com.realtech.socialsurvey.core.utils.SolrSearchUtils;
 /**
  * Implementation class for solr search services
  */
-@SuppressWarnings("deprecation")
 @Component
 public class SolrSearchServiceImpl implements SolrSearchService {
 
@@ -148,7 +147,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 
 			// TODO change the solr instance and do not use deprecated class
-			solrServer = new CommonsHttpSolrServer(solrRegionUrl);
+			solrServer = new HttpSolrServer(solrRegionUrl);
 			SolrInputDocument document = getSolrDocumentFromRegion(region);
 			UpdateResponse response = solrServer.add(document);
 			LOG.debug("response is while adding/updating region is : " + response);
@@ -174,7 +173,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to add/update branch to solr called for branch : " + branch);
 		SolrServer solrServer;
 		try {
-			solrServer = new CommonsHttpSolrServer(solrBranchUrl);
+			solrServer = new HttpSolrServer(solrBranchUrl);
 			// TODO remove deprecated class
 			SolrInputDocument document = getSolrDocumentFromBranch(branch);
 
@@ -262,7 +261,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			loginNamePattern = loginNamePattern + "*";
 
-			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery("loginName:" + loginNamePattern);
 			solrQuery.addFilterQuery("companyId:" + company.getCompanyId(), "status:" + CommonConstants.STATUS_ACTIVE);
@@ -289,22 +288,24 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException
 	 */
 	@Override
-	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException
+			{
 		LOG.info("Method searchUsersByLoginNameOrName called for pattern :" + pattern);
-		if (pattern == null || pattern.isEmpty()) {
+		if (pattern == null) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Users");
 		}
 		LOG.info("Method searchUsersByLoginNameOrName() called for parameter : " + pattern);
 		String usersResult = null;
 		QueryResponse response = null;
+		pattern = ClientUtils.escapeQueryChars(pattern);
 		try {
-			pattern = pattern + "*";
-
-			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("loginName:" + pattern + " OR firstName:" + pattern + " OR lastName:" + pattern);
+			solrQuery.setQuery("firstName:" + pattern + "* OR lastName:" + pattern + "* OR loginName:\"" + pattern
+					+"*\"");
 			solrQuery.addFilterQuery("companyId:" + companyId);
 			solrQuery.addFilterQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
 					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
@@ -340,7 +341,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		String usersResult = null;
 		QueryResponse response = null;
 		try {
-			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
 					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
@@ -372,13 +373,14 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		UpdateResponse response = null;
 		try {
 			// TODO change the solr instance and do not use deprecated class
-			solrServer = new CommonsHttpSolrServer(solrUserUrl);
+			solrServer = new HttpSolrServer(solrUserUrl);
 			SolrInputDocument document = new SolrInputDocument();
 			document.addField(CommonConstants.USER_ID_SOLR, user.getUserId());
 
 			document.addField(CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
 			document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
+			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
 			if (user.getCompany() != null)
 				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
@@ -417,7 +419,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException {
 		LOG.info("Method removeUserFromSolr() to remove user id {} from solr started.", userIdToRemove);
 		try {
-			SolrServer solrServer = new CommonsHttpSolrServer(solrUserUrl);
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			solrServer.deleteById(String.valueOf(userIdToRemove));
 			solrServer.commit();
 		}
@@ -427,5 +429,4 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method removeUserFromSolr() to remove user id {} from solr finished successfully.", userIdToRemove);
 	}
-
 }

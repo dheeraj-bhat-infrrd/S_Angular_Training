@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.noggit.JSONUtil;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -169,7 +169,9 @@ public class UserManagementController {
 				}
 			}
 			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
+				LOG.error("NonFatalException in inviteNewUser() while inviting new user. Reason : " + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.MESSAGE_HEADER;
 			}
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
@@ -303,7 +305,7 @@ public class UserManagementController {
 		String users = "";
 		try {
 			String searchKey = request.getParameter("searchKey");
-			if (searchKey == null || searchKey.isEmpty()) {
+			if (searchKey == null) {
 				LOG.error("Invalid search key passed in method findUserByEmail().");
 				throw new InvalidInputException("Invalid searchKey passed in method findUserByEmail().");
 			}
@@ -322,8 +324,8 @@ public class UserManagementController {
 				throw new InvalidInputException(invalidInputException.getMessage(), invalidInputException);
 			}
 			catch (MalformedURLException e) {
-				LOG.error("Sorry! No matching record found in our database.", e);
-				throw new NoRecordsFetchedException("Sorry! No matching record found in our database.", e);
+				LOG.error("Error occured while searching for email id in findUserByEmail(). Reason is ", e);
+				throw new NonFatalException("Error occured while searching for email id in findUserByEmail(). Reason is ", e);
 			}
 		}
 		catch (NonFatalException nonFatalException) {
@@ -914,46 +916,5 @@ public class UserManagementController {
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
 		return JspResolver.LANDING;
 	}
-
-	/*
-	 * Method to get list of all users from database for the company to which current user belongs
-	 * to.
-	 */
-	/*
-	 * private void getAllUsersForCompany(Model model, HttpServletRequest request) throws
-	 * NonFatalException {
-	 * LOG.debug("Method getAllUsersForCompany() started to fetch all the users for same company.");
-	 * HttpSession session = request.getSession(false); User user = (User)
-	 * session.getAttribute(CommonConstants.USER_IN_SESSION); // String userIdStr =
-	 * request.getParameter(CommonConstants.USER_ID); if (user == null) {
-	 * LOG.error("Invalid user id passed in method findUserByUserId()."); throw new
-	 * InvalidInputException("Invalid user id passed in method findUserByUserId()."); } long userId
-	 * = 0; try { userId = Long.parseLong(userIdStr); } catch (NumberFormatException e) {
-	 * LOG.error("Number format exception while parsing user Id", e); throw new
-	 * NonFatalException("Number format execption while parsing user id",
-	 * DisplayMessageConstants.GENERAL_ERROR, e); } List<User> allUsers =
-	 * userManagementService.getUsersForCompany(user); int maxIndex = BATCH_SIZE; if
-	 * (allUsers.size() <= BATCH_SIZE) { maxIndex = allUsers.size();
-	 * model.addAttribute("hasMoreUsers", false); } else { model.addAttribute("hasMoreUsers", true);
-	 * } List<User> users = allUsers.subList(CommonConstants.INITIAL_INDEX, maxIndex);
-	 * session.setAttribute("allUsersList", allUsers); session.setAttribute("currentIndex",
-	 * BATCH_SIZE); model.addAttribute("usersList", users);
-	 * LOG.debug("Method getAllUsersForCompany() finished to fetch all the users for same company."
-	 * ); } Method to iterate over the list of all the users which is fetched from database. It
-	 * returns same number of users as that of configured for maximum batch size. private void
-	 * getNextListOfUsers(Model model, HttpServletRequest request) {
-	 * LOG.debug("Method getNextListOfUsers() started to fetch next set of users for same company."
-	 * ); HttpSession session = request.getSession(false); int currentIndex = (Integer)
-	 * session.getAttribute("currentIndex");
-	 * @SuppressWarnings("unchecked") List<User> allUsers = (List<User>)
-	 * session.getAttribute("allUsersList"); int maxIndex = currentIndex + BATCH_SIZE; if
-	 * (allUsers.size() <= maxIndex) { maxIndex = allUsers.size();
-	 * model.addAttribute("hasMoreUsers", false); } else { maxIndex = currentIndex + BATCH_SIZE;
-	 * model.addAttribute("hasMoreUsers", true); } List<User> users = allUsers.subList(currentIndex,
-	 * maxIndex); currentIndex = maxIndex; model.addAttribute("usersList", users);
-	 * session.setAttribute("currentIndex", currentIndex);
-	 * LOG.debug("Method getNextListOfUsers() finished to fetch next set of users for same company."
-	 * ); }
-	 */
 }
 // JIRA SS-37 BY RM02 EOC
