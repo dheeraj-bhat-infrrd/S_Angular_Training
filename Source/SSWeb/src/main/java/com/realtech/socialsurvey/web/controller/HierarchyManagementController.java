@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
@@ -620,6 +621,7 @@ public class HierarchyManagementController {
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 		String searchRegionJson = null;
+		DisplayMessage message = null;
 		try {
 			if (regionPattern == null || regionPattern.isEmpty()) {
 				regionPattern = "*";
@@ -632,6 +634,7 @@ public class HierarchyManagementController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while searching regions. Reason : " + e.getMessage(), e);
