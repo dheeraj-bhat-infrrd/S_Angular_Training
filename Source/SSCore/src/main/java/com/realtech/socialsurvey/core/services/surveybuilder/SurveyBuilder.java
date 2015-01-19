@@ -10,7 +10,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 public interface SurveyBuilder {
 
-	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions, String surveyName) throws InvalidInputException;
+	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException;
 
 	public void addSurveyToCompany(Survey survey, Company company, User user) throws InvalidInputException;
 
