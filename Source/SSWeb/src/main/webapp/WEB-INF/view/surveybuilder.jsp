@@ -96,7 +96,6 @@
 	</div>
 </div>
 
-<jsp:include page="scripts.jsp" />
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Build Survey");

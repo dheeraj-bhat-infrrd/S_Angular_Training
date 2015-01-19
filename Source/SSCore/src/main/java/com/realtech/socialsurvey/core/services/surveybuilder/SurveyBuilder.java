@@ -7,17 +7,51 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 public interface SurveyBuilder {
 
-	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException;
+	/**
+	 * Method to create a new Survey into the survey table.
+	 * 
+	 * @throws InvalidInputException
+	 */
+	public void createNewSurvey(User user) throws InvalidInputException;
 
-	public void addSurveyToCompany(Survey survey, Company company, User user) throws InvalidInputException;
+	/**
+	 * Method to create a new survey company mapping into database.
+	 * 
+	 * @throws InvalidInputException
+	 */
+	public void addSurveyToCompany(User user, Survey survey, Company company) throws InvalidInputException;
 
-	public void addQuestionsToExistingSurvey(User user, Survey survey, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException;
+	/**
+	 * Method to mark survey to company mapping as inactive in SURVEY_COMPANY_MAPPING.
+	 * 
+	 * @throws InvalidInputException
+	 */
+	public void deactivateSurveyForCompany(User user, Company company) throws InvalidInputException, NoRecordsFetchedException;
 
-	public void deactivateExistingSurveyMappings(User user, SurveyQuestion surveyQuestion) throws InvalidInputException;
+	/**
+	 * Method to update an existing survey by the Corporate Admin.
+	 * 
+	 * @throws InvalidInputException
+	 */
+	public void addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestions) throws InvalidInputException;
 
+	/**
+	 * Method to mark survey to questions mapping as inactive in SURVEY_QUESTIONS_MAPPING.
+	 * 
+	 * @throws InvalidInputException
+	 */
+	public void deactivateQuestionSurveyMapping(User user, SurveyQuestion surveyQuestion) throws InvalidInputException;
+
+	/**
+	 * Method to fetch all the questions that belong to the specified survey. Company is fetched for
+	 * user passed which in turn is used to get survey ID. Assumption : Only 1 survey is linked to a
+	 * company.
+	 * 
+	 * @throws InvalidInputException
+	 */
 	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user) throws InvalidInputException;
-
 }

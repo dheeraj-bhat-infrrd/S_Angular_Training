@@ -8,9 +8,16 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Survey;
+import com.realtech.socialsurvey.core.entities.SurveyQuestion;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
@@ -20,10 +27,10 @@ public class SurveyBuilderController {
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderController.class);
 
 	@Autowired
-	private MessageUtils messageUtils;
+	private SurveyBuilder surveyBuilder;
 
 	@Autowired
-	private SurveyBuilder surveyBuilder;
+	private MessageUtils messageUtils;
 
 	/**
 	 * Method to show the build survey page
@@ -34,7 +41,7 @@ public class SurveyBuilderController {
 	 */
 	@RequestMapping(value = "/showbuildsurveypage", method = RequestMethod.GET)
 	public String showBuildSurveyPage(Model model, HttpServletRequest request) {
-		LOG.info("Method showBuildSurveyPage called");
+		LOG.info("Method showBuildSurveyPage started");
 		return JspResolver.SURVEY_BUILDER;
 	}
 	
@@ -46,15 +53,80 @@ public class SurveyBuilderController {
 	 * @return
 	 */
 	@RequestMapping(value = "/createsurvey", method = RequestMethod.POST)
+	@ResponseBody
 	public String createNewSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method createNewSurvey of SurveyBuilderController called");
 		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
-		
-		// surveyBuilder.createNewSurvey(user, surveyQuestions);
-		LOG.info("Method createNewSurvey of SurveyBuilderController finished successfully");
-		return null;
+		String message = "";
+		try {
+			surveyBuilder.createNewSurvey(user);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_CREATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method createNewSurvey of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("InvalidInputException while creating NewSurvey: " + e.getMessage(), e);
+		}
+		return message;
 	}
 
+	/**
+	 * Method to add question to existing survey
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/addquestiontosurvey", method = RequestMethod.POST)
+	public String addQuestionToExistingSurvey(Model model, HttpServletRequest request) {
+		LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController called");
+		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		String message = "";
+		
+		//TODO Get objects from UI
+		Survey survey = new Survey();
+		SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
+		
+		try {
+			surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("InvalidInputException while adding Question to Survey: " + e.getMessage(), e);
+		}
+		return message;
+	}
+
+	/**
+	 * Method to deactivate question from existing survey
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/removequestionfromsurvey", method = RequestMethod.POST)
+	public String removeQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
+		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
+		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		String message = "";
+		
+		//TODO Get objects from UI
+		SurveyQuestion question = new SurveyQuestion();
+		
+		try {
+			surveyBuilder.deactivateQuestionSurveyMapping(user, question);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+		}
+		return message;
+	}
+	
 	/**
 	 * Method to map survey to company
 	 * 
@@ -71,22 +143,6 @@ public class SurveyBuilderController {
 		// surveyBuilder.addSurveyToCompany(survey, user.getCompany(), user);
 		
 		LOG.info("Method addSurveyToCompany of SurveyBuilderController finished successfully");
-		return null;
-	}
-
-	/**
-	 * Method to add questions to existing survey
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/addquestionstosurvey", method = RequestMethod.POST)
-	public String addQuestionsToExistingSurvey(Model model, HttpServletRequest request) {
-		LOG.info("Method addQuestionsToExistingSurvey of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
-		
-		LOG.info("Method addQuestionsToExistingSurvey of SurveyBuilderController finished successfully");
 		return null;
 	}
 }
