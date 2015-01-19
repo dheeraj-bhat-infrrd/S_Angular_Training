@@ -172,9 +172,13 @@ function inviteUser() {
 			if (success) {
 				var userId = $('#mh-userId').val();
 				paintUserDetailsForm(userId);
+				paintUserListInUserManagement();
 			} else {
 				var userId = $('#mh-existing-userId').val();
-				if (userId != undefined || userId != "") {
+				if (userId == undefined || userId == "") {
+					createPopupInfo("Limit Exceeded","Maximum limit of users exceeded.");
+				}
+				else{
 					paintUserDetailsForm(userId);
 					return;
 				}
@@ -189,6 +193,14 @@ function inviteUser() {
 	});
 }
 
+function createPopupInfo(header,body) {
+	$('#overlay-header').html(header);
+	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-continue').addClass("btn-disabled");
+	$('#overlay-cancel').html('OK');
+	$('#overlay-text').html(body);
+   	$('#overlay-main').show();
+}
 
 function confirmDeleteUser(userId) {
 	var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
