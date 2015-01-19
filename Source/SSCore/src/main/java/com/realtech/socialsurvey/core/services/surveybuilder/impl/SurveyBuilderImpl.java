@@ -22,7 +22,9 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 
 // JIRA: SS-32: By RM05: BOC
 /**
@@ -51,46 +53,25 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	@Autowired
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
 
-	/**
-	 * Method to create a new Survey into the survey table.
-	 * 
-	 * @throws InvalidInputException
-	 */
 	@Override
 	@Transactional
-	public void createNewSurvey(User user, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException {
+	public void createNewSurvey(User user) throws InvalidInputException {
 		LOG.info("Method createNewSurvey() started.");
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
-		}
-		if (surveyQuestions == null || surveyQuestions.isEmpty()) {
-			LOG.error("Invalid argument. Null value is passed for surveyQuestions.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for surveyQuestions.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for user.", DisplayMessageConstants.GENERAL_ERROR);
 		}
 
-		Company company = user.getCompany();
-		Survey survey = addSurvey(company.getCompany(), company, user);
-		mapSurveyToCompany(survey, company, user);
-		if (surveyQuestions != null) {
-			for (SurveyQuestionDetails surveyQuestionDetails : surveyQuestions) {
-				SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
-						surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
-				mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey);
-			}
-		}
+		// creating new survey and mapping to company
+		Survey survey = addSurvey(user, "Survey Test");
+		addSurveyToCompany(user, survey, user.getCompany());
+
 		LOG.info("Method createNewSurvey() finished.");
 	}
 
-
-	/**
-	 * Method to create a new survey company mapping into database.
-	 * 
-	 * @throws InvalidInputException
-	 */
 	@Override
 	@Transactional
-	public void addSurveyToCompany(Survey survey, Company company, User user) throws InvalidInputException {
+	public void addSurveyToCompany(User user, Survey survey, Company company) throws InvalidInputException {
 		LOG.info("Method addSurveyToCompany() started.");
 		if (survey == null) {
 			LOG.error("Invalid argument. Null value is passed for survey.");
@@ -104,56 +85,77 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("Invalid argument. Null value is passed for user.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
 		}
-		
-		mapSurveyToCompany(survey, company, user);
+
+		SurveyCompanyMapping mapping = new SurveyCompanyMapping();
+		mapping.setSurvey(survey);
+		mapping.setCompany(company);
+		mapping.setStatus(CommonConstants.STATUS_ACTIVE);
+		mapping.setCreatedBy(String.valueOf(user.getUserId()));
+		mapping.setModifiedBy(String.valueOf(user.getUserId()));
+		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		mapping = surveyCompanyMappingDao.saveOrUpdate(mapping);
 		LOG.info("Method addSurveyToCompany() finished.");
 	}
 
-	
-	/**
-	 * Method to update an existing survey by the Corporate Admin.
-	 * 
-	 * @throws InvalidInputException
-	 */
 	@Override
 	@Transactional
-	public void addQuestionsToExistingSurvey(User user, Survey survey, List<SurveyQuestionDetails> surveyQuestions) throws InvalidInputException {
-		LOG.info("Method addQuestionsToExistingSurvey() started.");
+	public void deactivateSurveyForCompany(User user, Company company) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method deactivateSurveyForCompany() started.");
+		if (user == null) {
+			LOG.error("Invalid argument passed. User is null in method deactivateQuestionSurveyMapping.");
+			throw new InvalidInputException("Invalid argument passed. User is null in method deactivateQuestionSurveyMapping.");
+		}
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		List<SurveyCompanyMapping> surveyCompanyMappings = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries);
+		if (surveyCompanyMappings == null || surveyCompanyMappings.isEmpty()) {
+			LOG.error("No Survey Company Mapping records have been found for company id : " + company.getCompanyId());
+			throw new NoRecordsFetchedException("No disabled account records have been found for company id : " + company.getCompanyId());
+		}
+
+		SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappings.get(CommonConstants.INITIAL_INDEX);
+		surveyCompanyMapping.setStatus(CommonConstants.STATUS_INACTIVE);
+		surveyCompanyMappingDao.update(surveyCompanyMapping);
+		LOG.debug("Disabling the SurveyCompanyMapping record with id : " + surveyCompanyMapping.getSurveyCompanyMappingId() + "from the database.");
+
+		// Perform soft delete of the record in the database
+		LOG.info("Method deactivateSurveyForCompany() finished.");
+	}
+
+	@Override
+	@Transactional
+	public void addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
+		LOG.info("Method addQuestionToExistingSurvey() started.");
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
 			throw new InvalidInputException("Invalid argument for user is passed.");
 		}
-		if (surveyQuestions == null || surveyQuestions.isEmpty()) {
-			LOG.error("Invalid argument. Null value is passed for surveyQuestions.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for surveyQuestions.");
+		if (surveyQuestionDetails == null) {
+			LOG.error("Invalid argument. Null value is passed for surveyQuestion.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for surveyQuestion.");
 		}
 		if (survey == null) {
 			LOG.error("Invalid argument. Null value is passed for survey.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
 		}
 
-		for (SurveyQuestionDetails surveyQuestionDetails : surveyQuestions) {
-			SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
-					surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
-			mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey);
-		}
-
-		LOG.info("Method addQuestionsToExistingSurvey() finished.");
+		SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
+				surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
+		mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
+		LOG.info("Method addQuestionToExistingSurvey() finished.");
 	}
 
-	/**
-	 * Method to mark survey to questions mapping as inactive in SURVEY_QUESTIONS_MAPPING.
-	 * 
-	 * @throws InvalidInputException
-	 */
 	@Override
 	@Transactional
-	public void deactivateExistingSurveyMappings(User user, SurveyQuestion surveyQuestion) throws InvalidInputException {
-		LOG.info("Method deactivateExistingSurveyMappings() started.");
+	public void deactivateQuestionSurveyMapping(User user, SurveyQuestion surveyQuestion) throws InvalidInputException {
+		LOG.info("Method deactivateQuestionSurveyMapping() started.");
 		if (user == null || surveyQuestion == null) {
-			LOG.error("Invalid argument passed. Either user or surveyQuestion is null in method deactivateExistingSurveyMappings.");
+			LOG.error("Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
 			throw new InvalidInputException(
-					"Invalid argument passed. Either user or surveyQuestion is null in method deactivateExistingSurveyMappings.");
+					"Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
 		}
 		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByColumn(SurveyQuestionsMapping.class,
 				CommonConstants.SURVEY_QUESTION_COLUMN, surveyQuestion);
@@ -162,21 +164,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestionsMappingDao.save(surveyQuestionsMapping);
 			surveyQuestionsMappingDao.flush();
 		}
-		LOG.info("Method deactivateExistingSurveyMappings() finished.");
+		LOG.info("Method deactivateQuestionSurveyMapping() finished.");
 	}
 
-	/**
-	 * Method to fetch all the questions that belong to the specified survey. Company is fetched for
-	 * user passed which in turn is used to get survey ID. Assumption : Only 1 survey is linked to a
-	 * company.
-	 * 
-	 * @throws InvalidInputException
-	 */
 	@Override
 	@Transactional
 	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user) throws InvalidInputException {
 		if (user == null) {
-			LOG.error("Invalid argument passed. Either user cannot be  null.");
+			LOG.error("Invalid argument passed. User cannot be null.");
 			throw new InvalidInputException("Invalid argument passed. User is null in method getAllActiveQuestionsOfSurvey.");
 		}
 
@@ -231,9 +226,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	/**
-	 * Creates a new entry for new survey into database.
+	 * Method to create new survey in database.
 	 */
-	private Survey addSurvey(String surveyName, Company company, User user) {
+	private Survey addSurvey(User user, String surveyName) {
 		LOG.debug("Method addSurvey() called to add a new survey.");
 		Survey survey = new Survey();
 		survey.setSurveyName(surveyName);
@@ -248,32 +243,20 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 
 	/**
-	 * Creates a new survey company mapping into database.
-	 */
-	private SurveyCompanyMapping mapSurveyToCompany(Survey survey, Company company, User user) {
-		LOG.debug("Method addSurveyCompanyMapping() called to add a new surveyCompanyMapping.");
-		SurveyCompanyMapping mapping = new SurveyCompanyMapping();
-		mapping.setSurvey(survey);
-		mapping.setCompany(company);
-		mapping.setStatus(CommonConstants.STATUS_ACTIVE);
-		mapping.setCreatedBy(String.valueOf(user.getUserId()));
-		mapping.setModifiedBy(String.valueOf(user.getUserId()));
-		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		mapping = surveyCompanyMappingDao.save(mapping);
-		LOG.debug("Method addSurveyCompanyMapping() finished.");
-		return mapping;
-	}
-
-	/**
 	 * Method to store questions as well as all the answers for each question.
 	 */
 	private SurveyQuestion addNewQuestionsAndAnswers(User user, Survey survey, String question, String questionType, List<SurveyAnswer> answers) {
 		LOG.debug("Method addNewQuestionsAndAnswers() started.");
+		String MULTIPLE_CHOICE = "multiplechoice";
 		SurveyQuestion surveyQuestion = null;
-		if (question != null && answers != null) {
+
+		if (question != null && !questionType.equals("")) {
 			surveyQuestion = addNewQuestion(user, question, questionType);
-			addAnswersToQuestion(user, surveyQuestion, answers);
+
+			// Save answers only if question type is Multiple Choice
+			if (questionType == MULTIPLE_CHOICE && answers != null && !answers.isEmpty()) {
+				addAnswersToQuestion(user, surveyQuestion, answers);
+			}
 		}
 		LOG.debug("Method addNewQuestionsAndAnswers() finished");
 		return surveyQuestion;
@@ -325,13 +308,13 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	/**
 	 * Creates a new entry for new survey question mapping into database.
 	 */
-	private void mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey) {
+	private void mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey, int status) {
 		LOG.debug("Method mapQuestionToSurvey() started to map questions with survey.");
 		SurveyQuestionsMapping surveyQuestionsMapping = new SurveyQuestionsMapping();
 		surveyQuestionsMapping.setIsRatingQuestion(surveyQuestionDetails.getIsRatingQuestion());
 		surveyQuestionsMapping.setQuestionOrder(surveyQuestionDetails.getQuestionOrder());
 		surveyQuestionsMapping.setSurveyQuestion(surveyQuestion);
-		surveyQuestionsMapping.setStatus(CommonConstants.STATUS_ACTIVE);
+		surveyQuestionsMapping.setStatus(status);
 		surveyQuestionsMapping.setSurvey(survey);
 		surveyQuestionsMapping.setCreatedBy(String.valueOf(user.getUserId()));
 		surveyQuestionsMapping.setModifiedBy(String.valueOf(user.getUserId()));
@@ -339,7 +322,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		surveyQuestionsMapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 
 		LOG.debug("Saving mapping of survey to question.");
-		surveyQuestionsMappingDao.save(surveyQuestionsMapping);
+		surveyQuestionsMappingDao.saveOrUpdate(surveyQuestionsMapping);
 		LOG.debug("Method mapQuestionToSurvey() finished.");
 	}
 }
