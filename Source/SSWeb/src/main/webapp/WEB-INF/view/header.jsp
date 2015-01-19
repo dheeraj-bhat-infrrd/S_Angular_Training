@@ -78,7 +78,7 @@
 
 	<div class="header-main-wrapper">
 		<div class="container clearfix header-container">
-			<div class="header-logo float-left"></div>
+			<div class="header-logo float-left" id="header-logo" style="cursor: pointer;"></div>
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
@@ -121,8 +121,8 @@
 						<div class="initial-dd-item" id="account-setting">
 							<spring:message code="label.accountsetting.key" />
 						</div>
-						<div class="initial-dd-item" id="change-password">
-							<spring:message code="label.changepassword.key" />
+						<div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
+						<spring:message code="label.changepassword.key"/>
 						</div>
 						<div class="initial-dd-item" id="logout-section">
 							<spring:message code="label.logout.key" />

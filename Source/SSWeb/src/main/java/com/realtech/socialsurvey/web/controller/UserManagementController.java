@@ -373,7 +373,7 @@ public class UserManagementController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
 			}
-			LOG.debug("Removing user {} from solr.",userIdToRemove);
+			LOG.debug("Removing user {} from solr.", userIdToRemove);
 			solrSearchService.removeUserFromSolr(userIdToRemove);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -916,5 +916,81 @@ public class UserManagementController {
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
 		return JspResolver.LANDING;
 	}
+
+	@RequestMapping(value = "/showchangepasswordpage")
+	public String showChangePasswordPage() {
+		return JspResolver.CHANGE_PASSWORD;
+	}
+
+	// JIRA SS-77 BY RM07 BOC
+	/**
+	 * Method to change password
+	 */
+	@RequestMapping(value = "/changepassword", method = RequestMethod.POST)
+	public String changePassword(Model model, HttpServletRequest request) {
+		LOG.info("change the password");
+
+		String oldPassword = request.getParameter("oldpassword");
+		String newPassword = request.getParameter("newpassword");
+		String confirmNewPassword = request.getParameter("confirmnewpassword");
+
+		try {
+			validateChangePasswordFormParameters(oldPassword, newPassword, confirmNewPassword);
+
+			// get user in session
+			HttpSession session = request.getSession(false);
+			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+			// check if old password entered matches with the one in the encrypted
+			try {
+				LOG.debug("Calling authentication service to validate user while changing password");
+				authenticationService.validateUser(user, oldPassword);
+				LOG.debug("Successfully executed authentication service to validate user");
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_PASSWORD, e);
+
+			}
+			// change user's password
+			authenticationService.changePassword(user, newPassword);
+
+			LOG.info("change user password executed successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while changing password. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+
+		}
+		return JspResolver.CHANGE_PASSWORD;
+	}
+
+	// verify change password parameters
+	private void validateChangePasswordFormParameters(String oldPassword, String newPassword, String confirmNewPassword) throws InvalidInputException {
+		LOG.debug("Validating change password form paramters");
+		if (oldPassword == null || oldPassword.isEmpty() || !oldPassword.matches(CommonConstants.PASSWORD_REG_EX)) {
+			LOG.error("Invalid old password");
+			throw new InvalidInputException("Invalid old password", DisplayMessageConstants.INVALID_CURRENT_PASSWORD);
+		}
+		if (newPassword == null || newPassword.isEmpty() || !newPassword.matches(CommonConstants.PASSWORD_REG_EX)) {
+			LOG.error("Invalid new password");
+			throw new InvalidInputException("Invalid new password", DisplayMessageConstants.INVALID_NEW_PASSWORD);
+		}
+		if (confirmNewPassword == null || confirmNewPassword.isEmpty()) {
+			LOG.error("Confirm Password can not be null or empty");
+			throw new InvalidInputException("Confirm Password can not be null or empty", DisplayMessageConstants.INVALID_CONFIRM_NEW_PASSWORD);
+		}
+
+		// check if new password and confirm new password field match
+		if (!newPassword.equals(confirmNewPassword)) {
+			LOG.error("Password and confirm password fields do not match");
+			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
+		}
+		LOG.debug("change password form parameters validated successfully");
+	}
 }
+// JIRA SS-77 BY RM07 EOC
 // JIRA SS-37 BY RM02 EOC
