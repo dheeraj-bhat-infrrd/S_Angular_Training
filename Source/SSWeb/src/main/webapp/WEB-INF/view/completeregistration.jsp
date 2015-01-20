@@ -6,7 +6,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Set new password</title>
+    <title><spring:message code="label.completeregistration.title.key"></spring:message></title>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
@@ -19,10 +19,10 @@
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
-            	<form id="reset-pwd-form" method="POST" action="./setnewpassword.do">
+            	<form id="complet-registration-form" method="POST" action="./completeregistration.do">
 	                <div id="reset-pwd-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
-	                    <div class="login-txt text-center font-24 margin-bot-20">Set new password</div>
+	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.completeregistration.title.key"></spring:message></div>
 	                    <div id="serverSideerror" class="validation-msg-wrapper" >
                             <!--Use this container to input all the messages from server-->
                             <jsp:include page="messageheader.jsp"/>
@@ -41,24 +41,38 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-fname"></div>
+							<input class="float-left login-wrapper-txt" id="complete-reg-fname"
+								data-non-empty="true" name="firstName" value="${firstName}"
+								placeholder='<spring:message code="label.firstname.key" />'>
+						</div>
+                        <div id="complete-reg-page-firstname" class="input-error-2 margin-0-auto"></div>
+						<div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-lname"></div>
+							<input class="float-left login-wrapper-txt" id="complete-reg-lname" name="lastName" value="${lastName}"
+								placeholder='<spring:message code="label.lastname.key" />'>
+						</div>
+                        <div id="complete-reg-page-lastname" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-user-id"></div>
-	                        <input class="float-left login-wrapper-txt" id="login-user-id" data-non-empty="true" data-email = "true" name="emailId" value="${emailId }" placeholder='<spring:message code="label.emailid.key"/>'>
+	                        <input class="float-left login-wrapper-txt" id="complete-reg-user-id" data-non-empty="true" data-email = "true" name="emailId" value="${emailId }" readonly="readonly" placeholder='<spring:message code="label.emailid.key"/>'>
 	                    </div>
-	                    <div id="login-page-username" class="login-reg-err margin-0-auto"></div>
+	                    <div id="complete-reg-page-username" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-password"></div>
-	                        <input type="password" class="float-left login-wrapper-txt" id="login-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
+	                        <input type="password" class="float-left login-wrapper-txt" id="complete-reg-pwd" data-non-empty="true" name="password" placeholder='<spring:message code="label.password.key" />'>
 	                    </div>
-	                    <div id="login-page-pwd" class="login-reg-err margin-0-auto"></div>
+	                    <div id="complete-reg-page-pwd" class="input-error-2 margin-0-auto"></div>
 	                    <div class="login-input-wrapper margin-0-auto clearfix">
 	                        <div class="float-left login-wrapper-icon icn-confirm-password"></div>
-	                        <input type="password" class="float-left login-wrapper-txt" id="login-cnf-pwd" data-non-empty="true" name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
+	                        <input type="password" class="float-left login-wrapper-txt" id="complete-reg-cnf-pwd" data-non-empty="true" name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
 	                    </div>
-	                    <div id="login-page-cnf-pwd" class="login-reg-err margin-0-auto"></div>
+	                    <div id="complete-reg-page-cnf-pwd" class="input-error-2 margin-0-auto"></div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reset-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">
+	                <input type="hidden" value="${company}" name="companyId">
                	 </form>
                 <div class="footer-copyright text-center">
                 <spring:message code="label.copyright.key"/> 
@@ -76,11 +90,10 @@
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
     
     <script>
-    	var isResetFormValid;
+    	var isFormValid;
         $(document).ready(function(){
-        	$(document).attr("title", "Reset Password");
             adjustOnResize();
-            isResetFormValid = false;
+            isFormValid = false;
             $(window).resize(adjustOnResize);
             
             function adjustOnResize(){
@@ -93,10 +106,10 @@
                 }
             }
             
-            function submitResetPasswordForm() {
-            	console.log("submitting reset password form");
-            	if(validateResetPasswordForm('reset-pwd-form')){
-                	$('#reset-pwd-form').submit();
+            function submitCompleteRegistrationForm() {
+            	console.log("submitting complete registration form");
+            	if(validateCompleteRegistrationForm('reset-pwd-form')){
+                	$('#complet-registration-form').submit();
                 }
             }
             
@@ -104,64 +117,90 @@
 	        	// detect enter
 	        	if (e.which==13){
 	        		e.preventDefault();
-	        		submitResetPasswordForm();
+	        		submitCompleteRegistrationForm();
 	        	}
 			});
             
-            $('#login-user-id').blur(function() {
+            $('#complete-reg-fname').blur(function(){
+            	validateFirstName(this.id);
+            });
+            $('#complete-reg-lname').blur(function(){
+            	validateLastName(this.id);
+            });
+            $('#complete-reg-user-id').blur(function() {
 				validateEmailId(this.id);
 			});
             
-            $('#login-pwd').blur(function() {
+            $('#complete-reg-pwd').blur(function() {
 				validatePassword(this.id);
 			});
             
-            $('#login-cnf-pwd').blur(function() {
-				validateConfirmPassword('login-pwd',this.id);
+            $('#complete-reg-cnf-pwd').blur(function() {
+				validateConfirmPassword('complete-reg-pwd',this.id);
 			});
             
-            function validateResetPasswordForm(id) {
+            function validateCompleteRegistrationForm(id) {
             	var isFocussed = false;
-            	isResetFormValid = true;
+            	isFormValid = true;
             	var isSmallScreen = false;
             	if($(window).width()<768){
             		isSmallScreen = true;
             	}
-            	if(!validateEmailId('login-user-id')){
-            		isResetFormValid = false;
+            	if(!validateFirstName('complete-reg-fname')){
+            		isFormValid = false;
             		if(!isFocussed){
-            			$('#login-user-id').focus();
+            			$('#complete-reg-fname').focus();
             			isFocussed=true;
             		}
             		if(isSmallScreen){
-            			return isResetFormValid;
+            			return isFormValid;
             		}
             	}
-            	if(!validatePassword('login-pwd')){
-            		isResetFormValid = false;
+            	if(!validateLastName('complete-reg-lname')){
+            		isFormValid = false;
             		if(!isFocussed){
-            			$('#login-pwd').focus();
+            			$('#complete-reg-lname').focus();
             			isFocussed=true;
             		}
             		if(isSmallScreen){
-            			return isResetFormValid;
+            			return isFormValid;
             		}
             	}
-            	if(!validateConfirmPassword('login-pwd', 'login-cnf-pwd')){
-            		isResetFormValid = false;
+            	if(!validateEmailId('complete-reg-user-id')){
+            		isFormValid = false;
             		if(!isFocussed){
-            			$('#login-cnf-pwd').focus();
+            			$('#complete-reg-user-id').focus();
             			isFocussed=true;
             		}
             		if(isSmallScreen){
-            			return isResetFormValid;
+            			return isFormValid;
             		}
             	}
-            	return isResetFormValid;
+            	if(!validatePassword('complete-reg-pwd')){
+            		isFormValid = false;
+            		if(!isFocussed){
+            			$('#complete-reg-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isFormValid;
+            		}
+            	}
+            	if(!validateConfirmPassword('complete-reg-pwd', 'complete-reg-cnf-pwd')){
+            		isFormValid = false;
+            		if(!isFocussed){
+            			$('#complete-reg-cnf-pwd').focus();
+            			isFocussed=true;
+            		}
+            		if(isSmallScreen){
+            			return isFormValid;
+            		}
+            	}
+            	return isFormValid;
 			}
             
             $('#reset-pwd-submit').click(function(e){
-            	submitResetPasswordForm();
+            	submitCompleteRegistrationForm();
             });
             
         });

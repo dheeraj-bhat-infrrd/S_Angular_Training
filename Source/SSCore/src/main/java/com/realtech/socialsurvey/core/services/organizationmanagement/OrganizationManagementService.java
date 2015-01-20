@@ -16,12 +16,14 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface OrganizationManagementService {
 
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails);
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException;
 
-	public AccountType addAccountTypeForCompany(User user, String accountType) throws InvalidInputException;
+	public AccountType addAccountTypeForCompany(User user, String accountType) throws InvalidInputException, SolrException;
+	
 
 	public long fetchAccountTypeMasterIdForCompany(Company company) throws InvalidInputException;
 

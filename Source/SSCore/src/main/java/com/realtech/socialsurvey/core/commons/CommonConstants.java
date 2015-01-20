@@ -31,12 +31,11 @@ public interface CommonConstants {
 	/**
 	 * Profile master constants
 	 */
-	public static final int PROFILES_MASTER_NO_PROFILE_ID = 1;
-	public static final int PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID = 2;
-	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 3;
-	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 4;
-	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 5;
-
+	public static final int PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID = 1;
+	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 2;
+	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
+	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
+	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
 	 */
@@ -47,6 +46,7 @@ public interface CommonConstants {
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
+	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
 
 	/**
 	 * Status constants
@@ -54,8 +54,11 @@ public interface CommonConstants {
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_NOT_VERIFIED = 2;
+	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
+	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
+	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
 	public static final int YES = 1;
 	public static final int NO = 0;
 	public static final int SANDBOX_MODE_TRUE = 1;
@@ -105,6 +108,7 @@ public interface CommonConstants {
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	public static final String LOGIN_NAME="loginName";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	
@@ -133,6 +137,7 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
+	public static final int ACCOUNT_TYPE_TEAM = 2;
 
 	/**
 	 * Logo related config
@@ -180,6 +185,11 @@ public interface CommonConstants {
 	public static final String REGION_NAME_SOLR = "regionName";
 	public static final String BRANCH_ID_SOLR = "branchId";
 	public static final String BRANCH_NAME_SOLR = "branchName";
+	public static final String USER_ID_SOLR = "userId";
+	public static final String USER_FIRST_NAME_SOLR = "firstName";
+	public static final String USER_LAST_NAME_SOLR = "lastName";
+	public static final String USER_EMAIL_ID_SOLR = "emailId";
+	public static final String USER_IS_OWNER_SOLR = "isOwner";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
 }
