@@ -185,7 +185,7 @@
         display: block;
     }
     .hm-item-row-right-btn-save{
-        width: 235px;
+        width: 285px;
         margin: 10px auto !important;
         float: none;
     }
@@ -664,6 +664,9 @@
         padding: 0 0 0 27px;
         background-size: 18px !important;
     }
+    .sb-q-item-txt-or {
+        width: 79%;
+    }
 }
 
 
@@ -825,6 +828,9 @@
     .cp-err{
         padding-left: 141px;
     }
+    .sb-q-item-txt-or {
+        width: 91%;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -871,6 +877,9 @@
 	}
     .sb-q-item-txt{
         width: 81%;
+    }
+    .sb-q-item-txt-or {
+        width: 93%;
     }
     .cp-err{
         padding-left: 183px;
