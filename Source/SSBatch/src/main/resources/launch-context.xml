@@ -12,9 +12,10 @@
 	http://www.springframework.org/schema/task
         http://www.springframework.org/schema/task/spring-task-3.2.xsd">
 
-	<import resource="classpath:/META-INF/spring/payment-batch-job.xml" />
-	<import resource="classpath:sscore-beans.xml" />
+ 	<import resource="classpath:sscore-beans.xml" />
 	<import resource="classpath:hibernate-config-batch.xml" />
+	<import resource="classpath:/META-INF/spring/payment-batch-jobs.xml" />
+	<import resource="classpath:/META-INF/spring/batch-jobs.xml" />
 
 	<!-- JobRepository and JobLauncher are configuration/setup classes -->
 
@@ -33,11 +34,16 @@
 	<bean id="unsubscribeAccountsJobRunner" class="com.realtech.socialsurvey.batch.jobs.UnsubscribeAccountsJobRunner">
 		<property name="job" ref="unsubscribeAccounts" />
 	</bean>
+	
+	<bean id="logoDeletionJobRunner" class="com.realtech.socialsurvey.batch.jobs.LogoDeletionJobRunner">
+		<property name="job" ref="logoDeletion" />
+	</bean>
 
 	<!-- Run every 10 seconds -->
 	<task:scheduled-tasks>
 		<task:scheduled ref="paymentRetriesJobRunner" method="run" cron="*/20 * * * * *" />
 		<task:scheduled ref="unsubscribeAccountsJobRunner" method="run" cron="*/20 * * * * *" />
+	 	<task:scheduled ref="logoDeletionJobRunner" method="run" cron="*/20 * * * * *"/>
 	</task:scheduled-tasks>
 
 
