@@ -66,6 +66,7 @@
 			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
 			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
+			                                <div id="" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 			                            </div>
 			                        </div>
 			                    </div>
