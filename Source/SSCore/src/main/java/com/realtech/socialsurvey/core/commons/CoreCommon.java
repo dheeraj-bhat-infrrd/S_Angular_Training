@@ -1,5 +1,5 @@
 package com.realtech.socialsurvey.core.commons;
-
+// RM03
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +10,10 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
+/**
+ * Contains methods used in all projects.
+ *
+ */
 @Component
 public class CoreCommon {
 	
@@ -21,6 +25,10 @@ public class CoreCommon {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(CoreCommon.class);
 
+	/**
+	 * Sends a failure mail with exception details to the admin.
+	 * @param e
+	 */
 	public void sendFailureMail(Exception e) {
 
 		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
@@ -37,6 +45,13 @@ public class CoreCommon {
 		}
 	}
 	
+	/**
+	 * Send the mail to admin when an email sending fails with the email id and the name to whom
+	 * the email had to be sent to.
+	 * @param destinationMailId
+	 * @param displayName
+	 * @param e
+	 */
 	public void sendEmailSendingFailureMail(String destinationMailId,String displayName,Exception e) {
 
 		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
