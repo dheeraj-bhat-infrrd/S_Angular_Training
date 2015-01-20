@@ -99,7 +99,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public void deactivateSurveyCompanyMapping(User user, Company company) throws InvalidInputException, NoRecordsFetchedException {
+	public void deactivateSurveyCompanyMapping(User user, Survey survey, Company company) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method deactivateSurveyCompanyMapping() started.");
 		if (user == null) {
 			LOG.error("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
@@ -107,6 +107,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.SURVEY_COLUMN, survey);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 
 		List<SurveyCompanyMapping> surveyCompanyMappings = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries);
@@ -168,10 +169,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user) throws InvalidInputException {
+	public List<SurveyQuestionDetails> getAllActiveQuestionsOfMappedSurvey(User user) throws InvalidInputException {
 		if (user == null) {
 			LOG.error("Invalid argument passed. User cannot be null.");
-			throw new InvalidInputException("Invalid argument passed. User is null in method getAllActiveQuestionsOfSurvey.");
+			throw new InvalidInputException("Invalid argument passed. User is null in method getAllActiveQuestionsOfMappedSurvey.");
 		}
 
 		Company company = user.getCompany();
@@ -186,44 +187,65 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 
 		Survey survey = surveys.get(0);
-		Map<String, Object> criteriaQueries = new HashMap<>();
-		criteriaQueries.put(CommonConstants.SURVEY_COLUMN, survey);
-		criteriaQueries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao
-				.findByKeyValue(SurveyQuestionsMapping.class, criteriaQueries);
-		if (surveyQuestionsMappings == null || surveyQuestionsMappings.isEmpty()) {
-			LOG.error("No question mapped for the survey mapped to provided user.");
-			throw new InvalidInputException("No question mapped for the survey mapped to provided user.");
-		}
-
-		List<SurveyQuestionDetails> surveyQuestionDetailsList = new ArrayList<>();
-		SurveyQuestionDetails surveyQuestionDetails = null;
-		List<SurveyAnswer> answerOptionsToQuestion = null;
-		SurveyAnswer surveyAnswer = null;
-
-		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
-			surveyQuestionDetails = new SurveyQuestionDetails();
-
-			surveyQuestionDetails.setQuestion(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestion());
-			surveyQuestionDetails.setQuestionType(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestionsCode());
-			surveyQuestionDetails.setQuestionOrder(surveyQuestionsMapping.getQuestionOrder());
-			surveyQuestionDetails.setIsRatingQuestion(surveyQuestionsMapping.getIsRatingQuestion());
-
-			answerOptionsToQuestion = new ArrayList<>();
-
-			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsMapping.getSurveyQuestion()
-					.getSurveyQuestionsAnswerOptions()) {
-				surveyAnswer = new SurveyAnswer();
-				surveyAnswer.setAnswerText(surveyQuestionsAnswerOption.getAnswer());
-				surveyAnswer.setAnswerOrder(surveyQuestionsAnswerOption.getAnswerOrder());
-				answerOptionsToQuestion.add(surveyAnswer);
-			}
-
-			surveyQuestionDetailsList.add(surveyQuestionDetails);
-		}
-		return surveyQuestionDetailsList;
+		return fetchSurveyQuestions(survey);
 	}
 
+	@Override
+	@Transactional
+	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user, Survey survey) throws InvalidInputException {
+		if (user == null) {
+			LOG.error("Invalid argument passed. User cannot be null.");
+			throw new InvalidInputException("Invalid argument passed. User is null in method getAllActiveQuestionsOfSurvey.");
+		}
+		if (survey == null) {
+			LOG.error("Invalid argument passed. Survey cannot be null.");
+			throw new InvalidInputException("Invalid argument passed. Survey is null in method getAllActiveQuestionsOfSurvey.");
+		}
+
+		return fetchSurveyQuestions(survey);
+	}
+
+	@Override
+	@Transactional
+	public List<Survey> getSurveyTemplates() throws InvalidInputException {
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEY_TEMPLATE);
+		
+		List<Survey> surveys = surveyDao.findByKeyValue(Survey.class, queries);
+		return surveys;
+	}
+	
+	@Override
+	@Transactional
+	public Survey getSurvey(long surveyId) throws InvalidInputException {
+		Survey survey = surveyDao.findById(Survey.class, surveyId);
+		return survey;
+	}
+	
+	@Override
+	@Transactional
+	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException {
+		SurveyQuestion surveyQuestion = surveyQuestionDao.findById(SurveyQuestion.class, surveyQuestionId);
+		return surveyQuestion;
+	}
+
+	/**
+	 * Method to change Question order
+	 */
+	private void changeQuestionOrder(User user, SurveyQuestion surveyQuestion) {
+		LOG.debug("Method changeQuestionOrder() called");
+		
+		// Get corresponding mapping
+		
+		// get whether move up or down
+		
+		// fetch the other record
+		
+		// update both the questions
+		
+		LOG.debug("Method changeQuestionOrder() finished");
+	}
+	
 	/**
 	 * Method to create new survey in database.
 	 */
@@ -351,6 +373,48 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		mapping = surveyCompanyMappingDao.saveOrUpdate(mapping);
+	}
+	
+	/**
+	 * Method to create new survey in database.
+	 */
+	private List<SurveyQuestionDetails> fetchSurveyQuestions(Survey survey) throws InvalidInputException {
+		Map<String, Object> criteriaQueries = new HashMap<>();
+		criteriaQueries.put(CommonConstants.SURVEY_COLUMN, survey);
+		criteriaQueries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao
+				.findByKeyValue(SurveyQuestionsMapping.class, criteriaQueries);
+
+		if (surveyQuestionsMappings == null || surveyQuestionsMappings.isEmpty()) {
+			LOG.error("No question mapped for the survey mapped to provided user.");
+			throw new InvalidInputException("No question mapped for the survey mapped to provided user.");
+		}
+
+		List<SurveyQuestionDetails> surveyQuestionDetailsList = new ArrayList<>();
+		SurveyQuestionDetails surveyQuestionDetails = null;
+		List<SurveyAnswer> answerOptionsToQuestion = null;
+		SurveyAnswer surveyAnswer = null;
+
+		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
+			surveyQuestionDetails = new SurveyQuestionDetails();
+
+			surveyQuestionDetails.setQuestion(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestion());
+			surveyQuestionDetails.setQuestionType(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestionsCode());
+			surveyQuestionDetails.setQuestionOrder(surveyQuestionsMapping.getQuestionOrder());
+			surveyQuestionDetails.setIsRatingQuestion(surveyQuestionsMapping.getIsRatingQuestion());
+
+			answerOptionsToQuestion = new ArrayList<>();
+
+			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsMapping.getSurveyQuestion()
+					.getSurveyQuestionsAnswerOptions()) {
+				surveyAnswer = new SurveyAnswer();
+				surveyAnswer.setAnswerText(surveyQuestionsAnswerOption.getAnswer());
+				surveyAnswer.setAnswerOrder(surveyQuestionsAnswerOption.getAnswerOrder());
+				answerOptionsToQuestion.add(surveyAnswer);
+			}
+			surveyQuestionDetailsList.add(surveyQuestionDetails);
+		}
+		return surveyQuestionDetailsList;
 	}
 }
 // JIRA: SS-32: By RM05: EOC

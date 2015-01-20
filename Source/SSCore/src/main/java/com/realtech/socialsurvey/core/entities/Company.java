@@ -67,7 +67,7 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<Region> regions;
 
-	// bi-directional many-to-one association to Survey
+	// bi-directional many-to-one association to SurveyCompanyMapping
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
@@ -270,7 +270,7 @@ public class Company implements Serializable {
 
 		return surveyCompanyMapping;
 	}
-
+	
 	public List<User> getUsers() {
 		return this.users;
 	}

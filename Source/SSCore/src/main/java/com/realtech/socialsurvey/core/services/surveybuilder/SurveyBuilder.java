@@ -43,7 +43,7 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void deactivateSurveyCompanyMapping(User user, Company company) throws InvalidInputException, NoRecordsFetchedException;
+	public void deactivateSurveyCompanyMapping(User user, Survey survey, Company company) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to update an existing survey by the Corporate Admin.
@@ -69,5 +69,38 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user) throws InvalidInputException;
+	public List<SurveyQuestionDetails> getAllActiveQuestionsOfMappedSurvey(User user) throws InvalidInputException;
+
+	/**
+	 * Method to fetch all the questions that belong to the specified survey. Company is fetched for
+	 * user passed which in turn is used to get survey ID.
+	 * 
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user, Survey survey) throws InvalidInputException;
+
+	/**
+	 * Method to fetch list of all Default Surveys
+	 * 
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	public List<Survey> getSurveyTemplates() throws InvalidInputException;
+	
+	/**
+	 * Method to fetch Survey from SurveyId
+	 * 
+	 * @param surveyId
+	 * @throws InvalidInputException
+	 */
+	public Survey getSurvey(long surveyId) throws InvalidInputException;
+
+	/**
+	 * Method to fetch SurveyQuestion from SurveyQuestionId
+	 * 
+	 * @param surveyQuestionId
+	 * @throws InvalidInputException
+	 */
+	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException;
 }

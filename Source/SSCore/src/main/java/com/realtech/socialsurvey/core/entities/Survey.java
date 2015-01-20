@@ -45,7 +45,7 @@ public class Survey implements Serializable {
 	@Column(name = "SURVEY_NAME")
 	private String surveyName;
 
-	// bi-directional many-to-one association to SurveyQuestionsMapping
+	// bi-directional many-to-one association to SurveyCompanyMapping
 	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
 	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
