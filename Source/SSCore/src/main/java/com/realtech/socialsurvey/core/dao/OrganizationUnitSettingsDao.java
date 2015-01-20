@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.List;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 
@@ -48,9 +49,14 @@ public interface OrganizationUnitSettingsDao {
 	 * @param unitSettings
 	 * @param collectionName
 	 */
-	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,
-			String collectionName);
-
+	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings, String collectionName);
+	
+	/**
+	 * Fetchs the list of names of logos being used.
+	 * @return
+	 */
+	public List<String> fetchLogoList();
+	
 	/**
 	 * Updates a particular key of organization unit settings based on criteria specified
 	 * 

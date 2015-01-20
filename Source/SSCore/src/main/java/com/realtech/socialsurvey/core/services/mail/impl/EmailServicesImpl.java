@@ -332,6 +332,16 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retry charge mail ");
 		}
 		
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending retry charge mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending retry charge mail ");
+		}
+		
+		if (retries == null || retries.isEmpty()) {
+			LOG.error("retries is empty or null for sending retry charge mail ");
+			throw new InvalidInputException("retries parameter is empty or null for sending retry charge mail ");
+		}
+		
 		LOG.info("Sending retry charge email to : " + recipientMailId);
 
 		
@@ -361,9 +371,12 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
 		}
 		
-		LOG.info("Sending retries exhausted email to : " + recipientMailId);
-
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending retry exhausted mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending retry exhausted mail ");
+		}
 		
+		LOG.info("Sending retries exhausted email to : " + recipientMailId);		
 
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
 
@@ -379,6 +392,39 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
 
 		LOG.info("Successfully sent retries exhausted mail");
+		
+	}
+
+	@Override
+	public void sendAccountDisabledMail(String recipientMailId,String displayName) throws InvalidInputException, UndeliveredEmailException {
+		
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending retries exhausted mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending retries exhausted mail ");
+		}
+		
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending retry exhausted mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending retry exhausted mail ");
+		}
+		
+		LOG.info("Sending account disabled email to : " + recipientMailId);		
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_DISABLED_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_DISABLED_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent account disabled mail");
+		
 		
 	}
 
