@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.braintreegateway.exceptions.UnexpectedException;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
@@ -45,6 +46,9 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 	@Autowired
 	private BatchCommon commonServices;
 	
+	@Autowired
+	private CoreCommon coreCommonServices;
+	
 	private Map<String, Object> writerObjectsMap = new HashMap<String, Object>();
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsItemProcessor.class);
@@ -71,7 +75,7 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 			}
 			catch (UndeliveredEmailException e) {
 				LOG.error("UnsubscribeAccountsItemProcessor : Exception caught when sending account disabled mail. Message : " + e.getMessage());
-				commonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e);
+				coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e);
 			}
 			LOG.info("Email successfully sent!");
 			
@@ -93,7 +97,7 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 		catch(SubscriptionCancellationUnsuccessfulException e){			
 			
 			LOG.error("Subscription cancellation unsuccessful for Disabled Account with id : " + disabledAccount.getId());
-			commonServices.sendFailureMail(e);		
+			coreCommonServices.sendFailureMail(e);		
 			LOG.info("Processing of the item with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			return null;
 			
@@ -101,7 +105,7 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 		catch(UnexpectedException e){
 			
 			LOG.error("Unexpected Exception caught : Message : " + e.getMessage());
-			commonServices.sendFailureMail(e);
+			coreCommonServices.sendFailureMail(e);
 			LOG.info("Processing of the item with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			return null;
 		}

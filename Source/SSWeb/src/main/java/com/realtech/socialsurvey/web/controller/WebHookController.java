@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.braintreegateway.WebhookNotification;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.common.WebCommon;
 
 /**
  * Handles the web hooks and recieves the notifications from Braintree.
@@ -37,7 +37,7 @@ public class WebHookController {
 	private MessageUtils messageUtils;
 	
 	@Autowired
-	private WebCommon commonServices;
+	private CoreCommon commonServices;
 
 	private static final Logger LOG = LoggerFactory.getLogger(WebHookController.class);
 

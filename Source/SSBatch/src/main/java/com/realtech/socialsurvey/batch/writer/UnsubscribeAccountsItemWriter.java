@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
@@ -29,6 +30,9 @@ public class UnsubscribeAccountsItemWriter implements ItemWriter<Map<String, Obj
 
 	@Autowired
 	private BatchCommon commonServices; 
+	
+	@Autowired
+	private CoreCommon coreCommonServices;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsItemWriter.class);
 
@@ -72,7 +76,7 @@ public class UnsubscribeAccountsItemWriter implements ItemWriter<Map<String, Obj
 			}
 			catch (DatabaseException e) {
 				LOG.error("Database Exception caught : Message : " + e.getMessage());
-				commonServices.sendFailureMail(e);
+				coreCommonServices.sendFailureMail(e);
 				LOG.info("Writing for disabled account with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			}
 

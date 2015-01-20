@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -33,6 +34,9 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 
 	@Autowired
 	private BatchCommon commonServices;
+	
+	@Autowired
+	private CoreCommon coreCommonServices;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PaymentRetriesItemWriter.class);
 
@@ -182,7 +186,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 			}
 			catch (DatabaseException e) {
 				LOG.error("Database Exception caught : Message : " + e.getMessage());
-				commonServices.sendFailureMail(e);
+				coreCommonServices.sendFailureMail(e);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught : Message : " + e.getMessage());
