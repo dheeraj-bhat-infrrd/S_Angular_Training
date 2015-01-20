@@ -776,7 +776,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user present for the specified userId");
 		}
-
+		//Checking if admin can assign a user to the given branch.
+		if(!isAssigningAllowed(branchId, admin)){
+			throw new InvalidInputException("Not authorized to assign user to branch " + branchId);
+		}
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_COLUMN, user);
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
@@ -902,28 +905,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			LOG.error("No profile found for user : " + user.getUserId());
 			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
 		}
-		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-		UserProfile highestUserProfile = null;
+//		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+//		UserProfile highestUserProfile = null;
 		// get the highest user profile for the user
 		Collections.sort(userProfiles, new UserProfileComparator());
-		highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-		highestProfilesMasterId = highestUserProfile.getProfilesMaster().getProfileId();
+//		highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+//		highestProfilesMasterId = highestUserProfile.getProfilesMaster().getProfileId();
 		queries.clear();
-
-		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-			// Fetch all the branches of company
-			LOG.info("IN getBranchesForUser() for company {}" + user.getCompany().getCompany());
-			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-		}
-		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
-		}
-		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-			queries.put("company", user.getCompany());
-			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
-			queries.put("branch", branchDao.findById(Branch.class, highestUserProfile.getBranchId()));
-		}
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+//		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+//			// Fetch all the branches of company
+//			LOG.info("IN getBranchesForUser() for company {}" + user.getCompany().getCompany());
+//			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+//		}
+//		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+//			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+//			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
+//		}
+//		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+//			queries.put("company", user.getCompany());
+//			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
+//			queries.put("branch", branchDao.findById(Branch.class, highestUserProfile.getBranchId()));
+//		}
 		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
 		return branches;
@@ -1023,28 +1026,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	/*
 	 * Method to get the highest user profile for the user
 	 */
-	@Override
-	@Transactional
-	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException {
-		if (user == null) {
-			LOG.error("No user passed");
-			throw new InvalidInputException("No user passed");
-		}
-		LOG.info("Method getHighestUserProfileForUser() called to fetch the highest user profile for the user");
-		List<UserProfile> userProfiles = getAllUserProfilesForUser(user);
-		if (userProfiles == null || userProfiles.isEmpty()) {
-			LOG.error("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
-			throw new NoRecordsFetchedException("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
-		}
-		Collections.sort(userProfiles, new UserProfileComparator());
-		UserProfile highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-		if (highestUserProfile == null) {
-			LOG.error("No user profile found for the user");
-			throw new NoRecordsFetchedException("No user profile found for the user");
-		}
-		LOG.info("Method getHighestUserProfileForUser() finished successfully");
-		return highestUserProfile;
-	}
+//	@Override
+//	@Transactional
+//	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException {
+//		if (user == null) {
+//			LOG.error("No user passed");
+//			throw new InvalidInputException("No user passed");
+//		}
+//		LOG.info("Method getHighestUserProfileForUser() called to fetch the highest user profile for the user");
+//		List<UserProfile> userProfiles = getAllUserProfilesForUser(user);
+//		if (userProfiles == null || userProfiles.isEmpty()) {
+//			LOG.error("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
+//			throw new NoRecordsFetchedException("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
+//		}
+//		Collections.sort(userProfiles, new UserProfileComparator());
+//		UserProfile highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+//		if (highestUserProfile == null) {
+//			LOG.error("No user profile found for the user");
+//			throw new NoRecordsFetchedException("No user profile found for the user");
+//		}
+//		LOG.info("Method getHighestUserProfileForUser() finished successfully");
+//		return highestUserProfile;
+//	}
 
 	/**
 	 * Method to generate and send verification link
@@ -1486,4 +1489,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return agentSettings;
 	}
 
+	/*
+	 * Method to check if current user is authorized to assign a user to the given branch.
+	 */
+	private boolean isAssigningAllowed(long branchId, User admin){
+		LOG.debug("Method isAssigningAllowed() started to check if current user is authorized to assign a user to the given branch");
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if(admin.isCompanyAdmin())
+			return true;
+//		admin = userDao.findById(User.class, admin.getUserId());
+		for(UserProfile adminProfile:admin.getUserProfiles()){
+			if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin() && branch.getRegion().getRegionId()==adminProfile.getRegionId())
+				return true;
+			else if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID && admin.isBranchAdmin() && branch.getBranchId()==adminProfile.getBranchId())
+				return true;
+		}
+		LOG.debug("Method isAssigningAllowed() finsihed.");
+		return false;
+	}
 }

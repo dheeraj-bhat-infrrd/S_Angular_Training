@@ -110,7 +110,7 @@ public interface UserManagementService {
 
 	public boolean userExists(String userName);
 	
-	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException;
+//	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException;
 	
 	//JIRA SS-42 by RM-06:EOC
 	
