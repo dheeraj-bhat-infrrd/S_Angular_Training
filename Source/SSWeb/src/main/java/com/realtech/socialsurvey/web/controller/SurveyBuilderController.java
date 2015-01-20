@@ -42,7 +42,26 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/showbuildsurveypage", method = RequestMethod.GET)
 	public String showBuildSurveyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildSurveyPage started");
-		return JspResolver.SURVEY_BUILDER;
+		
+		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		String highestRole = (String) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+		boolean isSurveyBuildingAllowed = false;
+		try {
+			LOG.debug("Calling service for checking the status of regions already added");
+			isSurveyBuildingAllowed = surveyBuilder.isSurveyBuildingAllowed(user, highestRole);
+			
+			if(!isSurveyBuildingAllowed) {
+				LOG.error("User not allowed to access BuildSurvey Page. Reason: Access Denied");
+				model.addAttribute("message", "User not authorized to access BuildSurvey Page. Reason: Access Denied");
+				return JspResolver.MESSAGE_HEADER;
+			}
+			return JspResolver.SURVEY_BUILDER;
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException in showBuildSurveyPage. Reason:" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 	}
 	
 	/**

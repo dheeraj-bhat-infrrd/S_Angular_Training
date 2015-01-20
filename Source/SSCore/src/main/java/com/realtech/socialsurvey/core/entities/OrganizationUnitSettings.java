@@ -2,10 +2,12 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  * Holds the company settings
  */
+@Document
 public class OrganizationUnitSettings {
 
 	@Id

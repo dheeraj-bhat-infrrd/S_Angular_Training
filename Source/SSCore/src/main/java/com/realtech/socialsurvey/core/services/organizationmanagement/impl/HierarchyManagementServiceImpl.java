@@ -388,8 +388,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, String branchName, String branchAddress1, String branchAddress2) throws InvalidInputException,
-			SolrException {
+	public Branch addNewBranch(User user, long regionId, String branchName, String branchAddress1, String branchAddress2)
+			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
 		}
@@ -454,15 +454,46 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		organizationSettings.setModifiedBy(branch.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
 
-		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
-		contactSettings.setName(branch.getBranch());
-		contactSettings.setAddress1(branch.getAddress1());
-		contactSettings.setAddress2(branch.getAddress2());
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
 
 		organizationSettings.setContact_details(contactSettings);
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		LOG.info("Method to insert branch settings finished for branch : " + branch);
+	}
+
+	/**
+	 * Method to form ContactDetailsSettings object from branch
+	 * 
+	 * @param branch
+	 * @return
+	 */
+	private ContactDetailsSettings getContactDetailsSettingsFromBranch(Branch branch) {
+		LOG.debug("Method getContactDetailsSettingsFromBranch called for branch :" + branch);
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(branch.getBranch());
+		contactSettings.setAddress1(branch.getAddress1());
+		contactSettings.setAddress2(branch.getAddress2());
+
+		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
+		return contactSettings;
+	}
+
+	/**
+	 * Method to form ContactDetailsSettings object from region
+	 * 
+	 * @param region
+	 * @return
+	 */
+	private ContactDetailsSettings getContactDetailsSettingsFromRegion(Region region) {
+		LOG.debug("Method getContactDetailsSettingsFromRegion called for branch :" + region);
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(region.getRegion());
+		contactSettings.setAddress1(region.getAddress1());
+		contactSettings.setAddress2(region.getAddress2());
+
+		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
+		return contactSettings;
 	}
 
 	/**
@@ -518,10 +549,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		organizationSettings.setModifiedBy(region.getModifiedBy());
 		organizationSettings.setModifiedOn(System.currentTimeMillis());
 
-		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
-		contactSettings.setName(region.getRegion());
-		contactSettings.setAddress1(region.getAddress1());
-		contactSettings.setAddress2(region.getAddress2());
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
 
 		organizationSettings.setContact_details(contactSettings);
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
@@ -537,15 +565,15 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException,
-			SolrException {
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress1, String branchAddress2, User user)
+			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update branch");
 		}
 		if (branchName == null || branchName.isEmpty()) {
 			throw new InvalidInputException("Branch name is null in update branch");
 		}
-		if (branchAddress == null || branchAddress.isEmpty()) {
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
 			throw new InvalidInputException("Branch address is null in update branch");
 		}
 		if (branchId <= 0l) {
@@ -553,7 +581,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		LOG.info("Method update branch called for branchId:" + branchId + " ,regionId:" + regionId + " branchName : " + branchName
-				+ " ,branchAddress:" + branchAddress);
+				+ " ,branchAddress:" + branchAddress1);
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		if (branch == null) {
 			throw new InvalidInputException("No branch present for the required id in database while updating branch");
@@ -572,10 +600,17 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			branch.setRegion(region);
 		}
 		branch.setBranch(branchName);
+		branch.setAddress1(branchAddress1);
+		branch.setAddress2(branchAddress2);
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		// TODO update address details
 		branchDao.update(branch);
+		
+		LOG.debug("Update branch in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 
 		LOG.debug("Updating branch in solr");
 		solrSearchService.addOrUpdateBranchToSolr(branch);
@@ -589,20 +624,21 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException {
+	public void updateRegion(long regionId, String regionName, String regionAddress1, String regionAddress2, User user) throws InvalidInputException,
+			SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update region");
 		}
 		if (regionName == null || regionName.isEmpty()) {
 			throw new InvalidInputException("Region name is null in update region");
 		}
-		if (regionAddress == null || regionAddress.isEmpty()) {
+		if (regionAddress1 == null || regionAddress1.isEmpty()) {
 			throw new InvalidInputException("Region address is null in update region");
 		}
 		if (regionId <= 0l) {
 			throw new InvalidInputException("Region id is invalid in update region");
 		}
-		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress:" + regionAddress);
+		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress1:" + regionAddress1);
 		Region region = regionDao.findById(Region.class, regionId);
 		if (region == null) {
 			throw new InvalidInputException("No region present for the required id in database while updating region");
@@ -610,8 +646,15 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setRegion(regionName);
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		region.setModifiedBy(String.valueOf(user.getUserId()));
-		// TODO update address
+		region.setAddress1(regionAddress1);
+		region.setAddress2(regionAddress2);
 		regionDao.update(region);
+
+		LOG.debug("Updating region in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 
 		LOG.debug("Updating region in solr");
 		solrSearchService.addOrUpdateRegionToSolr(region);

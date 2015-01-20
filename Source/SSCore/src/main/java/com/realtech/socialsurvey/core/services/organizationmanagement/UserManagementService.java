@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 // JIRA SS-34 BY RM02 BOC
 /**
@@ -30,8 +31,9 @@ public interface UserManagementService {
 	 * @param accountType
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
 	 */
-	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException;
+	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException, NoRecordsFetchedException;
 	
 	/**
 	 * Gets user settings
