@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +16,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.commons.UserProfileComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -908,7 +906,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 //		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
 //		UserProfile highestUserProfile = null;
 		// get the highest user profile for the user
-		Collections.sort(userProfiles, new UserProfileComparator());
+//		Collections.sort(userProfiles, new UserProfileComparator());
 //		highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
 //		highestProfilesMasterId = highestUserProfile.getProfilesMaster().getProfileId();
 		queries.clear();
