@@ -156,13 +156,15 @@ public class LoginController {
 						return JspResolver.ERROR_PAGE;
 					}*/
 					//Compute all conditions for user and if user is CA then check for profile completion stage.
-					UserProfile adminProfile=null;
-					for(UserProfile userProfile:user.getUserProfiles()){
-						if((userProfile.getCompany().getCompanyId()==user.getCompany().getCompanyId())&&(userProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
-							adminProfile = userProfile;
-					}
-					if(user.isCompanyAdmin())
+					
+					if(user.isCompanyAdmin()){
+						UserProfile adminProfile=null;
+						for(UserProfile userProfile:user.getUserProfiles()){
+							if((userProfile.getCompany().getCompanyId()==user.getCompany().getCompanyId())&&(userProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
+								adminProfile = userProfile;
+						}
 						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
+					}
 					else
 						redirectTo = JspResolver.LANDING;
 					if(redirectTo.equals(JspResolver.LANDING)){
