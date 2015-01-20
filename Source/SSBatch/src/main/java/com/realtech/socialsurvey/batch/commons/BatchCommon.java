@@ -21,6 +21,13 @@ public class BatchCommon {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(BatchCommon.class);
 	
+	/**
+	 * Method that returns the corporate admin's User object.
+	 * @param company
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
 	public User getCorporateAdmin(Company company) throws InvalidInputException, NoRecordsFetchedException {
 
 		if (company == null) {
@@ -36,15 +43,17 @@ public class BatchCommon {
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER);
-
+		
 		LOG.debug("Making the database call to USERS table to fetch records.");
 		users = userDao.findByKeyValue(User.class, queries);
 
 		if (users == null || users.isEmpty()) {
+			//No corporate admins have been found
 			LOG.error("No users as corporate admins found for the company with id : " + company.getCompanyId());
 			throw new NoRecordsFetchedException("No users as corporate admins found for the company with id : " + company.getCompanyId());
 		}
-
+		
+		//The user object to be returned
 		user = users.get(CommonConstants.INITIAL_INDEX);
 
 		LOG.debug("Returning user found as corporate admin of company with user id : " + user.getUserId());
