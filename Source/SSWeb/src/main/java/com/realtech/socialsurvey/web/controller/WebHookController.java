@@ -15,13 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.braintreegateway.WebhookNotification;
-import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
+import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.web.common.JspResolver;
 
 /**
  * Handles the web hooks and recieves the notifications from Braintree.
@@ -31,10 +31,13 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class WebHookController {
 
 	@Autowired
-	Payment gateway;
+	private Payment gateway;
 
 	@Autowired
-	MessageUtils messageUtils;
+	private MessageUtils messageUtils;
+	
+	@Autowired
+	private CoreCommon commonServices;
 
 	private static final Logger LOG = LoggerFactory.getLogger(WebHookController.class);
 
@@ -84,24 +87,24 @@ public class WebHookController {
 
 		}
 		catch (InvalidInputException e) {
-
-			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInputException thrown : "
-					+ messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-
+			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInputException thrown : " + e.getMessage());
+			commonServices.sendFailureMail(e);
+			return null;
 		}
 		catch (UndeliveredEmailException e) {
-			LOG.error("WebHookController getSubscriptionNotifications() : UndeliveredEmailException thrown : "
-					+ messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			LOG.error("WebHookController getSubscriptionNotifications() : UndeliveredEmailException thrown : " + e.getMessage());
+			commonServices.sendFailureMail(e);
+			return null;
 		}
 		catch (NoRecordsFetchedException e) {
-			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : "
-					+ messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage());
+			commonServices.sendFailureMail(e);
+			return null;
+		}
+		catch (DatabaseException e) {
+			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage());
+			commonServices.sendFailureMail(e);
+			return null;
 		}
 
 		LOG.info("Subscription Notification handled!");

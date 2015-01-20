@@ -327,7 +327,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .success-message.msg-icn{
-    background: url(../images/icnTick.png) no-repeat center;
+    background: url(../images/icn-succ-msg.png) no-repeat center;
 }
 
 .display-message{
@@ -679,11 +679,11 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     position: absolute;
     width: 323px;
     background-color: #fff;
-    padding: 8px;
     border: 1px solid #dcdcdc;
 }
 
 .hm-dd-item {
+    padding: 8px;
     border-bottom: 1px solid #dcdcdc;
     line-height: 36px;
     cursor: pointer;
@@ -705,7 +705,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-btn-wrapper-fix {
-    width: 235px;
+    width: 285px;
 }
 
 .margin-right-0 {
@@ -2139,6 +2139,7 @@ button.paypal.is-active {
     height: 36px;
     width: 32px;
     background-size: 30px;
+    background-position: center;
 }
 
 .sb-range-sel-icn {
@@ -2153,6 +2154,16 @@ button.paypal.is-active {
     margin: 10px 0 10px 10px;
 }
 
+.hm-dd-hover:hover {
+    color: #fff;
+    background-color: #5cc7ef;
+}
+
+.hm-dd-item-keys-selected {
+    color: #fff;
+    background-color: #5cc7ef;
+}
+
 .mob-hm-address{
     background: url(../images/address-1.png) no-repeat;
     background-position: 10px center;
@@ -2161,4 +2172,127 @@ button.paypal.is-active {
 .mob-hm-person{
     background: url(../images/address-1.png) no-repeat;
     background-position: 10px center;
+}
+
+.mob-branch-name {
+    background: url(../SSWeb-1.0/resources/images/branch-name.png) no-repeat;
+    background-position: 10px center;
+}
+
+.prof-edit-hide-imp {
+    display : none !important;
+}
+.sb-ans-mc-wrapper {
+    font-size: 13px;
+    line-height: 22px;
+    padding: 0 10px;
+}
+
+.sb-txt-ar {
+    display: none;
+    padding: 10px;
+    width: 98%;
+    height: 150px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.sb-btn-save {
+    background: url(../images/icnSave.png) no-repeat center;
+    background-size: 20px;
+}
+
+.q-ans-obj-txt {
+    display: none;
+    padding: 10px;
+    width: 98%;
+    margin-left: -10px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    margin-bottom: 10px;
+}
+
+.sb-ans-rat-wrapper {
+    display: none;
+}
+
+.pos-static {
+    position: static;
+}
+
+.sb-dd-wrapper-or {
+    position: static;
+    width: 270px;
+    border-radius: 0 0 3px 3px;
+    overflow: hidden;
+    border: 1px solid #dcdcdc;
+    border-top: 3px solid #5cc7ef;
+    background-color: #fff;
+    z-index: 99999;
+}
+
+.sb-dd-item-or {
+    width: 33%;
+    float: left;
+    border-bottom: 0;
+    border-right: 1px solid #dcdcdc;
+}
+
+.sb-dd-item-or:last-child {
+    border-right: 0;
+}
+
+.icn-clear {
+    height: 40px;
+    width: 40px;
+    margin-left: 10px;
+    background: url(../images/clear.png) no-repeat center;
+}
+
+.sb-ct-exp {
+    background: url(../images/iconPlus.png) no-repeat center;
+    height: 42px;
+    width: 30px;
+}
+
+.sb-q-item-txt-or {
+    width: 93%;
+}
+
+.sb-ct-close {
+    background: url(../images/icnRemove.png) no-repeat center;
+    height: 42px;
+    width: 30px;
+}
+
+.sb-q-template-item {
+    margin-top: 15px;
+}
+
+.sb-btn-choose {
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    width: 150px;
+    line-height: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+    margin: 10px auto;
+}
+
+.sb-btn-choose:hover {
+    background-color: #7AB400;
+
+}
+
+.hm-um-btn-view-all {
+    text-align: center;
+}
+
+.um-hm-viewall {
+    font-size: 13px;
+    text-decoration: underline;
 }

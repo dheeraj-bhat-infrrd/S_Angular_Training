@@ -1,5 +1,6 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<div id="overlay-toast" class="overlay-toast"></div>
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -10,7 +11,7 @@
         </div>
     </div>
 </div>
- 
+<div id="temp-message" class="hide"></div>
 
 <div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="container">
@@ -23,10 +24,11 @@
 		                    <div class="hm-item-header padding-0150 clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn-type2 dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createbranch.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right"></div>
+		                        <div class="hm-item-header-right icn-plus dd-icn-plus float-right hm-dd-pls-btn"></div>
+								<div class="hm-item-header-right icn-remove dd-icn-minus hide float-right hm-dd-pls-btn"></div>
 		                    </div>
 		                </div>
-		                <div class="create-branch-dd">
+		                <div class="create-branch-dd hm-dd-main-content">
 		                	<form id="add-branch-form"> 
 			                    <div class="hm-top-panel-content clearfix">
 			                        <div class="clearfix">
@@ -64,11 +66,12 @@
 			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
 			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
+			                                <div id="" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 			                            </div>
 			                        </div>
 			                    </div>
 			                     <input type="hidden" name="branchId" id="branch-id-hidden"/>
-			                     <input type="hidden" name="accounttype" id="account-type" value="company"/>
+			                     <input type="hidden" id="account-type" account-type="company"/>
 		                    </form>
 		                    <div class="hm-bottom-panel margin-bottom-25">
 							    <div class="hm-bottom-header">
@@ -103,9 +106,10 @@
 		                    <div class="hm-item-header clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createregion.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right"></div>
+		                        <div class="hm-item-header-right icn-plus dd-icn-plus float-right hm-dd-pls-btn"></div>
+								<div class="hm-item-header-right icn-remove dd-icn-minus hide float-right hm-dd-pls-btn"></div>
 		                    </div>
-		                    <div class="create-branch-dd">
+		                    <div class="create-branch-dd hm-dd-main-content">
 		                    	<form id="add-region-form">
 			                        <div class="hm-item-content">
 			                            <div class="hm-item-row clearfix">
@@ -164,9 +168,10 @@
 		                    <div class="hm-item-header clearfix">
 		                        <div class="float-left hm-header-dd-icn dd-icn hide"></div>
 		                        <div class="hm-item-header-left float-left"><spring:message code="label.createbranch.key"/></div>
-		                        <div class="hm-item-header-right icn-plus float-right"></div>
+		                        <div class="hm-item-header-right icn-plus dd-icn-plus float-right hm-dd-pls-btn"></div>
+								<div class="hm-item-header-right icn-remove dd-icn-minus hide float-right hm-dd-pls-btn"></div>
 		                    </div>
-	                    <div class="create-branch-dd">
+	                    <div class="create-branch-dd hm-dd-main-content">
 	                    	<form id="add-branch-form">
 		                        <div class="hm-item-content">
 		                            <div class="hm-item-row clearfix">
@@ -181,6 +186,7 @@
 		                                <div class="hm-item-row-right pos-relative">
 		                                    <input class="hm-item-row-txt cursor-pointer" type="text" id="selected-region-txt" autocomplete="off">
 		                                    <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
+		                                    <div id="selected-region-error" class="input-error-2 error-msg"></div>
 		                                    <input type="hidden" name="branchId" id="branch-id-hidden"/>
 		                                    <div class="hm-dd-wrapper hide" id="hm-dd-wrapper-bottom">
 		                                        <!-- Regions are populated here through ajax from regionsautocomplete.jsp -->
