@@ -70,12 +70,12 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 			User user = commonServices.getCorporateAdmin(company);
 			LOG.info("Sending mail to the respective corporate admin with email id : " + user.getEmailId());
 			try {
-				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getDisplayName());
+				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
 				throw new UndeliveredEmailException("Email not delivered.");
 			}
 			catch (UndeliveredEmailException e) {
 				LOG.error("UnsubscribeAccountsItemProcessor : Exception caught when sending account disabled mail. Message : " + e.getMessage());
-				coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e);
+				coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e);
 			}
 			LOG.info("Email successfully sent!");
 			

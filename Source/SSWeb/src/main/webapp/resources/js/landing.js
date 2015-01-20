@@ -1,7 +1,6 @@
 /**
  * js functions for landing page
  */
-
 /**
  * function to change the content of page through ajax
  * 
@@ -17,7 +16,7 @@ function showMainContent(url) {
  * @param data
  */
 function showMainContentCallBack(data) {
-	$("#main-content").html(data);
+	$("#main-content").html(data);	
 }
 /**
  * function for logout

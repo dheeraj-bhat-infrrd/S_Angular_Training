@@ -3,9 +3,11 @@
  */
 package com.realtech.socialsurvey.core.services.search;
 
+import java.net.MalformedURLException;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -55,5 +57,17 @@ public interface SolrSearchService {
 	 * @throws SolrException
 	 */
 	public void addOrUpdateBranchToSolr(Branch branch) throws SolrException;
+
+	public String searchUsersByLoginNameAndCompany(String userNamePattern, Company company) throws InvalidInputException, SolrException,
+			MalformedURLException;
+
+	public void addUserToSolr(User user) throws SolrException;
+
+	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
+	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+			MalformedURLException;
+
+	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
