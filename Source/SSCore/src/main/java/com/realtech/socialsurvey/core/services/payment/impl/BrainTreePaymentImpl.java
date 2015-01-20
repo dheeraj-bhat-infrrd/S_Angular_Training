@@ -1000,10 +1000,3 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		
 	}	
 }
->>>>>>> 68cb6dd7784976167e24020f05961cf76956d6bd
-		
-		
-		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
-		
-	}	
-}
