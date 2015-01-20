@@ -44,7 +44,7 @@ public class SurveyBuilderController {
 		LOG.info("Method showBuildSurveyPage started");
 		
 		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
-		String highestRole = (String) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+		String highestRole = (Integer) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION) + "";
 		boolean isSurveyBuildingAllowed = false;
 		try {
 			LOG.debug("Calling service for checking the status of regions already added");
