@@ -327,7 +327,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .success-message.msg-icn{
-    background: url(../images/icnTick.png) no-repeat center;
+    background: url(../images/icn-succ-msg.png) no-repeat center;
 }
 
 .display-message{
@@ -2139,6 +2139,7 @@ button.paypal.is-active {
     height: 36px;
     width: 32px;
     background-size: 30px;
+    background-position: center;
 }
 
 .sb-range-sel-icn {
@@ -2215,4 +2216,30 @@ button.paypal.is-active {
 
 .sb-ans-rat-wrapper {
     display: none;
+}
+
+.pos-static {
+    position: static;
+}
+
+.sb-dd-wrapper-or {
+    position: static;
+    width: 270px;
+    border-radius: 0 0 3px 3px;
+    overflow: hidden;
+    border: 1px solid #dcdcdc;
+    border-top: 3px solid #5cc7ef;
+    background-color: #fff;
+    z-index: 99999;
+}
+
+.sb-dd-item-or {
+    width: 33%;
+    float: left;
+    border-bottom: 0;
+    border-right: 1px solid #dcdcdc;
+}
+
+.sb-dd-item-or:last-child {
+    border-right: 0;
 }
