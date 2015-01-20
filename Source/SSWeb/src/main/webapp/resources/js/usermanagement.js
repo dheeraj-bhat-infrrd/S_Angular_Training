@@ -85,13 +85,18 @@ function assignUserToBranch(userId, branchId) {
 		data : payload,
 		success : function(data) {
 			$('#message-header').html(data);
-			if ($('#message-header>div').hasClass("success-message")) {
+			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
+			}
+			if ($('#common-message-header').hasClass("error-message")) {
+				createPopupInfo("Error!",$('#message-header p').text());
 			}
 		},
 		complete : function() {
 			if (success) {
 				paintUserDetailsForm(userId);
+				UsersListStartIndex = 0;
+				paintUserListInUserManagement();
 			}
 			hideOverlay();
 		},
@@ -119,7 +124,7 @@ function unassignUserFromBranch(userId, branchId) {
 		data : payload,
 		success : function(data) {
 			$('#message-header').html(data);
-			if ($('#message-header>div').hasClass("success-message")) {
+			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
 			}
 		},
@@ -137,7 +142,7 @@ function unassignUserFromBranch(userId, branchId) {
 							.addClass('icn-save');
 				}
 			} else {
-				alert("branch delete unsuccessful");
+				createPopupInfo("Error!","Branch deletion unsuccessful");
 			}
 		},
 		error : function(e) {
@@ -172,6 +177,7 @@ function inviteUser() {
 			if (success) {
 				var userId = $('#mh-userId').val();
 				paintUserDetailsForm(userId);
+				UsersListStartIndex=0;
 				paintUserListInUserManagement();
 			} else {
 				var userId = $('#mh-existing-userId').val();
@@ -205,7 +211,7 @@ function createPopupInfo(header,body) {
 function confirmDeleteUser(userId) {
 	var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
 	if(userId == adminId){
-		alert("Can not delete the admin account");
+		createPopupInfo("Access Denied","Can not delete the admin account!");
 		return false;
 	}
 	$('#overlay-main').show();
@@ -232,7 +238,7 @@ function deleteUser(userId) {
 		data : payload,
 		success : function(data) {
 			$('#message-header').html(data);
-			if ($('#message-header>div').hasClass("success-message")) {
+			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
 			}
 		},
@@ -243,6 +249,8 @@ function deleteUser(userId) {
 				// paint blank user details form
 				$('#um-user-' + userId).remove();
 				paintUserDetailsForm("");
+				UsersListStartIndex=0;
+				paintUserListInUserManagement();
 			}
 		},
 		error : function(e) {
@@ -302,7 +310,6 @@ function paintUserListInUserManagement() {
 					doStopAjaxRequestForUsersList  = true;
 					$('#um-view-more-users').hide();
 				}
-				UsersListStartIndex += jsonData.length;
 				if(jsonData.length == 0){
 					return false;
 				}
@@ -338,7 +345,7 @@ function activateOrDeactivateUser(isActive, userId) {
 		data : payload,
 		success : function(data) {
 			$('#message-header').html(data);
-			if ($('#message-header>div').hasClass("success-message")) {
+			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
 			}
 		},
@@ -565,6 +572,7 @@ function paintUsersList(data){
 	if(UsersListStartIndex == 0){
 		$('#um-user-list').find('tbody').html("");
 	}
+	UsersListStartIndex += data.length;
 	var searchResult = data;
 	if(searchResult != null){
 		var len = searchResult.length;
@@ -584,7 +592,7 @@ function paintUsersList(data){
 				var col3 = $('<td>').attr({
 					"class" : "col-loanoff um-table-content clearfix"
 				});
-				if(user.isAgent=="true"){
+				if(user.isAgent){
 					var colImage = $('<div>').attr({
 						"class" : "float-left tm-table-tick-icn icn-right-tick"
 					});

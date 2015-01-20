@@ -45,6 +45,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_LOGO_FILE = "INVALID_LOGO_FILE";
 	public static final String MAX_USERS_LIMIT_REACHED = "MAX_USERS_LIMIT_REACHED";
 	public static final String USER_MANAGEMENT_NOT_AUTHORIZED = "USER_MANAGEMENT_NOT_AUTHORIZED";
+	public static final String BRANCH_ASSIGNING_NOT_AUTHORIZED = "BRANCH_ASSIGNING_NOT_AUTHORIZED";
 	public static final String NO_USER_IN_SESSION = "NO_USER_IN_SESSION";
 	public static final String USER_SEARCH_SUCCESSFUL = "USER_SEARCH_SUCCESSFUL";
 
