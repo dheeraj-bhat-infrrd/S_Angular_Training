@@ -27,6 +27,7 @@ function addBranchCallBack(data) {
  * @param data
  */
 function displayMessage(data) {
+	console.log("display message called :data "+data);
 	$("#temp-message").html(data);
 	var displayMessageDiv = $("#display-msg-div");
 	if($(displayMessageDiv).hasClass("success-message")) {
