@@ -42,6 +42,7 @@
 		console.log(data);
 	}
 	$(document).ready(function() {
+		$(document).attr("title", "Build Hierarcy");
 		$("#btn-add-region").on('click', function() {
 			console.log("inside click");
 			addRegion();

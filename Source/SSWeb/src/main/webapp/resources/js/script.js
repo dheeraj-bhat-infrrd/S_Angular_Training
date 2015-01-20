@@ -192,16 +192,16 @@ function validateEmailId(elementId){
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (emailRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid email id.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid email id.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter email id.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter email id.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -226,16 +226,16 @@ function validateFirstName(elementId){
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (nameRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid first name.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid first name.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter first name.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter first name.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -258,11 +258,11 @@ function validateLastName(elementId){
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid last name.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid last name.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
@@ -298,21 +298,21 @@ function validatePassword(elementId) {
 		if (password != "") {
 			//check if password length is proper
 			if(password.length < minPwdLength || password.length > maxPwdLength){
-				$('#'+elementId).parent().next('.input-error-2').html('Password must be between 6-15 characters.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Password must be between 6-15 characters.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 			else if (passwordRegex.test(password) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Password must contain one special character.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Password must contain one special character.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter password.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter password.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -338,16 +338,16 @@ function validateConfirmPassword(pwdId, confirmPwdId){
 	}else{
 		if($('#'+confirmPwdId).val() != ""){
 			if($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-				$('#'+confirmPwdId).parent().next('.input-error-2').html('Passwords do not match.');
-				$('#'+confirmPwdId).parent().next('.input-error-2').show();
+				$('#'+confirmPwdId).parent().next('.login-reg-err').html('Passwords do not match.');
+				$('#'+confirmPwdId).parent().next('.login-reg-err').show();
 				return false;
 			}else {
-				$('#'+confirmPwdId).parent().next('.input-error-2').hide();
+				$('#'+confirmPwdId).parent().next('.login-reg-err').hide();
 				return true;
 			}
 		}else{
-			$('#'+confirmPwdId).parent().next('.input-error-2').html('Please enter confirm password.');
-			$('#'+confirmPwdId).parent().next('.input-error-2').show();
+			$('#'+confirmPwdId).parent().next('.login-reg-err').html('Please enter confirm password.');
+			$('#'+confirmPwdId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -374,16 +374,16 @@ function validateCompany(elementId){
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid company name.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid company name.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter company name.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter company name.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -408,16 +408,16 @@ function validateZipcode(elementId){
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (zipcodeRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid zipcode.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid zipcode.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter zipcode.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter zipcode.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -442,16 +442,16 @@ function validatePhoneNumber(elementId) {
 	}else{
     	if ($('#'+elementId).val() != "") {
 			if (phoneRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			}else {
-				$('#'+elementId).parent().next('.input-error-2').html('Please enter a valid phone number.');
-				$('#'+elementId).parent().next('.input-error-2').show();
+				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid phone number.');
+				$('#'+elementId).parent().next('.login-reg-err').show();
 				return false;
 			}
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter phone number.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter phone number.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -469,11 +469,11 @@ function validateAddress1(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-				$('#'+elementId).parent().next('.input-error-2').hide();
+				$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 		}else{
-			$('#'+elementId).parent().next('.input-error-2').html('Please enter address.');
-			$('#'+elementId).parent().next('.input-error-2').show();
+			$('#'+elementId).parent().next('.login-reg-err').html('Please enter address.');
+			$('#'+elementId).parent().next('.login-reg-err').show();
 			return false;
 		}
 	}
@@ -488,7 +488,7 @@ function validateAddress2(elementId){
 function validateBranchName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid branch name.');
@@ -502,7 +502,7 @@ function validateBranchName(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).next('.input-error-2').hide();
 				return true;
 			}else {
@@ -522,7 +522,7 @@ function validateBranchName(elementId){
 function validateRegionName(elementId){
 	if($(window).width()<768){
 		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
 			}else {
 				$('#overlay-toast').html('Please enter a valid region name.');
@@ -536,7 +536,7 @@ function validateRegionName(elementId){
 		}
 	}else{
     	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				$('#'+elementId).next('.input-error-2').hide();
 				return true;
 			}else {
@@ -666,5 +666,8 @@ $('.user-info-initial').click(function(e){
 });
 
 $('body').click(function(){
-    $('.initial-dd-wrapper').slideUp(200);
+//    $('.initial-dd-wrapper').slideUp(200);
+    if($('.initial-dd-wrapper').css('display') == "block"){
+        $('.initial-dd-wrapper').slideUp(200);
+    }
 });

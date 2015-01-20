@@ -47,6 +47,9 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_SURVEY_REMINDER_INTERVAL = "INVALID_SURVEY_REMINDER_INTERVAL";
 	public static final String SUBSCRIPTION_UPGRADE_UNSUCCESSFUL = "SUBSCRIPTION_UPGRADE_UNSUCCESSFUL";
 	public static final String SUBSCRIPTION_PAST_DUE = "SUBSCRIPTION_PAST_DUE";
+	public static final String INVALID_CURRENT_PASSWORD = "INVALID_CURRENT_PASSWORD";
+	public static final String INVALID_NEW_PASSWORD = "INVALID_NEW_PASSWORD";
+	public static final String INVALID_CONFIRM_NEW_PASSWORD = "INVALID_CONFIRM_NEW_PASSWORD";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";

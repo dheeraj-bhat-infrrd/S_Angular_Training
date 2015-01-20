@@ -11,8 +11,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -20,6 +24,8 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 // JIRA SS-37 BY RM02 BOC
 
@@ -35,6 +41,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	private GenericDao<Branch, Long> branchDao;
 
 	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
 	private GenericDao<Region, Long> regionDao;
 
 	@Autowired
@@ -42,6 +51,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	/**
 	 * Fetch list of branches in a company
@@ -57,15 +69,15 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			LOG.error("Company object passed can not be null");
 			throw new InvalidInputException("Invalid Company passed");
 		}
-		LOG.info("Fetching the list of branches for company :" + company.getCompany());		
-		Map<String,Object> queries = new HashMap<String,Object>();
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
 		LOG.info("Branch list fetched for the company " + company);
 		return branchList;
 	}
-	
+
 	/**
 	 * Fetch list of regions in a company
 	 * 
@@ -83,10 +95,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.info("Fetching the list of regions for company :" + company.getCompany());
 
-		Map<String,Object> queries = new HashMap<String,Object>();
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
+
 		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
 		LOG.info("Region list fetched for the company " + company);
 		return regionList;
@@ -99,10 +111,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param branchId
 	 * @param status
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException {
+	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Update branch of id :" + branchId + " status to :" + status);
 		if (user == null) {
 			throw new InvalidInputException("User is null in updateRegionStatus");
@@ -122,6 +135,9 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		branch.setModifiedBy(String.valueOf(user.getUserId()));
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		branchDao.update(branch);
+
+		LOG.debug("Updating document of the branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
 		LOG.info("Branch status for branch ID :" + branchId + "/t successfully updated to:" + status);
 	}
 
@@ -130,10 +146,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * 
 	 * @param regionId
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException {
+	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Method updateRegionStatus called for regionId : " + regionId + " and status : " + status);
 		if (user == null) {
 			throw new InvalidInputException("User is null in updateRegionStatus");
@@ -150,6 +167,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		regionDao.update(region);
+
+		LOG.debug("Updating document of the region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
 		LOG.info("Region status for region ID :" + regionId + "/t successfully updated to " + status);
 	}
 
@@ -172,16 +193,16 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("No region present with the region Id :" + regionId);
 		}
 		LOG.info("Fetching the list of branches for region :" + region);
-		
-		Map<String,Object> queries = new HashMap<String,Object>();
+
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
-		
+
 		LOG.info("Branch list fetched for the region " + region);
 		return branchList;
 	}
-	
+
 	/**
 	 * Method to fetch count of branches in a company for a Region
 	 * 
@@ -201,12 +222,12 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("No region present with the region Id :" + regionId);
 		}
 		LOG.info("Fetching the list of branches for region :" + region);
-		
-		Map<String,Object> queries = new HashMap<String,Object>();
+
+		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
-		
+
 		LOG.info("Branch list fetched for the region " + region);
 		return branchCount;
 	}
@@ -235,7 +256,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		LOG.info("Users list fetched for the branch " + branchId);
 		return userList;
 	}
-	
+
 	/**
 	 * Method to fetch count of UserProfiles associated with a branch
 	 * 
@@ -359,17 +380,24 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param user
 	 * @param regionId
 	 * @param branchName
+	 * @param branchAddress1
+	 * @param branchAddress2
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, String branchName) throws InvalidInputException {
+	public Branch addNewBranch(User user, long regionId, String branchName, String branchAddress1, String branchAddress2) throws InvalidInputException,
+			SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
 		}
 		if (branchName == null || branchName.isEmpty()) {
 			throw new InvalidInputException("Branch name is null in addNewBranch");
+		}
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
+			throw new InvalidInputException("Branch address is null in addNewBranch");
 		}
 		LOG.info("Method add new branch called for regionId : " + regionId + " and branchName : " + branchName);
 		Region region = null;
@@ -398,9 +426,43 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 
 		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.NO);
+		branch.setAddress1(branchAddress1);
+		branch.setAddress2(branchAddress2);
+
+		LOG.debug("Adding new branch into mongo");
+		insertBranchSettings(branch);
+
+		LOG.debug("Adding newly added branch to solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
+	}
+
+	/**
+	 * Method to insert branch settings into mongo
+	 * 
+	 * @param branch
+	 */
+	private void insertBranchSettings(Branch branch) {
+		LOG.info("Method to insert branch settings called for branch : " + branch);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(branch.getBranchId());
+		organizationSettings.setCreatedBy(branch.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(branch.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
+
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(branch.getBranch());
+		contactSettings.setAddress1(branch.getAddress1());
+		contactSettings.setAddress2(branch.getAddress2());
+
+		organizationSettings.setContact_details(contactSettings);
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		LOG.info("Method to insert branch settings finished for branch : " + branch);
 	}
 
 	/**
@@ -408,32 +470,75 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * 
 	 * @param user
 	 * @param regionName
+	 * @param address1
+	 * @param address2
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegion(User user, String regionName) throws InvalidInputException {
+	public Region addNewRegion(User user, String regionName, String address1, String address2) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewRegion");
 		}
 		if (regionName == null || regionName.isEmpty()) {
 			throw new InvalidInputException("Region name is null in addNewRegion");
 		}
+		if (address1 == null || address1.isEmpty()) {
+			throw new InvalidInputException("Address1 is null in addNewRegion");
+		}
 		LOG.info("Method add new region called for regionName : " + regionName);
 
 		Region region = organizationManagementService.addRegion(user, CommonConstants.NO, regionName);
+		region.setAddress1(address1);
+		region.setAddress2(address2);
+
+		LOG.debug("Calling method to insert region settings");
+		insertRegionSettings(region);
+
+		LOG.debug("Updating solr with newly inserted region");
+		solrSearchService.addOrUpdateRegionToSolr(region);
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
 	}
 
 	/**
+	 * Method to insert region settings into mongo
+	 * 
+	 * @param region
+	 */
+	private void insertRegionSettings(Region region) {
+		LOG.info("Method for inserting region settings called for region : " + region);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(region.getRegionId());
+		organizationSettings.setCreatedBy(region.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(region.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
+
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(region.getRegion());
+		contactSettings.setAddress1(region.getAddress1());
+		contactSettings.setAddress2(region.getAddress2());
+
+		organizationSettings.setContact_details(contactSettings);
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.info("Method for inserting region settings finished");
+	}
+
+	/**
 	 * Method to update a branch
+	 * 
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException {
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress, User user) throws InvalidInputException,
+			SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update branch");
 		}
@@ -471,15 +576,20 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		// TODO update address details
 		branchDao.update(branch);
+
+		LOG.debug("Updating branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
 		LOG.info("Method to update branch completed successfully");
 	}
 
 	/**
 	 * Method to update a region
+	 * 
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
-	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException {
+	public void updateRegion(long regionId, String regionName, String regionAddress, User user) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in update region");
 		}
@@ -502,6 +612,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		region.setModifiedBy(String.valueOf(user.getUserId()));
 		// TODO update address
 		regionDao.update(region);
+
+		LOG.debug("Updating region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
 		LOG.info("Method to update region completed successfully");
 	}
 
