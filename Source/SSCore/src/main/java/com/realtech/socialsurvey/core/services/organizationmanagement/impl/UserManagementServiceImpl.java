@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -1329,7 +1330,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	// JIRA: SS-27: By RM05: EOC
 
 	@Override
-	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException {
+	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException, NoRecordsFetchedException {
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
 		}
@@ -1418,7 +1419,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles,
-			Map<Long, AgentSettings> agentSettings) throws InvalidInputException {
+			Map<Long, AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Getting branches settings for the user profile list");
 		Map<Long, OrganizationUnitSettings> branchesSettings = organizationManagementService.getBranchSettingsForUserProfiles(userProfiles);
 		// if agent settings is not null, the resolve the settings of branch associated with the
@@ -1435,8 +1436,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
 						}
 						if (!branchesSettings.containsKey(userProfile.getBranchId())) {
-							OrganizationUnitSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
-							branchesSettings.put(userProfile.getBranchId(), branchSetting);
+							BranchSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
+							branchesSettings.put(userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings());
 						}
 					}
 				}
