@@ -21,7 +21,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -419,10 +418,16 @@ public class UserManagementController {
 				LOG.error("Number format exception while parsing user Id or branch id", e);
 				throw new NonFatalException("Number format execption while parsing user id or branch id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			userManagementService.assignUserToBranch(admin, userId, branchId);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ASSIGN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			try {
+				userManagementService.assignUserToBranch(admin, userId, branchId);
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ASSIGN_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+			catch (InvalidInputException e) {
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ASSIGNING_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.MESSAGE_HEADER;
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning user to a branch. Reason : " + e.getMessage(), e);
@@ -847,7 +852,6 @@ public class UserManagementController {
 				throw new InvalidInputException("NumberFormat exception. Reason : " + exception.getStackTrace());
 			}
 
-			// update user's password
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
@@ -885,23 +889,21 @@ public class UserManagementController {
 			}
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 
-				UserProfile highestUserProfile = null;
+//				UserProfile highestUserProfile = null;
 				// fetch the highest user profile for user
-				try {
-					highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
-				}
-				catch (NoRecordsFetchedException e) {
-					LOG.error("No user profiles found for the user");
-					return JspResolver.ERROR_PAGE;
-				}
+//				try {
+//					highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
+//				}
+//				catch (NoRecordsFetchedException e) {
+//					LOG.error("No user profiles found for the user");
+//					return JspResolver.ERROR_PAGE;
+//				}
 
-				if (highestUserProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)) {
-					// get the user's canonical settings
-					LOG.info("Fetching the user's canonical settings and setting it in session");
-					sessionHelper.getCanonicalSettings(session);
-					// Set the session variables
-					sessionHelper.setSettingVariablesInSession(session);
-				}
+				// get the user's canonical settings
+				LOG.info("Fetching the user's canonical settings and setting it in session");
+				sessionHelper.getCanonicalSettings(session);
+				// Set the session variables
+				sessionHelper.setSettingVariablesInSession(session);
 
 			}
 			else {
