@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.batch.reader;
 //SS-84 RM03
 import java.util.List;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemReader;
@@ -11,68 +10,62 @@ import org.springframework.batch.item.UnexpectedInputException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import com.amazonaws.services.s3.AmazonS3;
+import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl;
 
 public class LogoDeletionItemReader implements ItemReader<String>,InitializingBean{
 	
-	private List<String> fileAbsolutePaths = null;
+	private List<String> logoFileNames = null;
 	
 	private int cursor = CommonConstants.INITIAL_INDEX;
 	
 	@Autowired
-	private EmailServices emailServices;
-	
-	@Value("${ADMIN_EMAIL_ID}")
-	private String recipientMailId;
+	private BatchCommon commonServices;
 	
 	@Autowired
 	private CloudUploadServiceImpl cloudService;
 	
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
+	
+	private AmazonS3 s3Client;
+	
 	private static final Logger LOG = LoggerFactory.getLogger(LogoDeletionItemReader.class);
 	
-	private void sendFailureMail(Exception e) {
-
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
-		String stackTrace = ExceptionUtils.getFullStackTrace(e);
-		// replace all dollars in the stack trace with \$
-		stackTrace = stackTrace.replace("$", "\\$");
-
-		try {
-			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
-			LOG.debug("Failure mail sent to admin.");
-		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
-			LOG.error("CustomItemProcessor : Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-		}
-	}
-
 	@Override
 	public String read() throws Exception, UnexpectedInputException, ParseException, NonTransientResourceException {
 		
 		LOG.info("Reader called for item.");
-		if(cursor < fileAbsolutePaths.size()){
-			LOG.info("Returning the item to the processor : " + fileAbsolutePaths.get(cursor));
-			return fileAbsolutePaths.get(cursor++);
+		if(cursor < logoFileNames.size()){
+			LOG.info("Returning the item to the processor : " + logoFileNames.get(cursor));
+			return logoFileNames.get(cursor++);
 		}		
+		LOG.info("Item queue completely read. Returning null!");
 		return null;
 	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		
+		//Creating the S3 client
+		LOG.debug("Creating the S3 client");
+		s3Client = cloudService.createAmazonClient(endpoint, bucket);
+		LOG.debug("S3 client created");
+		
 		//Fetches all the logos in the Amazon S3 bucket and loads it into the List.
 		try{
 			LOG.info("Fetching the list of logos from Amazon S3");
-			fileAbsolutePaths = cloudService.listAllOjectsInBucket();
+			logoFileNames = cloudService.listAllOjectsInBucket(s3Client);
 			LOG.info("Fetched the list of logos from Amazon S3");
 		}catch(FatalException e){
 			LOG.error("FatalException caught while fetching the list of logos from amazon server");
-			sendFailureMail(e);
+			commonServices.sendFailureMail(e);
 		}
 
 	}
