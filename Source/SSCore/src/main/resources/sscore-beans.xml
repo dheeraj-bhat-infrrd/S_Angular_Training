@@ -5,7 +5,7 @@
 	http://www.springframework.org/schema/context/spring-context.xsd">
 
 	<context:property-placeholder location="classpath*:config.properties" />
-	
+
 	<context:component-scan base-package="com.realtech.socialsurvey.*" />
 	<context:annotation-config />
 
@@ -27,8 +27,8 @@
 	</bean> <!-- Factory bean that creates the Mongo instance -->
 
 	<bean id="mongo" class="org.springframework.data.mongodb.core.MongoFactoryBean">
-		<property name="host" value="${MONGO_HOST}" />
-		<property name="port" value="${MONGO_PORT}" />
+		<property name="host" value="localhost" />
+		<property name="port" value="27017" />
 	</bean>
 
 	<!-- Use this post processor to translate any MongoExceptions thrown in 
