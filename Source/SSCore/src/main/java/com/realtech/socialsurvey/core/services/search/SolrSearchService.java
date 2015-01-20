@@ -19,25 +19,30 @@ public interface SolrSearchService {
 	 * 
 	 * @param regionPattern
 	 * @param company
+	 * @param start
+	 * @param rows
 	 * @return
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public String searchRegions(String regionPattern, Company company) throws InvalidInputException, SolrException;
+	public String searchRegions(String regionPattern, Company company, int start, int rows) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to perform search of branches from solr based on the input pattern and company
 	 * 
 	 * @param branchPattern
 	 * @param company
+	 * @param start
+	 * @param rows
 	 * @return
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public String searchBranches(String branchPattern, Company company) throws InvalidInputException, SolrException;
+	public String searchBranches(String branchPattern, Company company, int start, int rows) throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to add a region to solr
+	 * 
 	 * @param region
 	 * @throws SolrException
 	 */
@@ -45,6 +50,7 @@ public interface SolrSearchService {
 
 	/**
 	 * Method to add a branch to solr
+	 * 
 	 * @param branch
 	 * @throws SolrException
 	 */
