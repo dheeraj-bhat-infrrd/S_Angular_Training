@@ -35,6 +35,9 @@ public class AccountsMaster implements Serializable {
 
 	@Column(name="MAX_USERS_ALLOWED")
 	private int maxUsersAllowed;
+	
+	@Column(name="AMOUNT")
+	private float amount;
 
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
@@ -125,6 +128,14 @@ public class AccountsMaster implements Serializable {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+	
+	public float getAmount() {
+		return amount;
+	}
+
+	public void setAmount(float amount) {
+		this.amount = amount;
 	}
 
 	public List<CompanyInvitationLicenseKey> getCompanyInvitationLicenseKeys() {

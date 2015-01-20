@@ -4,10 +4,13 @@ import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -82,5 +85,23 @@ public class FileUploadServiceImpl implements FileUploadService {
 			LOG.error("Method imageUploadHandler inside ImageUploadServiceImpl failed to upload");
 			throw new InvalidInputException("Upload failed: " + logoName + " because the file was empty", DisplayMessageConstants.INVALID_LOGO_FILE);
 		}
+	}
+
+	@Override
+	public List<String> listAllOjectsInBucket(AmazonS3 s3Client) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void deleteObjectFromBucket(String key, AmazonS3 s3Client) throws InvalidInputException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public AmazonS3 createAmazonClient(String endpoint, String bucket) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
