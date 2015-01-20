@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import com.amazonaws.services.s3.AmazonS3;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
@@ -19,6 +20,9 @@ public class LogoDeletionItemWriter implements ItemWriter<String>,InitializingBe
 	
 	@Autowired
 	private BatchCommon commonServices;
+	
+	@Autowired
+	private CoreCommon coreCommonServices;
 	
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
@@ -43,7 +47,7 @@ public class LogoDeletionItemWriter implements ItemWriter<String>,InitializingBe
 			}
 		}catch(FatalException e){
 			LOG.error("FatalException caught when deleting an item");
-			commonServices.sendFailureMail(e);
+			coreCommonServices.sendFailureMail(e);
 		}
 		
 	}

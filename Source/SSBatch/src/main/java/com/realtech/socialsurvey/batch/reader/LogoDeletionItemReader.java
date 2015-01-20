@@ -13,8 +13,9 @@ import org.springframework.beans.factory.annotation.Value;
 import com.amazonaws.services.s3.AmazonS3;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
 public class LogoDeletionItemReader implements ItemReader<String>,InitializingBean{
 	
@@ -26,7 +27,10 @@ public class LogoDeletionItemReader implements ItemReader<String>,InitializingBe
 	private BatchCommon commonServices;
 	
 	@Autowired
-	private CloudUploadServiceImpl cloudService;
+	private CoreCommon coreCommonServices;
+	
+	@Autowired
+	private FileUploadService cloudService;
 	
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
@@ -65,7 +69,7 @@ public class LogoDeletionItemReader implements ItemReader<String>,InitializingBe
 			LOG.info("Fetched the list of logos from Amazon S3");
 		}catch(FatalException e){
 			LOG.error("FatalException caught while fetching the list of logos from amazon server");
-			commonServices.sendFailureMail(e);
+			coreCommonServices.sendFailureMail(e);
 		}
 
 	}

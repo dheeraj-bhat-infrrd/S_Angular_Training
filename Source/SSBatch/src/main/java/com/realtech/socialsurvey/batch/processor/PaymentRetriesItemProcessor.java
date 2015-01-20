@@ -17,6 +17,7 @@ import com.braintreegateway.Transaction;
 import com.braintreegateway.exceptions.UnexpectedException;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -57,6 +58,9 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 	
 	@Autowired
 	private BatchCommon commonServices;
+	
+	@Autowired
+	private CoreCommon coreCommonServices;
 	
 	private Map<String, Object> writerObjectsMap;
 
@@ -137,7 +141,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 		}
 		catch (InvalidInputException | UndeliveredEmailException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
-			commonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
+			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
 		}
 		
 		LOG.info("Returning transaction");
@@ -249,7 +253,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 			}
 			catch (UnexpectedException e) {
 				LOG.error("UnexpectedException caught : Message : " + e.getMessage(),e);
-				commonServices.sendFailureMail(e);
+				coreCommonServices.sendFailureMail(e);
 				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
 				return null;
 			}
@@ -287,7 +291,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 				}
 				catch (InvalidInputException | UndeliveredEmailException e1) {
 					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage(),e1);
-					commonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
+					coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getDisplayName(), e1);
 
 				}
 				
