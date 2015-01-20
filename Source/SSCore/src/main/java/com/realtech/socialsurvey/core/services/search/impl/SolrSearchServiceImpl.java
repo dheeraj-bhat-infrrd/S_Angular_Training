@@ -424,8 +424,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrServer.commit();
 		}
 		catch (SolrServerException | IOException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while removing user from solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while removing user from solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method removeUserFromSolr() to remove user id {} from solr finished successfully.", userIdToRemove);
 	}
