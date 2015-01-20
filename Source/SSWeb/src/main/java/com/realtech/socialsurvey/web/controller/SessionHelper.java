@@ -21,6 +21,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
@@ -59,7 +60,7 @@ public class SessionHelper {
 	@Value("${AMAZON_BUCKET}")
 	private String bucket;
 
-	public void getCanonicalSettings(HttpSession session) throws InvalidInputException{
+	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException{
 		LOG.info("Getting canonical settings");
 		User user = getCurrentUser();
 		AccountType accountType = (AccountType)session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
