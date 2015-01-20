@@ -57,12 +57,14 @@ public class UnsubscribeAccountsItemWriter implements ItemWriter<Map<String, Obj
 				LOG.info("Extracting the objects from the map");
 				company = (Company) writerMap.get(CommonConstants.COMPANY_OBJECT_KEY);
 				disabledAccount = (DisabledAccount) writerMap.get(CommonConstants.DISABLED_ACCOUNT_OBJECT_KEY);
-
+				
+				//Updating the company table after changing the company status
 				LOG.info("Updating objects for disabled account record with id : " + disabledAccount.getId());
 				LOG.info("Updating the company object in the database");
 				companyDao.merge(company);
 				LOG.info("Company object successfully updated.");
-
+				
+				// Updating the disabled account table.
 				LOG.info("Updating the disabled account object in the database");
 				disabledAccountDao.update(disabledAccount);
 				LOG.info("Disabled account object successfully updated.");
