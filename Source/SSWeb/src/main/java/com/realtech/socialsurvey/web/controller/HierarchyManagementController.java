@@ -415,11 +415,15 @@ public class HierarchyManagementController {
 			LOG.debug("Calling service to add a new region");
 			try {
 				hierarchyManagementService.addNewRegion(user, regionName, regionAddress1, regionAddress2);
+				
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException occured while adding new region.REason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
