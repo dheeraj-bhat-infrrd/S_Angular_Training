@@ -24,10 +24,14 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -60,7 +64,7 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
-	
+
 	/**
 	 * Method to upload logo image for a company
 	 * 
@@ -218,16 +222,16 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			
+
 			User user = (User) request.getSession().getAttribute(CommonConstants.USER_IN_SESSION);
-			
+
 			LOG.debug("Checking if payment has already been made.");
 
-			if(gateway.checkIfPaymentMade(user.getCompany())){
+			if (gateway.checkIfPaymentMade(user.getCompany())) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
 			}
-			
+
 			model.addAttribute("accounttype", strAccountType);
 			model.addAttribute("clienttoken", gateway.getClientToken());
 			model.addAttribute("message",
@@ -288,7 +292,7 @@ public class OrganizationManagementController {
 
 		try {
 			testEncompassConnection(model, request);
-			
+
 			// Encrypting the password
 			String plainPassword = request.getParameter("encompass-password");
 			String cipherPassword = encryptionHelper.encryptAES(plainPassword, "");
@@ -302,11 +306,12 @@ public class OrganizationManagementController {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
 			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
-			
+
 			// set the updated settings value in session with plain password
 			crmInfo.setCrm_password(plainPassword);
 			companySettings.setCrm_info(crmInfo);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while testing encompass detials. Reason : " + e.getMessage(), e);
@@ -332,7 +337,8 @@ public class OrganizationManagementController {
 			if (!validateEncompassParameters(request)) {
 				// TODO: code to test connection
 			}
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_CONNECTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 		}
 		catch (NonFatalException e) {
 			if (request.getAttribute("saveencompassdetails") != null) {
@@ -380,33 +386,37 @@ public class OrganizationManagementController {
 		String mailCategory = request.getParameter("mailcategory");
 		String mailBody = null;
 		String message = "";
-		
+
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
 			MailContentSettings updatedMailContentSettings = null;
-			if(mailCategory != null && mailCategory.equals("participationmail")){
+			if (mailCategory != null && mailCategory.equals("participationmail")) {
 				mailBody = request.getParameter("survey-participation-mailcontent");
 				if (mailBody == null || mailBody.isEmpty()) {
 					LOG.warn("Survey participation mail body is blank.");
 					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody,
+						CommonConstants.SURVEY_MAIL_BODY_CATEGORY);
 				// set the value back in session
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, mailBody);
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_MAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
-			
-			else if(mailCategory != null && mailCategory.equals("participationremindermail")){
+
+			else if (mailCategory != null && mailCategory.equals("participationremindermail")) {
 				mailBody = request.getParameter("survey-participation-reminder-mailcontent");
 				if (mailBody == null || mailBody.isEmpty()) {
 					LOG.warn("Survey participation reminder mail body is blank.");
 					throw new InvalidInputException("Survey participation mail body is blank.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody, CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
+				updatedMailContentSettings = organizationManagementService.updateSurveyParticipationMailBody(companySettings, mailBody,
+						CommonConstants.SURVEY_REMINDER_MAIL_BODY_CATEGORY);
 				// set the value back in session
 				session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, mailBody);
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_PARTICIPATION_REMINDERMAILBODY_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 			// update the mail content settings in session
 			companySettings.setMail_content(updatedMailContentSettings);
@@ -417,7 +427,7 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to update Survey Settings
 	 * 
@@ -445,18 +455,19 @@ public class OrganizationManagementController {
 					LOG.warn("Auto Post rating score is 0.");
 					throw new InvalidInputException("Auto Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				
+
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
-				surveySettings.setAuto_post_score((float)autopostRating);
-				if(originalSurveySettings != null){
+				surveySettings.setAuto_post_score((float) autopostRating);
+				if (originalSurveySettings != null) {
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
 					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
 				}
 				LOG.info("Updating Survey Settings Post score");
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_AUTO_POST_SCORE_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
 			else if (ratingCategory != null && ratingCategory.equals("rating-min-post")) {
@@ -465,21 +476,22 @@ public class OrganizationManagementController {
 					LOG.warn("Minimum Post rating score is 0.");
 					throw new InvalidInputException("Mimimum Post rating score is 0.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				
+
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
-				surveySettings.setShow_survey_above_score((float)minPostRating);
-				if(originalSurveySettings != null){
+				surveySettings.setShow_survey_above_score((float) minPostRating);
+				if (originalSurveySettings != null) {
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
 					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
 				}
 				LOG.info("Updating Survey Settings Min score");
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_MIN_POST_SCORE_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
-			if(organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
+			if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
 				companySettings.setSurvey_settings(surveySettings);
 				LOG.info("Updated Survey Settings");
 			}
@@ -490,7 +502,7 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to update Survey Reminder Settings
 	 * 
@@ -507,7 +519,7 @@ public class OrganizationManagementController {
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
 		String message = "";
-		
+
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
@@ -518,44 +530,47 @@ public class OrganizationManagementController {
 					LOG.warn("Reminder Interval is 0.");
 					throw new InvalidInputException("Reminder Interval is 0.", DisplayMessageConstants.GENERAL_ERROR);
 				}
-				
+
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
 				surveySettings.setSurvey_reminder_interval_in_days(reminderInterval);
-				if(originalSurveySettings != null){
+				if (originalSurveySettings != null) {
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
 					surveySettings.setReminderDisabled(originalSurveySettings.getIsReminderDisabled());
 				}
 				LOG.info("Updating Survey Settings Reminder Interval");
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_INTERVAL_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
 			else if (mailCategory != null && mailCategory.equals("reminder-needed")) {
 				boolean isReminderDisabled = Boolean.parseBoolean(request.getParameter("reminder-needed-hidden"));
-				
+
 				originalSurveySettings = companySettings.getSurvey_settings();
 				surveySettings = new SurveySettings();
 				surveySettings.setReminderDisabled(isReminderDisabled);
-				if(originalSurveySettings != null){
+				if (originalSurveySettings != null) {
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
 				}
 				LOG.info("Updating Survey Settings Reminder Needed");
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_REMINDER_ENABLED_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			}
 
-			if(organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
+			if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
 				companySettings.setSurvey_settings(surveySettings);
 				LOG.info("Updated Survey Settings");
 			}
 		}
 		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException while updating Reminder Interval. Reason : " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_REMINDER_INTERVAL, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while updating survey settings. Reason : " + e.getMessage(), e);
@@ -563,7 +578,7 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to update Other Company Settings
 	 * 
@@ -578,7 +593,7 @@ public class OrganizationManagementController {
 		HttpSession session = request.getSession(false);
 		String otherCategory = request.getParameter("othercategory");
 		String message = "";
-		
+
 		try {
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
@@ -589,24 +604,27 @@ public class OrganizationManagementController {
 
 				// set the updated settings value in session
 				companySettings.setLocationEnabled(isLocationEnabled);
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.LOCATION_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.LOCATION_SETTINGS_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 				LOG.info("Updated Location Settings");
 			}
-			
+
 			else if (otherCategory != null && otherCategory.equals("other-account")) {
 				boolean isAccountDisabled = Boolean.parseBoolean(request.getParameter("other-account"));
-				
+
 				// Calling services to update DB
 				organizationManagementService.updateAccountDisabled(companySettings, isAccountDisabled);
-				if(isAccountDisabled) {
+				if (isAccountDisabled) {
 					organizationManagementService.addDisabledAccount(companySettings.getIden());
-				} else {
+				}
+				else {
 					organizationManagementService.deleteDisabledAccount(companySettings.getIden());
 				}
 
 				// set the updated settings value in session
 				companySettings.setAccountDisabled(isAccountDisabled);
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACCOUNT_SETTINGS_UPDATE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 				LOG.info("Updated Location Settings");
 			}
 		}
@@ -615,6 +633,54 @@ public class OrganizationManagementController {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
+	}
+
+	@RequestMapping(value = "/upgradeplan", method = RequestMethod.POST)
+	@ResponseBody
+	public String upgradePlanForUserInSession(HttpServletRequest request, Model model) {
+		LOG.info("Upgrading the user's subscription");
+		HttpSession session = request.getSession(false);
+		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		String message = "";
+
+		LOG.info("Fetching the user in session");
+		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+
+		try {
+			LOG.info("Making the braintree API call to upgrade and updating the database!");
+
+			if (accountType == null || accountType.isEmpty()) {
+				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			int accountTypeValue = 0;
+			try {
+				accountTypeValue = Integer.parseInt(accountType);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			gateway.upgradePlanForSubscription(user.getCompany(), accountTypeValue);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
+			LOG.info("Upgrade successful");
+		}
+		catch (InvalidInputException | NoRecordsFetchedException | PaymentException e) {
+			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		catch (SubscriptionPastDueException e) {
+			LOG.error("SubscriptionPastDueException while upgrading subscription. Message : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		catch (SubscriptionUpgradeUnsuccessfulException e) {
+			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+
+		return message;
+
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

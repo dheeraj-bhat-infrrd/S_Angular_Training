@@ -6,7 +6,6 @@ import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
@@ -17,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.exceptions.UnexpectedException;
+import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -39,22 +40,13 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 	private Timestamp now = new Timestamp(System.currentTimeMillis());
 
 	@Autowired
-	private GenericDao<RetriedTransaction, Integer> retriedTransactionDao;
+	private GenericDao<RetriedTransaction, Long> retriedTransactionDao;
 
 	@Autowired
-	private GenericDao<LicenseDetail, Integer> licenseDetailDao;
-
-	@Autowired
-	private GenericDao<User, Integer> userDao;
-
-	@Autowired
-	private GenericDao<Company, Integer> companyDao;
+	private GenericDao<User, Long> userDao;
 
 	@Autowired
 	private Payment paymentGateway;
-
-	@Value("${ADMIN_EMAIL_ID}")
-	private String recipientMailId;
 
 	@Value("${MAX_PAYMENT_RETRIES}")
 	private int maxPaymentRetries;
@@ -64,41 +56,17 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
-
+	
+	@Autowired
+	private BatchCommon commonServices;
+	
+	@Autowired
+	private CoreCommon coreCommonServices;
+	
 	private Map<String, Object> writerObjectsMap;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PaymentRetriesItemProcessor.class);
 
-	private User getCorporateAdmin(Company company) throws InvalidInputException, NoRecordsFetchedException {
-
-		if (company == null) {
-			LOG.error("Parameter to getCorporateAdmin is null!");
-			throw new InvalidInputException("Parameter to getCorporateAdmin is null!");
-		}
-
-		LOG.debug("Fetching corporate user for the company with id : " + company.getCompanyId());
-		User user = null;
-		List<User> users = null;
-
-		// Fetching the list of users from USERS table with the IS_OWNER set and having the same
-		// company.
-		HashMap<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		queries.put(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER);
-
-		LOG.debug("Making the database call to USERS table to fetch records.");
-		users = userDao.findByKeyValue(User.class, queries);
-
-		if (users == null || users.isEmpty()) {
-			LOG.error("No users as corporate admins found for the company with id : " + company.getCompanyId());
-			throw new NoRecordsFetchedException("No users as corporate admins found for the company with id : " + company.getCompanyId());
-		}
-
-		user = users.get(CommonConstants.INITIAL_INDEX);
-
-		LOG.debug("Returning user found as corporate admin of company with user id : " + user.getUserId());
-		return user;
-	}
 
 	private RetriedTransaction checkForExistingTransactions(LicenseDetail licenseDetail) throws InvalidInputException {
 
@@ -150,39 +118,6 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 
 	}
 
-	private void sendFailureMail(Exception e) {
-
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
-		String stackTrace = ExceptionUtils.getFullStackTrace(e);
-		// replace all dollars in the stack trace with \$
-		stackTrace = stackTrace.replace("$", "\\$");
-
-		try {
-			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
-			LOG.debug("Failure mail sent to admin.");
-		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
-			LOG.error("CustomItemProcessor : Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-		}
-	}
-
-	private void sendEmailSendingFailureMail(String destinationMailId, String displayName, Exception e) {
-
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
-		String stackTrace = ExceptionUtils.getFullStackTrace(e);
-		// replace all dollars in the stack trace with \$
-		stackTrace = stackTrace.replace("$", "\\$");
-
-		try {
-			emailServices.sendEmailSendingFailureMail(recipientMailId, destinationMailId, displayName, stackTrace);;
-			LOG.debug("Failure mail sent to admin.");
-		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
-			LOG.error("CustomItemProcessor : sendEmailSendingFailureMail : Exception caught when sending Exception mail. Message : "
-					+ e1.getMessage());
-		}
-	}
-
 	private Transaction retryChargeAndSendMail(LicenseDetail licenseDetail) throws InvalidInputException, PaymentRetryUnsuccessfulException,
 			NoRecordsFetchedException {
 
@@ -201,7 +136,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 
 		// Sending retry email to client.
 		LOG.debug("Fetching the corporate admin");
-		User user = getCorporateAdmin(licenseDetail.getCompany());
+		User user = commonServices.getCorporateAdmin(licenseDetail.getCompany());
 		LOG.debug("Sending mail for retrying subscription charge.");
 
 		try {
@@ -210,7 +145,8 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 		}
 		catch (InvalidInputException | UndeliveredEmailException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
-			sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), e1);
+
+			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
 		}
 
 		LOG.info("Returning transaction");
@@ -324,8 +260,8 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 				return null;
 			}
 			catch (UnexpectedException e) {
-				LOG.error("UnexpectedException caught : Message : " + e.getMessage(), e);
-				sendFailureMail(e);
+				LOG.error("UnexpectedException caught : Message : " + e.getMessage(),e);
+				coreCommonServices.sendFailureMail(e);
 				LOG.info("Processing of item : License detail object with id : " + licenseDetail.getLicenseId() + " UNSUCCESSFUL");
 				return null;
 			}
@@ -344,7 +280,7 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 
 				// Fetch the admin of the company.
 				LOG.info("Fetching the corporate admin for the company");
-				user = getCorporateAdmin(company);
+				user = commonServices.getCorporateAdmin(company);
 
 				// Block the user by setting the status of that company to 0
 				LOG.info("Blocking the user by changing status in the Company entity");
@@ -362,8 +298,8 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 					LOG.info("Mail successfully sent.");
 				}
 				catch (InvalidInputException | UndeliveredEmailException e1) {
-					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage(), e1);
-					sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), e1);
+					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage(),e1);
+					coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
 
 				}
 

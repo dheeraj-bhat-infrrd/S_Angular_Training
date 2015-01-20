@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -78,13 +79,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
-	
+
 	@Autowired
 	private Payment gateway;
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
-	
+
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -465,14 +466,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		long companyId = user.getCompany().getCompanyId();
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-		
+
 		// Decrypting the encompass password
-		if(companySettings != null && companySettings.getCrm_info() != null) {
+		if (companySettings != null && companySettings.getCrm_info() != null) {
 			CRMInfo crmInfo = companySettings.getCrm_info();
-			
+
 			String encryptedPassword = crmInfo.getCrm_password();
 			String decryptedPassword = encryptionHelper.decryptAES(encryptedPassword, "");
-			
+
 			crmInfo.setCrm_password(decryptedPassword);
 		}
 		return companySettings;
@@ -511,22 +512,23 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	@Override
-	public Map<Long, OrganizationUnitSettings> getBranchSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
+	public Map<Long, OrganizationUnitSettings> getBranchSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException,
+			NoRecordsFetchedException {
 		Map<Long, OrganizationUnitSettings> branchSettings = null;
 		if (userProfiles != null && userProfiles.size() > 0) {
 			LOG.info("Get branch settings for the user profiles: " + userProfiles.toString());
 			branchSettings = new HashMap<Long, OrganizationUnitSettings>();
-			OrganizationUnitSettings branchSetting = null;
+			BranchSettings branchSetting = null;
 			// get the branch profiles and get the settings for each of them.
 			for (UserProfile userProfile : userProfiles) {
-				branchSetting = new OrganizationUnitSettings();
+				branchSetting = new BranchSettings();
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 					LOG.debug("Getting settings for " + userProfile);
 					// get the branch id and get the profile
 					if (userProfile.getBranchId() > 0l) {
 						branchSetting = getBranchSettings(userProfile.getBranchId());
-						if (branchSetting != null) {
-							branchSettings.put(userProfile.getBranchId(), branchSetting);
+						if (branchSetting != null && branchSetting.getOrganizationUnitSettings() != null) {
+							branchSettings.put(userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings());
 						}
 					}
 					else {
@@ -554,15 +556,47 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return regionSettings;
 	}
 
+	/**
+	 * Method to fetch branch settings along with the required region settings of region to which
+	 * the branch belongs
+	 */
+	@Transactional
 	@Override
-	public OrganizationUnitSettings getBranchSettings(long branchId) throws InvalidInputException {
-		OrganizationUnitSettings branchSettings = null;
+	public BranchSettings getBranchSettings(long branchId) throws InvalidInputException, NoRecordsFetchedException {
+		OrganizationUnitSettings organizationUnitSettings = null;
+		BranchSettings branchSettings = null;
 		if (branchId <= 0l) {
 			throw new InvalidInputException("Invalid branch id. :" + branchId);
 		}
-		LOG.info("Get the branch settings for region id: " + branchId);
-		branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+		LOG.info("Get the branch settings for branch id: " + branchId);
+		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		branchSettings = new BranchSettings();
+		branchSettings.setOrganizationUnitSettings(organizationUnitSettings);
+
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			throw new NoRecordsFetchedException("No branch present in db for branchId : " + branchId);
+		}
+		long regionId = branch.getRegion().getRegionId();
+
+		if (branch.getRegion().getIsDefaultBySystem() != CommonConstants.YES) {
+			LOG.debug("fetching region settings for regionId : " + regionId);
+			OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
+					MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+			if (regionSettings == null) {
+				throw new NoRecordsFetchedException("No region settings present in mongo for regionId : " + regionId);
+			}
+			LOG.debug("Successfully fetched region settings for regionId : " + regionId + " adding the info to branch settings");
+			branchSettings.setRegionId(regionSettings.getIden());
+			branchSettings.setRegionName(regionSettings.getContact_details().getName());
+		}
+		else {
+			LOG.debug("Branch belongs to default region");
+		}
+
+		LOG.info("Successfully fetched the branch settings for branch id: " + branchId + " returning : " + branchSettings);
 		return branchSettings;
 	}
 
@@ -585,39 +619,43 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings == null) {
 			throw new InvalidInputException("Company settings cannot be null.");
 		}
-		
-		LOG.info("Updating comapnySettings: " + companySettings+" with surveySettings: "+surveySettings);
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS, surveySettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		LOG.info("Updating comapnySettings: " + companySettings + " with surveySettings: " + surveySettings);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SURVEY_SETTINGS,
+				surveySettings, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated the record successfully");
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public void updateLocationEnabled(OrganizationUnitSettings companySettings, boolean isLocationEnabled) throws InvalidInputException {
 		if (companySettings == null) {
 			throw new InvalidInputException("Company settings cannot be null.");
 		}
 
-		LOG.info("Updating companySettings: " + companySettings+" with locationEnabled: "+isLocationEnabled);
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCATION_ENABLED, isLocationEnabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updating companySettings: " + companySettings + " with locationEnabled: " + isLocationEnabled);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCATION_ENABLED,
+				isLocationEnabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated the record successfully");
 	}
-	
+
 	@Override
 	public void updateAccountDisabled(OrganizationUnitSettings companySettings, boolean isAccountDisabled) throws InvalidInputException {
 		if (companySettings == null) {
 			throw new InvalidInputException("Company settings cannot be null.");
 		}
 
-		LOG.info("Updating companySettings: " + companySettings + " with AccountDisabled: "+isAccountDisabled);
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED, isAccountDisabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Updating companySettings: " + companySettings + " with AccountDisabled: " + isAccountDisabled);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACCOUNT_DISABLED,
+				isAccountDisabled, companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		LOG.info("Updated the isAccountDisabled successfully");
 	}
 
 	@Override
-	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory) throws InvalidInputException{
-		if(companySettings == null){
+	public MailContentSettings updateSurveyParticipationMailBody(OrganizationUnitSettings companySettings, String mailBody, String mailCategory)
+			throws InvalidInputException {
+		if (companySettings == null) {
 			throw new InvalidInputException("Company settings cannot be null.");
 		}
 		if (mailBody == null || mailBody.isEmpty()) {
@@ -657,29 +695,29 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional
 	public void addDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
 		LOG.info("Adding the disabled account to the database for company id : " + companyId);
-		if(companyId <= 0){
+		if (companyId <= 0) {
 			LOG.error("addDisabledAccount : Invalid companyId has been given.");
 			throw new InvalidInputException("addDisabledAccount : Invalid companyId has been given.");
 		}
 		List<LicenseDetail> licenseDetails = null;
-		
+
 		// Fetching the company entity from database
 		LOG.info("Fetching the company record from the database");
 		Company company = companyDao.findById(Company.class, companyId);
-		
+
 		// Fetching the license details for the company
 		LOG.info("Fetching the License Detail record from the database");
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		licenseDetails = licenceDetailDao.findByKeyValue(LicenseDetail.class, queries);
-		
-		if(licenseDetails == null || licenseDetails.isEmpty()){
+
+		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.error("No license detail records have been found for company id : " + companyId);
 			throw new NoRecordsFetchedException("No license detail records have been found for company id : " + companyId);
 		}
-		
+
 		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
-		
+
 		LOG.debug("Preparing the DisabledAccount entity to be saved in the database.");
 		DisabledAccount disabledAccount = new DisabledAccount();
 		disabledAccount.setCompany(company);
@@ -690,7 +728,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		disabledAccount.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		disabledAccount.setModifiedBy(CommonConstants.ADMIN_USER_NAME);
 		disabledAccount.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		
+
 		LOG.info("Adding the Disabled Account entity to the database");
 		disabledAccountDao.save(disabledAccount);
 		LOG.info("Added Disabled Account entity to the database.");
@@ -700,33 +738,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional
 	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Deleting the Disabled Account pertaining to company id : " + companyId);
-		if(companyId <= 0){
+		if (companyId <= 0) {
 			LOG.error("addDisabledAccount : Invalid companyId has been given.");
 			throw new InvalidInputException("addDisabledAccount : Invalid companyId has been given.");
 		}
 		List<DisabledAccount> disabledAccounts = null;
-		
-		//Fetching the company entity from database
+
+		// Fetching the company entity from database
 		LOG.info("Fetching the company record from the database");
 		Company company = companyDao.findById(Company.class, companyId);
-		
-		//Fetching the disabled account entity for the company
+
+		// Fetching the disabled account entity for the company
 		LOG.info("Fetching the Disabled Account from the database");
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		disabledAccounts = disabledAccountDao.findByKeyValue(DisabledAccount.class, queries);
-		
-		if(disabledAccounts == null || disabledAccounts.isEmpty()){
+
+		if (disabledAccounts == null || disabledAccounts.isEmpty()) {
 			LOG.error("No disabled account records have been found for company id : " + companyId);
 			throw new NoRecordsFetchedException("No disabled account records have been found for company id : " + companyId);
 		}
-		
+
 		DisabledAccount disabledAccount = disabledAccounts.get(CommonConstants.INITIAL_INDEX);
 		disabledAccount.setStatus(CommonConstants.STATUS_INACTIVE);
 		LOG.info("Removing the disabled account record with id : " + disabledAccount.getId() + "from the database.");
-		
-		//Perform soft delete of the record in the database
+
+		// Perform soft delete of the record in the database
 		disabledAccountDao.update(disabledAccount);
 		LOG.info("Record successfully deleted from the database!");
 	}
