@@ -1,3 +1,5 @@
+<jsp:include page="header.jsp"/>
+
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -200,6 +202,8 @@
     </div>
 </div>
 
+<jsp:include page="scripts.jsp"/>
+
 <script>
     $(document).ready(function(){
         
@@ -330,3 +334,5 @@
         
     });
 </script>
+
+<jsp:include page="footer.jsp"/>
