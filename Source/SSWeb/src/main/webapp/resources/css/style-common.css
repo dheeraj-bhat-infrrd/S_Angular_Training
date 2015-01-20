@@ -705,7 +705,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-btn-wrapper-fix {
-    width: 235px;
+    width: 285px;
 }
 
 .margin-right-0 {
@@ -2242,4 +2242,57 @@ button.paypal.is-active {
 
 .sb-dd-item-or:last-child {
     border-right: 0;
+}
+
+.icn-clear {
+    height: 40px;
+    width: 40px;
+    margin-left: 10px;
+    background: url(../images/clear.png) no-repeat center;
+}
+
+.sb-ct-exp {
+    background: url(../images/iconPlus.png) no-repeat center;
+    height: 42px;
+    width: 30px;
+}
+
+.sb-q-item-txt-or {
+    width: 93%;
+}
+
+.sb-ct-close {
+    background: url(../images/icnRemove.png) no-repeat center;
+    height: 42px;
+    width: 30px;
+}
+
+.sb-q-template-item {
+    margin-top: 15px;
+}
+
+.sb-btn-choose {
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    width: 150px;
+    line-height: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+    margin: 10px auto;
+}
+
+.sb-btn-choose:hover {
+    background-color: #7AB400;
+
+}
+
+.hm-um-btn-view-all {
+    text-align: center;
+}
+
+.um-hm-viewall {
+    font-size: 13px;
+    text-decoration: underline;
 }
