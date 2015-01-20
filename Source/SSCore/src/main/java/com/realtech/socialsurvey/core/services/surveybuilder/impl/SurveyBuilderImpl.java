@@ -55,6 +55,30 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
+	public boolean isSurveyBuildingAllowed(User user, String highestRole) throws InvalidInputException {
+		LOG.info("Method isSurveyBuildingAllowed() started for user: " + user);
+		if (user == null) {
+			throw new InvalidInputException("User is null in isSurveyBuildingAllowed");
+		}
+		if (highestRole == null) {
+			throw new InvalidInputException("Account type is null in isSurveyBuildingAllowed");
+		}
+		boolean isSurveyBuildingAllowed = true;
+		// TODO Add proper logic upon merging user mgmt
+		/*switch (highestRole) {
+			case ENTERPRISE:
+				LOG.debug("Checking Survey Building for account type ENTERPRISE");
+				isSurveyBuildingAllowed = false;
+				break;
+			default:
+				throw new InvalidInputException("Account type is invalid in isSurveyBuildingAllowed");
+		}*/
+		LOG.info("Returning from isSurveyBuildingAllowed for user : " + user.getUserId() + " isSurveyBuildingAllowed is :" + isSurveyBuildingAllowed);
+		return isSurveyBuildingAllowed;
+	}
+	
+	@Override
+	@Transactional
 	public void createNewSurvey(User user) throws InvalidInputException {
 		LOG.info("Method createNewSurvey() started.");
 		if (user == null) {
