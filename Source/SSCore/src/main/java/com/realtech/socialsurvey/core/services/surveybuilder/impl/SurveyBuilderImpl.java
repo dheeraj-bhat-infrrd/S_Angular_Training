@@ -28,15 +28,12 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 
 // JIRA: SS-32: By RM05: BOC
 /**
- * This class is responsible for creating a new survey and modifying a pre-existing survey.
+ * This class is responsible for survey building and modifying
  */
 @Component
 public class SurveyBuilderImpl implements SurveyBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
-
-	@Autowired
-	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
@@ -88,8 +85,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 		// creating new survey and mapping to company
 		Survey survey = addSurvey(user, "Survey Test");
-		addSurveyToCompany(user, survey, user.getCompany());
-
+		mapSurveyToCompany(user, survey, user.getCompany());
 		LOG.info("Method createNewSurvey() finished.");
 	}
 
@@ -97,38 +93,17 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	@Transactional
 	public void addSurveyToCompany(User user, Survey survey, Company company) throws InvalidInputException {
 		LOG.info("Method addSurveyToCompany() started.");
-		if (survey == null) {
-			LOG.error("Invalid argument. Null value is passed for survey.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
-		}
-		if (company == null) {
-			LOG.error("Invalid argument. Null value is passed for company.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for company.");
-		}
-		if (user == null) {
-			LOG.error("Invalid argument. Null value is passed for user.");
-			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
-		}
-
-		SurveyCompanyMapping mapping = new SurveyCompanyMapping();
-		mapping.setSurvey(survey);
-		mapping.setCompany(company);
-		mapping.setStatus(CommonConstants.STATUS_ACTIVE);
-		mapping.setCreatedBy(String.valueOf(user.getUserId()));
-		mapping.setModifiedBy(String.valueOf(user.getUserId()));
-		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		mapping = surveyCompanyMappingDao.saveOrUpdate(mapping);
+		mapSurveyToCompany(user, survey, company);
 		LOG.info("Method addSurveyToCompany() finished.");
 	}
 
 	@Override
 	@Transactional
-	public void deactivateSurveyForCompany(User user, Company company) throws InvalidInputException, NoRecordsFetchedException {
-		LOG.info("Method deactivateSurveyForCompany() started.");
+	public void deactivateSurveyCompanyMapping(User user, Company company) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method deactivateSurveyCompanyMapping() started.");
 		if (user == null) {
-			LOG.error("Invalid argument passed. User is null in method deactivateQuestionSurveyMapping.");
-			throw new InvalidInputException("Invalid argument passed. User is null in method deactivateQuestionSurveyMapping.");
+			LOG.error("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
+			throw new InvalidInputException("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
 		}
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
@@ -137,7 +112,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		List<SurveyCompanyMapping> surveyCompanyMappings = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries);
 		if (surveyCompanyMappings == null || surveyCompanyMappings.isEmpty()) {
 			LOG.error("No Survey Company Mapping records have been found for company id : " + company.getCompanyId());
-			throw new NoRecordsFetchedException("No disabled account records have been found for company id : " + company.getCompanyId());
+			throw new NoRecordsFetchedException("No SurveyCompany Mappings have been found for company id : " + company.getCompanyId());
 		}
 
 		SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappings.get(CommonConstants.INITIAL_INDEX);
@@ -146,7 +121,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.debug("Disabling the SurveyCompanyMapping record with id : " + surveyCompanyMapping.getSurveyCompanyMappingId() + "from the database.");
 
 		// Perform soft delete of the record in the database
-		LOG.info("Method deactivateSurveyForCompany() finished.");
+		LOG.info("Method deactivateSurveyCompanyMapping() finished.");
 	}
 
 	@Override
@@ -348,6 +323,34 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.debug("Saving mapping of survey to question.");
 		surveyQuestionsMappingDao.saveOrUpdate(surveyQuestionsMapping);
 		LOG.debug("Method mapQuestionToSurvey() finished.");
+	}
+	
+	/**
+	 * Creates a new entry for new survey company mapping into database.
+	 */
+	private void mapSurveyToCompany(User user, Survey survey, Company company) throws InvalidInputException {
+		if (survey == null) {
+			LOG.error("Invalid argument. Null value is passed for survey.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
+		}
+		if (company == null) {
+			LOG.error("Invalid argument. Null value is passed for company.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for company.");
+		}
+		if (user == null) {
+			LOG.error("Invalid argument. Null value is passed for user.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
+		}
+
+		SurveyCompanyMapping mapping = new SurveyCompanyMapping();
+		mapping.setSurvey(survey);
+		mapping.setCompany(company);
+		mapping.setStatus(CommonConstants.STATUS_ACTIVE);
+		mapping.setCreatedBy(String.valueOf(user.getUserId()));
+		mapping.setModifiedBy(String.valueOf(user.getUserId()));
+		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		mapping = surveyCompanyMappingDao.saveOrUpdate(mapping);
 	}
 }
 // JIRA: SS-32: By RM05: EOC
