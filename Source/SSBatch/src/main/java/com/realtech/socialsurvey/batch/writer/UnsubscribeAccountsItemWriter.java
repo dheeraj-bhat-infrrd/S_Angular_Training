@@ -3,21 +3,18 @@ package com.realtech.socialsurvey.batch.writer;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 /**
  * The writer class for the batch job for cancelling subscriptions
@@ -31,28 +28,9 @@ public class UnsubscribeAccountsItemWriter implements ItemWriter<Map<String, Obj
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
 
 	@Autowired
-	private EmailServices emailServices;
-
-	@Value("${ADMIN_EMAIL_ID}")
-	private String recipientMailId;
-
+	private BatchCommon commonServices; 
+	
 	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsItemWriter.class);
-
-	private void sendFailureMail(Exception e) {
-
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
-		String stackTrace = ExceptionUtils.getFullStackTrace(e);
-		// replace all dollars in the stack trace with \$
-		stackTrace = stackTrace.replace("$", "\\$");
-
-		try {
-			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
-			LOG.debug("Failure mail sent to admin.");
-		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
-			LOG.error("CustomItemProcessor : Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-		}
-	}
 
 	@Transactional
 	@Override
@@ -94,7 +72,7 @@ public class UnsubscribeAccountsItemWriter implements ItemWriter<Map<String, Obj
 			}
 			catch (DatabaseException e) {
 				LOG.error("Database Exception caught : Message : " + e.getMessage());
-				sendFailureMail(e);
+				commonServices.sendFailureMail(e);
 				LOG.info("Writing for disabled account with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			}
 

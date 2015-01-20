@@ -98,14 +98,13 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	 * Method that returns a list of all the keys in a bucket.
 	 * @return
 	 */
-	public List<String> listAllOjectsInBucket() {
+	@Override
+	public List<String> listAllOjectsInBucket(AmazonS3 s3Client) {
 		
 		List<String> fileList = new ArrayList<>();
 		LOG.info("Listing all objects in bucket : " + bucket);
 		
 		try{
-			LOG.info("Creating the Amazon Client");
-			AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
 			LOG.info("Creating the list objects request");
 			ListObjectsRequest request = new ListObjectsRequest();
 			request.setBucketName(bucket);
@@ -114,10 +113,13 @@ public class CloudUploadServiceImpl implements FileUploadService {
 			ObjectListing listing = null;
 			LOG.info("Preparing the arraylist of all the keys currently in the bucket : " + bucket);
 			do {
+				LOG.debug("Fetching the list of objects to be added to the list");
 				listing = s3Client.listObjects(request);
 				for (S3ObjectSummary objectSummary : listing.getObjectSummaries()) {
+					LOG.debug("Adding key to the list. Key : " + objectSummary.getKey());
 					fileList.add(objectSummary.getKey());
 				}
+				LOG.debug("Setting marker to fetch next batch of objects");
 				request.setMarker(listing.getNextMarker());
 			}
 			while (listing.isTruncated());	
@@ -136,7 +138,8 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	 * @param key
 	 * @throws InvalidInputException
 	 */
-	public void deleteObjectFromBucket(String key) throws InvalidInputException{
+	@Override
+	public void deleteObjectFromBucket(String key, AmazonS3 s3Client) throws InvalidInputException{
 		
 		if(key == null || key.isEmpty()){
 			LOG.error("key parameter sent to deleteObjectFromBucket is null or empty!");
@@ -144,9 +147,6 @@ public class CloudUploadServiceImpl implements FileUploadService {
 		}
 		
 		try{
-			
-			LOG.info("Creating the Amazon Client");
-			AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
 			LOG.info("Amazon Client created. Now sending a request to delete the object with key : " + key);
 			s3Client.deleteObject(bucket, key);
 			LOG.info("Object with key : " + key + " deleted from bucket : " + bucket);
@@ -161,7 +161,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	/**
 	 * Method to create AmazonS3 client
 	 */
-	private AmazonS3 createAmazonClient(String endpoint, String bucket) {
+	public AmazonS3 createAmazonClient(String endpoint, String bucket) {
 		LOG.debug("Creating Amazon S3 Client");
 		BasicAWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
 		Region region = Region.getRegion(Regions.US_WEST_1);

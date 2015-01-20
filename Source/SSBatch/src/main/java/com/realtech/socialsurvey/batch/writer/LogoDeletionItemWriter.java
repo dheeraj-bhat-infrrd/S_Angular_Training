@@ -1,47 +1,35 @@
 package com.realtech.socialsurvey.batch.writer;
 //SS-84 RM03
 import java.util.List;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import com.amazonaws.services.s3.AmazonS3;
+import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.exception.FatalException;
-import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.upload.impl.CloudUploadServiceImpl;
+import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 
-public class LogoDeletionItemWriter implements ItemWriter<String>{
+public class LogoDeletionItemWriter implements ItemWriter<String>,InitializingBean{
 	
 	@Autowired
-	private CloudUploadServiceImpl cloudService;
+	private FileUploadService cloudService;
 	
 	@Autowired
-	private EmailServices emailServices;
+	private BatchCommon commonServices;
 	
-	@Value("${ADMIN_EMAIL_ID}")
-	private String recipientMailId;
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
+	
+	private AmazonS3 s3Client;
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LogoDeletionItemWriter.class);
 	
-	private void sendFailureMail(Exception e) {
-
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
-		String stackTrace = ExceptionUtils.getFullStackTrace(e);
-		// replace all dollars in the stack trace with \$
-		stackTrace = stackTrace.replace("$", "\\$");
-
-		try {
-			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
-			LOG.debug("Failure mail sent to admin.");
-		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
-			LOG.error("CustomItemProcessor : Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-		}
-	}
-
 	@Override
 	public void write(List<? extends String> items) throws Exception {
 		LOG.info("Writer called to delete items from the Amazon S3 server");
@@ -50,13 +38,21 @@ public class LogoDeletionItemWriter implements ItemWriter<String>{
 			// Delete every item in the list from the Amazon S3 server.
 			for(String item : items){
 				LOG.info("Deleting the : " + item + " item from the Amazon S3 server");
-				cloudService.deleteObjectFromBucket(item);
+				cloudService.deleteObjectFromBucket(item,s3Client);
 				LOG.info("Deleted the item : " + item);
 			}
 		}catch(FatalException e){
 			LOG.error("FatalException caught when deleting an item");
-			sendFailureMail(e);
+			commonServices.sendFailureMail(e);
 		}
+		
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.debug("Creating the S3 client");
+		s3Client = cloudService.createAmazonClient(endpoint, bucket);
+		LOG.debug("S3 client created");
 		
 	}
 
