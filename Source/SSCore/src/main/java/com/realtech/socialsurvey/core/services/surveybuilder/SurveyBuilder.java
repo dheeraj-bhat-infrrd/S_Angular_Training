@@ -43,7 +43,7 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void deactivateSurveyForCompany(User user, Company company) throws InvalidInputException, NoRecordsFetchedException;
+	public void deactivateSurveyCompanyMapping(User user, Company company) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to update an existing survey by the Corporate Admin.

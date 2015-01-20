@@ -145,23 +145,4 @@ public class SurveyBuilderController {
 		}
 		return message;
 	}
-	
-	/**
-	 * Method to map survey to company
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/addsurveytocompany", method = RequestMethod.POST)
-	public String addSurveyToCompany(Model model, HttpServletRequest request) {
-		LOG.info("Method addSurveyToCompany of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
-		
-		String surveyId = request.getParameter("surveyId");
-		// surveyBuilder.addSurveyToCompany(survey, user.getCompany(), user);
-		
-		LOG.info("Method addSurveyToCompany of SurveyBuilderController finished successfully");
-		return null;
-	}
 }
