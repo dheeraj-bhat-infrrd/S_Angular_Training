@@ -325,8 +325,15 @@
         margin-top: 15px;
     }
     .input-error-2{
-        display: none !important;
+        display: none;
     }
+    .login-reg-err{
+        margin: 0;
+        line-height: 38px;
+        border-bottom: 1px solid #dcdcdc;
+        width: 100%;
+        padding-left: 50px;
+    }    
     .prof-map-wrapper{
         display: none;
     }
@@ -544,6 +551,111 @@
     .err-header-wrapper{
         height: 50px;
     }
+    .cp-container{
+		display: block;
+		margin-top: -2px;
+	}
+	.cp-item-row-txt{
+		background: url(../images/double-key.png) no-repeat;
+		background-position: 10px center;
+	}
+    .sb-container{
+        margin: 0;
+        padding: 0;
+    }
+    .sb-header{
+        font-size: 16px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        padding-left: 10px;
+    }
+    .sb-questions-wrapper{
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+    }
+    .sb-tab-header{
+        background-color: #fff;
+        padding: 0;
+        height: 45px;
+    }
+    .sb-tab-wrapper{
+        margin: 0;
+        float: none;
+        width: 100%;
+        padding: 0;
+    }
+    .sb-tab-item{
+        line-height: 44px;
+        float: left;
+        width: 50%;
+        padding: 0;
+        margin: 0;
+        text-align: center;
+        border: 0;
+    }
+    .sb-content{
+        padding: 0 0 10px 0;
+    }
+    .sb-con-txt{
+        padding-left: 10px;
+        margin: 10px 0 15px 0;
+    }
+    .sb-tem-select{
+        padding: 0;
+    }
+    .sb-sel-item{
+        float: none;
+        width: 145px;
+        margin: 10px auto 0;
+    }
+    .sb-dd-wrapper{
+        top: 30px;
+    }
+    .sb-txtarea-wrapper{
+        margin-bottom: 20px;
+        margin-top: 20px;
+        padding: 0 10px;
+    }
+    .sb-btn-wrapper{
+        width: 100%;
+        padding: 0 10px;
+    }
+    .btn-sb{
+        margin: 0;
+        width: 48%;
+    }
+    .btn-sb-add{
+        margin-right: 4%;
+    }
+    .sb-q-item-txt{
+        width: 78%;
+        line-height: 42px;
+    }
+    .sb-q-header-txt{
+        font-size: 14px;
+    }
+    .sb-q-header-icons-rem{
+        top: 8px;
+        font-size: 10px;
+        line-height: 28px;
+        width: 50px;
+    }
+    .view-all-lnk{
+        display: none;
+    }
+    .sb-q-item-btns{
+        width: 100%;
+        float: none;
+    }
+    .icn-address-mobile{
+        display: block;
+    }
+    .cp-err{
+        padding-left: 0;
+        line-height: 22px;
+        margin-top: 12px;
+    }
 }
 
 
@@ -558,7 +670,7 @@
     
     .error-wrapper{
         width: 365px;
-        margin: 0 auto 25px;
+        margin: 0 auto 10px;
     }
     .login-footer-wrapper{
         width: 457px;
@@ -584,6 +696,12 @@
         display: block !important;
     }
     .overlay-toast{
+        display: none;
+    }
+    .header-slider-wrapper{
+        display: none;
+    }
+    .icn-address-mobile, .hm-dd-pls-btn{
         display: none;
     }
 }
@@ -686,6 +804,19 @@
         text-overflow: ellipsis;
         white-space: nowrap;
     }
+    .cp-item-row-left{
+		width: 131px;
+		font-size: 12px;
+	}		
+	.cp-item-row-txt{
+		width: 190px;
+	}
+    .sb-q-item-txt {
+        width: 76%;
+    }
+    .cp-err{
+        padding-left: 141px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -726,6 +857,15 @@
     }
     .tweet-txt{
         width: 235px;
+    }
+    .cp-item-row-left{
+		width: 165px;
+	}
+    .sb-q-item-txt{
+        width: 81%;
+    }
+    .cp-err{
+        padding-left: 183px;
     }
 }
 

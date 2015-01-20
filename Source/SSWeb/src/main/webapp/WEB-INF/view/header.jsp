@@ -40,7 +40,7 @@
 			<div id="header-links-slider"
 				class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a href="#"><spring:message
+					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
 							code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 2}">
@@ -67,10 +67,10 @@
 
 	<div class="header-main-wrapper">
 		<div class="container clearfix header-container">
-			<div class="header-logo float-left"></div>
+			<div class="header-logo float-left" id="header-logo" style="cursor: pointer;"></div>
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
-					<a href="#"><spring:message
+					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
 							code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 2}">
@@ -108,7 +108,7 @@
 						<div class="initial-dd-item" id="account-setting">
 						<spring:message code="label.accountsetting.key"/>
 						</div>
-						<div class="initial-dd-item" id="change-password">
+						<div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
 						<spring:message code="label.changepassword.key"/>
 						</div>
 						<div class="initial-dd-item" id="logout-section">
