@@ -20,9 +20,9 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -39,14 +39,14 @@ public class PaymentController {
 	private Payment gateway;
 
 	@Autowired
-	private RegistrationService registrationService;
+	private UserManagementService userManagementService;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
 	@Autowired
 	private MessageUtils messageUtils;
-	
+
 	@Autowired
 	private SessionHelper sessionHelper;
 
@@ -90,6 +90,7 @@ public class PaymentController {
 			// Get the user object from the session and the company object from it
 			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			Company company = user.getCompany();
+			AccountType accountType = null;
 			
 			if(strAccountType == null || strAccountType.isEmpty()){
 				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
@@ -110,19 +111,18 @@ public class PaymentController {
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			catch (PaymentException e){
+			catch (PaymentException e) {
 				LOG.error("PaymentController subscribeForPlan() : Payment Exception thrown : " + e.getMessage(), e);
 				throw new PaymentException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 
 			}
 			if (status) {
 				LOG.info("Subscription Successful!");
-				AccountType accountType = null;
 				try {
 					LOG.debug("Calling sevices for adding account type of company");
 					accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
 					LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
-					
+
 					LOG.debug("Adding account type in session");
 					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
 					// get the settings
@@ -141,7 +141,7 @@ public class PaymentController {
 					 * profile completion stage is marked completed at the time of insert
 					 */
 					LOG.debug("Calling sevices for updating profile completion stage");
-					registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+					userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 							CommonConstants.DASHBOARD_STAGE);
 					LOG.debug("Successfully executed sevices for updating profile completion stage");
 				}

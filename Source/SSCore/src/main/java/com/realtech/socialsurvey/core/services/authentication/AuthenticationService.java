@@ -26,7 +26,7 @@ public interface AuthenticationService {
 	
 	public void changePassword(User user, String password) throws InvalidInputException;
 	
-	public User getUserWithEmailId(String emailId) throws InvalidInputException;
+	public User getUserWithLoginNameAndCompanyId(String loginName, long companyId) throws InvalidInputException;
 	
 	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException;
 

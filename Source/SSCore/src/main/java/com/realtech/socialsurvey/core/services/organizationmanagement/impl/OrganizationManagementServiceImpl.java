@@ -38,7 +38,8 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @Component
@@ -72,10 +73,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private UserManagementService userManagementService;
-
+	
 	@Autowired
-	private RegistrationService registrationService;
-
+	private SolrSearchService solrSearchService;
+	
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
 
@@ -88,16 +89,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
+	 * @throws SolrException 
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) {
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
-
+		
 		LOG.debug("Calling method for updating company for user profiles");
 		updateCompanyForUserProfile(user, company);
 
@@ -114,7 +116,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException {
+	public AccountType addAccountTypeForCompany(User user, String strAccountType) throws InvalidInputException, SolrException {
 		LOG.info("Method addAccountTypeForCompany started for user : " + user.getLoginName());
 		if (strAccountType == null || strAccountType.isEmpty()) {
 			throw new InvalidInputException("account type is null or empty while adding account type fro company");
@@ -144,6 +146,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			default:
 				throw new InvalidInputException("Account type is not valid");
 		}
+		user = userDao.findById(User.class, user.getUserId());
+		userManagementService.setProfilesOfUser(user);
+		solrSearchService.addUserToSolr(user);
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
@@ -216,7 +221,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		user = userDao.findById(User.class, user.getUserId());
-		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+//		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+		List<UserProfile> userProfiles = user.getUserProfiles();
 		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {
 				userProfile.setCompany(company);
@@ -267,7 +273,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method addIndividual started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -294,6 +300,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
 				String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileAgent);
+		/**
+		 * For an individual, only the company admin's profile completion stage is updated, all the
+		 * other profiles created by default need no action so their profile completion stage is
+		 * marked completed at the time of insert
+		 */
+		LOG.debug("Updating profile stage for company to payment stage");
+		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.info("Method addIndividual finished.");
 	}
@@ -308,7 +322,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -327,8 +341,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 
+		
 		LOG.debug("Updating profile stage to payment stage for account type team");
-		registrationService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.debug("Method addTeam finished.");
@@ -344,7 +359,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method addCompanyAccountType started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME);
+		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");

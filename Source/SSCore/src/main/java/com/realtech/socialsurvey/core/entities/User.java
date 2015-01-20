@@ -1,15 +1,23 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-
-import javax.persistence.*;
-
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 /**
  * The persistent class for the users database table.
- * 
  */
 @Entity
 @Table(name = "USERS")
@@ -28,17 +36,32 @@ public class User implements Serializable {
 	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name = "DISPLAY_NAME")
-	private String displayName;
+	@Column(name = "FIRST_NAME")
+	private String firstName;
+
+	@Column(name = "LAST_NAME")
+	private String lastName;
 
 	@Column(name = "EMAIL_ID")
 	private String emailId;
 
 	@Column(name = "IS_ATLEAST_ONE_USERPROFILE_COMPLETE")
 	private int isAtleastOneUserprofileComplete;
-	
+
 	@Column(name = "IS_OWNER")
 	private int isOwner;
+
+	@Transient
+	private boolean agent;
+
+	@Transient
+	private boolean branchAdmin;
+
+	@Transient
+	private boolean regionAdmin;
+
+	@Transient
+	private boolean companyAdmin;
 
 	public int getIsOwner() {
 		return isOwner;
@@ -79,8 +102,11 @@ public class User implements Serializable {
 	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	public User() {
-	}
+	// bi-directional many-to-one association to RemovedUser
+	@OneToMany(mappedBy = "user")
+	private List<RemovedUser> removedUsers;
+
+	public User() {}
 
 	public long getUserId() {
 		return this.userId;
@@ -106,12 +132,20 @@ public class User implements Serializable {
 		this.createdOn = createdOn;
 	}
 
-	public String getDisplayName() {
-		return this.displayName;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getEmailId() {
@@ -137,13 +171,12 @@ public class User implements Serializable {
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
-	
+
 	public int getIsAtleastOneUserprofileComplete() {
 		return isAtleastOneUserprofileComplete;
 	}
 
-	public void setIsAtleastOneUserprofileComplete(
-			int isAtleastOneUserprofileComplete) {
+	public void setIsAtleastOneUserprofileComplete(int isAtleastOneUserprofileComplete) {
 		this.isAtleastOneUserprofileComplete = isAtleastOneUserprofileComplete;
 	}
 
@@ -225,4 +258,57 @@ public class User implements Serializable {
 		this.company = company;
 	}
 
+	public boolean isAgent() {
+		return agent;
+	}
+
+	public void setAgent(boolean agent) {
+		this.agent = agent;
+	}
+
+	public boolean isBranchAdmin() {
+		return branchAdmin;
+	}
+
+	public void setBranchAdmin(boolean branchAdmin) {
+		this.branchAdmin = branchAdmin;
+	}
+
+	public boolean isRegionAdmin() {
+		return regionAdmin;
+	}
+
+	public void setRegionAdmin(boolean regionAdmin) {
+		this.regionAdmin = regionAdmin;
+	}
+
+	public boolean isCompanyAdmin() {
+		return companyAdmin;
+	}
+
+	public void setCompanyAdmin(boolean companyAdmin) {
+		this.companyAdmin = companyAdmin;
+	}
+
+	public List<RemovedUser> getRemovedUsers() {
+		return this.removedUsers;
+	}
+
+	public void setRemovedUsers(List<RemovedUser> removedUsers) {
+		this.removedUsers = removedUsers;
+	}
+
+	public RemovedUser addRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().add(removedUser);
+		removedUser.setUser(this);
+
+		return removedUser;
+	}
+
+	public RemovedUser removeRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().remove(removedUser);
+		removedUser.setUser(null);
+
+		return removedUser;
+	}
 }
