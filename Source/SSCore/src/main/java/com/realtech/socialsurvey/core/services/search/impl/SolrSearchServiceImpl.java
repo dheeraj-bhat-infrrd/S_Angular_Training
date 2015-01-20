@@ -46,13 +46,18 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	private SolrSearchUtils solrSearchUtils;
 
 	/**
-	 * Method to perform search of regions from solr based on the input pattern and user
+	 * Method to perform search of regions from solr based on the input pattern and company
 	 * 
+	 * @param regionPattern
+	 * @param company
+	 * @param start
+	 * @param rows
+	 * @return
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
 	@Override
-	public String searchRegions(String regionPattern, Company company) throws InvalidInputException, SolrException {
+	public String searchRegions(String regionPattern, Company company, int start, int rows) throws InvalidInputException, SolrException {
 		LOG.info("Method searchRegions called for regionPattern :" + regionPattern);
 		if (regionPattern == null || regionPattern.isEmpty()) {
 			throw new InvalidInputException("Region pattern is null or empty while searching for region");
@@ -71,6 +76,10 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setQuery(CommonConstants.REGION_NAME_SOLR + ":" + regionPattern);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_COLUMN + ":"
 					+ CommonConstants.STATUS_ACTIVE);
+			solrQuery.setStart(start);
+			if (rows > 0) {
+				solrQuery.setRows(rows);
+			}
 
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
@@ -91,11 +100,16 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	/**
 	 * Method to perform search of branches from solr based on the input pattern and company
 	 * 
+	 * @param branchPattern
+	 * @param company
+	 * @param start
+	 * @param rows
+	 * @return
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
 	@Override
-	public String searchBranches(String branchPattern, Company company) throws InvalidInputException, SolrException {
+	public String searchBranches(String branchPattern, Company company, int start, int rows) throws InvalidInputException, SolrException {
 		LOG.info("Method searchBranches called for branchPattern :" + branchPattern);
 		if (branchPattern == null || branchPattern.isEmpty()) {
 			throw new InvalidInputException("Branch pattern is null or empty while searching for branch");
@@ -115,6 +129,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			query.setQuery(CommonConstants.BRANCH_NAME_SOLR + ":" + branchPattern);
 			query.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_ACTIVE);
+			query.setStart(start);
+			
+			if (rows > 0) {
+				query.setRows(rows);
+			}
 
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(query);
