@@ -25,5 +25,7 @@ public final class EmailTemplateConstants {
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY = "SurveyParticipationMailBody.html";
 	public static final String EMAIL_SENDING_FAILURE_MAIL_BODY="EmailSendingFailureMailBody.html";
 	public static final String EMAIL_SENDING_FAILURE_MAIL_SUBJECT="EmailSendingFailureMailSubject.txt";
+	public static final String ACCOUNT_DISABLED_MAIL_SUBJECT="AccountDisabledMailSubject.txt";
+	public static final String ACCOUNT_DISABLED_MAIL_BODY="AccountDisabledMailBody.html";
 
 }

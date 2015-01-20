@@ -185,7 +185,7 @@
         display: block;
     }
     .hm-item-row-right-btn-save{
-        width: 235px;
+        width: 285px;
         margin: 10px auto !important;
         float: none;
     }
@@ -656,6 +656,17 @@
         line-height: 22px;
         margin-top: 12px;
     }
+    .sb-dd-wrapper-or{
+        width: 98%;
+    }
+    .sb-dd-item-or{
+        font-size: 12px;
+        padding: 0 0 0 27px;
+        background-size: 18px !important;
+    }
+    .sb-q-item-txt-or {
+        width: 79%;
+    }
 }
 
 
@@ -817,6 +828,9 @@
     .cp-err{
         padding-left: 141px;
     }
+    .sb-q-item-txt-or {
+        width: 91%;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -864,6 +878,9 @@
     .sb-q-item-txt{
         width: 81%;
     }
+    .sb-q-item-txt-or {
+        width: 93%;
+    }
     .cp-err{
         padding-left: 183px;
     }
@@ -873,6 +890,8 @@
 @media (min-width: 1200px) {
     
 }
+
+
 
 
 

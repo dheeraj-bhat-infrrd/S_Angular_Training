@@ -3,22 +3,20 @@ package com.realtech.socialsurvey.batch.writer;
 
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 
 /**
  * This is the custom item writer for the paymentRetries job.
@@ -35,33 +33,12 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
-	private EmailServices emailServices;
-
-	@Value("${ADMIN_EMAIL_ID}")
-	private String recipientMailId;
+	private BatchCommon commonServices;
+	
+	@Autowired
+	private CoreCommon coreCommonServices;
 
 	private static final Logger LOG = LoggerFactory.getLogger(PaymentRetriesItemWriter.class);
-
-	private void sendFailureMail(Exception e) {
-
-		LOG.debug("Sending failure mail to recpient : " + recipientMailId);
-		String stackTrace = ExceptionUtils.getFullStackTrace(e);
-		// replace all dollars in the stack trace with \$
-		stackTrace = stackTrace.replace("$", "\\$");
-
-		try {
-			emailServices.sendFatalExceptionEmail(recipientMailId, stackTrace);
-			LOG.debug("Failure mail sent to admin.");
-		}
-		catch (InvalidInputException e1) {
-			LOG.error("CustomItemProcessor : InvalidInputException caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-		}
-		catch (UndeliveredEmailException e1) {
-			LOG.error("CustomItemProcessor : UndeliveredEmailException caught when sending Fatal Exception mail. Message : " + e1.getMessage());
-
-		}
-
-	}
 
 	private void updateSettled(LicenseDetail licenseDetail, RetriedTransaction retriedTransaction) throws InvalidInputException {
 
@@ -76,6 +53,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we update the License Detail table and delete the record from the Retried Transactions table.
+		LOG.info("Updating the database for license detail object with id : " + licenseDetail.getLicenseId() + " and retried transaction object with id : " + retriedTransaction.getRetryId());
 		LOG.debug("Updating License Detail table.");
 		licenseDetailDao.update(licenseDetail);
 		LOG.debug("Delete record from Retried Transaction");
@@ -91,7 +69,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we just update the License Details table.
-		LOG.debug("Updating License Detail Table.");
+		LOG.debug("Updating License Detail object with id : " + licenseDetail.getLicenseId() );
 		licenseDetailDao.update(licenseDetail);
 
 		LOG.debug("Update Successful!");
@@ -110,6 +88,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we need to update both the License Details and the Retried Transactions table.
+		LOG.info("Updating the database for license detail object with id : " + licenseDetail.getLicenseId() + " and retried transaction object with id : " + retriedTransaction.getRetryId());
 		LOG.debug("Updating Retried Transaction table.");
 		retriedTransactionDao.saveOrUpdate(retriedTransaction);
 		LOG.debug("Updating License Detail table.");
@@ -130,6 +109,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 		}
 		
 		//For this case we update the License Details and the Company table.
+		LOG.info("Updating the database for license detail object with id : " + licenseDetail.getLicenseId() + " and company object with id : " + company.getCompanyId());
 		LOG.debug("Updating License Details table.");
 		licenseDetailDao.update(licenseDetail);
 		LOG.debug("Updating company table");
@@ -142,7 +122,7 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 	public void write(List<? extends Map<String, Object>> items) throws Exception {
 				
 		//Iterate through all the map objects check the case and call appropriate write methods.
-		LOG.info("Custom Writer called to write objects.");
+		LOG.info("Payment Retries Writer called to write objects.");
 		for (Map<String, Object> writerObjectMap : items) {
 
 			try {
@@ -206,14 +186,14 @@ public class PaymentRetriesItemWriter implements ItemWriter<Map<String, Object>>
 			}
 			catch (DatabaseException e) {
 				LOG.error("Database Exception caught : Message : " + e.getMessage());
-				sendFailureMail(e);
+				coreCommonServices.sendFailureMail(e);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught : Message : " + e.getMessage());
 			}
 
 		}
-
+		LOG.info("All objects written by Payment Retries Writer.");
 	}
 
 }

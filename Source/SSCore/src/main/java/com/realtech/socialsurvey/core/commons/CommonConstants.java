@@ -26,6 +26,7 @@ public interface CommonConstants {
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
+	
 
 	/**
 	 * Profile master constants
@@ -83,6 +84,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String BRANCH_ID_COLUMN = "branchId";
+	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -103,6 +105,7 @@ public interface CommonConstants {
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
+	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	
 	/**
 	 * Batch Constants
@@ -116,6 +119,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_OBJECT_KEY = "LicenseDetailObject";
 	public static final String RETRIED_TRANSACTION_OBJECT_KEY = "RetriedTransactionObject";
 	public static final String COMPANY_OBJECT_KEY = "CompanyObject";
+	public static final String DISABLED_ACCOUNT_OBJECT_KEY = "DisabledAccountObject";
 
 	/**
 	 * other constants
@@ -147,6 +151,7 @@ public interface CommonConstants {
 	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
 	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
 	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
+	public static final String HYPHEN = "-";
 	
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";

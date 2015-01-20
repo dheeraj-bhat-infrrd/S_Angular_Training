@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -23,6 +24,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
@@ -211,7 +213,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException {
+	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException, NoRecordsFetchedException {
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
 		}
@@ -300,7 +302,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles,
-			Map<Long, AgentSettings> agentSettings) throws InvalidInputException {
+			Map<Long, AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Getting branches settings for the user profile list");
 		Map<Long, OrganizationUnitSettings> branchesSettings = organizationManagementService.getBranchSettingsForUserProfiles(userProfiles);
 		// if agent settings is not null, the resolve the settings of branch associated with the
@@ -317,8 +319,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
 						}
 						if (!branchesSettings.containsKey(userProfile.getBranchId())) {
-							OrganizationUnitSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
-							branchesSettings.put(userProfile.getBranchId(), branchSetting);
+							BranchSettings branchSetting = organizationManagementService.getBranchSettings(userProfile.getBranchId());
+							branchesSettings.put(userProfile.getBranchId(), branchSetting.getOrganizationUnitSettings());
 						}
 					}
 				}
