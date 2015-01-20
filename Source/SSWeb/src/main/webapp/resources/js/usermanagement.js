@@ -1,17 +1,33 @@
 var UsersListStartIndex = 0;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
-var isUserManagementAuthorized=true;
+var isUserManagementAuthorized = true;
 var batchSize = 20;
 
+$(document).on('click', '.um-user-row', function() {
+	if (!isUserManagementAuthorized)
+		return false;
+	console.log("user row clicked");
+	var userId = this.id;
+	userId = userId.substr("um-user-".length);
+	paintUserDetailsForm(userId);
+});
+$(document).on('click', '.tm-table-remove-icn', function(event) {
+	if (!isUserManagementAuthorized)
+		return false;
+	event.stopPropagation();
+	var userId = $(this).closest('.um-user-row').attr("id");
+	userId = userId.substr("um-user-".length);
+	confirmDeleteUser(userId);
+});
 
-$(document).on('blur','#um-fname',function() {
+$(document).on('blur', '#um-fname', function() {
 	validateUserFirstName(this.id);
 });
-$(document).on('blur','#um-lname',function() {
+$(document).on('blur', '#um-lname', function() {
 	validateUserLastName(this.id);
 });
-$(document).on('blur','#um-emailid',function() {
+$(document).on('blur', '#um-emailid', function() {
 	validateUserEmailId(this.id);
 });
 
@@ -22,19 +38,19 @@ function initUserManagementPage() {
 }
 
 function selectBranch(element) {
-	var brach = $(element).html();
+	var branch = $(element).html();
 	var branchId = element.id.substr("branch-".length);
 	$(element).parent().children('.um-dd-wrapper').show();
 	$(element).parent().toggle();
-	$('#um-assignto').val(brach);
-	$('#um-assignto').attr("brachId", branchId);
+	$('#um-assignto').val(branch);
+	$('#um-assignto').attr("branchId", branchId);
 }
 
 $(document).on('click', '#um-assignto-con .icn-save', function() {
-	if(!isUserManagementAuthorized){
+	if (!isUserManagementAuthorized) {
 		return false;
 	}
-	var branchId = $('#um-assignto').attr("brachId");
+	var branchId = $('#um-assignto').attr("branchId");
 	var userId = $(this).closest('.row').attr("id");
 	if (!validateUserInviteDetails()) {
 		return false;
@@ -46,7 +62,7 @@ $(document).on('click', '#um-assignto-con .icn-save', function() {
 });
 
 $(document).on('click', '#um-emailid-con .icn-save', function() {
-	if(!isUserManagementAuthorized){
+	if (!isUserManagementAuthorized) {
 		return false;
 	}
 	if (!validateUserInviteDetails()) {
@@ -55,20 +71,16 @@ $(document).on('click', '#um-emailid-con .icn-save', function() {
 	inviteUser();
 });
 
-if (isUserManagementAuthorized) {
-	$(document).on('click','.um-user-row',function() {
-		console.log("user row clicked");
-		var userId = this.id;
-		userId = userId.substr("um-user-".length);
-		paintUserDetailsForm(userId);
-	});
-	$(document).on('click','.tm-table-remove-icn',function(event) {
-		event.stopPropagation();
-		var userId = $(this).closest('.um-user-row').attr("id");
-		userId = userId.substr("um-user-".length);
-		confirmDeleteUser(userId);
-	});
-}/*
+/*
+ * if (isUserManagementAuthorized) { $(document).on('click', '.um-user-row',
+ * function() { console.log("user row clicked"); var userId = this.id; userId =
+ * userId.substr("um-user-".length); paintUserDetailsForm(userId); });
+ * $(document).on('click', '.tm-table-remove-icn', function(event) {
+ * event.stopPropagation(); var userId =
+ * $(this).closest('.um-user-row').attr("id"); userId =
+ * userId.substr("um-user-".length); confirmDeleteUser(userId); }); }
+ */
+/*
  * Function to assign branch to a user
  */
 function assignUserToBranch(userId, branchId) {
@@ -89,7 +101,7 @@ function assignUserToBranch(userId, branchId) {
 				success = true;
 			}
 			if ($('#common-message-header').hasClass("error-message")) {
-				createPopupInfo("Error!",$('#message-header p').text());
+				createPopupInfo("Error!", $('#message-header p').text());
 			}
 		},
 		complete : function() {
@@ -136,13 +148,13 @@ function unassignUserFromBranch(userId, branchId) {
 						+ branchId);
 				$('#branch-to-unassign-' + branchId).remove();
 				// check if there are any assigned branches left
-				if ($('#um-assigned-brach-container > div').length <= 0) {
+				if ($('#um-assigned-branch-container > div').length <= 0) {
 					$('#um-assignto').parent().parent().find(
 							'.um-item-row-icon').removeClass('icn-tick')
 							.addClass('icn-save');
 				}
 			} else {
-				createPopupInfo("Error!","Branch deletion unsuccessful");
+				createPopupInfo("Error!", "Branch deletion unsuccessful");
 			}
 		},
 		error : function(e) {
@@ -177,14 +189,14 @@ function inviteUser() {
 			if (success) {
 				var userId = $('#mh-userId').val();
 				paintUserDetailsForm(userId);
-				UsersListStartIndex=0;
+				UsersListStartIndex = 0;
 				paintUserListInUserManagement();
 			} else {
 				var userId = $('#mh-existing-userId').val();
 				if (userId == undefined || userId == "") {
-					createPopupInfo("Limit Exceeded","Maximum limit of users exceeded.");
-				}
-				else{
+					createPopupInfo("Limit Exceeded",
+							"Maximum limit of users exceeded.");
+				} else {
 					paintUserDetailsForm(userId);
 					return;
 				}
@@ -199,26 +211,31 @@ function inviteUser() {
 	});
 }
 
-function createPopupInfo(header,body) {
+function createPopupInfo(header, body) {
 	$('#overlay-header').html(header);
 	$('#overlay-continue').attr("disabled", true);
 	$('#overlay-continue').addClass("btn-disabled");
 	$('#overlay-cancel').html('OK');
 	$('#overlay-text').html(body);
-   	$('#overlay-main').show();
+	$('#overlay-main').show();
+	$('#overlay-continue').removeClass("btn-disabled");
 }
 
 function confirmDeleteUser(userId) {
 	var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
-	if(userId == adminId){
-		createPopupInfo("Access Denied","Can not delete the admin account!");
+	if (userId == adminId) {
+		$('#overlay-continue').hide();
+		createPopupInfo("Access Denied", "Can not delete the admin account!");
 		return false;
 	}
 	$('#overlay-main').show();
+	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete User");
-	$('#overlay-text').html("Are you sure you want to delete user??<br>This action will remove all the user details.");
+	$('#overlay-text')
+			.html(
+					"Are you sure you want to delete user??<br>This action will remove all the user details.");
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
@@ -249,7 +266,7 @@ function deleteUser(userId) {
 				// paint blank user details form
 				$('#um-user-' + userId).remove();
 				paintUserDetailsForm("");
-				UsersListStartIndex=0;
+				UsersListStartIndex = 0;
 				paintUserListInUserManagement();
 			}
 		},
@@ -274,9 +291,9 @@ function paintUserDetailsForm(userId) {
 		success : function(data) {
 			$('#user-details-container').html(data);
 		},
-		complete:function(){
-			if(!isUserManagementAuthorized){
-				$('input').prop("disabled",true);
+		complete : function() {
+			if (!isUserManagementAuthorized) {
+				$('input').prop("disabled", true);
 			}
 		},
 		error : function(e) {
@@ -292,7 +309,8 @@ function paintUserDetailsForm(userId) {
 function paintUserListInUserManagement() {
 	var jsonData;
 	var payload = {
-		"startIndex" : 	UsersListStartIndex
+		"startIndex" : UsersListStartIndex,
+		"batchSize" : batchSize
 	};
 	var success = false;
 	$.ajax({
@@ -301,16 +319,17 @@ function paintUserListInUserManagement() {
 		data : payload,
 		dataType : "JSON",
 		success : function(data) {
-			if(data.errCode == undefined)
+			if (data.errCode == undefined)
 				success = true;
-		},complete:function(data){
-			if(success){
+		},
+		complete : function(data) {
+			if (success) {
 				var jsonData = data.responseJSON;
-				if(jsonData.length < batchSize){
-					doStopAjaxRequestForUsersList  = true;
+				if (jsonData.length < batchSize) {
+					doStopAjaxRequestForUsersList = true;
 					$('#um-view-more-users').hide();
 				}
-				if(jsonData.length == 0){
+				if (jsonData.length == 0) {
 					return false;
 				}
 				paintUsersList(jsonData);
@@ -542,7 +561,7 @@ $(document).on('click', '#overlay-cancel', function() {
 	$('#overlay-main').hide();
 });
 
-function searchUsersByNameEmailLoginId(searchKey){
+function searchUsersByNameEmailLoginId(searchKey) {
 	UsersListStartIndex = 0;
 	var payload = {
 		"searchKey" : searchKey
@@ -553,84 +572,157 @@ function searchUsersByNameEmailLoginId(searchKey){
 		type : "GET",
 		dataType : "JSON",
 		data : payload,
-		success : function(data){
-			if(data.errCode == undefined)
+		success : function(data) {
+			if (data.errCode == undefined)
 				success = true;
-		},complete:function(data){
-			if(success){
+		},
+		complete : function(data) {
+			if (success) {
 				paintUsersList(data.responseJSON);
 			}
 		},
-		error:function(){
-			
+		error : function() {
+
 		}
 	});
-	
+
 }
 
-function paintUsersList(data){
-	if(UsersListStartIndex == 0){
+function paintUsersList(data) {
+	if (UsersListStartIndex == 0) {
 		$('#um-user-list').find('tbody').html("");
 	}
 	UsersListStartIndex += data.length;
 	var searchResult = data;
-	if(searchResult != null){
+	if (searchResult != null) {
 		var len = searchResult.length;
-		if(len>0){
-			$.each(searchResult,function(i,user) {
-				var row = "";
-				row = $('<tr>').attr({
-					"id" : "um-user-"+user.userId,
-					"class" : "um-user-row"
-				});
-				var col1 = $('<td>').attr({
-					"class" : "col-username um-table-content"
-				}).html(user.firstName + " " + user.lastName);
-				var col2 = $('<td>').attr({
-					"class":"col-email um-table-content"
-				}).html(user.emailId);
-				var col3 = $('<td>').attr({
-					"class" : "col-loanoff um-table-content clearfix"
-				});
-				if(user.isAgent){
-					var colImage = $('<div>').attr({
-						"class" : "float-left tm-table-tick-icn icn-right-tick"
-					});
-					col3.append(colImage);
-				}
-				var col4 = $('<td>').attr({
-					"class":"col-status um-table-content clearfix"
-				});
-				if(user.status == 1){
-					var statusIcon = $('<div>').attr({
-						"class" : "tm-table-status-icn icn-green-col float-left"
-					});
-					col4.append(statusIcon);
-				}else if(user.status == 3){
-					var statusIcon = $('<div>').attr({
-						"class" : "tm-table-status-icn icn-green-brown float-left"
-					});
-					col4.append(statusIcon);
-				}
-				var col5 = $('<td>').attr({
-					"class" : "col-remove um-table-content clearfix"
-				});
-				var iconRemove = $('<div>').attr({
-					"class" : "tm-table-remove-icn icn-remove-user float-left cursor-pointer"
-				});
-				col5.append(iconRemove);
-				row.append(col1).append(col2).append(col3).append(col4).append(col5);
-				$('#um-user-list').find('tbody').append(row);
-			});
-		}else{
+		if (len > 0) {
+			$
+					.each(
+							searchResult,
+							function(i, user) {
+								var row = "";
+								row = $('<tr>').attr({
+									"id" : "um-user-" + user.userId,
+									"class" : "um-user-row"
+								});
+								var col1 = $('<td>').attr({
+									"class" : "col-username um-table-content"
+								}).html(user.firstName + " " + user.lastName);
+								var col2 = $('<td>').attr({
+									"class" : "col-email um-table-content"
+								}).html(user.emailId);
+								var col3 = $('<td>')
+										.attr(
+												{
+													"class" : "col-loanoff um-table-content clearfix"
+												});
+								if (user.isAgent) {
+									var colImage = $('<div>')
+											.attr(
+													{
+														"class" : "float-left tm-table-tick-icn icn-right-tick"
+													});
+									col3.append(colImage);
+								}
+								var col4 = $('<td>')
+										.attr(
+												{
+													"class" : "col-status um-table-content clearfix"
+												});
+								if (user.status == 1) {
+									var statusIcon = $('<div>')
+											.attr(
+													{
+														"class" : "tm-table-status-icn icn-green-col float-left"
+													});
+									col4.append(statusIcon);
+								} else if (user.status == 3) {
+									var statusIcon = $('<div>')
+											.attr(
+													{
+														"class" : "tm-table-status-icn icn-green-brown float-left"
+													});
+									col4.append(statusIcon);
+								}
+								var col5 = $('<td>')
+										.attr(
+												{
+													"class" : "col-remove um-table-content clearfix"
+												});
+								var iconRemove = $('<div>')
+										.attr(
+												{
+													"class" : "tm-table-remove-icn icn-remove-user float-left cursor-pointer"
+												});
+								col5.append(iconRemove);
+								row.append(col1).append(col2).append(col3)
+										.append(col4).append(col5);
+								$('#um-user-list').find('tbody').append(row);
+							});
+		} else {
 			$('#um-user-list').find('tbody').append("No results found");
 		}
 	}
-	//$('#um-user-list').find('tbody').html(data);
+	// $('#um-user-list').find('tbody').html(data);
 }
 
-function paginateUsersList(){
-	if(!doStopAjaxRequestForUsersList){
+function paginateUsersList() {
+	if (!doStopAjaxRequestForUsersList) {
 		paintUserListInUserManagement();
+	}
+}
+
+$(document).on('keyup', '#um-assignto', function() {
+	searchBranchesForUser(this.value);
+});
+
+/**
+ * Method to perform search on solr for provided branch pattern
+ * 
+ * @param branchPattern
+ */
+function searchBranchesForUser(branchPattern) {
+	var url = "./searchbranches.do?branchPattern=" + branchPattern;
+	$.ajax({
+		url : url,
+		type : "GET",
+		dataType : "JSON",
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				searchBranchesForUserCallBack(data.responseJSON);
+			}
+		},
+		error : function() {
+
+		}
+	});
+	// callAjaxGET(url, searchBranchesForUserCallBack, true);
+}
+
+function searchBranchesForUserCallBack(jsonData) {
+
+	var branchListContainer = $('<div>').attr({
+		"class" : "um-branch-list"
+	});
+	$('#um-assignto').parent().find('.um-branch-list').remove();
+	var searchResult = jsonData;
+	if (searchResult != null) {
+		var len = searchResult.length;
+		if (len > 0) {
+			$.each(searchResult, function(i, branch) {
+				var branchDiv = $('<div>').attr({
+					"id" : "branch-" + branch.branchId,
+					"class" : "um-dd-wrapper cursor-pointer",
+					"onclick" : "selectBranch(this);"
+				}).html(branch.branchName);
+				branchListContainer.append(branchDiv);
+			});
+		}
+		$('#um-assignto').parent().append(branchListContainer);
 	}
 }

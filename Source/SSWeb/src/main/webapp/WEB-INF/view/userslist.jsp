@@ -29,20 +29,6 @@
 	</c:forEach>
 </c:if>
 <script>
-	if (isUserManagementAuthorized) {
-		$('.um-user-row').click(function() {
-			console.log("user row clicked");
-			var userId = this.id;
-			userId = userId.substr("um-user-".length);
-			paintUserDetailsForm(userId);
-		});
-		$('.tm-table-remove-icn').click(function(event) {
-			event.stopPropagation();
-			var userId = $(this).closest('.um-user-row').attr("id");
-			userId = userId.substr("um-user-".length);
-			confirmDeleteUser(userId);
-		});
-	}
 	$(document).ready(function() {
 		var hasMoreUsers = $
 		{

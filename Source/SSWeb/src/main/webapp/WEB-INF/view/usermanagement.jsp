@@ -58,7 +58,7 @@
 				<div id="um-view-more-users" class="um-view-more" onclick="paginateUsersList();"><span>View more</span></div>
 			</div>
 			
-			<div id="branch-list" class="hide">
+			<%-- <div id="branch-list" class="hide">
 				<c:if test="${not empty branches }">
 					<div class="um-branch-list hide">
 					<c:forEach items="${branches }" var="branch">
@@ -66,7 +66,7 @@
 					</c:forEach>
 					</div>
 				</c:if>
-			</div>
+			</div> --%>
 			
 		</div>
 	</div>

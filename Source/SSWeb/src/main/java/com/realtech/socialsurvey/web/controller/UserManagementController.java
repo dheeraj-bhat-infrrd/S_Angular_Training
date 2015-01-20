@@ -67,8 +67,6 @@ public class UserManagementController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
-	private final int BATCH_SIZE = 20;
-
 	// JIRA SS-42 BY RM05 BOC
 	/*
 	 * Method to show the User Management Page to a user on clicking UserManagement link.
@@ -155,7 +153,7 @@ public class UserManagementController {
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
-						if (accountType.getValue() == 2) {
+						if (accountType.getValue() == CommonConstants.ACCOUNT_TYPE_TEAM) {
 							List<Branch> branchList = userManagementService.getBranchesForUser(admin);
 							Branch defaultBranch = branchList.get(CommonConstants.INITIAL_INDEX);
 							// assign new user to default branch in case of team account type
@@ -254,8 +252,10 @@ public class UserManagementController {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		HttpSession session = request.getSession(false);
 		String startIndexStr = request.getParameter("startIndex");
+		String batchSizeStr = request.getParameter("batchSize");
 		String users = "";
 		int startIndex = 0;
+		int batchSize = 0;
 		try {
 			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 			if (admin == null) {
@@ -266,15 +266,20 @@ public class UserManagementController {
 				LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
 				throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
 			}
+			if (batchSizeStr == null || batchSizeStr.isEmpty()) {
+				LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
+				throw new InvalidInputException("Invalid value found in batchSizeStr. It cannot be null or empty.");
+			}
 			try {
 				startIndex = Integer.parseInt(startIndexStr);
+				batchSize = Integer.parseInt(batchSizeStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
 				throw new NonFatalException("NumberFormatException while searching for user id", e);
 			}
 			try {
-				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, BATCH_SIZE);
+				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
