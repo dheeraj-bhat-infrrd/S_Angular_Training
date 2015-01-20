@@ -120,8 +120,9 @@ public interface UserManagementService {
 	 * @param accountType
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
 	 */
-	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException;
+	public UserSettings getCanonicalUserSettings(User user, AccountType accountType) throws InvalidInputException, NoRecordsFetchedException;
 	
 	/**
 	 * Gets user settings

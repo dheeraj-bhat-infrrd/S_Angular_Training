@@ -13,6 +13,9 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 
 /**
  * Handles the payment options for the application
@@ -49,9 +52,10 @@ public interface Payment {
 	 * @param planId
 	 * @param nonce
 	 * @return
+	 * @throws NoRecordsFetchedException 
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException;
+	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException;
 	
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
@@ -112,6 +116,29 @@ public interface Payment {
 	 * @return
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
+	 * @throws InvalidInputException 
 	 */
-	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException;
+	public Timestamp getDateForCompanyDeactivation(String subscriptionId) throws NoRecordsFetchedException, PaymentException, InvalidInputException;
+
+
+	/**
+	 * Unsubscribes the user from the payment gateway
+	 * @param subscriptionId
+	 * @throws SubscriptionCancellationUnsuccessfulException 
+	 * @throws InvalidInputException 
+	 */
+	public void unsubscribe(String subscriptionId) throws SubscriptionCancellationUnsuccessfulException, InvalidInputException;
+	
+	/**
+	 * Upgrades the plan for a particular subscription.
+	 * @param company
+	 * @param newAccountsMasterId
+	 * @throws InvalidInputException 
+	 * @throws NoRecordsFetchedException 
+	 * @throws SubscriptionPastDueException 
+	 * @throws PaymentException 
+	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 */
+	public void upgradePlanForSubscription(Company company,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
+
 }
