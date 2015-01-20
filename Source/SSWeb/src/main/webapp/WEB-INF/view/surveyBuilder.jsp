@@ -28,13 +28,14 @@
                 <div class="sb-con-txt">Choose Template</div>
                 <div class="clearfix sb-tem-select">
                     <div class="float-left clearfix sb-sel-item sb-sel-item-range pos-relative">
-                        <div class="float-left sb-sel-icn sb-range-sel-icn"></div>
-                        <div class="float-left sb-sel-txt">Range</div>
-                        <div class="float-left sb-sel-icn-dd"></div>
+                        <div class="float-left sb-sel-icn sb-sel-icn-inact sb-sel-icn-inact-range"></div>
+                        <div class="float-left sb-sel-icn sb-sel-icn-act sb-sel-icn-act-range hide"></div>
+                        <div class="float-left sb-sel-txt sb-sel-item-range-txt">Range</div>
+                        <div class="float-left sb-sel-icn-dd sb-sel-item-range-icn"></div>
                         <div class="sb-dd-wrapper blue-arrow-bot hide">
-                            <div class="sb-icn-smiles sb-dd-item">Smiles</div>
-                            <div class="sb-icn-star sb-dd-item">Star</div>
-                            <div class="sb-icn-scale sb-dd-item">Scale</div>
+                            <div class="sb-icn-smiles sb-ratings-sel-item sb-dd-item blue-text">Smiles</div>
+                            <div class="sb-icn-star sb-ratings-sel-item sb-dd-item">Star</div>
+                            <div class="sb-icn-scale sb-ratings-sel-item sb-dd-item">Scale</div>
                         </div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
@@ -82,18 +83,12 @@
                                 <div class="float-left sb-stars icn-full-star"></div>
                                 <div class="float-left sb-stars sb-icn-smiles hide"></div>
                                 <div class="float-left sb-stars sb-icn-scale hide"></div>
-<!--
-                                <div class="float-left sb-stars icn-full-star"></div>
-                                <div class="float-left sb-stars icn-full-star"></div>
-                                <div class="float-left sb-stars icn-half-star"></div>
-                                <div class="float-left sb-stars icn-no-star"></div>
--->
                             </div>
                             <div class="sb-ans-rat-wrapper">
-                                <div class="sb-dd-wrapper">
-                                    <div type="smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-ans">Smiles</div>
-                                    <div type="star" class="sb-icn-star sb-dd-item sb-dd-item-ans">Star</div>
-                                    <div type="scale" class="sb-icn-scale sb-dd-item sb-dd-item-ans">Scale</div>
+                                <div class="sb-dd-wrapper-or">
+                                    <div type="smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Smiles</div>
+                                    <div type="star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans">Star</div>
+                                    <div type="scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans">Scale</div>
                                 </div>
                             </div>
                         </div>
@@ -162,16 +157,29 @@
 <script>
     $(document).ready(function(){
         
-        $('.sb-sel-item-range').click(function(){
+        $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(){
             $('.sb-dd-wrapper').slideToggle(200);
         });
         
+        $('.sb-ratings-sel-item').click(function(){
+            $('.sb-ratings-sel-item').removeClass('blue-text');
+            $(this).addClass('blue-text');
+            $('.sb-sel-icn-act').hide();
+            $('.sb-sel-icn-inact').show();
+            $('.sb-sel-icn-inact-range').hide();
+            $('.sb-sel-icn-act-range').show();
+        });
+        
         $('.sb-sel-icn-inact').click(function(){
+            $('.sb-sel-icn-act').hide();
+            $('.sb-sel-icn-inact').show();
             $(this).hide();
             $(this).parent().find('.sb-sel-icn-act').show();
         });
         
         $('.sb-sel-icn-act').click(function(){
+            $('.sb-sel-icn-act').hide();
+            $('.sb-sel-icn-inact').show();
             $(this).hide();
             $(this).parent().find('.sb-sel-icn-inact').show();
         });
@@ -186,7 +194,7 @@
             $(this).parent().find('.sb-q-chk-no').show();
         });
         
-        var selectedRating = ""
+        var selectedRating = "";
         $('.sb-btn-edit').click(function(){
             $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html());
             
@@ -244,6 +252,8 @@
         
         $('body').on('click','.sb-dd-item-ans',function(){
             selectedRating = $(this).attr('type');
+            $('.sb-dd-item-ans').removeClass('blue-text');
+            $(this).addClass('blue-text');
         });
         
     });
