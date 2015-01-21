@@ -3,5 +3,6 @@
 	<cores adminPath="/admin/cores" hostPort="${jetty.port:8983}" hostContext="${hostContext:solr}">
 		<core default="true" instanceDir="ss-regions" name="ss-regions"/>
 		<core default="false" instanceDir="ss-branches" name="ss-branches"/>
+		<core default="false" instanceDir="ss-users" name="ss-users"/>
 	</cores>
 </solr>
