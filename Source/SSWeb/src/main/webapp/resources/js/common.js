@@ -110,3 +110,23 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
 function redirectErrorpage(){
 	window.location = "errorpage.do";
 }
+
+/**
+ * Generic method to use for post ajax request with payload data
+ * 
+ * @param url
+ * @param callBackFunction
+ * @param payload
+ */
+function callAjaxPostWithPayloadData(url, callBackFunction, payload){
+	console.log("payload is --"+payload);
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		success : callBackFunction,
+		error : function(e) {
+			redirectErrorpage();
+		}
+	});
+}
