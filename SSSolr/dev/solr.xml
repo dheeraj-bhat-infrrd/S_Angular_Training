@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<solr sharedLib="lib" persistent="true">
+	<cores adminPath="/admin/cores" hostPort="${jetty.port:8983}" hostContext="${hostContext:solr}">
+		<core default="true" instanceDir="ss-regions" name="ss-regions"/>
+		<core default="false" instanceDir="ss-branches" name="ss-branches"/>
+	</cores>
+</solr>
