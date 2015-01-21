@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,6 +16,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * The persistent class for the users database table.
@@ -22,7 +26,7 @@ import javax.persistence.Transient;
 @Entity
 @Table(name = "USERS")
 @NamedQuery(name = "User.findAll", query = "SELECT u FROM User u")
-public class User implements Serializable {
+public class User implements UserDetails, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
@@ -51,26 +55,6 @@ public class User implements Serializable {
 	@Column(name = "IS_OWNER")
 	private int isOwner;
 
-	@Transient
-	private boolean agent;
-
-	@Transient
-	private boolean branchAdmin;
-
-	@Transient
-	private boolean regionAdmin;
-
-	@Transient
-	private boolean companyAdmin;
-
-	public int getIsOwner() {
-		return isOwner;
-	}
-
-	public void setIsOwner(int isOwner) {
-		this.isOwner = isOwner;
-	}
-
 	@Column(name = "LAST_LOGIN")
 	private Timestamp lastLogin;
 
@@ -86,12 +70,24 @@ public class User implements Serializable {
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	private String source;
-
 	@Column(name = "SOURCE_USER_ID")
 	private int sourceUserId;
 
+	private String source;
+
 	private int status;
+
+	@Transient
+	private boolean agent;
+
+	@Transient
+	private boolean branchAdmin;
+
+	@Transient
+	private boolean regionAdmin;
+
+	@Transient
+	private boolean companyAdmin;
 
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -105,8 +101,6 @@ public class User implements Serializable {
 	// bi-directional many-to-one association to RemovedUser
 	@OneToMany(mappedBy = "user")
 	private List<RemovedUser> removedUsers;
-
-	public User() {}
 
 	public long getUserId() {
 		return this.userId;
@@ -154,6 +148,14 @@ public class User implements Serializable {
 
 	public void setEmailId(String emailId) {
 		this.emailId = emailId;
+	}
+
+	public int getIsOwner() {
+		return isOwner;
+	}
+
+	public void setIsOwner(int isOwner) {
+		this.isOwner = isOwner;
 	}
 
 	public Timestamp getLastLogin() {
@@ -310,5 +312,59 @@ public class User implements Serializable {
 		removedUser.setUser(null);
 
 		return removedUser;
+	}
+	
+	@Transient
+	private boolean accountNonExpired = true;
+	@Transient
+	private boolean accountNonLocked = true;
+	@Transient
+	private boolean credentialsNonExpired = true;
+	@Transient
+	private boolean enabled = true;
+	@Transient
+	private GrantedAuthority[] authorities;
+
+	public User() {
+		this.authorities = new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_USER") };
+	}
+
+	public void setAuthorities(GrantedAuthority[] authorities) {
+		this.authorities = authorities.clone();
+	}
+
+	public String getUsername() {
+		return emailId;
+	}
+
+	public boolean isAccountNonExpired() {
+		return accountNonExpired;
+	}
+
+	public boolean isAccountNonLocked() {
+		return accountNonLocked;
+	}
+
+	public boolean isCredentialsNonExpired() {
+		return credentialsNonExpired;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + userId + ", firstName=" + firstName + ", email=" + emailId + "]";
+	}
+
+	@Override
+	public String getPassword() {
+		return null;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return null;
 	}
 }
