@@ -254,7 +254,7 @@
         line-height: 50px;
     }
     .hm-sub-search-txt, .hm-sub-height-adjust{
-        height: 48px;
+        height: 30px;
     }
     .um-header {
         font-size: 16px;
@@ -665,7 +665,7 @@
         background-size: 18px !important;
     }
     .sb-q-item-txt-or {
-        width: 79%;
+        width: 78%;
     }
 }
 
