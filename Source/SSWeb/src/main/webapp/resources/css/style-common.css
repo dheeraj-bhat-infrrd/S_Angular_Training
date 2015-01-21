@@ -2301,3 +2301,19 @@ button.paypal.is-active {
 .sb-ul {
     margin-bottom: 25px;
 }
+
+.sb-mcq-ans-wrapper {
+    margin-top: -30px;
+}
+
+.sb-inparea:last-child {
+    margin-bottom: 0px;
+}
+.sb-inparea {
+    margin-bottom: 20px;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+}

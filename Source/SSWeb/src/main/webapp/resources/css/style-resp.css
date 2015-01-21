@@ -615,7 +615,19 @@
     .sb-txtarea-wrapper{
         margin-bottom: 20px;
         margin-top: 20px;
-        padding: 0 10px;
+        padding: 0;
+    }
+    .sb-txtarea, .sb-inparea{
+        border-right: 0;
+        border-left: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    .sb-mcq-ans-wrapper {
+        margin-top: -26px;
+    }
+    .sb-inparea{
+        margin-bottom: -1px;
     }
     .sb-btn-wrapper{
         width: 100%;
@@ -890,6 +902,7 @@
 @media (min-width: 1200px) {
     
 }
+
 
 
 
