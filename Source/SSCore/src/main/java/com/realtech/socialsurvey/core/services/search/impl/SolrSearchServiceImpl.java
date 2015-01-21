@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.search.impl;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,8 +61,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	@Override
 	public String searchRegions(String regionPattern, Company company) throws InvalidInputException, SolrException {
 		LOG.info("Method searchRegions called for regionPattern :" + regionPattern);
-		if (regionPattern == null || regionPattern.isEmpty()) {
-			throw new InvalidInputException("Region pattern is null or empty while searching for region");
+		if (regionPattern == null) {
+			throw new InvalidInputException("Region pattern is null while searching for region");
 		}
 		if (company == null) {
 			throw new InvalidInputException("company is null or empty while searching for region");
@@ -103,11 +104,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	@Override
 	public String searchBranches(String branchPattern, Company company) throws InvalidInputException, SolrException {
 		LOG.info("Method searchBranches called for branchPattern :" + branchPattern);
-		if (branchPattern == null || branchPattern.isEmpty()) {
-			throw new InvalidInputException("Branch pattern is null or empty while searching for branch");
+		if (branchPattern == null) {
+			throw new InvalidInputException("Branch pattern is null while searching for branch");
 		}
 		if (company == null) {
-			throw new InvalidInputException("Company is null or empty while searching for branch");
+			throw new InvalidInputException("Company is null while searching for branch");
 		}
 		LOG.info("Method searchBranches called for branchPattern : " + branchPattern + " and company : " + company);
 		String branchResult = null;
