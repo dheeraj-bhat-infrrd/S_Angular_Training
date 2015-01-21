@@ -87,7 +87,7 @@
 							            </div>
 							        </div>
 							    </div>
-							    <div class="hm-bottom-panel-content clearfix">
+							    <div class="hm-bottom-panel-content clearfix" id="hm-all-existing-comp-branches">
                     				<div id="existing-branches">
                     			
                						<!-- Existing branches get populated here from solr  -->
