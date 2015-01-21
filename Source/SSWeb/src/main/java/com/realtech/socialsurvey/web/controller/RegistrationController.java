@@ -182,7 +182,6 @@ public class RegistrationController {
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
-
 			boolean isDirectRegistration = false;
 			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
 				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
