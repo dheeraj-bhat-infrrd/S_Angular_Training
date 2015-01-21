@@ -4,11 +4,9 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +15,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -30,6 +27,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -48,6 +46,8 @@ public class LoginController {
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 	@Autowired
+	private UserManagementService userManagementService;
+	@Autowired
 	private SessionHelper sessionHelper;
 
 	@RequestMapping(value = "/login")
@@ -55,7 +55,7 @@ public class LoginController {
 		LOG.info("Login Page started");
 		return JspResolver.LOGIN;
 	}
-	
+
 	@RequestMapping(value = "/landing")
 	public String initLandingPage() {
 		LOG.info("Login Page started");
@@ -82,7 +82,6 @@ public class LoginController {
 		String loginName = request.getParameter("loginName");
 		String password = request.getParameter("password");
 		User user = null;
-		UserProfile userProfile = null;
 		String redirectTo = null;
 		AccountType accountType = null;
 
@@ -111,6 +110,7 @@ public class LoginController {
 				authenticationService.validateUser(user, password);
 				LOG.debug("Successfully executed authentication service to validate user while login");
 
+				// HttpSession session = request.getSession(false);
 				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
 
 				List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
@@ -143,24 +143,31 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					/**
-					 * redirect user to complete the top priority profile. Priority
-					 * Company->region->branch->agent
-					 */
-					LOG.debug("None of the user profiles are complete , Redirect to top priority profile first");
-
+					
+					/*UserProfile highestUserProfile = null;
+					UserProfile companyAdminProfile = null;
+					// fetch the highest user profile for user
 					try {
-						LOG.debug("Calling service for fetching company admin user profile");
-						userProfile = authenticationService.getCompanyAdminProfileForUser(user);
+						highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
+						companyAdminProfile = authenticationService.getCompanyAdminProfileForUser(user);
 					}
-					catch (InvalidInputException e) {
-						LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
-						throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_USER, e);
+					catch (NoRecordsFetchedException e) {
+						LOG.error("No user profiles found for the user");
+						return JspResolver.ERROR_PAGE;
+					}*/
+					//Compute all conditions for user and if user is CA then check for profile completion stage.
+					
+					if(user.isCompanyAdmin()){
+						UserProfile adminProfile=null;
+						for(UserProfile userProfile:user.getUserProfiles()){
+							if((userProfile.getCompany().getCompanyId()==user.getCompany().getCompanyId())&&(userProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
+								adminProfile = userProfile;
+						}
+						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
 					}
-
-					redirectTo = getRedirectionFromProfileCompletionStage(userProfile.getProfileCompletionStage());
-
-					if (userProfile.getProfileCompletionStage().equals(CommonConstants.DASHBOARD_STAGE)) {
+					else
+						redirectTo = JspResolver.LANDING;
+					if(redirectTo.equals(JspResolver.LANDING)){
 						// get the user's canonical settings
 						LOG.info("Fetching the user's canonical settings and setting it in session");
 						sessionHelper.getCanonicalSettings(session);
@@ -168,6 +175,8 @@ public class LoginController {
 						sessionHelper.setSettingVariablesInSession(session);
 					}
 
+				}else{
+					//TODO: add logic for what happens when no user profile present
 				}
 			}
 
@@ -239,7 +248,7 @@ public class LoginController {
 			}
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId, user.getDisplayName());
+				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName());
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
@@ -250,7 +259,7 @@ public class LoginController {
 
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getStackTrace(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.FORGOT_PASSWORD;
 		}
@@ -258,14 +267,32 @@ public class LoginController {
 		return JspResolver.FORGOT_PASSWORD;
 	}
 
+	// RM-06 : BOC
 	/**
 	 * Controller method to display the reset password page
 	 */
 	@RequestMapping(value = "/resetpassword")
-	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams) {
+	public String showResetPasswordPage(@RequestParam("q") String encryptedUrlParams, Model model) {
 		LOG.info("Forgot Password Page started with encrypter url : " + encryptedUrlParams);
+		try {
+			try {
+				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
+				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
+			}
+			catch (InvalidInputException e) {
+				LOG.error("Invalid Input exception in decrypting url parameters. Reason " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 		return JspResolver.RESET_PASSWORD;
 	}
+
+	// RM-06 : EOC
 
 	/**
 	 * Controller method to set a new password from the reset password link
@@ -303,11 +330,18 @@ public class LoginController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
-
+			long companyId = 0;
+			try {
+				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
+			}
+			catch (NumberFormatException | NullPointerException e) {
+				LOG.error("Invalid company id found in URL parameters. Reason " + e.getStackTrace(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 			// update user's password
 			try {
 				// fetch user object with email Id
-				user = authenticationService.getUserWithEmailId(emailId);
+				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
@@ -334,15 +368,16 @@ public class LoginController {
 
 		return JspResolver.LOGIN;
 	}
+
 	/**
 	 * method for logging out
 	 * 
-	 * @param 
+	 * @param
 	 * @param request
 	 * @param response
-	 * @return 
+	 * @return
 	 */
-	
+
 	@RequestMapping(value = "/logout")
 	public String initLogoutPage(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("logging out");
@@ -351,6 +386,7 @@ public class LoginController {
 				messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		return JspResolver.LOGIN;
 	}
+
 	/**
 	 * Verify the login Form Parameters
 	 * 
@@ -428,67 +464,45 @@ public class LoginController {
 		return redirectTo;
 	}
 
-	/*private void setSettingVariablesInSession(HttpSession session) {
-		LOG.info("Settings related session values being set.");
-		if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) {
-			// setting the logo name
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			// check if company has a logo
-			if (userSettings.getCompanySettings().getLogo() != null) {
-				LOG.debug("Settings logo image from company settings");
-				session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION, userSettings.getCompanySettings().getLogo());
-			}
-			else {
-				LOG.debug("Could not find logo settings in company. Checking in lower heirarchy.");
-				// TODO: Check the lower level hierarchy for logo
-			}
-			// check for the mail content
-			String body = null;
-			FileContentReplacements replacements = new FileContentReplacements();
-			replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY);
-			if (userSettings.getCompanySettings().getMail_content() == null) {
-				LOG.debug("Setting default survey participation mail body.");
-				// set the mail contents
-				try {
-					body = fileOperations.replaceFileContents(replacements);
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
-				}
-				catch (InvalidInputException e) {
-					LOG.warn("Could not set mail content for survey participation");
-				}
-			}
-			else {
-				LOG.debug("Company already has mail body settings. Hence, setting the same");
-				if (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings()
-							.getMail_content().getTake_survey_mail().getMail_body());
-				}
-				else {
-					try {
-						body = fileOperations.replaceFileContents(replacements);
-						session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
-					}
-					catch (InvalidInputException e) {
-						LOG.warn("Could not set mail content for survey participation");
-					}
-				}
-				if (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null) {
-					session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, userSettings.getCompanySettings()
-							.getMail_content().getTake_survey_reminder_mail().getMail_body());
-				}
-				else {
-					try {
-						body = fileOperations.replaceFileContents(replacements);
-						session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION, body);
-					}
-					catch (InvalidInputException e) {
-						LOG.warn("Could not set mail content for survey participation reminder");
-					}
-				}
-			}
-		}
-	}*/
+	/*
+	 * private void setSettingVariablesInSession(HttpSession session) {
+	 * LOG.info("Settings related session values being set."); if
+	 * (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) { //
+	 * setting the logo name UserSettings userSettings = (UserSettings)
+	 * session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION); // check if company
+	 * has a logo if (userSettings.getCompanySettings().getLogo() != null) {
+	 * LOG.debug("Settings logo image from company settings");
+	 * session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION,
+	 * userSettings.getCompanySettings().getLogo()); } else {
+	 * LOG.debug("Could not find logo settings in company. Checking in lower heirarchy."); // TODO:
+	 * Check the lower level hierarchy for logo } // check for the mail content String body = null;
+	 * FileContentReplacements replacements = new FileContentReplacements();
+	 * replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER +
+	 * EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY); if
+	 * (userSettings.getCompanySettings().getMail_content() == null) {
+	 * LOG.debug("Setting default survey participation mail body."); // set the mail contents try {
+	 * body = fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * body); } catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation"); } } else {
+	 * LOG.debug("Company already has mail body settings. Hence, setting the same"); if
+	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION,
+	 * userSettings.getCompanySettings() .getMail_content().getTake_survey_mail().getMail_body()); }
+	 * else { try { body = fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body); }
+	 * catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation"); } } if
+	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null)
+	 * { session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * userSettings.getCompanySettings()
+	 * .getMail_content().getTake_survey_reminder_mail().getMail_body()); } else { try { body =
+	 * fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * body); } catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation reminder"); } } } } }
+	 */
 
 }
 
