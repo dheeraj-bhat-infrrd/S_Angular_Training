@@ -642,7 +642,6 @@ public class OrganizationManagementController {
 	@ResponseBody
 	public String upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
-		HttpSession session = request.getSession(false);
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		String message = "";
 
