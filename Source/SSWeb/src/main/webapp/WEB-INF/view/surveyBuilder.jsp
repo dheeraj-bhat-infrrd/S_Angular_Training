@@ -163,7 +163,7 @@
                         <div class="float-left sb-q-item-txt sb-q-item-txt-or">
                             <div class="sb-q-txt-1" q-type="rating">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
                             <div class="sb-template-q-wrapper hide">
-                                <ul>
+                                <ul class="sb-ul">
                                     <li class="sb-q-template-item">
                                         <div class="sb-q-txt-1" q-type="objective">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
                                         <div class="sb-ans-mc-wrapper">
@@ -233,11 +233,13 @@
             $('.choose-survery-content').show();
         });
         
-        $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(){
+        $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(e){
+            e.stopPropagation();
             $('.sb-dd-wrapper').slideToggle(200);
         });
         
-        $('.sb-ratings-sel-item').click(function(){
+        $('.sb-ratings-sel-item').click(function(e){
+            e.stopPropagation();
             $('.sb-ratings-sel-item').removeClass('blue-text');
             $(this).addClass('blue-text');
             $('.sb-sel-icn-act').hide();
@@ -330,6 +332,12 @@
             selectedRating = $(this).attr('type');
             $('.sb-dd-item-ans').removeClass('blue-text');
             $(this).addClass('blue-text');
+        });
+        
+        $('body').click(function(){
+            if($('.sb-dd-wrapper').css('display') == "block"){
+                $('.sb-dd-wrapper').slideToggle(200);
+            }
         });
         
     });
