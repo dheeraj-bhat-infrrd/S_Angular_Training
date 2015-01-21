@@ -629,6 +629,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     outline: none;
     border: 0;
     height: 30px;
+    line-height: normal;
 }
 
 .hm-sub-header-left {
