@@ -2,7 +2,7 @@
  * js functions for hierarchy management
  */
 
-var numOfRows = 5;
+var numOfRows = 6;
 var branchesStartIndex = 0;
 var regionStartIndex = 0;
 
@@ -93,7 +93,13 @@ function viewMoreBranches(obj) {
 		branchPattern = "";
 	}
 	branchesStartIndex = branchesStartIndex + numOfRows;
-	searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	if($("#account-type").attr('account-type') == "company") {
+		searchBranchesForCompany("",branchesStartIndex,numOfRows);
+	}
+	else  {
+		searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	}
+	
 	$(obj).hide();
 }
 
@@ -187,7 +193,6 @@ function searchBranches(branchPattern,start,rows) {
  * @param data
  */
 function searchBranchesCallBack(data) {
-	console.log("search branches callback : "+data);
 	var searchResult =  $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
@@ -239,31 +244,33 @@ function searchBranchesForCompanyCallBack(data) {
 	var searchResult =  $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
-		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30">';
+		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30" id="hm-branches-left"></div>';
 		console.log("searchResult is "+searchResult);
+		var leftColHtml = "";
+		var rightColHtml = "";
 		if(len > 0) {
-			
 			if(len > numOfRows) {
 				searchResult.splice(len-1,1);
 			}
 			
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 == 0) {
-					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
-					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
+					leftColHtml = leftColHtml +'<div class="hm-sub-item clearfix">';
+					leftColHtml = leftColHtml +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					leftColHtml = leftColHtml +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			htmlData = htmlData + ' </div>';
-			htmlData = htmlData + ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30">';
+			
+			//htmlData = htmlData + ' </div>';
+			htmlData = htmlData + ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30" id="hm-branches-right"></div>';
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 != 0) {
-					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
-					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
+					rightColHtml = rightColHtml +'<div class="hm-sub-item clearfix">';
+					rightColHtml = rightColHtml +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					rightColHtml = rightColHtml +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			htmlData = htmlData + ' </div>';
+			//htmlData = htmlData + ' </div>';
 		}
 		else {
 			if(branchesStartIndex == 0) {
@@ -275,13 +282,17 @@ function searchBranchesForCompanyCallBack(data) {
 		}
 		if(branchesStartIndex == 0) {
 			$("#existing-branches").html(htmlData);
+			$("#hm-branches-left").html(leftColHtml);
+			$("#hm-branches-right").html(rightColHtml);
 		}
 		else {
 			$("#existing-branches").append(htmlData);
+			$("#hm-branches-left").append(leftColHtml);
+			$("#hm-branches-right").append(rightColHtml);
 		}
 		
 		if(len > numOfRows) {
-			$("#existing-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
+			$("#hm-all-existing-comp-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
 		}
 		
 		// bind the click event of branches with edit
