@@ -945,14 +945,27 @@ var delay = (function() {
 })();
 
 $('.dd-icn-plus').click(function(){
-	$(this).hide();
-	$('.dd-icn-minus').show();
-	$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	$(this).hide();	
+	if($("#account-type").attr('account-type') == "company") {
+		$(this).closest('.dd-icn-minus').show();
+		$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	}
+	else {
+		$('.dd-icn-minus').show();
+		$(this).parent().next('.hm-dd-main-content').slideToggle();
+	}	
+	
 });
 
 $('.dd-icn-minus').click(function(){
-	$(this).hide();
-	$('.dd-icn-plus').show();
-	$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	$(this).hide();	
+	if($("#account-type").attr('account-type') == "company") {
+		$(this).closest('.dd-icn-plus').show();
+		$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	}
+	else {
+		$('.dd-icn-plus').show();
+		$(this).parent().next('.hm-dd-main-content').slideToggle();
+	}
 });
 
