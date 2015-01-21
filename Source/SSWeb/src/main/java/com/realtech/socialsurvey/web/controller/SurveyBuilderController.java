@@ -32,6 +32,9 @@ public class SurveyBuilderController {
 	private SurveyBuilder surveyBuilder;
 
 	@Autowired
+	private SessionHelper sessionHelper;
+
+	@Autowired
 	private MessageUtils messageUtils;
 
 	/**
@@ -45,7 +48,7 @@ public class SurveyBuilderController {
 	public String showBuildSurveyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildSurveyPage started");
 		
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String highestRole = (Integer) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION) + "";
 		boolean isSurveyBuildingAllowed = false;
 		try {
@@ -101,7 +104,7 @@ public class SurveyBuilderController {
 	@ResponseBody
 	public String createNewSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method createNewSurvey of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		try {
 			surveyBuilder.createNewSurvey(user);
@@ -125,7 +128,7 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/addquestiontosurvey", method = RequestMethod.POST)
 	public String addQuestionToExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		
 		//TODO Get objects from UI
@@ -154,7 +157,7 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/removequestionfromsurvey", method = RequestMethod.POST)
 	public String removeQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		
 		try {
@@ -182,7 +185,7 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/deletesurveyforcompany", method = RequestMethod.POST)
 	public String deactivateSurveyCompanyMapping(Model model, HttpServletRequest request) {
 		LOG.info("Method deactivateSurveyCompanyMapping of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		
 		//TODO Get objects from UI
@@ -214,7 +217,7 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/getactivesurveydetails", method = RequestMethod.POST)
 	public String getActiveSurveyDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method getSurveyDetails of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String jspToReturn = "";
 		
 		List<SurveyQuestionDetails> surveyQuestionDetails;
@@ -243,7 +246,7 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/getsurveydetails", method = RequestMethod.POST)
 	public String getSurveyDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method getSurveyDetails of SurveyBuilderController called");
-		User user = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String jspToReturn = "";
 		
 		try {

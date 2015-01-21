@@ -3,11 +3,15 @@ $(document).ready(function(){
 	newQuestionEnableDisable();
 	
 	$('.sb-sel-icn-inact').click(function(){
-		$('.sb-sel-icn-act').hide();
-		$('.sb-sel-icn-inact').show();
-		$(this).hide();
-		$(this).parent().find('.sb-sel-icn-act').show();
-		
+		 $('.sb-sel-icn-act').hide();
+         $('.sb-sel-icn-inact').show();
+         $(this).hide();
+         $(this).parent().find('.sb-sel-icn-act').show();
+         if($(this).attr('type') == 'mcq'){
+             $('.sb-mcq-ans-wrapper').show();
+         }else{
+             $('.sb-mcq-ans-wrapper').hide();
+         }
 		newQuestionEnableDisable();
 	});
 	
@@ -16,7 +20,9 @@ $(document).ready(function(){
 		$('.sb-sel-icn-inact').show();
 		$(this).hide();
 		$(this).parent().find('.sb-sel-icn-inact').show();
-		
+		if($(this).attr('type') == 'mcq'){
+			$('.sb-mcq-ans-wrapper').hide();
+		}
 		newQuestionEnableDisable();
 	});
 
@@ -46,18 +52,20 @@ $(document).ready(function(){
 		$('.choose-survery-content').show();
 	});
 	
-	$('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(){
-		$('.sb-dd-wrapper').slideToggle(200);
-	});
+    $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(e){
+        e.stopPropagation();
+        $('.sb-dd-wrapper').slideToggle(200);
+    });
 	
-	$('.sb-ratings-sel-item').click(function(){
-		$('.sb-ratings-sel-item').removeClass('blue-text');
-		$(this).addClass('blue-text');
-		$('.sb-sel-icn-act').hide();
-		$('.sb-sel-icn-inact').show();
-		$('.sb-sel-icn-inact-range').hide();
-		$('.sb-sel-icn-act-range').show();
-	});
+    $('.sb-ratings-sel-item').click(function(e){
+        e.stopPropagation();
+        $('.sb-ratings-sel-item').removeClass('blue-text');
+        $(this).addClass('blue-text');
+        $('.sb-sel-icn-act').hide();
+        $('.sb-sel-icn-inact').show();
+        $('.sb-sel-icn-inact-range').hide();
+        $('.sb-sel-icn-act-range').show();
+    });
 	
 	$('.sb-q-chk-no').click(function(){
 		$(this).hide();
@@ -130,6 +138,12 @@ $(document).ready(function(){
 		$('.sb-dd-item-ans').removeClass('blue-text');
 		$(this).addClass('blue-text');
 	});
+	
+	 $('body').click(function(){
+         if($('.sb-dd-wrapper').css('display') == "block"){
+             $('.sb-dd-wrapper').slideToggle(200);
+         }
+     });
 });
 
 function newQuestionEnableDisable() {
