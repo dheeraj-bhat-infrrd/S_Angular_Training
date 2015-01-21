@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 public class SurveyBuilderImpl implements SurveyBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
+	private static final String CA_ROLE = "1";
 
 	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
@@ -60,16 +61,12 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		if (highestRole == null) {
 			throw new InvalidInputException("Account type is null in isSurveyBuildingAllowed");
 		}
-		boolean isSurveyBuildingAllowed = true;
-		// TODO Add proper logic upon merging user mgmt
-		/*switch (highestRole) {
-			case ENTERPRISE:
-				LOG.debug("Checking Survey Building for account type ENTERPRISE");
-				isSurveyBuildingAllowed = false;
-				break;
-			default:
-				throw new InvalidInputException("Account type is invalid in isSurveyBuildingAllowed");
-		}*/
+		boolean isSurveyBuildingAllowed = false;
+		
+		if (highestRole.equals(CA_ROLE)) {
+			LOG.debug("Checking Survey Building for user role CA_ROLE");
+			isSurveyBuildingAllowed = true;
+		}
 		LOG.info("Returning from isSurveyBuildingAllowed for user : " + user.getUserId() + " isSurveyBuildingAllowed is :" + isSurveyBuildingAllowed);
 		return isSurveyBuildingAllowed;
 	}

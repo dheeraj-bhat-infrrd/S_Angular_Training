@@ -1,18 +1,11 @@
-<jsp:include page="header.jsp"/>
-
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left">Build Your Customer Feedback</div>
-<!--
-            <a class="float-right hm-header-row-right hm-rt-btn-lnk" href="javascript:showMainContent('./showcompanysettings.do')">
-            	EDIT COMPANY
-            </a>
--->
         </div>
     </div>
 </div>
-
+<div id="overlay-toast" class="overlay-toast"></div>
 
 <div id="" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
     <div class="sb-container container">
@@ -25,11 +18,11 @@
                 </div>
             </div>
             <div class="sb-content new-survery-content">
-                <div class="sb-con-txt">Choose Template</div>
+                <div class="sb-con-txt">Choose Question Type</div>
                 <div class="clearfix sb-tem-select">
                     <div class="float-left clearfix sb-sel-item sb-sel-item-range pos-relative">
-                        <div class="float-left sb-sel-icn sb-sel-icn-inact sb-sel-icn-inact-range"></div>
-                        <div class="float-left sb-sel-icn sb-sel-icn-act sb-sel-icn-act-range hide"></div>
+                        <div id="sb-sel-range-off" class="float-left sb-sel-icn sb-sel-icn-inact sb-sel-icn-inact-range"></div>
+                        <div id="sb-sel-range-on" class="float-left sb-sel-icn sb-sel-icn-act sb-sel-icn-act-range hide"></div>
                         <div class="float-left sb-sel-txt sb-sel-item-range-txt">Range</div>
                         <div class="float-left sb-sel-icn-dd sb-sel-item-range-icn"></div>
                         <div class="sb-dd-wrapper blue-arrow-bot hide">
@@ -39,22 +32,22 @@
                         </div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div id="sb-sel-desc-off" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
+                        <div id="sb-sel-desc-on" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
                         <div class="float-left sb-sel-txt">Descriptive</div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div id="sb-sel-mult-off" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
+                        <div id="sb-sel-mult-on" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
                         <div class="float-left sb-sel-txt">Multiple Choice</div>
                     </div>
                 </div>
                 <div class="sb-txtarea-wrapper">
-                    <textarea class="sb-txtarea"></textarea>
+                    <textarea id="sb-question-txt" name="sb-question-txt" class="sb-txtarea"></textarea>
                 </div>
                 <div class="sb-btn-wrapper clearfix">
-                    <div class="btn-sb-add btn-sb">Add More</div>
-                    <div class="btn-sb-done btn-sb">Done</div>
+                    <div id="sb-question-add" class="btn-sb-add btn-sb">Add More</div>
+                    <div id="sb-question-done" class="btn-sb-done btn-sb">Done</div>
                 </div>
                  
                 <div class="sb-ques-wrapper">
@@ -202,137 +195,9 @@
     </div>
 </div>
 
-<jsp:include page="scripts.jsp"/>
-
+<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/surveyBuilder.js"></script>
 <script>
-    $(document).ready(function(){
-        
-        $('.sb-ct-exp').click(function(){
-            $(this).hide();
-            $('.sb-ct-close').show();
-            $(this).parent().prev('.sb-q-item-txt-or').find('.sb-template-q-wrapper').slideDown(350);
-        });
-        
-        $('.sb-ct-close').click(function(){
-            $(this).hide();
-            $('.sb-ct-exp').show();
-            $(this).parent().prev('.sb-q-item-txt-or').find('.sb-template-q-wrapper').slideUp(350);
-        });
-        
-        $('#btn-new-survey').click(function(){
-            $('.sb-tab-item').removeClass('sb-tab-active');
-            $(this).addClass('sb-tab-active');
-            $('.sb-content').hide();
-            $('.new-survery-content').show();
-        });
-        
-        $('#btn-choose-survey').click(function(){
-            $('.sb-tab-item').removeClass('sb-tab-active');
-            $(this).addClass('sb-tab-active');
-            $('.sb-content').hide();
-            $('.choose-survery-content').show();
-        });
-        
-        $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(){
-            $('.sb-dd-wrapper').slideToggle(200);
-        });
-        
-        $('.sb-ratings-sel-item').click(function(){
-            $('.sb-ratings-sel-item').removeClass('blue-text');
-            $(this).addClass('blue-text');
-            $('.sb-sel-icn-act').hide();
-            $('.sb-sel-icn-inact').show();
-            $('.sb-sel-icn-inact-range').hide();
-            $('.sb-sel-icn-act-range').show();
-        });
-        
-        $('.sb-sel-icn-inact').click(function(){
-            $('.sb-sel-icn-act').hide();
-            $('.sb-sel-icn-inact').show();
-            $(this).hide();
-            $(this).parent().find('.sb-sel-icn-act').show();
-        });
-        
-        $('.sb-sel-icn-act').click(function(){
-            $('.sb-sel-icn-act').hide();
-            $('.sb-sel-icn-inact').show();
-            $(this).hide();
-            $(this).parent().find('.sb-sel-icn-inact').show();
-        });
-
-        $('.sb-q-chk-no').click(function(){
-            $(this).hide();
-            $(this).parent().find('.sb-q-chk-yes').show();
-        });
-        
-        $('.sb-q-chk-yes').click(function(){
-            $(this).hide();
-            $(this).parent().find('.sb-q-chk-no').show();
-        });
-        
-        var selectedRating = "";
-        $('.sb-btn-edit').click(function(){
-            $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html());
-            
-            if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1').html());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2').html());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3').html());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4').html());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5-txt').val($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5').html());
-                $('.sb-ans-mc-item').hide();
-                $('.q-ans-obj-txt').show();
-            }else if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "rating"){
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-rat-wrapper').show();
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-2').hide();
-            }
-            
-            $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').hide();
-            $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').show();
-            $(this).next('.sb-btn-save').show();
-            $(this).hide();
-        });
-        
-        $('.sb-btn-save').click(function(){
-            $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val());
-            
-            if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-1-txt').val());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-2-txt').val());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-3-txt').val());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-4-txt').val());
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5').html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find('.q-ans-obj-5-txt').val());
-                $('.sb-ans-mc-item').show();
-                $('.q-ans-obj-txt').hide();
-            }else if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "rating"){
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-rat-wrapper').hide();
-                $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-2').show();
-            }
-            
-            if(selectedRating == "smiles"){
-                $('.sb-q-txt-2').find('.sb-stars').hide();
-                $('.sb-q-txt-2').find('.sb-icn-smiles').show();
-            }else if(selectedRating == "star"){
-                $('.sb-q-txt-2').find('.sb-stars').hide();
-                $('.sb-q-txt-2').find('.icn-full-star').show();
-            }else if(selectedRating == "scale"){
-                $('.sb-q-txt-2').find('.sb-stars').hide();
-                $('.sb-q-txt-2').find('.sb-icn-scale').show();
-            }
-            
-            $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').show();
-            $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').hide();
-            $(this).prev('.sb-btn-edit').show();
-            $(this).hide();
-        });
-        
-        $('body').on('click','.sb-dd-item-ans',function(){
-            selectedRating = $(this).attr('type');
-            $('.sb-dd-item-ans').removeClass('blue-text');
-            $(this).addClass('blue-text');
-        });
-        
-    });
+$(document).ready(function() {
+	$(document).attr("title", "Build Survey");
+});
 </script>
-
-<jsp:include page="footer.jsp"/>
