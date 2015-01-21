@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.services.upload;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 /**
