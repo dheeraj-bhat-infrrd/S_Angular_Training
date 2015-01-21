@@ -16,7 +16,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
-import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
@@ -415,7 +414,7 @@ public class HierarchyManagementController {
 			LOG.debug("Calling service to add a new region");
 			try {
 				hierarchyManagementService.addNewRegion(user, regionName, regionAddress1, regionAddress2);
-				
+
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
@@ -423,7 +422,7 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("InvalidInputException occured while adding new region.REason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
@@ -625,20 +624,48 @@ public class HierarchyManagementController {
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 		String searchRegionJson = null;
-		DisplayMessage message = null;
+		String strStart = request.getParameter("start");
+		String strRows = request.getParameter("rows");
+		int start = 0;
+		int rows = -1;
 		try {
 			if (regionPattern == null || regionPattern.isEmpty()) {
 				regionPattern = "*";
 			}
+			/**
+			 * if start index is present in request, parse and use it else use the default start
+			 * index
+			 */
+			if (strStart != null && !strStart.isEmpty()) {
+				try {
+					start = Integer.parseInt(strStart);
+				}
+				catch (NumberFormatException e) {
+					LOG.error("Number format exception while parsing start index value" + strStart + ".Reason :" + e.getMessage(), e);
+				}
+			}
+			/**
+			 * if number of rows is present in request, parse and use it else fetch default number
+			 * of rows
+			 */
+			if (strRows != null && !strRows.isEmpty()) {
+				try {
+					rows = Integer.parseInt(strRows);
+				}
+				catch (NumberFormatException e) {
+					LOG.error("Number format exception while parsing rows value" + strRows + ".Reason :" + e.getMessage(), e);
+				}
+			}
+
 			try {
 				LOG.debug("Calling solr search service to get the regions");
-				searchRegionJson = solrSearchService.searchRegions(regionPattern, user.getCompany());
+				searchRegionJson = solrSearchService.searchRegions(regionPattern, user.getCompany(), start, rows + 1);
 				LOG.debug("Calling solr search service to get the regions");
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while searching regions. Reason : " + e.getMessage(), e);
@@ -665,13 +692,41 @@ public class HierarchyManagementController {
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 		String searchBranchJson = null;
+		String strStart = request.getParameter("start");
+		String strRows = request.getParameter("rows");
+		int start = 0;
+		int rows = -1;
 		try {
 			if (branchPattern == null || branchPattern.isEmpty()) {
 				branchPattern = "*";
 			}
+			/**
+			 * if start index is present in request, parse and use it else use the default start
+			 * index
+			 */
+			if (strStart != null && !strStart.isEmpty()) {
+				try {
+					start = Integer.parseInt(strStart);
+				}
+				catch (NumberFormatException e) {
+					LOG.error("Number format exception while parsing start index value" + strStart + ".Reason :" + e.getMessage(), e);
+				}
+			}
+			/**
+			 * if number of rows is present in request, parse and use it else fetch default number
+			 * of rows
+			 */
+			if (strRows != null && !strRows.isEmpty()) {
+				try {
+					rows = Integer.parseInt(strRows);
+				}
+				catch (NumberFormatException e) {
+					LOG.error("Number format exception while parsing rows value" + strRows + ".Reason :" + e.getMessage(), e);
+				}
+			}
 			try {
 				LOG.debug("Calling solr search service to get the branches");
-				searchBranchJson = solrSearchService.searchBranches(branchPattern, user.getCompany());
+				searchBranchJson = solrSearchService.searchBranches(branchPattern, user.getCompany(), start, rows + 1);
 				LOG.debug("Calling solr search service to get the branches");
 			}
 			catch (InvalidInputException e) {
