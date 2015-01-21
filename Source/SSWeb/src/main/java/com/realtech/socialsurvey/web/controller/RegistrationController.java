@@ -17,13 +17,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -36,9 +38,11 @@ public class RegistrationController {
 	@Autowired
 	private CaptchaValidation captchaValidation;
 	@Autowired
-	private RegistrationService registrationService;
+	private UserManagementService userManagementService;
 	@Autowired
 	private MessageUtils messageUtils;
+	@Autowired
+	private SolrSearchService solrSearchService;
 	@Autowired
 	private SessionHelper sessionHelper;
 	
@@ -79,7 +83,7 @@ public class RegistrationController {
 			// continue with the invitation
 			try {
 				LOG.debug("Calling service for sending the registration invitation");
-				registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
+				userManagementService.inviteCorporateToRegister(firstName, lastName, emailId);
 				LOG.debug("Service for sending the registration invitation excecuted successfully");
 			}
 			catch (InvalidInputException e) {
@@ -119,7 +123,7 @@ public class RegistrationController {
 			LOG.debug("Calling registration service for validating registration url and extracting parameters from it");
 			Map<String, String> urlParams = null;
 			try {
-				urlParams = registrationService.validateRegistrationUrl(encryptedUrlParams);
+				urlParams = userManagementService.validateRegistrationUrl(encryptedUrlParams);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
@@ -133,6 +137,7 @@ public class RegistrationController {
 			model.addAttribute("isDirectRegistration", false);
 
 			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
@@ -177,6 +182,7 @@ public class RegistrationController {
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
+
 			boolean isDirectRegistration = false;
 			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
 				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
@@ -192,8 +198,15 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
+				
+				solrSearchService.addUserToSolr(user);
+				LOG.debug("Added newly added user {} to solr",user.getFirstName());
+				
+				LOG.debug("Adding newly registered user to principal session");
+				sessionHelper.loginOnRegistration(emailId, password);
+				LOG.debug("Successfully added registered user to principal session");
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
@@ -204,13 +217,13 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			sessionHelper.loginOnRegistration(emailId, password);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-
-			// Adding the attributes required in page after reloading
+			/**
+			 * Adding the attributes required in page after reloading
+			 */
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", originalEmailId);
@@ -218,6 +231,7 @@ public class RegistrationController {
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
+
 	}
 
 	/**
@@ -232,7 +246,7 @@ public class RegistrationController {
 	public String verifyAccount(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
 		LOG.info("Method to verify account called");
 		try {
-			registrationService.verifyAccount(encryptedUrlParams);
+			userManagementService.verifyAccount(encryptedUrlParams);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
@@ -242,7 +256,8 @@ public class RegistrationController {
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.LOGIN;
+
 	}
 
 	/**
@@ -299,6 +314,7 @@ public class RegistrationController {
 			throw new InvalidInputException("Email address is invalid in registration", DisplayMessageConstants.INVALID_EMAILID);
 		}
 		LOG.debug("Invitation form parameters validated successfully");
+
 	}
 
 	/**

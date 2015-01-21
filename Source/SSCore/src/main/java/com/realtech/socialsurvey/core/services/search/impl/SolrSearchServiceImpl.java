@@ -2,16 +2,18 @@ package com.realtech.socialsurvey.core.services.search.impl;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import org.apache.noggit.JSONUtil;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,8 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -30,7 +34,6 @@ import com.realtech.socialsurvey.core.utils.SolrSearchUtils;
 /**
  * Implementation class for solr search services
  */
-@SuppressWarnings("deprecation")
 @Component
 public class SolrSearchServiceImpl implements SolrSearchService {
 
@@ -41,6 +44,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 	@Value("${SOLR_BRANCH_URL}")
 	private String solrBranchUrl;
+
+	@Value("${SOLR_USER_URL}")
+	private String solrUserUrl;
 
 	@Autowired
 	private SolrSearchUtils solrSearchUtils;
@@ -141,7 +147,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 
 			// TODO change the solr instance and do not use deprecated class
-			solrServer = new CommonsHttpSolrServer(solrRegionUrl);
+			solrServer = new HttpSolrServer(solrRegionUrl);
 			SolrInputDocument document = getSolrDocumentFromRegion(region);
 			UpdateResponse response = solrServer.add(document);
 			LOG.debug("response is while adding/updating region is : " + response);
@@ -167,7 +173,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to add/update branch to solr called for branch : " + branch);
 		SolrServer solrServer;
 		try {
-			solrServer = new CommonsHttpSolrServer(solrBranchUrl);
+			solrServer = new HttpSolrServer(solrBranchUrl);
 			// TODO remove deprecated class
 			SolrInputDocument document = getSolrDocumentFromBranch(branch);
 
@@ -228,4 +234,195 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return document;
 	}
 
+	/**
+	 * Method to perform search of Users from solr based on the input pattern for user and company.
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 */
+	@Override
+	public String searchUsersByLoginNameAndCompany(String loginNamePattern, Company company) throws InvalidInputException, SolrException,
+			MalformedURLException {
+		LOG.info("Method searchUsers called for userNamePattern :" + loginNamePattern);
+		if (loginNamePattern == null || loginNamePattern.isEmpty()) {
+			throw new InvalidInputException("Username pattern is null or empty while searching for Users");
+		}
+		if (company == null) {
+			throw new InvalidInputException("company is null or empty while searching for users");
+		}
+		LOG.info("Method searchUsers() called for userNamePattern : " + loginNamePattern + " and company : " + company);
+		String usersResult = null;
+		QueryResponse response = null;
+		try {
+			loginNamePattern = loginNamePattern + "*";
+
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery("loginName:" + loginNamePattern);
+			solrQuery.addFilterQuery("companyId:" + company.getCompanyId(), "status:" + CommonConstants.STATUS_ACTIVE);
+
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			usersResult = JSONUtil.toJSON(results);
+			LOG.debug("User search result is : " + usersResult);
+
+		}
+		catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchUsers finished for username pattern :" + loginNamePattern + " returning : " + usersResult);
+		return usersResult;
+	}
+
+	/**
+	 * Method to perform search of Users from solr based on the input pattern for user and company.
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException
+	 */
+	@Override
+	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException
+			{
+		LOG.info("Method searchUsersByLoginNameOrName called for pattern :" + pattern);
+		if (pattern == null) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+		LOG.info("Method searchUsersByLoginNameOrName() called for parameter : " + pattern);
+		String usersResult = null;
+		QueryResponse response = null;
+		pattern = ClientUtils.escapeQueryChars(pattern);
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery("firstName:" + pattern + "* OR lastName:" + pattern + "* OR loginName:\"" + pattern
+					+"*\"");
+			solrQuery.addFilterQuery("companyId:" + companyId);
+			solrQuery.addFilterQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			usersResult = JSONUtil.toJSON(results);
+			LOG.debug("User search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + usersResult);
+		return usersResult;
+	}
+
+	/**
+	 * Method to perform search of Users from solr based on the input pattern for user and company.
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 */
+	@Override
+	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+			MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+		LOG.info("Method searchUsersByCompanyId() called for company id : " + companyId);
+		String usersResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery("companyId:" + companyId);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			usersResult = JSONUtil.toJSON(results);
+			LOG.debug("User search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
+		return usersResult;
+	}
+
+	/**
+	 * Method to add User into solr
+	 */
+	@Override
+	public void addUserToSolr(User user) throws SolrException {
+		LOG.info("Method to add user to solr called for user : " + user.getFirstName());
+		SolrServer solrServer;
+		UpdateResponse response = null;
+		try {
+			// TODO change the solr instance and do not use deprecated class
+			solrServer = new HttpSolrServer(solrUserUrl);
+			SolrInputDocument document = new SolrInputDocument();
+			document.addField(CommonConstants.USER_ID_SOLR, user.getUserId());
+
+			document.addField(CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
+			document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
+			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
+			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
+			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
+			if (user.getCompany() != null)
+				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
+			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
+			List<Long> branches = new ArrayList<>();
+			List<Long> regions = new ArrayList<>();
+			if (user.getUserProfiles() != null)
+				for (UserProfile userProfile : user.getUserProfiles()) {
+					if (userProfile.getRegionId() != 0)
+						regions.add(userProfile.getRegionId());
+					if (userProfile.getBranchId() != 0)
+						branches.add(userProfile.getBranchId());
+				}
+			document.addField("branches", branches);
+			document.addField("regions", regions);
+			document.addField("isAgent", user.isAgent());
+			LOG.debug("response while adding region is {}." + response);
+			solrServer.add(document);
+			solrServer.commit();
+		}
+		catch (MalformedURLException e) {
+			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method to add region to solr finshed for region : " + user);
+	}
+
+	/*
+	 * Method to remove a user from Solr
+	 */
+	@Override
+	public void removeUserFromSolr(long userIdToRemove) throws SolrException {
+		LOG.info("Method removeUserFromSolr() to remove user id {} from solr started.", userIdToRemove);
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			solrServer.deleteById(String.valueOf(userIdToRemove));
+			solrServer.commit();
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while removing user from solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while removing user from solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method removeUserFromSolr() to remove user id {} from solr finished successfully.", userIdToRemove);
+	}
 }
