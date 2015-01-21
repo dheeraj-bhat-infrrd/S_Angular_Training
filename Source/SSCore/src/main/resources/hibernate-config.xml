@@ -69,6 +69,7 @@
 				<value>com.realtech.socialsurvey.core.entities.User</value>
 				<value>com.realtech.socialsurvey.core.entities.UserInvite</value>
 				<value>com.realtech.socialsurvey.core.entities.UserProfile</value>
+				<value>com.realtech.socialsurvey.core.entities.RemovedUser</value>
 			</list>
 		</property>
 	</bean>

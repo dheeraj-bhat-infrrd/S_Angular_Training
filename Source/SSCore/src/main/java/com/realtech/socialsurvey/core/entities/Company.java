@@ -87,6 +87,10 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<DisabledAccount> disabledAccounts;
 
+	// bi-directional many-to-one association to RemovedUser
+	@OneToMany(mappedBy = "company")
+	private List<RemovedUser> removedUsers;
+
 	public Company() {}
 
 	public long getCompanyId() {
@@ -337,4 +341,25 @@ public class Company implements Serializable {
 		return userProfile;
 	}
 
+	public List<RemovedUser> getRemovedUsers() {
+		return this.removedUsers;
+	}
+
+	public void setRemovedUsers(List<RemovedUser> removedUsers) {
+		this.removedUsers = removedUsers;
+	}
+
+	public RemovedUser addRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().add(removedUser);
+		removedUser.setCompany(this);
+
+		return removedUser;
+	}
+
+	public RemovedUser removeRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().remove(removedUser);
+		removedUser.setCompany(null);
+
+		return removedUser;
+	}
 }
