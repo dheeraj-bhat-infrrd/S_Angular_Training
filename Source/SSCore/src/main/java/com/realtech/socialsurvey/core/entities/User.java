@@ -40,15 +40,18 @@ public class User implements UserDetails, Serializable {
 	@Column(name = "CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name = "DISPLAY_NAME")
-	private String displayName;
+	@Column(name = "FIRST_NAME")
+	private String firstName;
+
+	@Column(name = "LAST_NAME")
+	private String lastName;
 
 	@Column(name = "EMAIL_ID")
 	private String emailId;
 
 	@Column(name = "IS_ATLEAST_ONE_USERPROFILE_COMPLETE")
 	private int isAtleastOneUserprofileComplete;
-	
+
 	@Column(name = "IS_OWNER")
 	private int isOwner;
 
@@ -67,12 +70,39 @@ public class User implements UserDetails, Serializable {
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	private String source;
-
 	@Column(name = "SOURCE_USER_ID")
 	private int sourceUserId;
 
+	private String source;
+
 	private int status;
+
+	@Transient
+	private boolean agent;
+
+	@Transient
+	private boolean branchAdmin;
+
+	@Transient
+	private boolean regionAdmin;
+
+	@Transient
+	private boolean companyAdmin;
+
+	@Transient
+	private boolean accountNonExpired = true;
+	
+	@Transient
+	private boolean accountNonLocked = true;
+	
+	@Transient
+	private boolean credentialsNonExpired = true;
+	
+	@Transient
+	private boolean enabled = true;
+	
+	@Transient
+	private GrantedAuthority[] authorities;
 
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -82,6 +112,10 @@ public class User implements UserDetails, Serializable {
 	@ManyToOne
 	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
+
+	// bi-directional many-to-one association to RemovedUser
+	@OneToMany(mappedBy = "user")
+	private List<RemovedUser> removedUsers;
 
 	public long getUserId() {
 		return this.userId;
@@ -107,12 +141,20 @@ public class User implements UserDetails, Serializable {
 		this.createdOn = createdOn;
 	}
 
-	public String getDisplayName() {
-		return this.displayName;
+	public String getFirstName() {
+		return firstName;
 	}
 
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getEmailId() {
@@ -146,13 +188,12 @@ public class User implements UserDetails, Serializable {
 	public void setLoginName(String loginName) {
 		this.loginName = loginName;
 	}
-	
+
 	public int getIsAtleastOneUserprofileComplete() {
 		return isAtleastOneUserprofileComplete;
 	}
 
-	public void setIsAtleastOneUserprofileComplete(
-			int isAtleastOneUserprofileComplete) {
+	public void setIsAtleastOneUserprofileComplete(int isAtleastOneUserprofileComplete) {
 		this.isAtleastOneUserprofileComplete = isAtleastOneUserprofileComplete;
 	}
 
@@ -234,17 +275,6 @@ public class User implements UserDetails, Serializable {
 		this.company = company;
 	}
 
-	@Transient
-	private boolean accountNonExpired = true;
-	@Transient
-	private boolean accountNonLocked = true;
-	@Transient
-	private boolean credentialsNonExpired = true;
-	@Transient
-	private boolean enabled = true;
-	@Transient
-	private GrantedAuthority[] authorities;
-
 	public User() {
 		this.authorities = new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_USER") };
 	}
@@ -275,7 +305,7 @@ public class User implements UserDetails, Serializable {
 
 	@Override
 	public String toString() {
-		return "UserVO [id=" + userId + ", displayName=" + displayName + ", email=" + emailId + "]";
+		return "User [id=" + userId + ", firstName=" + firstName + ", email=" + emailId + "]";
 	}
 
 	@Override
