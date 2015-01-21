@@ -39,19 +39,27 @@
                         </div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div class="float-left sb-sel-icn sb-sel-icn-inact hide"></div>
+                        <div class="float-left sb-sel-icn sb-sel-icn-act"></div>
                         <div class="float-left sb-sel-txt">Descriptive</div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div type="mcq" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
+                        <div type="mcq" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
                         <div class="float-left sb-sel-txt">Multiple Choice</div>
                     </div>
                 </div>
                 <div class="sb-txtarea-wrapper">
-                    <textarea class="sb-txtarea"></textarea>
+                    <textarea class="sb-txtarea" placeholder="Enter Question"></textarea>
                 </div>
+                <div class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
+                    <input class="sb-inparea" placeholder="Enter option 1">
+                    <input class="sb-inparea" placeholder="Enter option 2">
+                    <input class="sb-inparea" placeholder="Enter option 3">
+                    <input class="sb-inparea" placeholder="Enter option 4">
+                    <input class="sb-inparea" placeholder="Enter option 5">
+                </div>
+                
                 <div class="sb-btn-wrapper clearfix">
                     <div class="btn-sb-add btn-sb">Add More</div>
                     <div class="btn-sb-done btn-sb">Done</div>
@@ -148,7 +156,7 @@
                 </div>
             </div>
             
-            <div class="sb-content choose-survery-content">
+            <div class="sb-content choose-survery-content hide">
                 <div class="sb-ques-wrapper">
                     <div class="sb-item-row sb-item-row-header clearfix">
                         <div class="float-left sb-q-item-no"></div>
@@ -163,7 +171,7 @@
                         <div class="float-left sb-q-item-txt sb-q-item-txt-or">
                             <div class="sb-q-txt-1" q-type="rating">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
                             <div class="sb-template-q-wrapper hide">
-                                <ul>
+                                <ul class="sb-ul">
                                     <li class="sb-q-template-item">
                                         <div class="sb-q-txt-1" q-type="objective">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
                                         <div class="sb-ans-mc-wrapper">
@@ -233,11 +241,13 @@
             $('.choose-survery-content').show();
         });
         
-        $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(){
+        $('.sb-sel-item-range-txt, .sb-sel-item-range-icn').click(function(e){
+            e.stopPropagation();
             $('.sb-dd-wrapper').slideToggle(200);
         });
         
-        $('.sb-ratings-sel-item').click(function(){
+        $('.sb-ratings-sel-item').click(function(e){
+            e.stopPropagation();
             $('.sb-ratings-sel-item').removeClass('blue-text');
             $(this).addClass('blue-text');
             $('.sb-sel-icn-act').hide();
@@ -251,13 +261,21 @@
             $('.sb-sel-icn-inact').show();
             $(this).hide();
             $(this).parent().find('.sb-sel-icn-act').show();
+            if($(this).attr('type') == 'mcq'){
+                $('.sb-mcq-ans-wrapper').show();
+            }else{
+                $('.sb-mcq-ans-wrapper').hide();
+            }
         });
         
         $('.sb-sel-icn-act').click(function(){
-            $('.sb-sel-icn-act').hide();
-            $('.sb-sel-icn-inact').show();
-            $(this).hide();
-            $(this).parent().find('.sb-sel-icn-inact').show();
+//            $('.sb-sel-icn-act').hide();
+//            $('.sb-sel-icn-inact').show();
+//            $(this).hide();
+//            $(this).parent().find('.sb-sel-icn-inact').show();
+//            if($(this).attr('type') == 'mcq'){
+//                $('.sb-mcq-ans-wrapper').hide();
+//            }
         });
 
         $('.sb-q-chk-no').click(function(){
@@ -330,6 +348,12 @@
             selectedRating = $(this).attr('type');
             $('.sb-dd-item-ans').removeClass('blue-text');
             $(this).addClass('blue-text');
+        });
+        
+        $('body').click(function(){
+            if($('.sb-dd-wrapper').css('display') == "block"){
+                $('.sb-dd-wrapper').slideToggle(200);
+            }
         });
         
     });
