@@ -66,7 +66,7 @@
 			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
 			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
-			                                <div id="" class="float-left icn-clear cursor-pointer margin-right-0"></div>
+			                                <div id="branch-clear-icon" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 			                            </div>
 			                        </div>
 			                    </div>
@@ -137,7 +137,8 @@
 			                                <div class="hm-item-row-right hm-item-row-right-btn-save">
 			                                    <div class="clearfix hm-btn-wrapper">
 			                                        <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addregionadmin.key"/></div>
-			                                        <div class="float-left icn-save cursor-pointer" id="region-save-icon"></div>
+			                                        <div class="float-left icn-save cursor-pointer margin-right-0" id="region-save-icon"></div>
+			                                        <div id="region-clear-icon" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 			                                    </div>
 			                                </div>
 			                            </div>
@@ -211,7 +212,8 @@
 		                                <div class="hm-item-row-right hm-item-row-right-btn-save">
 		                                    <div class="clearfix hm-btn-wrapper" id="branch-actions">
 		                                        <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
-		                                        <div class="float-left icn-save cursor-pointer" id="branch-save-icon"></div>
+		                                        <div class="float-left icn-save cursor-pointer margin-right-0" id="branch-save-icon"></div>
+		                                        <div id="branch-clear-icon" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 		                                    </div>
 		                                </div>
 		                            </div>
