@@ -89,21 +89,6 @@ public class User implements UserDetails, Serializable {
 	@Transient
 	private boolean companyAdmin;
 
-	@Transient
-	private boolean accountNonExpired = true;
-	
-	@Transient
-	private boolean accountNonLocked = true;
-	
-	@Transient
-	private boolean credentialsNonExpired = true;
-	
-	@Transient
-	private boolean enabled = true;
-	
-	@Transient
-	private GrantedAuthority[] authorities;
-
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
@@ -274,6 +259,71 @@ public class User implements UserDetails, Serializable {
 	public void setCompany(Company company) {
 		this.company = company;
 	}
+
+	public boolean isAgent() {
+		return agent;
+	}
+
+	public void setAgent(boolean agent) {
+		this.agent = agent;
+	}
+
+	public boolean isBranchAdmin() {
+		return branchAdmin;
+	}
+
+	public void setBranchAdmin(boolean branchAdmin) {
+		this.branchAdmin = branchAdmin;
+	}
+
+	public boolean isRegionAdmin() {
+		return regionAdmin;
+	}
+
+	public void setRegionAdmin(boolean regionAdmin) {
+		this.regionAdmin = regionAdmin;
+	}
+
+	public boolean isCompanyAdmin() {
+		return companyAdmin;
+	}
+
+	public void setCompanyAdmin(boolean companyAdmin) {
+		this.companyAdmin = companyAdmin;
+	}
+
+	public List<RemovedUser> getRemovedUsers() {
+		return this.removedUsers;
+	}
+
+	public void setRemovedUsers(List<RemovedUser> removedUsers) {
+		this.removedUsers = removedUsers;
+	}
+
+	public RemovedUser addRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().add(removedUser);
+		removedUser.setUser(this);
+
+		return removedUser;
+	}
+
+	public RemovedUser removeRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().remove(removedUser);
+		removedUser.setUser(null);
+
+		return removedUser;
+	}
+	
+	@Transient
+	private boolean accountNonExpired = true;
+	@Transient
+	private boolean accountNonLocked = true;
+	@Transient
+	private boolean credentialsNonExpired = true;
+	@Transient
+	private boolean enabled = true;
+	@Transient
+	private GrantedAuthority[] authorities;
 
 	public User() {
 		this.authorities = new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_USER") };
