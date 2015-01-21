@@ -627,7 +627,7 @@ public class HierarchyManagementController {
 		String strStart = request.getParameter("start");
 		String strRows = request.getParameter("rows");
 		int start = 0;
-		int rows = CommonConstants.DEFAULT_BRANCH_REGION_ROWS;
+		int rows = -1;
 		try {
 			if (regionPattern == null || regionPattern.isEmpty()) {
 				regionPattern = "*";
@@ -695,7 +695,7 @@ public class HierarchyManagementController {
 		String strStart = request.getParameter("start");
 		String strRows = request.getParameter("rows");
 		int start = 0;
-		int rows = CommonConstants.DEFAULT_BRANCH_REGION_ROWS;
+		int rows = -1;
 		try {
 			if (branchPattern == null || branchPattern.isEmpty()) {
 				branchPattern = "*";
