@@ -2,7 +2,7 @@
  * js functions for hierarchy management
  */
 
-var numOfRows = 5;
+var numOfRows = 6;
 var branchesStartIndex = 0;
 var regionStartIndex = 0;
 
@@ -93,7 +93,13 @@ function viewMoreBranches(obj) {
 		branchPattern = "";
 	}
 	branchesStartIndex = branchesStartIndex + numOfRows;
-	searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	if($("#account-type").attr('account-type') == "company") {
+		searchBranchesForCompany("",branchesStartIndex,numOfRows);
+	}
+	else  {
+		searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	}
+	
 	$(obj).hide();
 }
 
@@ -187,7 +193,6 @@ function searchBranches(branchPattern,start,rows) {
  * @param data
  */
 function searchBranchesCallBack(data) {
-	console.log("search branches callback : "+data);
 	var searchResult =  $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
@@ -281,7 +286,7 @@ function searchBranchesForCompanyCallBack(data) {
 		}
 		
 		if(len > numOfRows) {
-			$("#existing-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
+			$("#hm-all-existing-comp-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
 		}
 		
 		// bind the click event of branches with edit
