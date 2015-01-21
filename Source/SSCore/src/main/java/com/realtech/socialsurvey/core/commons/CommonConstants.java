@@ -66,6 +66,8 @@ public interface CommonConstants {
 	public static final int IS_NOT_OWNER = 0;
 	public static final int SUBSCRIPTION_DUE = 1;
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
+	public static final String IS_ASSIGN_ADMIN = "YES";
+	public static final String IS_UNASSIGN_ADMIN = "NO";
 
 
 	/**
@@ -137,7 +139,7 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
-	public static final int ACCOUNT_TYPE_TEAM = 2;
+	public static final long ACCOUNT_TYPE_TEAM = 2;
 
 	/**
 	 * Logo related config

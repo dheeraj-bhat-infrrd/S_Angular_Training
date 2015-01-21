@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -32,6 +34,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
@@ -67,6 +70,8 @@ public class UserManagementController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
+	private final static int SOLR_BATCH_SIZE = 20;
+
 	// JIRA SS-42 BY RM05 BOC
 	/*
 	 * Method to show the User Management Page to a user on clicking UserManagement link.
@@ -76,7 +81,6 @@ public class UserManagementController {
 		LOG.info("User Management page started");
 		HttpSession session = request.getSession(false);
 		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-		List<Branch> branches = null;
 		try {
 			if (user == null) {
 				LOG.error("No user found in session");
@@ -87,16 +91,6 @@ public class UserManagementController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
 			}
-			try {
-				branches = userManagementService.getBranchesForUser(user);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-			catch (NoRecordsFetchedException e) {
-				throw new NoRecordsFetchedException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-			model.addAttribute("branches", branches);
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);
@@ -109,7 +103,7 @@ public class UserManagementController {
 	 * Method to send invitation to a new user to join.
 	 */
 	@RequestMapping(value = "/invitenewuser", method = RequestMethod.POST)
-	public String inviteNewUser(Model model, HttpServletRequest request) {
+	public String inviteNewUser(Model model, HttpServletRequest request) throws NumberFormatException, JSONException {
 		LOG.info("Method to add a new user by existing admin called.");
 		HttpSession session = request.getSession(false);
 		User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
@@ -154,10 +148,12 @@ public class UserManagementController {
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == CommonConstants.ACCOUNT_TYPE_TEAM) {
-							List<Branch> branchList = userManagementService.getBranchesForUser(admin);
-							Branch defaultBranch = branchList.get(CommonConstants.INITIAL_INDEX);
+							String branches = solrSearchService.searchBranches("", admin.getCompany());
+							branches = branches.substring(1, branches.length() - 1);
+							JSONObject defaultBranch = new JSONObject(branches);
 							// assign new user to default branch in case of team account type
-							userManagementService.assignUserToBranch(admin, user.getUserId(), defaultBranch.getBranchId());
+							userManagementService.assignUserToBranch(admin, user.getUserId(),
+									Long.parseLong(defaultBranch.get(CommonConstants.BRANCH_ID_SOLR).toString()));
 						}
 					}
 				}
@@ -268,7 +264,7 @@ public class UserManagementController {
 			}
 			if (batchSizeStr == null || batchSizeStr.isEmpty()) {
 				LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
-				throw new InvalidInputException("Invalid value found in batchSizeStr. It cannot be null or empty.");
+				batchSize = SOLR_BATCH_SIZE;
 			}
 			try {
 				startIndex = Integer.parseInt(startIndexStr);
@@ -524,10 +520,10 @@ public class UserManagementController {
 			try {
 				branchId = Long.parseLong(branch);
 				userId = Long.parseLong(userToAssign);
-				if (isAssign.equalsIgnoreCase("YES"))
+				if (isAssign.equalsIgnoreCase(CommonConstants.IS_ASSIGN_ADMIN))
 					// Assigns the given user as branch admin
 					userManagementService.assignBranchAdmin(admin, branchId, userId);
-				else if (isAssign.equalsIgnoreCase("NO"))
+				else if (isAssign.equalsIgnoreCase(CommonConstants.IS_UNASSIGN_ADMIN))
 					// Unassigns the given user as branch admin
 					userManagementService.unassignBranchAdmin(admin, branchId, userId);
 			}
@@ -714,35 +710,6 @@ public class UserManagementController {
 	}
 
 	/**
-	 * Method to get list of all the branches, current user is admin of.
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	@RequestMapping(value = "/fetchBranches", method = RequestMethod.POST)
-	public String getBranchesForUser(Model model, HttpServletRequest request) {
-
-		User admin = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
-		try {
-			if (admin == null) {
-				LOG.error("No user found in session");
-				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
-			}
-			LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.", admin.getFirstName());
-			List<Branch> branches = userManagementService.getBranchesForUser(admin);
-			model.addAttribute("branches", branches);
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException in getBranchesForUser(). Reason : " + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finisheded.", admin.getFirstName());
-		return JspResolver.MESSAGE_HEADER;
-	}
-
-	/**
 	 * Method to show registration completion page to the user. User can update first name, last
 	 * name here. User must update the password for completion of registration.
 	 * 
@@ -893,16 +860,6 @@ public class UserManagementController {
 				LOG.debug("License details not found for the user's company");
 			}
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-
-//				UserProfile highestUserProfile = null;
-				// fetch the highest user profile for user
-//				try {
-//					highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
-//				}
-//				catch (NoRecordsFetchedException e) {
-//					LOG.error("No user profiles found for the user");
-//					return JspResolver.ERROR_PAGE;
-//				}
 
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
