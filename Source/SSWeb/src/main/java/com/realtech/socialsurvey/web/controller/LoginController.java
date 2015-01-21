@@ -75,7 +75,7 @@ public class LoginController {
 	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/userlogin", method = RequestMethod.POST)
+	@RequestMapping(value = "/userlogin", method = RequestMethod.GET)
 	public String login(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Login controller called for user login");
 		User user = null;
