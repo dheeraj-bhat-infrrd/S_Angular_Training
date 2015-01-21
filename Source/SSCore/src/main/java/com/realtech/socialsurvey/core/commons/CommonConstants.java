@@ -136,6 +136,7 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
+	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
 	public static final int ACCOUNT_TYPE_TEAM = 2;
 
 	/**
