@@ -32,19 +32,27 @@
                         </div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div id="sb-sel-desc-off" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div id="sb-sel-desc-on" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div id="sb-sel-desc-off" class="float-left sb-sel-icn sb-sel-icn-inact hide"></div>
+                        <div id="sb-sel-desc-on" class="float-left sb-sel-icn sb-sel-icn-act"></div>
                         <div class="float-left sb-sel-txt">Descriptive</div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div id="sb-sel-mult-off" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div id="sb-sel-mult-on" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div type="mcq" id="sb-sel-mult-off" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
+                        <div type="mcq" id="sb-sel-mult-on" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
                         <div class="float-left sb-sel-txt">Multiple Choice</div>
                     </div>
                 </div>
                 <div class="sb-txtarea-wrapper">
-                    <textarea id="sb-question-txt" name="sb-question-txt" class="sb-txtarea"></textarea>
+                    <textarea id="sb-question-txt" name="sb-question-txt" class="sb-txtarea" placeholder="Enter Question"></textarea>
                 </div>
+                <div class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
+                    <input class="sb-inparea" placeholder="Enter option 1">
+                    <input class="sb-inparea" placeholder="Enter option 2">
+                    <input class="sb-inparea" placeholder="Enter option 3">
+                    <input class="sb-inparea" placeholder="Enter option 4">
+                    <input class="sb-inparea" placeholder="Enter option 5">
+                </div>
+                
                 <div class="sb-btn-wrapper clearfix">
                     <div id="sb-question-add" class="btn-sb-add btn-sb">Add More</div>
                     <div id="sb-question-done" class="btn-sb-done btn-sb">Done</div>
@@ -141,7 +149,7 @@
                 </div>
             </div>
             
-            <div class="sb-content choose-survery-content">
+            <div class="sb-content choose-survery-content hide">
                 <div class="sb-ques-wrapper">
                     <div class="sb-item-row sb-item-row-header clearfix">
                         <div class="float-left sb-q-item-no"></div>
@@ -156,7 +164,7 @@
                         <div class="float-left sb-q-item-txt sb-q-item-txt-or">
                             <div class="sb-q-txt-1" q-type="rating">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
                             <div class="sb-template-q-wrapper hide">
-                                <ul>
+                                <ul class="sb-ul">
                                     <li class="sb-q-template-item">
                                         <div class="sb-q-txt-1" q-type="objective">Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun Lorem ipsum dore it ler aun </div>
                                         <div class="sb-ans-mc-wrapper">
