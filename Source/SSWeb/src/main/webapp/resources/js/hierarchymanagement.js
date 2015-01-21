@@ -2,7 +2,7 @@
  * js functions for hierarchy management
  */
 
-var numOfRows = 5;
+var numOfRows = 6;
 var branchesStartIndex = 0;
 var regionStartIndex = 0;
 
@@ -93,7 +93,13 @@ function viewMoreBranches(obj) {
 		branchPattern = "";
 	}
 	branchesStartIndex = branchesStartIndex + numOfRows;
-	searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	if($("#account-type").attr('account-type') == "company") {
+		searchBranchesForCompany("",branchesStartIndex,numOfRows);
+	}
+	else  {
+		searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	}
+	
 	$(obj).hide();
 }
 
@@ -187,7 +193,6 @@ function searchBranches(branchPattern,start,rows) {
  * @param data
  */
 function searchBranchesCallBack(data) {
-	console.log("search branches callback : "+data);
 	var searchResult =  $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
@@ -281,7 +286,7 @@ function searchBranchesForCompanyCallBack(data) {
 		}
 		
 		if(len > numOfRows) {
-			$("#existing-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
+			$("#hm-all-existing-comp-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
 		}
 		
 		// bind the click event of branches with edit
@@ -290,6 +295,15 @@ function searchBranchesForCompanyCallBack(data) {
 		});
 	}
 }
+
+function clearBranchForm() {
+	$("#add-branch-form :input").val("");
+	$("#add-branch-form .error-msg").hide();
+}
+
+$("#branch-clear-icon").click(function() {
+	clearBranchForm();
+});
 
 /**
  * function to display regions
@@ -495,6 +509,17 @@ function deleteBranchCheckCallBack(response, branchId) {
 	}
 }
 
+/**
+ * Method to clear out all input fields in region addition form
+ */
+function clearRegionForm() {
+	$("#add-region-form :input").val("");
+	$("#add-region-form .error-msg").hide();
+}
+
+$("#region-clear-icon").click(function() {
+	clearRegionForm();
+});
 
 // Pop-up Overlay modifications
 $('#overlay-cancel').click(function(){
@@ -550,26 +575,24 @@ $('#branch-address2-txt').blur(function() {
 	validateAddress2(this.id);
 });
 $('#selected-region-txt').blur(function(){
-	validateRegionSelector('selected-region-id-hidden');
+	validateRegionSelector('selected-region-id-hidden','selected-region-txt');
 });
 
-function validateRegionSelector(elementId) {
-	console.log("elementId" + $('#'+elementId).val()+ elementId);
+function validateRegionSelector(hiddenElementId,textElementId) {
 	if($(window).width()<768){
-		if ($('#'+elementId).val() == "") {
+		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
 			$('#overlay-toast').html('Please select a region');
 			showToast();
 			return false;
 		}
 		return true;
 	}else{
-		if ($('#'+elementId).val() == "") {
-			$('#'+elementId).next('.input-error-2').html('Please select a region');
-			$('#'+elementId).next('.input-error-2').show();
+		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
+			$('#'+hiddenElementId).next('.input-error-2').html('Please select a region');
+			$('#'+hiddenElementId).next('.input-error-2').show();
 			return false;
-		}
-		
-		$('#'+elementId).next('.input-error-2').hide();
+		}		
+		$('#'+hiddenElementId).next('.input-error-2').hide();
 		return true;
 	}
 }
@@ -585,6 +608,17 @@ function validateBranchInformation(elementId) {
 			isFocussed=true;
 		}
 	}
+	
+	if($('#selected-region-id-hidden').length > 0){
+		if(!validateRegionSelector('selected-region-id-hidden','selected-region-txt')){
+			isRegionValid = false;
+			if(!isFocussed){
+				$('#selected-region-txt').focus();
+				isFocussed=true;
+			}
+		}
+	} 
+	
 	if(!validateCompanyEnterpriseAddress1('branch-address1-txt')){
 		isBranchValid = false;
 		if(!isFocussed){
@@ -599,15 +633,6 @@ function validateBranchInformation(elementId) {
 			isFocussed=true;
 		}
 	}
-	if($('#selected-region-id-hidden').length > 0){
-		if(!validateRegionSelector('selected-region-id-hidden')){
-			isRegionValid = false;
-			if(!isFocussed){
-				$('#selected-region-txt').focus();
-				isFocussed=true;
-			}
-		}
-	} 
 	return isBranchValid;
 }
 
@@ -696,6 +721,7 @@ function populateRegionsSelectorCallBack(data) {
 			$('.hm-dd-item').click(function() {
 				$('#selected-region-txt').val($(this).html());
 				$('#selected-region-id-hidden').val($(this).data('regionid'));
+				$('#selected-region-id-hidden').next('.input-error-2').hide();
 				$('#hm-dd-wrapper-bottom').slideToggle(200);
 			});	
 			
@@ -803,7 +829,6 @@ $("#selected-region-txt").focus(function() {
 
 $("#selected-region-txt").keyup(function() {
 	console.log("key up");
-	//if (($("#hm-dd-wrapper-bottom").css("display") =="block") && $("#selected-region-id-hidden").length > 0)
 	var text = $("#selected-region-txt").val();
 	if (text.length > 1) {
 		delay(function() {
@@ -851,26 +876,11 @@ $("#selected-region-txt").keydown(function(e) {
 		}
 		$('#selected-region-txt').val($(selectedItem).html());
 		$('#selected-region-id-hidden').val($(selectedItem).data('regionid'));
-		$('#selected-region-txt').focusout();
+		$('#selected-region-id-hidden').next('.input-error-2').hide();
 		$('#hm-dd-wrapper-bottom').slideToggle(200);
 		
 	}
 });
-
-/*$("#search-region-txt").focus(function() {
-	var text = $("#search-region-txt").val();
-	regionStartIndex = 0;
-	if (text.length > 1) {
-		delay(function() {
-			searchRegions(text,regionStartIndex,numOfRows);
-		}, 500);
-	}
-	else {
-		delay(function() {
-			searchRegions("",regionStartIndex,numOfRows);
-		}, 500);
-	}
-});*/
 
 $("#search-region-txt").keyup(function() {
 	var text = $("#search-region-txt").val();
