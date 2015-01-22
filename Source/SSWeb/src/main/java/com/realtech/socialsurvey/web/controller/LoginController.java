@@ -35,6 +35,10 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class LoginController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LoginController.class);
+	private static final String STATUS_PARAM = "s";
+	private static final String AUTH_ERROR = "autherror";
+	private static final String SESSION_ERROR = "sessionerror";
+	private static final String LOGOUT = "logout";
 
 	@Autowired
 	private AuthenticationService authenticationService;
@@ -50,8 +54,23 @@ public class LoginController {
 	private SessionHelper sessionHelper;
 
 	@RequestMapping(value = "/login")
-	public String initLoginPage() {
-		LOG.info("Login Page started");
+	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		if (status != null) {
+			switch (status) {
+				case AUTH_ERROR:
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
+					break;
+				case SESSION_ERROR:
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
+					break;
+				case LOGOUT:
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					break;
+			}
+		}
 		return JspResolver.LOGIN;
 	}
 
