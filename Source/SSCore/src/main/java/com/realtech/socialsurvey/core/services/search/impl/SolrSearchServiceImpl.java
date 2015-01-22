@@ -11,7 +11,6 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
-import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.noggit.JSONUtil;
@@ -166,7 +165,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		SolrServer solrServer;
 		try {
 
-			// TODO change the solr instance and do not use deprecated class
 			solrServer = new HttpSolrServer(solrRegionUrl);
 			SolrInputDocument document = getSolrDocumentFromRegion(region);
 			UpdateResponse response = solrServer.add(document);
@@ -194,7 +192,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		SolrServer solrServer;
 		try {
 			solrServer = new HttpSolrServer(solrBranchUrl);
-			// TODO remove deprecated class
 			SolrInputDocument document = getSolrDocumentFromBranch(branch);
 
 			UpdateResponse response = solrServer.add(document);
@@ -279,8 +276,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("loginName:" + loginNamePattern);
-			solrQuery.addFilterQuery("companyId:" + company.getCompanyId(), "status:" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.setQuery(CommonConstants.USER_LOGIN_NAME_SOLR+":" + loginNamePattern);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR+":" + company.getCompanyId(), CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_ACTIVE);
 
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
@@ -316,14 +313,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByLoginNameOrName() called for parameter : " + pattern);
 		String usersResult = null;
 		QueryResponse response = null;
-		pattern = ClientUtils.escapeQueryChars(pattern);
+		pattern = pattern+"*";
 		try {
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("firstName:" + pattern + "* OR lastName:" + pattern + "* OR loginName:\"" + pattern
-					+"*\"");
+			solrQuery.setQuery("displayName:" + pattern + " OR "+CommonConstants.USER_FIRST_NAME_SOLR+":" + pattern + " OR "+CommonConstants.USER_LAST_NAME_SOLR+":" + pattern + " OR "+CommonConstants.USER_LOGIN_NAME_SOLR+":" + pattern);
 			solrQuery.addFilterQuery("companyId:" + companyId);
-			solrQuery.addFilterQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_ACTIVE + " OR "+CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "+CommonConstants.STATUS_SOLR+":"
 					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
@@ -359,9 +355,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("status:" + CommonConstants.STATUS_ACTIVE + " OR status:" + CommonConstants.STATUS_NOT_VERIFIED + " OR status:"
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_ACTIVE + " OR "+CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "+CommonConstants.STATUS_SOLR+":"
 					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
-			solrQuery.addFilterQuery("companyId:" + companyId);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR+":" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 			LOG.debug("Querying solr for searching users");
@@ -388,16 +384,15 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		SolrServer solrServer;
 		UpdateResponse response = null;
 		try {
-			// TODO change the solr instance and do not use deprecated class
 			solrServer = new HttpSolrServer(solrUserUrl);
 			SolrInputDocument document = new SolrInputDocument();
 			document.addField(CommonConstants.USER_ID_SOLR, user.getUserId());
-
 			document.addField(CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
 			document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
+			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName()+" "+user.getLastName());
 			if (user.getCompany() != null)
 				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
@@ -410,9 +405,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 					if (userProfile.getBranchId() != 0)
 						branches.add(userProfile.getBranchId());
 				}
-			document.addField("branches", branches);
-			document.addField("regions", regions);
-			document.addField("isAgent", user.isAgent());
+			document.addField(CommonConstants.BRANCHES_SOLR, branches);
+			document.addField(CommonConstants.REGIONS_SOLR, regions);
+			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
 			LOG.debug("response while adding region is {}." + response);
 			solrServer.add(document);
 			solrServer.commit();

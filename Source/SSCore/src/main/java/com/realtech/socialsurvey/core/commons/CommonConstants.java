@@ -190,8 +190,13 @@ public interface CommonConstants {
 	public static final String USER_ID_SOLR = "userId";
 	public static final String USER_FIRST_NAME_SOLR = "firstName";
 	public static final String USER_LAST_NAME_SOLR = "lastName";
+	public static final String USER_DISPLAY_NAME_SOLR = "displayName";
+	public static final String USER_LOGIN_NAME_SOLR = "loginName";
 	public static final String USER_EMAIL_ID_SOLR = "emailId";
 	public static final String USER_IS_OWNER_SOLR = "isOwner";
+	public static final String BRANCHES_SOLR = "branches";
+	public static final String REGIONS_SOLR = "regions";
+	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
 }
