@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -655,20 +656,29 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			int accountTypeValue = 0;
+			int newAccountsMasterId = 0;
 			try {
-				accountTypeValue = Integer.parseInt(accountType);
+				newAccountsMasterId = Integer.parseInt(accountType);
 			}
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			gateway.upgradePlanForSubscription(user.getCompany(), accountTypeValue);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			LOG.info("Making the API call to upgrade");
+			gateway.upgradePlanForSubscription(user.getCompany(), newAccountsMasterId);
 			LOG.info("Upgrade successful");
+
+			switch (newAccountsMasterId) {
+				case CommonConstants.ACCOUNTS_MASTER_TEAM: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
+				case CommonConstants.ACCOUNTS_MASTER_COMPANY: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_COMPANY_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
+				case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
+			}
+			LOG.info("Returning the dashboard page");
+			return JspResolver.USER_LOGIN;
 		}
-		catch (InvalidInputException | NoRecordsFetchedException | PaymentException e) {
+		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException e ) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
@@ -680,7 +690,7 @@ public class OrganizationManagementController {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-
+		
 		return message;
 
 	}

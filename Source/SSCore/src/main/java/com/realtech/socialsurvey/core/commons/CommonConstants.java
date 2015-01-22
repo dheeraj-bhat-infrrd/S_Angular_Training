@@ -3,6 +3,38 @@ package com.realtech.socialsurvey.core.commons;
 /**
  * Holds application level constants
  */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
+/**
+ * @author karthik
+ *
+ */
 public interface CommonConstants {
 
 	/**
@@ -36,6 +68,15 @@ public interface CommonConstants {
 	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
 	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
 	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
+	
+	/**
+	 *  Accounts master constants 
+	 */
+	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
+	public static final int ACCOUNTS_MASTER_TEAM = 2;
+	public static final int ACCOUNTS_MASTER_COMPANY = 3;
+	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
+
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
 	 */
