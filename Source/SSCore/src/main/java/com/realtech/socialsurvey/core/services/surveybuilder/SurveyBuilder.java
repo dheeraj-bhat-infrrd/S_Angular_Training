@@ -22,12 +22,20 @@ public interface SurveyBuilder {
 	public boolean isSurveyBuildingAllowed(User user, String highestRole) throws InvalidInputException;
 	
 	/**
+	 * Method to check and return for active Survey
+	 * 
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	public Survey checkForExistingSurvey(User user) throws InvalidInputException;
+	
+	/**
 	 * Method to create a new Survey into the survey table.
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void createNewSurvey(User user) throws InvalidInputException;
+	public Survey createNewSurvey(User user) throws InvalidInputException;
 
 	/**
 	 * Method to create a new survey company mapping into database.
@@ -45,6 +53,14 @@ public interface SurveyBuilder {
 	 */
 	public void deactivateSurveyCompanyMapping(User user, Survey survey, Company company) throws InvalidInputException, NoRecordsFetchedException;
 
+	/**
+	 * Method to get count of survey questions
+	 * 
+	 * @param survey
+	 * @throws InvalidInputException
+	 */
+	public int countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException;
+	
 	/**
 	 * Method to update an existing survey by the Corporate Admin.
 	 * 

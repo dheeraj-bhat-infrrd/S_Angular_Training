@@ -35,6 +35,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
 	private static final String CA_ROLE = "1";
+	private static final String MULTIPLE_CHOICE = "mult";
 
 	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
@@ -73,7 +74,31 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	
 	@Override
 	@Transactional
-	public void createNewSurvey(User user) throws InvalidInputException {
+	public Survey checkForExistingSurvey(User user) throws InvalidInputException {
+		LOG.info("Method checkForExistingSurvey() started.");
+		if (user == null) {
+			LOG.error("Invalid argument. Null value is passed for user.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for user.", DisplayMessageConstants.GENERAL_ERROR);
+		}
+
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		// Checking for existing survey
+		List<SurveyCompanyMapping> surveyCompanyMappingList = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries);
+		
+		LOG.info("Method checkForExistingSurvey() finished.");
+		if(!surveyCompanyMappingList.isEmpty()) {
+			SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappingList.get(CommonConstants.INITIAL_INDEX);
+			return surveyCompanyMapping.getSurvey();
+		}
+		return null;
+	}
+	
+	@Override
+	@Transactional
+	public Survey createNewSurvey(User user) throws InvalidInputException {
 		LOG.info("Method createNewSurvey() started.");
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
@@ -84,6 +109,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		Survey survey = addSurvey(user, "Survey Test");
 		mapSurveyToCompany(user, survey, user.getCompany());
 		LOG.info("Method createNewSurvey() finished.");
+		return survey;
 	}
 
 	@Override
@@ -124,6 +150,27 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
+	public int countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException {
+		LOG.info("Method countQuestionsInSurvey() started.");
+		if (survey == null) {
+			LOG.error("Invalid argument. Null value is passed for survey.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
+		}
+
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.SURVEY_COLUMN, survey);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		// Checking for existing survey
+		List<SurveyQuestionsMapping> surveyQuestionsMappingsList = surveyQuestionsMappingDao.findByKeyValue(SurveyQuestionsMapping.class, queries);
+
+		LOG.info("Method countQuestionsInSurvey() finished.");
+		return surveyQuestionsMappingsList.size();
+	}
+
+	
+	@Override
+	@Transactional
 	public void addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
 		LOG.info("Method addQuestionToExistingSurvey() started.");
 		if (user == null) {
@@ -138,7 +185,11 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("Invalid argument. Null value is passed for survey.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
 		}
-
+		if (surveyQuestionDetails.getQuestionType().indexOf(MULTIPLE_CHOICE) != -1 && surveyQuestionDetails.getAnswers().size() < 2) {
+			LOG.error("Invalid argument passed. Atleast two answers should be given.");
+			throw new InvalidInputException("Invalid argument passed. Atleast two answers should be given in method addNewQuestionsAndAnswers.");
+		}
+		
 		SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
 				surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
 		mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
@@ -177,13 +228,11 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("No company found for given survey.");
 			throw new InvalidInputException("No company found for given survey.");
 		}
-		List<Survey> surveys = surveyDao.findByColumn(Survey.class, CommonConstants.SURVEY_COMPANY_COLUMN, company);
-		if (surveys == null || surveys.isEmpty()) {
-			LOG.error("No survey found for given user.");
-			throw new InvalidInputException("No survey found for given user.");
-		}
 
-		Survey survey = surveys.get(0);
+		Survey survey = checkForExistingSurvey(user);
+		if(survey == null) {
+			survey = createNewSurvey(user);
+		}
 		return fetchSurveyQuestions(survey);
 	}
 
@@ -265,15 +314,16 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	 */
 	private SurveyQuestion addNewQuestionsAndAnswers(User user, Survey survey, String question, String questionType, List<SurveyAnswer> answers) {
 		LOG.debug("Method addNewQuestionsAndAnswers() started.");
-		String MULTIPLE_CHOICE = "multiplechoice";
 		SurveyQuestion surveyQuestion = null;
 
 		if (question != null && !questionType.equals("")) {
 			surveyQuestion = addNewQuestion(user, question, questionType);
 
-			// Save answers only if question type is Multiple Choice
-			if (questionType == MULTIPLE_CHOICE && answers != null && !answers.isEmpty()) {
-				addAnswersToQuestion(user, surveyQuestion, answers);
+			// Save answers only if question type is Multiple Choice & 
+			if (questionType.indexOf(MULTIPLE_CHOICE) != -1) {
+				if (answers != null && !answers.isEmpty() && answers.size() >= 2) {
+					addAnswersToQuestion(user, surveyQuestion, answers);
+				}
 			}
 		}
 		LOG.debug("Method addNewQuestionsAndAnswers() finished");
@@ -373,15 +423,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	}
 	
 	/**
-	 * Method to create new survey in database.
+	 * Method to fetch Survey Questions.
 	 */
 	private List<SurveyQuestionDetails> fetchSurveyQuestions(Survey survey) throws InvalidInputException {
-		Map<String, Object> criteriaQueries = new HashMap<>();
-		criteriaQueries.put(CommonConstants.SURVEY_COLUMN, survey);
-		criteriaQueries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao
-				.findByKeyValue(SurveyQuestionsMapping.class, criteriaQueries);
-
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.SURVEY_COLUMN, survey);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValue(SurveyQuestionsMapping.class, queries);
 		if (surveyQuestionsMappings == null || surveyQuestionsMappings.isEmpty()) {
 			LOG.error("No question mapped for the survey mapped to provided user.");
 			throw new InvalidInputException("No question mapped for the survey mapped to provided user.");
@@ -392,6 +441,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		List<SurveyAnswer> answerOptionsToQuestion = null;
 		SurveyAnswer surveyAnswer = null;
 
+		// For each question
 		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
 			surveyQuestionDetails = new SurveyQuestionDetails();
 
@@ -400,15 +450,18 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestionDetails.setQuestionOrder(surveyQuestionsMapping.getQuestionOrder());
 			surveyQuestionDetails.setIsRatingQuestion(surveyQuestionsMapping.getIsRatingQuestion());
 
-			answerOptionsToQuestion = new ArrayList<>();
-
-			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsMapping.getSurveyQuestion()
-					.getSurveyQuestionsAnswerOptions()) {
+			// For each answer
+			answerOptionsToQuestion = new ArrayList<SurveyAnswer>();
+			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestionsAnswerOptions()) {
 				surveyAnswer = new SurveyAnswer();
+				
 				surveyAnswer.setAnswerText(surveyQuestionsAnswerOption.getAnswer());
 				surveyAnswer.setAnswerOrder(surveyQuestionsAnswerOption.getAnswerOrder());
+				
 				answerOptionsToQuestion.add(surveyAnswer);
 			}
+			surveyQuestionDetails.setAnswers(answerOptionsToQuestion);
+			
 			surveyQuestionDetailsList.add(surveyQuestionDetails);
 		}
 		return surveyQuestionDetailsList;

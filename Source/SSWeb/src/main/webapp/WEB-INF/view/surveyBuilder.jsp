@@ -14,50 +14,52 @@
             <div class="sb-tab-header clearfix">
                 <div class="sb-tab-wrapper float-left clearfix">
                     <div id="btn-new-survey" class="sb-tab-item sb-tab-active">New Survey</div>
-                    <div id="btn-choose-survey" class="sb-tab-item">Choose Template</div>
+                    <div id="btn-choose-template" class="sb-tab-item">Choose Template</div>
                 </div>
             </div>
             <div class="sb-content new-survery-content">
                 <div class="sb-con-txt">Choose Question Type</div>
                 <div class="clearfix sb-tem-select">
                     <div class="float-left clearfix sb-sel-item sb-sel-item-range pos-relative">
-                        <div id="sb-sel-range-off" class="float-left sb-sel-icn sb-sel-icn-inact sb-sel-icn-inact-range"></div>
-                        <div id="sb-sel-range-on" class="float-left sb-sel-icn sb-sel-icn-act sb-sel-icn-act-range hide"></div>
+                        <div id="sb-range" class="float-left sb-sel-icn sb-sel-icn-inact sb-sel-icn-inact-range"></div>
+                        <div class="float-left sb-sel-icn sb-sel-icn-act sb-sel-icn-act-range hide"></div>
                         <div class="float-left sb-sel-txt sb-sel-item-range-txt">Range</div>
                         <div class="float-left sb-sel-icn-dd sb-sel-item-range-icn"></div>
                         <div class="sb-dd-wrapper blue-arrow-bot hide">
-                            <div class="sb-icn-smiles sb-ratings-sel-item sb-dd-item blue-text">Smiles</div>
-                            <div class="sb-icn-star sb-ratings-sel-item sb-dd-item">Star</div>
-                            <div class="sb-icn-scale sb-ratings-sel-item sb-dd-item">Scale</div>
+                            <div id="sb-range-smiles" class="sb-icn-smiles sb-ratings-sel-item sb-dd-item blue-text">Smiles</div>
+                            <div id="sb-range-star" class="sb-icn-star sb-ratings-sel-item sb-dd-item">Star</div>
+                            <div id="sb-range-scale" class="sb-icn-scale sb-ratings-sel-item sb-dd-item">Scale</div>
                         </div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div id="sb-sel-desc-off" class="float-left sb-sel-icn sb-sel-icn-inact hide"></div>
-                        <div id="sb-sel-desc-on" class="float-left sb-sel-icn sb-sel-icn-act"></div>
+                        <div id="sb-sel-desc" class="float-left sb-sel-icn sb-sel-icn-inact hide"></div>
+                        <div class="float-left sb-sel-icn sb-sel-icn-act"></div>
                         <div class="float-left sb-sel-txt">Descriptive</div>
                     </div>
                     <div class="float-left clearfix sb-sel-item">
-                        <div type="mcq" id="sb-sel-mult-off" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
-                        <div type="mcq" id="sb-sel-mult-on" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
+                        <div type="mcq" id="sb-sel-mult" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
+                        <div type="mcq" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
                         <div class="float-left sb-sel-txt">Multiple Choice</div>
                     </div>
                 </div>
-                <div class="sb-txtarea-wrapper">
-                    <textarea id="sb-question-txt" name="sb-question-txt" class="sb-txtarea" placeholder="Enter Question"></textarea>
-                </div>
-                <div class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
-                    <input class="sb-inparea" placeholder="Enter option 1">
-                    <input class="sb-inparea" placeholder="Enter option 2">
-                    <input class="sb-inparea" placeholder="Enter option 3">
-                    <input class="sb-inparea" placeholder="Enter option 4">
-                    <input class="sb-inparea" placeholder="Enter option 5">
-                </div>
-                
-                <div class="sb-btn-wrapper clearfix">
-                    <div id="sb-question-add" class="btn-sb-add btn-sb">Add More</div>
-                    <div id="sb-question-done" class="btn-sb-done btn-sb">Done</div>
-                </div>
-                 
+				<form id="sb-new-question-form">
+	                <div class="sb-txtarea-wrapper">
+						<input type="hidden" id="sb-question-type" name="sb-question-type" value="sb-sel-desc"/>
+						<textarea id="sb-question-txt" name="sb-question-txt" class="sb-txtarea" placeholder="Enter Question"></textarea>
+                	</div>
+                	<div class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
+						<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option 1">
+						<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option 2">
+						<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option 3">
+						<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option 4">
+						<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option 5">
+                	</div>
+                	<div class="sb-btn-wrapper clearfix">
+                    	<div id="sb-question-add" class="btn-sb-add btn-sb">Add More</div>
+                    	<div id="sb-question-done" class="btn-sb-done btn-sb">Done</div>
+                	</div>
+				</form>
+				
                 <div class="sb-ques-wrapper">
                     <div class="sb-item-row sb-item-row-header clearfix">
                         <div class="float-left sb-q-item-no"></div>
