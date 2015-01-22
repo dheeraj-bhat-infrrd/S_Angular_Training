@@ -244,31 +244,33 @@ function searchBranchesForCompanyCallBack(data) {
 	var searchResult =  $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
-		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30">';
+		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30" id="hm-branches-left"></div>';
 		console.log("searchResult is "+searchResult);
+		var leftColHtml = "";
+		var rightColHtml = "";
 		if(len > 0) {
-			
 			if(len > numOfRows) {
 				searchResult.splice(len-1,1);
 			}
 			
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 == 0) {
-					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
-					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
+					leftColHtml = leftColHtml +'<div class="hm-sub-item clearfix">';
+					leftColHtml = leftColHtml +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					leftColHtml = leftColHtml +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			htmlData = htmlData + ' </div>';
-			htmlData = htmlData + ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30">';
+			
+			//htmlData = htmlData + ' </div>';
+			htmlData = htmlData + ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30" id="hm-branches-right"></div>';
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 != 0) {
-					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
-					htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
-					htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
+					rightColHtml = rightColHtml +'<div class="hm-sub-item clearfix">';
+					rightColHtml = rightColHtml +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
+					rightColHtml = rightColHtml +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			htmlData = htmlData + ' </div>';
+			//htmlData = htmlData + ' </div>';
 		}
 		else {
 			if(branchesStartIndex == 0) {
@@ -280,9 +282,13 @@ function searchBranchesForCompanyCallBack(data) {
 		}
 		if(branchesStartIndex == 0) {
 			$("#existing-branches").html(htmlData);
+			$("#hm-branches-left").html(leftColHtml);
+			$("#hm-branches-right").html(rightColHtml);
 		}
 		else {
 			$("#existing-branches").append(htmlData);
+			$("#hm-branches-left").append(leftColHtml);
+			$("#hm-branches-right").append(rightColHtml);
 		}
 		
 		if(len > numOfRows) {
@@ -939,14 +945,27 @@ var delay = (function() {
 })();
 
 $('.dd-icn-plus').click(function(){
-	$(this).hide();
-	$('.dd-icn-minus').show();
-	$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	$(this).hide();	
+	if($("#account-type").attr('account-type') == "company") {
+		$(this).closest('.dd-icn-minus').show();
+		$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	}
+	else {
+		$('.dd-icn-minus').show();
+		$(this).parent().next('.hm-dd-main-content').slideToggle();
+	}	
+	
 });
 
 $('.dd-icn-minus').click(function(){
-	$(this).hide();
-	$('.dd-icn-plus').show();
-	$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	$(this).hide();	
+	if($("#account-type").attr('account-type') == "company") {
+		$(this).closest('.dd-icn-plus').show();
+		$(this).parent().parent().next('.hm-dd-main-content').slideToggle();
+	}
+	else {
+		$('.dd-icn-plus').show();
+		$(this).parent().next('.hm-dd-main-content').slideToggle();
+	}
 });
 
