@@ -74,6 +74,9 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
 		data : formData,
 		async : isAsync,
 		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+			},
 		error : function(e) {
 			redirectErrorpage();
 		}
@@ -125,6 +128,9 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload){
 		type : "POST",
 		data : payload,
 		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+		},
 		error : function(e) {
 			redirectErrorpage();
 		}
