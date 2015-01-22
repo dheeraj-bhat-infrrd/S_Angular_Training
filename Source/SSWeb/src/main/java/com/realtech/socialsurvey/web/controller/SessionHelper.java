@@ -7,6 +7,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -19,12 +23,13 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.FileOperations;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
+import com.realtech.socialsurvey.web.security.UserAuthProvider;
 
 /**
  * Manipulates the values in session
- *
  */
 @Component
 public class SessionHelper {
@@ -40,6 +45,15 @@ public class SessionHelper {
 	@Autowired
 	private PropertyFileReader propertyFileReader;
 
+	@Autowired
+	private UserAuthProvider userAuthProvider;
+
+	@Autowired
+	private UserDetailsService userDetailsService;
+
+	@Autowired
+	private EncryptionHelper encryptionHelper;
+
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
 
@@ -48,7 +62,7 @@ public class SessionHelper {
 
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException{
 		LOG.info("Getting canonical settings");
-		User user = (User)session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = getCurrentUser();
 		AccountType accountType = (AccountType)session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		LOG.info("Getting settings for "+user.toString()+" for account type "+accountType);
 		UserSettings userSettings = userManagementService.getCanonicalUserSettings(user, accountType);
@@ -65,7 +79,7 @@ public class SessionHelper {
 			// check for the mail content
 			setMailContent(session, userSettings);
 			// set the highest role from the user's profiles
-			setHighestRole(session, (User)session.getAttribute(CommonConstants.USER_IN_SESSION));
+			setHighestRole(session, getCurrentUser());
 		}
 	}
 	
@@ -140,5 +154,49 @@ public class SessionHelper {
 			// get the first one. that one will be the highest
 			session.setAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION, userProfiles.get(0).getProfilesMaster().getProfileId());
 		}
+	}
+	
+	/**
+	 * Method to add new user into Principal
+	 * 
+	 * @param emailId
+	 * @param password
+	 * @return
+	 */
+	public void loginOnRegistration(String username, String password) {
+		LOG.debug("Adding newly registered user to session");
+		try {
+			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+			String encryptedPassword = encryptionHelper.encryptSHA512(password);
+			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, encryptedPassword,
+					userDetails.getAuthorities());
+			userAuthProvider.authenticate(auth);
+
+			if (auth.isAuthenticated()) {
+				SecurityContextHolder.getContext().setAuthentication(auth);
+			}
+
+			if (getCurrentUser() == null) {
+				throw new NullPointerException();
+			}
+		}
+		catch (Exception e) {
+			 SecurityContextHolder.getContext().setAuthentication(null);
+			 LOG.error("Problem authenticating user" + username, e);
+		}
+	}
+
+	/**
+	 * Method to get active user from Principal
+	 * 
+	 * @return User
+	 */
+	public User getCurrentUser() {
+		final Object sessionUser = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		User user = null;
+		if (sessionUser instanceof User) {
+			user = (User) sessionUser;
+		}
+		return user;
 	}
 }

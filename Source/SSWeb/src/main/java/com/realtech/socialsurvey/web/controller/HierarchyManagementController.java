@@ -49,6 +49,8 @@ public class HierarchyManagementController {
 	private SolrSearchService solrSearchService;
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+	@Autowired
+	private SessionHelper sessionHelper;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -61,7 +63,7 @@ public class HierarchyManagementController {
 	public String showBuildHierarchyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildHierarchyPage called");
 		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		boolean isRegionAdditionAllowed = false;
 		boolean isBranchAdditionAllowed = false;
@@ -110,7 +112,7 @@ public class HierarchyManagementController {
 
 		LOG.info("Fetching all the branches for current user");
 		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		String jspToReturn = null;
 
@@ -157,8 +159,7 @@ public class HierarchyManagementController {
 	public String fetchAllRegions(Model model, HttpServletRequest request) {
 
 		LOG.info("Fetching all the regions for current user");
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 
 		try {
 			try {
@@ -193,8 +194,7 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/fetchregionsselector", method = RequestMethod.GET)
 	public String fetchRegionsSelector(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchRegionsSelector called in HierarchyManagementController ");
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 
 		try {
 			try {
@@ -233,8 +233,7 @@ public class HierarchyManagementController {
 
 		try {
 			long regionId = 0l;
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 
 			try {
 				regionId = Long.parseLong(request.getParameter("regionId"));
@@ -317,8 +316,7 @@ public class HierarchyManagementController {
 		LOG.info("Deactivating branch");
 		try {
 			long branchId = 0l;
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
 
@@ -405,9 +403,7 @@ public class HierarchyManagementController {
 
 			validateRegionForm(regionName, regionAddress1);
 
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
+			User user = sessionHelper.getCurrentUser();
 			String address = getCompleteAddress(regionAddress1, regionAddress2);
 			LOG.info("Address " + address + " is yet to be stored");
 
@@ -462,9 +458,8 @@ public class HierarchyManagementController {
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("NumberFormatException while parsing regionId", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
+			User user = sessionHelper.getCurrentUser();
 			String address = getCompleteAddress(branchAddress1, branchAddress2);
 			LOG.info("Address " + address + " is yet to be stored");
 
@@ -530,9 +525,7 @@ public class HierarchyManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
-
+			User user = sessionHelper.getCurrentUser();
 			String address = getCompleteAddress(branchAddress1, branchAddress2);
 			LOG.info("Address " + address + " is yet to be stored");
 
@@ -581,9 +574,8 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Error while parsing regionId in update region.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
 
+			User user = sessionHelper.getCurrentUser();
 			String address = getCompleteAddress(regionAddress1, regionAddress2);
 			LOG.info("Address " + address + " is yet to be stored");
 
@@ -621,8 +613,7 @@ public class HierarchyManagementController {
 	public String searchRegions(Model model, HttpServletRequest request) {
 		LOG.info("Method to search region called in controller");
 		String regionPattern = request.getParameter("regionPattern");
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String searchRegionJson = null;
 		String strStart = request.getParameter("start");
 		String strRows = request.getParameter("rows");
@@ -689,8 +680,7 @@ public class HierarchyManagementController {
 	public String searchBranches(Model model, HttpServletRequest request) {
 		LOG.info("Method to search branches called in controller");
 		String branchPattern = request.getParameter("branchPattern");
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		String searchBranchJson = null;
 		String strStart = request.getParameter("start");
 		String strRows = request.getParameter("rows");
