@@ -773,6 +773,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Record successfully deleted from the database!");
 	}
 	
+	/**
+	 * Method to upgrade a default region to a region
+	 * @param company
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
 	private Region upgradeDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException{
 		
 		LOG.info("Upgrading the default region");
@@ -805,6 +812,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return defaultRegion;		
 	}
 	
+	/**
+	 * Method to upgrade a default branch to a branch
+	 * @param company
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
 	private Branch upgradeDefaultBranch(Company company) throws InvalidInputException, NoRecordsFetchedException{
 		
 		LOG.info("Upgrading branch");
@@ -838,6 +852,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 	}
 	
+	/**
+	 * Method to upgrade from individual or team plan to higher plans
+	 * @param company
+	 * @param toAccountsMasterId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
 	private void upgradeFromIndividualOrTeam(Company company,int toAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SolrException{
 		
 		if( company == null){
@@ -887,6 +909,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Upgrade successful");
 	}
 	
+	/**
+	 * Method to upgrade from company plan to enterprise plan
+	 * @param company
+	 * @param toAccountsMasterId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
 	private void upgradeFromCompanyToEnterprise(Company company,int toAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SolrException{
 		
 		if( company == null){
@@ -910,6 +940,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Upgrade successful");
 	}
 	
+	/**
+	 * Method that updates all the branches and regions
+	 * @param currentLicenseDetail
+	 * @param toAccountsMasterId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
 	private void updateBranchesAndRegions(LicenseDetail currentLicenseDetail,int toAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SolrException{
 		
 		LOG.debug("updateBranchesAndRegions called");
@@ -942,6 +980,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 	}
 	
+	/**
+	 * Method called to update databases on plan upgrade
+	 * @param company
+	 * @param newAccountsMasterPlanId
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
 	@Transactional
 	public void upgradePlanAtBackend(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException{
 		
