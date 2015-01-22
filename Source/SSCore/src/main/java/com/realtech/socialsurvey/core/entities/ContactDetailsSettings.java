@@ -15,6 +15,7 @@ public class ContactDetailsSettings {
 	private MailIdSettings mail_ids;
 	private ContactNumberSettings contact_numbers;
 	private SocialLinksSettings social_links;
+	private WebAddressSettings web_addresses;
 
 	public String getName() {
 		return name;
@@ -94,6 +95,14 @@ public class ContactDetailsSettings {
 
 	public void setAddress2(String address2) {
 		this.address2 = address2;
+	}
+
+	public WebAddressSettings getWeb_addresses() {
+		return web_addresses;
+	}
+
+	public void setWeb_addresses(WebAddressSettings web_addresses) {
+		this.web_addresses = web_addresses;
 	}
 
 	@Override

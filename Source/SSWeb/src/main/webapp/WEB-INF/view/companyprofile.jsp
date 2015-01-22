@@ -6,6 +6,7 @@
 		value="${cannonicalusersettings.companySettings.contact_details }"
 		var="contactDetails"></c:set>
 </c:if>
+<div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
@@ -14,10 +15,7 @@
 		</div>
 	</div>
 </div>
-
-
-<div id=""
-	class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container">
 		<div class="row prof-pic-name-wrapper">
 			<div
