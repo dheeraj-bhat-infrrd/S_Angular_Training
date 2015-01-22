@@ -12,6 +12,8 @@
         border: 0;
         border-bottom: 1px solid #D3DEE0;
         margin: 0;
+        border-top: 1px solid #D3DEE0;
+        margin-top: -1px;
     }
     .login-wrapper-icon{
         width: 15%;
@@ -65,7 +67,8 @@
     .error-msg {
         padding: 0 25px;
         margin-bottom: 10px;
-        margin-top: 0px;
+        margin-top: 8px;
+        display: none !important;
     }
     .login-link{
         color: #555 !important;
@@ -663,6 +666,9 @@
     .icn-address-mobile{
         display: block;
     }
+    .mob-icn-email, .mob-icn-lname, .mob-icn-fname, .mob-icn-assignTo, .mob-icn-branch-name, .icn-address-mobile{
+        background-position: 6px center;
+    }
     .cp-err{
         padding-left: 0;
         line-height: 22px;
@@ -678,6 +684,17 @@
     }
     .sb-q-item-txt-or {
         width: 78%;
+    }
+    .hm-item-row-right{
+        min-height: 20px !important;
+        margin-top: -1px;
+    }
+    .um-btn-wrapper-fix {
+        margin-top: 30px;
+    }
+    .um-search-user{
+        padding: 0 24px 0 0;
+        margin-right: 5px;
     }
 }
 
@@ -722,9 +739,6 @@
         display: none;
     }
     .header-slider-wrapper{
-        display: none;
-    }
-    .icn-address-mobile, .hm-dd-pls-btn{
         display: none;
     }
 }
