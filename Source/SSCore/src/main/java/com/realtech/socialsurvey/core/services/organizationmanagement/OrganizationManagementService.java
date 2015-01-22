@@ -155,4 +155,6 @@ public interface OrganizationManagementService {
 	 * @throws PaymentException
 	 */
 	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException;
+	
+	public void upgradePlanAtBackend(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
 }

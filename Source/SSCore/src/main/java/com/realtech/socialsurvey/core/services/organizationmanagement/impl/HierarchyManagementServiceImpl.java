@@ -445,7 +445,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * 
 	 * @param branch
 	 */
-	private void insertBranchSettings(Branch branch) {
+	@Override
+	public void insertBranchSettings(Branch branch) {
 		LOG.info("Method to insert branch settings called for branch : " + branch);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(branch.getBranchId());
@@ -540,7 +541,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * 
 	 * @param region
 	 */
-	private void insertRegionSettings(Region region) {
+	@Override
+	public void insertRegionSettings(Region region) {
 		LOG.info("Method for inserting region settings called for region : " + region);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(region.getRegionId());

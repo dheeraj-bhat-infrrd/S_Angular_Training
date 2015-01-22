@@ -16,6 +16,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUns
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
  * Handles the payment options for the application
@@ -138,7 +139,8 @@ public interface Payment {
 	 * @throws SubscriptionPastDueException 
 	 * @throws PaymentException 
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 * @throws SolrException 
 	 */
-	public void upgradePlanForSubscription(Company company,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
+	public void upgradePlanForSubscription(Company company,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException;
 
 }

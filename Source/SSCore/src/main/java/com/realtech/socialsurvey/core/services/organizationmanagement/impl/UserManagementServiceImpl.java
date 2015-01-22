@@ -1432,7 +1432,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 					if (userProfile.getBranchId() > 0l) {
 						if (branchesSettings == null) {
 							// there were no branch profiles associated with the profile.
-							LOG.debug("No branches associated with the profile");
+							LOG.debug("No branches associated with the pro	file");
 							branchesSettings = new HashMap<Long, OrganizationUnitSettings>();
 						}
 						if (!branchesSettings.containsKey(userProfile.getBranchId())) {

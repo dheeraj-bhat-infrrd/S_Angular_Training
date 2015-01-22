@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
@@ -48,6 +49,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
@@ -95,6 +97,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 
 	private BraintreeGateway gateway = null;
+	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	/**
 	 * Returns the the Braintree gateway.
@@ -913,10 +918,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws SubscriptionPastDueException 
 	 * @throws PaymentException 
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 * @throws SolrException 
 	 */
 	@Transactional
 	@Override
-	public void upgradePlanForSubscription(Company company, int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException {
+	public void upgradePlanForSubscription(Company company, int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException {
 		
 		if( company == null ){
 			LOG.error("upgradePlanForSubscription : company parameter given is null.");
@@ -970,6 +976,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("Subscription upgraded at braintree");
 		
 		try{
+			//Update the branches and the regions and add settings to mongo
+			LOG.info("API call successful, updating the branch and region databases");
+			organizationManagementService.upgradePlanAtBackend(company, newAccountsMasterId);
 			//Updating license detail table.
 			LOG.info("Updating the License Detail table to show changes");
 			licenseDetail.setAccountsMaster(newAccountsMaster);
