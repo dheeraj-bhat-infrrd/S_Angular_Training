@@ -94,7 +94,6 @@ public interface CommonConstants {
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
-	public static final String USER_IN_SESSION = "user";
 	public static final String ACCOUNT_TYPE_IN_SESSION = "accounttype";
 	public static final String CANONICAL_USERSETTINGS_IN_SESSION = "cannonicalusersettings";
 	public static final String COMPANY_NAME = "companyName";
@@ -140,6 +139,7 @@ public interface CommonConstants {
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
 	public static final long ACCOUNT_TYPE_TEAM = 2;
+	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
 
 	/**
 	 * Logo related config

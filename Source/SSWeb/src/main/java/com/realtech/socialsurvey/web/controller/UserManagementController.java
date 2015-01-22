@@ -34,7 +34,6 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.impl.SolrSearchServiceImpl;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
@@ -79,8 +78,7 @@ public class UserManagementController {
 	@RequestMapping(value = "/showusermangementpage", method = RequestMethod.GET)
 	public String initUserManagementPage(Model model, HttpServletRequest request) {
 		LOG.info("User Management page started");
-		HttpSession session = request.getSession(false);
-		User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
 		try {
 			if (user == null) {
 				LOG.error("No user found in session");
@@ -106,7 +104,7 @@ public class UserManagementController {
 	public String inviteNewUser(Model model, HttpServletRequest request) throws NumberFormatException, JSONException {
 		LOG.info("Method to add a new user by existing admin called.");
 		HttpSession session = request.getSession(false);
-		User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+		User admin = sessionHelper.getCurrentUser();
 		try {
 			if (admin == null) {
 				LOG.error("No user found in session");
@@ -148,7 +146,7 @@ public class UserManagementController {
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == CommonConstants.ACCOUNT_TYPE_TEAM) {
-							String branches = solrSearchService.searchBranches("", admin.getCompany());
+							String branches = solrSearchService.searchBranches("", admin.getCompany(),0,0);
 							branches = branches.substring(1, branches.length() - 1);
 							JSONObject defaultBranch = new JSONObject(branches);
 							// assign new user to default branch in case of team account type
@@ -193,7 +191,7 @@ public class UserManagementController {
 		try {
 			String userIdStr = request.getParameter(CommonConstants.USER_ID);
 			HttpSession session = request.getSession(false);
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
@@ -246,14 +244,13 @@ public class UserManagementController {
 	@ResponseBody
 	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
-		HttpSession session = request.getSession(false);
 		String startIndexStr = request.getParameter("startIndex");
 		String batchSizeStr = request.getParameter("batchSize");
 		String users = "";
 		int startIndex = 0;
 		int batchSize = 0;
 		try {
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
@@ -310,8 +307,7 @@ public class UserManagementController {
 				throw new InvalidInputException("Invalid searchKey passed in method findUserByEmail().");
 			}
 
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 			if (user == null) {
 				LOG.error("No user found in current session in findUserByEmail().");
 				throw new InvalidInputException("No user found in current session in findUserByEmail().");
@@ -361,8 +357,7 @@ public class UserManagementController {
 						DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
 
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 			if (user == null) {
 				LOG.error("No user found in current session in removeExistingUser().");
 				throw new InvalidInputException("No user found in current session in removeExistingUser().");
@@ -391,7 +386,7 @@ public class UserManagementController {
 	 */
 	@RequestMapping(value = "/assignusertobranch", method = RequestMethod.POST)
 	public String assignUserToBranch(Model model, HttpServletRequest request) {
-		User admin = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User admin = sessionHelper.getCurrentUser();
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		String branchIdStr = request.getParameter("branchId");
 		try {
@@ -441,7 +436,7 @@ public class UserManagementController {
 
 	@RequestMapping(value = "/unassignuserfrombranch", method = RequestMethod.POST)
 	public String unassignUserFromBranch(Model model, HttpServletRequest request) {
-		User admin = (User) request.getSession(false).getAttribute(CommonConstants.USER_IN_SESSION);
+		User admin = sessionHelper.getCurrentUser();
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		String branchIdStr = request.getParameter("branchId");
 		try {
@@ -493,8 +488,7 @@ public class UserManagementController {
 	public String assignOrUnassignBranchAdmin(Model model, HttpServletRequest request) {
 		LOG.info("Method to assign or unassign branch admin called");
 		try {
-			HttpSession session = request.getSession(false);
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
@@ -555,8 +549,7 @@ public class UserManagementController {
 		LOG.info("Method to assign region admin called");
 
 		try {
-			HttpSession session = request.getSession(false);
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
@@ -609,8 +602,7 @@ public class UserManagementController {
 		LOG.info("Method to remove region admin called");
 
 		try {
-			HttpSession session = request.getSession(false);
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
@@ -663,8 +655,7 @@ public class UserManagementController {
 
 		LOG.info("Method to activate or deactivate a user, activateOrDecativateUser() called.");
 		try {
-			HttpSession session = request.getSession(false);
-			User admin = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
@@ -755,7 +746,6 @@ public class UserManagementController {
 	 */
 	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
 	public String completeRegistration(Model model, HttpServletRequest request) {
-
 		LOG.info("Method completeRegistration() to complete registration of user started.");
 
 		try {
@@ -847,7 +837,10 @@ public class UserManagementController {
 			}
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
-			session.setAttribute(CommonConstants.USER_IN_SESSION, user);
+			
+			LOG.debug("Adding newly registered user to principal session");
+			sessionHelper.loginOnRegistration(emailId, password);
+			LOG.debug("Successfully added registered user to principal session");
 
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
@@ -864,9 +857,7 @@ public class UserManagementController {
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
 				sessionHelper.getCanonicalSettings(session);
-				// Set the session variables
 				sessionHelper.setSettingVariablesInSession(session);
-
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present
@@ -902,8 +893,7 @@ public class UserManagementController {
 			validateChangePasswordFormParameters(oldPassword, newPassword, confirmNewPassword);
 
 			// get user in session
-			HttpSession session = request.getSession(false);
-			User user = (User) session.getAttribute(CommonConstants.USER_IN_SESSION);
+			User user = sessionHelper.getCurrentUser();
 
 			// check if old password entered matches with the one in the encrypted
 			try {

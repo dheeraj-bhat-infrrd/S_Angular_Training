@@ -2,6 +2,10 @@
  * js functions for hierarchy management
  */
 
+var numOfRows = 6;
+var branchesStartIndex = 0;
+var regionStartIndex = 0;
+
 /**
  * js function for adding a branch
  */
@@ -55,13 +59,15 @@ function addOrUpdateBranch(formId) {
  * function to display branches
  */
 function showBranches() {
+	//reset the start index
+	branchesStartIndex = 0;
+	
 	if($("#account-type").attr('account-type') == "company") {
-		searchBranchesForCompany("");
+		searchBranchesForCompany("",branchesStartIndex,numOfRows);
 	}
 	else {
-		searchBranches("");
-	}
-	
+		searchBranches("",branchesStartIndex,numOfRows);
+	}	
 }
 
 /**
@@ -76,6 +82,25 @@ function showBranchesCallBack(data) {
 	$(".branch-element").click(function() {
 		populateUpdateBranchForm(this);
 	});
+}
+
+/**
+ * function to search for more branches called on clicking view more
+ */
+function viewMoreBranches(obj) {
+	var branchPattern = $("#search-branch-txt").val();
+	if(branchPattern == undefined) {
+		branchPattern = "";
+	}
+	branchesStartIndex = branchesStartIndex + numOfRows;
+	if($("#account-type").attr('account-type') == "company") {
+		searchBranchesForCompany("",branchesStartIndex,numOfRows);
+	}
+	else  {
+		searchBranches(branchPattern,branchesStartIndex,numOfRows);
+	}
+	
+	$(obj).hide();
 }
 
 /**
@@ -157,8 +182,8 @@ function updateBranchCallBack(data) {
  * Method to perform search on solr for provided branch pattern
  * @param branchPattern
  */
-function searchBranches(branchPattern) {
-		var url = "./searchbranches.do?branchPattern="+branchPattern;
+function searchBranches(branchPattern,start,rows) {
+		var url = "./searchbranches.do?branchPattern="+branchPattern+"&start="+start+"&rows="+rows;
 		callAjaxGET(url, searchBranchesCallBack, true);
 }
 
@@ -168,23 +193,40 @@ function searchBranches(branchPattern) {
  * @param data
  */
 function searchBranchesCallBack(data) {
-	console.log("search branches callback : "+data);
 	var searchResult =  $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
 		var htmlData = "";
-		console.log("searchResult is "+searchResult);
 		if(len > 0) {
+			
+			if(len > numOfRows) {
+				searchResult.splice(len-1,1);
+			}
+			
 			$.each(searchResult,function(i,branch) {
 				htmlData = htmlData +'<div class="hm-sub-item clearfix">';
 				htmlData = htmlData +'<div class="float-left hm-sub-item-left branch-element" data-branchid = "'+branch.branchId+'" data-regionid = "'+branch.regionId+'" data-regionname = "'+branch.regionName+'">'+branch.branchName+'</div>';
 				htmlData = htmlData +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 			});
+			
+			if(len > numOfRows) {
+				htmlData = htmlData +'<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>';
+			}
 		}
 		else {
-			htmlData = 'No branches are added yet';
+			if(branchesStartIndex == 0) {
+				htmlData = 'No branches are added yet';
+			}
+			else {
+				htmlData = 'No more branches present';
+			}
 		}
-		$("#existing-branches").html(htmlData);
+		if(branchesStartIndex == 0) {
+			$("#existing-branches").html(htmlData);
+		}
+		else {
+			$("#existing-branches").append(htmlData);
+		}		
 		
 		// bind the click event of branches with edit
 		$(".branch-element").click(function() {
@@ -193,8 +235,8 @@ function searchBranchesCallBack(data) {
 	}
 }
 
-function searchBranchesForCompany(branchPattern){
-	var url = "./searchbranches.do?branchPattern="+branchPattern;
+function searchBranchesForCompany(branchPattern,start,rows){
+	var url = "./searchbranches.do?branchPattern="+branchPattern+"&start="+start+"&rows="+rows;
 	callAjaxGET(url, searchBranchesForCompanyCallBack, true);
 }
 
@@ -205,6 +247,11 @@ function searchBranchesForCompanyCallBack(data) {
 		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30">';
 		console.log("searchResult is "+searchResult);
 		if(len > 0) {
+			
+			if(len > numOfRows) {
+				searchResult.splice(len-1,1);
+			}
+			
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 == 0) {
 					htmlData = htmlData +'<div class="hm-sub-item clearfix">';
@@ -224,10 +271,23 @@ function searchBranchesForCompanyCallBack(data) {
 			htmlData = htmlData + ' </div>';
 		}
 		else {
-			htmlData = 'No branches are added yet';
+			if(branchesStartIndex == 0) {
+				htmlData = 'No branches are added yet';
+			}
+			else {
+				htmlData = 'No more branches present';
+			}
 		}
-		console.log(htmlData);
-		$("#existing-branches").html(htmlData);
+		if(branchesStartIndex == 0) {
+			$("#existing-branches").html(htmlData);
+		}
+		else {
+			$("#existing-branches").append(htmlData);
+		}
+		
+		if(len > numOfRows) {
+			$("#hm-all-existing-comp-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
+		}
 		
 		// bind the click event of branches with edit
 		$(".branch-element").click(function() {
@@ -236,11 +296,23 @@ function searchBranchesForCompanyCallBack(data) {
 	}
 }
 
+function clearBranchForm() {
+	$("#add-branch-form :input").val("");
+	$("#add-branch-form .error-msg").hide();
+}
+
+$("#branch-clear-icon").click(function() {
+	clearBranchForm();
+});
+
 /**
  * function to display regions
  */
 function showRegions() {
-	searchRegions("");
+	//reset the start index
+	regionStartIndex = 0;
+	
+	searchRegions("",regionStartIndex,numOfRows);
 }
 
 /**
@@ -277,6 +349,19 @@ function addOrUpdateRegion(formId) {
 		console.log("adding new region");
 		addRegion(formId);
 	}
+}
+
+/**
+ * function to search for more regions called on clicking view more
+ */
+function viewMoreRegions(obj) {
+	var regionPattern = $("#search-region-txt").val();
+	if(regionPattern == undefined) {
+		regionPattern = "";
+	}
+	regionStartIndex = regionStartIndex + numOfRows;
+	searchRegions(regionPattern,regionStartIndex,numOfRows);
+	$(obj).hide();
 }
 
 /**
@@ -424,6 +509,17 @@ function deleteBranchCheckCallBack(response, branchId) {
 	}
 }
 
+/**
+ * Method to clear out all input fields in region addition form
+ */
+function clearRegionForm() {
+	$("#add-region-form :input").val("");
+	$("#add-region-form .error-msg").hide();
+}
+
+$("#region-clear-icon").click(function() {
+	clearRegionForm();
+});
 
 // Pop-up Overlay modifications
 $('#overlay-cancel').click(function(){
@@ -479,26 +575,24 @@ $('#branch-address2-txt').blur(function() {
 	validateAddress2(this.id);
 });
 $('#selected-region-txt').blur(function(){
-	validateRegionSelector('selected-region-id-hidden');
+	validateRegionSelector('selected-region-id-hidden','selected-region-txt');
 });
 
-function validateRegionSelector(elementId) {
-	console.log("elementId" + $('#'+elementId).val()+ elementId);
+function validateRegionSelector(hiddenElementId,textElementId) {
 	if($(window).width()<768){
-		if ($('#'+elementId).val() == "") {
+		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
 			$('#overlay-toast').html('Please select a region');
 			showToast();
 			return false;
 		}
 		return true;
 	}else{
-		if ($('#'+elementId).val() == "") {
-			$('#'+elementId).next('.input-error-2').html('Please select a region');
-			$('#'+elementId).next('.input-error-2').show();
+		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
+			$('#'+hiddenElementId).next('.input-error-2').html('Please select a region');
+			$('#'+hiddenElementId).next('.input-error-2').show();
 			return false;
-		}
-		
-		$('#'+elementId).next('.input-error-2').hide();
+		}		
+		$('#'+hiddenElementId).next('.input-error-2').hide();
 		return true;
 	}
 }
@@ -514,6 +608,17 @@ function validateBranchInformation(elementId) {
 			isFocussed=true;
 		}
 	}
+	
+	if($('#selected-region-id-hidden').length > 0){
+		if(!validateRegionSelector('selected-region-id-hidden','selected-region-txt')){
+			isRegionValid = false;
+			if(!isFocussed){
+				$('#selected-region-txt').focus();
+				isFocussed=true;
+			}
+		}
+	} 
+	
 	if(!validateCompanyEnterpriseAddress1('branch-address1-txt')){
 		isBranchValid = false;
 		if(!isFocussed){
@@ -528,15 +633,6 @@ function validateBranchInformation(elementId) {
 			isFocussed=true;
 		}
 	}
-	if($('#selected-region-id-hidden').length > 0){
-		if(!validateRegionSelector('selected-region-id-hidden')){
-			isRegionValid = false;
-			if(!isFocussed){
-				$('#selected-region-txt').focus();
-				isFocussed=true;
-			}
-		}
-	} 
 	return isBranchValid;
 }
 
@@ -599,7 +695,7 @@ function validateRegionInformation(elementId) {
  */
 function populateRegionsSelector(regionPattern) {
 	console.log("Method populateRegionsSelector called for regionPattern : "+regionPattern);
-	var url = "./searchregions.do?regionPattern="+regionPattern;
+	var url = "./searchregions.do?regionPattern="+regionPattern+"&start=0&rows=-1";
 	callAjaxGET(url, populateRegionsSelectorCallBack, true);
 }
 
@@ -625,6 +721,7 @@ function populateRegionsSelectorCallBack(data) {
 			$('.hm-dd-item').click(function() {
 				$('#selected-region-txt').val($(this).html());
 				$('#selected-region-id-hidden').val($(this).data('regionid'));
+				$('#selected-region-id-hidden').next('.input-error-2').hide();
 				$('#hm-dd-wrapper-bottom').slideToggle(200);
 			});	
 			
@@ -642,9 +739,9 @@ function populateRegionsSelectorCallBack(data) {
  * 
  * @param regionPattern
  */
-function searchRegions(regionPattern){
-	console.log("search regions called for regionPattern : "+regionPattern);
-	var url = "./searchregions.do?regionPattern="+regionPattern;
+function searchRegions(regionPattern,start,rows){
+	console.log("search regions called for regionPattern : "+regionPattern+" start:"+start+" rows:"+rows);
+	var url = "./searchregions.do?regionPattern="+regionPattern+"&start="+start+"&rows="+rows;
 	callAjaxGET(url, searchRegionsCallBack, true); 
 }
 
@@ -659,18 +756,36 @@ function searchRegionsCallBack(data) {
 		var htmlData = "";
 		console.log("searchResult is "+searchResult);
 		if(len > 0) {
+			
+			if(len > numOfRows) {
+				searchResult.splice(len-1,1);
+			}
+			
 			htmlData = htmlData +'<input type="hidden" id="enable-branches-form" value="true">';
 			$.each(searchResult,function(i,region) {
 				htmlData = htmlData +'<div class="hm-sub-item clearfix">';
 					htmlData = htmlData + '<div class="float-left hm-sub-item-left region-element" data-regionid = '+region.regionId+'>'+region.regionName+'</div>';
 					htmlData = htmlData + '<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" onclick=deleteRegionPopup('+region.regionId+')></div></div>';
 			});
+			
+			if(len > numOfRows) {
+				htmlData = htmlData +'<div id="view-more-region-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreRegions(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>';
+			}
 		}
 		else {
-			htmlData = 'No regions added yet';
+			if(regionStartIndex == 0) {
+				htmlData = 'No regions are added yet';
+			}
+			else {
+				htmlData = 'No more regions present';
+			}
 		}
-		
-		$("#existing-regions").html(htmlData);
+		if(regionStartIndex == 0) {
+			$("#existing-regions").html(htmlData);
+		}
+		else {
+			$("#existing-regions").append(htmlData);
+		}	
 		
 		//validations for enabling branches form
 		if($("#enable-branches-form").length > 0) {
@@ -697,10 +812,10 @@ $("#region-save-icon").click(function(e) {
 
 $('#selected-region-txt').click(function(){
 	populateRegionsSelector("");
-	//$('#hm-dd-wrapper-bottom').slideToggle(200);
 });
 
 $("#selected-region-txt").focus(function() {
+	console.log("focus");
 	var text = $("#selected-region-txt").val();
 	if (text.length > 1) {
 		delay(function() {
@@ -713,39 +828,33 @@ $("#selected-region-txt").focus(function() {
 });
 
 $("#selected-region-txt").keyup(function() {
+	console.log("key up");
 	var text = $("#selected-region-txt").val();
 	if (text.length > 1) {
 		delay(function() {
 			populateRegionsSelector(text);
 		}, 500);
 	}
-	/*else {
-		$('#hm-dd-wrapper-bottom').slideUp(200);
-	}*/
 });
 
 //bindind arrow keys with region selector
 $("#selected-region-txt").keydown(function(e) {
-	console.log(" keydown event "+e);
 	if(e.which == 40) {
 		var text = $("#selected-region-txt").val();
 		if(text == undefined) {
 			text = "";
 		}
 		if (!($("#hm-dd-wrapper-bottom").css("display") =="block")){
-			console.log("inside hasclass hide : "+$("#hm-dd-wrapper-bottom"));
 			delay(function() {
 				populateRegionsSelector(text);
 			}, 500);
 		}else {
 			var current = $("#hm-dd-wrapper-bottom").find(".hm-dd-item-keys-selected");
-			console.log("inside else current : "+current + current.length);
 			if(current.length > 0) {
 				$(current).removeClass("hm-dd-item-keys-selected");
 				$(current).next().addClass("hm-dd-item-keys-selected");
 			}
 			else {
-				console.log("inside first child addtion" +$("#hm-dd-wrapper-bottom :first-child"));
 				$("#hm-dd-wrapper-bottom :first-child").addClass("hm-dd-item-keys-selected");
 			}
 			$("#hm-dd-wrapper-bottom").show();
@@ -767,63 +876,53 @@ $("#selected-region-txt").keydown(function(e) {
 		}
 		$('#selected-region-txt').val($(selectedItem).html());
 		$('#selected-region-id-hidden').val($(selectedItem).data('regionid'));
+		$('#selected-region-id-hidden').next('.input-error-2').hide();
 		$('#hm-dd-wrapper-bottom').slideToggle(200);
 		
 	}
 });
 
-$("#search-region-txt").focus(function() {
-	var text = $("#search-region-txt").val();
-	if (text.length > 1) {
-		delay(function() {
-			searchRegions(text);
-		}, 500);
-	}
-	else {
-		delay(function() {
-			searchRegions("");
-		}, 500);
-	}
-});
-
 $("#search-region-txt").keyup(function() {
 	var text = $("#search-region-txt").val();
+	regionStartIndex = 0;
 	if (text.length > 1) {
 		delay(function() {
-			searchRegions(text);
+			searchRegions(text,regionStartIndex,numOfRows);
 		}, 500);
 	}
 	else {
 		delay(function() {
-			searchRegions("");
+			searchRegions("",regionStartIndex,numOfRows);
 		}, 500);
 	}
 });
 
 $("#search-branch-txt").keyup(function() {
 	var text = $("#search-branch-txt").val();
+	branchesStartIndex = 0;	
 	if (text.length > 1) {
 		delay(function() {
-			searchBranches(text);
+			searchBranches(text,branchesStartIndex,numOfRows);
 		}, 500);
 	}
 	else {
 		delay(function() {
-			searchBranches("");
+			searchBranches("",branchesStartIndex,numOfRows);
 		}, 500);
 	}
 });
 
 $("#search-company-branch-txt").keyup(function() {
 	var text = $("#search-company-branch-txt").val();
-	if (text.length > 1) {
+	branchesStartIndex = 0;	
+	if (text.length > 1) {	
 		delay(function() {
-			searchBranchesForCompany(text);
+			searchBranchesForCompany(text,branchesStartIndex,numOfRows);
 		}, 500);
 	}
 	else {
 		delay(function() {
-			searchBranchesForCompany("");
+			searchBranchesForCompany("",branchesStartIndex,numOfRows);
 		}, 500);
 	}
 });
