@@ -8,7 +8,6 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,9 @@ public class RegistrationController {
 	private MessageUtils messageUtils;
 	@Autowired
 	private SolrSearchService solrSearchService;
-
+	@Autowired
+	private SessionHelper sessionHelper;
+	
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
 		LOG.info("Showing invitation page");
@@ -181,7 +182,6 @@ public class RegistrationController {
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
-
 			boolean isDirectRegistration = false;
 			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
 				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
@@ -199,13 +199,13 @@ public class RegistrationController {
 				LOG.debug("Registering user with emailId : " + emailId);
 				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
+				
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Added newly added user {} to solr",user.getFirstName());
-				LOG.debug("Adding newly registered user to session");
-				HttpSession session = request.getSession(true);
-				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
-				LOG.debug("Successfully added registered user to session");
-
+				
+				LOG.debug("Adding newly registered user to principal session");
+				sessionHelper.loginOnRegistration(emailId, password);
+				LOG.debug("Successfully added registered user to principal session");
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
