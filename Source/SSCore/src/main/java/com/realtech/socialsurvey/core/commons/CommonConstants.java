@@ -3,38 +3,7 @@ package com.realtech.socialsurvey.core.commons;
 /**
  * Holds application level constants
  */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
-/**
- * @author karthik
- *
- */
+
 public interface CommonConstants {
 
 	/**

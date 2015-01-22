@@ -156,5 +156,13 @@ public interface OrganizationManagementService {
 	 */
 	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException;
 	
+	/**
+	 * Method called to update databases on plan upgrade
+	 * @param company
+	 * @param newAccountsMasterPlanId
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
 	public void upgradePlanAtBackend(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
 }
