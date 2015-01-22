@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--  
+ This is the Social Survey Solr schema file for core ss-branches. This file should be named "schema.xml" and
+ should be in the conf directory under the solr home
+ (i.e. ./solr/socialsurvey/ss-branches/conf/schema.xml by default) 
+ or located where the classloader for the Solr webapp can find it.
+-->
+
+<schema name="db" version="1.1">
+  <types> 
+   <fieldType name="string"  class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
+   <fieldType name="long" class="solr.TrieLongField" precisionStep="0" positionIncrementGap="0"/>
+   <fieldType name="text" class="solr.TextField" positionIncrementGap="100">
+      <analyzer type="index">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+      <analyzer type="query">
+        <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+        <filter class="solr.LowerCaseFilterFactory"/>
+      </analyzer>
+   </fieldType>
+   <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
+  </types>
+
+  <fields>
+    <field name="branchId" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
+    <field name="companyId" type="long" indexed="true" stored="true" />
+    <field name="regionId" type="long" indexed="false" stored="true" />
+    <field name="branchName" type="text" indexed="true" stored="true" />
+    <field name="regionName" type="text" indexed="false" stored="true"/>
+    <field name="isDefaultBySystem" type="long" indexed="true" stored="true" />
+    <field name="status" type="integer" indexed="true" stored="true" />
+    <field name="address1" type="text" indexed="true" stored="true"/>
+    <field name="address2" type="text" indexed="true" stored="true"/>
+    <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
+  </fields>
+
+ <uniqueKey>branchId</uniqueKey>
+
+ <!-- field for the QueryParser to use when an explicit fieldname is absent -->
+ <defaultSearchField>branchName</defaultSearchField>
+
+ <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
+ <solrQueryParser defaultOperator="OR"/>
+
+</schema>
+

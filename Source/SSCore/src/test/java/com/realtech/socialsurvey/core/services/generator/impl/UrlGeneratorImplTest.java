@@ -8,15 +8,12 @@ import java.util.HashMap;
 import java.util.Map;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.realtech.socialsurvey.core.commons.InitializeJNDI;
-import com.realtech.socialsurvey.core.commons.SpringContextRule;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.generator.InvalidUrlException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -26,13 +23,20 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 /**
  * This the Junit test module for UrlGeneratorImpl in the generator package.
  */
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration("file:src/main/resources/sscore-beans.xml")
 public class UrlGeneratorImplTest {
 
 	@Autowired
 	URLGenerator urlGenerator;
 
 	Map<String, String> params;
-	
+
+	@BeforeClass
+	public static void setUp() throws Exception {
+		InitializeJNDI.initializeJNDIforTest();
+	}
+
 	/**
 	 * This method is called before the tests are run. Here we initialize the variables required for
 	 * the tests.

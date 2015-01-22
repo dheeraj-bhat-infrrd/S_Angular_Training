@@ -588,8 +588,9 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     height: 40px;
     line-height: 40px;
     padding: 0 20px 0 40px;
-    background: url(../images/iconPlus.png) no-repeat;
+    background: url(../images/iconPlusBig.png) no-repeat;
     background-position: 6px center;
+    background-size: 30px;
     border: 1px solid #5cc7ef;
     border-radius: 20px;
     color: #5cc7ef;
@@ -627,7 +628,8 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     width: 150px;
     outline: none;
     border: 0;
-    height: 58px;
+    height: 30px;
+    line-height: normal;
 }
 
 .hm-sub-header-left {
@@ -2036,7 +2038,7 @@ button.paypal.is-active {
 }
 
 .sb-q-item-txt {
-    width: 84%;
+    width: 83%;
 }
 
 .sb-q-chk {
@@ -2295,4 +2297,24 @@ button.paypal.is-active {
 .um-hm-viewall {
     font-size: 13px;
     text-decoration: underline;
+}
+
+.sb-ul {
+    margin-bottom: 25px;
+}
+
+.sb-mcq-ans-wrapper {
+    margin-top: -30px;
+}
+
+.sb-inparea:last-child {
+    margin-bottom: 0px;
+}
+.sb-inparea {
+    margin-bottom: 20px;
+    padding: 10px;
+    width: 100%;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
