@@ -20,7 +20,7 @@
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 </head>
 <body>
-    <div class="toast-container">
+    <div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
 	<div class="overlay-loader hide"></div>
