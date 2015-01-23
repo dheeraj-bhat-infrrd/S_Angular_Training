@@ -36,7 +36,7 @@
 			                                <div class="hm-item-row clearfix">
 			                                    <div class="hm-item-row-left text-right"><spring:message code="label.branchname.key"/></div>
 			                                    <div class="hm-item-row-right">
-			                                        <input type="text" name="branchName" id="branch-name-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.newbranch.key"/>'>
+			                                        <input type="text" name="branchName" id="branch-name-txt" class="hm-item-row-txt mob-icn-branch-name" placeholder='<spring:message code="label.newbranch.key"/>'>
 			                                        <div id="branch-name-error" class="input-error-2 error-msg"></div>
 			                                    </div>
 			                                </div>
@@ -46,7 +46,7 @@
 			                                    <div class="hm-item-row clearfix">
 			                                        <div class="hm-item-row-left text-right"><spring:message code="label.address1.key"/></div>
 			                                        <div class="hm-item-row-right">
-			                                            <input type="text" name="branchAddress1" id="branch-address1-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.address1.key"/>'>
+			                                            <input type="text" name="branchAddress1" id="branch-address1-txt" class="hm-item-row-txt icn-address-mobile" placeholder='<spring:message code="label.address1.key"/>'>
 			                                        	<div id="branch-address1-error" class="input-error-2 error-msg"></div>
 			                                        </div>
 			                                    </div>
@@ -55,7 +55,7 @@
 			                                    <div class="hm-item-row clearfix">
 			                                        <div class="hm-item-row-left text-right"><spring:message code="label.address2.key"/></div>
 			                                        <div class="hm-item-row-right">
-			                                            <input type="text" name="branchAddress2" id="branch-address2-txt" class="hm-item-row-txt" placeholder='<spring:message code="label.address2.key"/>'>
+			                                            <input type="text" name="branchAddress2" id="branch-address2-txt" class="hm-item-row-txt icn-address-mobile" placeholder='<spring:message code="label.address2.key"/>'>
 			                                        	<div id="branch-address2-error" class="input-error-2 error-msg"></div>
 			                                        </div>
 			                                    </div>
@@ -186,12 +186,12 @@
 		                                <div class="hm-item-row-left text-right"><spring:message code="label.selectregion.key"/></div>
 		                                <div class="hm-item-row-right pos-relative">
 		                                    <input class="hm-item-row-txt cursor-pointer" type="text" id="selected-region-txt" autocomplete="off">
-		                                    <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
-		                                    <div id="selected-region-error" class="input-error-2 error-msg"></div>
-		                                    <input type="hidden" name="branchId" id="branch-id-hidden"/>
 		                                    <div class="hm-dd-wrapper hide" id="hm-dd-wrapper-bottom">
 		                                        <!-- Regions are populated here through ajax from regionsautocomplete.jsp -->
 		                                    </div>
+		                                    <input type="hidden" name="branchId" id="branch-id-hidden"/>
+		                                    <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
+		                                    <div id="selected-region-error" class="input-error-2 error-msg"></div>
 		                                </div>
 		                            </div>
 		                            <div class="hm-item-row clearfix">
@@ -254,15 +254,11 @@
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Build Hierarchy");
-		
+
 		//for enterprise account type
 		if($("#show-regions-flag").length > 0) {
 			showRegions();
-			showBranches();
 		}
-		//company account type
-		else {
-			searchBranchesForCompany("");
-		}
+		showBranches();
 	});
 </script>
