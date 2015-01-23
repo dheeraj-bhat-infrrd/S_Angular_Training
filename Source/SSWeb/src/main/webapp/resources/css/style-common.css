@@ -1339,10 +1339,6 @@ button.paypal.is-active {
     color: #fff;
     padding: 0 20px;
     border-radius: 3px;
-    overflow: hidden;
-    line-height: 32px;
-    left: 10%;
-    z-index: 999999999;
     background-color: rgba(0,0,0,0.7);
 }
 
@@ -2351,6 +2347,7 @@ button.paypal.is-active {
 }
 
 .toast-container {
+    z-index: 99999999999;
     text-align: center;
     position: fixed;
     bottom: 50px;
