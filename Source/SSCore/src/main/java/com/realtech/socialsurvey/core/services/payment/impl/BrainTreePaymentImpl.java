@@ -978,7 +978,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		try{
 			//Update the branches and the regions and add settings to mongo
 			LOG.info("API call successful, updating the branch and region databases");
-			organizationManagementService.upgradePlanAtBackend(company, newAccountsMasterId);
+			organizationManagementService.upgradeAccount(company, newAccountsMasterId);
 			//Updating license detail table.
 			LOG.info("Updating the License Detail table to show changes");
 			licenseDetail.setAccountsMaster(newAccountsMaster);

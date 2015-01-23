@@ -164,5 +164,5 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public void upgradePlanAtBackend(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
+	public void upgradeAccount(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
 }
