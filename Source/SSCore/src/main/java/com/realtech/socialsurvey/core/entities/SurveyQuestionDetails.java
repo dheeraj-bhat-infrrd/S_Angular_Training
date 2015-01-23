@@ -7,11 +7,20 @@ import java.util.List;
  */
 public class SurveyQuestionDetails {
 
+	private long questionId;
 	private String question;
 	private List<SurveyAnswer> answers;
 	private String questionType;
 	private int isRatingQuestion;
 	private int questionOrder;
+
+	public long getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(long questionId) {
+		this.questionId = questionId;
+	}
 
 	public String getQuestion() {
 		return question;

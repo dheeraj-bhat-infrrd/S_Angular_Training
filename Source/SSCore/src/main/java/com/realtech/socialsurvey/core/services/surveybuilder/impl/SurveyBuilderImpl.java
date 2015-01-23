@@ -198,20 +198,18 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public void deactivateQuestionSurveyMapping(User user, SurveyQuestion surveyQuestion) throws InvalidInputException {
+	public void deactivateQuestionSurveyMapping(User user, long surveyQuestionId) throws InvalidInputException {
 		LOG.info("Method deactivateQuestionSurveyMapping() started.");
-		if (user == null || surveyQuestion == null) {
+		if (user == null) {
 			LOG.error("Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
 			throw new InvalidInputException(
 					"Invalid argument passed. Either user or surveyQuestion is null in method deactivateQuestionSurveyMapping.");
 		}
-		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByColumn(SurveyQuestionsMapping.class,
-				CommonConstants.SURVEY_QUESTION_COLUMN, surveyQuestion);
-		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
-			surveyQuestionsMapping.setStatus(CommonConstants.STATUS_INACTIVE);
-			surveyQuestionsMappingDao.save(surveyQuestionsMapping);
-			surveyQuestionsMappingDao.flush();
-		}
+		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, surveyQuestionId);
+		surveyQuestionsMapping.setStatus(CommonConstants.STATUS_INACTIVE);
+		
+		surveyQuestionsMappingDao.save(surveyQuestionsMapping);
+		surveyQuestionsMappingDao.flush();
 		LOG.info("Method deactivateQuestionSurveyMapping() finished.");
 	}
 
@@ -247,7 +245,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("Invalid argument passed. Survey cannot be null.");
 			throw new InvalidInputException("Invalid argument passed. Survey is null in method getAllActiveQuestionsOfSurvey.");
 		}
-
 		return fetchSurveyQuestions(survey);
 	}
 
@@ -445,6 +442,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		for (SurveyQuestionsMapping surveyQuestionsMapping : surveyQuestionsMappings) {
 			surveyQuestionDetails = new SurveyQuestionDetails();
 
+			surveyQuestionDetails.setQuestionId(surveyQuestionsMapping.getSurveyQuestionsMappingId());
 			surveyQuestionDetails.setQuestion(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestion());
 			surveyQuestionDetails.setQuestionType(surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestionsCode());
 			surveyQuestionDetails.setQuestionOrder(surveyQuestionsMapping.getQuestionOrder());
@@ -455,6 +453,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsMapping.getSurveyQuestion().getSurveyQuestionsAnswerOptions()) {
 				surveyAnswer = new SurveyAnswer();
 				
+				surveyAnswer.setAnswerId(surveyQuestionsAnswerOption.getSurveyQuestionsAnswerOptionsId());
 				surveyAnswer.setAnswerText(surveyQuestionsAnswerOption.getAnswer());
 				surveyAnswer.setAnswerOrder(surveyQuestionsAnswerOption.getAnswerOrder());
 				

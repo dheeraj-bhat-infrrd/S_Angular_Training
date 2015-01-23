@@ -37,7 +37,7 @@
 						<div class="float-left sb-sel-txt">Descriptive</div>
 					</div>
 					<div class="float-left clearfix sb-sel-item">
-						<div type="mcq" id="sb-sel-mult" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
+						<div type="mcq" id="sb-sel-mcq" class="float-left sb-sel-icn sb-sel-icn-inact"></div>
 						<div type="mcq" class="float-left sb-sel-icn sb-sel-icn-act hide"></div>
 						<div class="float-left sb-sel-txt">Multiple Choice</div>
 					</div>
@@ -63,7 +63,7 @@
 					</div>
 				</form>
 				
-				<div class="sb-ques-wrapper">
+				<div id="sb-ques-wrapper" class="sb-ques-wrapper">
 					<div class="sb-item-row sb-item-row-header clearfix">
 						<div class="float-left sb-q-item-no"></div>
 						<div class="float-left sb-q-item-chk">
@@ -118,13 +118,9 @@
 								<div class="sb-ans-mc-item q-ans-obj-1">Answer 1</div>
 								<div class="sb-ans-mc-item q-ans-obj-2">Answer 2</div>
 								<div class="sb-ans-mc-item q-ans-obj-3">Answer 3</div>
-								<div class="sb-ans-mc-item q-ans-obj-4">Answer 4</div>
-								<div class="sb-ans-mc-item q-ans-obj-5">Answer 5</div>
 								<input class="q-ans-obj-txt q-ans-obj-1-txt">
 								<input class="q-ans-obj-txt q-ans-obj-2-txt">
 								<input class="q-ans-obj-txt q-ans-obj-3-txt">
-								<input class="q-ans-obj-txt q-ans-obj-4-txt">
-								<input class="q-ans-obj-txt q-ans-obj-5-txt">
 							</div> 
 						</div>
 						<div class="float-right sb-q-item-btns clearfix">
@@ -207,10 +203,9 @@
 		</div>
 	</div>
 </div>
-
-<script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/surveyBuilder.js"></script>
 <script>
-$(document).ready(function() {
+$(document).ready(function(){
 	$(document).attr("title", "Build Survey");
+	loadActiveSurvey();
 });
 </script>
