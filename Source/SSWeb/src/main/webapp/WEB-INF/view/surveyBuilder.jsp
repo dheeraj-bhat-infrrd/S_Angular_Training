@@ -52,13 +52,17 @@
                 <div class="sb-txtarea-wrapper">
                     <textarea class="sb-txtarea" placeholder="Enter Question"></textarea>
                 </div>
-                <div class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
-                    <input class="sb-inparea" placeholder="Enter option 1">
-                    <input class="sb-inparea" placeholder="Enter option 2">
-                    <input class="sb-inparea" placeholder="Enter option 3">
-                    <input class="sb-inparea" placeholder="Enter option 4">
-                    <input class="sb-inparea" placeholder="Enter option 5">
+                <div id="sb-mcq-ans-wrapper" class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
+                    <div id="mcq-ans-container">
+                        <input class="sb-inparea" placeholder="Enter option">
+                        <input class="sb-inparea" placeholder="Enter option">
+                    </div>
+                    <div class="sb-btns-add-rem-wrapper clearfix">
+                        <div class="sb-ad-rem-btn icn-sb-ad-btn float-right"></div>
+                        <div class="sb-ad-rem-btn icn-sb-rem-btn hide float-right"></div>
+                    </div>
                 </div>
+                
                 
                 <div class="sb-btn-wrapper clearfix">
                     <div class="btn-sb-add btn-sb">Add More</div>
@@ -353,6 +357,26 @@
         $('body').click(function(){
             if($('.sb-dd-wrapper').css('display') == "block"){
                 $('.sb-dd-wrapper').slideToggle(200);
+            }
+        });
+        
+//        Adding new option for MCQ
+        $('.icn-sb-ad-btn').click(function(){
+            $('#mcq-ans-container').append('<input class="sb-inparea" placeholder="Enter option">');
+            var choiceLen = $('.sb-inparea').length;
+            if(choiceLen > 2){
+                $('.icn-sb-rem-btn').show();
+            }
+        });
+        
+        $('.icn-sb-rem-btn').click(function(){
+            var choiceLen = $('.sb-inparea').length;
+            if(choiceLen > 2){
+                $('.sb-inparea').each(function(){
+                    if($('.sb-inparea').index(this) > choiceLen - 2){
+                        $(this).remove();
+                    }
+                });
             }
         });
         
