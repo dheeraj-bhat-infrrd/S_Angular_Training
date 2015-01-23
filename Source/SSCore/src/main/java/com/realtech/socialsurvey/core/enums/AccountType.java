@@ -11,9 +11,9 @@ public enum AccountType {
 	INDIVIDUAL("Individual", 1), TEAM("Team", 2), COMPANY("Company", 3), ENTERPRISE("Enterprise", 4);
 
 	private String name;
-	private long value;
+	private int value;
 
-	private AccountType(String name, long value) {
+	private AccountType(String name, int value) {
 		this.name = name;
 		this.value = value;
 	}
@@ -26,11 +26,11 @@ public enum AccountType {
 		this.name = name;
 	}
 
-	public long getValue() {
+	public int getValue() {
 		return value;
 	}
 
-	public void setValue(long value) {
+	public void setValue(int value) {
 		this.value = value;
 	}
 
