@@ -778,9 +778,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
 	 */
-	private Region upgradeDefaultRegion(Region region) throws InvalidInputException, NoRecordsFetchedException{
+	private Region upgradeDefaultRegion(Region region) throws InvalidInputException{
 		
 		LOG.info("Upgrading the default region to a user made region");
 		if( region == null){
@@ -803,7 +802,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
 	 */
 	private Branch upgradeDefaultBranch(Branch branch) throws InvalidInputException{
 		
@@ -829,8 +827,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * Function to check if only default region exists for a company
 	 * @param company
 	 * @return
+	 * @throws InvalidInputException 
 	 */
-	private Region fetchDefaultRegion(Company company){
+	private Region fetchDefaultRegion(Company company) throws InvalidInputException{
+		
+		if (company == null) {
+			LOG.error(" fetchDefaultRegion : Company parameter is null");
+			throw new InvalidInputException(" fetchDefaultRegion : Company parameter is null");
+		}
 		
 		LOG.info("Checking if only default region exists");
 		Region defaultRegion = null;
@@ -866,8 +870,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * Function to check if only default branch exists for a company
 	 * @param company
 	 * @return
+	 * @throws InvalidInputException 
 	 */
-	private Branch fetchDefaultBranch(Company company){
+	private Branch fetchDefaultBranch(Company company) throws InvalidInputException{
+		
+		if (company == null) {
+			LOG.error(" fetchDefaultBranch : Company parameter is null");
+			throw new InvalidInputException(" fetchDefaultBranch : Company parameter is null");
+		}
 		
 		LOG.info("Checking if only default branch exists");
 		Branch defaultBranch = null;
@@ -900,6 +910,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 	}
 	
+	/**
+	 * Method to upgrade plan to Company
+	 * @param company
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 */
 	private void upgradeToCompany(Company company) throws InvalidInputException, SolrException, NoRecordsFetchedException{
 		
 		LOG.info("Upgrading to Company");
@@ -930,6 +947,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Databases upgraded successfully!");
 	}
 	
+	/**
+	 * Method to upgrade plan to Enterprise
+	 * @param company
+	 * @param fromAccountsMasterId
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 */
 	private void upgradeToEnterprise(Company company,int fromAccountsMasterId) throws InvalidInputException, SolrException, NoRecordsFetchedException{
 		
 		LOG.info("Upgrading to Enterprise");
