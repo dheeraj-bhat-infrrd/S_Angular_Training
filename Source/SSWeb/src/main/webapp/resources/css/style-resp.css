@@ -641,7 +641,8 @@
         width: 48%;
     }
     .btn-sb-add{
-        margin-right: 4%;
+        margin: 0 auto;
+        float: none;
     }
     .sb-q-item-txt{
         width: 78%;
