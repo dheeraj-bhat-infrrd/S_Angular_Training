@@ -1065,7 +1065,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Updating the regions and the branches for plan upgrade");
 		
 		switch (newAccountsMasterPlanId) {
-			case CommonConstants.ACCOUNT_TYPE_TEAM:
+			case CommonConstants.ACCOUNTS_MASTER_TEAM:
 				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >1 ) {
 					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid" );
 					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid");			
