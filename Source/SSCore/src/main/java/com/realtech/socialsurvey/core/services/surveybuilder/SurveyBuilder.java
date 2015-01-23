@@ -75,7 +75,7 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void deactivateQuestionSurveyMapping(User user, SurveyQuestion surveyQuestion) throws InvalidInputException;
+	public void deactivateQuestionSurveyMapping(User user, long surveyQuestionId) throws InvalidInputException;
 
 	/**
 	 * Method to fetch all the questions that belong to the specified survey. Company is fetched for
