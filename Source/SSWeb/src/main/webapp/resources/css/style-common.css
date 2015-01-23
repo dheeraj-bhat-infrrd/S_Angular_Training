@@ -2008,7 +2008,7 @@ button.paypal.is-active {
 
 .sb-txtarea-wrapper {
     margin-top: 30px;
-    margin-bottom: 50px
+    margin-bottom: 10px
 }
 
 .sb-tem-select {
@@ -2210,7 +2210,7 @@ button.paypal.is-active {
 .sb-ans-mc-wrapper {
     font-size: 13px;
     line-height: 22px;
-    padding: 0 10px;
+    padding: 0;
 }
 
 .sb-txt-ar {
@@ -2232,7 +2232,6 @@ button.paypal.is-active {
     display: none;
     padding: 10px;
     width: 98%;
-    margin-left: -10px;
     border: 1px solid #e3e3e3;
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
@@ -2327,7 +2326,7 @@ button.paypal.is-active {
 }
 
 .sb-mcq-ans-wrapper {
-    margin-top: -30px;
+    margin-top: 10px;
 }
 
 .sb-inparea:last-child {
@@ -2357,4 +2356,24 @@ button.paypal.is-active {
     bottom: 50px;
     width: 100%;
     line-height: 32px;
+}
+
+.sb-btns-add-rem-wrapper {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.sb-ad-rem-btn {
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    margin-left: 15px;
+}
+
+.icn-sb-ad-btn {
+    background: url(../images/Plus_Big.png) no-repeat center;
+}
+
+.icn-sb-rem-btn {
+    background: url(../images/minus_Big.png) no-repeat center;
 }
