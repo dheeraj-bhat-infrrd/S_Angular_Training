@@ -5,7 +5,6 @@
 		</div>
 	</div>
 </div>
-<div id="overlay-toast" class="overlay-toast"></div>
 
 <div id="" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="sb-container container">
@@ -49,8 +48,8 @@
 					</div>
 					<div id="sb-mcq-ans-wrapper" class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
 						<div id="mcq-ans-container">
-							<input class="sb-inparea" placeholder="Enter option">
-							<input class="sb-inparea" placeholder="Enter option">
+							<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option">
+							<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option">
 						</div>
 						<div class="sb-btns-add-rem-wrapper clearfix">
 							<div class="sb-ad-rem-btn icn-sb-ad-btn float-right"></div>

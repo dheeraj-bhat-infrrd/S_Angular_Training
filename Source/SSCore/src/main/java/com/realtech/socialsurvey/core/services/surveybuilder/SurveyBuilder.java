@@ -88,15 +88,6 @@ public interface SurveyBuilder {
 	public List<SurveyQuestionDetails> getAllActiveQuestionsOfMappedSurvey(User user) throws InvalidInputException;
 
 	/**
-	 * Method to fetch all the questions that belong to the specified survey. Company is fetched for
-	 * user passed which in turn is used to get survey ID.
-	 * 
-	 * @param user
-	 * @throws InvalidInputException
-	 */
-	public List<SurveyQuestionDetails> getAllActiveQuestionsOfSurvey(User user, Survey survey) throws InvalidInputException;
-
-	/**
 	 * Method to fetch list of all Default Surveys
 	 * 
 	 * @param user
@@ -119,4 +110,20 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException;
+	
+	/**
+	 * Method to update Survey Question and answers
+	 * 
+	 * @param questionId
+	 * @throws InvalidInputException
+	 */
+	public void updateQuestionAndAnswers(User user, long questionId, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException;
+	
+	/**
+	 * Method to reorder Survey Questions
+	 * 
+	 * @param questionId
+	 * @throws InvalidInputException
+	 */
+	public void reorderQuestion(User user, long questionId, String reorderType) throws InvalidInputException;
 }

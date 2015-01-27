@@ -55,7 +55,7 @@ $('body').on('click', '.sb-ratings-sel-item', function(e){
 
 // Adding new option for MCQ
 $('body').on('click', '.icn-sb-ad-btn', function(){
-	$('#mcq-ans-container').append('<input class="sb-inparea" placeholder="Enter option">');
+	$('#mcq-ans-container').append('<input name="sb-answers[]" class="sb-inparea" placeholder="Enter option">');
 	var choiceLen = $('.sb-inparea').length;
 	if(choiceLen > 2){
 		$('.icn-sb-rem-btn').show();
@@ -106,15 +106,10 @@ $('body').on('click', '.sb-q-chk-yes', function(){
 	$(this).parent().find('.sb-q-chk-no').show();
 });
 
-// Edit question
-$('body').on('click', '.sb-dd-item-ans', function(){
-	selectedRating = $(this).attr('type');
-	$('.sb-dd-item-ans').removeClass('blue-text');
-	$(this).addClass('blue-text');
-});
-
+// Edit/Update question
 var selectedRating = "";
 $('body').on('click', '.sb-btn-edit', function(){
+	$('.sb-ans-mc-wrapper').css('padding','0px');
 	$(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html());
 	
 	if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
@@ -140,6 +135,7 @@ $('body').on('click', '.sb-btn-edit', function(){
 });
 
 $('body').on('click', '.sb-btn-save', function(){
+	$('.sb-ans-mc-wrapper').css('padding','0 10px');
 	$(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val());
 	
 	if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
@@ -158,13 +154,13 @@ $('body').on('click', '.sb-btn-save', function(){
 		$(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-2').show();
 	}
 	
-	if(selectedRating == "smiles"){
+	if(selectedRating == "sb-range-smiles"){
 		$('.sb-q-txt-2').find('.sb-stars').hide();
 		$('.sb-q-txt-2').find('.sb-icn-smiles').show();
-	} else if(selectedRating == "star") {
+	} else if(selectedRating == "sb-range-star") {
 		$('.sb-q-txt-2').find('.sb-stars').hide();
 		$('.sb-q-txt-2').find('.icn-full-star').show();
-	} else if(selectedRating == "scale") {
+	} else if(selectedRating == "sb-range-scale") {
 		$('.sb-q-txt-2').find('.sb-stars').hide();
 		$('.sb-q-txt-2').find('.sb-icn-scale').show();
 	}
@@ -175,14 +171,41 @@ $('body').on('click', '.sb-btn-save', function(){
 	$(this).hide();
 });
 
-// Update Question
+$('body').on('click', '.sb-dd-item-ans', function(){
+	selectedRating = $(this).attr('type');
+	$('.sb-dd-item-ans').removeClass('blue-text');
+	$(this).addClass('blue-text');
+	
+	$(this).parent().parent().parent().find('#sb-question-edit-type').val(selectedRating);
+});
+
 $('body').on('click', '.sb-btn-save', function(){
 	var questionId = $(this).parent().attr('data-questionid');
 	var url = "./updatequestionfromsurvey.do?questionId=" + questionId;
-	
-	//TODO
-	callAjaxPOST(url, commonActiveSurveyCallback, true);
+	var formId = $(this).closest("form").attr('id');
+
+	callAjaxFormSubmit(url, commonActiveSurveyCallback, formId);
 });
+
+//TODO
+// Reorder Question
+$('body').on('click', '.sb-btn-reorder-up', function(){
+	var formData = new FormData();
+	formData.append("questionId", $(this).parent().attr('data-questionid'));
+	formData.append("reorder", "up");
+
+	callAjaxPOSTWithTextData("./reorderQuestion.do?", commonActiveSurveyCallback, true, formData);
+});
+
+$('body').on('click', '.sb-btn-reorder-down', function(){
+	var formData = new FormData();
+	formData.append("questionId", $(this).parent().attr('data-questionid'));
+	formData.append("reorderType", "down");
+
+	callAjaxPOSTWithTextData("./reorderQuestion.do?", commonActiveSurveyCallback, true, formData);
+});
+
+
 
 // Delete Question
 $('body').on('click', '.sb-btn-delete', function(){
@@ -205,7 +228,6 @@ function loadActiveSurvey() {
 }
 
 function loadActiveSurveyCallback(response) {
-	console.log(response);
 	var surveyQuestions =  $.parseJSON(response);
 	var htmlData = "";
 	if (surveyQuestions != null) {
@@ -226,13 +248,17 @@ function loadActiveSurveyCallback(response) {
 		+ '</div>';
 
 		// For Each Question
+		var lengthQuestions = surveyQuestions.length;
+		var countQues = 1;
 		$.each(surveyQuestions, function(i, surveyQuestion) {
+			htmlData = htmlData + '<form id="sb-ques-edit-' + countQues + '">';
+
 			// Question start
 			htmlData = htmlData + '<div class="sb-item-row clearfix">';
 
 			// Question order
 			htmlData = htmlData
-			+ '<div class="float-left sb-q-item-no">(' + surveyQuestion.questionOrder	+ ')</div>';
+			+ '<div class="float-left sb-q-item-no">(' + countQues + ')</div>';
 			
 			// Check boxes
 			htmlData = htmlData
@@ -259,58 +285,60 @@ function loadActiveSurveyCallback(response) {
 			// Question Text
 			htmlData = htmlData
 			+ '<div class="sb-q-txt-1" q-type="' + qType + '">' + surveyQuestion.question + '</div>'
-			+ '<textarea class="sb-q-txt-1 sb-txt-ar"></textarea>';
+			+ '<input type="hidden" id="sb-question-edit-type" name="sb-question-edit-type" value="' + questionTypeCode + '">'
+			+ '<textarea id="sb-question-edit-txt" name="sb-question-edit-txt" class="sb-q-txt-1 sb-txt-ar"></textarea>';
 			
 			// Question types
 			if (questionTypeCode == "sb-range-smiles") {
 				htmlData = htmlData + '<div class="sb-q-txt-2 clearfix">'
-					+ '<div class="float-left sb-stars icn-full-star"></div>'
-					+ '<div class="float-left sb-stars sb-icn-smiles hide"></div>'
+					+ '<div class="float-left sb-stars sb-icn-smiles"></div>'
+					+ '<div class="float-left sb-stars icn-full-star hide"></div>'
 					+ '<div class="float-left sb-stars sb-icn-scale hide"></div>'
 				+ '</div>';
 				
 				htmlData = htmlData + '<div class="sb-ans-rat-wrapper"><div class="sb-dd-wrapper-or">'
-					+ '<div type="smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Smiles</div>'
-					+ '<div type="star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans">Star</div>'
-					+ '<div type="scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans">Scale</div>'
+					+ '<div type="sb-range-smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Smiles</div>'
+					+ '<div type="sb-range-star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans">Star</div>'
+					+ '<div type="sb-range-scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans">Scale</div>'
 				+ '</div></div>';
 			}
 			else if (questionTypeCode == "sb-range-star") {
 				htmlData = htmlData + '<div class="sb-q-txt-2 clearfix">'
-					+ '<div class="float-left sb-stars icn-full-star hide"></div>'
-					+ '<div class="float-left sb-stars sb-icn-smiles"></div>'
+				+ '<div class="float-left sb-stars sb-icn-smiles hide"></div>'
+					+ '<div class="float-left sb-stars icn-full-star"></div>'
 					+ '<div class="float-left sb-stars sb-icn-scale hide"></div>'
 				+ '</div>';
 				
 				htmlData = htmlData + '<div class="sb-ans-rat-wrapper"><div class="sb-dd-wrapper-or">'
-					+ '<div type="smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans">Smiles</div>'
-					+ '<div type="star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Star</div>'
-					+ '<div type="scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans">Scale</div>'
+					+ '<div type="sb-range-smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans">Smiles</div>'
+					+ '<div type="sb-range-star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Star</div>'
+					+ '<div type="sb-range-scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans">Scale</div>'
 				+ '</div></div>';
 			}
 			else if (questionTypeCode == "sb-range-scale") {
 				htmlData = htmlData + '<div class="sb-q-txt-2 clearfix">'
-					+ '<div class="float-left sb-stars icn-full-star hide"></div>'
 					+ '<div class="float-left sb-stars sb-icn-smiles hide"></div>'
+					+ '<div class="float-left sb-stars icn-full-star hide"></div>'
 					+ '<div class="float-left sb-stars sb-icn-scale"></div>'
 				+ '</div>';
 				
 				htmlData = htmlData + '<div class="sb-ans-rat-wrapper"><div class="sb-dd-wrapper-or">'
-					+ '<div type="smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans">Smiles</div>'
-					+ '<div type="star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans">Star</div>'
-					+ '<div type="scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Scale</div>'
+					+ '<div type="sb-range-smiles" class="sb-icn-smiles sb-dd-item sb-dd-item-or sb-dd-item-ans">Smiles</div>'
+					+ '<div type="sb-range-star" class="sb-icn-star sb-dd-item sb-dd-item-or sb-dd-item-ans">Star</div>'
+					+ '<div type="sb-range-scale" class="sb-icn-scale sb-dd-item sb-dd-item-or sb-dd-item-ans blue-text">Scale</div>'
 				+ '</div></div>';
 			}
 			else if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
-				var length = surveyQuestion.answers.length;
-				htmlData = htmlData + '<div class="sb-ans-mc-wrapper" length="' + length + '">';
+				var lengthAns = surveyQuestion.answers.length;
+				htmlData = htmlData + '<div class="sb-ans-mc-wrapper" length="' + lengthAns + '">';
 				
-				var count = 1;
+				var countAns = 1;
 				$.each(surveyQuestion.answers, function(i, answer) {
 					htmlData = htmlData
-					+ '<div class="sb-ans-mc-item q-ans-obj-' + count + '">' + answer.answerText + '</div>'
-					+ '<input class="q-ans-obj-txt q-ans-obj-' + count + '-txt">';
-					count ++;
+					+ '<div class="sb-ans-mc-item q-ans-obj-' + countAns + '">' + answer.answerText + '</div>'
+					+ '<input id="sb-edit-answers-text[]" name="sb-edit-answers-text[]" class="q-ans-obj-txt q-ans-obj-' + countAns + '-txt">'
+					+ '<input type="hidden" id="sb-edit-answers-id[]" name="sb-edit-answers-id[]" value="' + answer.answerId + '">';
+					countAns ++;
 				});
 				
 				htmlData = htmlData	+ '</div>';
@@ -324,8 +352,23 @@ function loadActiveSurveyCallback(response) {
 
 			// Buttons
 			htmlData = htmlData
-			+ '<div class="float-right sb-q-item-btns clearfix" data-questionid="' + surveyQuestion.questionId + '">'
-				+ '<div class="float-left sb-q-btn sb-btn-reorder"></div>'
+			+ '<div class="float-right sb-q-item-btns clearfix" data-questionid="' + surveyQuestion.questionId + '">';
+			
+			if (countQues == 1) {
+				htmlData = htmlData
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-up hide"></div>'
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
+			} else if (countQues == lengthQuestions) {
+				htmlData = htmlData
+				+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
+				+ '<div class="float-left sb-q-btn sb-btn-reorder-down hide"></div>';
+			} else {
+				htmlData = htmlData
+				+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
+				+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
+			}
+			
+			htmlData = htmlData
 				+ '<div class="float-left sb-q-btn sb-btn-delete"></div>'
 				+ '<div class="float-left sb-q-btn sb-btn-edit"></div>'
 				+ '<div class="float-left sb-q-btn sb-btn-save hide"></div>'
@@ -333,6 +376,9 @@ function loadActiveSurveyCallback(response) {
 			
 			// Question End
 			htmlData = htmlData + '</div>';
+			htmlData = htmlData	+ '</form>';
+			
+			countQues++;
 		});
 		
 		$('#sb-ques-wrapper').html(htmlData);
