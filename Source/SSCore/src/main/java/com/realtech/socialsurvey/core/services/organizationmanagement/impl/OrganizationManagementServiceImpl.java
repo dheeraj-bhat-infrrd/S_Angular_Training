@@ -904,7 +904,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		else{
 			// More than one branches exist so no default branch exists. Return null.
-			LOG.info("More than one branches found. So returning null.");
+			LOG.info(branchList.size() + " branches found. So returning null.");
 			defaultBranch = null;
 		}
 		
@@ -1069,8 +1069,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		switch (newAccountsMasterPlanId) {
 			case CommonConstants.ACCOUNTS_MASTER_TEAM:
 				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >1 ) {
-					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid" );
-					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid");			
+					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid : value is : " + currentAccountsMasterId );
+					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
 				}
 				//In case of upgrading to the team account we need to change only the license details table.
 				LOG.info("Databases updated to Team plan");
@@ -1079,8 +1079,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			case CommonConstants.ACCOUNTS_MASTER_COMPANY:
 				// We check if the plan we are changing from and the plan we are changing to are correct
 				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >2 ) {
-					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid" );
-					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid");			
+					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
+					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
 				}
 				LOG.info("Calling the database update method for Company plan");
 				upgradeToCompany(company);		
@@ -1090,8 +1090,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE:
 				// We check if the plan we are changing from and the plan we are changing to are correct
 				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >3 ) {
-					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid" );
-					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid");			
+					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
+					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
 				}
 				LOG.info("Calling the database update method for Enterprise plan");
 				upgradeToEnterprise(company,currentAccountsMasterId);
