@@ -57,7 +57,7 @@
 						</div>
 					</div>
 					<div class="sb-btn-wrapper clearfix">
-						<div class="btn-sb-add btn-sb">Add Question</div>
+						<div id="sb-question-add" class="btn-sb-add btn-sb">Add Question</div>
 					</div>
 				</form>
 				
@@ -152,7 +152,7 @@
 			</div>
 			
 			<div class="sb-content choose-survery-content hide">
-				<div class="sb-ques-wrapper">
+				<div id="sb-template-wrapper" class="sb-ques-wrapper">
 					<div class="sb-item-row sb-item-row-header clearfix">
 						<div class="float-left sb-q-item-no"></div>
 						<div class="float-left sb-q-item-chk"></div>
@@ -173,13 +173,6 @@
 											<div class="sb-ans-mc-item q-ans-obj-1">Answer 1</div>
 											<div class="sb-ans-mc-item q-ans-obj-2">Answer 2</div>
 											<div class="sb-ans-mc-item q-ans-obj-3">Answer 3</div>
-											<div class="sb-ans-mc-item q-ans-obj-4">Answer 4</div>
-											<div class="sb-ans-mc-item q-ans-obj-5">Answer 5</div>
-											<input class="q-ans-obj-txt q-ans-obj-1-txt">
-											<input class="q-ans-obj-txt q-ans-obj-2-txt">
-											<input class="q-ans-obj-txt q-ans-obj-3-txt">
-											<input class="q-ans-obj-txt q-ans-obj-4-txt">
-											<input class="q-ans-obj-txt q-ans-obj-5-txt">
 										</div> 
 									</li>
 									<li class="sb-q-template-item">

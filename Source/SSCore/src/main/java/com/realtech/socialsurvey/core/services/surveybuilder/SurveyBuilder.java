@@ -5,6 +5,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -51,7 +52,7 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void deactivateSurveyCompanyMapping(User user, Survey survey, Company company) throws InvalidInputException, NoRecordsFetchedException;
+	public void deactivateSurveyCompanyMapping(User user) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to get count of survey questions
@@ -90,10 +91,10 @@ public interface SurveyBuilder {
 	/**
 	 * Method to fetch list of all Default Surveys
 	 * 
-	 * @param user
+	 * @param
 	 * @throws InvalidInputException
 	 */
-	public List<Survey> getSurveyTemplates() throws InvalidInputException;
+	public List<SurveyTemplate> getSurveyTemplates() throws InvalidInputException;
 	
 	/**
 	 * Method to fetch Survey from SurveyId
@@ -126,4 +127,12 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public void reorderQuestion(User user, long questionId, String reorderType) throws InvalidInputException;
+	
+	/**
+	 * Method to clone Survey from template
+	 * 
+	 * @param questionId
+	 * @throws InvalidInputException
+	 */
+	public void cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException;
 }
