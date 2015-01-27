@@ -38,11 +38,14 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public List<T> findByColumn(Class<T> dataClass, String column, Object value);
 
+	public List<T> findByColumnForMultipleValues(Class<T> dataClass, String column, List<?> values);
+
 	public long findNumberOfRows(Class<T> dataClass);
 
 	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries);
 
-	
+	public void merge(T entity);
+
 }
 
 // JIRA: SS-8: By RM05: EOC

@@ -6,8 +6,17 @@ package com.realtech.socialsurvey.core.entities;
  */
 public class SurveyAnswer {
 
+	private long answerId;
 	private String answerText;
 	private int answerOrder;
+
+	public long getAnswerId() {
+		return answerId;
+	}
+
+	public void setAnswerId(long answerId) {
+		this.answerId = answerId;
+	}
 
 	public String getAnswerText() {
 		return answerText;

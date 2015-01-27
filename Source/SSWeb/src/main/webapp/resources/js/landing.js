@@ -1,7 +1,6 @@
 /**
  * js functions for landing page
  */
-
 /**
  * function to change the content of page through ajax
  * 

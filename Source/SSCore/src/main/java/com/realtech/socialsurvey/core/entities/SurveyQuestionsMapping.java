@@ -13,50 +13,51 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+
 /**
  * The persistent class for the SURVEY_QUESTIONS_MAPPING database table.
  * 
  */
 @Entity
-@Table(name = "SURVEY_QUESTIONS_MAPPING")
-@NamedQuery(name = "SurveyQuestionsMapping.findAll", query = "SELECT s FROM SurveyQuestionsMapping s")
+@Table(name="SURVEY_QUESTIONS_MAPPING")
+@NamedQuery(name="SurveyQuestionsMapping.findAll", query="SELECT s FROM SurveyQuestionsMapping s")
 public class SurveyQuestionsMapping implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "SURVEY_QUESTIONS_MAPPING_ID")
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="SURVEY_QUESTIONS_MAPPING_ID")
 	private long surveyQuestionsMappingId;
 
-	@Column(name = "CREATED_BY")
+	@Column(name="CREATED_BY")
 	private String createdBy;
 
-	@Column(name = "CREATED_ON")
+	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
 
-	@Column(name = "IS_RATING_QUESTION")
+	@Column(name="IS_RATING_QUESTION")
 	private int isRatingQuestion;
 
-	@Column(name = "MODIFIED_BY")
+	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
 
-	@Column(name = "MODIFIED_ON")
+	@Column(name="MODIFIED_ON")
 	private Timestamp modifiedOn;
 
-	@Column(name = "QUESTION_ORDER")
+	@Column(name="QUESTION_ORDER")
 	private int questionOrder;
 
-	@Column(name = "STATUS")
+	@Column(name="STATUS")
 	private int status;
 
-	// bi-directional many-to-one association to Survey
+	//bi-directional many-to-one association to Survey
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "SURVEY_ID")
+	@JoinColumn(name="SURVEY_ID")
 	private Survey survey;
 
-	// bi-directional many-to-one association to SurveyQuestion
+	//bi-directional many-to-one association to SurveyQuestion
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "SURVEY_QUESTIONS_ID")
+	@JoinColumn(name="SURVEY_QUESTIONS_ID")
 	private SurveyQuestion surveyQuestion;
 
 	public SurveyQuestionsMapping() {
@@ -141,4 +142,5 @@ public class SurveyQuestionsMapping implements Serializable {
 	public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
 		this.surveyQuestion = surveyQuestion;
 	}
+
 }
