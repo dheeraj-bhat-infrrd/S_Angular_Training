@@ -217,6 +217,20 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 	}
 	
 	@Override
+	@SuppressWarnings("unchecked")
+	public List<T> findByColumnForMultipleValues(Class<T> dataClass, String column, List<?> values) {
+		Criteria criteria = getSession().createCriteria(dataClass);
+		try {
+			criteria.add(Restrictions.in(column, values));
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByColumnForMultipleValues().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByColumnForMultipleValues().", hibernateException);
+		}
+		return criteria.list();
+	}
+	
+	@Override
 	public long findNumberOfRows(Class<T> dataClass) {
 		try {
 			return (long) getSession().createCriteria(dataClass).setProjection(Projections.rowCount()).uniqueResult();
@@ -241,5 +255,20 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return (long) criteria.setProjection(Projections.rowCount()).uniqueResult();
 	}
+
+	@Override
+	public void merge(T entity) {
+		
+		try {
+			getSession().merge(entity);
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in merge().", hibernateException);
+			throw new DatabaseException("HibernateException caught in merge().", hibernateException);
+		}
+		
+	}
+	
+	
 }
 // JIRA: SS-8: By RM05: EOC

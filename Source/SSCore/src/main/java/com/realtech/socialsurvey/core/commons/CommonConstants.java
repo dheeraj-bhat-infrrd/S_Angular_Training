@@ -26,16 +26,16 @@ public interface CommonConstants {
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
+	
 
 	/**
 	 * Profile master constants
 	 */
-	public static final int PROFILES_MASTER_NO_PROFILE_ID = 1;
-	public static final int PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID = 2;
-	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 3;
-	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 4;
-	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 5;
-
+	public static final int PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID = 1;
+	public static final int PROFILES_MASTER_REGION_ADMIN_PROFILE_ID = 2;
+	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
+	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
+	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
 	 */
@@ -46,20 +46,30 @@ public interface CommonConstants {
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
+	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
 
 	/**
 	 * Status constants
 	 */
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
+	public static final int STATUS_SURVEY_TEMPLATE = 2;
 	public static final int STATUS_NOT_VERIFIED = 2;
+	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
 	public static final int IS_DEFAULT_BY_SYSTEM_YES = 1;
 	public static final int IS_DEFAULT_BY_SYSTEM_NO = 0;
-	public static final int SANDBOX_MODE_TRUE=1;
+	public static final int YES = 1;
+	public static final int NO = 0;
+	public static final int SANDBOX_MODE_TRUE = 1;
 	public static final int IS_OWNER = 1;
 	public static final int IS_NOT_OWNER = 0;
+	public static final int SUBSCRIPTION_DUE = 1;
+	public static final int SUBSCRIPTION_NOT_DUE = 0;
+	public static final String IS_ASSIGN_ADMIN = "YES";
+	public static final String IS_UNASSIGN_ADMIN = "NO";
+
 
 	/**
 	 * Hibernate entities and column name constants
@@ -76,16 +86,21 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
+	public static final String IS_OWNER_COLUMN = "isOwner";
+	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
+	public static final String REGION_COLUMN = "region";
+	public static final String BRANCH_ID_COLUMN = "branchId";
+	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
+
 	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
 	public static final String SURVEY_COLUMN = "survey";
 	public static final String SURVEY_COMPANY_COLUMN = "company";
-	
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
-	public static final String USER_IN_SESSION = "user";
 	public static final String ACCOUNT_TYPE_IN_SESSION = "accounttype";
+	public static final String CANONICAL_USERSETTINGS_IN_SESSION = "cannonicalusersettings";
 	public static final String COMPANY_NAME = "companyName";
 	public static final String ADDRESS = "address";
 	public static final String ZIPCODE = "zipCode";
@@ -95,7 +110,27 @@ public interface CommonConstants {
 	public static final String FIRST_NAME = "firstName";
 	public static final String LAST_NAME = "lastName";
 	public static final String USER_ID = "userId";
+	public static final String JOB_PARAMETER_NAME = "date";
+	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
+	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
+	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
+	public static final String LOGIN_NAME="loginName";
+	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
+	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	
+	/**
+	 * Batch Constants
+	 */
+	public static final String CASE_NONE = "None";
+	public static final String CASE_SETTLING = "Settling";
+	public static final String CASE_SETTLED = "Settled";
+	public static final String CASE_GENERAL = "General";
+	public static final String CASE_RETRIES_EXCEEDED = "RetriesExceeded";
+	public static final String CASE_KEY = "Case";
+	public static final String LICENSE_DETAIL_OBJECT_KEY = "LicenseDetailObject";
+	public static final String RETRIED_TRANSACTION_OBJECT_KEY = "RetriedTransactionObject";
+	public static final String COMPANY_OBJECT_KEY = "CompanyObject";
+	public static final String DISABLED_ACCOUNT_OBJECT_KEY = "DisabledAccountObject";
 
 	/**
 	 * other constants
@@ -107,6 +142,9 @@ public interface CommonConstants {
 	public static final int NO_LIMIT = -1;
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
+	public static final int PAYMENT_INCREMENT = 1;
+	public static final long ACCOUNT_TYPE_TEAM = 2;
+	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
 
 	/**
 	 * Logo related config
@@ -117,4 +155,53 @@ public interface CommonConstants {
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
+
+	/**
+	 * Amazon Details
+	 */
+	public static final String AMAZON_ACCESS_KEY = "AMAZON_ACCESS_KEY";
+	public static final String AMAZON_SECRET_KEY = "AMAZON_SECRET_KEY";
+	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
+	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
+	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
+	public static final String HYPHEN = "-";
+	
+	// settings constants
+	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
+	
+	// mail content
+	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
+	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
+	
+	//regular expressions
+	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$";
+	public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
+	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
+	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
+	public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
+	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
+	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
+	
+	/**
+	 * Solr document related constants 
+	 */
+	public static final String REGION_ID_SOLR = "regionId";
+	public static final String COMPANY_ID_SOLR = "companyId";
+	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
+	public static final String STATUS_SOLR = "status";
+	public static final String REGION_NAME_SOLR = "regionName";
+	public static final String BRANCH_ID_SOLR = "branchId";
+	public static final String BRANCH_NAME_SOLR = "branchName";
+	public static final String USER_ID_SOLR = "userId";
+	public static final String USER_FIRST_NAME_SOLR = "firstName";
+	public static final String USER_LAST_NAME_SOLR = "lastName";
+	public static final String USER_DISPLAY_NAME_SOLR = "displayName";
+	public static final String USER_LOGIN_NAME_SOLR = "loginName";
+	public static final String USER_EMAIL_ID_SOLR = "emailId";
+	public static final String USER_IS_OWNER_SOLR = "isOwner";
+	public static final String BRANCHES_SOLR = "branches";
+	public static final String REGIONS_SOLR = "regions";
+	public static final String IS_AGENT_SOLR = "isAgent";
+	public static final String ADDRESS1 = "address1";
+	public static final String ADDRESS2 = "address2";
 }

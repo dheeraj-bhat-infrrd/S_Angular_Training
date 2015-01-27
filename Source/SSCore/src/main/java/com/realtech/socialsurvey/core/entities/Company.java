@@ -67,7 +67,7 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<Region> regions;
 
-	// bi-directional many-to-one association to Survey
+	// bi-directional many-to-one association to SurveyCompanyMapping
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
@@ -82,6 +82,14 @@ public class Company implements Serializable {
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<UserProfile> userProfiles;
+	
+	// bi-directional many-to-one association to DisabledAccount
+	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
+	private List<DisabledAccount> disabledAccounts;
+
+	// bi-directional many-to-one association to RemovedUser
+	@OneToMany(mappedBy = "company")
+	private List<RemovedUser> removedUsers;
 
 	public Company() {}
 
@@ -266,7 +274,7 @@ public class Company implements Serializable {
 
 		return surveyCompanyMapping;
 	}
-
+	
 	public List<User> getUsers() {
 		return this.users;
 	}
@@ -333,4 +341,25 @@ public class Company implements Serializable {
 		return userProfile;
 	}
 
+	public List<RemovedUser> getRemovedUsers() {
+		return this.removedUsers;
+	}
+
+	public void setRemovedUsers(List<RemovedUser> removedUsers) {
+		this.removedUsers = removedUsers;
+	}
+
+	public RemovedUser addRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().add(removedUser);
+		removedUser.setCompany(this);
+
+		return removedUser;
+	}
+
+	public RemovedUser removeRemovedUser(RemovedUser removedUser) {
+		getRemovedUsers().remove(removedUser);
+		removedUser.setCompany(null);
+
+		return removedUser;
+	}
 }

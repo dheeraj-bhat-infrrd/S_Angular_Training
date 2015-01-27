@@ -8,7 +8,6 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +24,8 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.registration.RegistrationService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -38,10 +38,14 @@ public class RegistrationController {
 	@Autowired
 	private CaptchaValidation captchaValidation;
 	@Autowired
-	private RegistrationService registrationService;
+	private UserManagementService userManagementService;
 	@Autowired
 	private MessageUtils messageUtils;
-
+	@Autowired
+	private SolrSearchService solrSearchService;
+	@Autowired
+	private SessionHelper sessionHelper;
+	
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
 		LOG.info("Showing invitation page");
@@ -79,7 +83,7 @@ public class RegistrationController {
 			// continue with the invitation
 			try {
 				LOG.debug("Calling service for sending the registration invitation");
-				registrationService.inviteCorporateToRegister(firstName, lastName, emailId);
+				userManagementService.inviteCorporateToRegister(firstName, lastName, emailId);
 				LOG.debug("Service for sending the registration invitation excecuted successfully");
 			}
 			catch (InvalidInputException e) {
@@ -119,7 +123,7 @@ public class RegistrationController {
 			LOG.debug("Calling registration service for validating registration url and extracting parameters from it");
 			Map<String, String> urlParams = null;
 			try {
-				urlParams = registrationService.validateRegistrationUrl(encryptedUrlParams);
+				urlParams = userManagementService.validateRegistrationUrl(encryptedUrlParams);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
@@ -178,7 +182,6 @@ public class RegistrationController {
 		String strIsDirectRegistration = request.getParameter("isDirectRegistration");
 
 		try {
-
 			boolean isDirectRegistration = false;
 			if (strIsDirectRegistration != null && !strIsDirectRegistration.isEmpty()) {
 				isDirectRegistration = Boolean.parseBoolean(strIsDirectRegistration);
@@ -194,14 +197,15 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				User user = registrationService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
-
-				LOG.debug("Adding newly registered user to session");
-				HttpSession session = request.getSession(true);
-				session.setAttribute(CommonConstants.USER_IN_SESSION, user);
-				LOG.debug("Successfully added registered user to session");
-
+				
+				solrSearchService.addUserToSolr(user);
+				LOG.debug("Added newly added user {} to solr",user.getFirstName());
+				
+				LOG.debug("Adding newly registered user to principal session");
+				sessionHelper.loginOnRegistration(emailId, password);
+				LOG.debug("Successfully added registered user to principal session");
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);
@@ -241,7 +245,7 @@ public class RegistrationController {
 	public String verifyAccount(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
 		LOG.info("Method to verify account called");
 		try {
-			registrationService.verifyAccount(encryptedUrlParams);
+			userManagementService.verifyAccount(encryptedUrlParams);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
@@ -251,7 +255,7 @@ public class RegistrationController {
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
-		return JspResolver.MESSAGE_HEADER;
+		return JspResolver.LOGIN;
 
 	}
 
@@ -290,24 +294,22 @@ public class RegistrationController {
 	 */
 	private void validateFormParameters(String firstName, String lastName, String emailId) throws InvalidInputException {
 		LOG.debug("Validating invitation form parameters");
-		String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-		String ALPHA_REGEX = "[a-zA-Z]+";
-
+		
 		// check if first name is null or empty and only contains alphabets
-		if (firstName == null || firstName.isEmpty() || !firstName.matches(ALPHA_REGEX)) {
+		if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
 			throw new InvalidInputException("Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME);
 		}
 
 		// check if last name only contains alphabets
 		if (lastName != null && !lastName.isEmpty()) {
-			if (!(lastName.matches(ALPHA_REGEX))) {
+			if (!(lastName.matches(CommonConstants.LAST_NAME_REGEX))) {
 				throw new InvalidInputException("Last name is invalid in registration", DisplayMessageConstants.INVALID_LASTNAME);
 			}
 		}
 
 		// check if email Id isEmpty, null or whether it matches the regular
 		// expression or not
-		if (emailId == null || emailId.isEmpty() || !emailId.matches(EMAIL_REGEX)) {
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 			throw new InvalidInputException("Email address is invalid in registration", DisplayMessageConstants.INVALID_EMAILID);
 		}
 		LOG.debug("Invitation form parameters validated successfully");
@@ -328,13 +330,14 @@ public class RegistrationController {
 	private void validateRegistrationForm(String firstName, String lastName, String emailId, String password, String confirmPassword)
 			throws InvalidInputException {
 		LOG.debug("Validating registration form parameters");
+
 		/**
 		 * call the invitation form parameters validation as the form parameters and validation
 		 * criteria are same
 		 */
 		validateFormParameters(firstName, lastName, emailId);
-
-		if (password == null || password.isEmpty() || confirmPassword == null || confirmPassword.isEmpty()) {
+		
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX) || confirmPassword == null || confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (!password.equals(confirmPassword)) {
