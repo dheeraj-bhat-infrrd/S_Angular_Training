@@ -95,6 +95,7 @@ public interface CommonConstants {
 	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
 	public static final String SURVEY_COLUMN = "survey";
 	public static final String SURVEY_COMPANY_COLUMN = "company";
+	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
