@@ -40,7 +40,7 @@ public enum AccountType {
 	 * @param value
 	 * @return
 	 */
-	public static AccountType getAccountType(long value) {
+	public static AccountType getAccountType(int value) {
 		for (AccountType accountType : values()) {
 			if (accountType.value == (value)) {
 				return accountType;

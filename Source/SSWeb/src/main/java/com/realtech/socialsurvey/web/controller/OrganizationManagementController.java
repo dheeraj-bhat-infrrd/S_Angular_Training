@@ -17,11 +17,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -639,8 +641,13 @@ public class OrganizationManagementController {
 		return message;
 	}
 
+	/**
+	 * Method to upgrade a plan
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/upgradeplan", method = RequestMethod.POST)
-	@ResponseBody
 	public String upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -676,7 +683,6 @@ public class OrganizationManagementController {
 					break;
 			}
 			LOG.info("Returning the dashboard page");
-			return JspResolver.USER_LOGIN;
 		}
 		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException e ) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
@@ -691,8 +697,36 @@ public class OrganizationManagementController {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		
-		return message;
-
+		//After all the updates are done we set the account type in the session to reflect changes
+		HttpSession session = request.getSession();		
+		session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(Integer.parseInt(accountType)));
+				
+		model.addAttribute("message",message);
+		return "redirect:./"+JspResolver.LANDING+".do";
+	}
+	
+	/**
+	 * Method for displaying the upgrade page
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/upgradepage", method=RequestMethod.GET)
+	public String upgradePage(HttpServletRequest request, Model model){
+		
+		LOG.info("Upgrade page requested.");
+		
+		LOG.debug("Retrieveing the user from session to get his current plan details");
+		User user = sessionHelper.getCurrentUser();
+		LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+		
+		LOG.debug("Adding the current plan in the model and the upgrade flag");
+		model.addAttribute(CommonConstants.CURRENT_LICENSE_ID, currentLicenseDetail.getAccountsMaster().getAccountsMasterId());
+		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.STATUS_ACTIVE);
+		
+		LOG.info("Returning the upgrade account selection page");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
+		
 	}
 }
 // JIRA: SS-24 BY RM02 EOC
