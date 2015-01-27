@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class SurveyBuilderController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderController.class);
+	private static final String MULTIPLE_CHOICE = "mcq";
 
 	@Autowired
 	private SurveyBuilder surveyBuilder;
@@ -83,7 +84,6 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/addquestiontosurvey", method = RequestMethod.POST)
 	public String addQuestionToExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController called");
-		String MULTIPLE_CHOICE = "mcq";
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
 
@@ -122,7 +122,6 @@ public class SurveyBuilderController {
 					answerOrder++;
 				}
 				questionDetails.setAnswers(answers);
-				LOG.info(new Gson().toJson(answers));
 			}
 
 			// Adding the question to survey
@@ -147,16 +146,41 @@ public class SurveyBuilderController {
 	@ResponseBody
 	@RequestMapping(value = "/updatequestionfromsurvey", method = RequestMethod.POST)
 	public String updateQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
-		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
+		LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		
 		try {
 			long surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-			
-			surveyBuilder.deactivateQuestionSurveyMapping(user, surveyQuestionId);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
+			String questionType = request.getParameter("sb-question-edit-type");
+
+			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
+			questionDetails.setQuestion(request.getParameter("sb-question-edit-txt"));
+			questionDetails.setQuestionType(questionType);
+			questionDetails.setIsRatingQuestion(1);
+
+			if (questionType.indexOf(MULTIPLE_CHOICE) != -1) {
+				List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
+				List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
+				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
+
+				SurveyAnswer surveyAnswer;
+				int answerOrder = 0;
+				for (String answerIdStr : strAnswerIds) {
+					long answerId = Long.parseLong(answerIdStr);
+
+					surveyAnswer = new SurveyAnswer();
+					surveyAnswer.setAnswerText(strAnswerTexts.get(answerOrder));
+					surveyAnswer.setAnswerId(answerId);
+					answers.add(surveyAnswer);
+					
+					answerOrder++;
+				}
+				questionDetails.setAnswers(answers);
+			}			
+			surveyBuilder.updateQuestionAndAnswers(user, surveyQuestionId, questionDetails);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
@@ -189,6 +213,35 @@ public class SurveyBuilderController {
 		catch (InvalidInputException e) {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+		}
+		return message;
+	}
+	
+	/**
+	 * Method to reorder question in existing survey
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/reorderQuestion", method = RequestMethod.POST)
+	public String reorderQuestion(Model model, HttpServletRequest request) {
+		LOG.info("Method reorderQuestion of SurveyBuilderController called");
+		User user = sessionHelper.getCurrentUser();
+		String message = "";
+		
+		try {
+			long questionId = Long.parseLong(request.getParameter("questionId"));
+			String reorderType = request.getParameter("reorderType");
+			
+			surveyBuilder.reorderQuestion(user, questionId, reorderType);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method reorderQuestion of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("InvalidInputException while reordering Question from Survey: " + e.getMessage(), e);
 		}
 		return message;
 	}
@@ -243,67 +296,6 @@ public class SurveyBuilderController {
 			LOG.error("InvalidInputException while fetching SurveyTemplates: " + e.getMessage(), e);
 		}
 		return templatesJson;
-	}
-	
-	/**
-	 * Method to create new survey
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/createsurvey", method = RequestMethod.POST)
-	public String createNewSurvey(Model model, HttpServletRequest request) {
-		LOG.info("Method createNewSurvey of SurveyBuilderController called");
-		User user = sessionHelper.getCurrentUser();
-		String message = "";
-		try {
-			if(surveyBuilder.checkForExistingSurvey(user) != null) {
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_ALREADY_EXISTS, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			}
-			else {
-				surveyBuilder.createNewSurvey(user);
-				message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_CREATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-			}
-			LOG.info("Method createNewSurvey of SurveyBuilderController finished successfully");
-		}
-		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			LOG.error("InvalidInputException while creating NewSurvey: " + e.getMessage(), e);
-		}
-		return message;
-	}
-	
-	/**
-	 * Method to return particular survey for company
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/getsurveydetails", method = RequestMethod.POST)
-	public String getSurveyDetails(Model model, HttpServletRequest request) {
-		LOG.info("Method getSurveyDetails of SurveyBuilderController called");
-		User user = sessionHelper.getCurrentUser();
-		String surveyJson = "";
-		
-		try {
-			long surveyId = Long.parseLong(request.getParameter("surveyId"));
-			List<SurveyQuestionDetails> surveyQuestionDetails;
-		
-			Survey survey = surveyBuilder.getSurvey(surveyId);
-			surveyQuestionDetails = surveyBuilder.getAllActiveQuestionsOfSurvey(user, survey);
-
-			surveyJson = new Gson().toJson(surveyQuestionDetails);
-			LOG.info("Method getSurveyDetails of SurveyBuilderController finished successfully");
-		}
-		catch (InvalidInputException e) {
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			LOG.error("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
-		}
-		return surveyJson;
 	}
 	
 	/**
