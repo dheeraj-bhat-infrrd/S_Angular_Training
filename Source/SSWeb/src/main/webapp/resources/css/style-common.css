@@ -169,12 +169,42 @@ a, a:hover, a:visited{
     background: url('../images/first-name.png') no-repeat center;
 }
 
+.mob-icn-fname {
+    background: url('../images/first-name.png') no-repeat;
+    background-position: -50px center;
+}
+
+.mob-icn-assignTo {
+    background: url('../images/assignTo.png') no-repeat;
+    background-position: -50px center;
+}
+
 .icn-lname {
     background: url('../images/last-name.png') no-repeat center;
 }
 
+.mob-icn-lname {
+    background: url('../images/last-name.png') no-repeat;
+    background-position: -50px center;
+}
+
 .icn-email {
     background: url('../images/email.png') no-repeat center;
+}
+
+.mob-icn-email {
+    background: url('../images/email.png') no-repeat;
+    background-position: -50px center;
+}
+
+.mob-icn-branch-name {
+    background: url('../images/branch-name.png') no-repeat;
+    background-position: -50px center;
+}
+
+.icn-address-mobile {
+    background: url(../images/address-1.png) no-repeat center;
+    background-position: -50px center;
 }
 
 .icn-user-id {
@@ -206,10 +236,6 @@ a, a:hover, a:visited{
 }
 
 .icn-address {
-    background: url(../images/address-1.png) no-repeat center;
-}
-
-.icn-address-mobile {
     background: url(../images/address-1.png) no-repeat center;
 }
 
@@ -353,7 +379,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .msg-txt-area{
-    width: 81%;
+    width: 78%;
 }
 
 .msg-area {
@@ -1309,18 +1335,10 @@ button.paypal.is-active {
 }
 
 .overlay-toast {
-    display: none;
+    display: inline-block;
     color: #fff;
-    position: fixed;
-    bottom: 50px;
-    width: 80%;
-    line-height: 32px;
+    padding: 0 20px;
     border-radius: 3px;
-    overflow: hidden;
-    line-height: 32px;
-    text-align: center;
-    left: 10%;
-    z-index: 999999999;
     background-color: rgba(0,0,0,0.7);
 }
 
@@ -1908,6 +1926,7 @@ button.paypal.is-active {
      padding: 0 50px 0 0;
      background: url(../images/search.png) no-repeat;
      background-position: right center;
+     line-height: normal;
 }
 .sb-content {
     padding: 20px;
@@ -1961,7 +1980,7 @@ button.paypal.is-active {
 }
 
 .sb-btn-wrapper {
-    width: 313px;
+    width: 150px;
     margin: 0 auto 30px;
 }
 
@@ -1969,7 +1988,6 @@ button.paypal.is-active {
     border-radius: 3px;
     color: #fff;
     cursor: pointer;
-    float: left;
     width: 150px;
     line-height: 40px;
     text-align: center;
@@ -1985,7 +2003,7 @@ button.paypal.is-active {
 
 .sb-txtarea-wrapper {
     margin-top: 30px;
-    margin-bottom: 50px
+    margin-bottom: 10px
 }
 
 .sb-tem-select {
@@ -2013,7 +2031,7 @@ button.paypal.is-active {
 }
 
 .btn-sb-add {
-    margin-right: 12px;
+/*    margin-right: 12px;*/
 }
 
 .sb-q-item-no {
@@ -2072,8 +2090,8 @@ button.paypal.is-active {
 .sb-q-btn {
     cursor: pointer;
     height: 42px;
-    min-width: 33px;
-    width: 33%;
+    min-width: 25px;
+    width: 25%;
 }
 
 .sb-item-row {
@@ -2209,7 +2227,6 @@ button.paypal.is-active {
     display: none;
     padding: 10px;
     width: 98%;
-    margin-left: -10px;
     border: 1px solid #e3e3e3;
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
@@ -2304,7 +2321,7 @@ button.paypal.is-active {
 }
 
 .sb-mcq-ans-wrapper {
-    margin-top: -30px;
+    margin-top: 10px;
 }
 
 .sb-inparea:last-child {
@@ -2317,4 +2334,50 @@ button.paypal.is-active {
     border: 1px solid #e3e3e3;
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.um-btn-wrapper-fix {
+    width: 210px;
+}
+
+.um-branch-list {
+    position: absolute;
+    width: 100%;
+}
+
+.toast-container {
+    z-index: 99999999999;
+    text-align: center;
+    position: fixed;
+    bottom: 50px;
+    width: 100%;
+    line-height: 32px;
+}
+
+.sb-btns-add-rem-wrapper {
+    margin-bottom: 20px;
+    margin-top: 10px;
+}
+
+.sb-ad-rem-btn {
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    margin-left: 15px;
+}
+
+.icn-sb-ad-btn {
+    background: url(../images/Plus_Big.png) no-repeat center;
+}
+
+.icn-sb-rem-btn {
+    background: url(../images/minus_Big.png) no-repeat center;
+}
+
+.sb-btn-reorder-up {
+    background: url(../images/sb-reorder-up.png) no-repeat center;
+}
+
+.sb-btn-reorder-down {
+    background: url(../images/sb-reorder-down.png) no-repeat center;
 }

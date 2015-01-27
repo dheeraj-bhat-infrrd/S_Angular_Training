@@ -332,8 +332,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
-	private void addTeamAccountType(User user) throws InvalidInputException {
+	private void addTeamAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
@@ -348,6 +349,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
+		solrSearchService.addOrUpdateBranchToSolr(branch);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
