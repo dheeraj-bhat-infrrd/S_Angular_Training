@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.SurveyQuestionsMappingDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswer;
@@ -49,7 +48,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	private GenericDao<SurveyQuestionsAnswerOption, Long> surveyQuestionsAnswerOptionDao;
 
 	@Autowired
-	private SurveyQuestionsMappingDao surveyQuestionsMappingDao;
+	private GenericDao<SurveyQuestionsMapping, Long> surveyQuestionsMappingDao;
 
 	@Autowired
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
@@ -385,7 +384,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		queries.put(CommonConstants.SURVEY_COLUMN, survey);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		
-		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValue(SurveyQuestionsMapping.class, queries);
+		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValueAscending(SurveyQuestionsMapping.class,
+				queries, CommonConstants.SURVEY_QUESTION_ORDER_COLUMN);
 		if (surveyQuestionsMappings == null || surveyQuestionsMappings.isEmpty()) {
 			LOG.error("No question mapped for the survey mapped to provided user.");
 			throw new InvalidInputException("No question mapped for the survey mapped to provided user.");
@@ -526,8 +526,11 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	private void reorderSurveyQuestions(User user, SurveyQuestionsMapping surveyQuestionsMapping) {
 		LOG.debug("Method reorderSurveyQuestions() started.");
 
-		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.fetchActiveSurveyQuestions(user,
-				surveyQuestionsMapping.getSurvey());
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.SURVEY_COLUMN, surveyQuestionsMapping.getSurvey());
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValueAscending(SurveyQuestionsMapping.class,
+				queries, CommonConstants.SURVEY_QUESTION_ORDER_COLUMN);
 
 		int count = 1;
 		for (SurveyQuestionsMapping mapping : surveyQuestionsMappings) {
@@ -555,8 +558,11 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, questionId);
 		int order = surveyQuestionsMapping.getQuestionOrder();
 		
-		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.fetchActiveSurveyQuestions(user,
-				surveyQuestionsMapping.getSurvey());
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.SURVEY_COLUMN, surveyQuestionsMapping.getSurvey());
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<SurveyQuestionsMapping> surveyQuestionsMappings = surveyQuestionsMappingDao.findByKeyValueAscending(SurveyQuestionsMapping.class,
+				queries, CommonConstants.SURVEY_QUESTION_ORDER_COLUMN);
 		
 		
 		for (SurveyQuestionsMapping surveyQuestionsMappingNext : surveyQuestionsMappings) {

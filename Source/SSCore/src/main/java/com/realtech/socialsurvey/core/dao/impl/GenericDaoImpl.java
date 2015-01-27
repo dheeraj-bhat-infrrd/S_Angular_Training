@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -266,9 +267,23 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			LOG.error("HibernateException caught in merge().", hibernateException);
 			throw new DatabaseException("HibernateException caught in merge().", hibernateException);
 		}
-		
 	}
 	
-	
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<T> findByKeyValueAscending(Class<T> dataClass, Map<String, Object> queries, String ascendingColumn) {
+		Criteria criteria = getSession().createCriteria(dataClass);
+		try {
+			for (Entry<String, Object> query : queries.entrySet()) {
+				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+			criteria.addOrder(Order.asc(ascendingColumn));
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByKeyValue().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByKeyValue().", hibernateException);
+		}
+		return criteria.list();
+	}
 }
 // JIRA: SS-8: By RM05: EOC
