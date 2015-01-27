@@ -736,9 +736,9 @@
     .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
         display: block !important;
     }
-    .overlay-toast{
+    /* .overlay-toast{
         display: none;
-    }
+    } */
     .header-slider-wrapper{
         display: none;
     }
