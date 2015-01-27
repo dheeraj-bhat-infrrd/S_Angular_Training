@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswer;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -218,6 +219,38 @@ public class SurveyBuilderController {
 	}
 	
 	/**
+	 * Method to deactivate questions from existing survey
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/removequestionsfromsurvey", method = RequestMethod.POST)
+	public String removeQuestionsFromExistingSurvey(Model model, HttpServletRequest request) {
+		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
+		User user = sessionHelper.getCurrentUser();
+		String message = "";
+		
+		try {
+			String questionIdsStr = request.getParameter("questionIds");
+			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
+			
+			LOG.info(questionIdsStr);
+			for(String questionIdStr : surveyQuestionIdStrs) {
+				surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
+			}
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+		}
+		return message;
+	}
+	
+	/**
 	 * Method to reorder question in existing survey
 	 * 
 	 * @param model
@@ -282,12 +315,12 @@ public class SurveyBuilderController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/fetchsurveytemplates", method = RequestMethod.GET)
+	@RequestMapping(value = "/getactivesurveytemplates", method = RequestMethod.GET)
 	public String fetchSurveyTemplates(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchSurveyTemplates of SurveyBuilderController called");
 		String templatesJson = null;
 		try {
-			List<Survey> surveytemplates = surveyBuilder.getSurveyTemplates();
+			List<SurveyTemplate> surveytemplates = surveyBuilder.getSurveyTemplates();
 			templatesJson = new Gson().toJson(surveytemplates);
 			LOG.info("Method fetchSurveyTemplates of SurveyBuilderController finished successfully");
 		}
@@ -312,11 +345,8 @@ public class SurveyBuilderController {
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		
-		//TODO Get objects from UI
-		Survey survey = new Survey();
-		
 		try {
-			surveyBuilder.deactivateSurveyCompanyMapping(user, survey, user.getCompany());
+			surveyBuilder.deactivateSurveyCompanyMapping(user);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_COMPANY_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method deactivateSurveyCompanyMapping of SurveyBuilderController finished successfully");
 		}
@@ -327,6 +357,39 @@ public class SurveyBuilderController {
 		catch (NoRecordsFetchedException e) {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("NoRecordsFetchedException while disabling Survey from company: " + e.getMessage(), e);
+		}
+		return message;
+	}
+	
+	/**
+	 * Method to activate survey for company from template
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/activatesurveyfromtemplate", method = RequestMethod.POST)
+	public String activateSurveyFromTemplate(Model model, HttpServletRequest request) {
+		LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController called");
+		User user = sessionHelper.getCurrentUser();
+		String message = "";
+		
+		//TODO Get objects from UI
+		long templateId = Long.parseLong(request.getParameter("templateId"));
+		
+		try {
+			surveyBuilder.cloneSurveyFromTemplate(user, templateId);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("InvalidInputException while cloning Survey for company: " + e.getMessage(), e);
+		}
+		catch (NoRecordsFetchedException e) {
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NoRecordsFetchedException while cloning Survey for company: " + e.getMessage(), e);
 		}
 		return message;
 	}
