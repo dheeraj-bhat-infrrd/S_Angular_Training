@@ -65,8 +65,8 @@
                 
                 
                 <div class="sb-btn-wrapper clearfix">
-                    <div class="btn-sb-add btn-sb">Add More</div>
-                    <div class="btn-sb-done btn-sb">Done</div>
+                    <div class="btn-sb-add btn-sb">Add Question</div>
+<!--                    <div class="btn-sb-done btn-sb">Done</div>-->
                 </div>
                  
                 <div class="sb-ques-wrapper">
@@ -105,7 +105,8 @@
                             </div>
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
-                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
@@ -134,7 +135,8 @@
                             </div> 
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
-                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
@@ -151,7 +153,8 @@
                             <textarea class="sb-q-txt-1 sb-txt-ar"></textarea>
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
-                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
@@ -294,6 +297,7 @@
         
         var selectedRating = "";
         $('.sb-btn-edit').click(function(){
+            $('.sb-ans-mc-wrapper').css('padding','0px');
             $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html());
             
             if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
@@ -316,6 +320,7 @@
         });
         
         $('.sb-btn-save').click(function(){
+            $('.sb-ans-mc-wrapper').css('padding','0 10px');
             $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val());
             
             if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){

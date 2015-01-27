@@ -1339,10 +1339,6 @@ button.paypal.is-active {
     color: #fff;
     padding: 0 20px;
     border-radius: 3px;
-    overflow: hidden;
-    line-height: 32px;
-    left: 10%;
-    z-index: 999999999;
     background-color: rgba(0,0,0,0.7);
 }
 
@@ -1984,7 +1980,7 @@ button.paypal.is-active {
 }
 
 .sb-btn-wrapper {
-    width: 313px;
+    width: 150px;
     margin: 0 auto 30px;
 }
 
@@ -1992,7 +1988,6 @@ button.paypal.is-active {
     border-radius: 3px;
     color: #fff;
     cursor: pointer;
-    float: left;
     width: 150px;
     line-height: 40px;
     text-align: center;
@@ -2036,7 +2031,7 @@ button.paypal.is-active {
 }
 
 .btn-sb-add {
-    margin-right: 12px;
+/*    margin-right: 12px;*/
 }
 
 .sb-q-item-no {
@@ -2095,8 +2090,8 @@ button.paypal.is-active {
 .sb-q-btn {
     cursor: pointer;
     height: 42px;
-    min-width: 33px;
-    width: 33%;
+    min-width: 25px;
+    width: 25%;
 }
 
 .sb-item-row {
@@ -2210,7 +2205,7 @@ button.paypal.is-active {
 .sb-ans-mc-wrapper {
     font-size: 13px;
     line-height: 22px;
-    padding: 0;
+    padding: 0 10px;
 }
 
 .sb-txt-ar {
@@ -2351,6 +2346,7 @@ button.paypal.is-active {
 }
 
 .toast-container {
+    z-index: 99999999999;
     text-align: center;
     position: fixed;
     bottom: 50px;
@@ -2376,4 +2372,12 @@ button.paypal.is-active {
 
 .icn-sb-rem-btn {
     background: url(../images/minus_Big.png) no-repeat center;
+}
+
+.sb-btn-reorder-up {
+    background: url(../images/sb-reorder-up.png) no-repeat center;
+}
+
+.sb-btn-reorder-down {
+    background: url(../images/sb-reorder-down.png) no-repeat center;
 }
