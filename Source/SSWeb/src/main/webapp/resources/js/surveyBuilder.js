@@ -285,7 +285,6 @@ function loadActiveSurveyCallback(response) {
 				+ '<span class="sb-q-header-txt">Survey Questions</span>'
 				+ '<div id="remove-selected" class="sb-q-header-icons-rem">Remove</div>'
 			+ '</div>'
-			+ '<div class="float-right sb-q-item-btns blue-text cursor-pointer view-all-lnk">View All</div>'
 		+ '</div>';
 
 		// For Each Question

@@ -46,6 +46,6 @@ public interface GenericDao<T, ID extends Serializable> {
 
 	public void merge(T entity);
 
+	public List<T> findByKeyValueAscending(Class<T> dataClass, Map<String, Object> queries, String ascendingColumn);
 }
-
 // JIRA: SS-8: By RM05: EOC
