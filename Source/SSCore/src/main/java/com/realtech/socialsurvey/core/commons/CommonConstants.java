@@ -66,6 +66,8 @@ public interface CommonConstants {
 	public static final int IS_NOT_OWNER = 0;
 	public static final int SUBSCRIPTION_DUE = 1;
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
+	public static final String IS_ASSIGN_ADMIN = "YES";
+	public static final String IS_UNASSIGN_ADMIN = "NO";
 
 
 	/**
@@ -136,8 +138,8 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
+	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
-	public static final int ACCOUNT_TYPE_TEAM = 2;
 
 	/**
 	 * Logo related config
@@ -188,8 +190,13 @@ public interface CommonConstants {
 	public static final String USER_ID_SOLR = "userId";
 	public static final String USER_FIRST_NAME_SOLR = "firstName";
 	public static final String USER_LAST_NAME_SOLR = "lastName";
+	public static final String USER_DISPLAY_NAME_SOLR = "displayName";
+	public static final String USER_LOGIN_NAME_SOLR = "loginName";
 	public static final String USER_EMAIL_ID_SOLR = "emailId";
 	public static final String USER_IS_OWNER_SOLR = "isOwner";
+	public static final String BRANCHES_SOLR = "branches";
+	public static final String REGIONS_SOLR = "regions";
+	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
 }

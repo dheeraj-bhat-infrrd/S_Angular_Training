@@ -76,9 +76,6 @@ public interface UserManagementService {
 	// Method to update status of the given user as active or inactive.
 	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
 
-	// Method to get list of all the branches, current user is admin of.
-	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException;
-	
 	/* Sends an email to user with the link to complete registration.
 	 User has to provide password to set. Also, user can choose to change name.*/
 	public void sendRegistrationCompletionLink(String emailId, String firstName, String lastName, long companyId) throws InvalidInputException, UndeliveredEmailException;
@@ -109,8 +106,6 @@ public interface UserManagementService {
 	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException;
 
 	public boolean userExists(String userName);
-	
-//	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException;
 	
 	//JIRA SS-42 by RM-06:EOC
 	

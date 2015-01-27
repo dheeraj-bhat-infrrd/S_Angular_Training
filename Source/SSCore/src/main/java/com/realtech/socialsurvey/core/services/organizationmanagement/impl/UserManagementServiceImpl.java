@@ -389,8 +389,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Deactivating user " + userToBeDeactivated.getFirstName());
 		userDao.update(userToBeDeactivated);
-		
-		//Create an entry into the RemovedUser table for keeping historical records of users.
+
+		// Create an entry into the RemovedUser table for keeping historical records of users.
 		RemovedUser removedUser = new RemovedUser();
 		removedUser.setCompany(userToBeDeactivated.getCompany());
 		removedUser.setUser(userToBeDeactivated);
@@ -881,56 +881,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method to update a user finished for user : " + userIdToUpdate);
 	}
 
-	/*
-	 * Method to get list of all the branches, current user is admin of.
-	 */
-	@Transactional
-	@Override
-	public List<Branch> getBranchesForUser(User user) throws InvalidInputException, NoRecordsFetchedException {
-		if (user == null) {
-			throw new InvalidInputException("No user found in method getBranchesForUser()");
-		}
-		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} started.", user.getFirstName());
-		List<ProfilesMaster> profilesMasters = new ArrayList<>();
-		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
-		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
-		profilesMasters.add(getProfilesMasterById(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID));
-		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		queries.put(CommonConstants.USER_COLUMN, user);
-		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
-		if (userProfiles == null || userProfiles.isEmpty()) {
-			LOG.error("No profile found for user : " + user.getUserId());
-			throw new NoRecordsFetchedException("No branch found for user : " + user.getUserId());
-		}
-//		int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-//		UserProfile highestUserProfile = null;
-		// get the highest user profile for the user
-//		Collections.sort(userProfiles, new UserProfileComparator());
-//		highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-//		highestProfilesMasterId = highestUserProfile.getProfilesMaster().getProfileId();
-		queries.clear();
-		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-//		if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-//			// Fetch all the branches of company
-//			LOG.info("IN getBranchesForUser() for company {}" + user.getCompany().getCompany());
-//			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-//		}
-//		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-//			queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
-//			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
-//		}
-//		else if (highestProfilesMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-//			queries.put("company", user.getCompany());
-//			queries.put("region", regionDao.findById(Region.class, highestUserProfile.getRegionId()));
-//			queries.put("branch", branchDao.findById(Branch.class, highestUserProfile.getBranchId()));
-//		}
-		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
-		LOG.info("Method getBranchesForUser() to fetch list of all the branches whose admin is {} finished.", user.getFirstName());
-		return branches;
-	}
-
 	/**
 	 * Sends an email to user with the link to complete registration. User has to provide password
 	 * to set. Also, user can choose to change name.
@@ -1004,49 +954,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method getAllUserProfilesForUser() finised successfully");
 		return userProfiles;
 	}
-
-	/*
-	 * Method to get highest user profile for the user company->region->branch->agent
-	 * @Override public UserProfile getHighestUserProfile(List<UserProfile> userProfiles) throws
-	 * InvalidInputException { if (userProfiles == null || userProfiles.isEmpty()) {
-	 * LOG.error("User profiles passed was either null or empty"); throw new
-	 * InvalidInputException("User profiles passed was either null or empty"); }
-	 * LOG.info("Method getHighestUserProfile() called to fetch the highest user profile for the user"
-	 * ); int highestProfilesMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
-	 * UserProfile highestUserProfile = userProfiles.get(0); for (UserProfile userProfile :
-	 * userProfiles) { if ((userProfile.getProfilesMaster().getProfileId() <
-	 * highestProfilesMasterId) && (userProfile.getProfilesMaster().getProfileId() !=
-	 * CommonConstants.PROFILES_MASTER_NO_PROFILE_ID)) { highestProfilesMasterId =
-	 * userProfile.getProfilesMaster().getProfileId(); highestUserProfile = userProfile; } }
-	 * LOG.info("Method getHighestUserProfile() finished successfully"); return highestUserProfile;
-	 * }
-	 */
-
-	/*
-	 * Method to get the highest user profile for the user
-	 */
-//	@Override
-//	@Transactional
-//	public UserProfile getHighestUserProfileForUser(User user) throws NoRecordsFetchedException, InvalidInputException {
-//		if (user == null) {
-//			LOG.error("No user passed");
-//			throw new InvalidInputException("No user passed");
-//		}
-//		LOG.info("Method getHighestUserProfileForUser() called to fetch the highest user profile for the user");
-//		List<UserProfile> userProfiles = getAllUserProfilesForUser(user);
-//		if (userProfiles == null || userProfiles.isEmpty()) {
-//			LOG.error("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
-//			throw new NoRecordsFetchedException("No profile found for user {} in getHighestUserProfileForUser()", user.getFirstName());
-//		}
-//		Collections.sort(userProfiles, new UserProfileComparator());
-//		UserProfile highestUserProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-//		if (highestUserProfile == null) {
-//			LOG.error("No user profile found for the user");
-//			throw new NoRecordsFetchedException("No user profile found for the user");
-//		}
-//		LOG.info("Method getHighestUserProfileForUser() finished successfully");
-//		return highestUserProfile;
-//	}
 
 	/**
 	 * Method to generate and send verification link
@@ -1496,7 +1403,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		if(admin.isCompanyAdmin())
 			return true;
-//		admin = userDao.findById(User.class, admin.getUserId());
 		for(UserProfile adminProfile:admin.getUserProfiles()){
 			if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin() && branch.getRegion().getRegionId()==adminProfile.getRegionId())
 				return true;
@@ -1506,4 +1412,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Method isAssigningAllowed() finsihed.");
 		return false;
 	}
+
+	/*
+	 * 
+	 */
+	/*@Autowired
+	public boolean isModifiableByCurrentUser(User admin, User user) throws InvalidInputException {
+		LOG.info("Method isModifiableByCurrentUser() started to check if {} can modify {}", admin.getFirstName(), user.getFirstName());
+		if(user==null || admin==null){
+			throw new InvalidInputException("Null value found for user or admin in isModifiableByCurrentUser().");
+		}
+		admin = userDao.findById(User.class, admin.getUserId());
+		user = userDao.findById(User.class, user.getUserId());
+		for(UserProfile adminProfile:admin.getUserProfiles()){
+			for(UserProfile userProfile:user.getUserProfiles()){
+				if(userProfile.getProfilesMaster().getp)
+			}
+		}
+		LOG.info("Method isModifiableByCurrentUser() finished to check if {} can modify {}", admin.getFirstName(), user.getFirstName());
+		return false;
+	}*/
 }

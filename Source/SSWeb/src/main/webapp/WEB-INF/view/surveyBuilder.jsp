@@ -52,17 +52,21 @@
                 <div class="sb-txtarea-wrapper">
                     <textarea class="sb-txtarea" placeholder="Enter Question"></textarea>
                 </div>
-                <div class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
-                    <input class="sb-inparea" placeholder="Enter option 1">
-                    <input class="sb-inparea" placeholder="Enter option 2">
-                    <input class="sb-inparea" placeholder="Enter option 3">
-                    <input class="sb-inparea" placeholder="Enter option 4">
-                    <input class="sb-inparea" placeholder="Enter option 5">
+                <div id="sb-mcq-ans-wrapper" class="sb-txtarea-wrapper hide sb-mcq-ans-wrapper">
+                    <div id="mcq-ans-container">
+                        <input class="sb-inparea" placeholder="Enter option">
+                        <input class="sb-inparea" placeholder="Enter option">
+                    </div>
+                    <div class="sb-btns-add-rem-wrapper clearfix">
+                        <div class="sb-ad-rem-btn icn-sb-ad-btn float-right"></div>
+                        <div class="sb-ad-rem-btn icn-sb-rem-btn hide float-right"></div>
+                    </div>
                 </div>
                 
+                
                 <div class="sb-btn-wrapper clearfix">
-                    <div class="btn-sb-add btn-sb">Add More</div>
-                    <div class="btn-sb-done btn-sb">Done</div>
+                    <div class="btn-sb-add btn-sb">Add Question</div>
+<!--                    <div class="btn-sb-done btn-sb">Done</div>-->
                 </div>
                  
                 <div class="sb-ques-wrapper">
@@ -101,7 +105,8 @@
                             </div>
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
-                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
@@ -130,7 +135,8 @@
                             </div> 
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
-                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
@@ -147,7 +153,8 @@
                             <textarea class="sb-q-txt-1 sb-txt-ar"></textarea>
                         </div>
                         <div class="float-right sb-q-item-btns clearfix">
-                            <div class="float-left sb-q-btn sb-btn-reorder"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
+                            <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
@@ -290,6 +297,7 @@
         
         var selectedRating = "";
         $('.sb-btn-edit').click(function(){
+            $('.sb-ans-mc-wrapper').css('padding','0px');
             $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html());
             
             if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
@@ -312,6 +320,7 @@
         });
         
         $('.sb-btn-save').click(function(){
+            $('.sb-ans-mc-wrapper').css('padding','0 10px');
             $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val());
             
             if($(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type') == "objective"){
@@ -353,6 +362,26 @@
         $('body').click(function(){
             if($('.sb-dd-wrapper').css('display') == "block"){
                 $('.sb-dd-wrapper').slideToggle(200);
+            }
+        });
+        
+//        Adding new option for MCQ
+        $('.icn-sb-ad-btn').click(function(){
+            $('#mcq-ans-container').append('<input class="sb-inparea" placeholder="Enter option">');
+            var choiceLen = $('.sb-inparea').length;
+            if(choiceLen > 2){
+                $('.icn-sb-rem-btn').show();
+            }
+        });
+        
+        $('.icn-sb-rem-btn').click(function(){
+            var choiceLen = $('.sb-inparea').length;
+            if(choiceLen > 2){
+                $('.sb-inparea').each(function(){
+                    if($('.sb-inparea').index(this) > choiceLen - 2){
+                        $(this).remove();
+                    }
+                });
             }
         });
         
