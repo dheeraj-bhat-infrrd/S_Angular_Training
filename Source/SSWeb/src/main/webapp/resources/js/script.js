@@ -90,9 +90,9 @@ function hideOverlay(){
 
 //show Toast
 function showToast(){
-    $('#overlay-toast').fadeIn();
+    $('#toast-container').fadeIn();
     setTimeout(function(){
-        $('#overlay-toast').fadeOut();
+        $('#toast-container').fadeOut();
     },3000);
 }
 
