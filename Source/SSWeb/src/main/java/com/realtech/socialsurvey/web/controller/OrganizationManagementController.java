@@ -8,6 +8,8 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -648,7 +650,8 @@ public class OrganizationManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/upgradeplan", method = RequestMethod.POST)
-	public String upgradePlanForUserInSession(HttpServletRequest request, Model model) {
+	@ResponseBody
+	public Object upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		String message = "";
@@ -682,7 +685,7 @@ public class OrganizationManagementController {
 				case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 					break;
 			}
-			LOG.info("Returning the dashboard page");
+			LOG.info("message returned : " + message);
 		}
 		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException e ) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
@@ -702,7 +705,8 @@ public class OrganizationManagementController {
 		session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(Integer.parseInt(accountType)));
 				
 		model.addAttribute("message",message);
-		return "redirect:./"+JspResolver.LANDING+".do";
+		LOG.info("returning a 200 response");
+		return new ResponseEntity<String>("Upgrade successful!", HttpStatus.OK);
 	}
 	
 	/**
