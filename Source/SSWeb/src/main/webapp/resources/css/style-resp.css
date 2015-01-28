@@ -705,6 +705,10 @@
         height: 42px;
         background-size: 32px !important;
     }
+    .sq-slider-wrapper {
+        width: 80%;
+        margin: 0 auto;
+    }
 }
 
 
