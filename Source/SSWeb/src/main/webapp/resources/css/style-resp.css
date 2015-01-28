@@ -697,6 +697,14 @@
         padding: 0 24px 0 0;
         margin-right: 5px;
     }
+    .sq-star-wrapper{
+        width: 210px;
+    }
+    .sq-star{
+        width: 42px;
+        height: 42px;
+        background-size: 32px !important;
+    }
 }
 
 
@@ -917,6 +925,8 @@
 @media (min-width: 1200px) {
     
 }
+
+
 
 
 
