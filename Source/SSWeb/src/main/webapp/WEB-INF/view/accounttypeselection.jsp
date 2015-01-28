@@ -22,7 +22,9 @@
 </c:choose>
     
  <c:choose>
- <c:when test="${ upgrade == 1 }"></c:when>
+ <c:when test="${ upgrade == 1 }">
+ 	<div class="overlay-loader overlay hide"></div>
+ </c:when>
  <c:otherwise>
 	 <div class="overlay-loader overlay hide"></div>
 	 <div class="overlay-payment overlay-main hide">
@@ -34,15 +36,6 @@
  </c:choose>
  	<c:choose>
  	<c:when test="${ upgrade ==1 }">
- 		<div class="hm-header-main-wrapper">
-			<div class="container">
-				<div class="hm-header-row clearfix">
-					<div class="float-left hm-header-row-left">
-						<spring:message code="label.upgradeplan.header.key" />
-					</div>
-				</div>
-			</div>
-		</div>
  		<div class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
         <div class="container">
  	</c:when>
@@ -60,7 +53,11 @@
                     </c:choose>
                     <div id="acc-type-sel-options" class="acc-type-sel-options">
                         <c:choose>
-                        	<c:when test="${ upgrade == 1}"></c:when>
+                        	<c:when test="${ upgrade == 1}">
+                        	<div class="login-txt text-center font-24 margin-bot-20 margin-top-25">	
+                        		<spring:message code="label.upgradeplan.header.key"/>
+                        	</div>
+                        	</c:when>
                         	<c:otherwise>
                         	<div class="login-txt text-center font-24 margin-bot-20">	
                         		<spring:message code="label.accounttypeselection.header.key"/>
@@ -136,6 +133,9 @@
 		                                    </c:otherwise>
 		                                    </c:choose>
 		                                </div>
+		                                <div class="float-left ol-btn-wrapper">
+						                    <div id="ol-btn-cancel" class="ol-btn">Cancel</div>
+						                </div>
 		                            </div>
                             </c:when>
                             <c:otherwise>
@@ -295,6 +295,10 @@
                 }
             }            
         });
+        
+        $("#ol-btn-cancel").click(function() {
+        	$('.overlay-payment').hide();
+         })
     </script>
 <c:choose>
 <c:when test="${ upgrade == 1 }">
