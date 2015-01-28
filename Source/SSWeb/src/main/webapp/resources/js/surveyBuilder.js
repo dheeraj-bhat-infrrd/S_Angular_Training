@@ -486,6 +486,7 @@ $('body').on('click', '.sb-btn-choose', function(){
 		overlayRevert();
 		$('#overlay-continue').unbind('click');
 		$('#btn-new-survey').click();
+		loadActiveSurvey();
 	});
 });
 
@@ -528,19 +529,9 @@ function loadActiveTemplateCallback(response) {
 			// Questions
 			$.each(surveyTemplate.questions, function(i, surveyQuestion) {
 				var questionTypeCode = surveyQuestion.questionType.trim();
-				var qType = "";
-				if (questionTypeCode == "sb-range-smiles" || questionTypeCode == "sb-range-star" || questionTypeCode == "sb-range-scale") {
-					qType = "rating";
-				}
-				else if (questionTypeCode == "sb-sel-mcq") {
-					qType = "objective";
-				}
-				else if (questionTypeCode == "sb-sel-desc") {
-					qType = "descriptive";
-				}
 				
 				htmlData = htmlData + '<li class="sb-q-template-item">'
-					+ '<div class="sb-q-txt-1" q-type="' + qType + '">' + surveyQuestion.question + '</div>';
+					+ '<div class="sb-q-txt-1" q-type="' + questionTypeCode + '">' + surveyQuestion.question + '</div>';
 				
 				// Answers
 				if (questionTypeCode == "sb-range-smiles") {
