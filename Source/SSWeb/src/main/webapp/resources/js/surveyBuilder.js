@@ -198,48 +198,12 @@ $('body').on('click', '.sb-btn-cancel', function(){
 });
 
 $('body').on('click', '.sb-btn-save', function(){
+	var questionId = $(this).parent().attr('data-questionid');
+	var url = "./updatequestionfromsurvey.do?questionId=" + questionId;
+	var formId = $(this).closest("form").attr('id');
+
+	callAjaxFormSubmit(url, commonActiveSurveyCallback, formId);
 	questionData = [];
-	
-	$('.sb-ans-mc-wrapper').css('padding','0 10px');
-	$(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').html($(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').val());
-	
-	var questionType = $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').attr('q-type');
-	if (questionType == "sb-sel-mcq"){
-		var length = $(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').attr('length');
-		var count = 1;
-		while (count <= length) {
-			var ansText = '.q-ans-obj-' + count + '-txt';
-			var ans = '.q-ans-obj-' + count;
-			$(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find(ans).html($(this).parent().prev('.sb-q-item-txt').find('.sb-ans-mc-wrapper').find(ansText).val());
-			$('.sb-ans-mc-item').show();
-			$('.q-ans-obj-txt').hide();
-			count ++;
-		}
-	}
-	else if (questionType == "sb-range-smiles" || questionType == "sb-range-star" || questionType == "sb-range-scale") {
-		$(this).parent().prev('.sb-q-item-txt').find('.sb-ans-rat-wrapper').hide();
-		$(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-2').show();
-	}
-	
-	if (selectedRating == "sb-range-smiles"){
-		$('.sb-q-txt-2').find('.sb-stars').hide();
-		$('.sb-q-txt-2').find('.sb-icn-smiles').show();
-	}
-	else if (selectedRating == "sb-range-star") {
-		$('.sb-q-txt-2').find('.sb-stars').hide();
-		$('.sb-q-txt-2').find('.icn-full-star').show();
-	}
-	else if (selectedRating == "sb-range-scale") {
-		$('.sb-q-txt-2').find('.sb-stars').hide();
-		$('.sb-q-txt-2').find('.sb-icn-scale').show();
-	}
-	
-	$(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').show();
-	$(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').hide();
-	$(this).prev('.sb-btn-edit').show();
-	$(this).parent().find('.sb-btn-delete').show();
-	$(this).parent().find('.sb-btn-cancel').hide();
-	$(this).hide();
 });
 
 $('body').on('click', '.sb-dd-item-ans', function(){
@@ -248,14 +212,6 @@ $('body').on('click', '.sb-dd-item-ans', function(){
 	$(this).addClass('blue-text');
 	
 	$(this).parent().parent().parent().find('#sb-question-edit-type').val(selectedRating);
-});
-
-$('body').on('click', '.sb-btn-save', function(){
-	var questionId = $(this).parent().attr('data-questionid');
-	var url = "./updatequestionfromsurvey.do?questionId=" + questionId;
-	var formId = $(this).closest("form").attr('id');
-
-	callAjaxFormSubmit(url, commonActiveSurveyCallback, formId);
 });
 
 // Reorder Question
