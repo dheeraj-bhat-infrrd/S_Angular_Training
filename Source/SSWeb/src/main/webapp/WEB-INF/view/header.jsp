@@ -84,9 +84,8 @@
 					</div>
 				</c:if>
 				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-					<div class="header-links-item">
-						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message
-								code="label.header.upgrade.key" /></a>
+					<div class="header-links-item" id="upgrade-plan" onclick="upgradePlan();">
+						<spring:message	code="label.header.upgrade.key" />
 					</div>
 				</c:if>
 					<div class="header-links-item">
@@ -155,8 +154,8 @@
 						<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-							<div class="initial-dd-item" onclick="showMainContent('./upgradepage.do')"><spring:message
-										code="label.header.upgrade.key" /></a>
+							<div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
 						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
