@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.commons.UserProfileComparator;
@@ -60,6 +61,7 @@ public class SessionHelper {
 	@Value("${AMAZON_BUCKET}")
 	private String bucket;
 
+	@Transactional
 	public void getCanonicalSettings(HttpSession session) throws InvalidInputException, NoRecordsFetchedException{
 		LOG.info("Getting canonical settings");
 		User user = getCurrentUser();
