@@ -2381,3 +2381,124 @@ button.paypal.is-active {
 .sb-btn-reorder-down {
     background: url(../images/sb-reorder-down.png) no-repeat center;
 }
+
+.sb-btn-cancel {
+    background: url(../images/icntagClose.png) no-repeat center;
+}
+
+.sq-top-img {
+    height: 70px;
+    margin-bottom: 20px;
+    background: url(../images/chat.png) no-repeat center;
+}
+
+.sq-bord-bot-sm {
+    width: 55px;
+    border-bottom: 1px solid #C8C8C8;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+.sq-ques{
+    font-size: 18px;
+    width: 80%;
+    margin: 0 auto 30px;
+}
+
+.sq-main-txt {
+    margin-bottom: 20px;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    font-size: 20px;
+}
+
+.sq-ques-wrapper {
+    text-align: center;
+}
+
+.sq-star {
+    float: left;
+    cursor: pointer;
+    width: 62px;
+    height: 62px;
+    background: url(../images/no_star.png) no-repeat center;
+}
+
+.sq-full-star {
+    background: url(../images/full_star.png) no-repeat center;
+}
+
+.sq-rat-wrapper {
+    margin-bottom: 20px;
+}
+
+.sq-star-wrapper {
+    width: 310px;
+    margin: 0 auto;
+}
+
+.sq-skip-chk {
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+}
+
+.sq-skip-txt {
+    color: #47555E;
+    margin-left: 10px;
+    line-height: 20px;
+    font-size: 18px;
+}
+
+.sq-skip-wrapper {
+    width: 185px;
+    margin: 0 auto 20px;
+}
+
+.sq-np-wrapper {
+    line-height: 22px;
+    width: 240px;
+    margin: 30px auto;
+}
+
+.sq-np-item {
+    cursor: pointer;
+}
+
+.sq-np-item:first-child {
+    border-right: 1px solid #C8C8C8;
+}
+
+.sq-np-item-next {
+    width: 105px;
+    text-align: right
+}
+
+.sq-btn-wrapper {
+    margin-bottom: 20px;
+}
+
+.sq-btn-continue {
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    width: 150px;
+    line-height: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+    margin: 0 auto;
+}
+
+.sq-btn-continue:hover {
+    background-color: #7AB400;
+}
+
+.sq-np-item-prev {
+    text-align: left;
+    width: 130px;
+}
+.sq-np-item-disabled {
+    color: #ccc !important;
+    cursor: default !important;
+}
