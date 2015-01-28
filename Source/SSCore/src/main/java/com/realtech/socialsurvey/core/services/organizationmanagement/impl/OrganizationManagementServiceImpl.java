@@ -1072,7 +1072,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid : value is : " + currentAccountsMasterId );
 					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
 				}
-				//In case of upgrading to the team account we need to change only the license details table.
+				//In case of upgrading to the team account we need to change only the license details table and add default branch to solr.
+				LOG.debug("checking if only default branch exists and fetching it");
+				Branch defaultBranch = fetchDefaultBranch(company);
+				if(defaultBranch != null){
+					LOG.debug("Adding the new branch to solr");
+					solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
+					LOG.debug("Solr update successful");
+				}	
+				else {
+					LOG.error("No default branch found for company with id : " + company.getCompanyId());
+					throw new NoRecordsFetchedException("No default branch found for company with id : " + company.getCompanyId());
+				}
 				LOG.info("Databases updated to Team plan");
 				break;
 				
