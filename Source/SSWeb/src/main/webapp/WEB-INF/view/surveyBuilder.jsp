@@ -100,6 +100,7 @@
 							<div class="float-left sb-q-btn sb-btn-reorder-up"></div>
 							<div class="float-left sb-q-btn sb-btn-reorder-down"></div>
 							<div class="float-left sb-q-btn sb-btn-delete"></div>
+							<div class="float-left sb-q-btn sb-btn-cancel hide"></div>
 							<div class="float-left sb-q-btn sb-btn-edit"></div>
 							<div class="float-left sb-q-btn sb-btn-save hide"></div>
 						</div>
@@ -126,6 +127,7 @@
 							<div class="float-left sb-q-btn sb-btn-reorder-up"></div>
 							<div class="float-left sb-q-btn sb-btn-reorder-down"></div>
 							<div class="float-left sb-q-btn sb-btn-delete"></div>
+							<div class="float-left sb-q-btn sb-btn-cancel hide"></div>
 							<div class="float-left sb-q-btn sb-btn-edit"></div>
 							<div class="float-left sb-q-btn sb-btn-save hide"></div>
 						</div>
@@ -144,6 +146,7 @@
 							<div class="float-left sb-q-btn sb-btn-reorder-up"></div>
 							<div class="float-left sb-q-btn sb-btn-reorder-down"></div>
 							<div class="float-left sb-q-btn sb-btn-delete"></div>
+							<div class="float-left sb-q-btn sb-btn-cancel hide"></div>
 							<div class="float-left sb-q-btn sb-btn-edit"></div>
 							<div class="float-left sb-q-btn sb-btn-save hide"></div>
 						</div>
