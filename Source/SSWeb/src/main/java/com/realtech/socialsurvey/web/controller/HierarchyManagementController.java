@@ -728,7 +728,7 @@ public class HierarchyManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 
-		LOG.info("Method to search branches completed successfully. Returning json : " + searchBranchJson);
+		LOG.info("Method to search branches completed successfully.");
 		return searchBranchJson;
 	}
 

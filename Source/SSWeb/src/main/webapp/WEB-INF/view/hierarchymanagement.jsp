@@ -63,11 +63,16 @@
 			                            </div>
 			                        </div>
 			                        <div class="hm-btn-outer margin-bottom-25 margin-top-5 clearfix hm-item-row-right-btn-save">
-			                            <div class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
-			                                <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
+			                            <div class="clearfix hsm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
+			                                <div class="float-left add-curve-btn cursor-pointer" id="add-branch-admin-btn" ><spring:message code="label.addbranchadmin.key"/></div>
 			                                <div id="branch-save-icon" class="float-left icn-save cursor-pointer margin-right-0"></div>
 			                                <div id="branch-clear-icon" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 			                            </div>
+			                            <input class="hm-item-row-txt cursor-pointer hide" type="text" id="hm-add-branch-admin-txt" autocomplete="off">
+			                            <input class="hm-item-row-txt cursor-pointer" type="hidden" id="hm-add-branch-admin-hidden-userid">
+			                            <div class="hm-dd-wrapper hide" id="hm-branch-userslist">
+		                                        <!-- users list for assigning branch admin is populated here through ajax  -->
+		                                </div>
 			                        </div>
 			                    </div>
 			                     <input type="hidden" name="branchId" id="branch-id-hidden"/>
@@ -89,8 +94,7 @@
 							    </div>
 							    <div class="hm-bottom-panel-content clearfix" id="hm-all-existing-comp-branches">
                     				<div id="existing-branches">
-                    			
-               						<!-- Existing branches get populated here from solr  -->
+               							<!-- Existing branches get populated here from solr  -->
                     				</div>
                     			</div>
 	                    	</div>
@@ -136,10 +140,15 @@
 			                            <div class="hm-item-row clearfix">
 			                                <div class="hm-item-row-right hm-item-row-right-btn-save">
 			                                    <div class="clearfix hm-btn-wrapper">
-			                                        <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addregionadmin.key"/></div>
+			                                        <div class="float-left add-curve-btn cursor-pointer" id="add-region-admin-btn"><spring:message code="label.addregionadmin.key"/></div>
 			                                        <div class="float-left icn-save cursor-pointer margin-right-0" id="region-save-icon"></div>
 			                                        <div id="region-clear-icon" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 			                                    </div>
+			                                    <input class="hm-item-row-txt cursor-pointer hide" type="text" id="hm-add-region-admin-txt" autocomplete="off">
+			                            		<input class="hm-item-row-txt cursor-pointer" type="hidden" id="hm-add-region-admin-hidden-userid">
+			                            		<div class="hm-dd-wrapper hide" id="hm-region-userslist">
+		                                        	<!-- users list for assigning region admin is populated here through ajax  -->
+		                                		</div>
 			                                </div>
 			                            </div>
 			                  		</div> 
@@ -211,11 +220,17 @@
 		                            <div class="hm-item-row clearfix">
 		                                <div class="hm-item-row-right hm-item-row-right-btn-save">
 		                                    <div class="clearfix hm-btn-wrapper" id="branch-actions">
-		                                        <div class="float-left add-curve-btn cursor-pointer"><spring:message code="label.addbranchadmin.key"/></div>
+		                                        <div class="float-left add-curve-btn cursor-pointer" id="add-branch-admin-btn"><spring:message code="label.addbranchadmin.key"/></div>
 		                                        <div class="float-left icn-save cursor-pointer margin-right-0" id="branch-save-icon"></div>
 		                                        <div id="branch-clear-icon" class="float-left icn-clear cursor-pointer margin-right-0"></div>
 		                                    </div>
+		                                    <input class="hm-item-row-txt cursor-pointer hide" type="text" id="hm-add-branch-admin-txt" autocomplete="off">
+			                            	<input class="hm-item-row-txt cursor-pointer" type="hidden" id="hm-add-branch-admin-hidden-userid">
+			                            	<div class="hm-dd-wrapper hide" id="hm-branch-userslist">
+		                                        <!-- users list for assigning branch admin is populated here through ajax  -->
+		                                	</div>
 		                                </div>
+		                                
 		                            </div>
 		                        </div>
 		                    </form>
