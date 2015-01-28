@@ -664,6 +664,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	/**
 	 * Method to create profile for a region admin
 	 */
+	@Transactional
 	@Override
 	public User assignRegionAdmin(User assigneeUser, long regionId, long userId) throws InvalidInputException {
 		if (assigneeUser == null) {

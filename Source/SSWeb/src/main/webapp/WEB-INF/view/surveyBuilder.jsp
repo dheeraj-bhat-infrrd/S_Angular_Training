@@ -203,6 +203,9 @@
 <script>
 $(document).ready(function(){
 	$(document).attr("title", "Build Survey");
+	
+	$('#sb-ques-wrapper').html('');
+	$('#sb-template-wrapper').html('');
 	loadActiveSurvey();
 });
 </script>

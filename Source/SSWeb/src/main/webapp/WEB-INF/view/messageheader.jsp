@@ -6,7 +6,7 @@
         <div class="float-left msg-txt-area">
             <div class="msg-area">
                 <div id="display-msg-div" class="msg-con ${message.type.name}">
-                    <p>${message.message} ${param.message}</p>
+                    ${message.message} ${param.message}
                 </div>
             </div>
         </div>
