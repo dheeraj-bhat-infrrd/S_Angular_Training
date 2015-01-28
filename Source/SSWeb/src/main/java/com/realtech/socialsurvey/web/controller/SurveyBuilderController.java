@@ -240,7 +240,7 @@ public class SurveyBuilderController {
 			for(String questionIdStr : surveyQuestionIdStrs) {
 				surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
 			}
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
@@ -269,7 +269,7 @@ public class SurveyBuilderController {
 			String reorderType = request.getParameter("reorderType");
 			
 			surveyBuilder.reorderQuestion(user, questionId, reorderType);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method reorderQuestion of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
@@ -301,7 +301,7 @@ public class SurveyBuilderController {
 		}
 		catch (InvalidInputException e) {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			LOG.error("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
+			LOG.warn("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
 		}
 		LOG.info("Return: " + surveyJson);
 		return surveyJson;
@@ -319,6 +319,7 @@ public class SurveyBuilderController {
 	public String fetchSurveyTemplates(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchSurveyTemplates of SurveyBuilderController called");
 		String templatesJson = null;
+		
 		try {
 			List<SurveyTemplate> surveytemplates = surveyBuilder.getSurveyTemplates();
 			templatesJson = new Gson().toJson(surveytemplates);
@@ -326,7 +327,7 @@ public class SurveyBuilderController {
 		}
 		catch (InvalidInputException e) {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			LOG.error("InvalidInputException while fetching SurveyTemplates: " + e.getMessage(), e);
+			LOG.warn("InvalidInputException while fetching SurveyTemplates: " + e.getMessage(), e);
 		}
 		return templatesJson;
 	}
@@ -375,10 +376,9 @@ public class SurveyBuilderController {
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
 		
-		//TODO Get objects from UI
-		long templateId = Long.parseLong(request.getParameter("templateId"));
-		
 		try {
+			long templateId = Long.parseLong(request.getParameter("templateId"));
+			
 			surveyBuilder.cloneSurveyFromTemplate(user, templateId);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController finished successfully");
