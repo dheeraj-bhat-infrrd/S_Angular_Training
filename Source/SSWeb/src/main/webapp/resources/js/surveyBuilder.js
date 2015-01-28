@@ -551,9 +551,8 @@ function loadActiveTemplateCallback(response) {
 				}
 				else if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
 					htmlData = htmlData + '<div class="sb-ans-mc-wrapper">';
-				
 					$.each(surveyQuestion.answers, function(i, answer) {
-						htmlData = htmlData + '<div class="sb-ans-mc-item">Answer 1</div>';
+						htmlData = htmlData + '<div class="sb-ans-mc-item">' + answer.answerText + '</div>';
 					});
 					htmlData = htmlData	+ '</div>';
 				}
