@@ -295,12 +295,21 @@ function commonActiveSurveyCallback(response){
 }
 
 function loadActiveSurvey() {
-	var url = "./getactivesurveydetails.do";
+	var url = "./getactivesurveyquestions.do";
 	callAjaxGET(url, loadActiveSurveyCallback, true);
 }
 
 function loadActiveSurveyCallback(response) {
-	var surveyQuestions =  $.parseJSON(response);
+	var surveyDetail = $.parseJSON(response);
+	
+	// TODO message display
+	var message = surveyDetail.status;
+	if(message != "") {
+		console.log(message);
+	}
+	
+	// populate questions
+	var surveyQuestions = surveyDetail.questions;
 	var htmlData = "";
 	if (surveyQuestions != null) {
 		
