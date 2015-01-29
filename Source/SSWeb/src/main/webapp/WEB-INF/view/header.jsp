@@ -18,6 +18,7 @@
 	href="${pageContext.request.contextPath}/resources/css/style-common.css">
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
 </head>
 <body>
     <div id="toast-container" class="toast-container">
