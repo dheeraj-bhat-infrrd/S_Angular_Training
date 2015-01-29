@@ -26,15 +26,20 @@ import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
+import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -49,6 +54,7 @@ import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.core.utils.UrlValidationHelper;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 // JIRA: SS-24 BY RM02 BOC
@@ -80,6 +86,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+
+	@Autowired
+	private UrlValidationHelper urlValidationHelper;
 
 	/**
 	 * Method to upload logo image for a company
@@ -129,9 +138,11 @@ public class OrganizationManagementController {
 		String address2 = request.getParameter("address2");
 		String zipCode = request.getParameter("zipcode");
 		String companyContactNo = request.getParameter("contactno");
+		String country = request.getParameter("country");
+		String countryCode = request.getParameter("countrycode");
 
 		try {
-			validateCompanyInfoParams(companyName, address1, zipCode, companyContactNo);
+			validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo);
 			String address = getCompleteAddress(address1, address2);
 
 			HttpSession session = request.getSession(false);
@@ -149,6 +160,8 @@ public class OrganizationManagementController {
 			if (address2 != null) {
 				companyDetails.put(CommonConstants.ADDRESS2, address2);
 			}
+			companyDetails.put(CommonConstants.COUNTRY, country);
+			companyDetails.put(CommonConstants.COUNTRY_CODE, countryCode);
 			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
 			if (logoName != null) {
@@ -184,7 +197,8 @@ public class OrganizationManagementController {
 	 * @param companyContactNo
 	 * @throws InvalidInputException
 	 */
-	private void validateCompanyInfoParams(String companyName, String address, String zipCode, String companyContactNo) throws InvalidInputException {
+	private void validateCompanyInfoParams(String companyName, String address, String country, String countryCode, String zipCode,
+			String companyContactNo) throws InvalidInputException {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
@@ -196,7 +210,17 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
 
-		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(CommonConstants.ZIPCODE_REGEX)) {
+		if (country == null || country.isEmpty()) {
+			throw new InvalidInputException("Country is null or empty while adding company information", DisplayMessageConstants.INVALID_COUNTRY);
+		}
+
+		if (countryCode == null || countryCode.isEmpty()) {
+			throw new InvalidInputException("Country code is null or empty while adding company information", DisplayMessageConstants.INVALID_COUNTRY);
+		}
+
+		// if (zipCode == null || zipCode.isEmpty() ||
+		// !zipCode.matches(CommonConstants.ZIPCODE_REGEX)) {
+		if (zipCode == null || zipCode.isEmpty()) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
@@ -749,6 +773,12 @@ public class OrganizationManagementController {
 		return JspResolver.PROFILE_IMAGE_CONTENT;
 	}
 
+	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
+	public String fetchProfileSocialLinks() {
+		LOG.info("Fecthing profile image");
+		return JspResolver.PROFILE_SOCIAL_LINKS;
+	}
+
 	/**
 	 * Method to update associations in profile
 	 * 
@@ -811,6 +841,7 @@ public class OrganizationManagementController {
 		String name = request.getParameter("profName");
 		String address1 = request.getParameter(CommonConstants.ADDRESS1);
 		String address2 = request.getParameter(CommonConstants.ADDRESS2);
+		// String zipcode = request.getParameter(CommonConstants.ZIPCODE);
 		try {
 			// null checks for parameters
 			if (name == null || name.isEmpty()) {
@@ -826,6 +857,7 @@ public class OrganizationManagementController {
 			contactDetailsSettings.setName(name);
 			contactDetailsSettings.setAddress1(address1);
 			contactDetailsSettings.setAddress2(address2);
+			// contactDetailsSettings.setZipcode(zipcode);
 			try {
 				organizationManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
 						contactDetailsSettings);
@@ -1243,6 +1275,12 @@ public class OrganizationManagementController {
 			for (MiscValues webAddress : webAddresses) {
 				String key = webAddress.getKey();
 				String value = webAddress.getValue();
+				try {
+					urlValidationHelper.validateUrl(value);
+				}
+				catch (IOException ioException) {
+					throw new InvalidInputException("Web address passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+				}
 				if (key.equalsIgnoreCase("work")) {
 					webAddressSettings.setWork(value);
 				}
@@ -1256,7 +1294,7 @@ public class OrganizationManagementController {
 					others.add(webAddress);
 				}
 			}
-			webAddressSettings.setOthers(webAddresses);
+			webAddressSettings.setOthers(others);
 			contactDetailsSettings.setWeb_addresses(webAddressSettings);
 			try {
 				organizationManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
@@ -1279,6 +1317,211 @@ public class OrganizationManagementController {
 		}
 		return JspResolver.MESSAGE_HEADER;
 	}
+
+	@RequestMapping(value = "/updatefacebooklink", method = RequestMethod.POST)
+	public String updateFacebookLink(Model model, HttpServletRequest request) {
+
+		String fbLink = request.getParameter("fblink");
+		HttpSession session = request.getSession(false);
+		try {
+			if (fbLink == null || fbLink.isEmpty()) {
+				throw new InvalidInputException("Facebook link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			try {
+				urlValidationHelper.validateUrl(fbLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("Facebook link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+			if (unitSettings == null) {
+				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
+			if (socialMediaTokens == null) {
+				LOG.debug("No social media token in profile added");
+				socialMediaTokens = new SocialMediaTokens();
+			}
+			FacebookToken facebookToken = new FacebookToken();
+			facebookToken.setFacebookPageLink(fbLink);
+			socialMediaTokens.setFacebookToken(facebookToken);
+			try {
+				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+						socialMediaTokens);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			unitSettings.setSocialMediaTokens(socialMediaTokens);
+			userSettings.setCompanySettings(unitSettings);
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("Facebook link updated successfully");
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating facebook link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/updatetwitterlink", method = RequestMethod.POST)
+	public String updateTwitterLink(Model model, HttpServletRequest request) {
+
+		String twitterLink = request.getParameter("twitterlink");
+		HttpSession session = request.getSession(false);
+		try {
+			if (twitterLink == null || twitterLink.isEmpty()) {
+				throw new InvalidInputException("Twitter link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			try {
+				urlValidationHelper.validateUrl(twitterLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("LinkedIn link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+			if (unitSettings == null) {
+				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
+			if (socialMediaTokens == null) {
+				LOG.debug("No social media token in profile added");
+				socialMediaTokens = new SocialMediaTokens();
+			}
+			TwitterToken twitterToken = new TwitterToken();
+			twitterToken.setTwitterPageLink(twitterLink);
+			socialMediaTokens.setTwitterToken(twitterToken);
+			try {
+				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+						socialMediaTokens);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			unitSettings.setSocialMediaTokens(socialMediaTokens);
+			userSettings.setCompanySettings(unitSettings);
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("Twitter link updated successfully");
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating twitter link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/updatelinkedinlink", method = RequestMethod.POST)
+	public String updateLinkedInLink(Model model, HttpServletRequest request) {
+
+		String linkedinLink = request.getParameter("linkedinlink");
+		HttpSession session = request.getSession(false);
+		try {
+			if (linkedinLink == null || linkedinLink.isEmpty()) {
+				throw new InvalidInputException("LinkedIn link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			try {
+				urlValidationHelper.validateUrl(linkedinLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("LinkedIn link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+			if (unitSettings == null) {
+				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
+			if (socialMediaTokens == null) {
+				LOG.debug("No social media token in profile added");
+				socialMediaTokens = new SocialMediaTokens();
+			}
+			LinkedInToken linkedIntoken = new LinkedInToken();
+			linkedIntoken.setLinkedInPageLink(linkedinLink);
+			socialMediaTokens.setLinkedInToken(linkedIntoken);
+			try {
+				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+						socialMediaTokens);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			unitSettings.setSocialMediaTokens(socialMediaTokens);
+			userSettings.setCompanySettings(unitSettings);
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("LinkedIn link updated successfully");
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating linkedIn link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	@RequestMapping(value = "/updateyelplink", method = RequestMethod.POST)
+	public String updateYelpLink(Model model, HttpServletRequest request) {
+
+		String yelpLink = request.getParameter("yelplink");
+		HttpSession session = request.getSession(false);
+		try {
+			if (yelpLink == null || yelpLink.isEmpty()) {
+				throw new InvalidInputException("Yelp link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			try {
+				urlValidationHelper.validateUrl(yelpLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+			if (unitSettings == null) {
+				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
+			if (socialMediaTokens == null) {
+				LOG.debug("No social media token in profile added");
+				socialMediaTokens = new SocialMediaTokens();
+			}
+			YelpToken yelpToken = new YelpToken();
+			yelpToken.setYelpPageLink(yelpLink);
+			socialMediaTokens.setYelpToken(yelpToken);
+			try {
+				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+						socialMediaTokens);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			unitSettings.setSocialMediaTokens(socialMediaTokens);
+			userSettings.setCompanySettings(unitSettings);
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("YelpLinked in link updated successfully");
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating yelp link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
 	// JIRA SS-97 by RM-06 : EOC
 
 }

@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set
-		value="${cannonicalusersettings.companySettings.contact_details }"
-		var="contactDetails"></c:set>
+	value="${cannonicalusersettings.companySettings.contact_details }"
+	var="contactDetails"></c:set>
 <input id="prof-name" class="prof-name prof-edditable"
 	value="${contactDetails.name }">
 <div class="prof-rating">

@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -260,6 +261,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setAddress1(organizationalDetails.get(CommonConstants.ADDRESS1));
 		contactDetailSettings.setAddress2(organizationalDetails.get(CommonConstants.ADDRESS2));
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
+		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
+		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
 		//Add work phone number in contact details
 		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
 		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
@@ -859,16 +862,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Licence authorisations added successfully");
 		return licenses;
 	}
-	
-	public void updateLogoInProfile(String collection, OrganizationUnitSettings unitSettings,String logo) throws InvalidInputException{
-		LOG.info("Updating logo.");
-		
-		if(logo == null || logo.isEmpty()){
-			throw new InvalidInputException("Logo passed can not be null or empty");
-		}
-		
-		LOG.info("Logo update successful.");
-	}
 
+	@Override
+	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
+			throws InvalidInputException {
+		if(mediaTokens == null){
+			throw new InvalidInputException("Media tokens passed was null");
+		}
+		LOG.info("Updating the social media tokens in profile.");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens,
+				unitSettings, collection);
+		LOG.info("Successfully updated the social media tokens.");
+	}
 }
 // JIRA: SS-27: By RM05: EOC

@@ -49,6 +49,7 @@ public final class DisplayMessageConstants {
 	public static final String NO_USER_IN_SESSION = "NO_USER_IN_SESSION";
 	public static final String USER_SEARCH_SUCCESSFUL = "USER_SEARCH_SUCCESSFUL";
 	public static final String SESSION_EXPIRED = "SESSION_EXPIRED";
+	public static final String INVALID_COUNTRY = "INVALID_COUNTRY";
 
 	public static final String INVALID_REGION_SELECTED = "INVALID_REGION_SELECTED";
 	public static final String INVALID_SURVEY_REMINDER_INTERVAL = "INVALID_SURVEY_REMINDER_INTERVAL";
