@@ -21,6 +21,7 @@
                 </div>
                 <div class="sq-rat-wrapper">
                     <div class="sq-star-wrapper clearfix">
+                        <div class="sq-star-decoy sq-full-star hide"></div>
                         <div star-no="1" class="sq-star"></div>
                         <div star-no="2" class="sq-star"></div>
                         <div star-no="3" class="sq-star"></div>
@@ -81,13 +82,10 @@
                 <div class="sq-ques">
                     <i><span class="sq-ques-txt">lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler.</span></i>
                 </div>
-                <div class="sq-rat-wrapper">
-                    <div class="sq-star-wrapper clearfix">
-                        <div star-no="1" class="sq-star"></div>
-                        <div star-no="2" class="sq-star"></div>
-                        <div star-no="3" class="sq-star"></div>
-                        <div star-no="4" class="sq-star"></div>
-                        <div star-no="5" class="sq-star"></div>
+                <div class="sq-rat-wrapper mgn-bot-40">
+                    <div class="sq-slider-wrapper clearfix">
+                        <div class="sq-slider-val">1</div>
+                        <input type="range" min="1" max="10" step="1" value="1" data-rangeslider>
                     </div>
                 </div>
                 <div class="sq-skip-main">
@@ -114,6 +112,9 @@
 <script>
     $(document).ready(function(){
         
+        var survQuesNo = 1;
+         var nextQ, prevQ;
+            
         $('.sq-star').click(function(){
             $(this).parent().find('.sq-star').removeClass('sq-full-star');
             var starVal = $(this).attr('star-no');
@@ -136,21 +137,42 @@
         
         $('.sq-np-item-next').click(function(){
             if(!$(this).hasClass('sq-np-item-disabled')){
-                var qNo = $(this).parent().parent().attr('quest-no');
-                var nextQ = parseInt(qNo) + 1;
+                survQuesNo = $(this).parent().parent().attr('quest-no');
+                nextQ = parseInt(survQuesNo) + 1;
                 $(this).parent().parent().hide();
                 $(this).parent().parent().parent().find('div[quest-no="'+nextQ+'"]').show();
+                survQuesNo = nextQ;
             }
         });
         
         $('.sq-np-item-prev').click(function(){
             if(!$(this).hasClass('sq-np-item-disabled')){
-                var qNo = $(this).parent().parent().attr('quest-no');
-                var nextQ = parseInt(qNo) - 1;
+                survQuesNo = $(this).parent().parent().attr('quest-no');
+                prevQ = parseInt(survQuesNo) - 1;
                 $(this).parent().parent().hide();
-                $(this).parent().parent().parent().find('div[quest-no="'+nextQ+'"]').show();
+                $(this).parent().parent().parent().find('div[quest-no="'+prevQ+'"]').show();
+                survQuesNo = prevQ;
             }
         });
+        
+        $('input[type="range"]').rangeslider({
+            polyfill: false,
+
+            // Default CSS classes
+            rangeClass: 'rangeslider',
+            fillClass: 'rangeslider__fill',
+            handleClass: 'rangeslider__handle',
+
+            onSlide: function(position, value) {
+                $('div[quest-no="'+survQuesNo+'"]').find('.sq-slider-val').html(value);
+            },
+            
+            // Callback function
+            onSlideEnd: function(position, value) {
+                $('div[quest-no="'+survQuesNo+'"]').find('.sq-slider-val').html(value);
+            }
+        });
+        
         
     });
 </script>
