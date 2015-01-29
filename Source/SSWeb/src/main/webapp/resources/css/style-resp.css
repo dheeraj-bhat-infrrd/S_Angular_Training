@@ -709,6 +709,12 @@
         width: 80%;
         margin: 0 auto;
     }
+    .ov-payment-container .pu-acc-type-val{
+        float: none;
+    }
+    .ov-payment-container .pu-acc-type-txt {
+        float: none;
+    }
 }
 
 
