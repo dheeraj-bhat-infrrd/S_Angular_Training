@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswer;
+import com.realtech.socialsurvey.core.entities.SurveyDetail;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
@@ -31,7 +33,6 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class SurveyBuilderController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderController.class);
-	private static final String MULTIPLE_CHOICE = "mcq";
 
 	@Autowired
 	private SurveyBuilder surveyBuilder;
@@ -41,6 +42,9 @@ public class SurveyBuilderController {
 
 	@Autowired
 	private MessageUtils messageUtils;
+	
+	@Value("${MINIMUM_RATING_QUESTIONS}")
+	private int minRatingQuestions;
 
 	/**
 	 * Method to show the build survey page
@@ -52,26 +56,32 @@ public class SurveyBuilderController {
 	@RequestMapping(value = "/showbuildsurveypage", method = RequestMethod.GET)
 	public String showBuildSurveyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildSurveyPage started");
-		
 		User user = sessionHelper.getCurrentUser();
-		String highestRole = (Integer) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION) + "";
+		int highestRole;
 		boolean isSurveyBuildingAllowed = false;
+
 		try {
 			LOG.debug("Calling service for checking the status of regions already added");
+			highestRole = (Integer) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+
 			isSurveyBuildingAllowed = surveyBuilder.isSurveyBuildingAllowed(user, highestRole);
 			
 			if(!isSurveyBuildingAllowed) {
 				LOG.error("User not allowed to access BuildSurvey Page. Reason: Access Denied");
 				model.addAttribute("message", "User not authorized to access BuildSurvey Page. Reason: Access Denied");
-				return JspResolver.MESSAGE_HEADER;
+			} else {
+				return JspResolver.SURVEY_BUILDER;
 			}
-			return JspResolver.SURVEY_BUILDER;
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException in fetching Highest role. Reason:" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException in showBuildSurveyPage. Reason:" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
 		}
+		return JspResolver.MESSAGE_HEADER;
 	}
 	
 	/**
@@ -97,15 +107,20 @@ public class SurveyBuilderController {
 
 			// Creating new SurveyQuestionDetails from form
 			String questionType = request.getParameter("sb-question-type");
-			int activeQuestionsInSurvey = surveyBuilder.countActiveQuestionsInSurvey(survey);
+			int activeQuestionsInSurvey = (int) surveyBuilder.countActiveQuestionsInSurvey(survey);
 
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
 			questionDetails.setQuestion(request.getParameter("sb-question-txt"));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setQuestionOrder(activeQuestionsInSurvey + 1);
-			questionDetails.setIsRatingQuestion(1);
+			
+			if(questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
+				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+			} else {
+				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
+			}
 
-			if (questionType.indexOf(MULTIPLE_CHOICE) != -1) {
+			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
 				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers[]"));
 
@@ -127,12 +142,13 @@ public class SurveyBuilderController {
 
 			// Adding the question to survey
 			surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
+			
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while adding Question to Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -160,7 +176,7 @@ public class SurveyBuilderController {
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setIsRatingQuestion(1);
 
-			if (questionType.indexOf(MULTIPLE_CHOICE) != -1) {
+			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
 				List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
 				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
@@ -183,9 +199,13 @@ public class SurveyBuilderController {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
 		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while updating question. Reason:" + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -211,9 +231,13 @@ public class SurveyBuilderController {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while removeing question. Reason:" + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -244,8 +268,8 @@ public class SurveyBuilderController {
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -272,9 +296,13 @@ public class SurveyBuilderController {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method reorderQuestion of SurveyBuilderController finished successfully");
 		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while reordering question. Reason:" + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while reordering Question from Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -287,21 +315,34 @@ public class SurveyBuilderController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/getactivesurveydetails", method = RequestMethod.GET)
+	@RequestMapping(value = "/getactivesurveyquestions", method = RequestMethod.GET)
 	public String getActiveSurveyDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method getSurveyDetails of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String surveyJson = "";
+		String status = "";
 
-		List<SurveyQuestionDetails> surveyQuestionDetails;
+		SurveyDetail surveyDetail = new SurveyDetail();
+		List<SurveyQuestionDetails> surveyQuestions;
 		try {
-			surveyQuestionDetails = surveyBuilder.getAllActiveQuestionsOfMappedSurvey(user);
-			surveyJson = new Gson().toJson(surveyQuestionDetails);
+			// Fetch active questions
+			surveyQuestions = surveyBuilder.getAllActiveQuestionsOfMappedSurvey(user);
+			surveyDetail.setQuestions(surveyQuestions);
+			
+			// Fetch count of active Rating questions
+			int activeRatingQues = (int) surveyBuilder.countActiveRatingQuestionsInSurvey(user);
+			if (activeRatingQues < minRatingQuestions) {
+				status = "Add " + (minRatingQuestions - activeRatingQues) + " more rating questions to activate the survey";
+			}
+			surveyDetail.setStatus(status);
+			
+			// Converting to json
+			surveyJson = new Gson().toJson(surveyDetail);
 			LOG.info("Method getSurveyDetails of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			LOG.warn("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Return: " + surveyJson);
 		return surveyJson;
@@ -326,8 +367,8 @@ public class SurveyBuilderController {
 			LOG.info("Method fetchSurveyTemplates of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			LOG.warn("InvalidInputException while fetching SurveyTemplates: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return templatesJson;
 	}
@@ -352,12 +393,12 @@ public class SurveyBuilderController {
 			LOG.info("Method deactivateSurveyCompanyMapping of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		catch (NoRecordsFetchedException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("NoRecordsFetchedException while disabling Survey from company: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -383,13 +424,17 @@ public class SurveyBuilderController {
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController finished successfully");
 		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while cloning survey for company. Reason:" + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		catch (InvalidInputException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("InvalidInputException while cloning Survey for company: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		catch (NoRecordsFetchedException e) {
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			LOG.error("NoRecordsFetchedException while cloning Survey for company: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}

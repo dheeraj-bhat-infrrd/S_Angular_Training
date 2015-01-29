@@ -20,7 +20,7 @@ public interface SurveyBuilder {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public boolean isSurveyBuildingAllowed(User user, String highestRole) throws InvalidInputException;
+	public boolean isSurveyBuildingAllowed(User user, int highestRole) throws InvalidInputException;
 	
 	/**
 	 * Method to check and return for active Survey
@@ -60,8 +60,16 @@ public interface SurveyBuilder {
 	 * @param survey
 	 * @throws InvalidInputException
 	 */
-	public int countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException;
+	public long countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException;
 	
+	/**
+	 * Method to get count of survey rating questions
+	 * 
+	 * @param survey
+	 * @throws InvalidInputException
+	 */
+	public long countActiveRatingQuestionsInSurvey(User user) throws InvalidInputException;
+
 	/**
 	 * Method to update an existing survey by the Corporate Admin.
 	 * 

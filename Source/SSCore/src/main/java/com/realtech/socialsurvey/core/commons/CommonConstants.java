@@ -96,6 +96,7 @@ public interface CommonConstants {
 	public static final String SURVEY_COLUMN = "survey";
 	public static final String SURVEY_COMPANY_COLUMN = "company";
 	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
+	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -205,4 +206,10 @@ public interface CommonConstants {
 	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
+	
+	// Survey Constants
+	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
+	public static final String QUESTION_RATING = "range";
+	public static final int QUESTION_RATING_VALUE_TRUE = 1;
+	public static final int QUESTION_RATING_VALUE_FALSE = 1;
 }
