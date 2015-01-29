@@ -8,7 +8,7 @@
 	<c:set value="${searchedUser.emailId}" var="emailId"></c:set>
 	<c:set value="${searchedUser.status }" var="status"></c:set>
 </c:if>
-<div class="row" id="${userId}">
+<div class="row" data-id="${userId}" id="um-user-details-container">
 	<div class="um-top-row cleafix">
 		<div class="clearfix um-top-form-wrapper">
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
@@ -75,8 +75,8 @@
 			</div>
 		</div>
         <div class="row clearfix hm-btn-wrapper um-btn-wrapper-fix margin-0-auto">
-            <div class="float-left add-curve-btn cursor-pointer">Add New User</div>
-            <div class="float-left icn-clear cursor-pointer margin-right-0"></div>
+            <div id="um-add-user" class="float-left add-curve-btn cursor-pointer">Add New User</div>
+            <div id="um-clear-user-form" class="float-left icn-clear cursor-pointer margin-right-0"></div>
         </div>
 		<!-- Populate all the assigned branches to the user -->
 		<c:if test="${accounttypeval ne 2 }">

@@ -108,6 +108,7 @@
                             <div class="float-left sb-q-btn sb-btn-reorder-up"></div>
                             <div class="float-left sb-q-btn sb-btn-reorder-down"></div>
                             <div class="float-left sb-q-btn sb-btn-delete"></div>
+                            <div class="float-left sb-q-btn sb-btn-cancel hide"></div>
                             <div class="float-left sb-q-btn sb-btn-edit"></div>
                             <div class="float-left sb-q-btn sb-btn-save hide"></div>
                         </div>
@@ -316,6 +317,8 @@
             $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').hide();
             $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').show();
             $(this).next('.sb-btn-save').show();
+            $(this).parent().find('.sb-btn-delete').hide();
+            $(this).parent().find('.sb-btn-cancel').show();
             $(this).hide();
         });
         
@@ -350,7 +353,15 @@
             $(this).parent().prev('.sb-q-item-txt').find('.sb-q-txt-1').show();
             $(this).parent().prev('.sb-q-item-txt').find('.sb-txt-ar').hide();
             $(this).prev('.sb-btn-edit').show();
+            $(this).parent().find('.sb-btn-delete').show();
+            $(this).parent().find('.sb-btn-cancel').hide();
             $(this).hide();
+        });
+        
+        $('.sb-btn-cancel').click(function(){
+//            $(this).parent().find('.sb-btn-delete').show();
+//            $(this).hide();
+            $(this).parent().find('.sb-btn-save').click();
         });
         
         $('body').on('click','.sb-dd-item-ans',function(){
