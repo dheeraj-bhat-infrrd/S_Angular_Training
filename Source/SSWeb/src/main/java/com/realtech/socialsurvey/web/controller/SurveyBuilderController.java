@@ -332,7 +332,7 @@ public class SurveyBuilderController {
 			// Fetch count of active Rating questions
 			int activeRatingQues = (int) surveyBuilder.countActiveRatingQuestionsInSurvey(user);
 			if (activeRatingQues < minRatingQuestions) {
-				status = "Please add " + (minRatingQuestions - activeRatingQues) + " rating questions to activate the survey";
+				status = "Add " + (minRatingQuestions - activeRatingQues) + " more rating questions to activate the survey";
 			}
 			surveyDetail.setStatus(status);
 			

@@ -302,16 +302,12 @@ function loadActiveSurvey() {
 function loadActiveSurveyCallback(response) {
 	var surveyDetail = $.parseJSON(response);
 	
-	// TODO message display
-	var message = surveyDetail.status;
-	if(message != "") {
-		console.log(message);
-	}
-	
 	// populate questions
 	var surveyQuestions = surveyDetail.questions;
 	var htmlData = "";
 	if (surveyQuestions != null) {
+		// Message header
+		htmlData = htmlData	+ '<div class="sb-quests-error">' + surveyDetail.status + '</div>';
 		
 		// Row Header
 		htmlData = htmlData
