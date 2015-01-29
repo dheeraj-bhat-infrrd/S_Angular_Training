@@ -6,6 +6,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/usermanagement.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/changepassword.js"></script>
+<script src="https://js.braintreegateway.com/v2/braintree.js"></script>	
 <script>
 	$('#logout-section').click(function(e) {
 		logoutuser();

@@ -223,11 +223,11 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="clearfix st-settings-item-wrapper">
-                        <div class="float-left st-settings-check-wrapper">
+                        <!-- <div class="float-left st-settings-check-wrapper">
                             <div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
                             <div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
-                        </div>
-                        <div class="float-left st-check-txt-OR" id="st-chg-payment-info">Change Payment Information</div>
+                        </div> -->
+                        <div class="float-left st-check-txt-OR" id="st-chg-payment-info"><a onclick="showPaymentOptions();">Change Payment Information</a></div>
                     </div>
                     <div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
                 </div>

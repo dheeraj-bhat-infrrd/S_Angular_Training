@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
@@ -674,7 +675,7 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Making the API call to upgrade");
-			gateway.upgradePlanForSubscription(user.getCompany(), newAccountsMasterId);
+			gateway.upgradePlanForSubscription(user, newAccountsMasterId);
 			LOG.info("Upgrade successful");
 
 			switch (newAccountsMasterId) {
@@ -687,7 +688,7 @@ public class OrganizationManagementController {
 			}
 			LOG.info("message returned : " + message);
 		}
-		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException e ) {
+		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException | UndeliveredEmailException e ) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
