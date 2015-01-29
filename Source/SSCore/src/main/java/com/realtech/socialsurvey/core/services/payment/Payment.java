@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.payment;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Map;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
@@ -140,7 +141,12 @@ public interface Payment {
 	 * @throws PaymentException 
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
 	 * @throws SolrException 
+	 * @throws UndeliveredEmailException 
 	 */
-	public void upgradePlanForSubscription(Company company,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException;
+	public void upgradePlanForSubscription(User user,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException;
+	
+	public Map<String, String> getCurrentPaymentDetails(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+		
+	public boolean changePaymentMethod(String subscriptionId,String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 }

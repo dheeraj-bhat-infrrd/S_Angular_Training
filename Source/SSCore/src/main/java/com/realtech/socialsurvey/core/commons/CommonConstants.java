@@ -211,4 +211,14 @@ public interface CommonConstants {
 	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
+	
+	/*
+	 * Payment detail constants
+	 */
+	public static final String CARD_NUMBER = "cardNumber";
+	public static final String CARD_TYPE = "cardType";
+	public static final String CARD_HOLDER_NAME = "cardHolderName";
+	public static final String ISSUING_BANK = "issuingBank";
+	public static final String IMAGE_URL = "imageUrl";
+	
 }

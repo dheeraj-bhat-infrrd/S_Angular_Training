@@ -352,3 +352,23 @@ function overlayRevert() {
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
 }
+
+function showPaymentOptions() {
+	console.log("Calling payment controller for payment upgrade page");	
+	var url = "./paymentchange.do";
+    showOverlay();
+    $.ajax({
+    	url: url,
+    	type: "GET",
+    	success: function(data){
+        	$('.overlay-payment').html(data);
+        	console.log("Html content loaded");
+        	hideOverlay();
+        	$('.overlay-payment').show();
+        	console.log("Showing popup");
+        	},
+        error : function(e) {
+    			console.log(e);
+    		}
+    	});
+}

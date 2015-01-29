@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA: SS-15: By RM03
 
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -18,6 +19,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -61,7 +63,7 @@ public class PaymentController {
 	@RequestMapping(value = "/payment")
 	public String paymentPage(Model model, HttpServletResponse response, HttpServletRequest request) {
 
-		LOG.info("Payment Step 1.");
+		LOG.info("Returning payment page with client token");
 		model.addAttribute("clienttoken", gateway.getClientToken());
 		return JspResolver.PAYMENT;
 	}
@@ -76,7 +78,7 @@ public class PaymentController {
 	@RequestMapping(value = "/subscribe", method = RequestMethod.POST)
 	public String subscribeForPlan(Model model, HttpServletRequest request, HttpServletResponse response) {
 
-		LOG.info("Payment Step 2.");
+		LOG.info("Payment controller called for plan subscribal");
 		try {
 			boolean status = false;
 
@@ -164,5 +166,40 @@ public class PaymentController {
 			return JspResolver.ACCOUNT_TYPE_SELECTION;
 		}
 		return JspResolver.LANDING;
+	}
+	
+	@RequestMapping(value="/paymentchange",method = RequestMethod.GET)
+	public String paymentChangePage(Model model, HttpServletRequest request){
+		
+		LOG.info("Payment controller called for payment change page");
+		//Fetch current user in session
+		LOG.debug("Fetching the current user in session");
+		User user = sessionHelper.getCurrentUser();
+		Map<String, String> currentPaymentDetails = null;
+		
+		//Next we fetch the current payment details of user.
+		try {
+			currentPaymentDetails = gateway.getCurrentPaymentDetails(user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getSubscriptionId());
+		}
+		catch (InvalidInputException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (NoRecordsFetchedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (PaymentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		//Add the parameters to the response
+		LOG.info("Adding attributes");
+		model.addAttribute("clienttoken", gateway.getClientToken());
+		model.addAllAttributes(currentPaymentDetails);
+		model.addAttribute("paymentChange", CommonConstants.STATUS_ACTIVE);
+		return JspResolver.PAYMENT;		
+		
 	}
 }
