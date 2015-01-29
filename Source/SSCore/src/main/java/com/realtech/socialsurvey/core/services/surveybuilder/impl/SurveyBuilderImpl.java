@@ -35,8 +35,6 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 public class SurveyBuilderImpl implements SurveyBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
-	private static final String CA_ROLE = "1";
-	private static final String MULTIPLE_CHOICE = "mcq";
 
 	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
@@ -69,17 +67,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public boolean isSurveyBuildingAllowed(User user, String highestRole) throws InvalidInputException {
+	public boolean isSurveyBuildingAllowed(User user, int highestRole) throws InvalidInputException {
 		LOG.info("Method isSurveyBuildingAllowed() started for user: " + user);
 		if (user == null) {
 			throw new InvalidInputException("User is null in isSurveyBuildingAllowed");
 		}
-		if (highestRole == null) {
-			throw new InvalidInputException("Account type is null in isSurveyBuildingAllowed");
-		}
 		boolean isSurveyBuildingAllowed = false;
 		
-		if (highestRole.equals(CA_ROLE)) {
+		if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			LOG.debug("Checking Survey Building for user role CA_ROLE");
 			isSurveyBuildingAllowed = true;
 		}
@@ -194,16 +189,15 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 		SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappings.get(CommonConstants.INITIAL_INDEX);
 		surveyCompanyMapping.setStatus(CommonConstants.STATUS_INACTIVE);
-		surveyCompanyMappingDao.update(surveyCompanyMapping);
 		LOG.debug("Disabling the SurveyCompanyMapping record with id : " + surveyCompanyMapping.getSurveyCompanyMappingId() + "from the database.");
 
-		// Perform soft delete of the record in the database
+		surveyCompanyMappingDao.update(surveyCompanyMapping);
 		LOG.info("Method deactivateSurveyCompanyMapping() finished.");
 	}
 
 	@Override
 	@Transactional
-	public int countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException {
+	public long countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException {
 		LOG.info("Method countQuestionsInSurvey() started.");
 		if (survey == null) {
 			LOG.error("Invalid argument. Null value is passed for survey.");
@@ -214,13 +208,31 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		queries.put(CommonConstants.SURVEY_COLUMN, survey);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 
-		// Checking for existing survey
-		List<SurveyQuestionsMapping> surveyQuestionsMappingsList = surveyQuestionsMappingDao.findByKeyValue(SurveyQuestionsMapping.class, queries);
-
 		LOG.info("Method countQuestionsInSurvey() finished.");
-		return surveyQuestionsMappingsList.size();
+		return surveyQuestionsMappingDao.findNumberOfRowsByKeyValue(SurveyQuestionsMapping.class, queries);
 	}
+	
+	@Override
+	@Transactional
+	public long countActiveRatingQuestionsInSurvey(User user) throws InvalidInputException {
+		LOG.info("Method countActiveRatingQuestionsInSurvey() started.");
+		if (user == null) {
+			LOG.error("Invalid argument. Null value is passed for user.");
+			throw new InvalidInputException("Invalid argument. Null value is passed for user.");
+		}
+		Survey survey = checkForExistingSurvey(user);
+		if(survey == null) {
+			survey = createNewSurvey(user);
+		}
 
+		HashMap<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.SURVEY_COLUMN, survey);
+		queries.put(CommonConstants.SURVEY_IS_RATING_QUESTION_COLUMN, CommonConstants.QUESTION_RATING_VALUE_TRUE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		LOG.info("Method countActiveRatingQuestionsInSurvey() finished.");
+		return surveyQuestionsMappingDao.findNumberOfRowsByKeyValue(SurveyQuestionsMapping.class, queries);
+	}
 	
 	@Override
 	@Transactional
@@ -238,7 +250,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("Invalid argument. Null value is passed for survey.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for survey.");
 		}
-		if (surveyQuestionDetails.getQuestionType().indexOf(MULTIPLE_CHOICE) != -1 && surveyQuestionDetails.getAnswers().size() < 2) {
+		if (surveyQuestionDetails.getQuestionType().indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1 && surveyQuestionDetails.getAnswers().size() < 2) {
 			LOG.error("Invalid argument passed. Atleast two answers should be given.");
 			throw new InvalidInputException("Invalid argument passed. Atleast two answers should be given in method addNewQuestionsAndAnswers.");
 		}
@@ -260,7 +272,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestion = addNewQuestion(user, question, questionType);
 
 			// Save answers only if question type is Multiple Choice & 
-			if (questionType.indexOf(MULTIPLE_CHOICE) != -1) {
+			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				if (answers != null && !answers.isEmpty() && answers.size() >= 2) {
 					addAnswersToQuestion(user, surveyQuestion, answers);
 				}
@@ -435,7 +447,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("Invalid argument. Null value is passed for surveyQuestion.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for surveyQuestion.");
 		}
-		if (surveyQuestionDetails.getQuestionType().indexOf(MULTIPLE_CHOICE) != -1 && surveyQuestionDetails.getAnswers().size() < 2) {
+		if (surveyQuestionDetails.getQuestionType().indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1 && surveyQuestionDetails.getAnswers().size() < 2) {
 			LOG.error("Invalid argument passed. Atleast two answers should be given.");
 			throw new InvalidInputException("Invalid argument passed. Atleast two answers should be given in method addNewQuestionsAndAnswers.");
 		}
@@ -461,7 +473,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			surveyQuestion.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 
 			// Save answers only if question type is Multiple Choice & 
-			if (questionType.indexOf(MULTIPLE_CHOICE) != -1) {
+			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				if (answers != null && !answers.isEmpty() && answers.size() >= 2) {
 					modifyAnswersToQuestion(user, surveyQuestion, answers);
 				}
