@@ -62,6 +62,7 @@
 				</form>
 				
 				<div id="sb-ques-wrapper" class="sb-ques-wrapper">
+					<div class="sb-quests-error"></div>
 					<div class="sb-item-row sb-item-row-header clearfix">
 						<div class="float-left sb-q-item-no"></div>
 						<div class="float-left sb-q-item-chk">
