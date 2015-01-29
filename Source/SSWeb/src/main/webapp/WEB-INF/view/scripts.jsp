@@ -7,6 +7,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/usermanagement.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/changepassword.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/surveyBuilder.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
 <script>
 	$('#logout-section').click(function(e) {
 		logoutuser();
