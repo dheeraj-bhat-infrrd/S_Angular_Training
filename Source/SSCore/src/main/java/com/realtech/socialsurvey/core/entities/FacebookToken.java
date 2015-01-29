@@ -21,4 +21,9 @@ public class FacebookToken {
 		this.facebookPageLink = facebookPageLink;
 	}
 
+	@Override
+	public String toString() {
+		return "FacebookToken [facebookId=" + facebookId + ", facebookPageLink=" + facebookPageLink + "]";
+	}
+
 }

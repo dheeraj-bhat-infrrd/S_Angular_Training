@@ -9,6 +9,8 @@ public class ContactDetailsSettings {
 	private String address;
 	private String address1;
 	private String address2;
+	private String country;
+	private String countryCode;
 	private String zipcode;
 	private String about_me;
 	private String title;
@@ -80,7 +82,7 @@ public class ContactDetailsSettings {
 	public void setSocial_links(SocialLinksSettings social_links) {
 		this.social_links = social_links;
 	}
-	
+
 	public String getAddress1() {
 		return address1;
 	}
@@ -97,6 +99,22 @@ public class ContactDetailsSettings {
 		this.address2 = address2;
 	}
 
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
+
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+	public void setCountryCode(String countryCode) {
+		this.countryCode = countryCode;
+	}
+
 	public WebAddressSettings getWeb_addresses() {
 		return web_addresses;
 	}
@@ -107,9 +125,9 @@ public class ContactDetailsSettings {
 
 	@Override
 	public String toString() {
-		return "ContactDetailsSettings [name=" + name + ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", zipcode="
-				+ zipcode + ", title=" + title + ", mail_ids=" + mail_ids + ", contact_numbers=" + contact_numbers + ", social_links=" + social_links
-				+ "]";
+		return "ContactDetailsSettings [name=" + name + ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", country="
+				+ country + ", countryCode=" + countryCode + ", zipcode=" + zipcode + ", title=" + title + ", mail_ids=" + mail_ids
+				+ ", contact_numbers=" + contact_numbers + ", social_links=" + social_links + "]";
 	}
 
 }

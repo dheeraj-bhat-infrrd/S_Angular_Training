@@ -21,4 +21,9 @@ public class YelpToken {
 		this.yelpPageLink = yelpPageLink;
 	}
 
+	@Override
+	public String toString() {
+		return "YelpToken [yelpId=" + yelpId + ", yelpPageLink=" + yelpPageLink + "]";
+	}
+
 }

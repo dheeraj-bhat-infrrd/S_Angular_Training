@@ -4,7 +4,7 @@ public class SocialMediaTokens {
 
 	private FacebookToken facebookToken;
 	private TwitterToken twitterToken;
-	private LinkdenInToken linkdenInToken;
+	private LinkedInToken linkedInToken;
 	private YelpToken yelpToken;
 
 	public FacebookToken getFacebookToken() {
@@ -23,12 +23,12 @@ public class SocialMediaTokens {
 		this.twitterToken = twitterToken;
 	}
 
-	public LinkdenInToken getLinkdenInToken() {
-		return linkdenInToken;
+	public LinkedInToken getLinkedInToken() {
+		return linkedInToken;
 	}
 
-	public void setLinkdenInToken(LinkdenInToken linkdenInToken) {
-		this.linkdenInToken = linkdenInToken;
+	public void setLinkedInToken(LinkedInToken linkedInToken) {
+		this.linkedInToken = linkedInToken;
 	}
 
 	public YelpToken getYelpToken() {
@@ -41,10 +41,8 @@ public class SocialMediaTokens {
 
 	@Override
 	public String toString() {
-		return "SocialMediaTokens [facebookToken=" + facebookToken + ", twitterToken=" + twitterToken + ", linkdenInToken=" + linkdenInToken
+		return "SocialMediaTokens [facebookToken=" + facebookToken + ", twitterToken=" + twitterToken + ", linkdenInToken=" + linkedInToken
 				+ ", yelpToken=" + yelpToken + "]";
 	}
-	
-	
 
 }
