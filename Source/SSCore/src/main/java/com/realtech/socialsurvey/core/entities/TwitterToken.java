@@ -21,4 +21,9 @@ public class TwitterToken {
 		this.twitterPageLink = twitterPageLink;
 	}
 
+	@Override
+	public String toString() {
+		return "TwitterToken [twitterId=" + twitterId + ", twitterPageLink=" + twitterPageLink + "]";
+	}
+
 }
