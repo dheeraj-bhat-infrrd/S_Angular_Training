@@ -423,14 +423,16 @@ function loadActiveSurveyCallback(response) {
 				htmlData = htmlData
 					+ '<div class="float-left sb-q-btn sb-btn-reorder-up hide"></div>'
 					+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
-			} else if (countQues == lengthQuestions) {
+			}
+			else if (countQues == lengthQuestions) {
 				htmlData = htmlData
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-down hide"></div>';
-			} else {
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-down hide"></div>';
+			}
+			else {
 				htmlData = htmlData
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
 			}
 			
 			htmlData = htmlData
