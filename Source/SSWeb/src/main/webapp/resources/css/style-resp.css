@@ -697,6 +697,24 @@
         padding: 0 24px 0 0;
         margin-right: 5px;
     }
+    .sq-star-wrapper{
+        width: 210px;
+    }
+    .sq-star{
+        width: 42px;
+        height: 42px;
+        background-size: 32px !important;
+    }
+    .sq-slider-wrapper {
+        width: 80%;
+        margin: 0 auto;
+    }
+    .ov-payment-container .pu-acc-type-val{
+        float: none;
+    }
+    .ov-payment-container .pu-acc-type-txt {
+        float: none;
+    }
 }
 
 
@@ -736,9 +754,9 @@
     .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
         display: block !important;
     }
-    .overlay-toast{
+    /* .overlay-toast{
         display: none;
-    }
+    } */
     .header-slider-wrapper{
         display: none;
     }
@@ -917,6 +935,8 @@
 @media (min-width: 1200px) {
     
 }
+
+
 
 
 
