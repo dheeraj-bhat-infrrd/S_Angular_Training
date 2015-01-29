@@ -2633,8 +2633,92 @@ button.paypal.is-active {
 
 .t-pro-txt {
     line-height: 60px;
+    padding-left: 10px;
+    font-size: 22px;
 }
 
 .t-pro-wrapper {
     border-bottom: 1px solid #dcdcdc;
+}
+
+.t-pro-img-wrapper {
+    width: 100px;
+    margin-right: 15px;
+}
+
+.t-pro-txt-wrapper {
+    width: 595px;
+}
+
+.t-pro-line1 {
+    font-size: 18px;
+    line-height: 32px;
+}
+
+.t-pro-btn {
+    width: 115px;
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    margin-top: 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+}
+
+.t-pro-btn:hover {
+    background-color: #7AB400;
+}
+
+.margin-right-20 {
+    margin-right: 20px;
+}
+
+.t-pro-item {
+    border-bottom: 1px solid #dcdcdc;
+    padding: 10px 0;
+}
+
+.t-pro-item:last-child {
+    border-bottom: 0;
+}
+
+.t-pro-line2 {
+    line-height: 24px;
+}
+
+.t-pro-line3 {
+    font-size: 12px;
+    line-height: 24px;
+}
+
+.t-pro-btn-adj {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.t-pro-search-no {
+    font-size: 12px;
+    color: #A5A5A5;
+}
+
+.t-pro-search-txt {
+    line-height: 60px;
+    padding-left: 10px;
+}
+
+.t-pro-search-name {
+    font-size: 18px;
+}
+
+.ui-widget-content{
+    max-height: 200px;
+    display: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width:313px !important;
 }
