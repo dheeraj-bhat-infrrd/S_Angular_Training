@@ -295,14 +295,19 @@ function commonActiveSurveyCallback(response){
 }
 
 function loadActiveSurvey() {
-	var url = "./getactivesurveydetails.do";
+	var url = "./getactivesurveyquestions.do";
 	callAjaxGET(url, loadActiveSurveyCallback, true);
 }
 
 function loadActiveSurveyCallback(response) {
-	var surveyQuestions =  $.parseJSON(response);
+	var surveyDetail = $.parseJSON(response);
+	
+	// populate questions
+	var surveyQuestions = surveyDetail.questions;
 	var htmlData = "";
 	if (surveyQuestions != null) {
+		// Message header
+		htmlData = htmlData	+ '<div class="sb-quests-error">' + surveyDetail.status + '</div>';
 		
 		// Row Header
 		htmlData = htmlData
