@@ -39,4 +39,5 @@ public interface JspResolver {
 	public static final String LICENSE_LIST = "licencelist";
 	public static final String ADDRESS_DETAILS = "addressdetails";
 	public static final String PROFILE_IMAGE_CONTENT = "profileimagecontent";
+	public static final String PROFILE_SOCIAL_LINKS = "profilesociallinks";
 }

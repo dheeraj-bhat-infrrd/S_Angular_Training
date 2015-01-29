@@ -121,12 +121,16 @@ function redirectErrorpage(){
  * @param callBackFunction
  * @param payload
  */
-function callAjaxPostWithPayloadData(url, callBackFunction, payload){
+function callAjaxPostWithPayloadData(url, callBackFunction, payload,isAsync){
 	console.log("payload is --"+payload);
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
 	$.ajax({
 		url : url,
 		type : "POST",
 		data : payload,
+		async : isAsync,
 		success : callBackFunction,
 		complete: function(){
 			hideOverlay();

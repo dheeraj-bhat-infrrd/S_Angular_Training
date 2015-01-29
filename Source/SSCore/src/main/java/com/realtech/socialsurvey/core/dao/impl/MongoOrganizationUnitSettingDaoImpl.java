@@ -40,6 +40,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_ASSOCIATION = "associations";
 	public static final String KEY_ACHIEVEMENTS = "achievements";
 	public static final String KEY_LICENCES = "licenses";
+	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
 
 	public static final String KEY_IDENTIFIER = "iden";
 

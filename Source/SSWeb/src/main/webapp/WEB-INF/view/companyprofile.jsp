@@ -30,19 +30,17 @@
 					<!-- Call JavaScript function to populate the address details -->
 				</div>
 			</div>
-			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper"><spring:message code="label.map.key"/></div>
+			<div id="map-canvas" class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper"><spring:message code="label.map.key"/></div>
 		</div>
 
 		<div class="row">
 			<div
 				class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<div class="prof-left-row bord-bot-dc prof-left-social">
-					<div class="social-wrapper clearfix">
-						<div class="float-left social-item-icon icn-fb"></div>
-						<div class="float-left social-item-icon icn-twit"></div>
-						<div class="float-left social-item-icon icn-lin"></div>
-						<div class="float-left social-item-icon icn-yelp"></div>
+					<div id="prof-edit-social-link" class="social-wrapper clearfix">
+						<!-- Call JavaScript function to load social page links -->
 					</div>
+					<input id="social-token-text" type="text" class="hide" placeholder="Social page link">
 				</div>
 				<div class="prof-left-row prof-left-info bord-bot-dc">
 					<div class="left-contact-wrapper">
@@ -255,6 +253,5 @@
 			$('.mob-icn').removeClass('mob-icn-active');
 			$(this).addClass('mob-icn-active');
 		});
-
 	});
 </script>

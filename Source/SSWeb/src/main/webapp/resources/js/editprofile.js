@@ -1,6 +1,7 @@
 /**
  * JavaScript file for company settings page
  */
+var webAddressRegEx = /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
 var timer = 0;
 var delay = (function() {
 	return function(callback, ms) {
@@ -28,6 +29,43 @@ function adjustImage() {
 		$('.footer-main-wrapper').show();
 	}
 }
+
+//Function to show map on the screen
+function initializeGoogleMap() {
+    var mapCanvas = document.getElementById('map-canvas');
+    var geocoder = new google.maps.Geocoder();
+    /*var address1 = $('#prof-address1').val().trim();
+	var address2 = $('#prof-address2').val().trim();*/
+	var address = "Raremile technologies,HSR layout,bangalore, 560102";
+	var latitude = 45;
+	var longitude = -73;
+	geocoder.geocode({
+		'address' : address
+	}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			latitude = results[0].geometry.location.lat();
+			longitude = results[0].geometry.location.lng();
+			var mapOptions = {
+				      center: new google.maps.LatLng(latitude, longitude),
+				      zoom: 15,
+				      mapTypeId: google.maps.MapTypeId.ROADMAP
+				    };
+			
+			//create map
+			map = new google.maps.Map(mapCanvas, mapOptions);
+
+			//center map
+	        map.setCenter(results[0].geometry.location);
+	        
+	        //create marker
+	        marker = new google.maps.Marker({
+	            position: results[0].geometry.location,
+	            map: map,
+	            title: "RM"
+	        });
+		}
+	});
+  }
 
 $(document).on('focus', '.prof-edditable', function() {
 	$('.prof-edditable').addClass('prof-name-edit');
@@ -64,6 +102,7 @@ function startCompanyProfilePage() {
 	showLicenceList();
 	showAddressDetails();
 	showProfileImage();
+	showProfileSocialLinks();
 }
 
 // Function to populate contact details container
@@ -113,6 +152,7 @@ function showAddressDetails() {
 
 function callBackShowAddressDetails(data) {
 	$('#prof-name-container').html(data);
+	initializeGoogleMap();
 	adjustImage();
 }
 
@@ -141,6 +181,17 @@ function callBackShowProfileImage(data) {
 	} else {
 		$('.user-info-logo').css("background-image", logoImageUrl);
 	}
+	adjustImage();
+}
+
+//Function to show social media links
+function showProfileSocialLinks() {
+	$('#social-token-text').hide();
+	callAjaxGET("./fetchprofilesociallinks.do", callBackShowProfileSocialLinks);
+}
+
+function callBackShowProfileSocialLinks(data) {
+	$('#prof-edit-social-link').html(data);
 	adjustImage();
 }
 
@@ -182,7 +233,7 @@ function addAuthorisedIn() {
 	newAuthorisation.focus();
 }
 
-$(document).on('keyup', '#association-container input', function(e) {
+/*$(document).on('keyup', '#association-container input', function(e) {
 	if (e.which == 13) {
 		delay(function() {
 			updateAssociations();
@@ -192,7 +243,7 @@ $(document).on('keyup', '#association-container input', function(e) {
 	delay(function() {
 		updateAssociations();
 	}, 3000);
-});
+});*/
 
 $(document).on('blur', '#association-container input', function() {
 	delay(function() {
@@ -227,7 +278,7 @@ function callBackUpdateAssociations(data) {
 	}
 }
 
-$(document).on('keyup', '#achievement-container input', function(e) {
+/*$(document).on('keyup', '#achievement-container input', function(e) {
 	if (e.which == 13) {
 		delay(function() {
 			updateAchievements();
@@ -237,7 +288,7 @@ $(document).on('keyup', '#achievement-container input', function(e) {
 	delay(function() {
 		updateAchievements();
 	}, 3000);
-});
+});*/
 
 $(document).on('blur', '#achievement-container input', function() {
 	delay(function() {
@@ -272,7 +323,7 @@ function callBackUpdateAchievements(data) {
 	}
 }
 
-$(document).on('keyup', '#authorised-in-container input', function(e) {
+/*$(document).on('keyup', '#authorised-in-container input', function(e) {
 	if (e.which == 13) {
 		delay(function() {
 			updateLicenseAuthorizations();
@@ -282,7 +333,7 @@ $(document).on('keyup', '#authorised-in-container input', function(e) {
 	delay(function() {
 		updateLicenseAuthorizations();
 	}, 3000);
-});
+});*/
 
 $(document).on('blur', '#authorised-in-container input', function() {
 	delay(function() {
@@ -316,7 +367,7 @@ function callBackUpdateLicenseAuthorizations(data) {
 	}
 }
 
-$(document).on('keyup', '#prof-name-container input', function(e) {
+/*$(document).on('keyup', '#prof-name-container input', function(e) {
 	if (e.which == 13) {
 		delay(function() {
 			updateAddressDetails();
@@ -326,7 +377,7 @@ $(document).on('keyup', '#prof-name-container input', function(e) {
 	delay(function() {
 		updateAddressDetails();
 	}, 3000);
-});
+});*/
 
 $(document).on('blur', '#prof-name-container input', function() {
 	delay(function() {
@@ -336,9 +387,11 @@ $(document).on('blur', '#prof-name-container input', function() {
 
 // Function to update addresses
 function updateAddressDetails() {
-	var profName = $('#prof-name').val();
-	var profAddress1 = $('#prof-address1').val();
-	var profAddress2 = $('#prof-address2').val();
+	var profName = $('#prof-name').val().trim();
+	var profAddress1 = $('#prof-address1').val().trim();
+	var profAddress2 = $('#prof-address2').val().trim();
+	//var zipcode = profAddress2.substr(-5);
+	//profAddress2 = profAddress2.substr(0,profAddress2.length-7);
 	var payload = {
 		"profName" : profName,
 		"address1" : profAddress1,
@@ -372,7 +425,7 @@ function callBackOnLogoUpload(data) {
 	}
 }
 
-$(document).on('keyup', '#contant-info-container input[data-email]',
+/*$(document).on('keyup', '#contant-info-container input[data-email]',
 		function(e) {
 			if (e.which == 13) {
 				delay(function() {
@@ -384,7 +437,7 @@ $(document).on('keyup', '#contant-info-container input[data-email]',
 				updateEmailIdsInContactDetails();
 			}, 3000);
 
-		});
+		});*/
 
 $(document).on('blur', '#contant-info-container input[data-email]', function() {
 	delay(function() {
@@ -420,7 +473,7 @@ function callBackOnUpdateMailIds(data) {
 	}
 }
 
-$(document).on('keyup', '#contant-info-container input[data-phone-number]',
+/*$(document).on('keyup', '#contant-info-container input[data-phone-number]',
 		function(e) {
 			if (e.which == 13) {
 				delay(function() {
@@ -433,7 +486,7 @@ $(document).on('keyup', '#contant-info-container input[data-phone-number]',
 				updatePhoneNumbersInContactDetails();
 			}, 3000);
 
-		});
+		});*/
 
 $(document).on('blur', '#contant-info-container input[data-phone-number]',
 		function() {
@@ -470,7 +523,7 @@ function callBackOnUpdatePhoneNumbers(data) {
 	}
 }
 
-$(document).on('keyup', '#contant-info-container input[data-web-address]',
+/*$(document).on('keyup', '#contant-info-container input[data-web-address]',
 		function(e) {
 			if (e.which == 13) {
 				delay(function() {
@@ -483,7 +536,7 @@ $(document).on('keyup', '#contant-info-container input[data-web-address]',
 				updateWebAddressesInContactDetails();
 			}, 3000);
 
-		});
+		});*/
 
 $(document).on('blur', '#contant-info-container input[data-web-address]',
 		function() {
@@ -495,14 +548,28 @@ $(document).on('blur', '#contant-info-container input[data-web-address]',
 // Function to update web addresses in contact details
 function updateWebAddressesInContactDetails() {
 	var webAddresses = [];
+	var i = 0;
+	var webAddressValid = true;
 	$('#contant-info-container input[data-web-address]').each(function() {
-		if (this.value != "") {
-			var webAddress = {};
-			webAddress.key = $(this).attr("data-web-address");
-			webAddress.value = this.value;
-			webAddresses.push(webAddress);
+		var link = $.trim(this.value);
+		if (link != "") {
+			if(isValidUrl(link)){
+					var webAddress = {};
+					webAddress.key = $(this).attr("data-web-address");
+					webAddress.value = link;
+					webAddresses[i++] = webAddress;
+			}else{
+				return;
+				$(this).focus();
+				webAddressValid = false;
+			}
+				
 		}
 	});
+	if(!webAddressValid){
+		alert("Invalid web address");
+		return false;
+	}
 	webAddresses = JSON.stringify(webAddresses);
 	var payload = {
 		"webAddresses" : webAddresses
@@ -558,4 +625,148 @@ function callBackOnEditAdboutMeDetails(data) {
 		$('#intro-body-text').show();
 		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
 	}
+}
+
+$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add facebook link",
+		"value" : link,
+		"onblur" : "updateFacebookLink(this.value);"
+	});
+});
+
+$('body').on('click','#prof-edit-social-link .icn-twit',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Twitter link",
+		"value" : link,
+		"onblur" : "updateTwitterLink(this.value);"
+	});
+});
+
+$('body').on('click','#prof-edit-social-link .icn-lin',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add LinkedIn link",
+		"value" : link,
+		"onblur" : "updateLinkedInLink(this.value);"
+	});
+});
+
+$('body').on('click','#prof-edit-social-link .icn-yelp',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Yelp link",
+		"value" : link,
+		"onblur" : "updateYelpLink(this.value);"
+	});
+});
+
+function updateFacebookLink(link) {
+	var payload = {
+		"fblink" : link	
+	};
+	if(isValidUrl(link)){
+        callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateFacebookLink, payload);
+	}else{
+		alert("enter a valid url");
+	}
+}
+
+function callBackUpdateFacebookLink(data) {
+	$('#prof-message-header').html(data);
+	showProfileSocialLinks();
+}
+
+function updateTwitterLink(link) {
+	var payload = {
+		"twitterlink" : link	
+	};
+	if(isValidUrl(link)){
+        	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateTwitterLink, payload);
+	}else{
+		alert("enter a valid url");
+	}
+}
+
+function callBackUpdateTwitterLink(data) {
+	$('#prof-message-header').html(data);
+	showProfileSocialLinks();
+}
+
+function updateLinkedInLink(link) {
+	var payload = {
+		"linkedinlink" : link	
+	};
+	if(isValidUrl(link)){
+		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateLinkedInLink, payload);
+	}else{
+		alert("enter a valid url");
+	}
+}
+
+function callBackUpdateLinkedInLink(data) {
+	$('#prof-message-header').html(data);
+	showProfileSocialLinks();
+}
+
+function updateYelpLink(link) {
+	var payload = {
+		"yelplink" : link	
+	};
+	if(isValidUrl(link)){
+		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateYelpLink, payload);
+	}else{
+		alert("enter a valid url");
+	}
+}
+
+function callBackUpdateYelpLink(data) {
+	$('#prof-message-header').html(data);
+	showProfileSocialLinks();
+}
+
+function isValidUrl(url){
+	var myVariable = url;
+	if(/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(myVariable)) {
+		return true;
+	} else {
+		return false;
+	}  
+}
+
+// Checks if the specified URL in the function param, exists.
+function url_check(url){
+    var http = new XMLHttpRequest();
+    http.open('HEAD', url, false);
+    http.onreadystatechange = handler;
+    http.send();
+    return http.status != 404;
+}
+
+function isURLReal(fullyQualifiedURL) {
+	fullyQualifiedURL = fullyQualifiedURL.replace(/www./i, '');
+    var URL = encodeURIComponent(fullyQualifiedURL),
+        dfd = $.Deferred(),
+        checkURLPromise = $.getJSON('http://query.yahooapis.com/v1/public/yql?q=select%20*%20from%20html%20where%20url%3D%22' + URL + '%22&format=json');
+
+    checkURLPromise
+            .done(function(response) {
+                // results should be null if the page 404s or the domain doesn't work
+                if (response.query.results) { 
+                    dfd.resolve(true);
+                } else {
+                    dfd.reject(false);
+                }
+            })
+            .fail(function() {
+                dfd.reject('failed');
+            });
+
+    return dfd.promise();
 }
