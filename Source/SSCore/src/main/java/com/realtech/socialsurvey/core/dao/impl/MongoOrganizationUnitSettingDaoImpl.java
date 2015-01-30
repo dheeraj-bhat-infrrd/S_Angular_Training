@@ -18,6 +18,7 @@ import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.IndividualSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.User;
 
 /**
  * Mongo implementation of settings
@@ -53,10 +54,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Override
 	public void insertIndividualSettings(IndividualSettings individualSettings) {
-		LOG.info("Inseting individual settings. individual id: " + individualSettings.getIden());
-		LOG.debug("Inserting individual settings: " + individualSettings.toString());
+		LOG.info("Inserting individual settings. individual id: " + individualSettings.getUserId());
 		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
-		LOG.info("Inserted into individual settings");
+		LOG.info("Inserted individual settings");
+	}
+	
+	@Override
+	public void insertIndividualSettings(User user) {
+		IndividualSettings indivSettings = new IndividualSettings();
+		indivSettings.setUserId(user.getUserId());
+		indivSettings.setFirstName(user.getFirstName());
+		indivSettings.setLastName(user.getLastName());
+		indivSettings.setEmailId(user.getEmailId());
+		indivSettings.setProfileName(user.getUsername());
+		
+		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
+		insertIndividualSettings(indivSettings);
+		LOG.info("Inserted individual settings");
 	}
 
 	@Override
