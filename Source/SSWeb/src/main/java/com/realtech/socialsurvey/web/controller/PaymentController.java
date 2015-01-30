@@ -9,12 +9,16 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -169,7 +173,7 @@ public class PaymentController {
 	}
 	
 	@RequestMapping(value="/paymentchange",method = RequestMethod.GET)
-	public String paymentChangePage(Model model, HttpServletRequest request){
+	public Object paymentChangePage(Model model, HttpServletRequest request, HttpServletResponse response){
 		
 		LOG.info("Payment controller called for payment change page");
 		//Fetch current user in session
@@ -190,8 +194,8 @@ public class PaymentController {
 			e.printStackTrace();
 		}
 		catch (PaymentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			LOG.error("Payment Exception caught : message : " + e.getMessage());
+			return new ResponseEntity<String>("Notification recieved!", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		//Add the parameters to the response
@@ -200,6 +204,34 @@ public class PaymentController {
 		model.addAllAttributes(currentPaymentDetails);
 		model.addAttribute("paymentChange", CommonConstants.STATUS_ACTIVE);
 		return JspResolver.PAYMENT;		
+		
+	}
+	
+	@RequestMapping(value="/paymentupgrade",method=RequestMethod.POST)
+	public Object paymentUpgrade(Model model, HttpServletRequest request){
+		LOG.info("Payment controller called to upgrade payment method");
+		
+		String paymentNonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
+		LOG.info("Payment upgrade called with nonce : " + paymentNonce);
+		
+		//Fetching the user from session
+		LOG.debug("Fetching user from session");
+		User user = sessionHelper.getCurrentUser();
+		//Getting the company and the license detail object
+		Company company = user.getCompany();
+		LicenseDetail licenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+		
+		LOG.info("Making API call to update card details");
+		try {
+			gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
+		}
+		catch (InvalidInputException | NoRecordsFetchedException | PaymentException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return new ResponseEntity<String>("Notification recieved!", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		
+		return new ResponseEntity<String>("Notification recieved!", HttpStatus.OK);
 		
 	}
 }
