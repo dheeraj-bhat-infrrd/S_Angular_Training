@@ -16,7 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.IndividualSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 
 /**
@@ -28,7 +28,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
-	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	public static final String INDIVIDUAL_SETTINGS_COLLECTION = "INDIVIDUAL_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
 	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
@@ -52,11 +52,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 
 	@Override
-	public void insertAgentSettings(AgentSettings agentSettings) {
-		LOG.info("Inseting agent settings. Agent id: " + agentSettings.getIden());
-		LOG.debug("Inserting agent settings: " + agentSettings.toString());
-		mongoTemplate.insert(agentSettings, AGENT_SETTINGS_COLLECTION);
-		LOG.info("Inserted into agent settings");
+	public void insertIndividualSettings(IndividualSettings individualSettings) {
+		LOG.info("Inseting individual settings. individual id: " + individualSettings.getIden());
+		LOG.debug("Inserting individual settings: " + individualSettings.toString());
+		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
+		LOG.info("Inserted into individual settings");
 	}
 
 	@Override
@@ -77,10 +77,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			mongoTemplate.createCollection(BRANCH_SETTINGS_COLLECTION);
 			createIndexOnIden(BRANCH_SETTINGS_COLLECTION);
 		}
-		if (!mongoTemplate.collectionExists(AGENT_SETTINGS_COLLECTION)) {
-			LOG.info("Creating " + AGENT_SETTINGS_COLLECTION);
-			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
-			createIndexOnIden(AGENT_SETTINGS_COLLECTION);
+		if (!mongoTemplate.collectionExists(INDIVIDUAL_SETTINGS_COLLECTION)) {
+			LOG.info("Creating " + INDIVIDUAL_SETTINGS_COLLECTION);
+			mongoTemplate.createCollection(INDIVIDUAL_SETTINGS_COLLECTION);
+			createIndexOnIden(INDIVIDUAL_SETTINGS_COLLECTION);
 		}
 	}
 
@@ -93,10 +93,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 
 	@Override
-	public AgentSettings fetchAgentSettingsById(long identifier) {
-		LOG.info("Fetch agent settings from for id: " + identifier);
-		AgentSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER, identifier)), AgentSettings.class,
-				AGENT_SETTINGS_COLLECTION);
+	public IndividualSettings fetchIndividualSettingsById(long identifier) {
+		LOG.info("Fetch individual settings from for id: " + identifier);
+		IndividualSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER, identifier)), IndividualSettings.class,
+				INDIVIDUAL_SETTINGS_COLLECTION);
 		return settings;
 	}
 
