@@ -411,6 +411,16 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .overlay-payment{
+    position: fixed;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 999999999;
+    background-color: rgba(255,255,255,0.7);
+}
+
+.overlay-payment{
 }
 
 .btn-payment{
@@ -2380,4 +2390,356 @@ button.paypal.is-active {
 
 .sb-btn-reorder-down {
     background: url(../images/sb-reorder-down.png) no-repeat center;
+}
+
+.sb-btn-cancel {
+    background: url(../images/icntagClose.png) no-repeat center;
+}
+
+.sq-top-img {
+    height: 70px;
+    margin-bottom: 20px;
+    background: url(../images/chat.png) no-repeat center;
+}
+
+.sq-bord-bot-sm {
+    width: 55px;
+    border-bottom: 1px solid #C8C8C8;
+    margin: 0 auto;
+    margin-bottom: 20px;
+}
+
+.sq-ques{
+    font-size: 18px;
+    width: 80%;
+    margin: 0 auto 30px;
+}
+
+.sq-main-txt {
+    margin-bottom: 20px;
+    font-weight: bold !important;
+    text-transform: uppercase;
+    font-size: 20px;
+}
+
+.sq-ques-wrapper {
+    text-align: center;
+}
+
+.sq-star {
+    float: left;
+    cursor: pointer;
+    width: 62px;
+    height: 62px;
+    background: url(../images/no_star.png) no-repeat center;
+}
+
+.sq-full-star {
+    background: url(../images/full_star.png) no-repeat center;
+}
+
+.sq-rat-wrapper {
+    margin-bottom: 20px;
+}
+
+.sq-star-wrapper {
+    width: 310px;
+    margin: 0 auto;
+}
+
+.sq-skip-chk {
+    cursor: pointer;
+    height: 20px;
+    width: 20px;
+}
+
+.sq-skip-txt {
+    color: #47555E;
+    margin-left: 10px;
+    line-height: 20px;
+    font-size: 18px;
+}
+
+.sq-skip-wrapper {
+    width: 185px;
+    margin: 0 auto 20px;
+}
+
+.sq-np-wrapper {
+    line-height: 22px;
+    width: 240px;
+    margin: 30px auto;
+}
+
+.sq-np-item {
+    cursor: pointer;
+}
+
+.sq-np-item:first-child {
+    border-right: 1px solid #C8C8C8;
+}
+
+.sq-np-item-next {
+    width: 105px;
+    text-align: right
+}
+
+.sq-btn-wrapper {
+    margin-bottom: 20px;
+}
+
+.sq-btn-continue {
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    width: 150px;
+    line-height: 40px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+    margin: 0 auto;
+}
+
+.sq-btn-continue:hover {
+    background-color: #7AB400;
+}
+
+.sq-np-item-prev {
+    text-align: left;
+    width: 130px;
+}
+.sq-np-item-disabled {
+    color: #ccc !important;
+    cursor: default !important;
+}
+
+.sq-slider-wrapper {
+    width: 50%;
+    margin: 0 auto;
+}
+
+.sq-slider-val {
+    color: #5CC7EF;
+    font-size: 60px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.mgn-bot-40 {
+    margin-bottom: 40px;
+}
+
+.rangeslider__fill_blue{
+    background-color: #5CC7EF;
+}
+.t-inp {
+    padding: 0 10px;
+    width: 200px;
+    float: left;
+    height: 39px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.t-btn {
+    float: left;
+    height: 40px;
+    line-height: 40px;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    width: 150px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+    margin-top: 10px;
+}
+
+.t-btn:hover {
+    background-color: #7AB400;
+}
+
+.t-container {
+    width: 960px;
+    margin: 0 auto;
+}
+
+.t-heade-wrapper {
+    height: 60px;
+}
+
+.t-logo {
+    height: 60px;
+    width: 150px;
+    background: url(../images/logo.png) no-repeat center;
+    background-size: 130px auto;
+}
+
+.t-header-main {
+    border-top: 5px solid #5cc7ef;
+    background-color: #F9F9FB;
+}
+
+.t-main-pic {
+    width: 50%;
+    min-height: 200px;
+}
+
+.t-main-reg {
+    width: 50%;
+}
+
+.t-btn-reg {
+    height: 50px;
+    line-height: 50px;
+    border-radius: 3px;
+    color: #fff;
+    cursor: pointer;
+    width: 350px;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+}
+
+.t-btn-reg:hover {
+    background-color: #7AB400;
+}
+
+.t-reg-txt {
+    margin-bottom: 10px;
+    padding: 0 10px;
+    width: 350px;
+    height: 50px;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    display: block;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.t-reg-wrapper {
+    width: 350px;
+    margin: 56px auto 50px;
+}
+
+.t-bg-sample-img {
+    width: 450px;
+    margin: 0px auto;
+    background: url(../images/t-images.jpg) no-repeat center;
+    height: 400px;
+}
+
+.t-pro-txt {
+    line-height: 60px;
+    padding-left: 10px;
+    font-size: 22px;
+}
+
+.t-pro-wrapper {
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.t-pro-img-wrapper {
+    width: 100px;
+    margin-right: 15px;
+}
+
+.t-pro-txt-wrapper {
+    width: 595px;
+}
+
+.t-pro-line1 {
+    font-size: 18px;
+    line-height: 32px;
+}
+
+.t-pro-btn {
+    width: 115px;
+    float: left;
+    height: 32px;
+    line-height: 32px;
+    margin-top: 10px;
+    border-radius: 3px;
+    font-size: 12px;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    text-transform: uppercase;
+    background-color: #5CC7EF;
+}
+
+.t-pro-btn:hover {
+    background-color: #7AB400;
+}
+
+.margin-right-20 {
+    margin-right: 20px;
+}
+
+.t-pro-item {
+    border-bottom: 1px solid #dcdcdc;
+    padding: 10px 0;
+}
+
+.t-pro-item:last-child {
+    border-bottom: 0;
+}
+
+.t-pro-line2 {
+    line-height: 24px;
+}
+
+.t-pro-line3 {
+    font-size: 12px;
+    line-height: 24px;
+}
+
+.t-pro-btn-adj {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.t-pro-search-no {
+    font-size: 12px;
+    color: #A5A5A5;
+}
+
+.t-pro-search-txt {
+    line-height: 60px;
+    padding-left: 10px;
+}
+
+.t-pro-search-name {
+    font-size: 18px;
+}
+
+.ui-widget-content{
+    max-height: 200px;
+    display: none;
+    overflow-y: auto;
+    overflow-x: hidden;
+    width:313px !important;
+}
+
+.ov-payment-container{ 
+    height: 100%;
+    overflow: auto;
+}
+
+.ov-payment-shadow{
+    float: none;
+    margin: 0 auto;
+    box-shadow: 0px 0px 13px 4px #CCC;
+}
+
+.body-no-scroll{
+    overflow: hidden;
+}
+.sb-quests-error {
+    text-align: center;
+    color: rgb(240, 75, 75);
+    font-size: 18px;
+    margin-bottom: 15px;
 }
