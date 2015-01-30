@@ -1014,7 +1014,15 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
 		
 	}
-
+	
+	/**
+	 * Fetches the current card details for a particular subscription
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
 	@Override
 	public Map<String, String> getCurrentPaymentDetails(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
 		
@@ -1068,7 +1076,17 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("Returning the payment method details");
 		return paymentDetailsMap;
 	}
-
+	
+	/**
+	 * Changes the card for a particular customer and subscription
+	 * @param subscriptionId
+	 * @param paymentNonce
+	 * @param customerId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
 	@Override
 	public boolean changePaymentMethod(String subscriptionId, String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
 		

@@ -372,6 +372,8 @@ function showPaymentOptions() {
         error : function(e) {
         		console.log("Error occured. Hiding Overlay");
     			hideOverlay();
+    			$('#st-settings-payment-off').show();
+    	   		$('#st-settings-payment-on').hide();
     			console.log("Removing no-scroll class from body");
         		$('body').removeClass('body-no-scroll');
         		$('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");

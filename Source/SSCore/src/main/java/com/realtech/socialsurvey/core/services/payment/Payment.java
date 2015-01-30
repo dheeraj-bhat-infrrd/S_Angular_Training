@@ -145,8 +145,26 @@ public interface Payment {
 	 */
 	public void upgradePlanForSubscription(User user,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException;
 	
+	/**
+	 * Fetches the current card details for a particular subscription
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
 	public Map<String, String> getCurrentPaymentDetails(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 		
+	/**
+	 * Changes the card for a particular customer and subscription
+	 * @param subscriptionId
+	 * @param paymentNonce
+	 * @param customerId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
 	public boolean changePaymentMethod(String subscriptionId,String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
 
 }

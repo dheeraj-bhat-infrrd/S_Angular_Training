@@ -255,12 +255,23 @@
                 url : url,
                 type : "POST",
                 data : payLoad,
-                success : function(){
+                success : function(data){
                 	console.log("Account upgrade successful. Redirecting to dashboard");
-                	location.href = "./landing.do";
+                	$('#overlay-toast').html(data);
+		    		console.log("Added toast message. Showing it now");
+		    		showToast();
+		    		console.log("Finished showing the toast");
+                	setTimeout(function (){location.href = "./landing.do";},4000);
                 },
                 error : function(e) {
-                    console.error("error : " + e);
+                    console.error("Error occured while upgrading. ");
+    	        	$('.overlay-payment').hide();
+    	        	hideOverlay();
+                    $('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
+		    		console.log("Added toast message. Showing it now");
+		    		showToast();
+		    		console.log("Finished showing the toast");
+                    
                 }
             });
         }
