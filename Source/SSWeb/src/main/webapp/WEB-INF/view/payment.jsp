@@ -148,6 +148,7 @@
 	   
 	   $("#update-button").click( function(){
 		   console.log("Update button pressed");
+		   showOverlay();
 		   cardNumber = $("#card-number").val();
 		   expMonth = $("#exp-month").val();
 		   expYear = $("#exp-year").val();
@@ -165,7 +166,6 @@
 	   
 	   function makeAjaxCallToUpgrade(nonce){
 		   
-		   showOverlay();
 		   var data = "payment_method_nonce=" + nonce;
 		   $.ajax({
 			   url : "./paymentupgrade.do",
@@ -189,6 +189,8 @@
 				   	console.log("Error occured. Hiding Payment popup");
 					console.log("Removing no-scroll class from body");
 		    		$('body').removeClass('body-no-scroll');
+		    		$('#st-settings-payment-off').show();
+			   		$('#st-settings-payment-on').hide();
 		    		$('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
 		    		console.log("Added toast message. Showing it now");
 		    		showToast();

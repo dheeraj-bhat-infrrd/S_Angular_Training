@@ -220,5 +220,8 @@ public interface CommonConstants {
 	public static final String CARD_HOLDER_NAME = "cardHolderName";
 	public static final String ISSUING_BANK = "issuingBank";
 	public static final String IMAGE_URL = "imageUrl";
+	public static final String CLIENT_TOKEN = "clienttoken";
+	public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
+	
 	
 }

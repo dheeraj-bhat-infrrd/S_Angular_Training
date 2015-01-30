@@ -651,11 +651,10 @@ public class OrganizationManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/upgradeplan", method = RequestMethod.POST)
-	@ResponseBody
 	public Object upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		String message = "";
+		String message = null;
 
 		LOG.info("Fetching the user in session");
 		User user = sessionHelper.getCurrentUser();
@@ -691,23 +690,26 @@ public class OrganizationManagementController {
 		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException | UndeliveredEmailException e ) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return new ResponseEntity<String>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+
 		}
 		catch (SubscriptionPastDueException e) {
 			LOG.error("SubscriptionPastDueException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return new ResponseEntity<String>(message, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		catch (SubscriptionUpgradeUnsuccessfulException e) {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return new ResponseEntity<String>(message, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		//After all the updates are done we set the account type in the session to reflect changes
 		HttpSession session = request.getSession();		
 		session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(Integer.parseInt(accountType)));
 				
-		model.addAttribute("message",message);
 		LOG.info("returning a 200 response");
-		return new ResponseEntity<String>("Upgrade successful!", HttpStatus.OK);
+		return new ResponseEntity<String>(message, HttpStatus.OK);
 	}
 	
 	/**

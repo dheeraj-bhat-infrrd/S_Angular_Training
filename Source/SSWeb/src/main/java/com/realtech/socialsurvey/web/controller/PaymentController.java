@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -183,26 +182,20 @@ public class PaymentController {
 		
 		//Next we fetch the current payment details of user.
 		try {
+			LOG.debug("Fetching users current card details");
 			currentPaymentDetails = gateway.getCurrentPaymentDetails(user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getSubscriptionId());
 		}
-		catch (InvalidInputException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (NoRecordsFetchedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		catch (PaymentException e) {
-			LOG.error("Payment Exception caught : message : " + e.getMessage());
-			return new ResponseEntity<String>("Notification recieved!", HttpStatus.INTERNAL_SERVER_ERROR);
+		catch (PaymentException | InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("Exception caught : message : " + e.getMessage());
+			return new ResponseEntity<String>("Error while fetching payment details!", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		//Add the parameters to the response
-		LOG.info("Adding attributes");
+		LOG.debug("Adding attributes");
 		model.addAttribute("clienttoken", gateway.getClientToken());
 		model.addAllAttributes(currentPaymentDetails);
-		model.addAttribute("paymentChange", CommonConstants.STATUS_ACTIVE);
+		model.addAttribute(CommonConstants.PAYMENT_CHANGE_FLAG, CommonConstants.STATUS_ACTIVE);
+		LOG.info("Returning payment jsp page");
 		return JspResolver.PAYMENT;		
 		
 	}
@@ -211,6 +204,7 @@ public class PaymentController {
 	public Object paymentUpgrade(Model model, HttpServletRequest request){
 		LOG.info("Payment controller called to upgrade payment method");
 		
+		boolean status = false;
 		String paymentNonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 		LOG.info("Payment upgrade called with nonce : " + paymentNonce);
 		
@@ -223,15 +217,20 @@ public class PaymentController {
 		
 		LOG.info("Making API call to update card details");
 		try {
-			gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
+			status = gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
 		}
 		catch (InvalidInputException | NoRecordsFetchedException | PaymentException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return new ResponseEntity<String>("Notification recieved!", HttpStatus.INTERNAL_SERVER_ERROR);
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+			return new ResponseEntity<String>("Error while changing payment!", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<String>("Notification recieved!", HttpStatus.OK);
+		if(status == false){
+			LOG.info("Payment details change unsuccessful. Please check logs.");
+			return new ResponseEntity<String>("Payment details change unsuccessful!", HttpStatus.INTERNAL_SERVER_ERROR);
+		}		
+		
+		LOG.info("Payment details change successful! Returning 200");
+		return new ResponseEntity<String>("Payment change successful!", HttpStatus.OK);
 		
 	}
 }
