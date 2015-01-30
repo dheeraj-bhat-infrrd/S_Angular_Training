@@ -73,10 +73,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private UserManagementService userManagementService;
-	
+
 	@Autowired
 	private SolrSearchService solrSearchService;
-	
+
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
 
@@ -89,17 +89,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
-	 * @throws SolrException 
+	 * 
+	 * @throws SolrException
+	 * @throws InvalidInputException 
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException {
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
-		
+
 		LOG.debug("Calling method for updating company for user profiles");
 		updateCompanyForUserProfile(user, company);
 
@@ -221,7 +223,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		user = userDao.findById(User.class, user.getUserId());
-//		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+		// List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user",
+		// user);
 		List<UserProfile> userProfiles = user.getUserProfiles();
 		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {
@@ -236,12 +239,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	/**
-	 * This method adds all the key and value pairs into the ORGANIZATION_LEVEL_SETTINGS table.
+	 * This method adds all the key and value pairs into mongo collection COMPANY_SETTINGS
 	 * 
 	 * @param user
+	 * @param company
 	 * @param organizationalDetails
+	 * @throws InvalidInputException 
 	 */
-	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) {
+	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.debug("Method addOrganizationalDetails called.");
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
@@ -254,6 +259,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
 		companySettings.setContact_details(contactDetailSettings);
+		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		// insert the company settings
@@ -261,6 +267,41 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
 		LOG.debug("Method addOrganizationalDetails finished");
+	}
+
+	/**
+	 * JIRA:SS-117 by RM02
+	 * Method to generate profile name for a company based on some rules
+	 * 
+	 * @param companyName
+	 * @param iden
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String generateProfileNameForCompany(String companyName, long iden) throws InvalidInputException {
+		LOG.debug("Generating profile name for companyName:" + companyName + " and iden:" + iden);
+		String profileName = null;
+		if (companyName == null || companyName.isEmpty()) {
+			throw new InvalidInputException("Company name is null or empty while generating profile name");
+		}
+		profileName = companyName.replaceAll(" ", "-").toLowerCase();
+
+		LOG.debug("Checking uniqueness of profile name generated : " + profileName + " by querying mongo");
+
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		/**
+		 * if there exists a company with the profile name formed, append company iden to get the
+		 * unique profile name
+		 */
+		if (companySettings != null) {
+
+			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
+			profileName = profileName + iden;
+		}
+		LOG.debug("Successfully generated profile name. Returning : " + profileName);
+		return profileName;
+
 	}
 
 	/**
@@ -317,7 +358,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	private void addTeamAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
@@ -343,7 +384,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 
-		
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
@@ -769,6 +809,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// Perform soft delete of the record in the database
 		disabledAccountDao.update(disabledAccount);
 		LOG.info("Record successfully deleted from the database!");
+	}
+
+	/**
+	 * Method to get the company details based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings getCompanyDetailsByProfileName(String profileName) throws InvalidInputException {
+		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
+
+		LOG.info("Successfully executed method getCompanyDetailsByProfileName ");
+		return null;
 	}
 }
 // JIRA: SS-27: By RM05: EOC

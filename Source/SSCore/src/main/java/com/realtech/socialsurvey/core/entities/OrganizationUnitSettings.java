@@ -14,6 +14,7 @@ public class OrganizationUnitSettings {
 	private String id;
 	private long iden;
 	private float profile_completion;
+	private String profileName;
 	private String logo;
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
@@ -51,6 +52,14 @@ public class OrganizationUnitSettings {
 
 	public void setProfile_completion(float profile_completion) {
 		this.profile_completion = profile_completion;
+	}
+	
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
 	}
 
 	public String getLogo() {
@@ -167,12 +176,11 @@ public class OrganizationUnitSettings {
 
 	@Override
 	public String toString() {
-		return "iden: " + iden + "\t profile_completion: " + profile_completion + "\t logo: " + logo + "\t contact_details: "
-				+ (contact_details != null ? contact_details.toString() : "null") + "\t crm_info: "
-				+ (crm_info != null ? crm_info.toString() : "null") + "\t licenses: " + (licenses != null ? licenses.toString() : "null")
-				+ "\t associations: " + (associations != null ? associations.toString() : "") + "\t achievements: "
-				+ (achievements != null ? achievements.toString() : "null") + "\t survey_setings: "
-				+ (survey_settings != null ? survey_settings.toString() : "");
+		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
+				+ profileName + ", logo=" + logo + ", isLocationEnabled=" + isLocationEnabled + ", isAccountDisabled=" + isAccountDisabled
+				+ ", contact_details=" + contact_details + ", crm_info=" + crm_info + ", mail_content=" + mail_content + ", licenses=" + licenses
+				+ ", associations=" + associations + ", achievements=" + achievements + ", survey_settings=" + survey_settings + ", createdBy="
+				+ createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
 	}
 
 }
