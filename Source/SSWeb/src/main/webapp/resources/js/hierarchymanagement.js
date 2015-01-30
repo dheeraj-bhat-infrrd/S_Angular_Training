@@ -5,6 +5,7 @@
 var numOfRows = 6;
 var branchesStartIndex = 0;
 var regionStartIndex = 0;
+var usersStartIndex = 0;
 
 /**
  * js function for adding a branch
@@ -245,7 +246,7 @@ function searchBranchesForCompanyCallBack(data) {
 	if(searchResult != null) {
 		var len = searchResult.length;
 		var htmlData = '<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-right-30" id="hm-branches-left"></div>';
-		console.log("searchResult is "+searchResult);
+		console.log("searchResult is "+searchResult+" len : "+len+" numrows : "+numOfRows+" branchesStartIndex:"+branchesStartIndex);
 		var leftColHtml = "";
 		var rightColHtml = "";
 		if(len > 0) {
@@ -261,7 +262,6 @@ function searchBranchesForCompanyCallBack(data) {
 				}
 			});
 			
-			//htmlData = htmlData + ' </div>';
 			htmlData = htmlData + ' <div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-bottom-panel-item padding-left-30" id="hm-branches-right"></div>';
 			$.each(searchResult,function(i,branch) {
 				if(i % 2 != 0) {
@@ -270,7 +270,6 @@ function searchBranchesForCompanyCallBack(data) {
 					rightColHtml = rightColHtml +'<div class="float-right icn-remove cursor-pointer hm-item-height-adjust" id="branch-"'+branch.branchId+'"} onclick ="deleteBranchPopup('+branch.branchId+')"></div></div>';
 				}
 			});
-			//htmlData = htmlData + ' </div>';
 		}
 		else {
 			if(branchesStartIndex == 0) {
@@ -292,6 +291,7 @@ function searchBranchesForCompanyCallBack(data) {
 		}
 		
 		if(len > numOfRows) {
+			$("#view-more-branch-div").remove();
 			$("#hm-all-existing-comp-branches").after('<div id="view-more-branch-div" class="hm-um-btn-view-all blue-text" onclick=viewMoreBranches(this)><span class="um-hm-viewall cursor-pointer">View All...</span></div>');
 		}
 		
@@ -305,6 +305,7 @@ function searchBranchesForCompanyCallBack(data) {
 function clearBranchForm() {
 	$("#add-branch-form :input").val("");
 	$("#add-branch-form .error-msg").hide();
+	$("#hm-add-region-admin-txt").hide();
 }
 
 $("#branch-clear-icon").click(function() {
@@ -317,7 +318,6 @@ $("#branch-clear-icon").click(function() {
 function showRegions() {
 	//reset the start index
 	regionStartIndex = 0;
-	
 	searchRegions("",regionStartIndex,numOfRows);
 }
 
@@ -521,6 +521,7 @@ function deleteBranchCheckCallBack(response, branchId) {
 function clearRegionForm() {
 	$("#add-region-form :input").val("");
 	$("#add-region-form .error-msg").hide();
+	$("#hm-add-branch-admin-txt").hide();
 }
 
 $("#region-clear-icon").click(function() {
@@ -647,6 +648,11 @@ $("#branch-save-icon").click(function() {
 		console.log("submitting branch information form");
 		if (validateBranchInformation('add-branch-form')) {
 			addOrUpdateBranch("add-branch-form");
+			
+			var branchId = $("#branch-id-hidden").val();
+			if(branchId != undefined && branchId != "") {
+				assignBranchAdmin();
+			}
 		}
 	}
 });
@@ -724,7 +730,7 @@ function populateRegionsSelectorCallBack(data) {
 			$("#hm-dd-wrapper-bottom").html(htmlData).slideToggle(200);
 			
 			// bind the click event of selector
-			$('.hm-dd-item').click(function() {
+			$('.hm-dd-item-keys').click(function() {
 				$('#selected-region-txt').val($(this).html());
 				$('#selected-region-id-hidden').val($(this).data('regionid'));
 				$('#selected-region-id-hidden').next('.input-error-2').hide();
@@ -810,9 +816,13 @@ function searchRegionsCallBack(data) {
 }
 
 $("#region-save-icon").click(function(e) {
-	console.log("submitting region information form");
 	if(validateRegionInformation('enterprise-branch-region')){
 		addOrUpdateRegion("add-region-form");
+		
+		var regionId = $("#region-id-hidden").val();
+		if(regionId != undefined && regionId != "") {
+			assignRegionAdmin();
+		}
 	}
 });
 
@@ -843,7 +853,7 @@ $("#selected-region-txt").keyup(function() {
 	}
 });
 
-//bindind arrow keys with region selector
+//binding arrow keys with region selector
 $("#selected-region-txt").keydown(function(e) {
 	if(e.which == 40) {
 		var text = $("#selected-region-txt").val();
@@ -969,3 +979,169 @@ $('.dd-icn-minus').click(function(){
 	}
 });
 
+/**
+ * Method to fetch the users list for providing option to assign branch admin
+ * 
+ * @param searchKey
+ * @param start
+ * @param rows
+ */
+function showUsersForBranchAdmin(searchKey,start,rows) {
+	var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+searchKey;
+	callAjaxGET(url, showUsersForBranchAdminCallBack, true);
+}
+
+/**
+ * Call back function for showUsersForBranchAdmin, populates the dropsown with users list obtained
+ * @param data
+ */
+function showUsersForBranchAdminCallBack(data) {
+	var usersList = $.parseJSON(data);
+	var htmlData = "";
+	if(usersList != null) {
+		var len = usersList.length;
+		if(len > 0) {
+			$.each(usersList,function(i,user) {
+				htmlData = htmlData +'<div class="hm-dd-item hm-branch-user hm-dd-hover" data-userid="'+user.userId+'">'+user.firstName+" "+user.lastName+'</div>';
+			});
+		}
+	}	
+	$("#hm-branch-userslist").html(htmlData).slideToggle(200);
+	
+	//bind the hover event
+	$(".hm-dd-hover").hover(function() {
+		$(".hm-dd-item-keys").removeClass("hm-dd-item-keys-selected");
+	});
+	
+	// bind the click event of selector
+	$(".hm-branch-user").click(function() {
+		$('#hm-add-branch-admin-txt').val($(this).html());
+		$('#hm-add-branch-admin-hidden-userid').val($(this).data('userid'));
+		$('#hm-branch-userslist').slideToggle(200);
+	});
+}
+
+$("#hm-add-branch-admin-txt").click(function() {
+	showUsersForBranchAdmin("",usersStartIndex,numOfRows);
+});
+
+$("#hm-add-branch-admin-txt").keyup(function() {
+	var text = $(this).val();
+	usersStartIndex = 0;	
+	if (text.length > 1) {
+		delay(function() {
+			showUsersForBranchAdmin(text,usersStartIndex,numOfRows);
+		}, 500);
+	}
+	else {
+		delay(function() {
+			showUsersForBranchAdmin("",usersStartIndex,numOfRows);
+		}, 500);
+	}
+});
+
+$("#add-branch-admin-btn").click(function() {
+	$('#hm-add-branch-admin-txt').show();
+	showUsersForBranchAdmin("",usersStartIndex,numOfRows);
+});
+
+/**
+ * Method to assign a user as branch admin
+ */
+function assignBranchAdmin(){
+	var userId = $("#hm-add-branch-admin-hidden-userid").val();
+	var branchId = $("#branch-id-hidden").val();
+	var url = "./assignorunassignbranchadmin.do?branchId="+branchId+"&userId="+userId+"&isAssign=YES";
+	callAjaxPOST(url, assignBranchAdminCallBack, true);
+}
+
+/**
+ * callback for assignBranchAdmin
+ * @param data
+ */
+function assignBranchAdminCallBack(data) {
+	clearBranchForm();
+}
+
+/**
+ * Method to fetch users for assigning region admin
+ * @param searchKey
+ * @param start
+ * @param rows
+ */
+function showUsersForRegionAdmin(searchKey,start,rows) {
+	var url="./finduserbyemail.do?startIndex="+start+"&batchSize="+rows+"&searchKey="+searchKey;
+	callAjaxGET(url, showUsersForRegionAdminCallBack, true);
+}
+
+/**
+ * Callback for showUsersForRegionAdmin, populates the dropdown with users list obtained
+ * @param data
+ */
+function showUsersForRegionAdminCallBack(data) {
+	var usersList = $.parseJSON(data);
+	var htmlData = "";
+	if(usersList != null) {
+		var len = usersList.length;
+		if(len > 0) {
+			$.each(usersList,function(i,user) {
+				htmlData = htmlData +'<div class="hm-dd-item hm-region-user hm-dd-hover" data-userid="'+user.userId+'">'+user.firstName+" "+user.lastName+'</div>';
+			});
+		}
+	}	
+	$("#hm-region-userslist").html(htmlData).slideToggle(200);
+	
+	//bind the hover event
+	$(".hm-dd-hover").hover(function() {
+		$(".hm-dd-item-keys").removeClass("hm-dd-item-keys-selected");
+	});
+	
+	// bind the click event of selector
+	$(".hm-region-user").click(function() {
+		$('#hm-add-region-admin-txt').val($(this).html());
+		$('#hm-add-region-admin-hidden-userid').val($(this).data('userid'));
+		$('#hm-region-userslist').slideToggle(200);
+	});
+}
+
+$("#hm-add-region-admin-txt").click(function() {
+	showUsersForRegionAdmin("",usersStartIndex,numOfRows);
+});
+
+$("#hm-add-region-admin-txt").keyup(function() {
+	var text = $(this).val();
+	usersStartIndex = 0;	
+	if (text.length > 1) {
+		delay(function() {
+			showUsersForRegionAdmin(text,usersStartIndex,numOfRows);
+		}, 500);
+	}
+	else {
+		delay(function() {
+			showUsersForRegionAdmin("",usersStartIndex,numOfRows);
+		}, 500);
+	}
+});
+
+$("#add-region-admin-btn").click(function() {
+	$('#hm-add-region-admin-txt').show();
+	showUsersForRegionAdmin("",usersStartIndex,numOfRows);
+});
+
+/**
+ * Method to assign a user as region admin
+ */
+function assignRegionAdmin(){
+	var userId = $("#hm-add-region-admin-hidden-userid").val();
+	var regionId = $("#region-id-hidden").val();
+	var url = "./assignregionadmin.do?regionId="+regionId+"&userId="+userId;
+	callAjaxPOST(url, assignRegionAdminCallBack, true);
+}
+
+/**
+ * callback for assignRegionAdmin
+ * @param data
+ */
+function assignRegionAdminCallBack(data) {
+	clearRegionForm();
+}

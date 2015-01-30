@@ -678,23 +678,6 @@ $(window).resize(function(){
    }
 });
 
-/*$('body').on('click','#upgrade-plan',function(){
-    console.log("upgrade plan button clicked");
-    var url = "./upgradepage.do";
-    
-    $.ajax({
-    	url: url,
-    	type: "GET",
-    	success: function(data){
-        	$('.overlay-payment').html(data);
-        	$('.overlay-payment').show();
-        	},
-        error : function(e) {
-    			console.log(e);
-    		}
-    	});
-});*/
-
 function upgradePlan(){
 	 console.log("upgrade plan button clicked");
 	 var url = "./upgradepage.do";
