@@ -26,6 +26,7 @@
     </div>
 	<div class="overlay-loader hide"></div>
 	<div class="overlay-payment hide"></div>
+
 	<div id="overlay-main" class="overlay-main hide">
 		<div class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
