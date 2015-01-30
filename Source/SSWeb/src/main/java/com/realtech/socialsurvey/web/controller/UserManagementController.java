@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -68,6 +69,9 @@ public class UserManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	private final static int SOLR_BATCH_SIZE = 20;
 
@@ -138,9 +142,16 @@ public class UserManagementController {
 						throw new UserAlreadyExistsException("User already exists with the email id : " + emailId);
 					}
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
+						// persisting user to mysql
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
+						
+						// TODO persisting user to mongo
+						LOG.debug("Adding newly registered user {} to mongo: ", user.getFirstName());
+						organizationUnitSettingsDao.insertIndividualSettings(user);
+						LOG.debug("Successfully added newly registered user {} to mongo: ", user.getFirstName());
+
 						solrSearchService.addUserToSolr(user);
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 

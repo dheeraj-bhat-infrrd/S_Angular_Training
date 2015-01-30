@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -45,7 +46,9 @@ public class RegistrationController {
 	private SolrSearchService solrSearchService;
 	@Autowired
 	private SessionHelper sessionHelper;
-	
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
 		LOG.info("Showing invitation page");
@@ -196,16 +199,25 @@ public class RegistrationController {
 			 * user else send a registration invite on the changed emailId
 			 */
 			try {
+				// persisting user to mysql
 				LOG.debug("Registering user with emailId : " + emailId);
 				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 				
-				solrSearchService.addUserToSolr(user);
-				LOG.debug("Added newly added user {} to solr",user.getFirstName());
+				// TODO persisting user to mongo
+				LOG.debug("Adding newly registered user {} to mongo: ", user.getFirstName());
+				organizationUnitSettingsDao.insertIndividualSettings(user);
+				LOG.debug("Successfully added newly registered user {} to mongo: ", user.getFirstName());
 				
-				LOG.debug("Adding newly registered user to principal session");
+				// TODO persisting user to solr
+				LOG.debug("Adding newly registered user {} to solr: ", user.getFirstName());
+				solrSearchService.addUserToSolr(user);
+				LOG.debug("Successfully added newly registered user {} to solr: ", user.getFirstName());
+				
+				// persisting user to principal session
+				LOG.debug("Adding newly registered user {} to principal session: ", user.getFirstName());
 				sessionHelper.loginOnRegistration(emailId, password);
-				LOG.debug("Successfully added registered user to principal session");
+				LOG.debug("Successfully added newly registered user to principal session: ", user.getFirstName());
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_GENERAL_ERROR, e);

@@ -8,7 +8,8 @@ public class IndividualSettings extends OrganizationUnitSettings {
 	private String firstName;
 	private String lastName;
 	private String emailId;
-	private String profileUrl;
+	private String profileName;
+
 	private List<String> expertise;
 	private List<String> hobbies;
 
@@ -44,12 +45,12 @@ public class IndividualSettings extends OrganizationUnitSettings {
 		this.emailId = emailId;
 	}
 
-	public String getProfileUrl() {
-		return profileUrl;
+	public String getProfileName() {
+		return profileName;
 	}
 
-	public void setProfileUrl(String profileUrl) {
-		this.profileUrl = profileUrl;
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
 	}
 
 	public List<String> getExpertise() {
@@ -70,6 +71,6 @@ public class IndividualSettings extends OrganizationUnitSettings {
 
 	@Override
 	public String toString() {
-		return super.toString() + "\t expertise: " + expertise.toString() + "\t hobbies: " + hobbies.toString();
+		return "\t firstName: " + firstName + "\t lastName: " + lastName + "\t emailId: " + emailId;
 	}
 }
