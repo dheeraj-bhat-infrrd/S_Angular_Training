@@ -302,6 +302,7 @@ $('#st-settings-payment-on').click(function(){
 $('#st-settings-payment-off').click(function(){
 	$('#st-settings-payment-on').show();
 	$(this).hide();
+	showPaymentOptions();
 });
 
 
@@ -355,6 +356,7 @@ function overlayRevert() {
 
 function showPaymentOptions() {
 	console.log("Calling payment controller for payment upgrade page");	
+	$('body').addClass('body-no-scroll');
 	var url = "./paymentchange.do";
     showOverlay();
     $.ajax({
@@ -368,7 +370,14 @@ function showPaymentOptions() {
         	console.log("Showing popup");
         	},
         error : function(e) {
-    			console.log(e);
+        		console.log("Error occured. Hiding Overlay");
+    			hideOverlay();
+    			console.log("Removing no-scroll class from body");
+        		$('body').removeClass('body-no-scroll');
+        		$('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
+        		console.log("Added toast message. Showing it now");
+        		showToast();
+        		console.log("Finished showing the toast");
     		}
     	});
 }

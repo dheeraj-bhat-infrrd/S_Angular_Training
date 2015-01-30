@@ -1,6 +1,11 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div id="overlay-toast" class="overlay-toast"></div>
+<style>
+	.body-no-scroll{
+			overflow: hidden;
+		}
+</style>
 
 <div class="hm-header-main-wrapper">
     <div class="container">
@@ -223,11 +228,11 @@
                 </div>
                 <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
                     <div class="clearfix st-settings-item-wrapper">
-                        <!-- <div class="float-left st-settings-check-wrapper">
-                            <div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on"></div>
-                            <div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off hide"></div>
-                        </div> -->
-                        <div class="float-left st-check-txt-OR" id="st-chg-payment-info"><a onclick="showPaymentOptions();">Change Payment Information</a></div>
+                       <div class="float-left st-settings-check-wrapper">
+                            <div id="st-settings-payment-on" class="st-checkbox st-settings-checkbox st-checkbox-on hide"></div>
+                            <div id="st-settings-payment-off" class="st-checkbox st-settings-checkbox st-checkbox-off"></div>
+                        </div>
+                        <div class="float-left st-check-txt-OR" id="st-chg-payment-info">Change Payment Information</div>
                     </div>
                     <div class="st-settings-text">Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay Lorem ipsum dore it ler sun soay </div>
                 </div>
