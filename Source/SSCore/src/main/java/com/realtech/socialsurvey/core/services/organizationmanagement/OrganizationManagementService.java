@@ -20,10 +20,9 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface OrganizationManagementService {
 
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException;
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException;
 
 	public AccountType addAccountTypeForCompany(User user, String accountType) throws InvalidInputException, SolrException;
-	
 
 	public long fetchAccountTypeMasterIdForCompany(Company company) throws InvalidInputException;
 
@@ -155,4 +154,13 @@ public interface OrganizationManagementService {
 	 * @throws PaymentException
 	 */
 	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method to fetch company details when profile name is provided
+	 * 
+	 * @param profileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getCompanyDetailsByProfileName(String profileName) throws InvalidInputException;
 }
