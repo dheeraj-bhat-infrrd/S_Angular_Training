@@ -2,7 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.IndividualSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
@@ -125,7 +125,7 @@ public interface UserManagementService {
 	 * @return agentSettings
 	 * @throws InvalidInputException
 	 */
-	public AgentSettings getUserSettings(long agentId) throws InvalidInputException;
+	public IndividualSettings getUserSettings(long agentId) throws InvalidInputException;
 	
 	/**
 	 * Get all the agent settings linked to the user profile
@@ -133,7 +133,7 @@ public interface UserManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
+	public Map<Long, IndividualSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
 
 }
 // JIRA SS-34 BY RM02 BOC
