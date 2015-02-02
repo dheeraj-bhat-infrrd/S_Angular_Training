@@ -649,7 +649,7 @@ public class OrganizationManagementController {
 		JSONObject jsonMessage = new JSONObject();
 		LOG.debug("Building json response");
 		try {
-			jsonMessage.put("success", 0);
+			jsonMessage.put("success", status);
 			jsonMessage.put("message", message);
 		}
 		catch (JSONException e) {
