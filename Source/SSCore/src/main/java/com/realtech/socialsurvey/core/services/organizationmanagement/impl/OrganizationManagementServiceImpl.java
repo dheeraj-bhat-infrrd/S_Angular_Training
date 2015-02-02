@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyProfile;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
@@ -97,7 +98,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * profiles.
 	 * 
 	 * @throws SolrException
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -250,7 +251,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param user
 	 * @param company
 	 * @param organizationalDetails
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.debug("Method addOrganizationalDetails called.");
@@ -288,8 +289,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	/**
-	 * JIRA:SS-117 by RM02
-	 * Method to generate profile name for a company based on some rules
+	 * JIRA:SS-117 by RM02 Method to generate profile name for a company based on some rules
 	 * 
 	 * @param companyName
 	 * @param iden
@@ -913,6 +913,42 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens,
 				unitSettings, collection);
 		LOG.info("Successfully updated the social media tokens.");
+	}
+	
+	/**
+	 * JIRA:SS-117 by RM02 Method to get the company details based on profile name
+	 */
+	@Override
+	@Transactional
+	public CompanyProfile getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
+		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
+		if (profileName == null || profileName.isEmpty()) {
+			throw new InvalidInputException("profile name is null or empty while getting company details");
+		}
+		CompanyProfile companyProfile = new CompanyProfile();
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		if (companySettings != null) {
+			companyProfile.setCompanySettings(companySettings);
+			long companyId = companySettings.getIden();
+
+			LOG.debug("Fetching regions for company : " + companyId);
+			List<Region> regions = regionDao
+					.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, companyDao.findById(Company.class, companyId));
+			if (regions != null && !regions.isEmpty()) {
+				companyProfile.setRegions(regions);
+			}
+			else {
+				LOG.warn("No regions present for company : " + companyId);
+			}
+		}
+		else {
+			LOG.warn("No company settings found for profileName : " + profileName);
+		}
+
+		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
+		return companyProfile;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
