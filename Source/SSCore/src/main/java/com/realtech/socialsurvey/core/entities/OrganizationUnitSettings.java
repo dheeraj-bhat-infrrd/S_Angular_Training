@@ -25,6 +25,7 @@ public class OrganizationUnitSettings {
 	private List<Association> associations;
 	private List<Achievement> achievements;
 	private SurveySettings survey_settings;
+	private SocialMediaTokens socialMediaTokens;
 	private String createdBy;
 	private String modifiedBy;
 	private long createdOn;
@@ -140,6 +141,14 @@ public class OrganizationUnitSettings {
 
 	public void setSurvey_settings(SurveySettings survey_settings) {
 		this.survey_settings = survey_settings;
+	}
+
+	public SocialMediaTokens getSocialMediaTokens() {
+		return socialMediaTokens;
+	}
+
+	public void setSocialMediaTokens(SocialMediaTokens socialMediaTokens) {
+		this.socialMediaTokens = socialMediaTokens;
 	}
 
 	public String getCreatedBy() {
