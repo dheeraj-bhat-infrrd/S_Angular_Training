@@ -9,6 +9,7 @@ public class ContactNumberSettings {
 
 	private String work;
 	private String personal;
+	private String fax;
 	private List<MiscValues> others;
 
 	public String getWork() {
@@ -25,6 +26,14 @@ public class ContactNumberSettings {
 
 	public void setPersonal(String personal) {
 		this.personal = personal;
+	}
+
+	public String getFax() {
+		return fax;
+	}
+
+	public void setFax(String fax) {
+		this.fax = fax;
 	}
 
 	public List<MiscValues> getOthers() {
