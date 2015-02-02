@@ -1,7 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if test="${not empty cannonicalusersettings }">
+<c:if
+	test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
 	<c:set
 		value="${cannonicalusersettings.companySettings.contact_details }"
 		var="contactDetails"></c:set>
@@ -30,7 +31,10 @@
 					<!-- Call JavaScript function to populate the address details -->
 				</div>
 			</div>
-			<div id="map-canvas" class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper"><spring:message code="label.map.key"/></div>
+			<div id="map-canvas"
+				class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
+				<spring:message code="label.map.key" />
+			</div>
 		</div>
 
 		<div class="row">
@@ -40,12 +44,15 @@
 					<div id="prof-edit-social-link" class="social-wrapper clearfix">
 						<!-- Call JavaScript function to load social page links -->
 					</div>
-					<input id="social-token-text" type="text" class="hide" placeholder="Social page link">
+					<input id="social-token-text" type="text" class="hide"
+						placeholder="Social page link">
 				</div>
 				<div class="prof-left-row prof-left-info bord-bot-dc">
 					<div class="left-contact-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key"/></div>
+							<div class="float-left left-panel-header">
+								<spring:message code="label.contactinformation.key" />
+							</div>
 						</div>
 						<div class="left-panel-content" id="contant-info-container">
 							<!-- contact info details to be populated dynamically -->
@@ -55,7 +62,9 @@
 				<div class="prof-left-row prof-left-assoc bord-bot-dc">
 					<div class="left-assoc-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.membership.key"/></div>
+							<div class="float-left left-panel-header">
+								<spring:message code="label.membership.key" />
+							</div>
 							<div class="float-right icn-share icn-plus-open"
 								onclick="addAnAssociation();"></div>
 						</div>
@@ -67,7 +76,9 @@
 				<div class="prof-left-row prof-left-ach bord-bot-dc">
 					<div class="left-ach-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.achievement.key"/></div>
+							<div class="float-left left-panel-header">
+								<spring:message code="label.achievement.key" />
+							</div>
 							<div class="float-right icn-share icn-plus-open"
 								onclick="addAnAchievement();"></div>
 						</div>
@@ -79,7 +90,9 @@
 				<div class="prof-left-row prof-left-auth bord-bot-dc">
 					<div class="left-auth-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.licenses.key"/></div>
+							<div class="float-left left-panel-header">
+								<spring:message code="label.licenses.key" />
+							</div>
 							<div class="float-right icn-share icn-plus-open"
 								onclick="addAuthorisedIn();"></div>
 						</div>
@@ -92,18 +105,19 @@
 			<div
 				class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div class="intro-wrapper rt-content-main bord-bot-dc">
-					<div class="main-con-header">About ${contactDetails.name }</div>
+					<div class="main-con-header"><spring:message code="label.about.key" /> ${contactDetails.name }</div>
 					<div class="intro-body" id="intro-body-text">
 						<c:choose>
-							<c:when test="${not empty contactDetails.about_me && not empty fn:trim(contactDetails.about_me) }">${contactDetails.about_me }</c:when>
-							<c:otherwise>Add some details about your company</c:otherwise>
+							<c:when
+								test="${not empty contactDetails.about_me && not empty fn:trim(contactDetails.about_me) }">${contactDetails.about_me }</c:when>
+							<c:otherwise><spring:message code="label.aboutcompany.empty.key" /></c:otherwise>
 						</c:choose>
 					</div>
 					<textarea class="sb-txtarea hide" id="intro-body-text-edit"></textarea>
 				</div>
 				<div class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
-						<div class="main-con-header">Recent Tweets</div>
+						<div class="main-con-header"><spring:message code="label.recenttweets.key"/></div>
 						<div class="tweet-panel tweet-panel-left">
 							<div class="tweet-panel-item bord-bot-dc clearfix">
 								<div class="tweet-icn icn-tweet float-left"></div>
@@ -136,7 +150,7 @@
 						</div>
 					</div>
 					<div class="float-left panel-tweet-wrapper posts-wrapper">
-						<div class="main-con-header">Latest Posts</div>
+						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
 						<div class="posts-panel posts-panel-right">
 							<div class="posts-panel-item bord-bot-dc">
 								<div class="post-txt">Lorem ipsunmm dore tit sre leru

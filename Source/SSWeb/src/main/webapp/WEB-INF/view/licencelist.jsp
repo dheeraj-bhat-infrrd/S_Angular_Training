@@ -1,7 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:set
-	value="${cannonicalusersettings.companySettings.licenses.authorized_in }"
-	var="authorisedInList"></c:set>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<c:if
+	test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings && not empty cannonicalusersettings.companySettings.licenses}">
+	<c:set
+		value="${cannonicalusersettings.companySettings.licenses.authorized_in }"
+		var="authorisedInList"></c:set>
+</c:if>
 <c:choose>
 	<c:when test="${not empty authorisedInList }">
 		<c:forEach items="${authorisedInList }" var="authorisedIn">
@@ -10,6 +14,6 @@
 		</c:forEach>
 	</c:when>
 	<c:otherwise>
-		<div>No authorisation added yet</div>
+		<div><spring:message code="label.licenses.empty.key"></spring:message></div>
 	</c:otherwise>
 </c:choose>
