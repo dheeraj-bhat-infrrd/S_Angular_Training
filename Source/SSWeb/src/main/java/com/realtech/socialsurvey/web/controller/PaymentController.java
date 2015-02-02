@@ -9,12 +9,11 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -185,9 +184,19 @@ public class PaymentController {
 			LOG.debug("Fetching users current card details");
 			currentPaymentDetails = gateway.getCurrentPaymentDetails(user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getSubscriptionId());
 		}
-		catch (PaymentException | InvalidInputException | NoRecordsFetchedException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("Exception caught : message : " + e.getMessage());
-			return new ResponseEntity<String>("Error while fetching payment details!", HttpStatus.INTERNAL_SERVER_ERROR);
+			LOG.info("Setting message div and returning the jsp");
+			model.addAttribute("messageFlag", CommonConstants.STATUS_ACTIVE);
+			model.addAttribute("messageBody", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.PAYMENT;
+		}
+		catch (PaymentException e) {
+			LOG.error("Exception caught : message : " + e.getMessage());
+			LOG.info("Setting message div and returning the jsp");
+			model.addAttribute("messageFlag", CommonConstants.STATUS_ACTIVE);
+			model.addAttribute("messageBody", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.PAYMENT;
 		}
 		
 		//Add the parameters to the response
@@ -201,10 +210,12 @@ public class PaymentController {
 	}
 	
 	@RequestMapping(value="/paymentupgrade",method=RequestMethod.POST)
-	public Object paymentUpgrade(Model model, HttpServletRequest request){
+	@ResponseBody
+	public String paymentUpgrade(Model model, HttpServletRequest request){
 		LOG.info("Payment controller called to upgrade payment method");
 		
 		boolean status = false;
+		String message = null;
 		String paymentNonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 		LOG.info("Payment upgrade called with nonce : " + paymentNonce);
 		
@@ -219,18 +230,25 @@ public class PaymentController {
 		try {
 			status = gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
 		}
-		catch (InvalidInputException | NoRecordsFetchedException | PaymentException e) {
+		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("Exception has occured : " + e.getMessage(), e);
-			return new ResponseEntity<String>("Error while changing payment!", HttpStatus.INTERNAL_SERVER_ERROR);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return message;
+		}
+		catch (PaymentException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return message;
 		}
 		
 		if(status == false){
 			LOG.info("Payment details change unsuccessful. Please check logs.");
-			return new ResponseEntity<String>("Payment details change unsuccessful!", HttpStatus.INTERNAL_SERVER_ERROR);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}		
 		
-		LOG.info("Payment details change successful! Returning 200");
-		return new ResponseEntity<String>("Payment change successful!", HttpStatus.OK);
+		LOG.info("Payment details change successful! Returning message");
+		message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+		return message;
 		
 	}
 }

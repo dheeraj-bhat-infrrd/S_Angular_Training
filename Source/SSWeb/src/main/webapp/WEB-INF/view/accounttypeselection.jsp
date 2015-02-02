@@ -245,35 +245,32 @@
             console.log("selecting and upgrading account type");
             $('#account-type').val(accountType);
             var url = "./upgradeplan.do";
-
             /* show the progress icon */
             showOverlay();
-
-            var $form = $("#account-type-selection-form");
-            var payLoad = $form.serialize();
-            $.ajax({
-                url : url,
-                type : "POST",
-                data : payLoad,
-                success : function(data){
-                	console.log("Account upgrade successful. Redirecting to dashboard");
-                	$('#overlay-toast').html(data);
-		    		console.log("Added toast message. Showing it now");
-		    		showToast();
-		    		console.log("Finished showing the toast");
-                	setTimeout(function (){location.href = "./landing.do";},4000);
-                },
-                error : function(e) {
-                    console.error("Error occured while upgrading. ");
-    	        	$('.overlay-payment').hide();
-    	        	hideOverlay();
-                    $('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
-		    		console.log("Added toast message. Showing it now");
-		    		showToast();
-		    		console.log("Finished showing the toast");
-                    
-                }
-            });
+            callAjaxFormSubmit(url,showMessage,"account-type-selection-form");           
+            
+        }
+        
+        function showMessage(data){
+        	var jsonData = JSON.parse(data);
+        	console.log("Data recieved : " + jsonData);
+        	if(jsonData["success"] == 1){
+        		console.log("Account upgrade successful. Redirecting to dashboard");
+            	$('#overlay-toast').html(jsonData["message"]);
+	    		console.log("Added toast message. Showing it now");
+	    		showToast();
+	    		console.log("Finished showing the toast");
+            	setTimeout(function (){location.href = "./landing.do";},4000);
+        	}
+        	else{
+        		console.error("Error occured while upgrading. ");
+	        	$('.overlay-payment').hide();
+	        	hideOverlay();
+                $('#overlay-toast').html(jsonData["message"]);
+	    		console.log("Added toast message. Showing it now");
+	    		showToast();
+	    		console.log("Finished showing the toast");
+        	}
         }
 
         function selectAccountTypeCallBack(data,accountType,paymentAmount) {

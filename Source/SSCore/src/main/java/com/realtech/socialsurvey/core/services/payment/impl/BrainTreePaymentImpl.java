@@ -898,7 +898,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		catch(UnexpectedException e){
 			LOG.error("upgradeSubscription : UexpectedException has occured");
-			throw new PaymentException("upgradeSubscription : UexpectedException has occured");
+			throw new PaymentException("upgradeSubscription : UexpectedException has occured",DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 		
 		if(result.isSuccess()){
@@ -1070,7 +1070,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			
 		}catch (UnexpectedException e) {
 			LOG.error("UnexpectedException caught : message : " + e.getMessage());
-			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage());
+			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(),DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 		
 		LOG.info("Returning the payment method details");
@@ -1135,7 +1135,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			
 		}catch (UnexpectedException e) {
 			LOG.error("UnexpectedException caught : message : " + e.getMessage());
-			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage());
+			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(),DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}		
 		
 		LOG.info("Returning status");

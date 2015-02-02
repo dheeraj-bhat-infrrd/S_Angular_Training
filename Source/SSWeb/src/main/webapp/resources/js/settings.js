@@ -359,27 +359,29 @@ function showPaymentOptions() {
 	$('body').addClass('body-no-scroll');
 	var url = "./paymentchange.do";
     showOverlay();
-    $.ajax({
-    	url: url,
-    	type: "GET",
-    	success: function(data){
-        	$('.overlay-payment').html(data);
-        	console.log("Html content loaded");
-        	hideOverlay();
-        	$('.overlay-payment').show();
-        	console.log("Showing popup");
-        	},
-        error : function(e) {
-        		console.log("Error occured. Hiding Overlay");
-    			hideOverlay();
-    			$('#st-settings-payment-off').show();
-    	   		$('#st-settings-payment-on').hide();
-    			console.log("Removing no-scroll class from body");
-        		$('body').removeClass('body-no-scroll');
-        		$('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
-        		console.log("Added toast message. Showing it now");
-        		showToast();
-        		console.log("Finished showing the toast");
-    		}
-    	});
+    callAjaxGET(url,displayPopup);
+}
+
+function displayPopup(data){
+	console.log("display message called :data "+data);
+	$("#temp-div").html(data);
+	var displayMessageDiv = $("#display-msg-div");
+	if($(displayMessageDiv).hasClass("message")) {
+		console.log("Error occured. Hiding Overlay");
+		hideOverlay();
+		$('#st-settings-payment-off').show();
+   		$('#st-settings-payment-on').hide();
+		console.log("Removing no-scroll class from body");
+		$('body').removeClass('body-no-scroll');
+		$("#overlay-toast").html($(displayMessageDiv).html());
+		showToast();
+	}	
+	else{
+		$('.overlay-payment').html(data);
+    	console.log("Html content loaded");
+    	hideOverlay();
+    	$('.overlay-payment').show();
+    	console.log("Showing popup");
+    }
+	$("#temp-div").html("");
 }

@@ -8,8 +8,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -643,6 +643,23 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
+	
+	private String makeJsonMessage(int status, String message){
+		
+		JSONObject jsonMessage = new JSONObject();
+		LOG.debug("Building json response");
+		try {
+			jsonMessage.put("success", 0);
+			jsonMessage.put("message", message);
+		}
+		catch (JSONException e) {
+			LOG.error("Exception occured while building json response : " + e.getMessage());
+			e.printStackTrace();
+		}
+		
+		LOG.info("Returning json response : " + jsonMessage.toString());
+		return jsonMessage.toString();
+	}
 
 	/**
 	 * Method to upgrade a plan
@@ -651,6 +668,7 @@ public class OrganizationManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/upgradeplan", method = RequestMethod.POST)
+	@ResponseBody
 	public Object upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -687,29 +705,38 @@ public class OrganizationManagementController {
 			}
 			LOG.info("message returned : " + message);
 		}
-		catch (InvalidInputException | NoRecordsFetchedException | PaymentException | SolrException | UndeliveredEmailException e ) {
+		catch (InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e ) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			return new ResponseEntity<String>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+			
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 
+		}
+		catch (PaymentException e) {
+			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionPastDueException e) {
 			LOG.error("SubscriptionPastDueException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			return new ResponseEntity<String>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+			
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionUpgradeUnsuccessfulException e) {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			return new ResponseEntity<String>(message, HttpStatus.INTERNAL_SERVER_ERROR);
+			
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		
 		//After all the updates are done we set the account type in the session to reflect changes
 		HttpSession session = request.getSession();		
 		session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(Integer.parseInt(accountType)));
 				
-		LOG.info("returning a 200 response");
-		return new ResponseEntity<String>(message, HttpStatus.OK);
+		LOG.info("returning message : " + message);
+		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
 	}
 	
 	/**
