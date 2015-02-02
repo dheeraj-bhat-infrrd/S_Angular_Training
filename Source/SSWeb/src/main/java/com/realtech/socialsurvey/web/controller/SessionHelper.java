@@ -179,9 +179,7 @@ public class SessionHelper {
 		LOG.debug("Adding newly registered user to session");
 		try {
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			String encryptedPassword = encryptionHelper.encryptSHA512(password);
-			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, encryptedPassword,
-					userDetails.getAuthorities());
+			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
 			userAuthProvider.authenticate(auth);
 
 			if (auth.isAuthenticated()) {
