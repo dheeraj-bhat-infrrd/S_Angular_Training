@@ -110,7 +110,7 @@
 					</div>
 				</c:if>
 			</div>
-			<div class="header-user-info float-right clearfix">
+			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
 					<span>${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
