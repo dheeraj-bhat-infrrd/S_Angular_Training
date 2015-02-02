@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.IndividualSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -25,6 +26,8 @@ import com.realtech.socialsurvey.core.entities.User;
  */
 @Repository
 public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSettingsDao, InitializingBean {
+
+	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
 	public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
@@ -42,10 +45,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_ACHIEVEMENTS = "achievements";
 	public static final String KEY_LICENCES = "licenses";
 	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
-
 	public static final String KEY_IDENTIFIER = "iden";
-
-	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
@@ -59,23 +59,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 
 	@Override
-	public void insertIndividualSettings(IndividualSettings individualSettings) {
-		LOG.info("Inserting individual settings. individual id: " + individualSettings.getUserId());
-		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
-		LOG.info("Inserted individual settings");
-	}
-	
-	@Override
-	public void insertIndividualSettings(User user) {
-		IndividualSettings indivSettings = new IndividualSettings();
-		indivSettings.setUserId(user.getUserId());
-		indivSettings.setFirstName(user.getFirstName());
-		indivSettings.setLastName(user.getLastName());
-		indivSettings.setEmailId(user.getEmailId());
-		indivSettings.setProfileName(user.getUsername());
+	public void insertIndividualSettings(User user, Company company) {
+		IndividualSettings individualSettings = new IndividualSettings();
+		OrganizationUnitSettings organizationUnitSettings;
+		
+		if (company != null && company.getCompanyId() != 0) {
+			organizationUnitSettings = fetchOrganizationUnitSettingsById(company.getCompanyId(), COMPANY_SETTINGS_COLLECTION);
+			individualSettings.setOrganizationUnitSettings(organizationUnitSettings);
+		}
+		else {
+			individualSettings.setOrganizationUnitSettings(null);
+		}
+
+		individualSettings.setUserId(user.getUserId());
+		individualSettings.setFirstName(user.getFirstName());
+		individualSettings.setLastName(user.getLastName());
+		individualSettings.setEmailId(user.getEmailId());
+		individualSettings.setProfileName(user.getUsername());
 		
 		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
-		insertIndividualSettings(indivSettings);
+		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
 		LOG.info("Inserted individual settings");
 	}
 

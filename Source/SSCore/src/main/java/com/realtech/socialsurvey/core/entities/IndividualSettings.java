@@ -2,14 +2,14 @@ package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
 
-public class IndividualSettings extends OrganizationUnitSettings {
+public class IndividualSettings {
 
 	private long userId;
 	private String firstName;
 	private String lastName;
 	private String emailId;
 	private String profileName;
-
+	private OrganizationUnitSettings organizationUnitSettings;
 	private List<String> expertise;
 	private List<String> hobbies;
 
@@ -51,6 +51,14 @@ public class IndividualSettings extends OrganizationUnitSettings {
 
 	public void setProfileName(String profileName) {
 		this.profileName = profileName;
+	}
+
+	public OrganizationUnitSettings getOrganizationUnitSettings() {
+		return organizationUnitSettings;
+	}
+
+	public void setOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings) {
+		this.organizationUnitSettings = organizationUnitSettings;
 	}
 
 	public List<String> getExpertise() {

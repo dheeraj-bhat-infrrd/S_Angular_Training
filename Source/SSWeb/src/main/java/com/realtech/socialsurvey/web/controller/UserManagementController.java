@@ -147,12 +147,18 @@ public class UserManagementController {
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
 						
-						// TODO persisting user to mongo
+						// TODO
+						// persisting user to mongo
 						LOG.debug("Adding newly registered user {} to mongo: ", user.getFirstName());
-						organizationUnitSettingsDao.insertIndividualSettings(user);
+						organizationUnitSettingsDao.insertIndividualSettings(user, admin.getCompany());
 						LOG.debug("Successfully added newly registered user {} to mongo: ", user.getFirstName());
 
+						// persisting user to solr
+						LOG.debug("Adding invited user {} to solr: ", user.getFirstName());
 						solrSearchService.addUserToSolr(user);
+						LOG.debug("Successfully added invited user {} to solr: ", user.getFirstName());
+						
+						// Send Registration completion link
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
@@ -401,10 +407,6 @@ public class UserManagementController {
 		String userIdStr = request.getParameter(CommonConstants.USER_ID);
 		String branchIdStr = request.getParameter("branchId");
 		try {
-			if (admin == null) {
-				LOG.error("No user found in session");
-				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
-			}
 			if (userIdStr == null || userIdStr.isEmpty()) {
 				LOG.error("Invalid user id passed in method assignUserToBranch().");
 				throw new InvalidInputException("Invalid user id passed in method assignUserToBranch().");
@@ -537,7 +539,6 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing branch Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		// TODO add success message.
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while trying to assign or unassign a user to branch. Reason : " + nonFatalException.getMessage(),
 					nonFatalException);
@@ -591,7 +592,6 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		// TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning branch admin. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
@@ -645,7 +645,6 @@ public class UserManagementController {
 				throw new NonFatalException("Number format execption while parsing region Id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
-		// TODO add success message.
 		catch (NonFatalException e) {
 			LOG.error("Exception occured while assigning region admin.Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
@@ -791,17 +790,15 @@ public class UserManagementController {
 				LOG.error("Company Id passed was null or empty");
 				throw new InvalidInputException("Company Id passed was null or empty", DisplayMessageConstants.INVALID_COMPANY_NAME);
 			}
-
 			if (confirmPassword == null || confirmPassword.isEmpty()) {
 				LOG.error("Confirm password passed was null or empty");
 				throw new InvalidInputException("Confirm password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
 			}
-
-			// check if password and confirm password field match
 			if (!password.equals(confirmPassword)) {
 				LOG.error("Password and confirm password fields do not match");
 				throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 			}
+			
 			// Decrypting URL parameters
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
@@ -816,6 +813,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
+			
 			long companyId = 0;
 			try {
 				companyId = Long.parseLong(companyIdStr);
@@ -824,7 +822,7 @@ public class UserManagementController {
 				LOG.error("NumberFormat exception. Reason : " + exception.getStackTrace());
 				throw new InvalidInputException("NumberFormat exception. Reason : " + exception.getStackTrace());
 			}
-
+			
 			try {
 				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
@@ -838,6 +836,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
+			
 			try {
 				// change user's password
 				authenticationService.changePassword(user, password);
@@ -846,14 +845,16 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			AccountType accountType = null;
-			HttpSession session = request.getSession(true);
 			
+			// persisting user to principal session
 			LOG.debug("Adding newly registered user to principal session");
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
 
+			AccountType accountType = null;
+			HttpSession session = request.getSession(true);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
 				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
@@ -863,9 +864,8 @@ public class UserManagementController {
 			else {
 				LOG.debug("License details not found for the user's company");
 			}
+			
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-
-				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
 				sessionHelper.getCanonicalSettings(session);
 				sessionHelper.setSettingVariablesInSession(session);

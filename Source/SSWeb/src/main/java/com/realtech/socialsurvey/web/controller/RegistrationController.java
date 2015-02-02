@@ -206,7 +206,7 @@ public class RegistrationController {
 				
 				// TODO persisting user to mongo
 				LOG.debug("Adding newly registered user {} to mongo: ", user.getFirstName());
-				organizationUnitSettingsDao.insertIndividualSettings(user);
+				organizationUnitSettingsDao.insertIndividualSettings(user, null);
 				LOG.debug("Successfully added newly registered user {} to mongo: ", user.getFirstName());
 				
 				// TODO persisting user to solr
