@@ -14,18 +14,24 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Achievement;
+import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -257,7 +263,19 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
+		contactDetailSettings.setAddress1(organizationalDetails.get(CommonConstants.ADDRESS1));
+		contactDetailSettings.setAddress2(organizationalDetails.get(CommonConstants.ADDRESS2));
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
+		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
+		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
+		//Add work phone number in contact details
+		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
+		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
+		contactDetailSettings.setContact_numbers(contactNumberSettings);
+		//Add work Mail id in contact details
+		MailIdSettings mailIdSettings = new MailIdSettings();
+		mailIdSettings.setWork(user.getEmailId());
+		contactDetailSettings.setMail_ids(mailIdSettings);
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		companySettings.setCreatedOn(System.currentTimeMillis());
@@ -811,15 +829,90 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Record successfully deleted from the database!");
 	}
 
-	/**
-	 * Method to get the company details based on profile name
-	 */
 	@Override
-	public OrganizationUnitSettings getCompanyDetailsByProfileName(String profileName) throws InvalidInputException {
-		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
+	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException {
+		if (logo == null || logo.isEmpty()) {
+			throw new InvalidInputException("Logo passed can not be null or empty");
+		}
+		LOG.info("Updating logo");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOGO, logo, companySettings,
+				collection);
+		LOG.info("Logo updated successfully");
+	}
 
-		LOG.info("Successfully executed method getCompanyDetailsByProfileName ");
-		return null;
+	@Override
+	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
+			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException {
+		if (contactDetailsSettings == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+		LOG.info("Updating contact detail information");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, unitSettings, collection);
+		LOG.info("Contact details updated successfully");
+		return contactDetailsSettings;
+	}
+
+	@Override
+	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
+			throws InvalidInputException {
+		if (associations == null || associations.isEmpty()) {
+			throw new InvalidInputException("Association name passed can not be null");
+		}
+		for (Association association : associations) {
+			if (association.getName() == null || association.getName().isEmpty()) {
+				associations.remove(association);
+			}
+		}
+		LOG.info("Adding associations");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
+				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Associations added successfully");
+		return associations;
+	}
+
+	@Override
+	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
+			throws InvalidInputException {
+		if (achievements == null || achievements.isEmpty()) {
+			throw new InvalidInputException("Achievements passed can not be null or empty");
+		}
+		LOG.info("Adding achievements");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements,
+				unitSettings, collection);
+		LOG.info("Achievements added successfully");
+		return achievements;
+	}
+
+	@Override
+	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn) throws InvalidInputException {
+		if (authorisedIn == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+
+		Licenses licenses = unitSettings.getLicenses();
+		if(licenses == null){
+			LOG.debug("Licenses not present for current profile, create a new license object");
+			licenses = new Licenses();
+		}
+		licenses.setAuthorized_in(authorisedIn);
+		LOG.info("Adding Licences list");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses,
+				unitSettings, collection);
+		LOG.info("Licence authorisations added successfully");
+		return licenses;
+	}
+
+	@Override
+	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
+			throws InvalidInputException {
+		if(mediaTokens == null){
+			throw new InvalidInputException("Media tokens passed was null");
+		}
+		LOG.info("Updating the social media tokens in profile.");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens,
+				unitSettings, collection);
+		LOG.info("Successfully updated the social media tokens.");
 	}
 }
 // JIRA: SS-27: By RM05: EOC
