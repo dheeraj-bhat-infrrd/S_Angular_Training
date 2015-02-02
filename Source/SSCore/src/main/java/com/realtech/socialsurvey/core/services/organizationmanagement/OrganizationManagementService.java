@@ -10,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.CompanyProfile;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -47,7 +48,7 @@ public interface OrganizationManagementService {
 	 * Gets the company settings of the user.
 	 * 
 	 * @param user
-	 * @return company settings
+	 * @return company settings 
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings getCompanySettings(User user) throws InvalidInputException;
@@ -162,7 +163,11 @@ public interface OrganizationManagementService {
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**
+<<<<<<< Updated upstream
 	 * Method to update logo of a company
+=======
+	 * Method to fetch company profile when profile name is provided
+>>>>>>> Stashed changes
 	 * 
 	 * @param collection
 	 * @param companySettings
@@ -231,4 +236,5 @@ public interface OrganizationManagementService {
 	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens) throws InvalidInputException;
 
 	// JIRA SS-97 by RM-06 : EOC
+	public CompanyProfile getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
 }

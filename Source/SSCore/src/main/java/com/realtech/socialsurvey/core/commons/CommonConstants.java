@@ -26,7 +26,6 @@ public interface CommonConstants {
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
-	
 
 	/**
 	 * Profile master constants
@@ -69,7 +68,6 @@ public interface CommonConstants {
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
 
-
 	/**
 	 * Hibernate entities and column name constants
 	 */
@@ -109,12 +107,11 @@ public interface CommonConstants {
 	public static final String LOGO_DISPLAY_IN_SESSION = "displaylogo";
 	public static final String SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION = "surveymailbody";
 	public static final String SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION = "surveyremindermailbody";
-	public static final String LOGIN_NAME="loginName";
+	public static final String LOGIN_NAME = "loginName";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	public static final String COUNTRY_CODE = "countryCode";
 	public static final String COUNTRY = "country";
-	
 	/**
 	 * Batch Constants
 	 */
@@ -162,15 +159,15 @@ public interface CommonConstants {
 	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
 	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
 	public static final String HYPHEN = "-";
-	
+
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
-	
+
 	// mail content
 	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
 	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
-	
-	//regular expressions
+
+	// regular expressions
 	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$";
 	public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
 	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
@@ -178,9 +175,9 @@ public interface CommonConstants {
 	public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
 	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
 	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
-	
+
 	/**
-	 * Solr document related constants 
+	 * Solr document related constants
 	 */
 	public static final String REGION_ID_SOLR = "regionId";
 	public static final String COMPANY_ID_SOLR = "companyId";
@@ -201,4 +198,17 @@ public interface CommonConstants {
 	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
+
+	/**
+	 * Error codes
+	 */
+	public static final int ERROR_CODE_GENERAL = 100;
+	public static final int ERROR_CODE_COMPANY_PROFILE_PRECONDITION_FAILURE = 101;
+	public static final int ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE = 102;
+
+	/**
+	 * Service codes
+	 */	
+	public static final int SERVICE_CODE_GENERAL = 100;
+	public static final int SERVICE_CODE_COMPANY_PROFILE = 101;
 }
