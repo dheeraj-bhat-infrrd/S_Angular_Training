@@ -112,6 +112,8 @@ public interface CommonConstants {
 	public static final String LOGIN_NAME="loginName";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
+	public static final String COUNTRY_CODE = "countryCode";
+	public static final String COUNTRY = "country";
 	
 	/**
 	 * Batch Constants
