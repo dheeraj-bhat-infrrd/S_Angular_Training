@@ -244,6 +244,7 @@ public class PaymentController {
 		if(status == false){
 			LOG.info("Payment details change unsuccessful. Please check logs.");
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return message;
 		}		
 		
 		LOG.info("Payment details change successful! Returning message");
