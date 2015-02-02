@@ -4,33 +4,30 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:choose>
+<c:when test="${ messageFlag == 1 }">
+	<div id="display-msg-div" class="message">'${messageBody}'</div>
+</c:when>
+<c:otherwise>
+<c:choose>
 <c:when test="${ paymentChange == 1 }">
 	<div class="overlay-loader hide"></div>
 	<div class="ov-payment-container">
 		<div class="clearfix container ov-payment-shadow margin-top-25 margin-bottom-25 padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-md-6 col-xs-9">
     		<div>
-    <style>
-    	.ov-payment-container{	
-    	height: 100%;
-		overflow: auto;
-    	}
-    	.ov-payment-shadow{
-    		float: none;
-    		margin: 0 auto;
-			box-shadow: 0px 0px 13px 4px #CCC;
-    	}
-    	
-    	.ov-payment-container .pu-acc-type-val{
-    		float: none;
-    	}
-    	.ov-payment-container .pu-acc-type-txt {
-		    float: none;
-		}
-		.body-no-scroll{
-			overflow: hidden;
-		}
-    </style>
-    
+    			
+    		<style>
+    			.update-card-details-txt{
+    				display: block;
+					width: 100% !important;
+					min-width: 100px !important;
+					margin-bottom: 10px;
+					height: 40px;
+					padding: 0 10px;
+    			}
+    			.card-det-adj{
+    				margin-bottom: 30px;
+    			}
+    		</style>
 </c:when>
 <c:otherwise>
 	<!DOCTYPE">
@@ -100,9 +97,12 @@
 				            <div class="clearfix">
 				            	<c:choose>
 						        <c:when test="${ paymentChange == 1 }">
-						        	<input class="float-left login-wrapper-txt" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
-						        	<input class="float-left login-wrapper-txt" id="exp-month" data-non-empty="true" placeholder='<spring:message code="label.expmonth.key"/>'>
-						        	<input class="float-left login-wrapper-txt" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
+						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="16" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
+						        	<div id="card-num-err" class=""></div>
+						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-month" data-non-empty="true" placeholder='<spring:message code="label.expmonth.key"/>'>
+						        	<div id="exp-month-err" class=""></div>
+						        	<input class="float-left login-wrapper-txt update-card-details-txt card-det-adj" maxlength="2" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
+						        	<div id="exp-year-err" class=""></div>
 						        	<input type="button" id="update-button" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
 						        </c:when>
 						        <c:otherwise>
@@ -165,38 +165,32 @@
 	   });   
 	   
 	   function makeAjaxCallToUpgrade(nonce){
-		   
+		   console.log("making ajax call with nonce: " + nonce)
 		   var data = "payment_method_nonce=" + nonce;
+		   var url = "./paymentupgrade.do";
 		   $.ajax({
-			   url : "./paymentupgrade.do",
-			   type : "POST",
-			   data : data,
-			   success : function(){
-					hidePayment();
-					hideOverlay();
-				   	console.log("Request successfully completed!");
-					console.log("Removing no-scroll class from body and changing the checkbox");
-		    		$('body').removeClass('body-no-scroll');
-		    		$('#st-settings-payment-off').show();
-			   		$('#st-settings-payment-on').hide();
-		    		$('#overlay-toast').html("Your card details were successfully updated!");
-		    		console.log("Added toast message. Showing it now");
-		    		showToast();
-		    		console.log("Finished showing the toast");
-			   },
-			   error : function(){
-					hidePayment();
-				   	console.log("Error occured. Hiding Payment popup");
-					console.log("Removing no-scroll class from body");
-		    		$('body').removeClass('body-no-scroll');
-		    		$('#st-settings-payment-off').show();
-			   		$('#st-settings-payment-on').hide();
-		    		$('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
-		    		console.log("Added toast message. Showing it now");
-		    		showToast();
-		    		console.log("Finished showing the toast");
-			   }			   
+			  url : url,
+			  type : "POST",
+			  data : data,
+			  success : displayToast,
+			  error : function(e) {
+					redirectErrorpage();
+				}
 		   });
+	   }
+	   
+	   function displayToast(data){
+		    hidePayment();
+			hideOverlay();
+		   	console.log("Message recieved. Hiding Payment popup");
+			console.log("Removing no-scroll class from body");
+	   		$('body').removeClass('body-no-scroll');
+	   		$('#st-settings-payment-off').show();
+		   	$('#st-settings-payment-on').hide();
+	   		$('#overlay-toast').html(data);
+	   		console.log("Added toast message. Showing it now");
+	   		showToast();
+	   		console.log("Finished showing the toast");
 	   }
 	   
 	   function displayError(err){
@@ -204,6 +198,7 @@
 	   		$('#st-settings-payment-off').show();
 	   		$('#st-settings-payment-on').hide();
 		   	hidePayment();
+		   	hideOverlay();
 		   	console.log("Error occured. Hiding Overlay");
 			console.log("Removing no-scroll class from body");
     		$('body').removeClass('body-no-scroll');
@@ -212,6 +207,46 @@
     		showToast();
     		console.log("Finished showing the toast");
 	   }
+	   
+	  
+	   
+	   function validateCreditCard(){
+		   var pattern = /^\d{16}$/;
+		   cardNumber = String($("#card-number").val());
+		   if(cardNumber.match(pattern)){
+			   return true;
+		   }
+		   else
+			   return false;
+	   }
+	   
+	   function validateExp(){
+		   expYear = $("#exp-year").val();
+		   expMonth = $("#exp-month").val();
+		   pattern = /^\d{2}$/;
+		   if(!(String(expYear).match(pattern) && String(expMonth).match(pattern))){
+			   return false;
+		   }
+		   
+		   var year = parseInt(String(expYear));
+		   var month = parseInt(String(expMonth));
+		   var curYear = new Date().getFullYear();
+		   curYear = parseInt(curYear.toString().substr(2,2));
+		   curMonth = new Date().getMonth();
+		   
+		   if(year >= curYear && year < curYear+10){
+			   if(year == curYear){
+				   if( month < curMonth ){
+					   return false;
+				   }
+			   }
+			   return true;
+		   }
+		   else{
+			   return false;
+		   }
+	   }
+	   
 	</script>
    
    <c:choose>
@@ -222,5 +257,6 @@
 	    <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
    </c:otherwise>
    </c:choose>
-</body>
-</html>
+
+</c:otherwise>
+</c:choose>
