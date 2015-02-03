@@ -57,14 +57,10 @@ public class SurveyBuilderController {
 	public String showBuildSurveyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showBuildSurveyPage started");
 		User user = sessionHelper.getCurrentUser();
-		int highestRole;
 		boolean isSurveyBuildingAllowed = false;
 
 		try {
-			LOG.debug("Calling service for checking the status of regions already added");
-			highestRole = (Integer) request.getSession(false).getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
-
-			isSurveyBuildingAllowed = surveyBuilder.isSurveyBuildingAllowed(user, highestRole);
+			isSurveyBuildingAllowed = surveyBuilder.isSurveyBuildingAllowed(user);
 			
 			if(!isSurveyBuildingAllowed) {
 				LOG.error("User not allowed to access BuildSurvey Page. Reason: Access Denied");

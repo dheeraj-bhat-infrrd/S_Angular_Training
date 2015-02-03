@@ -67,15 +67,15 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public boolean isSurveyBuildingAllowed(User user, int highestRole) throws InvalidInputException {
+	public boolean isSurveyBuildingAllowed(User user) throws InvalidInputException {
 		LOG.info("Method isSurveyBuildingAllowed() started for user: " + user);
 		if (user == null) {
 			throw new InvalidInputException("User is null in isSurveyBuildingAllowed");
 		}
 		boolean isSurveyBuildingAllowed = false;
 		
-		if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-			LOG.debug("Checking Survey Building for user role CA_ROLE");
+		if (user.isCompanyAdmin()) {
+			LOG.debug("Checking Survey Building for user role Company Admin");
 			isSurveyBuildingAllowed = true;
 		}
 		LOG.info("Returning from isSurveyBuildingAllowed for user : " + user.getUserId() + " isSurveyBuildingAllowed is :" + isSurveyBuildingAllowed);
