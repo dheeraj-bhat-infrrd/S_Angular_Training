@@ -126,7 +126,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	@Override
 	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,
 			String collectionName) {
-		LOG.info("Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate + " wtih value: "
+		LOG.info("Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate + " with value: "
 				+ updatedRecord);
 		Query query = new Query();
 		query.addCriteria(Criteria.where("_id").is(unitSettings.getId()));
@@ -136,13 +136,25 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Updated the unit setting");
 	}
 	
+	@Override
+	public void updateParticularKeyIndividualSettings(String keyToUpdate, Object updatedRecord, IndividualSettings individualSettings,
+			String collectionName) {
+		LOG.info("Updating individual setting in " + collectionName + " with " + individualSettings + " for key: " + keyToUpdate + " with value: "
+				+ updatedRecord);
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").is(individualSettings.getId()));
+		Update update = new Update().set(keyToUpdate, updatedRecord);
+		LOG.debug("Updating the individual settings");
+		mongoTemplate.updateFirst(query, update, IndividualSettings.class, collectionName);
+		LOG.info("Updated the individual setting");
+	}
+
 	/**
 	 * Fetchs the list of names of logos being used.
 	 * @return
 	 */
 	@Override
 	public List<String> fetchLogoList() {
-		
 		LOG.info("Fetching the list of logos being used");		
 		List<OrganizationUnitSettings> settingsList = mongoTemplate.findAll(OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
 		List<String> logoList = new ArrayList<>();
@@ -153,7 +165,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 				logoList.add(logoName);				
 			}
 		}
-		
 		LOG.info("Returning the list prepared!");
 		return logoList;
 	}
@@ -180,5 +191,4 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
 		LOG.debug("Index created");
 	}
-
 }

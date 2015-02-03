@@ -851,6 +851,11 @@ public class UserManagementController {
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
 
+			// TODO persisting user to mongo
+			LOG.debug("Adding newly assigned user {} to mongo: ", user.getFirstName());
+			organizationUnitSettingsDao.insertIndividualSettings(user, user.getCompany());
+			LOG.debug("Successfully added newly assigned user {} to mongo: ", user.getFirstName());
+
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();

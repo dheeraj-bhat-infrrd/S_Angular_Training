@@ -204,12 +204,13 @@ public class RegistrationController {
 				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 				
-				// TODO persisting user to mongo
+				// TODO
+				// persisting user to mongo
 				LOG.debug("Adding newly registered user {} to mongo: ", user.getFirstName());
 				organizationUnitSettingsDao.insertIndividualSettings(user, null);
 				LOG.debug("Successfully added newly registered user {} to mongo: ", user.getFirstName());
 				
-				// TODO persisting user to solr
+				// persisting user to solr
 				LOG.debug("Adding newly registered user {} to solr: ", user.getFirstName());
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Successfully added newly registered user {} to solr: ", user.getFirstName());
