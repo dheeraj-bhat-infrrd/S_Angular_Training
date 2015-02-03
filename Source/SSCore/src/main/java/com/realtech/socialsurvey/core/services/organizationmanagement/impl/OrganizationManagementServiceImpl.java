@@ -944,6 +944,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Override
 	public List<VerticalsMaster> getAllVerticalsMaster() throws InvalidInputException {
+		LOG.info("Method getAllVerticalsMaster called to fetch the list of vertical masters");
 		List<VerticalsMaster> verticalsMasters = new ArrayList<>();
 		for (Map.Entry<Integer, VerticalsMaster> entry : verticalsMastersMap.entrySet()) {
 			verticalsMasters.add(entry.getValue());
@@ -951,6 +952,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (verticalsMasters.isEmpty()) {
 			throw new InvalidInputException("No verticals master found");
 		}
+		LOG.info("Method getAllVerticalsMaster successfully finished");
 		return verticalsMasters;
 	}
 
@@ -960,6 +962,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (vertical == null || vertical.isEmpty()) {
 			throw new InvalidInputException("Vertical passed was null or empty");
 		}
+		LOG.info("Method getCrmSourceByVerticalName called to fetch the crm source for for vertical - {}", vertical);
 		for (Map.Entry<Integer, VerticalsCrmMapping> entry : verticalsCrmMappingsMap.entrySet()) {
 			VerticalsCrmMapping mapping = entry.getValue();
 			if (mapping.getVerticalsMaster().getVerticalName().equals(vertical)) {
