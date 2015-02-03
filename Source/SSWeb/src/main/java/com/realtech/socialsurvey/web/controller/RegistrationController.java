@@ -239,7 +239,7 @@ public class RegistrationController {
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", originalEmailId);
-			return JspResolver.REGISTRATION;
+			return JspResolver.INDEX;
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
