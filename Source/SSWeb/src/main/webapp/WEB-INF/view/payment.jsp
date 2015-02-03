@@ -27,6 +27,13 @@
     			.card-det-adj{
     				margin-bottom: 30px;
     			}
+    			.card-err-txt{
+    				line-height: 24px;
+					padding-left: 10px;
+					font-size: 12px;
+					color: #DE3838;
+					margin-bottom: 10px;
+    			}
     		</style>
 </c:when>
 <c:otherwise>
@@ -97,13 +104,19 @@
 				            <div class="clearfix">
 				            	<c:choose>
 						        <c:when test="${ paymentChange == 1 }">
-						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="16" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
-						        	<div id="card-num-err" class=""></div>
+						        	<div class="clearfix">
+						        		<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="16" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
+						        	</div>
+						        	<div id="card-num-err" class="card-err-txt"></div>
+						        	<div class="clearfix">
 						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-month" data-non-empty="true" placeholder='<spring:message code="label.expmonth.key"/>'>
-						        	<div id="exp-month-err" class=""></div>
-						        	<input class="float-left login-wrapper-txt update-card-details-txt card-det-adj" maxlength="2" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
-						        	<div id="exp-year-err" class=""></div>
-						        	<input type="button" id="update-button" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
+						        	</div>
+						        	<div id="exp-month-err" class="card-err-txt"></div>
+						        	<div class="clearfix">
+						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
+						        	</div>
+						        	<div id="exp-year-err" class="card-err-txt"></div>
+						        	<input type="button" onclick="updateCardDetails();" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
 						        </c:when>
 						        <c:otherwise>
 					            	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
@@ -146,23 +159,34 @@
 		   	hidePayment();
 	   });
 	   
-	   $("#update-button").click( function(){
-		   console.log("Update button pressed");
-		   showOverlay();
-		   cardNumber = $("#card-number").val();
-		   expMonth = $("#exp-month").val();
-		   expYear = $("#exp-year").val();
-		   console.log("Fetched values");
-		   var client = new braintree.api.Client({clientToken: '${clienttoken}'});
-		   client.tokenizeCard({number: cardNumber, expirationDate: expMonth + "/" + expYear }, function (err, nonce) {
-			   if( err == null){
-				   makeAjaxCallToUpgrade(nonce);
-			   }
-			   else{
-				   displayError(err);
-			   }
-			 });		   
-	   });   
+	   $('input').keypress(function(e){       	
+	       	// detect enter
+	       	if (e.which==13){
+	       		e.preventDefault();
+	       		updateCardDetails();
+	       	}
+		});
+	   
+	   function updateCardDetails(){
+		   console.log("checking if form is valid");
+		   if(validateCardForm()){
+			   console.log("Submitting the form");
+			   showOverlay();
+			   cardNumber = $("#card-number").val();
+			   expMonth = $("#exp-month").val();
+			   expYear = $("#exp-year").val();
+			   console.log("Fetched values");
+			   var client = new braintree.api.Client({clientToken: '${clienttoken}'});
+			   client.tokenizeCard({number: cardNumber, expirationDate: expMonth + "/" + expYear }, function (err, nonce) {
+				   if( err == null){
+					   makeAjaxCallToUpgrade(nonce);
+				   }
+				   else{
+					   displayError(err);
+				   }
+				 });			   
+		   }		   		   
+	   }  
 	   
 	   function makeAjaxCallToUpgrade(nonce){
 		   console.log("making ajax call with nonce: " + nonce)
@@ -208,44 +232,154 @@
     		console.log("Finished showing the toast");
 	   }
 	   
-	  
+	   function validateCardForm(){
+		    console.log("Form validation called");
+	       	isLoginFormValid=true;
+	       	var isFocussed = false;
+	       	var isSmallScreen = false;
+	       	if($(window).width()<768){
+	       		isSmallScreen = true;
+	       	}
+	       	if(!validateCreditCard()){
+	       		isLoginFormValid=false;
+	       		if(!isFocussed){
+	       			console.log("Focussing on card");
+	       			$("#card-number").focus();
+	       			isFocussed=true;
+	       		}
+	       		if(isSmallScreen){
+	       			return isLoginFormValid;
+	       		}
+	       	}
+	       	if(!validateMonth()){
+	       		isLoginFormValid = false;
+	       		if(!isFocussed){
+	       			console.log("Focussing on month");
+	       			$("#exp-month").focus();
+	       			isFocussed=true;
+	       		}
+	       		if(isSmallScreen){
+	       			return isLoginFormValid;
+	       		}
+	       	}
+	       	if(!validateYear()){
+	       		isLoginFormValid = false;
+	       		if(!isFocussed){
+	       			console.log("Focussing on year");
+	       			$("#exp-year").focus();
+	       			isFocussed=true;
+	       		}
+	       		if(isSmallScreen){
+	       			return isLoginFormValid;
+	       		}
+	       		return isLoginFormValid;
+	       	}
+	       	if(!validateExp()){
+	       		isLoginFormValid = false;
+	       		if(!isFocussed){
+	       			$("#exp-month").focus();
+	       			isFocussed=true;
+	       		}
+	       		if(isSmallScreen){
+	       			return isLoginFormValid;
+	       		}
+	       	}
+	       	return isLoginFormValid;
+       }
 	   
 	   function validateCreditCard(){
+		   console.log("Card validation called");
 		   var pattern = /^\d{16}$/;
 		   cardNumber = String($("#card-number").val());
 		   if(cardNumber.match(pattern)){
+			   console.log("Valid card");
+			   $("#card-num-err").html("");
 			   return true;
 		   }
-		   else
+		   else{
+			   console.log("Not a valid card");
+			   $("#card-num-err").html("Please enter valid card number");
 			   return false;
+		   }
+	   }
+	   
+	   function validateMonth(){
+		   console.log("Month validation called");
+		   expMonth = $("#exp-month").val();
+		   monthPattern = /^[1-9]?\d$/;
+		   
+		   if(!(String(expMonth).match(monthPattern)) || !(parseInt(String(expMonth))<=12) ){
+			   console.log("Not a valid month");
+			   $("#exp-month-err").html("Please enter valid month");
+			   return false;
+		   }
+		   else{
+			   console.log("Valid  month");
+			   $("#exp-month-err").html("");
+			   return true;
+		   }
+	   }
+	   
+	   function validateYear(){
+		   console.log("Year validation called");
+		   expYear = $("#exp-year").val();
+		   yearPattern = /^\d{1,2}$/;
+		   
+		   var year = parseInt(String(expYear));
+		   var curYear = new Date().getFullYear();
+		   curYear = parseInt(curYear.toString().substr(2,2));
+		   
+		   if(!(String(expYear).match(yearPattern)) || !(year >= curYear && year < curYear+10)){
+			   $("#exp-year-err").html("Please enter valid year");
+			   return false;
+		   }
+		   else{
+			   $("#exp-year-err").html("");
+			   return true;
+		   }			
 	   }
 	   
 	   function validateExp(){
+		   console.log("Expiration validation called");
 		   expYear = $("#exp-year").val();
 		   expMonth = $("#exp-month").val();
-		   pattern = /^\d{2}$/;
-		   if(!(String(expYear).match(pattern) && String(expMonth).match(pattern))){
-			   return false;
-		   }
 		   
 		   var year = parseInt(String(expYear));
 		   var month = parseInt(String(expMonth));
 		   var curYear = new Date().getFullYear();
 		   curYear = parseInt(curYear.toString().substr(2,2));
-		   curMonth = new Date().getMonth();
+		   curMonth = parseInt(new Date().getMonth())+1;
 		   
-		   if(year >= curYear && year < curYear+10){
-			   if(year == curYear){
-				   if( month < curMonth ){
-					   return false;
-				   }
+		   
+		   if(year == curYear){
+			   console.log( month);
+			   console.log( curMonth);
+			   if( month < curMonth ){
+				   console.log("Not a valid exp date");
+				   $("#exp-month-err").html("");
+				   $("#exp-year-err").html("");
+				   $("#exp-year-err").html("Please enter valid expiration date");
+				   return false;
 			   }
-			   return true;
 		   }
-		   else{
-			   return false;
-		   }
+		   console.log("Valid exp date");
+		   $("#exp-year-err").html("");
+		   $("#exp-month-err").html("");
+		   return true;
 	   }
+	   
+	   $('#card-number').blur(function() {
+		   console.log("On blur card called");
+		   validateCreditCard();
+       });
+	   $('#exp-month').blur(function(){
+		   console.log("On blur month called");
+    	   validateMonth();
+       });
+       $('#exp-year').blur(function(){
+		   console.log("On blur year called");
+    	   validateYear();
+       });
 	   
 	</script>
    
