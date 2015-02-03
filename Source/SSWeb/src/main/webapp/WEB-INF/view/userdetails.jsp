@@ -154,7 +154,7 @@
 		$(this).removeAttr("brachid");
 	}); */
 	$('#icon-user-delete').click(function() {
-		var userId = $(this).closest('.row').attr("id");
+		var userId = $(this).closest('.row').attr("data-id");
 		confirmDeleteUser(userId);
 	});
 	$('#icn-status-green')
