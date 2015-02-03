@@ -60,7 +60,7 @@
                 if($(window).width() < 768){
                     var minH = winH - 50 - 50 - 5 - 1;
                 }else{
-                    var minH = winH - 83 - 78 - 78 + 4;
+                    var minH = winH - 83 - 78 - 78 -1;
                 }
                 $('.error-main-wrapper').css('min-height',minH+'px');
             }

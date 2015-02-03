@@ -19,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.ClientTokenRequest;
+import com.braintreegateway.CreditCard;
 import com.braintreegateway.Customer;
 import com.braintreegateway.CustomerRequest;
 import com.braintreegateway.Environment;
@@ -40,6 +41,7 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
@@ -48,6 +50,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
@@ -95,6 +98,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 
 	private BraintreeGateway gateway = null;
+	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
 
 	/**
 	 * Returns the the Braintree gateway.
@@ -892,7 +898,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		catch(UnexpectedException e){
 			LOG.error("upgradeSubscription : UexpectedException has occured");
-			throw new PaymentException("upgradeSubscription : UexpectedException has occured");
+			throw new PaymentException("upgradeSubscription : UexpectedException has occured",DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 		
 		if(result.isSuccess()){
@@ -913,14 +919,16 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws SubscriptionPastDueException 
 	 * @throws PaymentException 
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 * @throws SolrException 
+	 * @throws UndeliveredEmailException 
 	 */
 	@Transactional
 	@Override
-	public void upgradePlanForSubscription(Company company, int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException {
+	public void upgradePlanForSubscription(User user, int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException {
 		
-		if( company == null ){
-			LOG.error("upgradePlanForSubscription : company parameter given is null.");
-			throw new InvalidInputException("upgradePlanForSubscription : company parameter given is null.");
+		if( user == null ){
+			LOG.error("upgradePlanForSubscription : User parameter given is null.");
+			throw new InvalidInputException("upgradePlanForSubscription : User parameter given is null.");
 		}
 		
 		if( newAccountsMasterId < 0 ){
@@ -928,6 +936,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
 		}
 		
+		Company company = user.getCompany();
 		//Fetching the new accounts master record
 		LOG.info("Fetching the new accounts master record from the database.");
 		AccountsMaster newAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, newAccountsMasterId);
@@ -970,6 +979,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("Subscription upgraded at braintree");
 		
 		try{
+			//Update the branches and the regions and add settings to mongo
+			LOG.info("API call successful, updating the branch and region databases");
+			organizationManagementService.upgradeAccount(company, newAccountsMasterId);
 			//Updating license detail table.
 			LOG.info("Updating the License Detail table to show changes");
 			licenseDetail.setAccountsMaster(newAccountsMaster);
@@ -995,8 +1007,168 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			
 		}
 		
+		LOG.info("Sending mail to the customer about the upgrade");
+		emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		LOG.info("Mail successfully sent");		
 		
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
 		
+	}
+	
+	/**
+	 * Fetches the current card details for a particular subscription
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	@Override
+	public Map<String, String> getCurrentPaymentDetails(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
+		
+		LOG.info("getCurrentPaymentDetails called to fetch the current payment method");
+		
+		if( subscriptionId == null || subscriptionId.isEmpty() ){
+			LOG.error("getCurrentPaymentDetails : subscriptionId parameter is null or empty");
+			throw new InvalidInputException("getCurrentPaymentDetails : subscriptionId parameter is null or empty");
+		}
+		
+		Map<String, String> paymentDetailsMap = new HashMap<>();
+		
+		try{		
+			
+			//Firstly we get the subscription whose payment method we need
+			Subscription subscription = null;
+			try{
+				LOG.debug("Fetching the subscription object from the vault for subscription id : " + subscriptionId);
+				subscription = gateway.subscription().find(subscriptionId);
+			}catch(NotFoundException e){
+				LOG.error("NotFoundException caught while fetching subscription with id : " + subscriptionId );
+				throw new NoRecordsFetchedException("NotFoundException caught while fetching subscription with id : " + subscriptionId);
+			}
+			
+			//Once we have the subscription we use the payment method token to get the payment method from the vault
+			CreditCard currentPaymentMethod = null;
+			try{
+				LOG.debug("Fetching the payment method object from the vault for payment token id : " + subscription.getPaymentMethodToken());
+				currentPaymentMethod = (CreditCard) gateway.paymentMethod().find(subscription.getPaymentMethodToken());
+			}catch(NotFoundException e){
+				LOG.error("NotFoundException caught while fetching payment method with id : " + subscription.getPaymentMethodToken() );
+				throw new NoRecordsFetchedException("NotFoundException caught while fetching payment method with id : " + subscription.getPaymentMethodToken());
+			}
+			
+			
+			//Now we build the hashmap to be returned
+			LOG.debug("Payment details fetched. Building the Hashmap to return");
+			paymentDetailsMap.put(CommonConstants.CARD_NUMBER, currentPaymentMethod.getMaskedNumber());
+			paymentDetailsMap.put(CommonConstants.CARD_TYPE, currentPaymentMethod.getCardType());
+			paymentDetailsMap.put(CommonConstants.CARD_HOLDER_NAME, currentPaymentMethod.getCardholderName());
+			paymentDetailsMap.put(CommonConstants.ISSUING_BANK, currentPaymentMethod.getIssuingBank());
+			paymentDetailsMap.put(CommonConstants.IMAGE_URL, currentPaymentMethod.getImageUrl());
+			
+			LOG.debug("Payment details map built");
+			
+		}catch (UnexpectedException e) {
+			LOG.error("UnexpectedException caught : message : " + e.getMessage());
+			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(),DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+		}
+		
+		LOG.info("Returning the payment method details");
+		return paymentDetailsMap;
+	}
+	
+	/**
+	 * Changes the card for a particular customer and subscription
+	 * @param subscriptionId
+	 * @param paymentNonce
+	 * @param customerId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	@Override
+	public boolean changePaymentMethod(String subscriptionId, String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
+		
+		LOG.info(" changePaymentMethod called to change payment method");
+		
+		if( subscriptionId == null || subscriptionId.isEmpty() ){
+			LOG.error("changePaymentMethod : subscriptionId parameter is null or empty");
+			throw new InvalidInputException("getCurrentPaymentDetails : subscriptionId parameter is null or empty");
+		}
+		if( paymentNonce == null || paymentNonce.isEmpty() ){
+			LOG.error("changePaymentMethod : paymentNonce parameter is null or empty");
+			throw new InvalidInputException("getCurrentPaymentDetails : paymentNonce parameter is null or empty");
+		}
+		
+		boolean status = false;
+		
+		try{					
+			//Firstly we get the subscription whose payment method we need
+			Subscription subscription = null;
+			try{
+				LOG.debug("Fetching the subscription object from the vault for subscription id : " + subscriptionId);
+				subscription = gateway.subscription().find(subscriptionId);
+			}catch(NotFoundException e){
+				LOG.error("NotFoundException caught while fetching subscription with id : " + subscriptionId );
+				throw new NoRecordsFetchedException("NotFoundException caught while fetching subscription with id : " + subscriptionId);
+			}
+			
+			//Next we update the customer with the new payment nonce
+			LOG.info("Updating the payment method for customer with id : " + customerId + " to : " + paymentNonce);
+			CustomerRequest customerRequest = new CustomerRequest();
+			customerRequest.creditCard()
+								.paymentMethodNonce(paymentNonce)
+								.options()
+									.updateExistingToken(subscription.getPaymentMethodToken())
+									.verifyCard(true)
+									.done();
+			Result<Customer> result = gateway.customer().update(customerId, customerRequest);
+			if(result.isSuccess()){
+				LOG.info("Result : " + result.isSuccess());
+				status = true;
+			}
+			else{
+				LOG.info("Result : " + result.isSuccess() + " message : " + result.getMessage());
+				status = false;
+			}
+			
+		}catch (UnexpectedException e) {
+			LOG.error("UnexpectedException caught : message : " + e.getMessage());
+			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(),DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+		}		
+		
+		LOG.info("Returning status");
+		return status;
+	}
+	
+	/**
+	 * Returns the balance amount while upgrading from one plan to another
+	 * @param fromAccountsMasterId
+	 * @param toAccountsMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Transactional
+	@Override
+	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId, int toAccountsMasterId) throws InvalidInputException {
+		
+		if(fromAccountsMasterId <=0){
+			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
+			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
+		}
+		
+		if(toAccountsMasterId <=1){
+			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid toAccountsMasterId parameter ");
+			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid toAccountsMasterId parameter ");
+		}
+		
+		//We fetch the accounts master records for each.
+		AccountsMaster fromAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, fromAccountsMasterId);
+		AccountsMaster toAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, toAccountsMasterId);
+		
+		return toAccountsMaster.getAmount()-fromAccountsMaster.getAmount();
 	}	
+	
+	
 }

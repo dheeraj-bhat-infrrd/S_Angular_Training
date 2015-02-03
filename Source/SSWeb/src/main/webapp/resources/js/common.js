@@ -74,6 +74,9 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
 		data : formData,
 		async : isAsync,
 		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+			},
 		error : function(e) {
 			redirectErrorpage();
 		}
@@ -109,4 +112,31 @@ function callAjaxFormSubmit(url, callBackFunction, formId) {
  */
 function redirectErrorpage(){
 	window.location = "errorpage.do";
+}
+
+/**
+ * Generic method to use for post ajax request with payload data
+ * 
+ * @param url
+ * @param callBackFunction
+ * @param payload
+ */
+function callAjaxPostWithPayloadData(url, callBackFunction, payload,isAsync){
+	console.log("payload is --"+payload);
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+		url : url,
+		type : "POST",
+		data : payload,
+		async : isAsync,
+		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			redirectErrorpage();
+		}
+	});
 }

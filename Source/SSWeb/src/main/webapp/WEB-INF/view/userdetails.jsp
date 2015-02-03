@@ -8,7 +8,7 @@
 	<c:set value="${searchedUser.emailId}" var="emailId"></c:set>
 	<c:set value="${searchedUser.status }" var="status"></c:set>
 </c:if>
-<div class="row" id="${userId}">
+<div class="row" data-id="${userId}" id="um-user-details-container">
 	<div class="um-top-row cleafix">
 		<div class="clearfix um-top-form-wrapper">
 			<div class="col-lg-6 col-md-6 col-sm-6 col-xs-12 um-panel-item">
@@ -19,7 +19,7 @@
 					<div class="um-item-row-icon"></div>
 					<div class="hm-item-row-right um-item-row-right">
 						<input type="text" id="um-fname" name="firstName"
-							value="${firstName }" class="um-item-row-txt"
+							value="${firstName }" class="um-item-row-txt mob-icn-fname"
 							placeholder='<spring:message code="label.firstname.key"/>'>
 						<div id="um-fname-error" class="input-error-2 error-msg"></div>
 					</div>
@@ -33,7 +33,7 @@
 					<div class="um-item-row-icon"></div>
 					<div class="hm-item-row-right um-item-row-right">
 						<input type="text" id="um-lname" name="lastName"
-							value="${lastName }" class="um-item-row-txt"
+							value="${lastName }" class="um-item-row-txt mob-icn-lname"
 							placeholder='<spring:message code="label.lastname.key" />'>
 						<div id="um-lname-error" class="input-error-2 error-msg"></div>
 					</div>
@@ -54,7 +54,7 @@
 					</c:choose>
 					<div class="hm-item-row-right um-item-row-right">
 						<input type="text" id="um-emailid" name="emailId"
-							value="${emailId }" class="um-item-row-txt"
+							value="${emailId }" class="um-item-row-txt mob-icn-email"
 							placeholder='<spring:message code="label.emailid.key" />'>
 						<div id="um-emailid-error" class="input-error-2 error-msg"></div>
 					</div>
@@ -66,14 +66,18 @@
 							<spring:message code="label.assignto.key" />
 						</div>
 						<div class="um-item-row-icon icn-save cursor-pointer"></div>
-						<div class="hm-item-row-right um-item-row-right">
-							<input type="text" class="um-item-row-txt" id="um-assignto"
+						<div class="hm-item-row-right um-item-row-right pos-relative">
+							<input type="text" class="um-item-row-txt mob-icn-assignTo" id="um-assignto"
 								placeholder='<spring:message code="label.assignto.key" />'>
 						</div>
 					</div>
 				</c:if>
 			</div>
 		</div>
+        <div class="row clearfix hm-btn-wrapper um-btn-wrapper-fix margin-0-auto">
+            <div id="um-add-user" class="float-left add-curve-btn cursor-pointer">Add New User</div>
+            <div id="um-clear-user-form" class="float-left icn-clear cursor-pointer margin-right-0"></div>
+        </div>
 		<!-- Populate all the assigned branches to the user -->
 		<c:if test="${accounttypeval ne 2 }">
 			<c:choose>
@@ -201,7 +205,7 @@
 			});
 
 	$('#um-assignto').click(function() {
-		$(this).parent().find('.um-branch-list').toggle();
+		$(this).parent().find('.um-branch-list').slideToggle(200);
 	});
 
 	$(document).ready(function() {
