@@ -58,6 +58,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_CURRENT_PASSWORD = "INVALID_CURRENT_PASSWORD";
 	public static final String INVALID_NEW_PASSWORD = "INVALID_NEW_PASSWORD";
 	public static final String INVALID_CONFIRM_NEW_PASSWORD = "INVALID_CONFIRM_NEW_PASSWORD";
+	public static final String INVALID_SURVEY_ANSWER = "INVALID_SURVEY_ANSWER";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";

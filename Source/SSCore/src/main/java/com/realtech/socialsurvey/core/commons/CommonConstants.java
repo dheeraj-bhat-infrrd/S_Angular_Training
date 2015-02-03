@@ -213,5 +213,5 @@ public interface CommonConstants {
 	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
 	public static final String QUESTION_RATING = "range";
 	public static final int QUESTION_RATING_VALUE_TRUE = 1;
-	public static final int QUESTION_RATING_VALUE_FALSE = 1;
+	public static final int QUESTION_RATING_VALUE_FALSE = 0;
 }
