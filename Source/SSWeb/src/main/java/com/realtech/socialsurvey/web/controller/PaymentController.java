@@ -95,8 +95,8 @@ public class PaymentController {
 			User user = sessionHelper.getCurrentUser();
 			Company company = user.getCompany();
 			AccountType accountType = null;
-			
-			if(strAccountType == null || strAccountType.isEmpty()){
+
+			if (strAccountType == null || strAccountType.isEmpty()) {
 				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
@@ -169,20 +169,21 @@ public class PaymentController {
 		}
 		return JspResolver.LANDING;
 	}
-	
-	@RequestMapping(value="/paymentchange",method = RequestMethod.GET)
-	public Object paymentChangePage(Model model, HttpServletRequest request, HttpServletResponse response){
-		
+
+	@RequestMapping(value = "/paymentchange", method = RequestMethod.GET)
+	public Object paymentChangePage(Model model, HttpServletRequest request, HttpServletResponse response) {
+
 		LOG.info("Payment controller called for payment change page");
-		//Fetch current user in session
+		// Fetch current user in session
 		LOG.debug("Fetching the current user in session");
 		User user = sessionHelper.getCurrentUser();
 		Map<String, String> currentPaymentDetails = null;
-		
-		//Next we fetch the current payment details of user.
+
+		// Next we fetch the current payment details of user.
 		try {
 			LOG.debug("Fetching users current card details");
-			currentPaymentDetails = gateway.getCurrentPaymentDetails(user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getSubscriptionId());
+			currentPaymentDetails = gateway.getCurrentPaymentDetails(user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX)
+					.getSubscriptionId());
 		}
 		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("Exception caught : message : " + e.getMessage());
@@ -198,34 +199,34 @@ public class PaymentController {
 			model.addAttribute("messageBody", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.PAYMENT;
 		}
-		
-		//Add the parameters to the response
+
+		// Add the parameters to the response
 		LOG.debug("Adding attributes");
 		model.addAttribute("clienttoken", gateway.getClientToken());
 		model.addAllAttributes(currentPaymentDetails);
 		model.addAttribute(CommonConstants.PAYMENT_CHANGE_FLAG, CommonConstants.STATUS_ACTIVE);
 		LOG.info("Returning payment jsp page");
-		return JspResolver.PAYMENT;		
-		
+		return JspResolver.PAYMENT;
+
 	}
-	
-	@RequestMapping(value="/paymentupgrade",method=RequestMethod.POST)
+
+	@RequestMapping(value = "/paymentupgrade", method = RequestMethod.POST)
 	@ResponseBody
-	public String paymentUpgrade(Model model, HttpServletRequest request){
+	public String paymentUpgrade(Model model, HttpServletRequest request) {
 		LOG.info("Payment controller called to upgrade payment method");
-		
+
 		boolean status = false;
 		String message = null;
 		String paymentNonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 		LOG.info("Payment upgrade called with nonce : " + paymentNonce);
-		
-		//Fetching the user from session
+
+		// Fetching the user from session
 		LOG.debug("Fetching user from session");
 		User user = sessionHelper.getCurrentUser();
-		//Getting the company and the license detail object
+		// Getting the company and the license detail object
 		Company company = user.getCompany();
 		LicenseDetail licenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
-		
+
 		LOG.info("Making API call to update card details");
 		try {
 			status = gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
@@ -240,16 +241,17 @@ public class PaymentController {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			return message;
 		}
-		
-		if(status == false){
+
+		if (status == false) {
 			LOG.info("Payment details change unsuccessful. Please check logs.");
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			return message;
-		}		
-		
-		LOG.info("Payment details change successful! Returning message");
-		message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+		}
+		else {
+			LOG.info("Payment details change successful! Returning message");
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+		}
+
 		return message;
-		
+
 	}
 }

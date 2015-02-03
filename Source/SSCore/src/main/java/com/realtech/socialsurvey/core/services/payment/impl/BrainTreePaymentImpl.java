@@ -1140,5 +1140,35 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		
 		LOG.info("Returning status");
 		return status;
+	}
+	
+	/**
+	 * Returns the balance amount while upgrading from one plan to another
+	 * @param fromAccountsMasterId
+	 * @param toAccountsMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Transactional
+	@Override
+	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId, int toAccountsMasterId) throws InvalidInputException {
+		
+		if(fromAccountsMasterId <=0){
+			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
+			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
+		}
+		
+		if(toAccountsMasterId <=1){
+			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid toAccountsMasterId parameter ");
+			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid toAccountsMasterId parameter ");
+		}
+		
+		//We fetch the accounts master records for each.
+		AccountsMaster fromAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, fromAccountsMasterId);
+		AccountsMaster toAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, toAccountsMasterId);
+		
+		return toAccountsMaster.getAmount()-fromAccountsMaster.getAmount();
 	}	
+	
+	
 }
