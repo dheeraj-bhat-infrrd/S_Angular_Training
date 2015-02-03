@@ -294,7 +294,9 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		surveyQuestion.setModifiedBy(String.valueOf(user.getUserId()));
 		surveyQuestion.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		surveyQuestion.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		
 		surveyQuestion = surveyQuestionDao.save(surveyQuestion);
+		surveyQuestionDao.flush();
 		LOG.debug("Method addNewQuestion finished()");
 		return surveyQuestion;
 	}
@@ -343,6 +345,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 		LOG.debug("Saving mapping of survey to question.");
 		surveyQuestionsMappingDao.save(surveyQuestionsMapping);
+		surveyQuestionsMappingDao.flush();
+
 		LOG.debug("Method mapQuestionToSurvey() finished.");
 	}
 
