@@ -350,7 +350,6 @@ public class SurveyBuilderController {
 			LOG.warn("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.info("Return: " + surveyJson);
 		return surveyJson;
 	}
 	

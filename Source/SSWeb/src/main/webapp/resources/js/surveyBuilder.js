@@ -298,6 +298,7 @@ function commonActiveSurveyCallback(response){
 	$("#overlay-toast").html(response);
 	showToast();
 
+	$('#sb-ques-wrapper').html('');
 	loadActiveSurvey();
 }
 
