@@ -16,7 +16,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.IndividualSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -59,23 +58,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 
 	@Override
-	public void insertIndividualSettings(User user, Company company) {
+	public void insertIndividualSettings(User user) {
 		IndividualSettings individualSettings = new IndividualSettings();
-		OrganizationUnitSettings organizationUnitSettings;
-		
-		if (company != null && company.getCompanyId() != 0) {
-			organizationUnitSettings = fetchOrganizationUnitSettingsById(company.getCompanyId(), COMPANY_SETTINGS_COLLECTION);
-			individualSettings.setOrganizationUnitSettings(organizationUnitSettings);
-		}
-		else {
-			individualSettings.setOrganizationUnitSettings(null);
-		}
-
 		individualSettings.setUserId(user.getUserId());
-		individualSettings.setFirstName(user.getFirstName());
-		individualSettings.setLastName(user.getLastName());
-		individualSettings.setEmailId(user.getEmailId());
-		individualSettings.setProfileName(user.getUsername());
 		
 		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
 		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
