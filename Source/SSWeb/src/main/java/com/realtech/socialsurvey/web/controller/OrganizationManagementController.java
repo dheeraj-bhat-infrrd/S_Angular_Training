@@ -694,8 +694,7 @@ public class OrganizationManagementController {
 			jsonMessage.put("message", message);
 		}
 		catch (JSONException e) {
-			LOG.error("Exception occured while building json response : " + e.getMessage());
-			e.printStackTrace();
+			LOG.error("Exception occured while building json response : " + e.getMessage(),e);
 		}
 
 		LOG.info("Returning json response : " + jsonMessage.toString());
