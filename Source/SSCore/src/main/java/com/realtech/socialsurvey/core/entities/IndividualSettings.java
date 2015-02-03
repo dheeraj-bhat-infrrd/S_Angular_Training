@@ -1,9 +1,12 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
+import org.springframework.data.annotation.Id;
 
 public class IndividualSettings {
 
+	@Id
+	private String id;
 	private long userId;
 	private String firstName;
 	private String lastName;
@@ -12,6 +15,14 @@ public class IndividualSettings {
 	private OrganizationUnitSettings organizationUnitSettings;
 	private List<String> expertise;
 	private List<String> hobbies;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
 
 	public long getUserId() {
 		return userId;
