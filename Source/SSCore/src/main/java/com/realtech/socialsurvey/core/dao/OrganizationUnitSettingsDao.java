@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
-import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.IndividualSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
@@ -24,7 +23,7 @@ public interface OrganizationUnitSettingsDao {
 	 * 
 	 * @param user
 	 */
-	public void insertIndividualSettings(User user, Company company);
+	public void insertIndividualSettings(User user);
 
 	/**
 	 * Fetches the organization unit settings for the given identifier and collection name

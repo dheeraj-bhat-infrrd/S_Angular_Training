@@ -142,18 +142,18 @@ public class UserManagementController {
 						throw new UserAlreadyExistsException("User already exists with the email id : " + emailId);
 					}
 					catch (NoRecordsFetchedException noRecordsFetchedException) {
-						// persisting user to mysql
+						// adding user to mysql
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
 						
 						// TODO
-						// persisting user to mongo
+						// adding user to mongo
 						LOG.debug("Adding newly registered user {} to mongo: ", user.getFirstName());
-						organizationUnitSettingsDao.insertIndividualSettings(user, admin.getCompany());
+						organizationUnitSettingsDao.insertIndividualSettings(user);
 						LOG.debug("Successfully added newly registered user {} to mongo: ", user.getFirstName());
 
-						// persisting user to solr
+						// adding user to solr
 						LOG.debug("Adding invited user {} to solr: ", user.getFirstName());
 						solrSearchService.addUserToSolr(user);
 						LOG.debug("Successfully added invited user {} to solr: ", user.getFirstName());
@@ -846,15 +846,16 @@ public class UserManagementController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			
-			// persisting user to principal session
+			// TODO
+			// adding user to mongo
+			LOG.debug("Adding newly assigned user {} to mongo: ", user.getFirstName());
+			organizationUnitSettingsDao.insertIndividualSettings(user);
+			LOG.debug("Successfully added newly assigned user {} to mongo: ", user.getFirstName());
+
+			// adding user to principal session
 			LOG.debug("Adding newly registered user to principal session");
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
-
-			// TODO persisting user to mongo
-			LOG.debug("Adding newly assigned user {} to mongo: ", user.getFirstName());
-			organizationUnitSettingsDao.insertIndividualSettings(user, user.getCompany());
-			LOG.debug("Successfully added newly assigned user {} to mongo: ", user.getFirstName());
 
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
