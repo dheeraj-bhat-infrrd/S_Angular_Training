@@ -124,6 +124,8 @@ public interface CommonConstants {
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	public static final String CURRENT_LICENSE_ID = "currentplan";
 	public static final String UPGRADE_FLAG = "upgrade";
+	public static final String COUNTRY_CODE = "countryCode";
+	public static final String COUNTRY = "country";
 	
 	/**
 	 * Batch Constants
