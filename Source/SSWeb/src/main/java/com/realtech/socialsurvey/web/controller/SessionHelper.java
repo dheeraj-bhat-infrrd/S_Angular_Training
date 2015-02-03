@@ -85,6 +85,16 @@ public class SessionHelper {
 		}
 	}
 	
+	//JIRA SS-97 by RM-06 : BOC
+	
+	public void setLogoInSession(HttpSession session, UserSettings userSettings){
+		LOG.info("Setting logo in session");
+		setLogo(session, userSettings);
+		LOG.info("Logo successfully updated in session");
+	}
+	
+	//JIRA SS-97 by RM-06 : EOC
+	
 	private void setLogo(HttpSession session, UserSettings userSettings){
 		LOG.debug("Setting logo name in the session");
 		// check if company has a logo
@@ -169,9 +179,7 @@ public class SessionHelper {
 		LOG.debug("Adding newly registered user to session");
 		try {
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			String encryptedPassword = encryptionHelper.encryptSHA512(password);
-			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, encryptedPassword,
-					userDetails.getAuthorities());
+			UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, password, userDetails.getAuthorities());
 			userAuthProvider.authenticate(auth);
 
 			if (auth.isAuthenticated()) {

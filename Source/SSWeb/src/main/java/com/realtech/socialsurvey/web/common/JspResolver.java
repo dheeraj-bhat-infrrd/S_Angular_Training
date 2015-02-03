@@ -33,5 +33,12 @@ public interface JspResolver {
 	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
 	public static final String CHANGE_PASSWORD = "changepassword";
 	public static final String UPGRADE_CONFIRMATION = "upgradeconfirmation";
-
+	public static final String COMPANY_PROFILE = "companyprofile";
+	public static final String CONTACT_DETAILS_LIST = "contactdetailslist";
+	public static final String ASSOCIATION_LIST = "associationlist";
+	public static final String ACHIEVEMENT_LIST = "achievementlist";
+	public static final String LICENSE_LIST = "licencelist";
+	public static final String ADDRESS_DETAILS = "addressdetails";
+	public static final String PROFILE_IMAGE_CONTENT = "profileimagecontent";
+	public static final String PROFILE_SOCIAL_LINKS = "profilesociallinks";
 }
