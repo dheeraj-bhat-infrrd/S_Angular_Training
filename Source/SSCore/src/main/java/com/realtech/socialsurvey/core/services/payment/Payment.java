@@ -166,5 +166,13 @@ public interface Payment {
 	 * @throws PaymentException
 	 */
 	public boolean changePaymentMethod(String subscriptionId,String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
-
+	
+	/**
+	 * Returns the balance amount while upgrading from one plan to another
+	 * @param fromAccountsMasterId
+	 * @param toAccountsMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId,int toAccountsMasterId) throws InvalidInputException;
 }

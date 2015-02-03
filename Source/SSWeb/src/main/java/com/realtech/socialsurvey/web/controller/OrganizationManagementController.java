@@ -70,7 +70,7 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
-	
+
 	@Autowired
 	private SessionHelper sessionHelper;
 
@@ -231,11 +231,11 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			
+
 			User user = sessionHelper.getCurrentUser();
-			
+
 			LOG.debug("Checking if payment has already been made.");
-			if(gateway.checkIfPaymentMade(user.getCompany())){
+			if (gateway.checkIfPaymentMade(user.getCompany())) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
 			}
@@ -643,9 +643,9 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
-	
-	private String makeJsonMessage(int status, String message){
-		
+
+	private String makeJsonMessage(int status, String message) {
+
 		JSONObject jsonMessage = new JSONObject();
 		LOG.debug("Building json response");
 		try {
@@ -656,13 +656,14 @@ public class OrganizationManagementController {
 			LOG.error("Exception occured while building json response : " + e.getMessage());
 			e.printStackTrace();
 		}
-		
+
 		LOG.info("Returning json response : " + jsonMessage.toString());
 		return jsonMessage.toString();
 	}
 
 	/**
 	 * Method to upgrade a plan
+	 * 
 	 * @param request
 	 * @param model
 	 * @return
@@ -681,6 +682,7 @@ public class OrganizationManagementController {
 			LOG.info("Making the braintree API call to upgrade and updating the database!");
 
 			if (accountType == null || accountType.isEmpty()) {
+				LOG.error("Account type parameter passed is null or empty");
 				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
@@ -689,6 +691,7 @@ public class OrganizationManagementController {
 				newAccountsMasterId = Integer.parseInt(accountType);
 			}
 			catch (NumberFormatException e) {
+				LOG.error("Error while parsing account type ");
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Making the API call to upgrade");
@@ -696,71 +699,122 @@ public class OrganizationManagementController {
 			LOG.info("Upgrade successful");
 
 			switch (newAccountsMasterId) {
-				case CommonConstants.ACCOUNTS_MASTER_TEAM: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				case CommonConstants.ACCOUNTS_MASTER_TEAM:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 					break;
-				case CommonConstants.ACCOUNTS_MASTER_COMPANY: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_COMPANY_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				case CommonConstants.ACCOUNTS_MASTER_COMPANY:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_COMPANY_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 					break;
-				case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE: message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+				case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 					break;
 			}
 			LOG.info("message returned : " + message);
 		}
-		catch (InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e ) {
+		catch (InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			
+
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 
 		}
 		catch (PaymentException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			
+
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionPastDueException e) {
 			LOG.error("SubscriptionPastDueException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			
+
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionUpgradeUnsuccessfulException e) {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			
+
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
-		
-		//After all the updates are done we set the account type in the session to reflect changes
-		HttpSession session = request.getSession();		
+
+		// After all the updates are done we set the account type in the session to reflect changes
+		HttpSession session = request.getSession();
 		session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(Integer.parseInt(accountType)));
-				
+
 		LOG.info("returning message : " + message);
 		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
 	}
-	
+
 	/**
 	 * Method for displaying the upgrade page
+	 * 
 	 * @param request
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value="/upgradepage", method=RequestMethod.GET)
-	public String upgradePage(HttpServletRequest request, Model model){
-		
+	@RequestMapping(value = "/upgradepage", method = RequestMethod.GET)
+	public String upgradePage(HttpServletRequest request, Model model) {
+
 		LOG.info("Upgrade page requested.");
-		
+
 		LOG.debug("Retrieveing the user from session to get his current plan details");
 		User user = sessionHelper.getCurrentUser();
 		LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
-		
+
 		LOG.debug("Adding the current plan in the model and the upgrade flag");
 		model.addAttribute(CommonConstants.CURRENT_LICENSE_ID, currentLicenseDetail.getAccountsMaster().getAccountsMasterId());
 		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.STATUS_ACTIVE);
-		
+
 		LOG.info("Returning the upgrade account selection page");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
-		
+
+	}
+
+	/**
+	 * Returns the upgrade confirmation page
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/upgradeconfirmation", method = RequestMethod.POST)
+	public String getUpgradeConfirmationPage(HttpServletRequest request, Model model) {
+
+		LOG.info("Upgrade confirmation page requested");
+		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
+
+		try {
+			// We need to calculate the balance amount and put it into the model
+			if (accountType == null || accountType.isEmpty()) {
+				LOG.error("Account type parameter passed is null or empty");
+				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			int toAccountsMasterId = 0;
+			try {
+				toAccountsMasterId = Integer.parseInt(accountType);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Error while parsing account type ");
+				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			int fromAccountsMasterId = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster()
+					.getAccountsMasterId();
+
+			model.addAttribute("balanceAmount",
+					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(fromAccountsMasterId, toAccountsMasterId)) + "$");
+			model.addAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, toAccountsMasterId);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+		}
+
+		LOG.info("Returning the confirmation page");
+		return JspResolver.UPGRADE_CONFIRMATION;
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

@@ -20,20 +20,17 @@
 		<body>
    	</c:otherwise>
 </c:choose>
-    
- <c:choose>
- <c:when test="${ upgrade == 1 }">
- 	<div class="overlay-loader overlay hide"></div>
- </c:when>
- <c:otherwise>
-	 <div class="overlay-loader overlay hide"></div>
-	 <div class="overlay-payment overlay-main hide">
+<c:choose>
+<c:when test="${ upgrade ==1 }"></c:when>
+<c:otherwise>
+	<div class="overlay-payment overlay-main hide">
 	 	<div id="payment-section" class="payment-section">
 			<!-- Payment page comes here through ajax  -->
 		</div>
 	 </div>
- </c:otherwise>
- </c:choose>
+</c:otherwise>
+</c:choose>
+
  	<c:choose>
  	<c:when test="${ upgrade ==1 }">
  		<div class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
@@ -90,7 +87,7 @@
 		                                    </div>
 		                                    <c:choose>
 		                                    <c:when test="${ currentplan < 2}">
-		                                       	<div class="btn-payment-sel" onclick="javascript:upgradeAccountType(2)"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                       	<div class="btn-payment-sel" onclick="javascript:confirmUpgradation(2)"><spring:message code="label.accounttype.upgrade.button.key"/></div>
 		                                    </c:when>
 		                                    <c:otherwise>
 		                                    	<div class="btn-payment-sel btn-disabled"><spring:message code="label.accounttype.upgrade.button.key"/></div>
@@ -108,7 +105,7 @@
 		                                    </div>
 											<c:choose>
 		                                    <c:when test="${ currentplan < 3}">
-		                                       	<div class="btn-payment-sel" onclick="javascript:upgradeAccountType(3)"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                       	<div class="btn-payment-sel" onclick="javascript:confirmUpgradation(3)"><spring:message code="label.accounttype.upgrade.button.key"/></div>
 		                                    </c:when>
 		                                    <c:otherwise>
 		                                    	<div class="btn-payment-sel btn-disabled"><spring:message code="label.accounttype.upgrade.button.key"/></div>
@@ -126,7 +123,7 @@
 		                                    </div>
 		                                    <c:choose>
 		                                    <c:when test="${ currentplan < 4}">
-		                                       	<div class="btn-payment-sel" onclick="javascript:upgradeAccountType(4)"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                       	<div class="btn-payment-sel" onclick="javascript:confirmUpgradation(4)"><spring:message code="label.accounttype.upgrade.button.key"/></div>
 		                                    </c:when>
 		                                    <c:otherwise>
 		                                    	<div class="btn-payment-sel btn-disabled"><spring:message code="label.accounttype.upgrade.button.key"/></div>
@@ -218,6 +215,7 @@
 	</c:otherwise>
 	</c:choose>
     <script>
+            	
         function selectAccountType(accountType,paymentAmount) {
             console.log("selecting and saving account type");
             $('#account-type').val(accountType);
@@ -241,13 +239,41 @@
             });
         }
         
+        
+        function confirmUpgradation(accountType){
+        	console.log("Returning the upgrade confirmation page")
+        	data = "accounttype=" + String(accountType);
+    	   	$('.overlay-payment').hide();
+			$('.overlay-payment').html("");
+			showOverlay();
+        	var url = "./upgradeconfirmation.do";
+        	$.ajax({
+        		url : url,
+        		type : "POST",
+        		data : data,
+        		success : function(data){
+                    $('.overlay-payment').html(data);		
+        			hideOverlay();
+        			$('.overlay-payment').show();
+        		},
+        		error : redirectErrorpage
+        	});        	
+        }
+        
         function upgradeAccountType(accountType) {
             console.log("selecting and upgrading account type");
-            $('#account-type').val(accountType);
+        	data = "accounttype=" + String(accountType);
             var url = "./upgradeplan.do";
             /* show the progress icon */
+            $('.overlay-payment').hide();
             showOverlay();
-            callAjaxFormSubmit(url,showMessage,"account-type-selection-form");           
+            $.ajax({
+        		url : url,
+        		type : "POST",
+        		data : data,
+        		success : showMessage,
+        		error : redirectErrorpage
+        	});         
             
         }
         
