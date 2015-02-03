@@ -128,7 +128,8 @@ public class SurveyBuilderController {
 				int answerOrder = 1;
 				for (String answerStr : strAnswers) {
 					if (answerStr.equals("")) {
-						continue;
+						LOG.error("Answer text cannot be empty !");
+						throw new InvalidInputException("Answer text cannot be empty !");
 					}
 					surveyAnswer = new SurveyAnswer();
 					surveyAnswer.setAnswerText(answerStr);
@@ -148,7 +149,7 @@ public class SurveyBuilderController {
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while adding Question to Survey: " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_ANSWER, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -187,7 +188,12 @@ public class SurveyBuilderController {
 					long answerId = Long.parseLong(answerIdStr);
 
 					surveyAnswer = new SurveyAnswer();
-					surveyAnswer.setAnswerText(strAnswerTexts.get(answerOrder));
+					String answerStr = strAnswerTexts.get(answerOrder);
+					if (answerStr.equals("")) {
+						LOG.error("Answer text cannot be empty");
+						throw new InvalidInputException("Answer text cannot be empty !");
+					}
+					surveyAnswer.setAnswerText(answerStr);
 					surveyAnswer.setAnswerId(answerId);
 					answers.add(surveyAnswer);
 					
@@ -204,7 +210,7 @@ public class SurveyBuilderController {
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+			LOG.error("InvalidInputException while updating question. Reason: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
@@ -232,7 +238,7 @@ public class SurveyBuilderController {
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException while removeing question. Reason:" + e.getMessage(), e);
+			LOG.error("NumberFormatException while disabling question. Reason:" + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		catch (InvalidInputException e) {
@@ -268,7 +274,7 @@ public class SurveyBuilderController {
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
+			LOG.error("InvalidInputException while disabling Questions from Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
