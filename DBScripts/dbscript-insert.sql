@@ -9,3 +9,9 @@ INSERT into ss_user.ACCOUNTS_MASTER values(1,"Individual",1000,365,50,1,'2014-11
 INSERT into ss_user.ACCOUNTS_MASTER values(2,"Team",1000,365,75,1,'2014-11-28 04:00:00',"1",'2014-11-28 04:00:00',"1");
 INSERT into ss_user.ACCOUNTS_MASTER values(3,"Company",1000,365,99,1,'2014-11-28 04:00:00',"1",'2014-11-28 04:00:00',"1");
 INSERT into ss_user.ACCOUNTS_MASTER values(4,"Enterprise",1000,365,150,1,'2014-11-28 04:00:00',"1",'2014-11-28 04:00:00',"1");
+
+-- Insert verticals_master table data Feb-2-2015
+INSERT INTO `verticals_master` VALUES (1,'BANKING',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(2,'MORTGAGE',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(3,'REALTOR',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1');
+
+-- Insert verticals_crm_mapping table data Feb-2-2015
+INSERT INTO `verticals_crm_mapping` VALUES (1,1,'ENCOMPASS',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(2,2,'DOT LOOP',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(3,3,'ENCOMPASS',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1');

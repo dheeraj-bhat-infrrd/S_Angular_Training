@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE">
 <html>
 <head>
@@ -83,6 +84,16 @@
 							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" data-phone = "true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
 						</div>
 						<div id="com-page-contactno" class="login-reg-err margin-0-auto"></div>
+						<c:if test="${not empty verticals }">
+							<div class="login-input-wrapper margin-0-auto clearfix">
+								<select name="vertical" id="select-vertical" class="login-input-wrapper">
+									<option disabled selected>Select a vertical </option>
+									<c:forEach items="${verticals }" var="vertical">
+										<option id="vertical-${vertical.verticalsMasterId }">${vertical.verticalName}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</c:if>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="company-info-submit">
                             <spring:message code="label.done.key" />
 						</div>

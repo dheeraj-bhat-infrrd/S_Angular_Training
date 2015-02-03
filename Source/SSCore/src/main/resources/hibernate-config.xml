@@ -69,6 +69,8 @@
 				<value>com.realtech.socialsurvey.core.entities.UserInvite</value>
 				<value>com.realtech.socialsurvey.core.entities.UserProfile</value>
 				<value>com.realtech.socialsurvey.core.entities.RemovedUser</value>
+				<value>com.realtech.socialsurvey.core.entities.VerticalsCrmMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.VerticalsMaster</value>
 			</list>
 		</property>
 	</bean>
