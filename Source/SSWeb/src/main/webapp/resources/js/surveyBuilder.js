@@ -90,6 +90,13 @@ function addQuestionCallback(response) {
 	
 	$('#sb-new-question-form :input').val('');
 	loadActiveSurvey();
+	
+	$('.sb-sel-icn-act').hide();
+	$('.sb-sel-icn-inact').show();
+	$('#sb-sel-desc').hide();
+	$('#sb-sel-desc').parent().find('.sb-sel-icn-act').show();
+	
+	$('#sb-question-type').val('sb-sel-desc');
 }
 
 // Edit/Update question
