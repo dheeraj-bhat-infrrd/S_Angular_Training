@@ -20,7 +20,7 @@ public interface SurveyBuilder {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public boolean isSurveyBuildingAllowed(User user, int highestRole) throws InvalidInputException;
+	public boolean isSurveyBuildingAllowed(User user) throws InvalidInputException;
 	
 	/**
 	 * Method to check and return for active Survey
