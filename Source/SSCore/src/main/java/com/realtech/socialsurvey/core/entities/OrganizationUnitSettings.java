@@ -18,6 +18,7 @@ public class OrganizationUnitSettings {
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
 	private ContactDetailsSettings contact_details;
+	private String vertical;
 	private CRMInfo crm_info;
 	private MailContentSettings mail_content;
 	private Licenses licenses;
@@ -84,6 +85,14 @@ public class OrganizationUnitSettings {
 
 	public void setContact_details(ContactDetailsSettings contact_details) {
 		this.contact_details = contact_details;
+	}
+
+	public String getVertical() {
+		return vertical;
+	}
+
+	public void setVertical(String vertical) {
+		this.vertical = vertical;
 	}
 
 	public CRMInfo getCrm_info() {
@@ -177,7 +186,7 @@ public class OrganizationUnitSettings {
 	@Override
 	public String toString() {
 		return "iden: " + iden + "\t profile_completion: " + profile_completion + "\t logo: " + logo + "\t contact_details: "
-				+ (contact_details != null ? contact_details.toString() : "null") + "\t crm_info: "
+				+ (contact_details != null ? contact_details.toString() : "null") + "\t buisness_type: " + vertical + "\t crm_info: "
 				+ (crm_info != null ? crm_info.toString() : "null") + "\t licenses: " + (licenses != null ? licenses.toString() : "null")
 				+ "\t associations: " + (associations != null ? associations.toString() : "") + "\t achievements: "
 				+ (achievements != null ? achievements.toString() : "null") + "\t survey_setings: "
