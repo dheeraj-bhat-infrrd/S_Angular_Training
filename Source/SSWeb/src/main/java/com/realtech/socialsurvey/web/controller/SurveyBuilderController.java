@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Survey;
-import com.realtech.socialsurvey.core.entities.SurveyAnswer;
+import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyDetail;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
@@ -42,7 +42,7 @@ public class SurveyBuilderController {
 
 	@Autowired
 	private MessageUtils messageUtils;
-	
+
 	@Value("${MINIMUM_RATING_QUESTIONS}")
 	private int minRatingQuestions;
 
@@ -61,11 +61,12 @@ public class SurveyBuilderController {
 
 		try {
 			isSurveyBuildingAllowed = surveyBuilder.isSurveyBuildingAllowed(user);
-			
-			if(!isSurveyBuildingAllowed) {
+
+			if (!isSurveyBuildingAllowed) {
 				LOG.error("User not allowed to access BuildSurvey Page. Reason: Access Denied");
 				model.addAttribute("message", "User not authorized to access BuildSurvey Page. Reason: Access Denied");
-			} else {
+			}
+			else {
 				return JspResolver.SURVEY_BUILDER;
 			}
 		}
@@ -79,7 +80,7 @@ public class SurveyBuilderController {
 		}
 		return JspResolver.MESSAGE_HEADER;
 	}
-	
+
 	/**
 	 * Method to add question to existing survey
 	 * 
@@ -109,28 +110,29 @@ public class SurveyBuilderController {
 			questionDetails.setQuestion(request.getParameter("sb-question-txt"));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setQuestionOrder(activeQuestionsInSurvey + 1);
-			
-			if(questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
+
+			if (questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
 				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
-			} else {
+			}
+			else {
 				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
 			}
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
-				List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
+				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
 				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers[]"));
 
-				SurveyAnswer surveyAnswer;
+				SurveyAnswerOptions surveyAnswerOptions;
 				int answerOrder = 1;
 				for (String answerStr : strAnswers) {
 					if (answerStr.equals("")) {
 						LOG.error("Answer text cannot be empty !");
 						throw new InvalidInputException("Answer text cannot be empty !");
 					}
-					surveyAnswer = new SurveyAnswer();
-					surveyAnswer.setAnswerText(answerStr);
-					surveyAnswer.setAnswerOrder(answerOrder);
-					answers.add(surveyAnswer);
+					surveyAnswerOptions = new SurveyAnswerOptions();
+					surveyAnswerOptions.setAnswerText(answerStr);
+					surveyAnswerOptions.setAnswerOrder(answerOrder);
+					answers.add(surveyAnswerOptions);
 
 					answerOrder++;
 				}
@@ -139,8 +141,9 @@ public class SurveyBuilderController {
 
 			// Adding the question to survey
 			surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
-			
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
@@ -163,7 +166,7 @@ public class SurveyBuilderController {
 		LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
-		
+
 		try {
 			long surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
 			String questionType = request.getParameter("sb-question-edit-type");
@@ -174,16 +177,16 @@ public class SurveyBuilderController {
 			questionDetails.setIsRatingQuestion(1);
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
-				List<SurveyAnswer> answers = new ArrayList<SurveyAnswer>();
+				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
 				List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
 				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
 
-				SurveyAnswer surveyAnswer;
+				SurveyAnswerOptions surveyAnswer;
 				int answerOrder = 0;
 				for (String answerIdStr : strAnswerIds) {
 					long answerId = Long.parseLong(answerIdStr);
 
-					surveyAnswer = new SurveyAnswer();
+					surveyAnswer = new SurveyAnswerOptions();
 					String answerStr = strAnswerTexts.get(answerOrder);
 					if (answerStr.equals("")) {
 						LOG.error("Answer text cannot be empty");
@@ -192,13 +195,14 @@ public class SurveyBuilderController {
 					surveyAnswer.setAnswerText(answerStr);
 					surveyAnswer.setAnswerId(answerId);
 					answers.add(surveyAnswer);
-					
+
 					answerOrder++;
 				}
 				questionDetails.setAnswers(answers);
-			}			
+			}
 			surveyBuilder.updateQuestionAndAnswers(user, surveyQuestionId, questionDetails);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {
@@ -211,7 +215,7 @@ public class SurveyBuilderController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to deactivate question from existing survey
 	 * 
@@ -225,12 +229,13 @@ public class SurveyBuilderController {
 		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
-		
+
 		try {
 			long surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-			
+
 			surveyBuilder.deactivateQuestionSurveyMapping(user, surveyQuestionId);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {
@@ -243,7 +248,7 @@ public class SurveyBuilderController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to deactivate questions from existing survey
 	 * 
@@ -257,16 +262,17 @@ public class SurveyBuilderController {
 		LOG.info("Method removequestionfromsurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
-		
+
 		try {
 			String questionIdsStr = request.getParameter("questionIds");
 			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
-			
+
 			LOG.info(questionIdsStr);
-			for(String questionIdStr : surveyQuestionIdStrs) {
+			for (String questionIdStr : surveyQuestionIdStrs) {
 				surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
 			}
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method removequestionfromsurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
@@ -275,7 +281,7 @@ public class SurveyBuilderController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to reorder question in existing survey
 	 * 
@@ -289,13 +295,14 @@ public class SurveyBuilderController {
 		LOG.info("Method reorderQuestion of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
-		
+
 		try {
 			long questionId = Long.parseLong(request.getParameter("questionId"));
 			String reorderType = request.getParameter("reorderType");
-			
+
 			surveyBuilder.reorderQuestion(user, questionId, reorderType);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method reorderQuestion of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {
@@ -308,7 +315,7 @@ public class SurveyBuilderController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to return active survey for company
 	 * 
@@ -330,14 +337,14 @@ public class SurveyBuilderController {
 			// Fetch active questions
 			surveyQuestions = surveyBuilder.getAllActiveQuestionsOfMappedSurvey(user);
 			surveyDetail.setQuestions(surveyQuestions);
-			
+
 			// Fetch count of active Rating questions
 			int activeRatingQues = (int) surveyBuilder.countActiveRatingQuestionsInSurvey(user);
 			if (activeRatingQues < minRatingQuestions) {
 				status = "Add " + (minRatingQuestions - activeRatingQues) + " more rating questions to activate the survey";
 			}
 			surveyDetail.setStatus(status);
-			
+
 			// Converting to json
 			surveyJson = new Gson().toJson(surveyDetail);
 			LOG.info("Method getSurveyDetails of SurveyBuilderController finished successfully");
@@ -348,7 +355,7 @@ public class SurveyBuilderController {
 		}
 		return surveyJson;
 	}
-	
+
 	/**
 	 * Method to create new survey
 	 * 
@@ -361,7 +368,7 @@ public class SurveyBuilderController {
 	public String fetchSurveyTemplates(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchSurveyTemplates of SurveyBuilderController called");
 		String templatesJson = null;
-		
+
 		try {
 			List<SurveyTemplate> surveytemplates = surveyBuilder.getSurveyTemplates();
 			templatesJson = new Gson().toJson(surveytemplates);
@@ -373,7 +380,7 @@ public class SurveyBuilderController {
 		}
 		return templatesJson;
 	}
-	
+
 	/**
 	 * Method to deactivate survey for company
 	 * 
@@ -387,10 +394,11 @@ public class SurveyBuilderController {
 		LOG.info("Method deactivateSurveyCompanyMapping of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
-		
+
 		try {
 			surveyBuilder.deactivateSurveyCompanyMapping(user);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_COMPANY_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_COMPANY_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method deactivateSurveyCompanyMapping of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
@@ -403,7 +411,7 @@ public class SurveyBuilderController {
 		}
 		return message;
 	}
-	
+
 	/**
 	 * Method to activate survey for company from template
 	 * 
@@ -417,12 +425,13 @@ public class SurveyBuilderController {
 		LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
-		
+
 		try {
 			long templateId = Long.parseLong(request.getParameter("templateId"));
-			
+
 			surveyBuilder.cloneSurveyFromTemplate(user, templateId);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
+					.getMessage();
 			LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {

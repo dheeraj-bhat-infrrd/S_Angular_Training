@@ -21,7 +21,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public boolean isSurveyBuildingAllowed(User user) throws InvalidInputException;
-	
+
 	/**
 	 * Method to check and return for active Survey
 	 * 
@@ -29,7 +29,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public Survey checkForExistingSurvey(User user) throws InvalidInputException;
-	
+
 	/**
 	 * Method to create a new Survey into the survey table.
 	 * 
@@ -61,7 +61,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public long countActiveQuestionsInSurvey(Survey survey) throws InvalidInputException;
-	
+
 	/**
 	 * Method to get count of survey rating questions
 	 * 
@@ -103,7 +103,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public List<SurveyTemplate> getSurveyTemplates() throws InvalidInputException;
-	
+
 	/**
 	 * Method to fetch Survey from SurveyId
 	 * 
@@ -119,7 +119,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException;
-	
+
 	/**
 	 * Method to update Survey Question and answers
 	 * 
@@ -127,7 +127,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public void updateQuestionAndAnswers(User user, long questionId, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException;
-	
+
 	/**
 	 * Method to reorder Survey Questions
 	 * 
@@ -135,7 +135,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public void reorderQuestion(User user, long questionId, String reorderType) throws InvalidInputException;
-	
+
 	/**
 	 * Method to clone Survey from template
 	 * 
@@ -143,4 +143,12 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public void cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method to fetch Survey Questions.
+	 * 
+	 * @param agentId
+	 * @throws InvalidInputException
+	 */
+	public List<SurveyQuestionDetails> getSurveyByAgenId(long agentId) throws InvalidInputException;
 }
