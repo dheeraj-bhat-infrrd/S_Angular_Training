@@ -10,7 +10,7 @@ import java.sql.Timestamp;
  * 
  */
 @Entity
-@Table(name="vertical_crm_mapping")
+@Table(name="VERTICAL_CRM_MAPPING")
 @NamedQuery(name="VerticalCrmMapping.findAll", query="SELECT v FROM VerticalCrmMapping v")
 public class VerticalCrmMapping implements Serializable {
 	private static final long serialVersionUID = 1L;
