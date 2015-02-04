@@ -10,6 +10,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -281,6 +282,27 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in findAllActive().", hibernateException);
 			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<T> findProjectionsByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries) {
+		try {
+			Criteria crit = getSession().createCriteria(dataClass);
+			ProjectionList projections = Projections.projectionList();
+			for (String columnName : columnNames) {
+				projections.add(Projections.property(columnName));
+			}
+			crit.setProjection(projections);
+			for (Entry<String, Object> query : queries.entrySet()) {
+				crit.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+			return crit.list();
+		}
+		catch (HibernateException e) {
+			LOG.error("HibernateException caught in findProjectionsByKeyValue(). Reason: "+e.getMessage(), e);
+			throw new DatabaseException("HibernateException caught in findProjectionsByKeyValue().", e);
 		}
 	}
 
