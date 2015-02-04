@@ -10,7 +10,6 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
-import com.realtech.socialsurvey.core.entities.CompanyProfile;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -48,7 +47,7 @@ public interface OrganizationManagementService {
 	 * Gets the company settings of the user.
 	 * 
 	 * @param user
-	 * @return company settings 
+	 * @return company settings
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings getCompanySettings(User user) throws InvalidInputException;
@@ -163,11 +162,7 @@ public interface OrganizationManagementService {
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**
-<<<<<<< Updated upstream
 	 * Method to update logo of a company
-=======
-	 * Method to fetch company profile when profile name is provided
->>>>>>> Stashed changes
 	 * 
 	 * @param collection
 	 * @param companySettings
@@ -222,9 +217,8 @@ public interface OrganizationManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn)
-			throws InvalidInputException;
-	
+	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn) throws InvalidInputException;
+
 	/**
 	 * Method to update social media tokens in profile
 	 * 
@@ -233,8 +227,47 @@ public interface OrganizationManagementService {
 	 * @param mediaTokens
 	 * @throws InvalidInputException
 	 */
-	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens) throws InvalidInputException;
+	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
+			throws InvalidInputException;
 
 	// JIRA SS-97 by RM-06 : EOC
-	public CompanyProfile getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
+
+	/**
+	 * JIRA SS-117 by RM-02 Method to fetch company profile when profile name is provided
+	 * 
+	 * @param collection
+	 * @param companySettings
+	 * @param logo
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
+
+	/**
+	 * Method to get the region profile based on region and company profile name
+	 * 
+	 * @param companyProfileName
+	 * @param regionProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException;
+
+	/**
+	 * Method to get the branch profile based on branch and company profile name
+	 * 
+	 * @param companyProfileName
+	 * @param branchProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException;
+
+	/**
+	 * Method to fetch all regions of a company
+	 * 
+	 * @param companyProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException;
 }

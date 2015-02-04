@@ -79,5 +79,13 @@ public interface OrganizationUnitSettingsDao {
 	 * @return
 	 */
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName(String profileName, String collectionName);
+	
+	/**
+	 *  Method to fetch organization unit settings on the basis of profile url
+	 * @param profileUrl
+	 * @param collectionName
+	 * @return
+	 */
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName);
 
 }

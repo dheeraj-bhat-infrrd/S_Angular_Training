@@ -205,10 +205,19 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_GENERAL = 100;
 	public static final int ERROR_CODE_COMPANY_PROFILE_PRECONDITION_FAILURE = 101;
 	public static final int ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE = 102;
+	public static final int ERROR_CODE_REGION_PROFILE_PRECONDITION_FAILURE = 103;
+	public static final int ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE= 104;
+	public static final int ERROR_CODE_BRANCH_PROFILE_PRECONDITION_FAILURE = 105;
+	public static final int ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE= 106;
+	public static final int ERROR_CODE_REGION_FETCH_PRECONDITION_FAILURE = 107;
+	public static final int ERROR_CODE_REGION_FETCH_SERVICE_FAILURE= 108;
 
 	/**
 	 * Service codes
 	 */	
 	public static final int SERVICE_CODE_GENERAL = 100;
 	public static final int SERVICE_CODE_COMPANY_PROFILE = 101;
+	public static final int SERVICE_CODE_REGION_PROFILE = 102;
+	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
+	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
 }
