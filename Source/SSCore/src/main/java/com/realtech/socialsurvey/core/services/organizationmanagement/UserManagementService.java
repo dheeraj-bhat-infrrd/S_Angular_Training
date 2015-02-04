@@ -69,6 +69,27 @@ public interface UserManagementService {
 
 	// Method to assign a user to a particular branch.
 	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException, SolrException;
+	
+	/**
+	 * Assign a user directly under the company.
+	 * @param admin
+	 * @param userId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignUserToCompany(User admin, long userId) throws InvalidInputException, NoRecordsFetchedException, SolrException;
+	
+	/**
+	 * Assign a user directly to a region 
+	 * @param admin
+	 * @param userId
+	 * @param regionId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignUserToRegion(User admin, long userId, long regionId) throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 	// Method to unassign a user from branch.
 	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException;

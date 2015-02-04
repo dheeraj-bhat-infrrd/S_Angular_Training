@@ -268,12 +268,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
-	private void addIndividualAccountType(User user) throws InvalidInputException {
+	private void addIndividualAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.info("Method addIndividual started for user : " + user.getLoginName());
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
+		solrSearchService.addOrUpdateRegionToSolr(region);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -286,6 +288,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new branch");
 		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
+		solrSearchService.addOrUpdateBranchToSolr(branch);
 
 		LOG.debug("Creating user profile for branch admin");
 		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
@@ -324,6 +327,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
+		solrSearchService.addOrUpdateRegionToSolr(region);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -363,6 +367,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
+		solrSearchService.addOrUpdateRegionToSolr(region);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -398,6 +403,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		LOG.debug("Adding a new region");
 		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
+		solrSearchService.addOrUpdateRegionToSolr(region);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
