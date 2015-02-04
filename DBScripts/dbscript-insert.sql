@@ -13,5 +13,6 @@ INSERT into ss_user.ACCOUNTS_MASTER values(4,"Enterprise",1000,365,150,1,'2014-1
 -- Insert verticals_master table data Feb-2-2015
 INSERT INTO `verticals_master` VALUES (1,'BANKING',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(2,'MORTGAGE',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(3,'REALTOR',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1');
 
--- Insert verticals_crm_mapping table data Feb-2-2015
-INSERT INTO `verticals_crm_mapping` VALUES (1,1,'ENCOMPASS',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(2,2,'DOT LOOP',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1'),(3,3,'ENCOMPASS',1,'2015-02-02 07:00:00','1','2015-02-02 07:00:00','1');
+-- Insert crm_master table data Feb-4-2015
+INSERT INTO `ss_user`.`crm_master` (`CRM_MASTER_ID`, `CRM_NAME`, `STATUS`, `CREATED_ON`, `CREATED_BY`, `MODIFIED_ON`, `MODIFIED_BY`) VALUES ('1', 'ENCOMPASS', '1', '2015-02-04 12:30:00', '1', '2015-02-04 12:30:00', '1');
+INSERT INTO `ss_user`.`crm_master` (`CRM_MASTER_ID`, `CRM_NAME`, `STATUS`, `CREATED_ON`, `CREATED_BY`, `MODIFIED_ON`, `MODIFIED_BY`) VALUES ('2', 'DOTLOOP', '1', '2015-02-04 12:30:00', '1', '2015-02-04 12:30:00', '1');

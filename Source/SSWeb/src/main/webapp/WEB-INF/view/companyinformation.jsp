@@ -87,7 +87,7 @@
 						<c:if test="${not empty verticals }">
 							<div class="login-input-wrapper margin-0-auto clearfix">
 								<select name="vertical" id="select-vertical" class="login-input-wrapper">
-									<option disabled selected>Select a vertical </option>
+									<option disabled selected><spring:message code="label.vertical.key"/></option>
 									<c:forEach items="${verticals }" var="vertical">
 										<option id="vertical-${vertical.verticalsMasterId }">${vertical.verticalName}</option>
 									</c:forEach>

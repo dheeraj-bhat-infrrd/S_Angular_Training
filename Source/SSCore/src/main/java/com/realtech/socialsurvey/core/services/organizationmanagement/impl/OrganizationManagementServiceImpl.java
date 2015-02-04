@@ -26,7 +26,6 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
-import com.realtech.socialsurvey.core.entities.DotLoopCrmInfo;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -40,7 +39,6 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.VerticalsCrmMapping;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
@@ -61,7 +59,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
-	private static Map<Integer, VerticalsCrmMapping> verticalsCrmMappingsMap = new HashMap<Integer, VerticalsCrmMapping>();
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -89,9 +86,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private GenericDao<VerticalsMaster, Integer> verticalMastersDao;
-
-	@Autowired
-	private GenericDao<VerticalsCrmMapping, Integer> verticalCrmMappingDao;
 
 	@Autowired
 	private UserManagementService userManagementService;
@@ -289,18 +283,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		MailIdSettings mailIdSettings = new MailIdSettings();
 		mailIdSettings.setWork(user.getEmailId());
 		contactDetailSettings.setMail_ids(mailIdSettings);
-		// Add crm source type in company settings
-		String crm_source = organizationalDetails.get(CommonConstants.CRM_SOURCE);
-		if (crm_source.equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
-			EncompassCrmInfo crmInfo = new EncompassCrmInfo();
-			crmInfo.setCrm_source(organizationalDetails.get(CommonConstants.CRM_SOURCE));
-			companySettings.setCrm_info(crmInfo);
-		}
-		else if (crm_source.equalsIgnoreCase(CommonConstants.CRM_SOURCE_DOTLOOP)) {
-			DotLoopCrmInfo crmInfo = new DotLoopCrmInfo();
-			crmInfo.setCrm_source(organizationalDetails.get(CommonConstants.CRM_SOURCE));
-			companySettings.setCrm_info(crmInfo);
-		}
+		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
@@ -910,8 +893,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("afterPropertiesSet called for organization managemnet service");
 		// Populate the verticals master map
 		populateVerticalMastersMap();
-		// Populate vertical crm mapping map
-		populateVerticalCrmMappingMap();
 		LOG.info("afterPropertiesSet finished for organization managemnet service");
 
 	}
@@ -921,23 +902,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	private void populateVerticalMastersMap() {
 		LOG.debug("Method called to populate vertical masters table");
-		List<VerticalsMaster> verticalsMasters = verticalMastersDao.findAll(VerticalsMaster.class);
+		List<VerticalsMaster> verticalsMasters = verticalMastersDao.findAllActive(VerticalsMaster.class);
 		if (verticalsMasters != null && !verticalsMasters.isEmpty()) {
 			for (VerticalsMaster verticalsMaster : verticalsMasters) {
 				verticalsMastersMap.put(verticalsMaster.getVerticalsMasterId(), verticalsMaster);
-			}
-		}
-	}
-
-	/**
-	 * Method to populate vertical-crm-mapping table
-	 */
-	private void populateVerticalCrmMappingMap() {
-		LOG.debug("Method called to populate vertical-crm mapping table");
-		List<VerticalsCrmMapping> verticalsCrmMappings = verticalCrmMappingDao.findAll(VerticalsCrmMapping.class);
-		if (verticalsCrmMappings != null && !verticalsCrmMappings.isEmpty()) {
-			for (VerticalsCrmMapping verticalCrmMapping : verticalsCrmMappings) {
-				verticalsCrmMappingsMap.put(verticalCrmMapping.getVerticalMappingId(), verticalCrmMapping);
 			}
 		}
 	}
@@ -954,23 +922,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method getAllVerticalsMaster successfully finished");
 		return verticalsMasters;
-	}
-
-	@Override
-	public String getCrmSourceByVerticalName(String vertical) throws InvalidInputException {
-		String crmSource = null;
-		if (vertical == null || vertical.isEmpty()) {
-			throw new InvalidInputException("Vertical passed was null or empty");
-		}
-		LOG.info("Method getCrmSourceByVerticalName called to fetch the crm source for for vertical - {}", vertical);
-		for (Map.Entry<Integer, VerticalsCrmMapping> entry : verticalsCrmMappingsMap.entrySet()) {
-			VerticalsCrmMapping mapping = entry.getValue();
-			if (mapping.getVerticalsMaster().getVerticalName().equals(vertical)) {
-				crmSource = mapping.getCrmSource();
-				break;
-			}
-		}
-		return crmSource;
 	}
 
 }

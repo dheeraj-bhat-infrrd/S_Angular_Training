@@ -238,14 +238,5 @@ public interface OrganizationManagementService {
 	 */
 	public List<VerticalsMaster> getAllVerticalsMaster() throws InvalidInputException;
 
-	/**
-	 * Method to get crm source mapped to the vertical with the vertical name
-	 * 
-	 * @param vertical
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	public String getCrmSourceByVerticalName(String vertical) throws InvalidInputException;
-
 	// JIRA SS-97 by RM-06 : EOC
 }

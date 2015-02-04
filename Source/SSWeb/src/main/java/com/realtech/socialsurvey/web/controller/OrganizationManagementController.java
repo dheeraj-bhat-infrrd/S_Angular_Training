@@ -169,9 +169,7 @@ public class OrganizationManagementController {
 			if (logoName != null) {
 				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
 			}
-			//Get the corresponding crm source for the vertical
-			String crmSource = organizationManagementService.getCrmSourceByVerticalName(vertical);
-			companyDetails.put(CommonConstants.CRM_SOURCE, crmSource);
+			companyDetails.put(CommonConstants.VERTICAL, vertical);
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
