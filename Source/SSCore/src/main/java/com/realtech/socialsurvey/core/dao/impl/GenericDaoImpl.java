@@ -270,6 +270,21 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<T> findAllActive(Class<T> entityClass) {
+		try {
+			Criteria crit = getSession().createCriteria(entityClass);
+			crit.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+			return crit.list();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findAllActive().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
+		}
+	}
+	
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<T> findByKeyValueAscending(Class<T> dataClass, Map<String, Object> queries, String ascendingColumn) {
@@ -286,21 +301,5 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	@Transactional
-	public List<T> findAllActive(Class<T> entityClass) {
-		try {
-			Criteria crit = getSession().createCriteria(entityClass);
-			crit.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
-			return crit.list();
-		}
-		catch (HibernateException hibernateException) {
-			LOG.error("HibernateException caught in findAllActive().", hibernateException);
-			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
-		}
-	}
-
 }
 // JIRA: SS-8: By RM05: EOC
