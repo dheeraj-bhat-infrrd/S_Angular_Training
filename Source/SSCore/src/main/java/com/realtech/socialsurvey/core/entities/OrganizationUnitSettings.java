@@ -20,6 +20,7 @@ public class OrganizationUnitSettings {
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
 	private ContactDetailsSettings contact_details;
+	private String vertical;
 	private CRMInfo crm_info;
 	private MailContentSettings mail_content;
 	private Licenses licenses;
@@ -103,6 +104,14 @@ public class OrganizationUnitSettings {
 
 	public void setContact_details(ContactDetailsSettings contact_details) {
 		this.contact_details = contact_details;
+	}
+
+	public String getVertical() {
+		return vertical;
+	}
+
+	public void setVertical(String vertical) {
+		this.vertical = vertical;
 	}
 
 	public CRMInfo getCrm_info() {
@@ -205,9 +214,9 @@ public class OrganizationUnitSettings {
 	public String toString() {
 		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
 				+ profileName + ", profileUrl=" + profileUrl + ", logo=" + logo + ", isLocationEnabled=" + isLocationEnabled + ", isAccountDisabled="
-				+ isAccountDisabled + ", contact_details=" + contact_details + ", crm_info=" + crm_info + ", mail_content=" + mail_content
-				+ ", licenses=" + licenses + ", associations=" + associations + ", achievements=" + achievements + ", survey_settings="
-				+ survey_settings + ", socialMediaTokens=" + socialMediaTokens + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
-				+ ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
+				+ isAccountDisabled + ", contact_details=" + contact_details + ", vertical=" + vertical + ", crm_info=" + crm_info
+				+ ", mail_content=" + mail_content + ", licenses=" + licenses + ", associations=" + associations + ", achievements=" + achievements
+				+ ", survey_settings=" + survey_settings + ", socialMediaTokens=" + socialMediaTokens + ", lockSettings=" + lockSettings
+				+ ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
 	}
 }

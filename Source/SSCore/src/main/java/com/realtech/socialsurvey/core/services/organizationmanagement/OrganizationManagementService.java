@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -229,6 +230,13 @@ public interface OrganizationManagementService {
 	 */
 	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
+
+	/**
+	 * Method to fetch the verticals master list
+	 * 
+	 * @return
+	 */
+	public List<VerticalsMaster> getAllVerticalsMaster() throws InvalidInputException;
 
 	// JIRA SS-97 by RM-06 : EOC
 

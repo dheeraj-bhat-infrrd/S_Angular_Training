@@ -2,12 +2,15 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -24,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
@@ -37,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -50,10 +55,12 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
+@DependsOn("generic")
 @Component
-public class OrganizationManagementServiceImpl implements OrganizationManagementService {
+public class OrganizationManagementServiceImpl implements OrganizationManagementService, InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
+	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -80,6 +87,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Autowired
+	private GenericDao<VerticalsMaster, Integer> verticalMastersDao;
+
+	@Autowired
 	private UserManagementService userManagementService;
 
 	@Autowired
@@ -102,7 +112,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * profiles.
 	 * 
 	 * @throws SolrException
+	 *             <<<<<<< HEAD
 	 * @throws InvalidInputException
+	 *             ======= >>>>>>> upstream/master
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
@@ -281,6 +293,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		MailIdSettings mailIdSettings = new MailIdSettings();
 		mailIdSettings.setWork(user.getEmailId());
 		contactDetailSettings.setMail_ids(mailIdSettings);
+		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		companySettings.setCreatedOn(System.currentTimeMillis());
@@ -533,8 +546,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
 		// Decrypting the encompass password
-		if (companySettings != null && companySettings.getCrm_info() != null) {
-			CRMInfo crmInfo = companySettings.getCrm_info();
+		if (companySettings != null && companySettings.getCrm_info() != null
+				&& companySettings.getCrm_info().getCrm_source().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
+			EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
 
 			String encryptedPassword = crmInfo.getCrm_password();
 			String decryptedPassword = encryptionHelper.decryptAES(encryptedPassword, "");
@@ -996,6 +1010,42 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.warn("No company settings found for profileName : " + companyProfileName);
 		}
 		return regions;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.info("afterPropertiesSet called for organization managemnet service");
+		// Populate the verticals master map
+		populateVerticalMastersMap();
+		LOG.info("afterPropertiesSet finished for organization managemnet service");
+
+	}
+
+	/**
+	 * Method to populate the vertical master map
+	 */
+	private void populateVerticalMastersMap() {
+		LOG.debug("Method called to populate vertical masters table");
+		List<VerticalsMaster> verticalsMasters = verticalMastersDao.findAllActive(VerticalsMaster.class);
+		if (verticalsMasters != null && !verticalsMasters.isEmpty()) {
+			for (VerticalsMaster verticalsMaster : verticalsMasters) {
+				verticalsMastersMap.put(verticalsMaster.getVerticalsMasterId(), verticalsMaster);
+			}
+		}
+	}
+
+	@Override
+	public List<VerticalsMaster> getAllVerticalsMaster() throws InvalidInputException {
+		LOG.info("Method getAllVerticalsMaster called to fetch the list of vertical masters");
+		List<VerticalsMaster> verticalsMasters = new ArrayList<>();
+		for (Map.Entry<Integer, VerticalsMaster> entry : verticalsMastersMap.entrySet()) {
+			verticalsMasters.add(entry.getValue());
+		}
+		if (verticalsMasters.isEmpty()) {
+			throw new InvalidInputException("No verticals master found");
+		}
+		LOG.info("Method getAllVerticalsMaster successfully finished");
+		return verticalsMasters;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
