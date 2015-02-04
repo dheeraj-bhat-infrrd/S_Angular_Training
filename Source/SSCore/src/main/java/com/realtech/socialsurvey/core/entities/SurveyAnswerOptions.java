@@ -4,7 +4,7 @@ package com.realtech.socialsurvey.core.entities;
  * Stores answer to a specific question and order in which answer should appear for Multiple Choice
  * Questions.
  */
-public class SurveyAnswer {
+public class SurveyAnswerOptions {
 
 	private long answerId;
 	private String answerText;
