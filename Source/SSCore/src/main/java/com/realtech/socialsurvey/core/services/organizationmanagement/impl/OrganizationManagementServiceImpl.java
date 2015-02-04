@@ -996,15 +996,31 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @return
 	 * @throws InvalidInputException
 	 */
+	@Override
+	@Transactional
 	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException {
 		LOG.info("Method getRegionsForCompany called for companyProfileName:" + companyProfileName);
 		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
 		List<Region> regions = null;
 		if (companySettings != null) {
 			long companyId = companySettings.getIden();
-
 			LOG.debug("Fetching regions for company : " + companyId);
-			regions = regionDao.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, companyDao.findById(Company.class, companyId));
+			
+			/**
+			 * Adding columns to be fetched in the list
+			 */
+			List<String> columnNames = new ArrayList<String>();
+			columnNames.add(CommonConstants.REGION_NAME_COLUMN);
+			columnNames.add(CommonConstants.REGION_ID_COLUMN);
+			
+			/**
+			 * Building criteria
+			 */
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.COMPANY_COLUMN, companyDao.findById(Company.class, companyId));
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
+			regions = regionDao.findProjectionsByKeyValue(Region.class, columnNames, queries);
 		}
 		else {
 			LOG.warn("No company settings found for profileName : " + companyProfileName);

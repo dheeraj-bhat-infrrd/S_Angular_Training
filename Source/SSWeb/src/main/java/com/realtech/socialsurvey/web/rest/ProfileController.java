@@ -160,7 +160,7 @@ public class ProfileController {
 	 * @throws InvalidInputException
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/{companyProfileName/regions}")
+	@RequestMapping(value = "/{companyProfileName}/regions")
 	public Response getRegionsForCompany(@PathVariable String companyProfileName) throws InvalidInputException {
 		LOG.info("Service to get regions for company called for companyProfileName:" + companyProfileName);
 		Response response = null;

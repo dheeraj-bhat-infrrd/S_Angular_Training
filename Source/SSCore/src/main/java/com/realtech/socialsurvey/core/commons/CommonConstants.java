@@ -86,9 +86,10 @@ public interface CommonConstants {
 	public static final String IS_OWNER_COLUMN = "isOwner";
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
+	public static final String REGION_ID_COLUMN = "regionId";
 	public static final String BRANCH_ID_COLUMN = "branchId";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
-
+	public static final String REGION_NAME_COLUMN = "region";
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
