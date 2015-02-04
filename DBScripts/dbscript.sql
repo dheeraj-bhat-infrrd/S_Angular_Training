@@ -534,7 +534,7 @@ ENGINE = InnoDB
 COMMENT = 'Holds the information of users which have been removed from the company.';
 
 --CREATE scripts : 02 FEB 2015 : Table for verticals master
-CREATE TABLE `verticals_master` (
+CREATE TABLE `ss_user`.`verticals_master` (
   `VERTICALS_MASTER_ID` int(11) NOT NULL,
   `VERTICAL_NAME` varchar(45) NOT NULL,
   `STATUS` int(1) NOT NULL,
@@ -546,7 +546,7 @@ CREATE TABLE `verticals_master` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   
 --CREATE scripts : 02 FEB 2015 : Table for crm_master
-  CREATE TABLE `crm_master` (
+  CREATE TABLE `ss_user`.`crm_master` (
   `CRM_MASTER_ID` int(11) NOT NULL,
   `CRM_NAME` varchar(45) NOT NULL,
   `STATUS` int(1) NOT NULL,
@@ -558,7 +558,7 @@ CREATE TABLE `verticals_master` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  
  --CREATE scripts : 02 FEB 2015 : Table for vertical_crm_mapping
-SELECT * FROM ss_user.users;CREATE TABLE `vertical_crm_mapping` (
+CREATE TABLE `ss_user`.`vertical_crm_mapping` (
   `VERTICAL_CRM_MAPPING_ID` int(11) NOT NULL,
   `VERTICAL_ID` int(11) NOT NULL,
   `CRM_ID` int(11) NOT NULL,
