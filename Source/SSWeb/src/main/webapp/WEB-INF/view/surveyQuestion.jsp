@@ -97,6 +97,60 @@
                 </div>
                 <div class="sq-np-wrapper clearfix">
                     <div class="float-left sq-np-item sq-np-item-prev">&lt;&lt;&nbsp;&nbsp;&nbsp;Previous</div>
+                    <div class="float-left sq-np-item sq-np-item-next">Next&nbsp;&nbsp;&nbsp;&gt;&gt;</div>
+                </div>
+                <div class="sq-btn-wrapper">
+                    <div class="sq-btn-continue">Continue</div>
+                </div>
+            </div>
+            <div quest-no="4" class="sq-quest-item hide">
+                <div class="sq-top-img"></div>
+                <div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
+                <div class="sq-bord-bot-sm"></div>
+                <div class="sq-ques">
+                    <i><span class="sq-ques-txt">lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler.</span></i>
+                </div>
+                <div class="sq-rat-wrapper">
+                    <div class="sq-mcq-wrapper">
+                        <div class="sq-mcq-item clearfix">
+                            <div class="sq-mcq-chk-wrapper float-left">
+                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
+                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
+                            </div>
+                            <div class="sq-mcq-ans-wrapper float-left">lorem ipsum dore it ler. lorem ipsum dore</div>
+                        </div>
+                        <div class="sq-mcq-item clearfix">
+                            <div class="sq-mcq-chk-wrapper float-left">
+                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
+                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
+                            </div>
+                            <div class="sq-mcq-ans-wrapper float-left">lorem ipsum dore it ler vdore it lerdore it lerdore it lervdore it ler dore it ler. lorem ipsum dore</div>
+                        </div>
+                        <div class="sq-mcq-item clearfix">
+                            <div class="sq-mcq-chk-wrapper float-left">
+                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
+                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
+                            </div>
+                            <div class="sq-mcq-ans-wrapper float-left">lorem. lorem ipsum dore</div>
+                        </div>
+                        <div class="sq-mcq-item clearfix">
+                            <div class="sq-mcq-chk-wrapper float-left">
+                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
+                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
+                            </div>
+                            <div class="sq-mcq-ans-wrapper float-left">lorem ipsum dore it ler. lorem ipsum dore</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="sq-skip-main">
+                    <div class="sq-skip-wrapper clearfix">
+                        <div class="float-left sq-skip-chk st-checkbox-on hide"></div>
+                        <div class="float-left sq-skip-chk st-checkbox-off"></div>
+                        <div class="float-left sq-skip-txt"><i>Skip this question</i></div>
+                    </div>
+                </div>
+                <div class="sq-np-wrapper clearfix">
+                    <div class="float-left sq-np-item sq-np-item-prev">&lt;&lt;&nbsp;&nbsp;&nbsp;Previous</div>
                     <div class="float-left sq-np-item sq-np-item-next sq-np-item-disabled">Next&nbsp;&nbsp;&nbsp;&gt;&gt;</div>
                 </div>
                 <div class="sq-btn-wrapper">
@@ -123,6 +177,18 @@
                     $(this).addClass('sq-full-star');
                 }
             });
+        });
+        
+        $('.st-mcq-chk-on').click(function(){
+            $(this).hide();
+            $(this).parent().find('.st-mcq-chk-off').show();
+        });
+        
+        $('.st-mcq-chk-off').click(function(){
+            $('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
+            $('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
+            $(this).hide();
+            $(this).parent().find('.st-mcq-chk-on').show();
         });
         
         $('.st-checkbox-on').click(function(){
