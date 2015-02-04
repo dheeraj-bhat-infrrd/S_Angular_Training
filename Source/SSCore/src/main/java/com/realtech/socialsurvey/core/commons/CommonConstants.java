@@ -114,6 +114,8 @@ public interface CommonConstants {
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
 	public static final String COUNTRY_CODE = "countryCode";
 	public static final String COUNTRY = "country";
+	public static final String CRM_SOURCE = "crm_source";
+	public static final String VERTICAL = "vertical";
 	
 	/**
 	 * Batch Constants
@@ -165,6 +167,8 @@ public interface CommonConstants {
 	
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
+	public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
+	public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
 	
 	// mail content
 	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
