@@ -41,6 +41,14 @@ function validateLoginForm(id) {
 	return true;
 }
 
+function loginUser() {
+	console.log("submitting login form");
+	if (validateLoginForm('login-form')) {
+		$('#login-form').submit();
+		showOverlay();
+	}
+}
+
 // Function to validate registration form
 function validateRegistrationForm(id) {
 	// hide the server error
@@ -143,7 +151,6 @@ function validateRegPassword(elementId) {
 		showToast();
 		return false;
 	}
-
 }
 
 // Function to match password and confirm password
@@ -162,5 +169,63 @@ function validateRegConfirmPassword(pwdId, confirmPwdId) {
 		showToast();
 		return false;
 	}
+}
 
+function submitRegistrationForm() {
+	console.log("submitting registration form");
+	if(validateRegistrationForm('reg-form')){
+		$('#registration-form').submit();
+		showOverlay();
+	}
+}
+
+// Find a professional
+function validateRegFirstName(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (nameRegex.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter a valid first name.');
+			showToast();
+			return false;
+		}
+	} else {
+		$('#overlay-toast').html('Please enter first name.');
+		showToast();
+		return false;
+	}
+}
+
+// Function to validate the last name
+function validateRegLastName(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter a valid last name.');
+			showToast();
+			return false;
+		}
+	} else {
+		return true;
+	}
+}
+
+//Function to validate registration form
+function validateFindProForm(id) {
+	$("#serverSideerror").hide();
+	if (!validateRegFirstName('find-pro-first-name') && !validateRegLastName('find-pro-last-name')) {
+		$('#find-pro-first-name').focus();
+		return false;
+	}
+	return true;
+}
+
+function submitFindProForm() {
+	console.log("Submitting Find a Profile form");
+	if(validateFindProForm('find-pro-form')){
+		$('#find-pro-form').submit();
+		showOverlay();
+	}
+	showOverlay();
 }

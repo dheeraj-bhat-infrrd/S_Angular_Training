@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <!DOCTYPE">
 <html>
 <head>
@@ -32,11 +31,13 @@
         <div class="t-pro-wrapper">
             <div class="t-container clearfix">
                 <div class="float-left t-pro-txt">Looking for a Pro?</div>
-                <div class="float-right t-pro-search">
-                    <input class="t-inp" placeholder="First Name">
-                    <input class="t-inp" placeholder="Last Name">
-                    <div class="t-btn">Search</div>
-                </div>
+                <form id="find-pro-form" method="POST" action="./findaprofile.do">
+	                <div class="float-right t-pro-search">
+    	                <input id="find-pro-first-name" name="find-pro-first-name" class="t-inp" placeholder="First Name">
+    	                <input id="find-pro-last-name" name="find-pro-last-name" class="t-inp" placeholder="Last Name">
+        	            <div id="find-pro-submit" class="t-btn">Search</div>
+        	        </div>
+                </form>
             </div>
         </div>
         <div class="t-main-wrapper t-container clearfix">
@@ -90,13 +91,13 @@
             $('#login-submit').click(function(){
                 loginUser();
             });
-           
+
             $('#reg-submit').click(function() {
-				submitRegistrationForm();
-			});
-            
+            	submitRegistrationForm();
+            });
+
             /**
-            *Form validation for login page
+            * Form validation for login page
             */
             $('#login-user-id').blur(function() {
             	validateUserId(this.id);
@@ -104,45 +105,32 @@
             $('#login-pwd').blur(function(){
             	validateLoginPassword(this.id);
             });
-            
-            /* ==Functions to trigger form validation of various input elements== */
-			$('#reg-fname').blur(function() {
-				validateRegFirstName(this.id);
-			});
-			
-			$('#reg-lname').blur(function() {
-				validateRegLastName(this.id);
-			});
-			
-			$('#reg-email').blur(function() {
-				validateRegEmailId(this.id);
-			});
-			
-			$('#reg-pwd').blur(function() {
-				validateRegPassword(this.id);
-			});
-			
-			$('#reg-conf-pwd').blur(function(){
-				validateRegConfirmPassword('reg-pwd',this.id);
-			});
-			
-			function loginUser() {
-				console.log("submitting login form");
-				if (validateLoginForm('login-form')) {
-					$('#login-form').submit();
-					showOverlay();
-				}
-			}
 
-			function submitRegistrationForm() {
-				console.log("submitting registration form");
-				if(validateRegistrationForm('reg-form')){
-					$('#registration-form').submit();
-					showOverlay();
-				}
-			}
-        });
+            /* ==Functions to trigger form validation of various input elements== */
+            $('#reg-fname').blur(function() {
+            	validateRegFirstName(this.id);
+            });
+
+            $('#reg-lname').blur(function() {
+            	validateRegLastName(this.id);
+            });
+
+            $('#reg-email').blur(function() {
+            	validateRegEmailId(this.id);
+            });
+
+            $('#reg-pwd').blur(function() {
+            	validateRegPassword(this.id);
+            });
+
+            $('#reg-conf-pwd').blur(function(){
+            	validateRegConfirmPassword('reg-pwd',this.id);
+            });
+
+            $('#find-pro-submit').click(function() {
+            	submitFindProForm();
+            });
+		});
     </script>
-    
 </body>
 </html>

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.solr.common.SolrDocument;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -961,6 +962,50 @@ public class UserManagementController {
 			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
 		LOG.debug("change password form parameters validated successfully");
+	}
+	
+	/*
+	 * Method to find a user on the basis of email id provided.
+	 */
+	@RequestMapping(value = "/findaprofile", method = RequestMethod.POST)
+	public String findAProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method findAProfile called.");
+		List<SolrDocument> users;
+		String patternFirst;
+		String patternLast;
+		
+		try {
+			patternFirst = request.getParameter("find-pro-first-name");
+			patternLast = request.getParameter("find-pro-last-name");
+			if (patternFirst == null && patternLast == null) {
+				LOG.error("Invalid search key passed in method findAProfile().");
+				throw new InvalidInputException("Invalid searchKey passed in method findAProfile().");
+			}
+
+			try {
+				users = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), e);
+			}
+			catch (MalformedURLException e) {
+				LOG.error("Error occured while searching in findAProfile(). Reason is ", e);
+				throw new NonFatalException("Error occured while searching in findAProfile(). Reason is ", e);
+			}
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
+			return JSONUtil.toJSON(errorResponse);
+		}
+		model.addAttribute("users", users);
+		model.addAttribute("patternFirst", patternFirst);
+		model.addAttribute("patternLast", patternLast);
+		
+		LOG.info("Method findAProfile finished.");
+		return JspResolver.PROFILE_LIST;
 	}
 }
 // JIRA SS-77 BY RM07 EOC
