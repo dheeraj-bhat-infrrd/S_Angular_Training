@@ -73,7 +73,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional
 	public List<T> findAll(Class<T> entityClass) {
 		try {
 			final Criteria crit = getSession().createCriteria(entityClass);
