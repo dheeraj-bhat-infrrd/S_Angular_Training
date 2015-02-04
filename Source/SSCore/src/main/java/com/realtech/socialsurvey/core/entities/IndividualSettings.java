@@ -4,16 +4,34 @@ import java.util.List;
 
 public class IndividualSettings extends OrganizationUnitSettings{
 
-	private long userId;
+	private long iden;
+	private long companyId;
+	private boolean companyAdmin;
 	private List<String> expertise;
 	private List<String> hobbies;
 
-	public long getUserId() {
-		return userId;
+	public long getIden() {
+		return iden;
 	}
 
-	public void setUserId(long userId) {
-		this.userId = userId;
+	public void setIden(long iden) {
+		this.iden = iden;
+	}
+
+	public long getCompanyId() {
+		return companyId;
+	}
+
+	public void setCompanyId(long companyId) {
+		this.companyId = companyId;
+	}
+
+	public boolean isCompanyAdmin() {
+		return companyAdmin;
+	}
+
+	public void setCompanyAdmin(boolean companyAdmin) {
+		this.companyAdmin = companyAdmin;
 	}
 
 	public List<String> getExpertise() {
@@ -34,6 +52,6 @@ public class IndividualSettings extends OrganizationUnitSettings{
 
 	@Override
 	public String toString() {
-		return "\t userId: " + userId;
+		return "\t userId: " + iden;
 	}
 }
