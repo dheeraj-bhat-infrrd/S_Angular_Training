@@ -37,7 +37,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
 
 	public static final String KEY_PROFILE_NAME = "profileName";
-	public static final String KEY_LOGO = "logo"; 
+	public static final String KEY_PROFILE_URL = "profileUrl";
+	public static final String KEY_LOGO = "logo";
 	public static final String KEY_CONTACT_DETAILS = "contact_details";
 	public static final String KEY_ASSOCIATION = "associations";
 	public static final String KEY_ACHIEVEMENTS = "achievements";
@@ -173,11 +174,26 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	@Override
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName(String profileName, String collectionName) {
 		LOG.info("Method fetchOrganizationUnitSettingsByProfileName called for profileName:" + profileName + " and collectionName:" + collectionName);
-		
+
 		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_PROFILE_NAME, profileName)),
 				OrganizationUnitSettings.class, collectionName);
-		
+
 		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
+		return organizationUnitSettings;
+	}
+
+	/**
+	 * Method to fetch organization settings based on profile url
+	 */
+
+	@Override
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName) {
+		LOG.info("Method fetchOrganizationUnitSettingsByProfileUrl called for profileUrl:" + profileUrl + " and collectionName:" + collectionName);
+
+		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_PROFILE_URL, profileUrl)),
+				OrganizationUnitSettings.class, collectionName);
+
+		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileUrl");
 		return organizationUnitSettings;
 	}
 

@@ -15,6 +15,7 @@ public class OrganizationUnitSettings {
 	private long iden;
 	private float profile_completion;
 	private String profileName;
+	private String profileUrl;
 	private String logo;
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
@@ -26,6 +27,7 @@ public class OrganizationUnitSettings {
 	private List<Achievement> achievements;
 	private SurveySettings survey_settings;
 	private SocialMediaTokens socialMediaTokens;
+	private LockSettings lockSettings;
 	private String createdBy;
 	private String modifiedBy;
 	private long createdOn;
@@ -61,6 +63,14 @@ public class OrganizationUnitSettings {
 
 	public void setProfileName(String profileName) {
 		this.profileName = profileName;
+	}
+	
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
 	}
 
 	public String getLogo() {
@@ -146,6 +156,14 @@ public class OrganizationUnitSettings {
 	public SocialMediaTokens getSocialMediaTokens() {
 		return socialMediaTokens;
 	}
+	
+	public LockSettings getLockSettings() {
+		return lockSettings;
+	}
+
+	public void setLockSettings(LockSettings lockSettings) {
+		this.lockSettings = lockSettings;
+	}
 
 	public void setSocialMediaTokens(SocialMediaTokens socialMediaTokens) {
 		this.socialMediaTokens = socialMediaTokens;
@@ -186,10 +204,10 @@ public class OrganizationUnitSettings {
 	@Override
 	public String toString() {
 		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
-				+ profileName + ", logo=" + logo + ", isLocationEnabled=" + isLocationEnabled + ", isAccountDisabled=" + isAccountDisabled
-				+ ", contact_details=" + contact_details + ", crm_info=" + crm_info + ", mail_content=" + mail_content + ", licenses=" + licenses
-				+ ", associations=" + associations + ", achievements=" + achievements + ", survey_settings=" + survey_settings + ", createdBy="
-				+ createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
+				+ profileName + ", profileUrl=" + profileUrl + ", logo=" + logo + ", isLocationEnabled=" + isLocationEnabled + ", isAccountDisabled="
+				+ isAccountDisabled + ", contact_details=" + contact_details + ", crm_info=" + crm_info + ", mail_content=" + mail_content
+				+ ", licenses=" + licenses + ", associations=" + associations + ", achievements=" + achievements + ", survey_settings="
+				+ survey_settings + ", socialMediaTokens=" + socialMediaTokens + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy
+				+ ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
 	}
-
 }

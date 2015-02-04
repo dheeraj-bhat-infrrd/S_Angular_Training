@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -20,12 +21,12 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.CompanyProfile;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
@@ -92,6 +93,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
+
+	@Autowired
+	private Utils utils;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -269,11 +273,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
 		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
 		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
-		//Add work phone number in contact details
+		// Add work phone number in contact details
 		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
 		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
 		contactDetailSettings.setContact_numbers(contactNumberSettings);
-		//Add work Mail id in contact details
+		// Add work Mail id in contact details
 		MailIdSettings mailIdSettings = new MailIdSettings();
 		mailIdSettings.setWork(user.getEmailId());
 		contactDetailSettings.setMail_ids(mailIdSettings);
@@ -281,7 +285,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
-		// insert the company settings
+		// TODO set lock settings
+		companySettings.setLockSettings(new LockSettings());
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -891,7 +896,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 
 		Licenses licenses = unitSettings.getLicenses();
-		if(licenses == null){
+		if (licenses == null) {
 			LOG.debug("Licenses not present for current profile, create a new license object");
 			licenses = new Licenses();
 		}
@@ -906,49 +911,91 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Override
 	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException {
-		if(mediaTokens == null){
+		if (mediaTokens == null) {
 			throw new InvalidInputException("Media tokens passed was null");
 		}
 		LOG.info("Updating the social media tokens in profile.");
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS, mediaTokens,
-				unitSettings, collection);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS,
+				mediaTokens, unitSettings, collection);
 		LOG.info("Successfully updated the social media tokens.");
 	}
-	
+
 	/**
 	 * JIRA:SS-117 by RM02 Method to get the company details based on profile name
 	 */
 	@Override
 	@Transactional
-	public CompanyProfile getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
 		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
 		if (profileName == null || profileName.isEmpty()) {
 			throw new InvalidInputException("profile name is null or empty while getting company details");
 		}
-		CompanyProfile companyProfile = new CompanyProfile();
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
+		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
+		return companySettings;
+	}
+
+	/**
+	 * Method to get the region based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException {
+		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
+
+		/**
+		 * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
+		 * unique, whereas profileName is unique only within a company
+		 */
+		String profileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
+		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.info("Method getRegionByProfileName excecuted successfully");
+		return regionSettings;
+	}
+
+	/**
+	 * Method to get the branch based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
+		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
+
+		/**
+		 * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
+		 * unique, whereas profileName is unique only within a company
+		 */
+		String profileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
+		OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		LOG.info("Method getBranchByProfileName excecuted successfully");
+		return branchSettings;
+	}
+
+	/**
+	 * Method to fetch all regions of a company
+	 * 
+	 * @param companyProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException {
+		LOG.info("Method getRegionsForCompany called for companyProfileName:" + companyProfileName);
+		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		List<Region> regions = null;
 		if (companySettings != null) {
-			companyProfile.setCompanySettings(companySettings);
 			long companyId = companySettings.getIden();
 
 			LOG.debug("Fetching regions for company : " + companyId);
-			List<Region> regions = regionDao
-					.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, companyDao.findById(Company.class, companyId));
-			if (regions != null && !regions.isEmpty()) {
-				companyProfile.setRegions(regions);
-			}
-			else {
-				LOG.warn("No regions present for company : " + companyId);
-			}
+			regions = regionDao.findByColumn(Region.class, CommonConstants.COMPANY_COLUMN, companyDao.findById(Company.class, companyId));
 		}
 		else {
-			LOG.warn("No company settings found for profileName : " + profileName);
+			LOG.warn("No company settings found for profileName : " + companyProfileName);
 		}
-
-		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
-		return companyProfile;
+		return regions;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
