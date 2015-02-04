@@ -19,7 +19,7 @@
     <div class="login-main-wrapper padding-001 login-wrapper-min-height">
         <div class="container login-container">
             <div class="row login-row">
-            	<form id="complet-registration-form" method="POST" action="./completeregistration.do">
+            	<form id="complete-registration-form" method="POST" action="./completeregistration.do">
 	                <div id="reset-pwd-div" class="login-wrapper-resp padding-001 margin-top-25 margin-bottom-25 login-wrapper bg-fff margin-0-auto col-xs-12">
 	                    <div class="logo login-logo margin-bottom-25 margin-top-25"></div>
 	                    <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.completeregistration.title.key"></spring:message></div>
@@ -108,8 +108,8 @@
             
             function submitCompleteRegistrationForm() {
             	console.log("submitting complete registration form");
-            	if(validateCompleteRegistrationForm('reset-pwd-form')){
-                	$('#complet-registration-form').submit();
+            	if(validateCompleteRegistrationForm()){
+                	$('#complete-registration-form').submit();
                 }
             }
             
@@ -139,7 +139,7 @@
 				validateConfirmPassword('complete-reg-pwd',this.id);
 			});
             
-            function validateCompleteRegistrationForm(id) {
+            function validateCompleteRegistrationForm() {
             	var isFocussed = false;
             	isFormValid = true;
             	var isSmallScreen = false;
