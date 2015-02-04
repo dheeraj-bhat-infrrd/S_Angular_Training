@@ -61,6 +61,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public void insertIndividualSettings(User user) {
 		IndividualSettings individualSettings = new IndividualSettings();
 		individualSettings.setUserId(user.getUserId());
+		individualSettings.setIden(user.getCompany().getCompanyId());
 		
 		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
 		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
