@@ -346,14 +346,24 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		
 		List<SolrDocument> users = new ArrayList<SolrDocument>();
 		QueryResponse response = null;
-		patternFirst = patternFirst + "*";
-		patternLast = patternLast + "*";
 		try {
 			SolrQuery solrQuery = new SolrQuery();
 			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
 					CommonConstants.USER_EMAIL_ID_SOLR };
 			solrQuery.setFields(fields);
-			solrQuery.setQuery(CommonConstants.USER_FIRST_NAME_SOLR + patternFirst + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast);
+			
+			String query = "";
+			if (!patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+			}
+			else if (!patternFirst.equals("") && patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
+			}
+			else if (patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+			}
+			solrQuery.setQuery(query);
+			
 			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 
