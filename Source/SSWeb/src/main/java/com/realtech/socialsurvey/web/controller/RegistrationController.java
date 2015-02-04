@@ -6,6 +6,7 @@ package com.realtech.socialsurvey.web.controller;
  * Registration Controller Sends an invitation to the corporate admin
  */
 
+import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
@@ -19,12 +20,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -48,7 +51,9 @@ public class RegistrationController {
 	private SessionHelper sessionHelper;
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-	
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
 		LOG.info("Showing invitation page");
@@ -229,6 +234,15 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			List<VerticalsMaster> verticalsMasters = null;
+			try {
+				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			model.addAttribute("verticals",verticalsMasters);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
@@ -307,7 +321,7 @@ public class RegistrationController {
 	 */
 	private void validateFormParameters(String firstName, String lastName, String emailId) throws InvalidInputException {
 		LOG.debug("Validating invitation form parameters");
-		
+
 		// check if first name is null or empty and only contains alphabets
 		if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
 			throw new InvalidInputException("Firstname is invalid in registration", DisplayMessageConstants.INVALID_FIRSTNAME);
@@ -349,8 +363,9 @@ public class RegistrationController {
 		 * criteria are same
 		 */
 		validateFormParameters(firstName, lastName, emailId);
-		
-		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX) || confirmPassword == null || confirmPassword.isEmpty()) {
+
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX) || confirmPassword == null
+				|| confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}
 		if (!password.equals(confirmPassword)) {
