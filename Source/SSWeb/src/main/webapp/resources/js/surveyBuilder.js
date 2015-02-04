@@ -90,6 +90,13 @@ function addQuestionCallback(response) {
 	
 	$('#sb-new-question-form :input').val('');
 	loadActiveSurvey();
+	
+	$('.sb-sel-icn-act').hide();
+	$('.sb-sel-icn-inact').show();
+	$('#sb-sel-desc').hide();
+	$('#sb-sel-desc').parent().find('.sb-sel-icn-act').show();
+	
+	$('#sb-question-type').val('sb-sel-desc');
 }
 
 // Edit/Update question
@@ -291,18 +298,24 @@ function commonActiveSurveyCallback(response){
 	$("#overlay-toast").html(response);
 	showToast();
 
+	$('#sb-ques-wrapper').html('');
 	loadActiveSurvey();
 }
 
 function loadActiveSurvey() {
-	var url = "./getactivesurveydetails.do";
+	var url = "./getactivesurveyquestions.do";
 	callAjaxGET(url, loadActiveSurveyCallback, true);
 }
 
 function loadActiveSurveyCallback(response) {
-	var surveyQuestions =  $.parseJSON(response);
+	var surveyDetail = $.parseJSON(response);
+	
+	// populate questions
+	var surveyQuestions = surveyDetail.questions;
 	var htmlData = "";
 	if (surveyQuestions != null) {
+		// Message header
+		htmlData = htmlData	+ '<div class="sb-quests-error">' + surveyDetail.status + '</div>';
 		
 		// Row Header
 		htmlData = htmlData
@@ -418,14 +431,16 @@ function loadActiveSurveyCallback(response) {
 				htmlData = htmlData
 					+ '<div class="float-left sb-q-btn sb-btn-reorder-up hide"></div>'
 					+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
-			} else if (countQues == lengthQuestions) {
+			}
+			else if (countQues == lengthQuestions) {
 				htmlData = htmlData
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-down hide"></div>';
-			} else {
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-down hide"></div>';
+			}
+			else {
 				htmlData = htmlData
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
-				+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-up"></div>'
+					+ '<div class="float-left sb-q-btn sb-btn-reorder-down"></div>';
 			}
 			
 			htmlData = htmlData

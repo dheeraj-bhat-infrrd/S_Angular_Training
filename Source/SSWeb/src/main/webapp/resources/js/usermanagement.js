@@ -18,7 +18,7 @@ $(document).on('click', '.tm-table-remove-icn', function(event) {
 	if (!isUserManagementAuthorized)
 		return false;
 	event.stopPropagation();
-	var userId = $(this).closest('.um-user-row').attr("id");
+	var userId = $(this).closest('.row').attr("data-id");
 	userId = userId.substr("um-user-".length);
 	confirmDeleteUser(userId);
 });
