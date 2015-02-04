@@ -9,10 +9,11 @@ public class SurveyQuestionDetails {
 
 	private long questionId;
 	private String question;
-	private List<SurveyAnswer> answers;
+	private List<SurveyAnswerOptions> answers;
 	private String questionType;
 	private int isRatingQuestion;
 	private int questionOrder;
+	private String customerResponse;
 
 	public long getQuestionId() {
 		return questionId;
@@ -30,11 +31,11 @@ public class SurveyQuestionDetails {
 		this.question = question;
 	}
 
-	public List<SurveyAnswer> getAnswers() {
+	public List<SurveyAnswerOptions> getAnswers() {
 		return answers;
 	}
 
-	public void setAnswers(List<SurveyAnswer> answers) {
+	public void setAnswers(List<SurveyAnswerOptions> answers) {
 		this.answers = answers;
 	}
 
@@ -60,5 +61,13 @@ public class SurveyQuestionDetails {
 
 	public void setQuestionOrder(int questionOrder) {
 		this.questionOrder = questionOrder;
+	}
+
+	public String getCustomerResponse() {
+		return customerResponse;
+	}
+
+	public void setCustomerResponse(String customerResponse) {
+		this.customerResponse = customerResponse;
 	}
 }

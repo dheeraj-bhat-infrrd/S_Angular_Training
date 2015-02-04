@@ -533,8 +533,8 @@ CREATE TABLE `ss_user`.`REMOVED_USER` (
 ENGINE = InnoDB
 COMMENT = 'Holds the information of users which have been removed from the company.';
 
---CREATE scripts : 02 FEB 2015 : Table for verticals master
-CREATE TABLE `verticals_master` (
+-- CREATE scripts : 02 FEB 2015 : Table for verticals master
+CREATE TABLE `ss_user`.`VERTICALS_MASTER` (
   `VERTICALS_MASTER_ID` int(11) NOT NULL,
   `VERTICAL_NAME` varchar(45) NOT NULL,
   `STATUS` int(1) NOT NULL,
@@ -545,8 +545,8 @@ CREATE TABLE `verticals_master` (
   PRIMARY KEY (`VERTICALS_MASTER_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
   
---CREATE scripts : 02 FEB 2015 : Table for crm_master
-  CREATE TABLE `crm_master` (
+-- CREATE scripts : 02 FEB 2015 : Table for CRM_MASTER
+CREATE TABLE `ss_user`.`CRM_MASTER` (
   `CRM_MASTER_ID` int(11) NOT NULL,
   `CRM_NAME` varchar(45) NOT NULL,
   `STATUS` int(1) NOT NULL,
@@ -557,8 +557,8 @@ CREATE TABLE `verticals_master` (
   PRIMARY KEY (`CRM_MASTER_ID`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  
- --CREATE scripts : 02 FEB 2015 : Table for vertical_crm_mapping
-CREATE TABLE `vertical_crm_mapping` (
+ -- CREATE scripts : 02 FEB 2015 : Table for vertical_crm_mapping
+CREATE TABLE `ss_user`.`VERTICAL_CRM_MAPPING` (
   `VERTICAL_CRM_MAPPING_ID` int(11) NOT NULL,
   `VERTICAL_ID` int(11) NOT NULL,
   `CRM_ID` int(11) NOT NULL,
@@ -571,8 +571,8 @@ CREATE TABLE `vertical_crm_mapping` (
   UNIQUE KEY `uk_vertical_crm_mapping` (`VERTICAL_ID`,`CRM_ID`,`STATUS`),
   KEY `VERTICAL_ID_idx` (`VERTICAL_ID`),
   KEY `CRM_ID_idx` (`CRM_ID`),
-  CONSTRAINT `CRM_ID` FOREIGN KEY (`CRM_ID`) REFERENCES `crm_master` (`CRM_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `VERTICAL_ID` FOREIGN KEY (`VERTICAL_ID`) REFERENCES `verticals_master` (`VERTICALS_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
+  CONSTRAINT `CRM_ID` FOREIGN KEY (`CRM_ID`) REFERENCES `CRM_MASTER` (`CRM_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `VERTICAL_ID` FOREIGN KEY (`VERTICAL_ID`) REFERENCES `VERTICALS_MASTER` (`VERTICALS_MASTER_ID`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- ALTER SCRIPTS: 26 Dec 2014 : Moving Company Survey Mapping to a different table
