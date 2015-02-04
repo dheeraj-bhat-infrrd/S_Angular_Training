@@ -2743,3 +2743,35 @@ button.paypal.is-active {
     font-size: 18px;
     margin-bottom: 15px;
 }
+
+.sq-mcq-wrapper {
+    margin: 0 auto;
+    width: 500px;
+}
+
+.sq-mcq-chk-wrapper {
+    cursor: pointer;
+    height: 32px;
+    width: 40px;
+}
+
+.sq-mcq-ans-wrapper {
+    width: 460px;
+    text-align: left;
+    font-size: 18px;
+    line-height: 24px;
+}
+
+.st-mcq-chk-on {
+    background: url(../images/check-yes.png) no-repeat center;
+}
+
+.st-mcq-chk-off {
+    background: url(../images/check-no.png) no-repeat center;
+}
+
+.sq-mcq-chk {
+    cursor: pointer;
+    width: 40px;
+    height: 26px;
+}
