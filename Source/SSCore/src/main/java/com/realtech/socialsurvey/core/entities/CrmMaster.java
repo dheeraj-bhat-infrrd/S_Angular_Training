@@ -9,7 +9,7 @@ import java.util.List;
  * The persistent class for the crm_master database table.
  */
 @Entity
-@Table(name = "crm_master")
+@Table(name = "CRM_MASTER")
 @NamedQuery(name = "CrmMaster.findAll", query = "SELECT c FROM CrmMaster c")
 public class CrmMaster implements Serializable {
 	private static final long serialVersionUID = 1L;

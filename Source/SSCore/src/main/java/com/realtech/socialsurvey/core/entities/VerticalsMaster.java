@@ -11,7 +11,7 @@ import java.util.List;
  * 
  */
 @Entity
-@Table(name="verticals_master")
+@Table(name="VERTICALS_MASTER")
 @NamedQuery(name="VerticalsMaster.findAll", query="SELECT v FROM VerticalsMaster v")
 public class VerticalsMaster implements Serializable {
 	private static final long serialVersionUID = 1L;
