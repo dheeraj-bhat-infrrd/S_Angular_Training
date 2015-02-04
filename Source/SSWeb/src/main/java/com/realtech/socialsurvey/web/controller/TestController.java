@@ -31,8 +31,7 @@ public class TestController {
 	@Autowired
 	private CaptchaValidation captchaValidation;
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(TestController.class);
+	private static final Logger LOG = LoggerFactory.getLogger(TestController.class);
 
 	@RequestMapping(value = "/testpage")
 	public String testpage(HttpServletRequest request) {
@@ -41,11 +40,10 @@ public class TestController {
 	}
 
 	@RequestMapping(value = "/jumptodashboard")
-	public String jumpToDashboard(Model model, HttpServletRequest req,
-			HttpServletResponse response) {
+	public String jumpToDashboard(Model model, HttpServletRequest req, HttpServletResponse response) {
 		LOG.info("Jumping to Dashboard with ");
-		
-		//TODO Fill active username and password for testing
+
+		// TODO Fill active username and password for testing
 		sessionHelper.loginOnRegistration("nishit@raremile.com", "");
 		return JspResolver.LANDING;
 	}
@@ -76,19 +74,18 @@ public class TestController {
 	}
 
 	@RequestMapping("/validat")
-	public String validate(
-			@RequestParam("recaptcha_challenge_field") String challangeField,
-			@RequestParam("recaptcha_response_field") String responseField,
-			ServletRequest servletRequest) {
+	public String validate(@RequestParam("recaptcha_challenge_field") String challangeField,
+			@RequestParam("recaptcha_response_field") String responseField, ServletRequest servletRequest) {
 
 		String remoteAddress = servletRequest.getRemoteAddr();
 		try {
-			captchaValidation.isCaptchaValid(remoteAddress, challangeField,
-					responseField);
-		} catch (InvalidInputException e) {
+			captchaValidation.isCaptchaValid(remoteAddress, challangeField, responseField);
+		}
+		catch (InvalidInputException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return "test";
 	}
+
 }

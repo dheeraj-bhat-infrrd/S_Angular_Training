@@ -9,16 +9,23 @@
 
 	<http use-expressions="true" auto-config="true" entry-point-ref="customEntryPoint"
 		authentication-manager-ref="authenticationManager">
-		<intercept-url pattern="/login.do" access="permitAll" />
+		<intercept-url pattern="/" access="permitAll" />
+		
 		<intercept-url pattern="/registration.do" access="permitAll" />
 		<intercept-url pattern="/register.do" access="permitAll" />
+		<intercept-url pattern="/verification.do" access="permitAll" />
+		
+		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
+		<intercept-url pattern="/completeregistration.do" access="permitAll" />
+		
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
+		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
 		<intercept-url pattern="/resetPassword.do" access="permitAll" />
 
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 
-		<form-login login-page="/login.do"
-			authentication-failure-url="/login.do?s=autherror"
+		<form-login login-page="/"
+			authentication-failure-url="/?s=autherror"
 			authentication-success-handler-ref="userLoginHandler" />
 
 		<session-management session-fixation-protection="newSession">
@@ -26,13 +33,13 @@
 				error-if-maximum-exceeded="true" />
 		</session-management>
 
-		<logout invalidate-session="true" logout-success-url="/login.do?s=logout" />
+		<logout invalidate-session="true" logout-success-url="/?s=logout" />
 		<custom-filter ref="logoutFilter" before="LOGOUT_FILTER" />
 	</http>
 
 	<beans:bean id="customEntryPoint"
 		class="com.realtech.socialsurvey.web.security.AjaxAwareLoginUrlAuthenticationEntryPoint">
-		<beans:constructor-arg value="/login.do?s=sessionerror" />
+		<beans:constructor-arg value="/?s=sessionerror" />
 	</beans:bean>
 
 	<authentication-manager alias="authenticationManager">
@@ -48,7 +55,7 @@
 
 	<beans:bean id="logoutFilter"
 		class="org.springframework.security.web.authentication.logout.LogoutFilter">
-		<beans:constructor-arg index="0" value="/login.do?s=logout" />
+		<beans:constructor-arg index="0" value="/?s=logout" />
 		<beans:constructor-arg index="1">
 			<beans:list>
 				<beans:ref bean="securityContextLogoutHandler" />
