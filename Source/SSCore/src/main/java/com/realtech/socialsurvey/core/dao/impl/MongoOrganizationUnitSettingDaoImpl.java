@@ -50,25 +50,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	private MongoTemplate mongoTemplate;
 
 	@Override
-	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName) {
-		LOG.info("Creating " + collectionName + " document. Organiztion Unit id: " + organizationUnitSettings.getIden());
-		LOG.debug("Inserting into " + collectionName + ". Object: " + organizationUnitSettings.toString());
-		mongoTemplate.insert(organizationUnitSettings, collectionName);
-		LOG.info("Inserted into " + collectionName);
-	}
-
-	@Override
-	public void insertIndividualSettings(User user) {
-		IndividualSettings individualSettings = new IndividualSettings();
-		individualSettings.setUserId(user.getUserId());
-		individualSettings.setIden(user.getCompany().getCompanyId());
-		
-		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
-		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
-		LOG.info("Inserted individual settings");
-	}
-
-	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("Checking if collections are created in mongodb");
 		if (!mongoTemplate.collectionExists(COMPANY_SETTINGS_COLLECTION)) {
@@ -91,6 +72,35 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			mongoTemplate.createCollection(INDIVIDUAL_SETTINGS_COLLECTION);
 			createIndexOnIden(INDIVIDUAL_SETTINGS_COLLECTION);
 		}
+	}
+
+	// creates index on field 'iden'
+	private void createIndexOnIden(String collectionName) {
+		LOG.debug("Creating unique index on 'iden' for " + collectionName);
+		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
+		LOG.debug("Index created");
+	}
+	
+	@Override
+	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName) {
+		LOG.info("Creating " + collectionName + " document. Organiztion Unit id: " + organizationUnitSettings.getIden());
+		LOG.debug("Inserting into " + collectionName + ". Object: " + organizationUnitSettings.toString());
+		mongoTemplate.insert(organizationUnitSettings, collectionName);
+		LOG.info("Inserted into " + collectionName);
+	}
+
+	@Override
+	public void insertIndividualSettings(User user) {
+		IndividualSettings individualSettings = new IndividualSettings();
+		individualSettings.setIden(user.getUserId());
+		individualSettings.setCompanyId(user.getCompany().getCompanyId());
+		individualSettings.setCompanyAdmin(user.isCompanyAdmin());
+		individualSettings.setCreatedOn(System.currentTimeMillis());
+		individualSettings.setCreatedBy(String.valueOf(user.getUserId()));
+		
+		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
+		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
+		LOG.info("Inserted individual settings");
 	}
 
 	@Override
@@ -169,12 +179,5 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.debug("Updating unit settings based on criteria");
 		mongoTemplate.updateMulti(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Successfully completed updation of unit settings");
-	}
-
-	// creates index on field 'iden'
-	private void createIndexOnIden(String collectionName) {
-		LOG.debug("Creating unique index on 'iden' for " + collectionName);
-		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
-		LOG.debug("Index created");
 	}
 }
