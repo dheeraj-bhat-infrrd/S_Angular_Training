@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -76,7 +77,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 	public List<T> findAll(Class<T> entityClass) {
 		try {
 			final Criteria crit = getSession().createCriteria(entityClass);
-			  return crit.list();
+			return crit.list();
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in findAll().", hibernateException);
@@ -215,7 +216,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<T> findByColumnForMultipleValues(Class<T> dataClass, String column, List<?> values) {
@@ -229,7 +230,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
-	
+
 	@Override
 	public long findNumberOfRows(Class<T> dataClass) {
 		try {
@@ -240,7 +241,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			throw new DatabaseException("HibernateException caught in findNumberOfRows().", hibernateException);
 		}
 	}
-	
+
 	@Override
 	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries) {
 		Criteria criteria = getSession().createCriteria(dataClass);
@@ -258,7 +259,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@Override
 	public void merge(T entity) {
-		
+
 		try {
 			getSession().merge(entity);
 		}
@@ -266,9 +267,23 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			LOG.error("HibernateException caught in merge().", hibernateException);
 			throw new DatabaseException("HibernateException caught in merge().", hibernateException);
 		}
-		
+
 	}
-	
-	
+
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<T> findAllActive(Class<T> entityClass) {
+		try {
+			Criteria crit = getSession().createCriteria(entityClass);
+			crit.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+			return crit.list();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findAllActive().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
+		}
+	}
+
 }
 // JIRA: SS-8: By RM05: EOC

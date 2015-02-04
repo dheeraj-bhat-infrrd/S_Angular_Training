@@ -6,27 +6,24 @@ import java.sql.Timestamp;
 
 
 /**
- * The persistent class for the verticals_crm_mapping database table.
+ * The persistent class for the vertical_crm_mapping database table.
  * 
  */
 @Entity
-@Table(name="verticals_crm_mapping")
-@NamedQuery(name="VerticalsCrmMapping.findAll", query="SELECT v FROM VerticalsCrmMapping v")
-public class VerticalsCrmMapping implements Serializable {
+@Table(name="vertical_crm_mapping")
+@NamedQuery(name="VerticalCrmMapping.findAll", query="SELECT v FROM VerticalCrmMapping v")
+public class VerticalCrmMapping implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@Column(name="VERTICAL_MAPPING_ID")
-	private int verticalMappingId;
+	@Column(name="VERTICAL_CRM_MAPPING_ID")
+	private int verticalCrmMappingId;
 
 	@Column(name="CREATED_BY")
 	private String createdBy;
 
 	@Column(name="CREATED_ON")
 	private Timestamp createdOn;
-
-	@Column(name="CRM_SOURCE")
-	private String crmSource;
 
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
@@ -36,20 +33,25 @@ public class VerticalsCrmMapping implements Serializable {
 
 	private int status;
 
+	//bi-directional many-to-one association to CrmMaster
+	@ManyToOne
+	@JoinColumn(name="CRM_ID")
+	private CrmMaster crmMaster;
+
 	//bi-directional many-to-one association to VerticalsMaster
 	@ManyToOne
 	@JoinColumn(name="VERTICAL_ID")
 	private VerticalsMaster verticalsMaster;
 
-	public VerticalsCrmMapping() {
+	public VerticalCrmMapping() {
 	}
 
-	public int getVerticalMappingId() {
-		return this.verticalMappingId;
+	public int getVerticalCrmMappingId() {
+		return this.verticalCrmMappingId;
 	}
 
-	public void setVerticalMappingId(int verticalMappingId) {
-		this.verticalMappingId = verticalMappingId;
+	public void setVerticalCrmMappingId(int verticalCrmMappingId) {
+		this.verticalCrmMappingId = verticalCrmMappingId;
 	}
 
 	public String getCreatedBy() {
@@ -66,14 +68,6 @@ public class VerticalsCrmMapping implements Serializable {
 
 	public void setCreatedOn(Timestamp createdOn) {
 		this.createdOn = createdOn;
-	}
-
-	public String getCrmSource() {
-		return this.crmSource;
-	}
-
-	public void setCrmSource(String crmSource) {
-		this.crmSource = crmSource;
 	}
 
 	public String getModifiedBy() {
@@ -98,6 +92,14 @@ public class VerticalsCrmMapping implements Serializable {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public CrmMaster getCrmMaster() {
+		return this.crmMaster;
+	}
+
+	public void setCrmMaster(CrmMaster crmMaster) {
+		this.crmMaster = crmMaster;
 	}
 
 	public VerticalsMaster getVerticalsMaster() {

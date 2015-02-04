@@ -115,6 +115,7 @@ public interface CommonConstants {
 	public static final String COUNTRY_CODE = "countryCode";
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
+	public static final String VERTICAL = "vertical";
 	
 	/**
 	 * Batch Constants
