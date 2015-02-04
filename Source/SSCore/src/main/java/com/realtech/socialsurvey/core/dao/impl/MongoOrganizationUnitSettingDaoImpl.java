@@ -35,7 +35,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LOCATION_ENABLED = "isLocationEnabled";
 	public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
-	public static final String KEY_LOGO = "logo"; 
+
+	public static final String KEY_PROFILE_NAME = "profileName";
+	public static final String KEY_PROFILE_URL = "profileUrl";
+	public static final String KEY_LOGO = "logo";
 	public static final String KEY_CONTACT_DETAILS = "contact_details";
 	public static final String KEY_ASSOCIATION = "associations";
 	public static final String KEY_ACHIEVEMENTS = "achievements";
@@ -118,29 +121,30 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Updated the unit setting");
 	}
-	
+
 	/**
 	 * Fetchs the list of names of logos being used.
+	 * 
 	 * @return
 	 */
 	@Override
 	public List<String> fetchLogoList() {
-		
-		LOG.info("Fetching the list of logos being used");		
+
+		LOG.info("Fetching the list of logos being used");
 		List<OrganizationUnitSettings> settingsList = mongoTemplate.findAll(OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
 		List<String> logoList = new ArrayList<>();
 		LOG.info("Preparing the list of logo names");
-		for(OrganizationUnitSettings settings : settingsList){
+		for (OrganizationUnitSettings settings : settingsList) {
 			String logoName = settings.getLogo();
-			if ( logoName != null && !logoName.isEmpty()){
-				logoList.add(logoName);				
+			if (logoName != null && !logoName.isEmpty()) {
+				logoList.add(logoName);
 			}
 		}
-		
+
 		LOG.info("Returning the list prepared!");
 		return logoList;
 	}
-	
+
 	/**
 	 * Updates a particular key of organization unit settings based on criteria specified
 	 */
@@ -162,6 +166,35 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.debug("Creating unique index on 'iden' for " + collectionName);
 		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
 		LOG.debug("Index created");
+	}
+
+	/**
+	 * Method to fetch organization settings based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName(String profileName, String collectionName) {
+		LOG.info("Method fetchOrganizationUnitSettingsByProfileName called for profileName:" + profileName + " and collectionName:" + collectionName);
+
+		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_PROFILE_NAME, profileName)),
+				OrganizationUnitSettings.class, collectionName);
+
+		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
+		return organizationUnitSettings;
+	}
+
+	/**
+	 * Method to fetch organization settings based on profile url
+	 */
+
+	@Override
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName) {
+		LOG.info("Method fetchOrganizationUnitSettingsByProfileUrl called for profileUrl:" + profileUrl + " and collectionName:" + collectionName);
+
+		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_PROFILE_URL, profileUrl)),
+				OrganizationUnitSettings.class, collectionName);
+
+		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileUrl");
+		return organizationUnitSettings;
 	}
 
 }
