@@ -82,4 +82,22 @@ public interface OrganizationUnitSettingsDao {
 	 */
 	public void updateKeyOrganizationUnitSettingsByCriteria(String keyToUpdate, Object updatedRecord, String criteriaKey, Object criteriaValue,
 			String collectionName);
+
+	/**
+	 * Method to fetch organization unit settings on the basis of profile name
+	 * 
+	 * @param profileName
+	 * @param collectionName
+	 * @return
+	 */
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName(String profileName, String collectionName);
+	
+	/**
+	 *  Method to fetch organization unit settings on the basis of profile url
+	 * @param profileUrl
+	 * @param collectionName
+	 * @return
+	 */
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName);
+
 }
