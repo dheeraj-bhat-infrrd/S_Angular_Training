@@ -1,9 +1,17 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 /**
  * The persistent class for the SURVEY database table.
@@ -37,10 +45,9 @@ public class Survey implements Serializable {
 	@Column(name = "SURVEY_NAME")
 	private String surveyName;
 
-	// bi-directional many-to-one association to Company
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "COMPANY_ID")
-	private Company company;
+	// bi-directional many-to-one association to SurveyCompanyMapping
+	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
+	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
 	// bi-directional many-to-one association to SurveyQuestionsMapping
 	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
@@ -104,14 +111,6 @@ public class Survey implements Serializable {
 		this.surveyName = surveyName;
 	}
 
-	public Company getCompany() {
-		return this.company;
-	}
-
-	public void setCompany(Company company) {
-		this.company = company;
-	}
-
 	public List<SurveyQuestionsMapping> getSurveyQuestionsMappings() {
 		return this.surveyQuestionsMappings;
 	}
@@ -134,4 +133,25 @@ public class Survey implements Serializable {
 		return surveyQuestionsMapping;
 	}
 
+	public List<SurveyCompanyMapping> getSurveyCompanyMappings() {
+		return this.surveyCompanyMappings;
+	}
+
+	public void setSurveyCompanyMappings(List<SurveyCompanyMapping> surveyCompanyMappings) {
+		this.surveyCompanyMappings = surveyCompanyMappings;
+	}
+
+	public SurveyCompanyMapping addSurveyCompanyMapping(SurveyCompanyMapping surveyCompanyMapping) {
+		getSurveyCompanyMappings().add(surveyCompanyMapping);
+		surveyCompanyMapping.setSurvey(this);
+
+		return surveyCompanyMapping;
+	}
+
+	public SurveyCompanyMapping removeSurveyCompanyMapping(SurveyCompanyMapping surveyCompanyMapping) {
+		getSurveyCompanyMappings().remove(surveyCompanyMapping);
+		surveyCompanyMapping.setSurvey(null);
+
+		return surveyCompanyMapping;
+	}
 }
