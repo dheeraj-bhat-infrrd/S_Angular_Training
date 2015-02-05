@@ -3,6 +3,7 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <c:choose>
    	<c:when test="${ upgrade == 1}"></c:when>
    	<c:otherwise>
@@ -16,7 +17,11 @@
 		    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 		    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
 		    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-		</head>    
+		</head>  
+		<div id="toast-container" class="toast-container">
+		   <span id="overlay-toast" class="overlay-toast"></span>
+	    </div>
+		
 		<body>
    	</c:otherwise>
 </c:choose>
@@ -214,6 +219,18 @@
 		<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
 	</c:otherwise>
 	</c:choose>
+	<c:if test="${ message != null}">
+		<script>
+				$(document).ready(function(){
+					var message = '<c:out value="${message}"/>';
+					console.log("Showing toast message : " + message);
+					$('#overlay-toast').html(message);
+					showToast(message);
+					
+				});
+
+		</script>
+	</c:if>  
     <script>
             	
         function selectAccountType(accountType,paymentAmount) {
