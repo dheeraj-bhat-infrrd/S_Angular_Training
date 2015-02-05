@@ -112,9 +112,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * profiles.
 	 * 
 	 * @throws SolrException
-	 *             <<<<<<< HEAD
 	 * @throws InvalidInputException
-	 *             ======= >>>>>>> upstream/master
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })

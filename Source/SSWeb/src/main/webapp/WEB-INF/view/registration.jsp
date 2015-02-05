@@ -59,13 +59,13 @@
 						<div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-email"></div>
 							<c:choose>
-								<c:when test="${not empty emailid}">
+								<c:when test="${not isDirectRegistration}">
 								<input class="float-left login-wrapper-txt" id="reg-email" readonly="readonly" data-non-empty="true" name="emailid"
 									value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
 								</c:when>
 								<c:otherwise>
 									<input class="float-left login-wrapper-txt" id="reg-email" data-non-empty="true" data-email = "true" name="emailid"
-									 placeholder='<spring:message code="label.emailid.key" />'>
+									value="${emailid}" placeholder='<spring:message code="label.emailid.key" />'>
 								</c:otherwise>
 							</c:choose>
 						</div>
