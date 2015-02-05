@@ -60,6 +60,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_CONFIRM_NEW_PASSWORD = "INVALID_CONFIRM_NEW_PASSWORD";
 	public static final String PAYMENT_GATEWAY_EXCEPTION = "PAYMENT_GATEWAY_EXCEPTION";
 	public static final String CARD_UPDATE_UNSUCCESSFUL = "CARD_UPDATE_UNSUCCESSFUL";
+	public static final String CREDIT_CARD_INVALID = "CREDIT_CARD_INVALID";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";

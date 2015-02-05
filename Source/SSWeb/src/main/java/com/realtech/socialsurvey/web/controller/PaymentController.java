@@ -26,7 +26,10 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -82,8 +85,7 @@ public class PaymentController {
 
 		LOG.info("Payment controller called for plan subscribal");
 		try {
-			boolean status = false;
-
+			
 			String strAccountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 			// Get the nonce from the request
 			String nonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
@@ -109,7 +111,7 @@ public class PaymentController {
 			}
 
 			try {
-				status = gateway.subscribe(user, company, accountTypeValue, nonce);
+				gateway.subscribe(user, company, accountTypeValue, nonce);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + e.getMessage(), e);
@@ -118,49 +120,50 @@ public class PaymentController {
 			catch (PaymentException e) {
 				LOG.error("PaymentController subscribeForPlan() : Payment Exception thrown : " + e.getMessage(), e);
 				throw new PaymentException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			catch (CreditCardException e) {
+				LOG.error("PaymentController subscribeForPlan() : CreditCardException thrown : " + e.getMessage(),e);
+				throw new CreditCardException("PaymentController subscribeForPlan() : CreditCardException thrown : " + e.getMessage(),DisplayMessageConstants.CREDIT_CARD_INVALID,e);
+			}
+			catch (SubscriptionUnsuccessfulException e) {
+				LOG.error("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),e);
+				throw new CreditCardException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL,e);
+			}
+			
+			LOG.info("Subscription Successful!");
+			try {
+				LOG.debug("Calling sevices for adding account type of company");
+				accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
+				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
 
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				// get the settings
+				sessionHelper.getCanonicalSettings(session);
+				// set the session variable
+				sessionHelper.setSettingVariablesInSession(session);
 			}
-			if (status) {
-				LOG.info("Subscription Successful!");
-				try {
-					LOG.debug("Calling sevices for adding account type of company");
-					accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
-					LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
-
-					LOG.debug("Adding account type in session");
-					session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
-					// get the settings
-					sessionHelper.getCanonicalSettings(session);
-					// set the session variable
-					sessionHelper.setSettingVariablesInSession(session);
-				}
-				catch (InvalidInputException e) {
-					throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
-							DisplayMessageConstants.GENERAL_ERROR, e);
-				}
-				try {
-					/**
-					 * For each account type, only the company admin's profile completion stage is
-					 * updated, all the other profiles created by default need no action so their
-					 * profile completion stage is marked completed at the time of insert
-					 */
-					LOG.debug("Calling sevices for updating profile completion stage");
-					userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-							CommonConstants.DASHBOARD_STAGE);
-					LOG.debug("Successfully executed sevices for updating profile completion stage");
-				}
-				catch (InvalidInputException e) {
-					LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
-					throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-				}
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			else {
-				LOG.info("Subscription Unsuccessful!");
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			try {
+				/**
+				 * For each account type, only the company admin's profile completion stage is
+				 * updated, all the other profiles created by default need no action so their
+				 * profile completion stage is marked completed at the time of insert
+				 */
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.DASHBOARD_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
 			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
@@ -214,8 +217,7 @@ public class PaymentController {
 	@ResponseBody
 	public String paymentUpgrade(Model model, HttpServletRequest request) {
 		LOG.info("Payment controller called to upgrade payment method");
-
-		boolean status = false;
+		
 		String message = null;
 		String paymentNonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 		LOG.info("Payment upgrade called with nonce : " + paymentNonce);
@@ -229,7 +231,7 @@ public class PaymentController {
 
 		LOG.info("Making API call to update card details");
 		try {
-			status = gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
+			gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
 		}
 		catch (InvalidInputException | NoRecordsFetchedException e) {
 			LOG.error("Exception has occured : " + e.getMessage(), e);
@@ -241,15 +243,19 @@ public class PaymentController {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			return message;
 		}
+		catch (CreditCardException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return message;
+		}
+		catch (CardUpdateUnsuccessfulException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return message;
+		}
 
-		if (status == false) {
-			LOG.info("Payment details change unsuccessful. Please check logs.");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
-		else {
-			LOG.info("Payment details change successful! Returning message");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
-		}
+		LOG.info("Payment details change successful! Returning message");
+		message = messageUtils.getDisplayMessage(DisplayMessageConstants.CARD_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 
 		return message;
 

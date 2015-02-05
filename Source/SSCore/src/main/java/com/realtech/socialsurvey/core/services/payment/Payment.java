@@ -12,10 +12,13 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
@@ -55,9 +58,11 @@ public interface Payment {
 	 * @param nonce
 	 * @return
 	 * @throws NoRecordsFetchedException 
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws CreditCardException 
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException;
+	public void subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, CreditCardException, SubscriptionUnsuccessfulException;
 	
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
@@ -164,8 +169,10 @@ public interface Payment {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
+	 * @throws CreditCardException 
+	 * @throws CardUpdateUnsuccessfulException 
 	 */
-	public boolean changePaymentMethod(String subscriptionId,String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+	public void changePaymentMethod(String subscriptionId,String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException, CreditCardException, CardUpdateUnsuccessfulException;
 	
 	/**
 	 * Returns the balance amount while upgrading from one plan to another
