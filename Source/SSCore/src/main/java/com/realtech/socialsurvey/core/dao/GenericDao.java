@@ -47,6 +47,8 @@ public interface GenericDao<T, ID extends Serializable> {
 	public void merge(T entity);
 	
 	public List<T> findAllActive(Class<T> entityClass);
+	
+	public List<T> findProjectionsByKeyValue(Class<T> dataClass,List<String> columnNames,Map<String, Object> queries);
 
 }
 

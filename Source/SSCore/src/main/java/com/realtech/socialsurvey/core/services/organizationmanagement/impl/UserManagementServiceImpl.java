@@ -476,7 +476,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	private void populateProfileMastersMap() {
 		LOG.debug("Getting all profile masters from database and storing in map");
-		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAll(ProfilesMaster.class);
+		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAllActive(ProfilesMaster.class);
 		if (profileMasterList != null && !profileMasterList.isEmpty()) {
 			for (ProfilesMaster profilesMaster : profileMasterList) {
 				profileMasters.put(profilesMaster.getProfileId(), profilesMaster);
