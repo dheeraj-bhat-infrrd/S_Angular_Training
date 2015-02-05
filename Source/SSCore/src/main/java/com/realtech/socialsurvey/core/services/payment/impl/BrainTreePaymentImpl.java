@@ -28,6 +28,8 @@ import com.braintreegateway.Subscription;
 import com.braintreegateway.SubscriptionRequest;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
+import com.braintreegateway.ValidationError;
+import com.braintreegateway.ValidationErrors;
 import com.braintreegateway.exceptions.NotFoundException;
 import com.braintreegateway.exceptions.UnexpectedException;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -42,9 +44,12 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
@@ -224,8 +229,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @return Success or Failure of the operation.
 	 * @throws InvalidInputException
 	 * @throws PaymentException
+	 * @throws CreditCardException 
+	 * @throws SubscriptionUnsuccessfulException 
 	 */
-	private boolean addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException {
+	private void addCustomerWithPayment(Company company, String nonce) throws InvalidInputException, PaymentException, CreditCardException, SubscriptionUnsuccessfulException {
 
 		if (company == null) {
 			LOG.error("addCustomerWithPayment : company parameter is null!");
@@ -260,7 +267,29 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.debug("addCustomerWithPayment : adding user " + Long.toString(company.getCompanyId()) + " : Status : " + result.isSuccess()
 				+ " Message : " + result.getMessage());
 
-		return result.isSuccess();
+		if(!result.isSuccess()){
+			ValidationErrors creditCardErrors = result.getErrors().forObject("customer").forObject("creditCard");
+			if(creditCardErrors.size()>0){
+				String errorMessage = "";
+				for (ValidationError error : creditCardErrors.getAllValidationErrors()) {
+				    errorMessage += " Error Code : " +error.getCode();
+				    errorMessage += " Error message : " + error.getMessage() + "\n";
+				}	
+				
+				throw new CreditCardException("Credit Card Validation failed, reason : \n " + errorMessage );
+			}
+			
+			List<ValidationError> allErrors = result.getErrors().getAllDeepValidationErrors();
+			if(allErrors.size()>0){
+				String errorMessage = "";
+				for (ValidationError error : allErrors) {
+				    errorMessage += " Error Code : " +error.getCode();
+				    errorMessage += " Error message : " + error.getMessage() + "\n";
+				}	
+				
+				throw new SubscriptionUnsuccessfulException("Subscription creation failed, reason : \n " + errorMessage );
+			}
+		}
 	}
 
 	/**
@@ -311,11 +340,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @return Success or Failure of the operation.
 	 * @throws InvalidInputException
 	 * @throws PaymentException
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws NoRecordsFetchedException 
 	 * @throws NonFatalException
 	 */
-	private String subscribeCustomer(String customerId, String planId) throws InvalidInputException, PaymentException {
+	private String subscribeCustomer(String customerId, String planId) throws InvalidInputException, PaymentException, SubscriptionUnsuccessfulException, NoRecordsFetchedException {
 
-		String resultStatus = null;
+		String subscriptionId = null;
 		Customer customer = null;
 
 		if (customerId == null || customerId.isEmpty()) {
@@ -353,19 +384,21 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("subscribeCustomer : customerId : " + customerId + " for planId : " + planId + " Status : " + result.isSuccess()
 					+ " Message : " + result.getMessage());
 			if (result.isSuccess()) {
-				resultStatus = result.getTarget().getId();
+				LOG.info("Subscription successful, subscription id : " + subscriptionId);
+				subscriptionId = result.getTarget().getId();
 			}
 			else {
-				resultStatus = null;
+				LOG.error("Subscription Unsuccessful : message : " + result.getMessage());
+				throw new SubscriptionUnsuccessfulException("Subscription Unsuccessful : message : " + result.getMessage());
 			}
 		}
 		else {
 
 			LOG.error("Customer with id " + customerId + " not found in vault to make subscription!");
-			resultStatus = null;
+			throw new NoRecordsFetchedException("Customer with id " + customerId + " not found in vault to make subscription!");
+			
 		}
-
-		return resultStatus;
+		return subscriptionId;
 	}
 
 	/**
@@ -378,12 +411,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 * @throws PaymentException
 	 * @throws NoRecordsFetchedException 
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws CreditCardException 
 	 */
 	@Override
 	@Transactional
-	public boolean subscribe(User user, Company company, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException {
+	public void subscribe(User user, Company company, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, CreditCardException, SubscriptionUnsuccessfulException {
 
-		boolean result = false;
 		String subscriptionId = null;
 		
 		if (user == null) {
@@ -431,34 +465,22 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		else {
 			LOG.debug("Customer does not exist in the vault.Adding customer to vault.");
 			// If he doesnt add him to the vault and subscribe him
-			if (!addCustomerWithPayment(company, nonce)) {
-				LOG.error("Addition of customer with id : " + company.getCompanyId() + " failed! Aborting subscription.");
-				result = false;
-			}
-			else {
-				LOG.info("Customer Added. Making subscription.");
-				subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanName);
-			}
+			addCustomerWithPayment(company, nonce); 
+			LOG.info("Customer Added. Making subscription.");
+			subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanName);
+			
 		}
 
-		if (subscriptionId != null) {
-			result = true;
-			LOG.info("Subscription successful. Updating the license table.");
-			try{
-				updateLicenseTable(accountsMasterId, company, user, subscriptionId);
-				LOG.info("LicenseDetail table update done!");
-			}catch ( DatabaseException e){
-				LOG.info("Database update was unsuccessful so reverting the braintree subscription.");
-				cancelSubscription(subscriptionId);
-				LOG.info("Reverted the subscription.");
-				throw e;
-			}
+		LOG.info("Subscription successful. Updating the license table.");
+		try{
+			updateLicenseTable(accountsMasterId, company, user, subscriptionId);
+			LOG.info("LicenseDetail table update done!");
+		}catch ( DatabaseException e){
+			LOG.info("Database update was unsuccessful so reverting the braintree subscription.");
+			cancelSubscription(subscriptionId);
+			LOG.info("Reverted the subscription.");
+			throw e;
 		}
-		else {
-			LOG.info("Subscription Unsuccessful!");
-		}
-
-		return result;
 	}
 
 	/**
@@ -906,7 +928,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		else{
 			LOG.debug("Subscription upgrade unsuccessful, message : " + result.getMessage());
-			throw new SubscriptionUpgradeUnsuccessfulException("Subscription upgrade unsuccessful, message : " + result.getMessage(),DisplayMessageConstants.SUBSCRIPTION_UPGRADE_UNSUCCESSFUL);
+			String errorMessage = "";
+			if(result.getErrors().getAllValidationErrors().size()>0){
+				for(ValidationError error : result.getErrors().getAllDeepValidationErrors()){
+					errorMessage += "Error code : " + error.getCode();
+					errorMessage += " Message : " + error.getMessage() + "\n";					
+				}
+			}
+			throw new SubscriptionUpgradeUnsuccessfulException("Subscription upgrade unsuccessful, message : \n" + errorMessage,DisplayMessageConstants.SUBSCRIPTION_UPGRADE_UNSUCCESSFUL);
 		}		
 	}
 	
@@ -1086,9 +1115,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
+	 * @throws CreditCardException 
+	 * @throws CardUpdateUnsuccessfulException 
 	 */
 	@Override
-	public boolean changePaymentMethod(String subscriptionId, String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException {
+	public void changePaymentMethod(String subscriptionId, String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException, CreditCardException, CardUpdateUnsuccessfulException {
 		
 		LOG.info(" changePaymentMethod called to change payment method");
 		
@@ -1100,9 +1131,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("changePaymentMethod : paymentNonce parameter is null or empty");
 			throw new InvalidInputException("getCurrentPaymentDetails : paymentNonce parameter is null or empty");
 		}
-		
-		boolean status = false;
-		
+				
 		try{					
 			//Firstly we get the subscription whose payment method we need
 			Subscription subscription = null;
@@ -1126,11 +1155,28 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			Result<Customer> result = gateway.customer().update(customerId, customerRequest);
 			if(result.isSuccess()){
 				LOG.info("Result : " + result.isSuccess());
-				status = true;
 			}
 			else{
 				LOG.info("Result : " + result.isSuccess() + " message : " + result.getMessage());
-				status = false;
+				ValidationErrors creditCardErrors = result.getErrors().forObject("customer").forObject("creditCard");
+				if(creditCardErrors.size()>0){
+					String errorMessage = "";
+					for (ValidationError error : creditCardErrors.getAllValidationErrors()) {
+					    errorMessage += " Error Code : " + error.getCode();
+					    errorMessage += " Error message : " + error.getMessage() + "\n";
+					}						
+					throw new CreditCardException("Credit Card Validation failed, reason : \n " + errorMessage,DisplayMessageConstants.CREDIT_CARD_INVALID);
+				}			
+				List<ValidationError> allErrors = result.getErrors().getAllDeepValidationErrors();
+				if(allErrors.size()>0){
+					String errorMessage = "";
+					for (ValidationError error : allErrors) {
+					    errorMessage += " Error Code : " +error.getCode();
+					    errorMessage += " Error message : " + error.getMessage() + "\n";
+					}	
+					
+					throw new CardUpdateUnsuccessfulException("Subscription creation failed, reason : \n " + errorMessage );
+				}
 			}
 			
 		}catch (UnexpectedException e) {
@@ -1138,8 +1184,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(),DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}		
 		
-		LOG.info("Returning status");
-		return status;
+		LOG.info("Card details changed successfully!");
 	}
 	
 	/**
