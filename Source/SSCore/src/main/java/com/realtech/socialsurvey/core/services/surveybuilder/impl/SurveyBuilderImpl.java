@@ -36,6 +36,8 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 public class SurveyBuilderImpl implements SurveyBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
+	private static final String REORDER_UP = "up";
+	private static final String REORDER_DOWN = "down";
 
 	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
@@ -589,8 +591,6 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			throw new InvalidInputException("Invalid argument passed. Either user or reordertype is null in method deactivateQuestionSurveyMapping.");
 		}
 
-		String REORDER_UP = "up";
-		String REORDER_DOWN = "down";
 		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, questionId);
 		int order = surveyQuestionsMapping.getQuestionOrder();
 
