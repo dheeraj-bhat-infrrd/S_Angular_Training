@@ -2,9 +2,12 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +18,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.CRMInfo;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -64,7 +69,7 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
-	
+
 	@Autowired
 	private SessionHelper sessionHelper;
 
@@ -116,9 +121,12 @@ public class OrganizationManagementController {
 		String address2 = request.getParameter("address2");
 		String zipCode = request.getParameter("zipcode");
 		String companyContactNo = request.getParameter("contactno");
-
+		String country = request.getParameter("country");
+		String countryCode = request.getParameter("countrycode");
+		String vertical = request.getParameter("vertical");
+		
 		try {
-			validateCompanyInfoParams(companyName, address1, zipCode, companyContactNo);
+			validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo,vertical);
 			String address = getCompleteAddress(address1, address2);
 
 			HttpSession session = request.getSession(false);
@@ -132,11 +140,18 @@ public class OrganizationManagementController {
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
 			companyDetails.put(CommonConstants.ADDRESS, address);
+			companyDetails.put(CommonConstants.ADDRESS1, address1);
+			if (address2 != null) {
+				companyDetails.put(CommonConstants.ADDRESS2, address2);
+			}
+			companyDetails.put(CommonConstants.COUNTRY, country);
+			companyDetails.put(CommonConstants.COUNTRY_CODE, countryCode);
 			companyDetails.put(CommonConstants.ZIPCODE, zipCode);
 			companyDetails.put(CommonConstants.COMPANY_CONTACT_NUMBER, companyContactNo);
 			if (logoName != null) {
 				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
 			}
+			companyDetails.put(CommonConstants.VERTICAL, vertical);
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
@@ -146,6 +161,15 @@ public class OrganizationManagementController {
 					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 
 			LOG.debug("Successfully executed service to add company details");
+			List<VerticalsMaster> verticalsMasters = null;
+			try {
+				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			model.addAttribute("verticals",verticalsMasters);
 
 		}
 		catch (NonFatalException e) {
@@ -167,7 +191,8 @@ public class OrganizationManagementController {
 	 * @param companyContactNo
 	 * @throws InvalidInputException
 	 */
-	private void validateCompanyInfoParams(String companyName, String address, String zipCode, String companyContactNo) throws InvalidInputException {
+	private void validateCompanyInfoParams(String companyName, String address, String country, String countryCode, String zipCode,
+			String companyContactNo,String vertical) throws InvalidInputException {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
@@ -179,12 +204,25 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Address is null or empty while adding company information", DisplayMessageConstants.INVALID_ADDRESS);
 		}
 
-		if (zipCode == null || zipCode.isEmpty() || !zipCode.matches(CommonConstants.ZIPCODE_REGEX)) {
+		if (country == null || country.isEmpty()) {
+			throw new InvalidInputException("Country is null or empty while adding company information", DisplayMessageConstants.INVALID_COUNTRY);
+		}
+
+		if (countryCode == null || countryCode.isEmpty()) {
+			throw new InvalidInputException("Country code is null or empty while adding company information", DisplayMessageConstants.INVALID_COUNTRY);
+		}
+
+		// if (zipCode == null || zipCode.isEmpty() ||
+		// !zipCode.matches(CommonConstants.ZIPCODE_REGEX)) {
+		if (zipCode == null || zipCode.isEmpty()) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
+		}
+		if(vertical == null || vertical.isEmpty()){
+			throw new InvalidInputException("Vertical selected is not valid",DisplayMessageConstants.INVALID_VERTICAL);
 		}
 		LOG.debug("Returning from validateCompanyInfoParams after validating parameters");
 	}
@@ -225,11 +263,11 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Accounttype is null for adding account type", DisplayMessageConstants.INVALID_ADDRESS);
 			}
 			LOG.debug("AccountType obtained : " + strAccountType);
-			
+
 			User user = sessionHelper.getCurrentUser();
-			
+
 			LOG.debug("Checking if payment has already been made.");
-			if(gateway.checkIfPaymentMade(user.getCompany())){
+			if (gateway.checkIfPaymentMade(user.getCompany())) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
 			}
@@ -300,19 +338,19 @@ public class OrganizationManagementController {
 			String plainPassword = request.getParameter("encompass-password");
 			String cipherPassword = encryptionHelper.encryptAES(plainPassword, "");
 
-			CRMInfo crmInfo = new CRMInfo();
-			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
-			crmInfo.setCrm_username(request.getParameter("encompass-username"));
-			crmInfo.setCrm_password(cipherPassword);
-			crmInfo.setUrl(request.getParameter("encompass-url"));
-			crmInfo.setConnection_successful(true);
+			EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
+			encompassCrmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
+			encompassCrmInfo.setCrm_username(request.getParameter("encompass-username"));
+			encompassCrmInfo.setCrm_password(cipherPassword);
+			encompassCrmInfo.setUrl(request.getParameter("encompass-url"));
+			encompassCrmInfo.setConnection_successful(true);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
-			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
+			organizationManagementService.updateCRMDetails(companySettings, encompassCrmInfo);
 
 			// set the updated settings value in session with plain password
-			crmInfo.setCrm_password(plainPassword);
-			companySettings.setCrm_info(crmInfo);
+			encompassCrmInfo.setCrm_password(plainPassword);
+			companySettings.setCrm_info(encompassCrmInfo);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
 		}
@@ -680,9 +718,7 @@ public class OrganizationManagementController {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
-
 		return message;
-
 	}
 }
 // JIRA: SS-24 BY RM02 EOC

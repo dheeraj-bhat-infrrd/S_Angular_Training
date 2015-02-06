@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE">
 <html>
 <head>
@@ -11,6 +12,7 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.2/themes/smoothness/jquery-ui.css">
 </head>
 <body>
 	<div id="overlay-toast" class="overlay-toast"></div>
@@ -67,6 +69,11 @@
 							<div class="float-left login-wrapper-icon icn-address"></div>
 							<input class="float-left login-wrapper-txt" id="com-address2" name="address2" placeholder='<spring:message code="label.address2.key"/>'>
 						</div>
+						<div class="login-input-wrapper margin-0-auto clearfix">
+							<div class="float-left login-wrapper-icon icn-address"></div>
+							<input class="float-left login-wrapper-txt" id="com-country" data-non-empty="true" name="country" placeholder='<spring:message code="label.country.key"/>'>
+						</div>
+						<div id="com-page-country" class="login-reg-err margin-0-auto"></div>
                         <div class="login-input-wrapper margin-0-auto clearfix">
 							<div class="float-left login-wrapper-icon icn-zip"></div>
 							<input class="float-left login-wrapper-txt" id="com-zipcode" data-non-empty="true" data-zipcode = "true" name="zipcode" placeholder='<spring:message code="label.zipcode.key"/>'>
@@ -77,11 +84,22 @@
 							<input class="float-left login-wrapper-txt" id="com-contactno" data-non-empty="true" data-phone = "true" name="contactno" placeholder='<spring:message code="label.companycontactno.key"/>'>
 						</div>
 						<div id="com-page-contactno" class="login-reg-err margin-0-auto"></div>
+						<c:if test="${not empty verticals }">
+							<div class="login-input-wrapper margin-0-auto clearfix">
+								<select name="vertical" id="select-vertical" class="login-input-wrapper">
+									<option disabled selected><spring:message code="label.vertical.key"/></option>
+									<c:forEach items="${verticals }" var="vertical">
+										<option id="vertical-${vertical.verticalsMasterId }">${vertical.verticalName}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</c:if>
 						<div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="company-info-submit">
                             <spring:message code="label.done.key" />
 						</div>
 					</div>
 					<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
+					<input type="hidden" name="countrycode" id="country-code">
 				</form>
 				<div class="login-footer-wrapper login-footer-txt clearfix margin-0-auto margin-bottom-50 col-xs-12">
 					<div class="float-right">
@@ -109,9 +127,14 @@
 	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/countrydata.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/zipcoderegex.js"></script>
+	<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+  	<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 
 	<script>
 		var isCompanyInfoPageValid;
+		var selectedCountryRegEx = "";
 		$(document).ready(function() {
 		$(document).attr("title", "Company Information");
 			isCompanyInfoPageValid=false;
@@ -142,6 +165,39 @@
                 $('#com-logo-decoy').val(fileAdd[fileAdd.length - 1]);
             });
 			
+            //Integrating autocomplete with country input text field
+            $( "#com-country" ).autocomplete({
+                minLength: 1,
+                source: countryData,
+                delay : 0,
+                open : function( event, ui ) {
+                    $( "#country-code" ).val("");
+                },
+                focus: function( event, ui ) {
+                  $( "#com-country" ).val( ui.item.label );
+                  return false;
+                },
+                select: function( event, ui ) {
+                  $( "#com-country" ).val( ui.item.label );
+                  $( "#country-code" ).val( ui.item.code );
+                  for(var i=0;i<postCodeRegex.length;i++){
+                	  if(postCodeRegex[i].code == ui.item.code){
+                		  selectedCountryRegEx = "^"+postCodeRegex[i].regex+"$";
+                		  selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+                		  break;
+                	  }
+                  }
+                  return false;
+                },
+                close: function( event, ui ) {
+                }
+              })
+              .autocomplete( "instance" )._renderItem = function( ul, item ) {
+                return $( "<li>" )
+                  .append(item.label)
+                  .appendTo( ul );
+              };
+            
 		});
 		$('#com-company').blur(function() {
 			validateCompany(this.id);
@@ -154,8 +210,9 @@
 		$('#com-address2').blur(function() {
 			validateAddress2(this.id);
 		});
+		
 		$('#com-zipcode').blur(function() {
-			validateZipcode(this.id);
+			validateCountryZipcode(this.id);
 		});
 		
 		$('#com-contactno').blur(function() {
@@ -202,7 +259,19 @@
         			return isCompanyInfoPageValid;
         		}
 			}
-			if(!validateZipcode('com-zipcode')){
+			
+			if(!validateCountry('com-country')){
+				isCompanyInfoPageValid = false;
+				if(!isFocussed){
+        			$('#com-country').focus();
+        			isFocussed=true;
+        		}
+        		if(isSmallScreen){
+        			return isCompanyInfoPageValid;
+        		}
+			}
+			
+			if(!validateCountryZipcode('com-zipcode')){
 				isCompanyInfoPageValid = false;
 				if(!isFocussed){
         			$('#com-zipcode').focus();
@@ -253,6 +322,62 @@
 			formData.append("logo_name", $('#com-logo').prop("files")[0].name);
 			callAjaxPOSTWithTextData("./uploadcompanylogo.do", uploadImageSuccessCallback, true, formData);
 		});
+		
+		function validateCountry(){
+			var country = $.trim($('#com-country').val());
+			if(country == ""){
+				$('#com-page-country').html("Please enter country name");
+				$('#com-page-country').show();
+				return false;
+			}else{
+				var countryCode = $.trim($('#country-code').val());
+				if(countryCode == ""){
+					$('#com-page-country').html("Please enter valid country name");
+					$('#com-page-country').show();
+					return false;
+				}else{
+					$('#com-page-country').html("");
+					$('#com-page-country').hide();
+					return true;
+				}
+			}
+		}
+		
+		//Function to validate the zipcode
+		function validateCountryZipcode(elementId){
+			var zipcode = $('#'+elementId).val();
+			if($(window).width()<768){
+				if (zipcode != "") {
+					if (selectedCountryRegEx.test(zipcode) == true) {
+						return true;
+					}else {
+						$('#overlay-toast').html('Please enter a valid zipcode.');
+						showToast();
+						return false;
+					}
+				}else{
+					$('#overlay-toast').html('Please enter zipcode.');
+					showToast();
+					return false;
+				}
+			}else{
+		    	if (zipcode != "") {
+					if (selectedCountryRegEx.test(zipcode) == true) {
+						$('#'+elementId).parent().next('.login-reg-err').hide();
+						return true;
+					}else {
+						$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid zipcode.');
+						$('#'+elementId).parent().next('.login-reg-err').show();
+						return false;
+					}
+				}else{
+					$('#'+elementId).parent().next('.login-reg-err').html('Please enter zipcode.');
+					$('#'+elementId).parent().next('.login-reg-err').show();
+					return false;
+				}
+			}
+		}
+		
 	</script>
 </body>
 </html>

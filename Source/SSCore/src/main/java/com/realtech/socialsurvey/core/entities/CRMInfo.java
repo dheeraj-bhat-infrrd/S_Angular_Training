@@ -3,12 +3,9 @@ package com.realtech.socialsurvey.core.entities;
 /**
  * Holds the CRM information
  */
-public class CRMInfo {
+public abstract class CRMInfo {
 
 	private String crm_source;
-	private String crm_username;
-	private String crm_password;
-	private String url;
 	private boolean connection_successful;
 
 	public String getCrm_source() {
@@ -17,30 +14,6 @@ public class CRMInfo {
 
 	public void setCrm_source(String crm_source) {
 		this.crm_source = crm_source;
-	}
-
-	public String getCrm_username() {
-		return crm_username;
-	}
-
-	public void setCrm_username(String crm_username) {
-		this.crm_username = crm_username;
-	}
-
-	public String getCrm_password() {
-		return crm_password;
-	}
-
-	public void setCrm_password(String crm_password) {
-		this.crm_password = crm_password;
-	}
-
-	public String getUrl() {
-		return url;
-	}
-
-	public void setUrl(String url) {
-		this.url = url;
 	}
 
 	public boolean isConnection_successful() {
@@ -53,7 +26,7 @@ public class CRMInfo {
 
 	@Override
 	public String toString() {
-		return "crm_source: " + crm_source + "\t crm_username: " + crm_username + "\t connection_successful: " + connection_successful;
+		return "crm_source: " + crm_source + "\t connection_successful: " + connection_successful;
 	}
 
 }

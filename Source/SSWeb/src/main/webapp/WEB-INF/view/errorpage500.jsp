@@ -8,7 +8,7 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><spring:message code="label.login.title.key" /></title>
+    <title>Error</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
@@ -44,7 +44,7 @@
 
         <div class="footer-main-wrapper">
             <div class="container text-center footer-text">
-                <spring:message code="label.copyright.key"/> &copy; <spring:message code="label.footer.socialsurvey.key"/> <span class="center-dot">.</span> <spring:message code="label.allrightscopyright.key"/>
+                Copyright &copy; Social Survey <span class="center-dot">.</span> All Rights Reserved.
             </div>
         </div>
     </div>

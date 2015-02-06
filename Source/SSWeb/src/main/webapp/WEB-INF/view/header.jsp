@@ -67,7 +67,7 @@
 				</c:if>
 				<c:if test="${highestrole == 1}">
 					<div class="header-links-item">
-						<a href="#"><spring:message
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
@@ -99,7 +99,7 @@
 				</c:if>
 				<c:if test="${highestrole == 1}">
 					<div class="header-links-item">
-						<a href="#"><spring:message
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
@@ -110,7 +110,7 @@
 					</div>
 				</c:if>
 			</div>
-			<div class="header-user-info float-right clearfix">
+			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
 					<span>${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
