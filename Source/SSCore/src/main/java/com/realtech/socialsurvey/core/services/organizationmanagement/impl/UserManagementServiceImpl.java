@@ -21,7 +21,7 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
-import com.realtech.socialsurvey.core.entities.IndividualSettings;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -1246,7 +1246,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("Invalid account type.");
 		}
 		UserSettings canonicalUserSettings = new UserSettings();
-		Map<Long, IndividualSettings> agentSettings = null;
+		Map<Long, AgentSettings> agentSettings = null;
 		Map<Long, OrganizationUnitSettings> branchesSettings = null;
 		Map<Long, OrganizationUnitSettings> regionsSettings = null;
 		LOG.info("Getting the canonical settings for the user: " + user.toString());
@@ -1327,7 +1327,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles,
-			Map<Long, IndividualSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
+			Map<Long, AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Getting branches settings for the user profile list");
 		Map<Long, OrganizationUnitSettings> branchesSettings = organizationManagementService.getBranchSettingsForUserProfiles(userProfiles);
 		// if agent settings is not null, the resolve the settings of branch associated with the
@@ -1355,25 +1355,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	public IndividualSettings getUserSettings(long agentId) throws InvalidInputException {
+	public AgentSettings getUserSettings(long agentId) throws InvalidInputException {
 		LOG.info("Getting agent settings for agent id: " + agentId);
 		if (agentId <= 0l) {
 			throw new InvalidInputException("Invalid agent id for fetching user settings");
 		}
-		IndividualSettings agentSettings = organizationUnitSettingsDao.fetchIndividualSettingsById(agentId);
+		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
 		return agentSettings;
 	}
 
 	@Override
-	public Map<Long, IndividualSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
-		Map<Long, IndividualSettings> agentSettings = null;
+	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
+		Map<Long, AgentSettings> agentSettings = null;
 		if (userProfiles != null && userProfiles.size() > 0) {
 			LOG.info("Get agent settings for the user profiles: " + userProfiles.toString());
-			agentSettings = new HashMap<Long, IndividualSettings>();
-			IndividualSettings agentSetting = null;
+			agentSettings = new HashMap<Long, AgentSettings>();
+			AgentSettings agentSetting = null;
 			// get the agent profiles and get the settings for each of them.
 			for (UserProfile userProfile : userProfiles) {
-				agentSetting = new IndividualSettings();
+				agentSetting = new AgentSettings();
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 					LOG.debug("Getting settings for " + userProfile);
 					// get the agent id and get the profile
