@@ -9,6 +9,7 @@ var questionDetails;
 var agentId;
 var customerResponse;
 var customerEmail;
+var mood;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -62,9 +63,9 @@ function paintSurveyPageFromJson() {
 		$("#ques-text").html(question);
 		$("#sq-stars").show();
 	} else if (questionType == "sb-range-smiles") {
-		$("div[data-ques-type='stars']").show();
+		$("div[data-ques-type='smiley']").show();
 		$("#ques-text").html(question);
-		$("#sq-stars").show();
+		$("#sq-smiles").show();
 	} else if (questionType == "sb-range-scale") {
 		$("div[data-ques-type='stars']").show();
 		$("#ques-text").html(question);
@@ -82,22 +83,32 @@ function paintSurveyPageFromJson() {
 		$("#answer-options").html(options);
 		bindMcqCheckButton();
 	} else if (questionType == "sb-sel-desc") {
-		$("div[data-ques-type='stars']").show();
-		$("#ques-text").html(question);
-		$("#sq-stars").show();
+		$("div[data-ques-type='smiley-text-final']").show();
+		$("#ques-text-textarea").html(question);
+		$("#text-area").show();
+		$("#smiles-final").hide();
+	} else if (questionType == "sb-master") {
+		$("div[data-ques-type='smiley-text-final']").show();
+		$("#text-area").hide();
+		$("#smiles-final").show();
+		$("#ques-text-textarea").html(question);
 	}
 	if (isRatingQuestion == 1) {
 		$("#skip-ques").hide();
-		$("#next").addClass("sq-np-item-disabled");
+		$("#next-star").addClass("sq-np-item-disabled");
 	}
 	if (qno == 0) {
-		$("#prev").addClass("sq-np-item-disabled");
+		$("#prev-star").addClass("sq-np-item-disabled");
 		$("#prev-mcq").addClass("sq-np-item-disabled");
+		$("#prev-textarea-smiley").addClass("sq-np-item-disabled");
 	} else {
-		$("#prev").removeClass("sq-np-item-disabled");
+		$("#prev-star").removeClass("sq-np-item-disabled");
+		$("#prev-mcq").removeClass("sq-np-item-disabled");
+		$("#prev-textarea-smiley").removeClass("sq-np-item-disabled");
 	}
 	if (qno == data.length - 1) {
 		$("#next-mcq").addClass("sq-np-item-disabled");
+		$("#next-textarea-smiley").addClass("sq-np-item-disabled");
 		$("#skip-ques-mcq").hide();
 	}
 }
@@ -112,7 +123,7 @@ function storeCustomerAnswer(customerResponse) {
 		"answer" : customerResponse,
 		"question" : questionDetails.question,
 		"questionType" : questionDetails.questionType,
-		"stage" : qno+1,
+		"stage" : qno + 1,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail
 	};
@@ -137,6 +148,48 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
+function updateCustomeResponse(feedback) {
+	var payload = {
+		"mood" : mood,
+		"feedback" : feedback,
+		"question" : questionDetails.question,
+		"questionType" : questionDetails.questionType,
+		"agentId" : agentId,
+		"customerEmail" : customerEmail
+	};
+	questionDetails.customerResponse = customerResponse;
+	$.ajax({
+		url : "./../data/storeFeedback",
+		type : "GET",
+		data : payload
+	});
+}
+
+function showFeedbackPage(mood)
+{
+	$("div[data-ques-type]").hide();
+	$("div[data-ques-type='smiley-text-final']").show();
+	$("#text-area").show();
+	$("#smiles-final").hide();
+	switch (mood) {
+	case "happy":
+		question = "Please share your kind words about us!";
+		$("#ques-text-textarea").html(question);
+		break;
+	case "neutral":
+		question = "Please share your views to help us improve our quality!";
+		$("#ques-text-textarea").html(question);
+		break;
+	case "sad":
+		question = "Please let us know what went wrong so that you dont get disappointed next time!";
+		$("#ques-text-textarea").html(question);
+		break;
+	}
+	$("#prev-textarea-smiley").removeClass("sq-np-item-disabled");
+	$("#next-textarea-smiley").addClass("sq-np-item-disabled");
+	$("#submit").show();
+}
+
 /*
  * This is used to render all the possible choices for an MCQ.
  */
@@ -156,10 +209,10 @@ function bindMcqCheckButton() {
 	$('.st-mcq-chk-on').click(function() {
 		$(this).hide();
 		$(this).parent().find('.st-mcq-chk-off').show();
-		customerResponse = $(this).parent().attr('answer');
 	});
 
 	$('.st-mcq-chk-off').click(function() {
+		customerResponse = $(this).parent().parent().attr('data-answer');
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
 		$('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
 		$(this).hide();
@@ -180,7 +233,7 @@ $('.sq-star').click(function() {
 		}
 	});
 	if (qno != data.length - 1) {
-		$("#next").removeClass("sq-np-item-disabled");
+		$("#next-star").removeClass("sq-np-item-disabled");
 	}
 	storeCustomerAnswer(starVal);
 });
@@ -189,9 +242,18 @@ $('.sq-star').click(function() {
 
 $('.sq-np-item-next').click(
 		function() {
-			if (questionDetails.question == "sb-sel-mcq"
-					&& customerResponse != undefined)
+			if (questionDetails.questionType == "sb-sel-mcq"
+					&& customerResponse != undefined) {
 				storeCustomerAnswer(customerResponse);
+			}
+			if (questionDetails.questionType == "sb-sel-desc"
+					&& customerResponse != undefined) {
+				customerResponse = $("#text-area").val();
+				if (customerResponse == undefined) {
+					customerResponse = "";
+				}
+				storeCustomerAnswer(customerResponse);
+			}
 			$(".sq-star").removeClass('sq-full-star');
 			qno++;
 			paintSurveyPageFromJson();
@@ -203,11 +265,44 @@ $('.sq-np-item-prev').click(function() {
 	$(".sq-star").removeClass('sq-full-star');
 	qno--;
 	paintSurveyPageFromJson();
-	var starVal = parseInt(questionDetails.customerResponse);
-	$('#sq-stars').find('.sq-star').each(function(index) {
-		if (index < starVal) {
-			$(this).addClass('sq-full-star');
-		}
-	});
-	$("#next").removeClass("sq-np-item-disabled");
+	if (questionDetails.questionType == "sb-range-star") {
+		var starVal = parseInt(questionDetails.customerResponse);
+		$('#sq-stars').find('.sq-star').each(function(index) {
+			if (index < starVal) {
+				$(this).addClass('sq-full-star');
+			}
+		});
+	}
+	if (questionDetails.questionType == "sb-range-smiles") {
+		var starVal = parseInt(questionDetails.customerResponse);
+		$('#sq-smiles').find('.sq-smile').each(function(index) {
+			if (index < starVal) {
+				$(this).addClass('sq-full-star');
+			}
+		});
+	}
+	$("#next-star").removeClass("sq-np-item-disabled");
+});
+
+$('.sq-happy-smile').click(function() {
+	// Update customer's mood in db and ask for cutomer's kind words.
+	mood = "happy";
+	showFeedbackPage(mood);
+});
+$('.sq-neutral-smile').click(function() {
+	// Update customer's mood in db and ask for feedback that could have made
+	// him happy.
+	mood = "neutral";
+	showFeedbackPage(mood);
+});
+$('.sq-sad-smile').click(function() {
+	// Update customer's mood in db and ask what went wrong during the entire
+	// course.
+	mood = "sad";
+	showFeedbackPage(mood);
+});
+
+$('.sq-btn-continue').click(function() {
+	feednack = $("#text-area").val();
+	updateCustomeResponse(feedback);
 });
