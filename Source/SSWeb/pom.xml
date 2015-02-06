@@ -20,7 +20,7 @@
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>
 		<servlet.version>2.5</servlet.version>
-		<dev.deployment.path>/home/bhumika/servers/jboss-as-7.1.1.Final/standalone/deployments</dev.deployment.path>
+		<dev.deployment.path>C:\Users\Shubham\Documents\jboss-as-7.1.1.Final\jboss-as-7.1.1.Final\standalone\deployments</dev.deployment.path>
 
 		<!-- Spring -->
 		<spring-framework.version>3.2.4.RELEASE</spring-framework.version>
@@ -132,7 +132,7 @@
 			<artifactId>recaptcha4j</artifactId>
 			<version>0.0.7</version>
 		</dependency>
-		
+
 		<!-- Spring Security -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -183,7 +183,12 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+		<dependency>
+			<groupId>javax.ws.rs</groupId>
+			<artifactId>javax.ws.rs-api</artifactId>
+			<version>2.0-m01</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

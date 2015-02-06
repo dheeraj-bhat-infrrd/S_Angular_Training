@@ -2,33 +2,46 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Achievement;
+import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisabledAccount;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailContent;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -42,10 +55,12 @@ import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
+@DependsOn("generic")
 @Component
-public class OrganizationManagementServiceImpl implements OrganizationManagementService {
+public class OrganizationManagementServiceImpl implements OrganizationManagementService, InitializingBean {
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
+	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
@@ -72,11 +87,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
 
 	@Autowired
+	private GenericDao<VerticalsMaster, Integer> verticalMastersDao;
+
+	@Autowired
 	private UserManagementService userManagementService;
-	
+
 	@Autowired
 	private SolrSearchService solrSearchService;
-	
+
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
 
@@ -86,20 +104,25 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Autowired
 	private EncryptionHelper encryptionHelper;
 
+	@Autowired
+	private Utils utils;
+
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
-	 * @throws SolrException 
+	 * 
+	 * @throws SolrException
+	 * @throws InvalidInputException
 	 */
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException {
+	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
 		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
-		
+
 		LOG.debug("Calling method for updating company for user profiles");
 		updateCompanyForUserProfile(user, company);
 
@@ -221,7 +244,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		user = userDao.findById(User.class, user.getUserId());
-//		List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user", user);
+		// List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user",
+		// user);
 		List<UserProfile> userProfiles = user.getUserProfiles();
 		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {
@@ -236,12 +260,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	/**
-	 * This method adds all the key and value pairs into the ORGANIZATION_LEVEL_SETTINGS table.
+	 * This method adds all the key and value pairs into mongo collection COMPANY_SETTINGS
 	 * 
 	 * @param user
+	 * @param company
 	 * @param organizationalDetails
+	 * @throws InvalidInputException
 	 */
-	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) {
+	private void addOrganizationalDetails(User user, Company company, Map<String, String> organizationalDetails) throws InvalidInputException {
 		LOG.debug("Method addOrganizationalDetails called.");
 		// create a organization settings object
 		OrganizationUnitSettings companySettings = new OrganizationUnitSettings();
@@ -252,15 +278,64 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactDetailSettings = new ContactDetailsSettings();
 		contactDetailSettings.setName(company.getCompany());
 		contactDetailSettings.setAddress(organizationalDetails.get(CommonConstants.ADDRESS));
+		contactDetailSettings.setAddress1(organizationalDetails.get(CommonConstants.ADDRESS1));
+		contactDetailSettings.setAddress2(organizationalDetails.get(CommonConstants.ADDRESS2));
 		contactDetailSettings.setZipcode(organizationalDetails.get(CommonConstants.ZIPCODE));
+		contactDetailSettings.setCountry(organizationalDetails.get(CommonConstants.COUNTRY));
+		contactDetailSettings.setCountryCode(organizationalDetails.get(CommonConstants.COUNTRY_CODE));
+		// Add work phone number in contact details
+		ContactNumberSettings contactNumberSettings = new ContactNumberSettings();
+		contactNumberSettings.setWork(organizationalDetails.get(CommonConstants.COMPANY_CONTACT_NUMBER));
+		contactDetailSettings.setContact_numbers(contactNumberSettings);
+		// Add work Mail id in contact details
+		MailIdSettings mailIdSettings = new MailIdSettings();
+		mailIdSettings.setWork(user.getEmailId());
+		contactDetailSettings.setMail_ids(mailIdSettings);
+		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
+		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
-		// insert the company settings
+		// TODO set lock settings
+		companySettings.setLockSettings(new LockSettings());
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
 		LOG.debug("Method addOrganizationalDetails finished");
+	}
+
+	/**
+	 * JIRA:SS-117 by RM02 Method to generate profile name for a company based on some rules
+	 * 
+	 * @param companyName
+	 * @param iden
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String generateProfileNameForCompany(String companyName, long iden) throws InvalidInputException {
+		LOG.debug("Generating profile name for companyName:" + companyName + " and iden:" + iden);
+		String profileName = null;
+		if (companyName == null || companyName.isEmpty()) {
+			throw new InvalidInputException("Company name is null or empty while generating profile name");
+		}
+		profileName = companyName.replaceAll(" ", "-").toLowerCase();
+
+		LOG.debug("Checking uniqueness of profile name generated : " + profileName + " by querying mongo");
+
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		/**
+		 * if there exists a company with the profile name formed, append company iden to get the
+		 * unique profile name
+		 */
+		if (companySettings != null) {
+
+			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
+			profileName = profileName + iden;
+		}
+		LOG.debug("Successfully generated profile name. Returning : " + profileName);
+		return profileName;
+
 	}
 
 	/**
@@ -317,7 +392,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	private void addTeamAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
@@ -343,7 +418,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 
-		
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
@@ -470,8 +544,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
 		// Decrypting the encompass password
-		if (companySettings != null && companySettings.getCrm_info() != null) {
-			CRMInfo crmInfo = companySettings.getCrm_info();
+		if (companySettings != null && companySettings.getCrm_info() != null
+				&& companySettings.getCrm_info().getCrm_source().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
+			EncompassCrmInfo crmInfo = (EncompassCrmInfo) companySettings.getCrm_info();
 
 			String encryptedPassword = crmInfo.getCrm_password();
 			String decryptedPassword = encryptionHelper.decryptAES(encryptedPassword, "");
@@ -769,6 +844,222 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// Perform soft delete of the record in the database
 		disabledAccountDao.update(disabledAccount);
 		LOG.info("Record successfully deleted from the database!");
+	}
+
+	@Override
+	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException {
+		if (logo == null || logo.isEmpty()) {
+			throw new InvalidInputException("Logo passed can not be null or empty");
+		}
+		LOG.info("Updating logo");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOGO, logo, companySettings,
+				collection);
+		LOG.info("Logo updated successfully");
+	}
+
+	@Override
+	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
+			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException {
+		if (contactDetailsSettings == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+		LOG.info("Updating contact detail information");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, unitSettings, collection);
+		LOG.info("Contact details updated successfully");
+		return contactDetailsSettings;
+	}
+
+	@Override
+	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
+			throws InvalidInputException {
+		if (associations == null || associations.isEmpty()) {
+			throw new InvalidInputException("Association name passed can not be null");
+		}
+		for (Association association : associations) {
+			if (association.getName() == null || association.getName().isEmpty()) {
+				associations.remove(association);
+			}
+		}
+		LOG.info("Adding associations");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
+				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Associations added successfully");
+		return associations;
+	}
+
+	@Override
+	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
+			throws InvalidInputException {
+		if (achievements == null || achievements.isEmpty()) {
+			throw new InvalidInputException("Achievements passed can not be null or empty");
+		}
+		LOG.info("Adding achievements");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements,
+				unitSettings, collection);
+		LOG.info("Achievements added successfully");
+		return achievements;
+	}
+
+	@Override
+	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn) throws InvalidInputException {
+		if (authorisedIn == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+
+		Licenses licenses = unitSettings.getLicenses();
+		if (licenses == null) {
+			LOG.debug("Licenses not present for current profile, create a new license object");
+			licenses = new Licenses();
+		}
+		licenses.setAuthorized_in(authorisedIn);
+		LOG.info("Adding Licences list");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses,
+				unitSettings, collection);
+		LOG.info("Licence authorisations added successfully");
+		return licenses;
+	}
+
+	@Override
+	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
+			throws InvalidInputException {
+		if (mediaTokens == null) {
+			throw new InvalidInputException("Media tokens passed was null");
+		}
+		LOG.info("Updating the social media tokens in profile.");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS,
+				mediaTokens, unitSettings, collection);
+		LOG.info("Successfully updated the social media tokens.");
+	}
+
+	/**
+	 * JIRA:SS-117 by RM02 Method to get the company details based on profile name
+	 */
+	@Override
+	@Transactional
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
+		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
+		if (profileName == null || profileName.isEmpty()) {
+			throw new InvalidInputException("profile name is null or empty while getting company details");
+		}
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
+		return companySettings;
+	}
+
+	/**
+	 * Method to get the region based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException {
+		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
+
+		/**
+		 * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
+		 * unique, whereas profileName is unique only within a company
+		 */
+		String profileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
+		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.info("Method getRegionByProfileName excecuted successfully");
+		return regionSettings;
+	}
+
+	/**
+	 * Method to get the branch based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
+		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
+
+		/**
+		 * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
+		 * unique, whereas profileName is unique only within a company
+		 */
+		String profileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
+		OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		LOG.info("Method getBranchByProfileName excecuted successfully");
+		return branchSettings;
+	}
+
+	/**
+	 * Method to fetch all regions of a company
+	 * 
+	 * @param companyProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException {
+		LOG.info("Method getRegionsForCompany called for companyProfileName:" + companyProfileName);
+		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		List<Region> regions = null;
+		if (companySettings != null) {
+			long companyId = companySettings.getIden();
+			LOG.debug("Fetching regions for company : " + companyId);
+			
+			/**
+			 * Adding columns to be fetched in the list
+			 */
+			List<String> columnNames = new ArrayList<String>();
+			columnNames.add(CommonConstants.REGION_NAME_COLUMN);
+			columnNames.add(CommonConstants.REGION_ID_COLUMN);
+			
+			/**
+			 * Building criteria
+			 */
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.COMPANY_COLUMN, companyDao.findById(Company.class, companyId));
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_INACTIVE);
+			regions = regionDao.findProjectionsByKeyValue(Region.class, columnNames, queries);
+		}
+		else {
+			LOG.warn("No company settings found for profileName : " + companyProfileName);
+		}
+		return regions;
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.info("afterPropertiesSet called for organization managemnet service");
+		// Populate the verticals master map
+		populateVerticalMastersMap();
+		LOG.info("afterPropertiesSet finished for organization managemnet service");
+
+	}
+
+	/**
+	 * Method to populate the vertical master map
+	 */
+	private void populateVerticalMastersMap() {
+		LOG.debug("Method called to populate vertical masters table");
+		List<VerticalsMaster> verticalsMasters = verticalMastersDao.findAllActive(VerticalsMaster.class);
+		if (verticalsMasters != null && !verticalsMasters.isEmpty()) {
+			for (VerticalsMaster verticalsMaster : verticalsMasters) {
+				verticalsMastersMap.put(verticalsMaster.getVerticalsMasterId(), verticalsMaster);
+			}
+		}
+	}
+
+	@Override
+	public List<VerticalsMaster> getAllVerticalsMaster() throws InvalidInputException {
+		LOG.info("Method getAllVerticalsMaster called to fetch the list of vertical masters");
+		List<VerticalsMaster> verticalsMasters = new ArrayList<>();
+		for (Map.Entry<Integer, VerticalsMaster> entry : verticalsMastersMap.entrySet()) {
+			verticalsMasters.add(entry.getValue());
+		}
+		if (verticalsMasters.isEmpty()) {
+			throw new InvalidInputException("No verticals master found");
+		}
+		LOG.info("Method getAllVerticalsMaster successfully finished");
+		return verticalsMasters;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
