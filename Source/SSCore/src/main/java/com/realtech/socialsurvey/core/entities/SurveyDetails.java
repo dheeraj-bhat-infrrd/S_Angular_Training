@@ -10,7 +10,7 @@ public class SurveyDetails {
 	private String customerName;
 	private String customerEmail;
 	private long companyId;
-	private long regionID;
+	private long regionId;
 	private long branchId;
 	private int stage;
 	private double score;
@@ -54,11 +54,11 @@ public class SurveyDetails {
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
-	public long getRegionID() {
-		return regionID;
+	public long getRegionId() {
+		return regionId;
 	}
-	public void setRegionID(long regionID) {
-		this.regionID = regionID;
+	public void setRegionId(long regionId) {
+		this.regionId = regionId;
 	}
 	public long getBranchId() {
 		return branchId;
