@@ -20,7 +20,7 @@
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>
 		<servlet.version>2.5</servlet.version>
-		<dev.deployment.path>/home/bhumika/servers/jboss-as-7.1.1.Final/standalone/deployments</dev.deployment.path>
+		<dev.deployment.path>C:\Users\Shubham\Documents\jboss-as-7.1.1.Final\jboss-as-7.1.1.Final\standalone\deployments</dev.deployment.path>
 
 		<!-- Spring -->
 		<spring-framework.version>3.2.4.RELEASE</spring-framework.version>
