@@ -14,24 +14,18 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
 /**
- * The persistent class for the SURVEY_QUESTIONS_ANSWER_OPTIONS database table.
+ * The persistent class for the SURVEY_COMPANY_MAPPING database table.
  */
 @Entity
-@Table(name = "SURVEY_QUESTIONS_ANSWER_OPTIONS")
-@NamedQuery(name = "SurveyQuestionsAnswerOption.findAll", query = "SELECT s FROM SurveyQuestionsAnswerOption s")
-public class SurveyQuestionsAnswerOption implements Serializable {
+@Table(name = "SURVEY_COMPANY_MAPPING")
+@NamedQuery(name = "SurveyCompanyMapping.findAll", query = "SELECT s FROM SurveyCompanyMapping s")
+public class SurveyCompanyMapping implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "SURVEY_QUESTIONS_ANSWER_OPTIONS_ID")
-	private int surveyQuestionsAnswerOptionsId;
-
-	@Column(name = "ANSWER")
-	private String answer;
-
-	@Column(name = "ANSWER_ORDER")
-	private int answerOrder;
+	@Column(name = "SURVEY_COMPANY_ID")
+	private long surveyCompanyMappingId;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -48,35 +42,24 @@ public class SurveyQuestionsAnswerOption implements Serializable {
 	@Column(name = "STATUS")
 	private int status;
 
-	// bi-directional many-to-one association to SurveyQuestion
+	// bi-directional many-to-one association to Survey
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "SURVEY_QUESTIONS_ID")
-	private SurveyQuestion surveyQuestion;
+	@JoinColumn(name = "SURVEY_ID")
+	private Survey survey;
 
-	public SurveyQuestionsAnswerOption() {}
+	// bi-directional many-to-one association to Company
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "COMPANY_ID")
+	private Company company;
 
-	public int getSurveyQuestionsAnswerOptionsId() {
-		return this.surveyQuestionsAnswerOptionsId;
+	public SurveyCompanyMapping() {}
+
+	public long getSurveyCompanyMappingId() {
+		return surveyCompanyMappingId;
 	}
 
-	public void setSurveyQuestionsAnswerOptionsId(int surveyQuestionsAnswerOptionsId) {
-		this.surveyQuestionsAnswerOptionsId = surveyQuestionsAnswerOptionsId;
-	}
-
-	public String getAnswer() {
-		return this.answer;
-	}
-
-	public void setAnswer(String answer) {
-		this.answer = answer;
-	}
-
-	public int getAnswerOrder() {
-		return this.answerOrder;
-	}
-
-	public void setAnswerOrder(int answerOrder) {
-		this.answerOrder = answerOrder;
+	public void setSurveyCompanyMappingId(long surveyCompanyMappingId) {
+		this.surveyCompanyMappingId = surveyCompanyMappingId;
 	}
 
 	public String getCreatedBy() {
@@ -119,12 +102,19 @@ public class SurveyQuestionsAnswerOption implements Serializable {
 		this.status = status;
 	}
 
-	public SurveyQuestion getSurveyQuestion() {
-		return this.surveyQuestion;
+	public Survey getSurvey() {
+		return this.survey;
 	}
 
-	public void setSurveyQuestion(SurveyQuestion surveyQuestion) {
-		this.surveyQuestion = surveyQuestion;
+	public void setSurvey(Survey survey) {
+		this.survey = survey;
 	}
 
+	public Company getCompany() {
+		return company;
+	}
+
+	public void setCompany(Company company) {
+		this.company = company;
+	}
 }

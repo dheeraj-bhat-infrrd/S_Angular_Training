@@ -52,6 +52,7 @@ public interface CommonConstants {
 	 */
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
+	public static final int STATUS_SURVEY_TEMPLATE = 2;
 	public static final int STATUS_NOT_VERIFIED = 2;
 	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
@@ -90,6 +91,12 @@ public interface CommonConstants {
 	public static final String BRANCH_ID_COLUMN = "branchId";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
 	public static final String REGION_NAME_COLUMN = "region";
+	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
+	public static final String SURVEY_COLUMN = "survey";
+	public static final String SURVEY_COMPANY_COLUMN = "company";
+	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
+	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
+
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -204,6 +211,12 @@ public interface CommonConstants {
 	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
+	
+	// Survey Constants
+	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
+	public static final String QUESTION_RATING = "range";
+	public static final int QUESTION_RATING_VALUE_TRUE = 1;
+	public static final int QUESTION_RATING_VALUE_FALSE = 0;
 
 	/**
 	 * Error codes
