@@ -97,6 +97,7 @@
         height: auto;
         padding: 0;
         margin: 0;
+        background-color: rgba(0, 159, 224, 0.8);
     }
     .pro-inp{
         margin-right: 10px;
@@ -110,7 +111,7 @@
 	}
 	.hdr-logo {
 		height: 60px;
-		width: 132px;
+		width: 120px;
 		background-size: 108px 36px;
 	}
 	.hdr-wrapper {
@@ -121,12 +122,12 @@
 		padding-left: 0;
 	}
 	.hr-txt {
-		font-size: 18px;
+		font-size: 14px;
 		line-height: 70px;
 	}
 	.hdr-log-reg-btn{
 		margin-left : 0;
-		padding: 0 15px;
+		padding: 0 10px;
 	}
 	.fp-container{
 		height: auto;

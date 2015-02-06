@@ -176,9 +176,10 @@ a, a:hover, a:visited{
 }
 
 .c-pic-top-1 {
+    position: relative;
     width: 475px;
     height: 180px;
-    background-color: rgba(0, 159, 224, 0.8);
+/*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
     margin-right: 5px;
     padding: 15px;
@@ -208,6 +209,8 @@ a, a:hover, a:visited{
 }
 
 .c-panel-txt-top {
+    position: relative;
+    z-index: 99;
     font-size: 32px;
 }
 
@@ -337,9 +340,10 @@ a, a:hover, a:visited{
 }
 
 .pro-right-wrapper {
+    position: relative;
     width: 660px;
     height: 80px;
-    background-color: rgba(0, 159, 224, 0.8);
+/*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
     padding: 20px;
 }
@@ -356,6 +360,8 @@ a, a:hover, a:visited{
     font-size: 12px;
     padding: 0 10px;
     margin-right: 10px;
+    z-index: 99;
+    position: relative;
 }
 
 .pro-btn {
@@ -528,4 +534,28 @@ a, a:hover, a:visited{
 
 .ctnt-list-item-even{
 	background-color: #fafaf9;
+}
+.blue-ext-left {
+    position: absolute;
+    width: 1500px;
+    height: 180px;
+    background-color: rgba(0, 159, 224, 0.8);
+    top: 0;
+    right: 0;
+    z-index: 9;
+}
+
+.c-panel-txt-bot {
+    position: relative;
+    z-index: 99;
+}
+
+.blue-ext-right {
+    position: absolute;
+    width: 1500px;
+    height: 80px;
+    background-color: rgba(0, 159, 224, 0.8);
+    top: 0;
+    left: 0;
+    z-index: 9;
 }
