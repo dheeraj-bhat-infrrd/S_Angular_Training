@@ -67,9 +67,9 @@ public class Company implements Serializable {
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
 	private List<Region> regions;
 
-	// bi-directional many-to-one association to Survey
+	// bi-directional many-to-one association to SurveyCompanyMapping
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
-	private List<Survey> surveys;
+	private List<SurveyCompanyMapping> surveyCompanyMappings;
 
 	// bi-directional many-to-one association to User
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
@@ -253,28 +253,28 @@ public class Company implements Serializable {
 		return region;
 	}
 
-	public List<Survey> getSurveys() {
-		return this.surveys;
+	public List<SurveyCompanyMapping> getSurveyCompanyMappings() {
+		return this.surveyCompanyMappings;
 	}
 
-	public void setSurveys(List<Survey> surveys) {
-		this.surveys = surveys;
+	public void setSurveyCompanyMappings(List<SurveyCompanyMapping> surveyCompanyMappings) {
+		this.surveyCompanyMappings = surveyCompanyMappings;
 	}
 
-	public Survey addSurvey(Survey survey) {
-		getSurveys().add(survey);
-		survey.setCompany(this);
+	public SurveyCompanyMapping addSurveyCompanyMapping(SurveyCompanyMapping surveyCompanyMapping) {
+		getSurveyCompanyMappings().add(surveyCompanyMapping);
+		surveyCompanyMapping.setCompany(this);
 
-		return survey;
+		return surveyCompanyMapping;
 	}
 
-	public Survey removeSurvey(Survey survey) {
-		getSurveys().remove(survey);
-		survey.setCompany(null);
+	public SurveyCompanyMapping removeSurveyCompanyMapping(SurveyCompanyMapping surveyCompanyMapping) {
+		getSurveyCompanyMappings().remove(surveyCompanyMapping);
+		surveyCompanyMapping.setCompany(null);
 
-		return survey;
+		return surveyCompanyMapping;
 	}
-
+	
 	public List<User> getUsers() {
 		return this.users;
 	}
