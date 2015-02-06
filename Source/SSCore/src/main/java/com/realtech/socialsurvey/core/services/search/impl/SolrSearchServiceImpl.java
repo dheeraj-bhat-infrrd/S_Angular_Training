@@ -338,12 +338,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 	
 	@Override
-	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException, MalformedURLException {
+	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
+			MalformedURLException {
 		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
 		if (patternFirst == null && patternLast == null) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Users");
 		}
-		
+
 		List<SolrDocument> users = new ArrayList<SolrDocument>();
 		QueryResponse response = null;
 		try {
@@ -351,10 +352,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
 					CommonConstants.USER_EMAIL_ID_SOLR };
 			solrQuery.setFields(fields);
-			
+
 			String query = "";
 			if (!patternFirst.equals("") && !patternLast.equals("")) {
-				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+						+ patternLast + "*";
 			}
 			else if (!patternFirst.equals("") && patternLast.equals("")) {
 				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
@@ -363,9 +365,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
 			}
 			solrQuery.setQuery(query);
-			
-			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
-					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
 
 			LOG.debug("Querying solr for searching users");
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
