@@ -10,10 +10,13 @@
 	<http use-expressions="true" auto-config="true" entry-point-ref="customEntryPoint"
 		authentication-manager-ref="authenticationManager">
 		<intercept-url pattern="/" access="permitAll" />
+		<intercept-url pattern="/fetchprofile.do" access="permitAll" />
 		
 		<intercept-url pattern="/registration.do" access="permitAll" />
 		<intercept-url pattern="/register.do" access="permitAll" />
 		<intercept-url pattern="/verification.do" access="permitAll" />
+		
+		<intercept-url pattern="/testpage.do" access="permitAll" />
 		
 		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
 		<intercept-url pattern="/completeregistration.do" access="permitAll" />
@@ -22,7 +25,6 @@
 		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
 		<intercept-url pattern="/resetPassword.do" access="permitAll" />
 
-		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 
 		<form-login login-page="/"
 			authentication-failure-url="/?s=autherror"

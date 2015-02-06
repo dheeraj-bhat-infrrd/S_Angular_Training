@@ -11,6 +11,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -74,7 +75,6 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional
 	public List<T> findAll(Class<T> entityClass) {
 		try {
 			final Criteria crit = getSession().createCriteria(entityClass);
@@ -270,6 +270,21 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<T> findAllActive(Class<T> entityClass) {
+		try {
+			Criteria crit = getSession().createCriteria(entityClass);
+			crit.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+			return crit.list();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findAllActive().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
+		}
+	}
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<T> findByKeyValueAscending(Class<T> dataClass, Map<String, Object> queries, String ascendingColumn) {
@@ -289,18 +304,23 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional
-	public List<T> findAllActive(Class<T> entityClass) {
+	public List<T> findProjectionsByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries) {
 		try {
-			Criteria crit = getSession().createCriteria(entityClass);
-			crit.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+			Criteria crit = getSession().createCriteria(dataClass);
+			ProjectionList projections = Projections.projectionList();
+			for (String columnName : columnNames) {
+				projections.add(Projections.property(columnName));
+			}
+			crit.setProjection(projections);
+			for (Entry<String, Object> query : queries.entrySet()) {
+				crit.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
 			return crit.list();
 		}
-		catch (HibernateException hibernateException) {
-			LOG.error("HibernateException caught in findAllActive().", hibernateException);
-			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
+		catch (HibernateException e) {
+			LOG.error("HibernateException caught in findProjectionsByKeyValue(). Reason: "+e.getMessage(), e);
+			throw new DatabaseException("HibernateException caught in findProjectionsByKeyValue().", e);
 		}
 	}
-
 }
 // JIRA: SS-8: By RM05: EOC

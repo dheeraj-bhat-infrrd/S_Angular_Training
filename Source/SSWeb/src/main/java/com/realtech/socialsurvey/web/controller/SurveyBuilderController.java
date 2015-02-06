@@ -70,10 +70,6 @@ public class SurveyBuilderController {
 				return JspResolver.SURVEY_BUILDER;
 			}
 		}
-		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException in fetching Highest role. Reason:" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
-		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException in showBuildSurveyPage. Reason:" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
