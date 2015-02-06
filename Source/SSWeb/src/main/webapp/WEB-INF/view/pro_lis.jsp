@@ -27,7 +27,7 @@
         
         <div class="hero-wrapper">
             <div class="hero-container container">
-                <div class="hr-txt">Not the one your are looking for?</div>
+                <div class="hr-txt"><spring:message code="label.notrelevatprofile.key"/></div>
             </div>
         </div>
         
