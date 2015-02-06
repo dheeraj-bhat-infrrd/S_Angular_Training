@@ -60,6 +60,36 @@ function validateRegistrationForm(id) {
 		return false;
 
 	}
+	
+	if (!validateRegPassword('reg-pwd')) {
+		$('#reg-pwd').focus();
+		return false;
+	}
+	if (!validateRegConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
+		$('#reg-conf-pwd').focus();
+		return false;
+	}
+	return true;
+}
+
+function validatePreRegistrationForm(id) {
+	// hide the server error
+	$("#serverSideerror").hide();
+	// Validate form input elements
+	if (!validateRegFirstName('reg-fname')) {
+		$('#reg-fname').focus();
+		return false;
+	}
+	if (!validateRegLastName('reg-lname')) {
+		$('#reg-lname').focus();
+		return false;
+
+	}
+	if (!validateRegEmailId('reg-email')) {
+		$('#reg-email').focus();
+		return false;
+
+	}
 	return true;
 }
 
