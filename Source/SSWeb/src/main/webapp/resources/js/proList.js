@@ -1,8 +1,9 @@
 function adjustTextContainerWidthOnResize() {
 	var parentWidth = $('.ctnt-list-item').width();
 	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
-	var buttonWidth = $('.ctnt-list-item .ctnt-list-item-btn-wrap').width();
-	var textContainerWidth = parentWidth - (imgWidth + buttonWidth) - 20;
+	// var buttonWidth = $('.ctnt-list-item .ctnt-list-item-btn-wrap').width();
+	// var textContainerWidth = parentWidth - (imgWidth + buttonWidth) - 20;
+	var textContainerWidth = parentWidth - imgWidth - 20;
 	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
 }
 
