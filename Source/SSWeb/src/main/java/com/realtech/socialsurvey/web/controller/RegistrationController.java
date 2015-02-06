@@ -163,10 +163,29 @@ public class RegistrationController {
 	 * @return
 	 */
 	@RequestMapping(value = "/registration")
-	public String initDirectRegistration(Model model) {
+	public String initDirectRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method called for showing up the direct registration page");
-		model.addAttribute("isDirectRegistration", true);
-		return JspResolver.REGISTRATION;
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
+		try {
+			LOG.debug("Validating form elements");
+			validateFormParameters(firstName, lastName, emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
+
+			model.addAttribute("firstname", firstName);
+			model.addAttribute("lastname", lastName);
+			model.addAttribute("emailid", emailId);
+			model.addAttribute("isDirectRegistration", true);
+			return JspResolver.REGISTRATION;
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.LOGIN;
+		}
+
 	}
 
 	/**
@@ -242,7 +261,7 @@ public class RegistrationController {
 				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			model.addAttribute("verticals",verticalsMasters);
+			model.addAttribute("verticals", verticalsMasters);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while registering user. Reason : " + e.getMessage(), e);
@@ -253,7 +272,8 @@ public class RegistrationController {
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", originalEmailId);
-			return JspResolver.INDEX;
+			model.addAttribute("isDirectRegistration", strIsDirectRegistration);
+			return JspResolver.REGISTRATION;
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
