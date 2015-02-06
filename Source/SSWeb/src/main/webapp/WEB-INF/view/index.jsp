@@ -49,6 +49,7 @@
                 <div class="float-left c-pic-panel">
                     <div class="clearfix c-pic-panel-top">
                         <div class="float-left c-pic-top-1">
+                        	<div class="blue-ext-left"></div>
                             <div class="c-panel-txt-top txt-bold">Lorem Ipsum Dore It</div>
                             <div class="c-panel-txt-bot">Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It </div>
                         </div>
@@ -120,6 +121,7 @@
             <div class="pro-wrapper clearfix">
                 <div class="pro-left-wrapper float-left">Find a professional</div>
                 <div class="pro-right-wrapper clearfix float-left">
+                	<div class="blue-ext-right"></div>
                     <input class="pro-inp" placeholder="First Name">
                     <input class="pro-inp" placeholder="Last Name">
                     <input type="button" class="pro-inp pro-btn" value="Submit">
@@ -213,7 +215,7 @@
 
 			function submitRegistrationForm() {
 				console.log("submitting registration form");
-				if(validateRegistrationForm('reg-form')){
+				if(validatePreRegistrationForm('reg-form')){
 					$('#registration-form').submit();
 					showOverlay();
 				}
