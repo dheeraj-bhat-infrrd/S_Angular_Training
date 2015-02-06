@@ -17,6 +17,8 @@
 		<intercept-url pattern="/register.do" access="permitAll" />
 		<intercept-url pattern="/verification.do" access="permitAll" />
 		
+		<intercept-url pattern="/testpage.do" access="permitAll" />
+		
 		<intercept-url pattern="/showcompleteregistrationpage.do" access="permitAll" />
 		<intercept-url pattern="/completeregistration.do" access="permitAll" />
 		
