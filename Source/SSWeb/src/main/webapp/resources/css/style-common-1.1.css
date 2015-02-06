@@ -360,10 +360,10 @@ a, a:hover, a:visited{
 
 .pro-btn {
     margin-right: 0;
-    color: #fff;
+    color: #fff !important;
     cursor: pointer;
     background-color: #7fba00;
-    font-size: 16px;
+    font-size: 18px !important;
 }
 
 .pro-wrapper {
@@ -439,13 +439,13 @@ a, a:hover, a:visited{
 
 .fp-left-item {
     font-family: 'opensanssemibold';
-    font-size: 24px;
-    text-align: right;
+	font-size: 22px;
+	text-align: right;
+	line-height: 80px;
+	padding-left: 15px;
 }
 
 .fp-wrapper {
-    padding: 20px;
-    width: 660px;
     height: 80px;
 }
 
@@ -463,8 +463,9 @@ a, a:hover, a:visited{
     margin-right: 10px;
 }
 
-.srch-name {
-    font-weight: bold;
+.srch-name,.ctnt-item-desig {
+   font-weight: bold;
+   font-size:14px;
 }
 
 .srch-num {
@@ -473,14 +474,58 @@ a, a:hover, a:visited{
 
 .ctnt-list-item {
     padding: 20px;
+    height: 135px;
+    border-bottom: 1px solid #EEEDE9;
 }
 
 .ctnt-review-btn {
     cursor: pointer;
     background-color: #009FE0;
     color: #fff;
+    width: 160px;
+	line-height: 40px;
+	height: 40px;
+	text-align: center;
+	border-radius: 3px;
+	font-size: 14px;
 }
 
 .ctnt-item-name {
     color: #009FE0;
+}
+
+.fp-right-item{
+	margin-left: 40px;
+	margin-top: 20px;
+}
+
+.fp-row-wrapper{
+	margin:0 auto;
+	width:890px;
+}
+
+.ctnt-list-item-img{
+	width : 80px;
+	height : 80px;
+	margin: auto 15px;
+	background: url(../images/Person1.png) no-repeat center;
+	border-radius: 3px;
+}
+
+.ctnt-list-item-txt-wrap{
+	height: 100px;
+	overflow: hidden;
+}
+
+.ctnt-list-header{
+	border-bottom: 1px solid #EEEDE9;
+	margin-top: 50px;
+}
+
+.ctnt-list-wrapper{
+	margin-bottom: 2px;
+}
+
+.ctnt-list-item-even{
+	background-color: #fafaf9;
 }
