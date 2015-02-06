@@ -107,7 +107,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12"></div>
+                    <div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
                 </div>
             </div>
         </div>
@@ -130,7 +130,8 @@
 	        	var parentWidth = $('.ctnt-list-item').width();
 	        	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
 	        	var buttonWidth = $('.ctnt-list-item .ctnt-list-item-btn-wrap').width();
-	        	var textContainerWidth = parentWidth - (imgWidth + buttonWidth) - 20;
+//	        	var textContainerWidth = parentWidth - (imgWidth + buttonWidth) - 20;
+	        	var textContainerWidth = parentWidth - imgWidth - 20;
 	        	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
         	}
             
