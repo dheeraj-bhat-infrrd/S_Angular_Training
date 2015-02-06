@@ -61,7 +61,8 @@ public class SurveyManagementController {
 			survey = new Gson().toJson(surveyQuestionDetails);
 		}
 		catch (NonFatalException e) {
-
+			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
+			return "{error:"+e.getMessage()+"}";
 		}
 		LOG.info("Service to get survey executed successfully");
 		return survey;
@@ -79,10 +80,26 @@ public class SurveyManagementController {
 		String questionType = request.getParameter("questionType");
 		int stage = Integer.parseInt(request.getParameter("stage"));
 		String customerEmail = request.getParameter("customerEmail");
-		System.out.println(request.getParameter("agentId"));
 		long agentId = Long.valueOf(request.getParameter("agentId"));
 		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
+	}
+	
+	/*
+	 * Method to store final feedback of the survey from customer.
+	 */
+	@RequestMapping(value = "/data/storeFeedback")
+	public void storeFeedback(HttpServletRequest request) {
+		LOG.info("Method storeFeedback() started to store response of customer.");
+		// TODO store answer provided by customer in mongoDB.
+		String answer = request.getParameter("answer");
+		String question = request.getParameter("question");
+		String questionType = request.getParameter("questionType");
+		int stage = Integer.parseInt(request.getParameter("stage"));
+		String customerEmail = request.getParameter("customerEmail");
+		long agentId = Long.valueOf(request.getParameter("agentId"));
+		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
+		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
 
 	/*
@@ -99,7 +116,7 @@ public class SurveyManagementController {
 	 * Method to store questions and other details into mongo initially.
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/triggersurvey/{customerEmail}/{companyIdStr}/{regionIdStr}/{branchIdStr}/{agentIdStr}")
+	@RequestMapping(value = "/triggersurvey/{customerEmail}/{companyIdStr}/{regionIdStr}/{branchIdStr}/{agentIdStr}/")
 	public String triggerSurvey(Model model, @PathVariable String customerEmail, @PathVariable String companyIdStr, @PathVariable String regionIdStr,
 			@PathVariable String branchIdStr, @PathVariable String agentIdStr) {
 		LOG.info("Method to store initial values for a survey, triggerSurvey() started");
