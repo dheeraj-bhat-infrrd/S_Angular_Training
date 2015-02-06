@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
@@ -42,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -146,9 +148,10 @@ public class OrganizationManagementController {
 		String companyContactNo = request.getParameter("contactno");
 		String country = request.getParameter("country");
 		String countryCode = request.getParameter("countrycode");
-
+		String vertical = request.getParameter("vertical");
+		
 		try {
-			validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo);
+			validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo,vertical);
 			String address = getCompleteAddress(address1, address2);
 
 			HttpSession session = request.getSession(false);
@@ -173,6 +176,7 @@ public class OrganizationManagementController {
 			if (logoName != null) {
 				companyDetails.put(CommonConstants.LOGO_NAME, logoName);
 			}
+			companyDetails.put(CommonConstants.VERTICAL, vertical);
 
 			LOG.debug("Calling services to add company details");
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
@@ -182,6 +186,15 @@ public class OrganizationManagementController {
 					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 
 			LOG.debug("Successfully executed service to add company details");
+			List<VerticalsMaster> verticalsMasters = null;
+			try {
+				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			model.addAttribute("verticals",verticalsMasters);
 
 		}
 		catch (NonFatalException e) {
@@ -204,7 +217,7 @@ public class OrganizationManagementController {
 	 * @throws InvalidInputException
 	 */
 	private void validateCompanyInfoParams(String companyName, String address, String country, String countryCode, String zipCode,
-			String companyContactNo) throws InvalidInputException {
+			String companyContactNo,String vertical) throws InvalidInputException {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
@@ -232,6 +245,9 @@ public class OrganizationManagementController {
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
+		}
+		if(vertical == null || vertical.isEmpty()){
+			throw new InvalidInputException("Vertical selected is not valid",DisplayMessageConstants.INVALID_VERTICAL);
 		}
 		LOG.debug("Returning from validateCompanyInfoParams after validating parameters");
 	}
@@ -347,19 +363,19 @@ public class OrganizationManagementController {
 			String plainPassword = request.getParameter("encompass-password");
 			String cipherPassword = encryptionHelper.encryptAES(plainPassword, "");
 
-			CRMInfo crmInfo = new CRMInfo();
-			crmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
-			crmInfo.setCrm_username(request.getParameter("encompass-username"));
-			crmInfo.setCrm_password(cipherPassword);
-			crmInfo.setUrl(request.getParameter("encompass-url"));
-			crmInfo.setConnection_successful(true);
+			EncompassCrmInfo encompassCrmInfo = new EncompassCrmInfo();
+			encompassCrmInfo.setCrm_source(CommonConstants.CRM_INFO_SOURCE_ENCOMPASS);
+			encompassCrmInfo.setCrm_username(request.getParameter("encompass-username"));
+			encompassCrmInfo.setCrm_password(cipherPassword);
+			encompassCrmInfo.setUrl(request.getParameter("encompass-url"));
+			encompassCrmInfo.setConnection_successful(true);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
-			organizationManagementService.updateCRMDetails(companySettings, crmInfo);
+			organizationManagementService.updateCRMDetails(companySettings, encompassCrmInfo);
 
 			// set the updated settings value in session with plain password
-			crmInfo.setCrm_password(plainPassword);
-			companySettings.setCrm_info(crmInfo);
+			encompassCrmInfo.setCrm_password(plainPassword);
+			companySettings.setCrm_info(encompassCrmInfo);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ENCOMPASS_DATA_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
 		}

@@ -49,14 +49,16 @@ public interface OrganizationUnitSettingsDao {
 	 * @param unitSettings
 	 * @param collectionName
 	 */
-	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings, String collectionName);
-	
+	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,
+			String collectionName);
+
 	/**
 	 * Fetchs the list of names of logos being used.
+	 * 
 	 * @return
 	 */
 	public List<String> fetchLogoList();
-	
+
 	/**
 	 * Updates a particular key of organization unit settings based on criteria specified
 	 * 
@@ -68,5 +70,22 @@ public interface OrganizationUnitSettingsDao {
 	 */
 	public void updateKeyOrganizationUnitSettingsByCriteria(String keyToUpdate, Object updatedRecord, String criteriaKey, Object criteriaValue,
 			String collectionName);
+
+	/**
+	 * Method to fetch organization unit settings on the basis of profile name
+	 * 
+	 * @param profileName
+	 * @param collectionName
+	 * @return
+	 */
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName(String profileName, String collectionName);
+	
+	/**
+	 *  Method to fetch organization unit settings on the basis of profile url
+	 * @param profileUrl
+	 * @param collectionName
+	 * @return
+	 */
+	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName);
 
 }

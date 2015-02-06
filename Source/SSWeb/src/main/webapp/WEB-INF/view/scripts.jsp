@@ -9,6 +9,8 @@
 <script src="https://js.braintreegateway.com/v2/braintree.js"></script><script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/surveyBuilder.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
 <script>
 	$('#logout-section').click(function(e) {
 		logoutuser();

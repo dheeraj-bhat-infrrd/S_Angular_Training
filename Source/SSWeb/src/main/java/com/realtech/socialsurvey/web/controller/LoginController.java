@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -126,6 +127,17 @@ public class LoginController {
 
 				LOG.debug("Company profile not complete, redirecting to company information page");
 				redirectTo = JspResolver.COMPANY_INFORMATION;
+				if(redirectTo.equals(JspResolver.COMPANY_INFORMATION)){
+					List<VerticalsMaster> verticalsMasters = null;
+					try {
+						verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+					}
+					catch (InvalidInputException e) {
+						throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+								DisplayMessageConstants.GENERAL_ERROR, e);
+					}
+					model.addAttribute("verticals",verticalsMasters);
+				}
 			}
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
