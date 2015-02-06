@@ -950,7 +950,7 @@ public class UserManagementController {
 	/*
 	 * Method to find a user on the basis of email id provided.
 	 */
-	@RequestMapping(value = "/findaprofile", method = RequestMethod.POST)
+	@RequestMapping(value = "/findapro", method = RequestMethod.POST)
 	public String findAProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method findAProfile called.");
 		List<SolrDocument> users;
@@ -984,6 +984,7 @@ public class UserManagementController {
 			return JSONUtil.toJSON(errorResponse);
 		}
 		model.addAttribute("users", users);
+		model.addAttribute("results", users.size());
 		model.addAttribute("patternFirst", patternFirst);
 		model.addAttribute("patternLast", patternLast);
 		
