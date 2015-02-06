@@ -176,9 +176,10 @@ a, a:hover, a:visited{
 }
 
 .c-pic-top-1 {
+    position: relative;
     width: 475px;
     height: 180px;
-    background-color: rgba(0, 159, 224, 0.8);
+/*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
     margin-right: 5px;
     padding: 15px;
@@ -208,6 +209,8 @@ a, a:hover, a:visited{
 }
 
 .c-panel-txt-top {
+    position: relative;
+    z-index: 99;
     font-size: 32px;
 }
 
@@ -337,9 +340,10 @@ a, a:hover, a:visited{
 }
 
 .pro-right-wrapper {
+    position: relative;
     width: 660px;
     height: 80px;
-    background-color: rgba(0, 159, 224, 0.8);
+/*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
     padding: 20px;
 }
@@ -356,6 +360,8 @@ a, a:hover, a:visited{
     font-size: 12px;
     padding: 0 10px;
     margin-right: 10px;
+    z-index: 99;
+    position: relative;
 }
 
 .pro-btn {
@@ -391,4 +397,121 @@ a, a:hover, a:visited{
 
 .footer-wrapper {
     margin: 20px 0;
+}
+
+.hdr-log-reg-btn {
+    font-size: 12px;
+    margin-top: 25px;
+    margin-left: 10px;
+    padding: 0 25px;
+    cursor: pointer;
+    height: 28px;
+    line-height: 28px;
+    text-transform: uppercase;
+}
+
+.hdr-btns-wrapper {
+    color: #fff;
+}
+
+.hdr-wrapper {
+    height: 80px;
+    background-color: #009FE0;
+}
+
+.hdr-logo {
+    height: 80px;
+    width: 180px;
+    background: url(../images/ss-logo.png) no-repeat center;
+}
+
+.hdr-reg-btn {
+    border: 1px solid #fff;
+    border-radius: 3px;
+}
+
+.hr-txt {
+    font-family: 'opensanssemibold';
+    font-size: 22px;
+    text-align: center;
+    line-height: 95px;
+}
+
+.fp-container {
+    height: 80px;
+    background-color: #009FE0;
+    color: #fff;
+}
+
+.fp-left-item {
+    font-family: 'opensanssemibold';
+    font-size: 24px;
+    text-align: right;
+}
+
+.fp-wrapper {
+    padding: 20px;
+    width: 660px;
+    height: 80px;
+}
+
+.fp-inp {
+    color: #3e3e3e;
+    display: block;
+    float: left;
+    width: 200px;
+    margin-right: 0;
+    height: 40px;
+    border: 0;
+    border-radius: 3px;
+    font-size: 12px;
+    padding: 0 10px;
+    margin-right: 10px;
+}
+
+.srch-name {
+    font-weight: bold;
+}
+
+.srch-num {
+    font-weight: bold;
+}
+
+.ctnt-list-item {
+    padding: 20px;
+}
+
+.ctnt-review-btn {
+    cursor: pointer;
+    background-color: #009FE0;
+    color: #fff;
+}
+
+.ctnt-item-name {
+    color: #009FE0;
+}
+
+.blue-ext-left {
+    position: absolute;
+    width: 1500px;
+    height: 180px;
+    background-color: rgba(0, 159, 224, 0.8);
+    top: 0;
+    right: 0;
+    z-index: 9;
+}
+
+.c-panel-txt-bot {
+    position: relative;
+    z-index: 99;
+}
+
+.blue-ext-right {
+    position: absolute;
+    width: 1500px;
+    height: 80px;
+    background-color: rgba(0, 159, 224, 0.8);
+    top: 0;
+    left: 0;
+    z-index: 9;
 }
