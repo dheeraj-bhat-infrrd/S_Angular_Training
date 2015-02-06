@@ -39,7 +39,7 @@ public class TestController {
 	@RequestMapping(value = "/testpage")
 	public String testpage(HttpServletRequest request) {
 		LOG.info("Method testpage called");
-		return "errorpage";
+		return "index-small";
 	}
 
 	@RequestMapping(value = "/jumptodashboard")
