@@ -1,0 +1,350 @@
+/* ============== SMARTPHONES ==============*/
+@media (max-width: 767px) {
+    .header-logo-wrapper{
+        width: 100%;
+        height: 50px;
+        background-size: auto 32px;
+        float: none;
+    }
+    .header-row{
+        margin: 0 -15px;
+    }
+    .header-login-wrapper{
+        float: none;
+        width: 100%;
+        overflow: auto;
+        height: auto;
+    }
+    .h-email-wrapper, .h-pwd-wrapper, .h-login-btn-wrapper{
+        float: none;
+        width: 100%;
+        margin: 0;
+    }
+    .h-lbl{
+        line-height: 30px;
+        margin-bottom: 0;
+        padding: 0 10px;
+    }
+    .h-inp{
+        width: 100%;
+        border-radius: 0;
+    }
+    .h-btn-login{
+        margin: 10px auto;
+    }
+    .hero-txt-wrapper{
+        width: 100%;
+        padding: 10px 0px;
+        font-size: 24px;
+        margin: 0;
+    }
+    .content-wrapper{
+        margin: 0 -15px;
+    }
+    .c-pic-panel{
+        display: none;
+    }
+    .c-reg-panel{
+        width: 100%;
+        padding: 0;
+        height: auto;
+    }
+    .reg-txt-top1{
+        font-size: 18px;
+        text-align: center;
+        margin-top: 5px;
+    }
+    .reg-txt-top2{
+        text-align: center;
+    }
+    .reg-inp{
+        width: 100% !important;
+        margin-bottom: 15px;
+        border-radius: 0;
+    }
+    .reg-captcha-wrapper{
+        width: 100%;
+        border-radius: 0;
+    }
+    .reg-captcha-btns{
+        width: 100%;
+        background-color: #fff;
+    }
+    .reg-cap-txt{
+/*        max-width: 165px;*/
+    }
+    .reg-btn{
+        width: 280px !important;
+        display: block;
+        margin: 10px auto;
+        height: 44px;
+        font-size: 14px;
+    }
+    .pro-wrapper{
+        margin: 25px -15px;
+    }
+    .pro-left-wrapper{
+        width: 100%;
+        line-height: 40px;
+        text-align: center;
+        font-size: 16px;
+        padding: 0;
+        margin: 0;
+        height: 40px;
+    }
+    .pro-right-wrapper{
+        width: 100%;
+        height: auto;
+        padding: 0;
+        margin: 0;
+        background-color: rgba(0, 159, 224, 0.8);
+    }
+    .pro-inp{
+        margin-right: 10px;
+        margin: 0 0 15px 0;
+        width: 100%;
+        border-radius: 0;
+    }
+    .hr-txt {
+		font-size: 20px;
+		line-height: 70px;
+	}
+	.hdr-logo {
+		height: 60px;
+		width: 120px;
+		background-size: 108px 36px;
+	}
+	.hdr-wrapper {
+		height: 60px;
+	}
+	.fp-container {
+		padding-right: 0;
+		padding-left: 0;
+	}
+	.hr-txt {
+		font-size: 14px;
+		line-height: 70px;
+	}
+	.hdr-log-reg-btn{
+		margin-left : 0;
+		padding: 0 10px;
+	}
+	.fp-container{
+		height: auto;
+	}
+	.fp-right-item{
+		float: none;
+		display:block;
+		margin-top: 10px;
+		margin-left: 0;
+	}
+	.fp-left-item{
+		float: none;
+		display:block;
+		line-height: 40px;
+		text-align: center;
+	}
+	.fp-inp{
+		width: 100%;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		border-radius: 0;
+	}
+	.fp-row-wrapper{
+		width:100%;
+	}
+	.fp-container .row{
+		margin-left:0;
+		margin-right: 0;
+	}
+	.fp-wrapper{
+		height: auto;
+	}
+	.ctnt-list-item{
+		padding: 10px 0;
+	}
+	.ctnt-list-item-img {
+		width: 50px;
+		height: 50px;
+		margin: auto 5px;
+	}
+	.ctnt-review-btn{
+		width: 90px;
+		font-size: 12px;
+	}
+}
+
+
+
+/* ============== ANTHING ABOVE SMARTPHONES ==============*/
+@media (min-width: 768px) {
+}
+
+
+
+/* ============== ONLY TABLETS ==============*/
+@media (min-width: 768px) and (max-width: 991px) {
+    .c-pic-panel {
+        margin-right: 0;
+        width: 720px;
+        margin-bottom: 15px;
+    }
+    .c-pic-top-1{
+        width: 477px;
+        margin-right: 7px;
+    }
+    .c-pic-panel-top {
+        margin-bottom: 7px;
+    }
+    .c-pic-img{
+        width: 235px;
+    }
+    .c-pic-bot-1{
+        margin-right: 7px;
+    }
+    .c-reg-panel{
+        width: 719px;
+        height: auto;
+    }
+    .reg-inp{
+        margin-right: 0;
+    }
+    .reg-btn{
+        margin-bottom: 0;
+    }
+    .reg-cap-txt{
+        width: 565px;
+    }
+    .reg-inp-1 {
+        margin-right: 5px !important;
+        width: 335px;
+    }
+    .reg-inp-2{
+        width: 335px;
+    }
+    .pro-wrapper{
+        width: 719px;
+    }
+    .pro-left-wrapper{
+        width: 100%;
+        text-align: left;
+        line-height: 44px;
+        height: 44px;
+        padding: 0 20px;
+        font-size: 18px;
+        margin: 0;
+    }
+    .pro-right-wrapper{
+        width: 719px;
+        height: 60px;
+        padding: 2px 20px;
+    }
+    .pro-inp{
+        width: 219px;
+    }
+    .ctnt-list-item-txt-wrap{
+    	width: 257px !important;
+    }
+    .ctnt-review-btn{
+    	width:125px;
+    }
+    .fp-inp{
+    	width:150px;
+    }
+}
+
+
+
+/* ============== MEDIUM SIZED SCREENS ==============*/
+@media (min-width: 992px) and (max-width: 1199px) {
+    .c-pic-panel{
+        width: 625px;
+    }
+    .c-pic-top-1{
+        width: 415px;
+    }
+    .c-pic-img{
+        width: 205px;
+    }
+    .c-reg-panel{
+        width: 300px;
+    }
+    .reg-txt-top1{
+        font-size: 24px;
+    }
+    .reg-item{
+        margin-bottom: 0;
+    }
+    .reg-inp{
+        width: 100% !important;
+        margin-bottom: 7px;
+    }
+    .reg-captcha-wrapper{
+        margin-bottom: 7px;
+    }
+    .reg-cap-txt{
+        width: 162px;
+    }
+    .c-reg-panel{
+        padding: 12px;
+    }
+    .pro-left-wrapper{
+        font-size: 16px;
+        padding: 0px 15px;
+        width: 205px;
+    }
+    .pro-right-wrapper{
+        width: 730px;
+    }
+    .pro-inp{
+        width: 223px;
+    }
+    .ctnt-list-item-txt-wrap{
+    	width: 385px !important;
+    }
+}
+
+
+
+/* ============== LARGE SIZED SCREENS ==============*/
+@media (min-width: 1200px) {
+    .ctnt-list-item-txt-wrap{
+		width:537px !important;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

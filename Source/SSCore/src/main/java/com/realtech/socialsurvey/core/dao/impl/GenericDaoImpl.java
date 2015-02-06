@@ -10,6 +10,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Example;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
 
@@ -72,11 +75,10 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@SuppressWarnings("unchecked")
 	@Override
-	@Transactional
 	public List<T> findAll(Class<T> entityClass) {
 		try {
 			final Criteria crit = getSession().createCriteria(entityClass);
-			  return crit.list();
+			return crit.list();
 		}
 		catch (HibernateException hibernateException) {
 			LOG.error("HibernateException caught in findAll().", hibernateException);
@@ -215,7 +217,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
-	
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public List<T> findByColumnForMultipleValues(Class<T> dataClass, String column, List<?> values) {
@@ -229,7 +231,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 		}
 		return criteria.list();
 	}
-	
+
 	@Override
 	public long findNumberOfRows(Class<T> dataClass) {
 		try {
@@ -240,7 +242,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			throw new DatabaseException("HibernateException caught in findNumberOfRows().", hibernateException);
 		}
 	}
-	
+
 	@Override
 	public long findNumberOfRowsByKeyValue(Class<T> dataClass, Map<String, Object> queries) {
 		Criteria criteria = getSession().createCriteria(dataClass);
@@ -258,7 +260,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 
 	@Override
 	public void merge(T entity) {
-		
+
 		try {
 			getSession().merge(entity);
 		}
@@ -266,9 +268,59 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			LOG.error("HibernateException caught in merge().", hibernateException);
 			throw new DatabaseException("HibernateException caught in merge().", hibernateException);
 		}
-		
 	}
 	
-	
+	@SuppressWarnings("unchecked")
+	@Override
+	@Transactional
+	public List<T> findAllActive(Class<T> entityClass) {
+		try {
+			Criteria crit = getSession().createCriteria(entityClass);
+			crit.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+			return crit.list();
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findAllActive().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findAllActive().", hibernateException);
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public List<T> findByKeyValueAscending(Class<T> dataClass, Map<String, Object> queries, String ascendingColumn) {
+		Criteria criteria = getSession().createCriteria(dataClass);
+		try {
+			for (Entry<String, Object> query : queries.entrySet()) {
+				criteria.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+			criteria.addOrder(Order.asc(ascendingColumn));
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("HibernateException caught in findByKeyValue().", hibernateException);
+			throw new DatabaseException("HibernateException caught in findByKeyValue().", hibernateException);
+		}
+		return criteria.list();
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<T> findProjectionsByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries) {
+		try {
+			Criteria crit = getSession().createCriteria(dataClass);
+			ProjectionList projections = Projections.projectionList();
+			for (String columnName : columnNames) {
+				projections.add(Projections.property(columnName));
+			}
+			crit.setProjection(projections);
+			for (Entry<String, Object> query : queries.entrySet()) {
+				crit.add(Restrictions.eq(query.getKey(), query.getValue()));
+			}
+			return crit.list();
+		}
+		catch (HibernateException e) {
+			LOG.error("HibernateException caught in findProjectionsByKeyValue(). Reason: "+e.getMessage(), e);
+			throw new DatabaseException("HibernateException caught in findProjectionsByKeyValue().", e);
+		}
+	}
 }
 // JIRA: SS-8: By RM05: EOC
