@@ -60,14 +60,6 @@ function validateRegistrationForm(id) {
 		return false;
 
 	}
-	if (!validateRegPassword('reg-pwd')) {
-		$('#reg-pwd').focus();
-		return false;
-	}
-	if (!validateRegConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
-		$('#reg-conf-pwd').focus();
-		return false;
-	}
 	return true;
 }
 
