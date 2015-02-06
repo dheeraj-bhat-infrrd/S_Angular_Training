@@ -1,9 +1,8 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
-import com.realtech.socialsurvey.core.entities.IndividualSettings;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.User;
 
 /**
  * Gets the organization settings
@@ -19,11 +18,11 @@ public interface OrganizationUnitSettingsDao {
 	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName);
 
 	/**
-	 * Inserts individual settings
+	 * Inserts agent settings
 	 * 
-	 * @param user
+	 * @param agentSettings
 	 */
-	public void insertIndividualSettings(User user);
+	public void insertAgentSettings(AgentSettings agentSettings);
 
 	/**
 	 * Fetches the organization unit settings for the given identifier and collection name
@@ -35,12 +34,12 @@ public interface OrganizationUnitSettingsDao {
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsById(long identifier, String collectionName);
 
 	/**
-	 * Returns the individual settings
+	 * Returns the agent settings
 	 * 
 	 * @param identitifier
 	 * @return
 	 */
-	public IndividualSettings fetchIndividualSettingsById(long identifier);
+	public AgentSettings fetchAgentSettingsById(long identifier);
 
 	/**
 	 * Updates a particular element in the collection
@@ -51,17 +50,6 @@ public interface OrganizationUnitSettingsDao {
 	 * @param collectionName
 	 */
 	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,
-			String collectionName);
-
-	/**
-	 * Updates a particular element in the collection
-	 * 
-	 * @param keyToUpdate
-	 * @param updatedRecord
-	 * @param individualSettings
-	 * @param collectionName
-	 */
-	public void updateParticularKeyIndividualSettings(String keyToUpdate, Object updatedRecord, IndividualSettings individualSettings,
 			String collectionName);
 
 	/**

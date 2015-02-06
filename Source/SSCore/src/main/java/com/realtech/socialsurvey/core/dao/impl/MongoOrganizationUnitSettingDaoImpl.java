@@ -16,9 +16,8 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
-import com.realtech.socialsurvey.core.entities.IndividualSettings;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.User;
 
 /**
  * Mongo implementation of settings
@@ -26,12 +25,10 @@ import com.realtech.socialsurvey.core.entities.User;
 @Repository
 public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSettingsDao, InitializingBean {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
-
 	public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
-	public static final String INDIVIDUAL_SETTINGS_COLLECTION = "INDIVIDUAL_SETTINGS";
+	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String KEY_CRM_INFO = "crm_info";
 	public static final String KEY_MAIL_CONTENT = "mail_content";
 	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
@@ -47,10 +44,29 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_ACHIEVEMENTS = "achievements";
 	public static final String KEY_LICENCES = "licenses";
 	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
+
 	public static final String KEY_IDENTIFIER = "iden";
+
+	private static final Logger LOG = LoggerFactory.getLogger(MongoOrganizationUnitSettingDaoImpl.class);
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
+
+	@Override
+	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName) {
+		LOG.info("Creating " + collectionName + " document. Organiztion Unit id: " + organizationUnitSettings.getIden());
+		LOG.debug("Inserting into " + collectionName + ". Object: " + organizationUnitSettings.toString());
+		mongoTemplate.insert(organizationUnitSettings, collectionName);
+		LOG.info("Inserted into " + collectionName);
+	}
+
+	@Override
+	public void insertAgentSettings(AgentSettings agentSettings) {
+		LOG.info("Inseting agent settings. Agent id: " + agentSettings.getIden());
+		LOG.debug("Inserting agent settings: " + agentSettings.toString());
+		mongoTemplate.insert(agentSettings, AGENT_SETTINGS_COLLECTION);
+		LOG.info("Inserted into agent settings");
+	}
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -70,40 +86,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			mongoTemplate.createCollection(BRANCH_SETTINGS_COLLECTION);
 			createIndexOnIden(BRANCH_SETTINGS_COLLECTION);
 		}
-		if (!mongoTemplate.collectionExists(INDIVIDUAL_SETTINGS_COLLECTION)) {
-			LOG.info("Creating " + INDIVIDUAL_SETTINGS_COLLECTION);
-			mongoTemplate.createCollection(INDIVIDUAL_SETTINGS_COLLECTION);
-			createIndexOnIden(INDIVIDUAL_SETTINGS_COLLECTION);
+		if (!mongoTemplate.collectionExists(AGENT_SETTINGS_COLLECTION)) {
+			LOG.info("Creating " + AGENT_SETTINGS_COLLECTION);
+			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
+			createIndexOnIden(AGENT_SETTINGS_COLLECTION);
 		}
-	}
-
-	// creates index on field 'iden'
-	private void createIndexOnIden(String collectionName) {
-		LOG.debug("Creating unique index on 'iden' for " + collectionName);
-		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
-		LOG.debug("Index created");
-	}
-	
-	@Override
-	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName) {
-		LOG.info("Creating " + collectionName + " document. Organiztion Unit id: " + organizationUnitSettings.getIden());
-		LOG.debug("Inserting into " + collectionName + ". Object: " + organizationUnitSettings.toString());
-		mongoTemplate.insert(organizationUnitSettings, collectionName);
-		LOG.info("Inserted into " + collectionName);
-	}
-
-	@Override
-	public void insertIndividualSettings(User user) {
-		IndividualSettings individualSettings = new IndividualSettings();
-		individualSettings.setIden(user.getUserId());
-		individualSettings.setCompanyId(user.getCompany().getCompanyId());
-		individualSettings.setCompanyAdmin(user.isCompanyAdmin());
-		individualSettings.setCreatedOn(System.currentTimeMillis());
-		individualSettings.setCreatedBy(String.valueOf(user.getUserId()));
-		
-		LOG.info("Inserting individual settings. individual id: " + user.getUserId());
-		mongoTemplate.insert(individualSettings, INDIVIDUAL_SETTINGS_COLLECTION);
-		LOG.info("Inserted individual settings");
 	}
 
 	@Override
@@ -115,17 +102,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	}
 
 	@Override
-	public IndividualSettings fetchIndividualSettingsById(long identifier) {
-		LOG.info("Fetch individual settings from for id: " + identifier);
-		IndividualSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER, identifier)), IndividualSettings.class,
-				INDIVIDUAL_SETTINGS_COLLECTION);
+	public AgentSettings fetchAgentSettingsById(long identifier) {
+		LOG.info("Fetch agent settings from for id: " + identifier);
+		AgentSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER, identifier)), AgentSettings.class,
+				AGENT_SETTINGS_COLLECTION);
 		return settings;
 	}
 
 	@Override
 	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,
 			String collectionName) {
-		LOG.info("Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate + " with value: "
+		LOG.info("Updating unit setting in " + collectionName + " with " + unitSettings + " for key: " + keyToUpdate + " wtih value: "
 				+ updatedRecord);
 		Query query = new Query();
 		query.addCriteria(Criteria.where("_id").is(unitSettings.getId()));
@@ -133,19 +120,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.debug("Updating the unit settings");
 		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, collectionName);
 		LOG.info("Updated the unit setting");
-	}
-	
-	@Override
-	public void updateParticularKeyIndividualSettings(String keyToUpdate, Object updatedRecord, IndividualSettings individualSettings,
-			String collectionName) {
-		LOG.info("Updating individual setting in " + collectionName + " with " + individualSettings + " for key: " + keyToUpdate + " with value: "
-				+ updatedRecord);
-		Query query = new Query();
-		query.addCriteria(Criteria.where("_id").is(individualSettings.getId()));
-		Update update = new Update().set(keyToUpdate, updatedRecord);
-		LOG.debug("Updating the individual settings");
-		mongoTemplate.updateFirst(query, update, IndividualSettings.class, collectionName);
-		LOG.info("Updated the individual setting");
 	}
 
 	/**
@@ -155,7 +129,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	 */
 	@Override
 	public List<String> fetchLogoList() {
-		LOG.info("Fetching the list of logos being used");		
+
+		LOG.info("Fetching the list of logos being used");
 		List<OrganizationUnitSettings> settingsList = mongoTemplate.findAll(OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
 		List<String> logoList = new ArrayList<>();
 		LOG.info("Preparing the list of logo names");
@@ -186,6 +161,13 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Successfully completed updation of unit settings");
 	}
 
+	// creates index on field 'iden'
+	private void createIndexOnIden(String collectionName) {
+		LOG.debug("Creating unique index on 'iden' for " + collectionName);
+		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
+		LOG.debug("Index created");
+	}
+
 	/**
 	 * Method to fetch organization settings based on profile name
 	 */
@@ -214,4 +196,5 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileUrl");
 		return organizationUnitSettings;
 	}
+
 }

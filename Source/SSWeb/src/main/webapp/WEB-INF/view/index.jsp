@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <!DOCTYPE">
 <html>
 <head>
@@ -118,13 +119,11 @@
             
             <div class="pro-wrapper clearfix">
                 <div class="pro-left-wrapper float-left">Find a professional</div>
-                <form id="find-pro-form" method="POST" action="./findaprofile.do">
-                	<div class="pro-right-wrapper clearfix float-left">
-            	        <input id="find-pro-first-name" name="find-pro-first-name" class="pro-inp" placeholder="First Name">
-        	            <input id="find-pro-last-name" name="find-pro-last-name"class="pro-inp" placeholder="Last Name">
-    	                <input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Submit">
-	                </div>
-                </form>
+                <div class="pro-right-wrapper clearfix float-left">
+                    <input class="pro-inp" placeholder="First Name">
+                    <input class="pro-inp" placeholder="Last Name">
+                    <input type="button" class="pro-inp pro-btn" value="Submit">
+                </div>
             </div>
             
             <div class="footer-wrapper">
@@ -203,18 +202,23 @@
 				validateRegEmailId(this.id);
 			});
 			
-			$('#reg-pwd').blur(function() {
-            	validateRegPassword(this.id);
-            });
+			
+			function loginUser() {
+				console.log("submitting login form");
+				if (validateLoginForm('login-form')) {
+					$('#login-form').submit();
+					showOverlay();
+				}
+			}
 
-            $('#reg-conf-pwd').blur(function(){
-            	validateRegConfirmPassword('reg-pwd',this.id);
-            });
+			function submitRegistrationForm() {
+				console.log("submitting registration form");
+				if(validateRegistrationForm('reg-form')){
+					$('#registration-form').submit();
+					showOverlay();
+				}
+			}
             
-            $('#find-pro-submit').click(function() {
-            	event.preventDefault();
-            	submitFindProForm();
-            });
         });
     </script>
     
