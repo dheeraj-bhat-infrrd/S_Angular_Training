@@ -154,13 +154,13 @@
 		$(this).removeAttr("brachid");
 	}); */
 	$('#icon-user-delete').click(function() {
-		var userId = $(this).closest('.row').attr("id");
+		var userId = $(this).closest('.row').attr("data-id");
 		confirmDeleteUser(userId);
 	});
 	$('#icn-status-green')
 			.click(
 					function() {
-						var userId = $(this).closest('.row').attr("id");
+						var userId = $(this).closest('.row').attr("data-id");
 						$('#overlay-main').show();
 						$('#overlay-continue').html("Deactivate");
 						$('#overlay-cancel').html("Cancel");
@@ -174,7 +174,7 @@
 					});
 	$('#icn-status-red').click(
 			function() {
-				var userId = $(this).closest('.row').attr("id");
+				var userId = $(this).closest('.row').attr("data-id");
 				$('#overlay-continue').html("Activate");
 				$('#overlay-cancel').html("Cancel");
 				$('#overlay-main').show();
@@ -190,7 +190,7 @@
 				var branchIdToUnassign = $(this).parent().parent().attr("id");
 				branchIdToUnassign = branchIdToUnassign
 						.substr("branch-to-unassign-".length);
-				var userId = $(this).closest('.row').attr("id");
+				var userId = $(this).closest('.row').attr("data-id");
 				$('#overlay-continue').html("Confirm");
 				$('#overlay-cancel').html("Cancel");
 				$('#overlay-main').show();
