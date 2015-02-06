@@ -59,6 +59,7 @@
 				<value>com.realtech.socialsurvey.core.entities.RetriedTransaction
 				</value>
 				<value>com.realtech.socialsurvey.core.entities.Survey</value>
+				<value>com.realtech.socialsurvey.core.entities.SurveyCompanyMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestion
 				</value>
 				<value>com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption
@@ -69,6 +70,9 @@
 				<value>com.realtech.socialsurvey.core.entities.UserInvite</value>
 				<value>com.realtech.socialsurvey.core.entities.UserProfile</value>
 				<value>com.realtech.socialsurvey.core.entities.RemovedUser</value>
+				<value>com.realtech.socialsurvey.core.entities.VerticalCrmMapping</value>
+				<value>com.realtech.socialsurvey.core.entities.VerticalsMaster</value>
+				<value>com.realtech.socialsurvey.core.entities.CrmMaster</value>
 			</list>
 		</property>
 	</bean>
