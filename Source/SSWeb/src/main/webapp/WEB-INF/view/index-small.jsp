@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
 	pageEncoding="UTF-8"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <!DOCTYPE">
 <html>
 <head>
@@ -7,9 +8,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home Page</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+<!--
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
-    <script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
+-->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1-small.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1-small.css">
 </head>
 <body class="index-body">
     
@@ -103,7 +107,7 @@
 	                    <div class="clearfix reg-captcha-wrapper reg-item">
 	                        <div class="reg-captcha-img"></div>
 	                        <div class="reg-captcha-btns clearfix">
-	                            <input class="float-left reg-cap-txt" name="captchaResponse" placeholder="Type the above text" autocomplete="off" autocorrect="off" autocapitalize="off">
+	                            <input class="float-left reg-cap-txt" placeholder="Type the above text">
 	                            <div class="clearfix reg-btns-wrapper float-right">
 	                                <div class="float-left reg-cap-img reg-cap-reload"></div>
 	                                <div class="float-left reg-cap-img reg-cap-sound"></div>
@@ -111,9 +115,8 @@
 	                            </div>
 	                        </div>
 	                    </div>
-	                    <div id="recaptcha" class="hide"></div>
 	                    <div class="clearfix reg-item">
-	                        <input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Submit">
+	                        <input id="reg-submit"  type="button" class="reg-inp reg-btn" value="Submit">
 	                    </div>
                     </form>
                 </div>
@@ -132,6 +135,7 @@
             <div class="footer-wrapper">
                     &copy; Copyright 2015. All Rights Reserved.
             </div>
+            
         </div>
 
     </div>
@@ -144,9 +148,6 @@
     <script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
     <script>
         $(document).ready(function(){
-        	
-        	var captchaText=true;
-        	
             resizeFunc();
             $(window).resize(resizeFunc);
             
@@ -157,13 +158,6 @@
                     $('.reg-cap-txt').css('max-width',offset+'px');
                 }
             }
-            
-            console.log("Loading captcha");
-            Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-', 'recaptcha', {
-            	theme : 'white',
-            	callback : captchaLoaded
-            	});
-            console.log("Captcha loaded");
             
             /* $('#login-form input').keypress(function(e){
 	        	// detect enter
@@ -228,52 +222,6 @@
 					showOverlay();
 				}
 			}
-			function captchaLoaded() {
-				/* $('#registerForm').on('added.field.bv',function(e, data) {
-						// The field "recaptcha_response_field" has just been
-						// added
-						if (data.field === 'recaptcha_response_field') {
-						// Find the icon
-						var $parent = data.element.parents('.form-group'), $icon = $parent
-						.find('.form-control-feedback[data-bv-icon-for="'
-						+ data.field + '"]');
-						// Move icon to other position
-						$icon.insertAfter('#recaptcha');
-						}
-				}); */
-				
-				var imgData = $(".recaptcha_image_cell").html();
-				console.log("Captcha image data : " + imgData);
-				$(".reg-captcha-img").html(imgData);
-				
-			}
-			
-			$(".reg-cap-reload").click(function(){
-				console.log("Captcha reload button clicked");
-				$("#recaptcha_reload").click();
-				console.log("Initiated the click of hidden reload");
-			});
-			
-			$(".reg-cap-sound").click(function(){
-				if(captchaText == true){
-					console.log("Captcha sound button clicked");
-					$("#recaptcha_switch_audio").click();
-					console.log("Initiated the click of hidden sound");
-					captchaText=false;
-				}
-				else{
-					console.log("Captcha text button clicked");
-					$("#recaptcha_switch_img").click();
-					console.log("Initiated the click of hidden text");
-					captchaText=true;
-				}
-				
-			});
-			
-			$(".reg-cap-info").click(function(){
-				console.log("Info button clicked");
-				$("#recaptcha_whatsthis").click();
-			});
             
         });
     </script>
