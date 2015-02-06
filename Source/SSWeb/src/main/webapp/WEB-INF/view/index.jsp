@@ -7,72 +7,156 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home Page</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
 </head>
-<body>
-    <div id="toast-container" class="toast-container">
-	   <span id="overlay-toast" class="overlay-toast"></span>
-    </div>
-    <div class="t-main-container">
-        <div class="t-header-main">
-            <div class="t-heade-wrapper t-container clearfix">
-                <div class="t-logo float-left"></div>
-                <div class="t-login-wrapper float-right clearfix">
-                	<form id="login-form" method="POST" action="j_spring_security_check">
-	                    <input type="text" id="login-user-id" name="j_username" class="t-inp" placeholder="Username">
-	                    <input type="password" id="login-pwd" name="j_password" class="t-inp" type="password" placeholder="Password">
-	                    <div id="login-submit" class="t-btn">Login</div>
+<body class="index-body">
+    
+    <div class="body-wrapper">
+        
+        <div class="container">
+            
+            <div class="header-row clearfix">
+                <div class="float-left header-logo-wrapper ss-logo"></div>
+                <div class="float-right header-login-wrapper clearfix">
+               	 	<form id="login-form" method="POST" action="j_spring_security_check">
+	                    <div class="float-left h-email-wrapper">
+	                        <div class="h-lbl">email address</div>
+	                        <div class="h-inp-wrapper">
+	                            <input type="text" class="h-inp" placeholder="Username" id="login-user-id" name="j_username">
+	                        </div>
+	                    </div>
+	                    <div class="float-left h-pwd-wrapper">
+	                        <div class="h-lbl clearfix">
+	                            <div class="float-left">Password</div>
+	                            <div class="float-right fgt-pwd"><a href ="./forgotpassword.do">Forgot your Password?</a></div>
+	                        </div>
+	                        <div class="h-inp-wrapper">
+	                            <input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password">
+	                        </div>
+	                    </div>
+	                    <div class="float-left h-login-btn-wrapper">
+	                        <div id="login-submit" class="h-btn-login"></div>
+	                    </div>
                     </form>
                 </div>
             </div>
-        </div>
-        <div class="t-pro-wrapper">
-            <div class="t-container clearfix">
-                <div class="float-left t-pro-txt">Looking for a Pro?</div>
+            
+            <div class="hero-txt-wrapper"><span class="txt-bold">Control</span> your online <span class="txt-bold">presence, read, write</span> and <span class="txt-bold">Share reviews</span></div>
+            
+            <div class="content-wrapper clearfix">
+                <div class="float-left c-pic-panel">
+                    <div class="clearfix c-pic-panel-top">
+                        <div class="float-left c-pic-top-1">
+                            <div class="c-panel-txt-top txt-bold">Lorem Ipsum Dore It</div>
+                            <div class="c-panel-txt-bot">Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It Lorem Ipsum Dore It </div>
+                        </div>
+                        <div class="float-left c-pic-img c-pic-top-2">
+                            <div class="pic-bot-txt">
+<!--
+                                <div class="pic-bot-txt-top">John Doe</div>
+                                <div class="pic-bot-txt-bot">CEO</div>
+-->
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix c-pic-panel-bot">
+                        <div class="float-left c-pic-img c-pic-bot-1">
+                            <div class="pic-bot-txt">
+<!--
+                                <div class="pic-bot-txt-top">John Doe</div>
+                                <div class="pic-bot-txt-bot">CEO</div>
+-->
+                            </div>
+                        </div>
+                        <div class="float-left c-pic-img c-pic-bot-2">
+                            <div class="pic-bot-txt">
+<!--
+                                <div class="pic-bot-txt-top">John Doe</div>
+                                <div class="pic-bot-txt-bot">CEO</div>
+-->
+                            </div>
+                        </div>
+                        <div class="float-left c-pic-img c-pic-bot-3">
+                            <div class="pic-bot-txt">
+<!--
+                                <div class="pic-bot-txt-top">John Doe</div>
+                                <div class="pic-bot-txt-bot">CEO</div>
+-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="float-left c-reg-panel">
+               		<form id="registration-form" method="POST" action="./registration.do">
+	                    <div class="reg-txt-top1">Get Started - It's Free</div>
+	                    <div class="reg-txt-top2">Sign Up to Start Your Survey</div>
+	                    <div class="clearfix reg-item">
+	                        <input id="reg-fname" name="firstName" class="reg-inp reg-inp-1" placeholder="First Name">
+	                        <input id="reg-lname" name="lastName" class="reg-inp reg-inp-2" placeholder="Last Name">
+	                    </div>
+	                    <div class="clearfix reg-item">
+	                        <input type="text" name="emailId" id="reg-email" class="reg-inp reg-inp-3" placeholder="Email">
+	                    </div>
+	                    <div class="clearfix reg-captcha-wrapper reg-item">
+	                        <div class="reg-captcha-img"></div>
+	                        <div class="reg-captcha-btns clearfix">
+	                            <input class="float-left reg-cap-txt" placeholder="Type the above text">
+	                            <div class="clearfix reg-btns-wrapper float-right">
+	                                <div class="float-left reg-cap-img reg-cap-reload"></div>
+	                                <div class="float-left reg-cap-img reg-cap-sound"></div>
+	                                <div class="float-left reg-cap-img reg-cap-info"></div>
+	                            </div>
+	                        </div>
+	                    </div>
+	                    <div class="clearfix reg-item">
+	                        <input id="reg-submit"  type="button" class="reg-inp reg-btn" value="Submit">
+	                    </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="pro-wrapper clearfix">
+                <div class="pro-left-wrapper float-left">Find a professional</div>
                 <form id="find-pro-form" method="POST" action="./findaprofile.do">
-	                <div class="float-right t-pro-search">
-    	                <input id="find-pro-first-name" name="find-pro-first-name" class="t-inp" placeholder="First Name">
-    	                <input id="find-pro-last-name" name="find-pro-last-name" class="t-inp" placeholder="Last Name">
-        	            <div id="find-pro-submit" class="t-btn">Search</div>
-        	        </div>
+                	<div class="pro-right-wrapper clearfix float-left">
+            	        <input id="find-pro-first-name" name="find-pro-first-name" class="pro-inp" placeholder="First Name">
+        	            <input id="find-pro-last-name" name="find-pro-last-name"class="pro-inp" placeholder="Last Name">
+    	                <input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Submit">
+	                </div>
                 </form>
             </div>
-        </div>
-        <div class="t-main-wrapper t-container clearfix">
-            <div class="float-left t-main-pic">
-                <div class="t-bg-sample-img"></div>
-            </div>
-            <div class="float-left t-main-reg">
-                <div class="t-reg-wrapper">
-                	<form id="registration-form" method="POST" action="./register.do">
-	                    <input type="text" id="reg-fname" name="firstname" class="t-reg-txt" placeholder="First Name" value="${firstname }">
-	                    <input type="text" id="reg-lname" name="lastname" class="t-reg-txt" placeholder="Last Name" value="${lastname }">
-	                    <input type="text" id="reg-email" name="emailid" class="t-reg-txt" placeholder="Email" value="${emailid }">
-	                    <input type="password" id="reg-pwd" name="password" class="t-reg-txt" placeholder="Password">
-	                    <input type="password" id="reg-conf-pwd" name="confirmpassword" class="t-reg-txt" placeholder="Confirm Password">
-	                    <div id="reg-submit" class="t-btn-reg">Register</div>
-                    </form>
+            
+            <div class="footer-wrapper">
+                <div class="footer-container container">
+                    &copy; Copyright 2014. All Rights Reserved.
                 </div>
             </div>
+            
         </div>
-        <div class="footer-main-wrapper">
-            <div class="t-container text-center footer-text">
-                Copyright © Social Survey <span class="center-dot">.</span> All Rights Reserved.
-            </div>
-        </div>
+
     </div>
-    
     
     <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
+    <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
     <script>
         $(document).ready(function(){
-            $('#login-form input').keypress(function(e){
+            resizeFunc();
+            $(window).resize(resizeFunc);
+            
+            function resizeFunc(){
+                var winW = $(window).width();
+                if(winW < 768){
+                    var offset = winW - 114 - 20;
+                    $('.reg-cap-txt').css('max-width',offset+'px');
+                }
+            }
+            
+            /* $('#login-form input').keypress(function(e){
 	        	// detect enter
 	        	if (e.which==13){
 	        		e.preventDefault();
@@ -86,18 +170,18 @@
 	        		e.preventDefault();
 	        		submitRegistrationForm();
 	        	}
-			});
+			}); */
             
             $('#login-submit').click(function(){
                 loginUser();
             });
-
+           
             $('#reg-submit').click(function() {
-            	submitRegistrationForm();
-            });
-
+				submitRegistrationForm();
+			});
+            
             /**
-            * Form validation for login page
+            *Form validation for login page
             */
             $('#login-user-id').blur(function() {
             	validateUserId(this.id);
@@ -105,32 +189,34 @@
             $('#login-pwd').blur(function(){
             	validateLoginPassword(this.id);
             });
-
+            
             /* ==Functions to trigger form validation of various input elements== */
-            $('#reg-fname').blur(function() {
-            	validateRegFirstName(this.id);
-            });
-
-            $('#reg-lname').blur(function() {
-            	validateRegLastName(this.id);
-            });
-
-            $('#reg-email').blur(function() {
-            	validateRegEmailId(this.id);
-            });
-
-            $('#reg-pwd').blur(function() {
+			$('#reg-fname').blur(function() {
+				validateRegFirstName(this.id);
+			});
+			
+			$('#reg-lname').blur(function() {
+				validateRegLastName(this.id);
+			});
+			
+			$('#reg-email').blur(function() {
+				validateRegEmailId(this.id);
+			});
+			
+			$('#reg-pwd').blur(function() {
             	validateRegPassword(this.id);
             });
 
             $('#reg-conf-pwd').blur(function(){
             	validateRegConfirmPassword('reg-pwd',this.id);
             });
-
+            
             $('#find-pro-submit').click(function() {
+            	event.preventDefault();
             	submitFindProForm();
             });
-		});
+        });
     </script>
+    
 </body>
 </html>

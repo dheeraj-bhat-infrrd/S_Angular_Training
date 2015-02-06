@@ -19,6 +19,7 @@ public interface JspResolver {
 	public static final String PAYMENT = "payment";
 	public static final String LANDING = "landing";
 	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
+	public static final String SURVEY_BUILDER = "surveyBuilder";
 	public static final String DASHBOARD = "dashboard";
 	public static final String USER_MANAGEMENT="usermanagement";
 	public static final String USER_DETAILS="userdetails";
