@@ -2462,7 +2462,7 @@ button.paypal.is-active {
     cursor: pointer;
     width: 62px;
     height: 62px;
-    background: url(../images/icn-err-msg.png) no-repeat center;
+    background: url(../images/icn-succ-grey.png) no-repeat center;
 }
 
 .sq-full-smile {
