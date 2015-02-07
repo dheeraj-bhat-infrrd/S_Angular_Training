@@ -156,8 +156,8 @@
 					<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev">&lt;&lt;&nbsp;&nbsp;&nbsp;Previous</div>
 					<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next">Next&nbsp;&nbsp;&nbsp;&gt;&gt;</div>
 				</div>
-				<div class="sq-btn-wrapper hide">
-					<div id="submit" class="sq-btn-continue">Submit</div>
+				<div class="sq-btn-wrapper">
+					<div id="submit" class="sq-btn-continue hide">Submit</div>
 				</div>
 			</div>
 
