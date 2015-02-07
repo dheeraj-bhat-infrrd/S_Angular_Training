@@ -55,17 +55,15 @@
 					ipsum</div>
 				<div class="sq-bord-bot-sm"></div>
 				<div class="sq-ques">
-					<i><span class="sq-ques-txt">lorem ipsum dore it ler.
-							lorem ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum
-							dore it ler. lorem ipsum dore it ler. lorem ipsum dore it ler.</span></i>
+					<i><span id="ques-text-smiley" class="sq-ques-txt"></span></i>
 				</div>
 				<div id="sq-smiles" class="sq-rat-wrapper">
 					<div class="sq-star-wrapper clearfix">
-						<div star-no="1" class="sq-smile"></div>
-						<div star-no="2" class="sq-smile"></div>
-						<div star-no="3" class="sq-smile"></div>
-						<div star-no="4" class="sq-smile"></div>
-						<div star-no="5" class="sq-smile"></div>
+						<div smile-no="1" class="sq-smile"></div>
+						<div smile-no="2" class="sq-smile"></div>
+						<div smile-no="3" class="sq-smile"></div>
+						<div smile-no="4" class="sq-smile"></div>
+						<div smile-no="5" class="sq-smile"></div>
 					</div>
 				</div>
 				<!-- Commented code for skip question -->
@@ -79,8 +77,8 @@
 					</div>
 				</div> -->
 				<div class="sq-np-wrapper clearfix">
-					<div class="float-left sq-np-item sq-np-item-prev">&lt;&lt;&nbsp;&nbsp;&nbsp;Previous</div>
-					<div class="float-left sq-np-item sq-np-item-next">Next&nbsp;&nbsp;&nbsp;&gt;&gt;</div>
+					<div id="prev-smile" class="float-left sq-np-item sq-np-item-prev">&lt;&lt;&nbsp;&nbsp;&nbsp;Previous</div>
+					<div id="next-smile" class="float-left sq-np-item sq-np-item-next">Next&nbsp;&nbsp;&nbsp;&gt;&gt;</div>
 				</div>
 				<!-- <div class="sq-btn-wrapper">
 					<div class="sq-btn-continue">Continue</div>
