@@ -96,6 +96,7 @@ function paintSurveyPageFromJson() {
 	if (isRatingQuestion == 1) {
 		$("#skip-ques").hide();
 		$("#next-star").addClass("sq-np-item-disabled");
+		$("#next-smile").addClass("sq-np-item-disabled");
 	}
 	if (qno == 0) {
 		$("#prev-star").addClass("sq-np-item-disabled");
@@ -110,6 +111,8 @@ function paintSurveyPageFromJson() {
 	}
 	if (qno == data.length - 1) {
 		$("#next-mcq").addClass("sq-np-item-disabled");
+		$("#next-smile").addClass("sq-np-item-disabled");
+		$("#next-star").addClass("sq-np-item-disabled");
 		$("#next-textarea-smiley").addClass("sq-np-item-disabled");
 		$("#skip-ques-mcq").hide();
 	}
@@ -156,6 +159,7 @@ function updateCustomeResponse(feedback) {
 		"feedback" : feedback,
 		"question" : questionDetails.question,
 		"questionType" : questionDetails.questionType,
+		"stage" : -1,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail
 	};
@@ -171,6 +175,7 @@ function showFeedbackPage(mood) {
 	$("div[data-ques-type]").hide();
 	$("div[data-ques-type='smiley-text-final']").show();
 	$("#text-area").show();
+	$("#text-area").val("");
 	$("#smiles-final").hide();
 	switch (mood) {
 	case "happy":
@@ -281,7 +286,7 @@ $('.sq-np-item-next').click(
 			}
 		});
 
-// Code to be executed on click of previous for star questions.
+// Code to be executed on click of previous for star and smile questions.
 
 $('.sq-np-item-prev').click(function() {
 	$(".sq-star").removeClass('sq-full-star');
@@ -304,8 +309,15 @@ $('.sq-np-item-prev').click(function() {
 			}
 		});
 	}
+	if (questionDetails.questionType == "sb-sel-desc") {
+		var val = questionDetails.customerResponse;
+		if (val != undefined) {
+			$("#text-area").val(val);
+		}
+	}
 	$("#next-star").removeClass("sq-np-item-disabled");
 	$("#next-smile").removeClass("sq-np-item-disabled");
+	$("#next-textarea-smiley").removeClass("sq-np-item-disabled");
 });
 
 /* Click event on grey smile. */
@@ -321,6 +333,7 @@ $('.sq-smile').click(function() {
 		$("#next-smile").removeClass("sq-np-item-disabled");
 	}
 	storeCustomerAnswer(smileVal);
+	$("#next-star").removeClass("sq-np-item-disabled");
 });
 
 $('.sq-happy-smile').click(function() {
@@ -342,6 +355,6 @@ $('.sq-sad-smile').click(function() {
 });
 
 $('.sq-btn-continue').click(function() {
-	feednack = $("#text-area").val();
+	var feedback = $("#text-area").val();
 	updateCustomeResponse(feedback);
 });
