@@ -211,7 +211,9 @@ public interface CommonConstants {
 	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
-	
+	public static final boolean IS_AGENT_TRUE_SOLR = true;
+	public static final boolean IS_AGENT_FALSE_SOLR = false;
+
 	// Survey Constants
 	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
 	public static final String QUESTION_RATING = "range";
