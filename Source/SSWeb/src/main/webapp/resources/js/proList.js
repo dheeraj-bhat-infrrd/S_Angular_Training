@@ -48,3 +48,55 @@ function validateFindProForm(id) {
 	}
 	return true;
 }
+
+$('#find-pro-submit').click(function() {
+	event.preventDefault();
+	console.log("Submitting Find a Profile form");
+	if(validateFindProForm('find-pro-form')){
+		$('#find-pro-form').submit();
+	}
+	showOverlay();
+});
+
+var startIndex = 10;
+var rowSize = 10;
+$(window).scroll(function() {
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndex <= $('#srch-num').html()) {
+		var formData = new FormData();
+		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
+		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
+		formData.append("find-pro-start-index", startIndex);
+		formData.append("find-pro-row-size", rowSize);
+
+		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+	}
+});
+
+function infiniteScrollCallback(response) {
+	startIndex = startIndex + rowSize;
+	console.log(response);
+	
+	var users =  $.parseJSON(response);
+	var htmlData = "";
+	if (users != null) {
+		var loopStatus = $('#fp-users-size').val();
+		$.each(users, function(i, user) {
+			var evenOdd = (loopStatus % 2 == 0) ? '' : 'ctnt-list-item-even';
+			htmlData = htmlData + '<div class="ctnt-list-item clearfix ' + evenOdd + '">'
+				+ '<div class="float-left ctnt-list-item-img"></div>'
+					+ '<div class="float-left ctnt-list-item-txt-wrap">'
+						+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
+						+ '<div class="ctnt-item-desig">Marketting Head at Ralecon</div>'
+						+ '<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>'
+					+ '</div>'
+					+ '<div class="float-left ctnt-list-item-btn-wrap">'
+						+ '<div class="ctnt-review-btn">Review</div>'
+					+ '</div>'
+				+ '</div>';
+			loopStatus ++;
+		});
+		
+		$('#ctnt-list-wrapper').append(htmlData);
+		$('#fp-users-size').val(loopStatus);
+	}
+}
