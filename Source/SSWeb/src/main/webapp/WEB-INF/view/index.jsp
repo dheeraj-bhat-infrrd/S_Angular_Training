@@ -266,12 +266,14 @@
 					$("#recaptcha_switch_audio").click();
 					console.log("Initiated the click of hidden sound");
 					captchaText=false;
+					$(this).addClass('reg-cap-text');
 				}
 				else{
 					console.log("Captcha text button clicked");
 					$("#recaptcha_switch_img").click();
 					console.log("Initiated the click of hidden text");
 					captchaText=true;
+					$(this).removeClass('reg-cap-text');
 				}
 				
 			});
