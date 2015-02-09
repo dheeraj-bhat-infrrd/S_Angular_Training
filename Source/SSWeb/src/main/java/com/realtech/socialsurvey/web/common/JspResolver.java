@@ -43,4 +43,5 @@ public interface JspResolver {
 	public static final String PROFILE_IMAGE_CONTENT = "profileimagecontent";
 	public static final String PROFILE_SOCIAL_LINKS = "profilesociallinks";
 	public static final String INDEX = "index";
+	public static final String PROFILE_LIST = "proList";
 }
