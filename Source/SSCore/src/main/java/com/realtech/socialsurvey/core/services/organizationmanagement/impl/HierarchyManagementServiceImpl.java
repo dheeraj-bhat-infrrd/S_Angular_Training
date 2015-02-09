@@ -530,6 +530,14 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
+		
+		LOG.debug("Adding a default branch under the newly created region");
+		Branch defaultBranch = organizationManagementService.addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
+		LOG.debug("Added default branch for region : " + region.getRegionId() + " with branch id : " + defaultBranch.getBranchId());
+		
+		LOG.debug("Updating Solr with newly inserted default branch");
+		solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
+		LOG.debug("Solr updated with new default branch");
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
