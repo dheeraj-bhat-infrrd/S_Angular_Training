@@ -4,10 +4,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,25 +16,30 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -676,12 +679,35 @@ public class OrganizationManagementController {
 		return message;
 	}
 
+	private String makeJsonMessage(int status, String message) {
+
+		JSONObject jsonMessage = new JSONObject();
+		LOG.debug("Building json response");
+		try {
+			jsonMessage.put("success", status);
+			jsonMessage.put("message", message);
+		}
+		catch (JSONException e) {
+			LOG.error("Exception occured while building json response : " + e.getMessage(),e);
+		}
+
+		LOG.info("Returning json response : " + jsonMessage.toString());
+		return jsonMessage.toString();
+	}
+
+	/**
+	 * Method to upgrade a plan
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
 	@RequestMapping(value = "/upgradeplan", method = RequestMethod.POST)
 	@ResponseBody
-	public String upgradePlanForUserInSession(HttpServletRequest request, Model model) {
+	public Object upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		String message = "";
+		String message = null;
 
 		LOG.info("Fetching the user in session");
 		User user = sessionHelper.getCurrentUser();
@@ -690,35 +716,140 @@ public class OrganizationManagementController {
 			LOG.info("Making the braintree API call to upgrade and updating the database!");
 
 			if (accountType == null || accountType.isEmpty()) {
+				LOG.error("Account type parameter passed is null or empty");
 				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			int accountTypeValue = 0;
+			int newAccountsMasterId = 0;
 			try {
-				accountTypeValue = Integer.parseInt(accountType);
+				newAccountsMasterId = Integer.parseInt(accountType);
 			}
 			catch (NumberFormatException e) {
+				LOG.error("Error while parsing account type ");
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			gateway.upgradePlanForSubscription(user.getCompany(), accountTypeValue);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_UPGRADE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			LOG.info("Making the API call to upgrade");
+			gateway.upgradePlanForSubscription(user, newAccountsMasterId);
 			LOG.info("Upgrade successful");
+
+			switch (newAccountsMasterId) {
+				case CommonConstants.ACCOUNTS_MASTER_TEAM:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
+				case CommonConstants.ACCOUNTS_MASTER_COMPANY:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_COMPANY_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
+				case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_ENTERPRISE_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
+			}
+			LOG.info("message returned : " + message);
 		}
-		catch (InvalidInputException | NoRecordsFetchedException | PaymentException e) {
+		catch (InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
+
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+
+		}
+		catch (PaymentException e) {
+			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionPastDueException e) {
 			LOG.error("SubscriptionPastDueException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionUpgradeUnsuccessfulException e) {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
-		return message;
+
+		// After all the updates are done we set the account type in the session to reflect changes
+		HttpSession session = request.getSession();
+		session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, AccountType.getAccountType(Integer.parseInt(accountType)));
+
+		LOG.info("returning message : " + message);
+		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
+	}
+
+	/**
+	 * Method for displaying the upgrade page
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/upgradepage", method = RequestMethod.GET)
+	public String upgradePage(HttpServletRequest request, Model model) {
+
+		LOG.info("Upgrade page requested.");
+
+		LOG.debug("Retrieveing the user from session to get his current plan details");
+		User user = sessionHelper.getCurrentUser();
+		LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+
+		LOG.debug("Adding the current plan in the model and the upgrade flag");
+		model.addAttribute(CommonConstants.CURRENT_LICENSE_ID, currentLicenseDetail.getAccountsMaster().getAccountsMasterId());
+		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.STATUS_ACTIVE);
+
+		LOG.info("Returning the upgrade account selection page");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
+
+	}
+
+	/**
+	 * Returns the upgrade confirmation page
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/upgradeconfirmation", method = RequestMethod.POST)
+	public String getUpgradeConfirmationPage(HttpServletRequest request, Model model) {
+
+		LOG.info("Upgrade confirmation page requested");
+		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		User user = sessionHelper.getCurrentUser();
+
+		try {
+			// We need to calculate the balance amount and put it into the model
+			if (accountType == null || accountType.isEmpty()) {
+				LOG.error("Account type parameter passed is null or empty");
+				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			int toAccountsMasterId = 0;
+			try {
+				toAccountsMasterId = Integer.parseInt(accountType);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Error while parsing account type ");
+				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			int fromAccountsMasterId = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster()
+					.getAccountsMasterId();
+
+			model.addAttribute("balanceAmount",
+					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(fromAccountsMasterId, toAccountsMasterId)) + "$");
+			model.addAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, toAccountsMasterId);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+		}
+
+		LOG.info("Returning the confirmation page");
+		return JspResolver.UPGRADE_CONFIRMATION;
 	}
 }
+	
 // JIRA: SS-24 BY RM02 EOC

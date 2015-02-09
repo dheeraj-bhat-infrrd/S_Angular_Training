@@ -11,6 +11,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.client.solrj.response.UpdateResponse;
+import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
 import org.noggit.JSONUtil;
@@ -334,6 +335,98 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + usersResult);
 		return usersResult;
+	}
+	
+	@Override
+	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
+			MalformedURLException {
+		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
+		if (patternFirst == null && patternLast == null) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		List<SolrDocument> users = new ArrayList<SolrDocument>();
+		QueryResponse response = null;
+		try {
+			SolrQuery solrQuery = new SolrQuery();
+			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
+					CommonConstants.USER_EMAIL_ID_SOLR };
+			solrQuery.setFields(fields);
+
+			String query = "";
+			if (!patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+						+ patternLast + "*";
+			}
+			else if (!patternFirst.equals("") && patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
+			}
+			else if (patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+			}
+			solrQuery.setQuery(query);
+
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+
+			LOG.debug("Querying solr for searching users");
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			for (SolrDocument solrDocument : results) {
+				users.add(solrDocument);
+			}
+			LOG.debug("User search result size is : " + users.size());
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : " + users);
+		return users;
+	}
+
+	@Override
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException, MalformedURLException {
+		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
+		if (patternFirst == null && patternLast == null) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		QueryResponse response = null;
+		try {
+			SolrQuery solrQuery = new SolrQuery();
+			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
+					CommonConstants.USER_EMAIL_ID_SOLR };
+			solrQuery.setFields(fields);
+
+			String query = "";
+			if (!patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+						+ patternLast + "*";
+			}
+			else if (!patternFirst.equals("") && patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
+			}
+			else if (patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+			}
+			solrQuery.setQuery(query);
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+
+			LOG.debug("Querying solr for searching users");
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			response = solrServer.query(solrQuery);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : "
+				+ response.getResults());
+		return response.getResults();
 	}
 
 	/**

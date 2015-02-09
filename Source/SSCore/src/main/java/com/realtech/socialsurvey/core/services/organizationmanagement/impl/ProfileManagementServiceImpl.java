@@ -179,48 +179,48 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return agentSettings;
 	}
 
-	private void updateSettings(OrganizationUnitSettings settings, OrganizationUnitSettings agentSettings, LockSettings agentLock) {
-		LockSettings lock = settings.getLockSettings();
+	private void updateSettings(OrganizationUnitSettings higherSettings, OrganizationUnitSettings lowerSettings, LockSettings finalLock) {
+		LockSettings lock = higherSettings.getLockSettings();
 		if (lock != null) {
-			if (lock.isLogoLocked() && !agentLock.isLogoLocked()) {
-				agentSettings.setLogo(settings.getLogo());
-				agentLock.setLogoLocked(true);
+			if (lock.isLogoLocked() && !finalLock.isLogoLocked()) {
+				lowerSettings.setLogo(higherSettings.getLogo());
+				finalLock.setLogoLocked(true);
 			}
-			if (lock.isLocationLocked() && !agentLock.isLocationLocked()) {
-				agentSettings.setLocationEnabled(settings.getIsLocationEnabled());
-				agentLock.setLocationLocked(true);
+			if (lock.isLocationLocked() && !finalLock.isLocationLocked()) {
+				lowerSettings.setLocationEnabled(higherSettings.getIsLocationEnabled());
+				finalLock.setLocationLocked(true);
 			}
-			if (lock.isVerticalLocked() && !agentLock.isVerticalLocked()) {
-				agentSettings.setVertical(settings.getVertical());
-				agentLock.setVerticalLocked(true);
+			if (lock.isVerticalLocked() && !finalLock.isVerticalLocked()) {
+				lowerSettings.setVertical(higherSettings.getVertical());
+				finalLock.setVerticalLocked(true);
 			}
-			if (lock.isCRMInfoLocked() && !agentLock.isCRMInfoLocked()) {
-				agentSettings.setCrm_info(settings.getCrm_info());
-				agentLock.setCRMInfoLocked(true);
+			if (lock.isCRMInfoLocked() && !finalLock.isCRMInfoLocked()) {
+				lowerSettings.setCrm_info(higherSettings.getCrm_info());
+				finalLock.setCRMInfoLocked(true);
 			}
-			if (lock.isMailContentLocked() && !agentLock.isMailContentLocked()) {
-				agentSettings.setMail_content(settings.getMail_content());
-				agentLock.setMailContentLocked(true);
+			if (lock.isMailContentLocked() && !finalLock.isMailContentLocked()) {
+				lowerSettings.setMail_content(higherSettings.getMail_content());
+				finalLock.setMailContentLocked(true);
 			}
-			if (lock.isLicensesLocked() && !agentLock.isLicensesLocked()) {
-				agentSettings.setLicenses(settings.getLicenses());
-				agentLock.setLicensesLocked(true);
+			if (lock.isLicensesLocked() && !finalLock.isLicensesLocked()) {
+				lowerSettings.setLicenses(higherSettings.getLicenses());
+				finalLock.setLicensesLocked(true);
 			}
-			if (lock.isAssociationsLocked() && !agentLock.isAssociationsLocked()) {
-				agentSettings.setAssociations(settings.getAssociations());
-				agentLock.setAssociationsLocked(true);
+			if (lock.isAssociationsLocked() && !finalLock.isAssociationsLocked()) {
+				lowerSettings.setAssociations(higherSettings.getAssociations());
+				finalLock.setAssociationsLocked(true);
 			}
-			if (lock.isAcheivementsLocked() && !agentLock.isAcheivementsLocked()) {
-				agentSettings.setAchievements(settings.getAchievements());
-				agentLock.setAcheivementsLocked(true);
+			if (lock.isAcheivementsLocked() && !finalLock.isAcheivementsLocked()) {
+				lowerSettings.setAchievements(higherSettings.getAchievements());
+				finalLock.setAcheivementsLocked(true);
 			}
-			if (lock.isSocialTokensLocked() && !agentLock.isSocialTokensLocked()) {
-				agentSettings.setSocialMediaTokens(settings.getSocialMediaTokens());
-				agentLock.setSocialTokensLocked(true);
+			if (lock.isSocialTokensLocked() && !finalLock.isSocialTokensLocked()) {
+				lowerSettings.setSocialMediaTokens(higherSettings.getSocialMediaTokens());
+				finalLock.setSocialTokensLocked(true);
 			}
-			if (lock.isSurveySettingsLocked() && !agentLock.isSurveySettingsLocked()) {
-				agentSettings.setSurvey_settings(settings.getSurvey_settings());
-				agentLock.setSurveySettingsLocked(true);
+			if (lock.isSurveySettingsLocked() && !finalLock.isSurveySettingsLocked()) {
+				lowerSettings.setSurvey_settings(higherSettings.getSurvey_settings());
+				finalLock.setSurveySettingsLocked(true);
 			}
 		}
 	}

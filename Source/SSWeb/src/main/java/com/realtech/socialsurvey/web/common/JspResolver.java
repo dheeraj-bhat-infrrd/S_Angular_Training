@@ -33,6 +33,7 @@ public interface JspResolver {
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
 	public static final String CHANGE_PASSWORD = "changepassword";
+	public static final String UPGRADE_CONFIRMATION = "upgradeconfirmation";
 	public static final String COMPANY_PROFILE = "companyprofile";
 	public static final String CONTACT_DETAILS_LIST = "contactdetailslist";
 	public static final String ASSOCIATION_LIST = "associationlist";
@@ -42,4 +43,5 @@ public interface JspResolver {
 	public static final String PROFILE_IMAGE_CONTENT = "profileimagecontent";
 	public static final String PROFILE_SOCIAL_LINKS = "profilesociallinks";
 	public static final String INDEX = "index";
+	public static final String PROFILE_LIST = "proList";
 }
