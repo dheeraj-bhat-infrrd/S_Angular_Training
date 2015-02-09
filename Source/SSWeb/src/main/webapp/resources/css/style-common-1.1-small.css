@@ -22,6 +22,7 @@
     font-family: 'OpenSans';
     font-weight: normal;
     -webkit-tap-highlight-color: rgba(0,0,0,0);
+    font-size: 12px;
 }
 
 body {
@@ -91,14 +92,15 @@ a, a:hover, a:visited{
 }
 
 .header-logo-wrapper {
-    height: 80px;
-    width: 175px;
+    height: 70px;
+    width: 165px;
     background-color: rgba(0, 159, 224, 0.8);
+    background-size: 75%;
 }
 
 .header-login-wrapper {
-    width: 505px;
-    height: 80px;
+    width: 445px;
+    height: 70px;
     background-color: rgba(0, 159, 224, 0.8);
 }
 
@@ -113,26 +115,33 @@ a, a:hover, a:visited{
 .h-lbl {
     margin-bottom: 2px;
     color: #fff;
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
 }
 
+.h-lbl .float-left{
+    font-size: 11px;
+}
+
 .h-inp {
-    width: 212px;
+    width: 180px;
     height: 33px;
     border: 0;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 11px;
     padding: 0 10px;
 }
 
 .fgt-pwd {
-    font-size: 11px;
+    font-size: 10px;
     text-transform: none;
+    font-family: opensanslight;
 }
 
 .fgt-pwd a{
     color: #fff !important;
+    font-family: opensanslight;
+    font-size: 10px;
 }
 
 .fgt-pwd a:hover{
@@ -149,11 +158,12 @@ a, a:hover, a:visited{
 
 .hero-txt-wrapper {
     text-transform: capitalize;
-    font-size: 32px;
-    width: 705px;
+    font-size: 24px;
+    width: 570px;
     margin: 2px auto;
     padding: 20px;
     text-align: center;
+    line-height: 33px;
 }
 
 .index-body {
@@ -163,30 +173,30 @@ a, a:hover, a:visited{
 
 .txt-bold {
     font-family: 'OpenSansBold';
+    font-size: 24px;
 }
 
 .h-email-wrapper {
     margin: 10px;
-    margin-top: 17px;
 }
 
 .h-pwd-wrapper {
-    margin: 17px 10px 10px 0;
+    margin: 9px 10px 10px 0;
 }
 
 .h-login-btn-wrapper {
-    margin: 30px 10px 10px 0;
+    margin: 23px 10px 10px 0;
 }
 
 .c-pic-panel {
     margin-right: 15px;
-    width: 715px;
+    width: 575px;
 }
 
 .c-pic-top-1 {
     position: relative;
-    width: 475px;
-    height: 180px;
+    width: 378px;
+    height: 140px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
     margin-right: 5px;
@@ -200,8 +210,8 @@ a, a:hover, a:visited{
 
 .c-pic-img {
     position: relative;
-    width: 235px;
-    height: 180px;
+    width: 187px;
+    height: 140px;
     background-color: #000;
 }
 
@@ -219,7 +229,7 @@ a, a:hover, a:visited{
 .c-panel-txt-top {
     position: relative;
     z-index: 99;
-    font-size: 32px;
+    font-size: 24px;
 }
 
 .pic-bot-txt {
@@ -241,9 +251,9 @@ a, a:hover, a:visited{
 
 .c-reg-panel {
     padding: 20px;
-    height: 365px;
+    width: 360px;
+    height: 285px;
     background-color: rgba(0, 159, 224, 0.8);
-    width: 410px;
     color: #fff;
 }
 
@@ -253,20 +263,20 @@ a, a:hover, a:visited{
 
 .reg-inp {
     color: #3e3e3e;
-    height: 40px;
+    height: 32px;
     border: 0;
     border-radius: 3px;
-    font-size: 12px;
+    font-size: 11px;
     padding: 0 10px;
 }
 
 .reg-inp-1 {
     margin-right: 8px;
-    width: 179px;
+    width: 154px;
 }
 
 .reg-inp-2 {
-    width: 179px;
+    width: 154px;
 }
 
 .reg-inp-3 {
@@ -282,7 +292,7 @@ a, a:hover, a:visited{
 }
 
 .reg-captcha-img {
-    height: 56px;
+    height: 50px;
     border-bottom: 1px solid #dcdcdc;
     background: #fff;
 }
@@ -294,14 +304,14 @@ a, a:hover, a:visited{
 
 .reg-cap-img {
     width: 38px;
-    height: 36px;
+    height: 30px;
     border-left: 1px solid #dcdcdc;
     background-color: #fff !important;
 }
 
 .reg-cap-txt {
-    width: 256px;
-    height: 36px;
+    width: 206px;
+    height: 30px;
     padding: 0 10px;
     border: 0;
     font-size: 12px;
@@ -309,7 +319,7 @@ a, a:hover, a:visited{
 }
 
 .reg-btn {
-    height: 50px;
+    height: 34px;
     width: 100%;
     color: #fff;
     background-color: #7fba00;
@@ -317,7 +327,7 @@ a, a:hover, a:visited{
 }
 
 .reg-txt-top1 {
-    font-size: 28px;
+    font-size: 24px;
     margin-top: -14px;
     font-weight: bold;
     letter-spacing: 1px;
@@ -325,6 +335,7 @@ a, a:hover, a:visited{
 
 .reg-txt-top2 {
     margin-bottom: 7px;
+    font-size: 14px;
 }
 
 .pic-bot-txt-top {
@@ -337,32 +348,32 @@ a, a:hover, a:visited{
 
 .pro-left-wrapper {
     text-align: right;
-    font-size: 24px;
-    width: 475px;
-    line-height: 80px;
-    height: 80px;
+    font-size: 19px;
+    width: 380px;
+    line-height: 65px;
+    height: 65px;
     background-color: rgba(0, 159, 224, 0.8);
     color: #fff;
     margin-right: 5px;
-    padding: 0 50px;
+    padding: 0 30px;
 }
 
 .pro-right-wrapper {
     position: relative;
-    width: 660px;
-    height: 80px;
+    width: 565px;
+    height: 65px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
-    padding: 20px;
+    padding: 18px;
 }
 
 .pro-inp {
     color: #3e3e3e;
     display: block;
     float: left;
-    width: 200px;
+    width: 168px;
     margin-right: 0;
-    height: 40px;
+    height: 32px;
     border: 0;
     border-radius: 3px;
     font-size: 12px;
@@ -377,7 +388,7 @@ a, a:hover, a:visited{
     color: #fff !important;
     cursor: pointer;
     background-color: #7fba00;
-    font-size: 18px !important;
+    font-size: 13px !important;
 }
 
 .pro-wrapper {
@@ -407,7 +418,7 @@ a, a:hover, a:visited{
     margin: 20px 0;
     text-align: center;
 }
-
+    
 .hdr-log-reg-btn {
     font-size: 12px;
     margin-top: 25px;
@@ -547,7 +558,7 @@ a, a:hover, a:visited{
 .blue-ext-left {
     position: absolute;
     width: 1500px;
-    height: 180px;
+    height: 140px;
     background-color: rgba(0, 159, 224, 0.8);
     top: 0;
     right: 0;
@@ -557,12 +568,15 @@ a, a:hover, a:visited{
 .c-panel-txt-bot {
     position: relative;
     z-index: 99;
+    line-height: 17px;
+    margin-top: 5px;
+    font-size: 11px;
 }
 
 .blue-ext-right {
     position: absolute;
     width: 1500px;
-    height: 80px;
+    height: 65px;
     background-color: rgba(0, 159, 224, 0.8);
     top: 0;
     left: 0;
@@ -577,4 +591,8 @@ a, a:hover, a:visited{
     background: url('../images/temp_ad.png') no-repeat center;
     height: 1000px;
     background-size: 160px;
+}
+
+.container{
+    width: 980px !important;
 }

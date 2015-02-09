@@ -188,5 +188,22 @@ public interface HierarchyManagementService {
 	 * @return
 	 */
 	public boolean canEditCompany(User user, AccountType accountType);
+	
+	/**
+	 * Method to insert region settings into mongo
+	 * 
+	 * @param region
+	 * @throws InvalidInputException
+	 */
+	public void insertRegionSettings(Region region) throws InvalidInputException;
+	
+	/**
+	 * Method to insert branch settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertBranchSettings(Branch branch) throws InvalidInputException;
+
 
 }
