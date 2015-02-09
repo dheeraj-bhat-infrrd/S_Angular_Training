@@ -29,4 +29,9 @@ public interface SurveyHandler {
 	 * @throws Exception
 	 */
 	public void updateCustomerAnswersInSurvey(long agentId, String customerEmail, String question, String questionType, String answer, int stage);
+
+	/*
+	 * Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS.
+	 */
+	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review);
 }

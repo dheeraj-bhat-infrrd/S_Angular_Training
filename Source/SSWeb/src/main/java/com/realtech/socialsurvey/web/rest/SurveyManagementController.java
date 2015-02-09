@@ -92,13 +92,11 @@ public class SurveyManagementController {
 	public void storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
 		// TODO store answer provided by customer in mongoDB.
-		String answer = request.getParameter("answer");
-		String question = request.getParameter("question");
-		String questionType = request.getParameter("questionType");
-		int stage = Integer.parseInt(request.getParameter("stage"));
+		String feedback = request.getParameter("feedback");
+		String mood = request.getParameter("mood");
 		String customerEmail = request.getParameter("customerEmail");
 		long agentId = Long.valueOf(request.getParameter("agentId"));
-		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
+		surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
 
@@ -146,7 +144,7 @@ public class SurveyManagementController {
 			LOG.error("Non Fatal exception caught in triggerSurvey() method of SurveyManagementController.", e);
 		}
 		LOG.info("Method to store initial values for a survey, triggerSurvey() finished");
-		return "Successfully stored! Ab ghar jaiye aur so jaiye.";
+		return "Your survey has been initiated successfully!";
 	}
 }
 // JIRA SS-119 by RM-05 : EOC

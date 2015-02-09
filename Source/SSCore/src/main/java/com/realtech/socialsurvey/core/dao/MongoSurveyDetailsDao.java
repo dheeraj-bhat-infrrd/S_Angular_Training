@@ -11,4 +11,8 @@ public interface MongoSurveyDetailsDao {
 
 	public void updateCustomerResponse(long agentId, String customerEmail, SurveyResponse surveyResponse, int stage);
 
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review);
+
+	public void updateFinalScore(long agentId, String customerEmail);
+
 }
