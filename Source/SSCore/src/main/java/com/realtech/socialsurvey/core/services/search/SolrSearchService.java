@@ -6,8 +6,8 @@ package com.realtech.socialsurvey.core.services.search;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -87,7 +87,7 @@ public interface SolrSearchService {
 	 * @throws MalformedURLException
 	 * @throws UnsupportedEncodingException
 	 */
-	public QueryResponse searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
 
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;

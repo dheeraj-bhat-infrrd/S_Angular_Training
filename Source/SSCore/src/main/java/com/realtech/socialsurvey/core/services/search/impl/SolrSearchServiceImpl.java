@@ -386,7 +386,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public QueryResponse searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
 			throws InvalidInputException, SolrException, MalformedURLException {
 		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
 		if (patternFirst == null && patternLast == null) {
@@ -424,8 +424,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("SolrServerException while performing User search");
 			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
 		}
-		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : " + response);
-		return response;
+		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : "
+				+ response.getResults());
+		return response.getResults();
 	}
 
 	/**
