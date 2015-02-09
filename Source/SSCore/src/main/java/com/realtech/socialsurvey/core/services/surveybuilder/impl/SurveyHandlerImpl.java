@@ -75,9 +75,20 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		SurveyResponse surveyResponse = new SurveyResponse();
 		surveyResponse.setAnswer(answer);
 		surveyResponse.setQuestion(question);
-		surveyResponse.setQuestionType("rating");
+		surveyResponse.setQuestionType(questionType);
 		mongoSurveyDetailsDao.updateCustomerResponse(agentId, customerEmail, surveyResponse, stage);
 		LOG.info("Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
+	}
+	
+	/*
+	 * Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS.
+	 */
+	@Override
+	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review){
+		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started.");
+		mongoSurveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review);
+		mongoSurveyDetailsDao.updateFinalScore(agentId, customerEmail);
+		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
 }
 // JIRA SS-119 by RM-05:EOC

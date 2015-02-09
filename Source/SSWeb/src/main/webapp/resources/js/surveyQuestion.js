@@ -157,9 +157,6 @@ function updateCustomeResponse(feedback) {
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
-		"question" : questionDetails.question,
-		"questionType" : questionDetails.questionType,
-		"stage" : -1,
 		"agentId" : agentId,
 		"customerEmail" : customerEmail
 	};
