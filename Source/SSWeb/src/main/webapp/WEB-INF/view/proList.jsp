@@ -46,6 +46,8 @@
 								<div class="fp-wrapper clearfix">
 									<input id="find-pro-first-name" name="find-pro-first-name" class="fp-inp" placeholder="First Name">
 									<input id="find-pro-last-name" name="find-pro-last-name" class="fp-inp" placeholder="Last Name">
+									<input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
+									<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10">
 									<input id="find-pro-submit" type="button" class="fp-inp pro-btn" value="Search">
 								</div>
 							</form>
@@ -63,20 +65,23 @@
 							<div class="ctnt-list-header-left float-left">
 								<spring:message code="label.profilefoundfor.key" />
 								<span class="srch-name">${patternFirst} ${patternLast}</span>
+								<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
+								<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
+								<input id="fp-users-size" type="hidden" value="${size}">
 							</div>
 							<div class="ctnt-list-header-right float-right">
 								<c:choose>
-									<c:when test="${results >= '0'}">
-										<span class="srch-num">${results}</span>
+									<c:when test="${numfound >= '0'}">
+										<span id="srch-num" class="srch-num">${numfound}</span>
 									</c:when>
 									<c:otherwise>
-										<span class="srch-num">0</span>
+										<span id="srch-num" class="srch-num">0</span>
 									</c:otherwise>
 								</c:choose>
 								<spring:message code="label.profilelistfound.key" />
 							</div>
 						</div>
-						<div class="ctnt-list-wrapper">
+						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper">
 							
 							<!-- Populating user search results -->
 							<c:choose>
@@ -139,6 +144,7 @@
 	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
 		$(document).ready(function() {
@@ -149,15 +155,6 @@
 					adjustTextContainerWidthOnResize();
 				}
 			});
-			
-			$('#find-pro-submit').click(function() {
-            	event.preventDefault();
-            	console.log("Submitting Find a Profile form");
-				if(validateFindProForm('find-pro-form')){
-					$('#find-pro-form').submit();
-				}
-				showOverlay();
-            });
 		});
 	</script>
 </body>
