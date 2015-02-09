@@ -1,3 +1,7 @@
+// pagination variables
+var rowSize = 10;
+var startIndex = 0;
+
 function adjustTextContainerWidthOnResize() {
 	var parentWidth = $('.ctnt-list-item').width();
 	var imgWidth = $('.ctnt-list-item .ctnt-list-item-img').width();
@@ -51,29 +55,30 @@ function validateFindProForm(id) {
 
 $('#find-pro-submit').click(function() {
 	event.preventDefault();
-	console.log("Submitting Find a Profile form");
 	if(validateFindProForm('find-pro-form')){
+		console.log("Submitting Find a Profile form");
 		$('#find-pro-form').submit();
 	}
 	showOverlay();
 });
 
-var startIndex = 10;
-var rowSize = 10;
 $(window).scroll(function() {
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndex <= $('#srch-num').html()) {
+	var newIndex = startIndex + rowSize;
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
+		console.log(newIndex);
+		console.log($('#srch-num').html());
 		var formData = new FormData();
 		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-		formData.append("find-pro-start-index", startIndex);
+		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
 
 		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+		startIndex = newIndex;
 	}
 });
 
 function infiniteScrollCallback(response) {
-	startIndex = startIndex + rowSize;
 	console.log(response);
 	
 	var users =  $.parseJSON(response);
