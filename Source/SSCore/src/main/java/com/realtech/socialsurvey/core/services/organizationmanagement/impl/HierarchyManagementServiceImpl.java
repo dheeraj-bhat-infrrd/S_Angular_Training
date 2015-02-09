@@ -451,7 +451,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param branch
 	 * @throws InvalidInputException
 	 */
-	private void insertBranchSettings(Branch branch) throws InvalidInputException {
+	public void insertBranchSettings(Branch branch) throws InvalidInputException {
 		LOG.info("Method to insert branch settings called for branch : " + branch);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(branch.getBranchId());
@@ -605,7 +605,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param region
 	 * @throws InvalidInputException
 	 */
-	private void insertRegionSettings(Region region) throws InvalidInputException {
+	public void insertRegionSettings(Region region) throws InvalidInputException {
 		LOG.info("Method for inserting region settings called for region : " + region);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(region.getRegionId());

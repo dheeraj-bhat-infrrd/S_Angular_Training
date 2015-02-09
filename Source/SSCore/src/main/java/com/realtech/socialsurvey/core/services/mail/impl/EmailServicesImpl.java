@@ -473,5 +473,36 @@ public class EmailServicesImpl implements EmailServices {
 		
 	}
 
+	@Override
+	public void sendAccountUpgradeMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+		
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending account upgrade mail ");
+		}
+		
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending account upgrade mail ");
+		}
+		
+		LOG.info("Sending account upgrade email to : " + recipientMailId);		
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_UPGRADE_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_UPGRADE_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent account upgrade mail");
+	}
+
 }
 // JIRA: SS-7: By RM02: EOC
