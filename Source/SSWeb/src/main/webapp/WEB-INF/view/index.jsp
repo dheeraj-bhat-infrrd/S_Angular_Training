@@ -119,15 +119,17 @@
                 </div>
             </div>
             
-            <div class="pro-wrapper clearfix">
-                <div class="pro-left-wrapper float-left">Find a professional</div>
-                <div class="pro-right-wrapper clearfix float-left">
-                	<div class="blue-ext-right"></div>
-                    <input class="pro-inp" placeholder="First Name">
-                    <input class="pro-inp" placeholder="Last Name">
-                    <input type="button" class="pro-inp pro-btn" value="Submit">
-                </div>
-            </div>
+			<div class="pro-wrapper clearfix">
+				<div class="pro-left-wrapper float-left">Find a professional</div>
+				<form id="find-pro-form" method="POST" action="./findapro.do">
+					<div class="pro-right-wrapper clearfix float-left">
+						<div class="blue-ext-right"></div>
+						<input id="find-pro-first-name" name="find-pro-first-name" class="pro-inp" placeholder="First Name">
+						<input id="find-pro-last-name" name="find-pro-last-name" class="pro-inp" placeholder="Last Name">
+						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Submit">
+					</div>
+				</form>
+			</div>
             
             <div class="footer-wrapper">
                     &copy; Copyright 2015. All Rights Reserved.
@@ -186,12 +188,16 @@
             });
            
             $('#reg-submit').click(function() {
+				event.preventDefault();
 				submitRegistrationForm();
 			});
             
-            /**
-            *Form validation for login page
-            */
+            $('#find-pro-submit').click(function() {
+            	event.preventDefault();
+            	submitFindProForm();
+            });
+            
+            // Form validation for login page
             $('#login-user-id').blur(function() {
             	validateUserId(this.id);
             });
@@ -199,7 +205,7 @@
             	validateLoginPassword(this.id);
             });
             
-            /* ==Functions to trigger form validation of various input elements== */
+            // Functions to trigger form validation of various input elements
 			$('#reg-fname').blur(function() {
 				validateRegFirstName(this.id);
 			});
@@ -275,8 +281,14 @@
 				$("#recaptcha_whatsthis").click();
 			});
             
+            function submitFindProForm() {
+				console.log("Submitting Find a Profile form");
+				if(validateFindProForm('find-pro-form')){
+					$('#find-pro-form').submit();
+				}
+				showOverlay();
+			}
         });
     </script>
-    
 </body>
 </html>
