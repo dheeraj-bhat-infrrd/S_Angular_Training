@@ -11,6 +11,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.MongoSurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -68,8 +69,9 @@ public class MongoSurveyDetailsDaoImpl implements MongoSurveyDetailsDao {
 		query.addCriteria(Criteria.where("customerEmail").is(customerEmail));
 		Update update = new Update();
 		update.set("stage", stage);
-		update.push("surveyResponse", surveyResponse);
+		update.pull("surveyResponse", new BasicDBObject("question", surveyResponse.getQuestion()));
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		mongoTemplate.updateMulti(query, new Update().push("surveyResponse", surveyResponse), SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateCustomerResponse() to update response provided by customer finished.");
 	}
 

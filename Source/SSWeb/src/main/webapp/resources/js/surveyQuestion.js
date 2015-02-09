@@ -67,8 +67,8 @@ function paintSurveyPageFromJson() {
 		$("#ques-text-smiley").html(question);
 		$("#sq-smiles").show();
 	} else if (questionType == "sb-range-scale") {
-		$("div[data-ques-type='stars']").show();
-		$("#ques-text").html(question);
+		$("div[data-ques-type='scale']").show();
+		$("#ques-text-scale").html(question);
 		$("#sq-stars").show();
 	} else if (questionType == "sb-sel-mcq") {
 		$("div[data-ques-type='mcq']").show();
@@ -97,15 +97,18 @@ function paintSurveyPageFromJson() {
 		$("#skip-ques").hide();
 		$("#next-star").addClass("sq-np-item-disabled");
 		$("#next-smile").addClass("sq-np-item-disabled");
+		$("#next-scale").addClass("sq-np-item-disabled");
 	}
 	if (qno == 0) {
 		$("#prev-star").addClass("sq-np-item-disabled");
 		$("#prev-smile").addClass("sq-np-item-disabled");
+		$("#prev-scale").addClass("sq-np-item-disabled");
 		$("#prev-mcq").addClass("sq-np-item-disabled");
 		$("#prev-textarea-smiley").addClass("sq-np-item-disabled");
 	} else {
 		$("#prev-star").removeClass("sq-np-item-disabled");
 		$("#prev-smile").removeClass("sq-np-item-disabled");
+		$("#prev-scale").removeClass("sq-np-item-disabled");
 		$("#prev-mcq").removeClass("sq-np-item-disabled");
 		$("#prev-textarea-smiley").removeClass("sq-np-item-disabled");
 	}
@@ -116,6 +119,7 @@ function paintSurveyPageFromJson() {
 		$("#next-textarea-smiley").addClass("sq-np-item-disabled");
 		$("#skip-ques-mcq").hide();
 	}
+	$(".sq-main-txt").html("Survey for Agent Id "+agentId);
 }
 
 /*
@@ -264,6 +268,7 @@ $('.sq-np-item-next').click(
 			if (questionDetails.questionType == "sb-range-star") {
 				var starVal = parseInt(questionDetails.customerResponse);
 				if (starVal != undefined) {
+					$("#next-star").removeClass("sq-np-item-disabled");
 					$('#sq-stars').find('.sq-star').each(function(index) {
 						if (index < starVal) {
 							$(this).addClass('sq-full-star');
@@ -274,11 +279,19 @@ $('.sq-np-item-next').click(
 			if (questionDetails.questionType == "sb-range-smiles") {
 				var smileVal = parseInt(questionDetails.customerResponse);
 				if (smileVal != undefined) {
+					$("#next-smile").removeClass("sq-np-item-disabled");
 					$('#sq-smiles').find('.sq-smile').each(function(index) {
 						if (index < smileVal) {
 							$(this).addClass('sq-full-smile');
 						}
 					});
+				}
+			}
+			if (questionDetails.questionType == "sb-range-scale") {
+				var value = parseInt(questionDetails.customerResponse);
+				if (value != undefined) {
+					$("#next-scale").removeClass("sq-np-item-disabled");
+					$('#range-slider-value').html(value);
 				}
 			}
 		});
@@ -306,6 +319,10 @@ $('.sq-np-item-prev').click(function() {
 			}
 		});
 	}
+	if (questionDetails.questionType == "sb-range-scale") {
+		var value = parseInt(questionDetails.customerResponse);
+		$('#range-slider-value').html(value);
+	}
 	if (questionDetails.questionType == "sb-sel-desc") {
 		var val = questionDetails.customerResponse;
 		if (val != undefined) {
@@ -314,6 +331,7 @@ $('.sq-np-item-prev').click(function() {
 	}
 	$("#next-star").removeClass("sq-np-item-disabled");
 	$("#next-smile").removeClass("sq-np-item-disabled");
+	$("#next-scale").removeClass("sq-np-item-disabled");
 	$("#next-textarea-smiley").removeClass("sq-np-item-disabled");
 });
 
@@ -355,3 +373,24 @@ $('.sq-btn-continue').click(function() {
 	var feedback = $("#text-area").val();
 	updateCustomeResponse(feedback);
 });
+
+$('input[type="range"]').rangeslider(
+		{
+			polyfill : false,
+
+			// Default CSS classes
+			rangeClass : 'rangeslider',
+			fillClass : 'rangeslider__fill',
+			handleClass : 'rangeslider__handle',
+
+			onSlide : function(position, value) {
+				//$('div[quest-no="' + survQuesNo + '"]').find(
+					//	'.sq-slider-val').html(value);
+				$('#range-slider-value').html(value);
+			},
+			// Callback function
+			onSlideEnd : function(position, value) {
+				$('#range-slider-value').html(value);
+				storeCustomerAnswer(value);
+			},
+		});
