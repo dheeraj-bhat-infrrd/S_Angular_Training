@@ -302,6 +302,7 @@ $('#st-settings-payment-on').click(function(){
 $('#st-settings-payment-off').click(function(){
 	$('#st-settings-payment-on').show();
 	$(this).hide();
+	showPaymentOptions();
 });
 
 
@@ -351,4 +352,36 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
+}
+
+function showPaymentOptions() {
+	console.log("Calling payment controller for payment upgrade page");	
+	$('body').addClass('body-no-scroll');
+	var url = "./paymentchange.do";
+    showOverlay();
+    callAjaxGET(url,displayPopup);
+}
+
+function displayPopup(data){
+	console.log("display message called :data "+data);
+	$("#temp-div").html(data);
+	var displayMessageDiv = $("#display-msg-div");
+	if($(displayMessageDiv).hasClass("message")) {
+		console.log("Error occured. Hiding Overlay");
+		hideOverlay();
+		$('#st-settings-payment-off').show();
+   		$('#st-settings-payment-on').hide();
+		console.log("Removing no-scroll class from body");
+		$('body').removeClass('body-no-scroll');
+		$("#overlay-toast").html($(displayMessageDiv).html());
+		showToast();
+	}	
+	else{
+		$('.overlay-payment').html(data);
+    	console.log("Html content loaded");
+    	hideOverlay();
+    	$('.overlay-payment').show();
+    	console.log("Showing popup");
+    }
+	$("#temp-div").html("");
 }

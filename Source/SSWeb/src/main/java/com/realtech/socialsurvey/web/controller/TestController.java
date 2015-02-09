@@ -1,5 +1,8 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,7 +39,7 @@ public class TestController {
 	@RequestMapping(value = "/testpage")
 	public String testpage(HttpServletRequest request) {
 		LOG.info("Method testpage called");
-		return "errorpage";
+		return "index-small";
 	}
 
 	@RequestMapping(value = "/jumptodashboard")
@@ -68,9 +71,9 @@ public class TestController {
 		return "companyInfo";
 	}
 
-	@RequestMapping("/form")
+	@RequestMapping("/pro")
 	public String form() {
-		return "form";
+		return "pro_lis";
 	}
 
 	@RequestMapping("/validat")
@@ -88,4 +91,17 @@ public class TestController {
 		return "test";
 	}
 
+	
+	public static void main(String[] args) throws IOException {
+		URL u = new URL("https://www.dotloop.com/my/api/v1_0/profile");
+		HttpURLConnection huc = (HttpURLConnection) u.openConnection();
+		huc.setRequestMethod("GET"); // OR huc.setRequestMethod ("HEAD");
+		huc.setRequestProperty("Authorization", "Bearer 1234-5678-90123");
+		huc.connect();
+		int status = huc.getResponseCode();
+		System.out.println(status);
+	}
+	
+	
+	
 }

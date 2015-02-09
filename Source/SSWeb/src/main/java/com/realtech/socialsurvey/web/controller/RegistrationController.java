@@ -165,7 +165,18 @@ public class RegistrationController {
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String emailId = request.getParameter("emailId");
+		
+		String captchaResponse = request.getParameter("captchaResponse");
+		String challengeField = request.getParameter("recaptcha_challenge_field");
+		String remoteAddress = request.getRemoteAddr();
+		
 		try {
+			
+			if(!captchaValidation.isCaptchaValid(remoteAddress, challengeField, captchaResponse)){
+				LOG.error("Captcha Validation failed!");
+				throw new InvalidInputException("Captcha Validation failed!",DisplayMessageConstants.INVALID_CAPTCHA);
+			}
+			LOG.debug("Captcha validation complete!");
 			LOG.debug("Validating form elements");
 			validateFormParameters(firstName, lastName, emailId);
 			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
