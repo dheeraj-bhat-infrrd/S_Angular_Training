@@ -2,15 +2,11 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
-import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -150,7 +145,7 @@ public class UserManagementController {
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
-						if (accountType.getValue() == CommonConstants.ACCOUNT_TYPE_TEAM) {
+						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {							
 							String branches = solrSearchService.searchBranches("", admin.getCompany(),0,0);
 							branches = branches.substring(1, branches.length() - 1);
 							JSONObject defaultBranch = new JSONObject(branches);
@@ -202,7 +197,7 @@ public class UserManagementController {
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			Long accountTypeVal = accountType.getValue();
+			int accountTypeVal = accountType.getValue();
 			model.addAttribute("accounttypeval", accountTypeVal);
 			if (userIdStr == null) {
 				LOG.error("Invalid user id passed in method findUserByUserId().");
@@ -949,113 +944,6 @@ public class UserManagementController {
 			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
 		LOG.debug("change password form parameters validated successfully");
-	}
-	
-	/*
-	 * Method to find a user on the basis of email id provided.
-	 */
-	@RequestMapping(value = "/findapro", method = RequestMethod.POST)
-	public String findAProfile(Model model, HttpServletRequest request) {
-		LOG.info("Method findAProfile called.");
-		List<SolrDocument> users = new ArrayList<SolrDocument>();
-		String patternFirst;
-		String patternLast;
-		int startIndex;
-		int batchSize;
-		QueryResponse response = null;
-		
-		try {
-			patternFirst = request.getParameter("find-pro-first-name");
-			patternLast = request.getParameter("find-pro-last-name");
-			startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));
-			batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));
-
-			if (patternFirst == null && patternLast == null) {
-				LOG.error("Invalid search key passed in method findAProfile().");
-				throw new InvalidInputException("Invalid searchKey passed in method findAProfile().");
-			}
-
-			try {
-				response = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
-				SolrDocumentList results = response.getResults();
-				
-				for (SolrDocument solrDocument : results) {
-					users.add(solrDocument);
-				}
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), e);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("Error occured while searching in findAProfile(). Reason is ", e);
-				throw new NonFatalException("Error occured while searching in findAProfile(). Reason is ", e);
-			}
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			return JSONUtil.toJSON(errorResponse);
-		}
-		model.addAttribute("users", users);
-		model.addAttribute("size", users.size());
-		model.addAttribute("numfound", response.getResults().getNumFound());
-		model.addAttribute("patternFirst", patternFirst);
-		model.addAttribute("patternLast", patternLast);
-		
-		LOG.info("Method findAProfile finished.");
-		return JspResolver.PROFILE_LIST;
-	}
-	
-	@ResponseBody
-	@RequestMapping(value = "/findaproscroll", method = RequestMethod.POST)
-	public String findAProfileScroll(Model model, HttpServletRequest request) {
-		LOG.info("Method findAProfileScroll called.");
-		List<SolrDocument> users = new ArrayList<SolrDocument>();
-		String patternFirst;
-		String patternLast;
-		int startIndex;
-		int batchSize;
-		QueryResponse response = null;
-		
-		try {
-			patternFirst = request.getParameter("find-pro-first-name");
-			patternLast = request.getParameter("find-pro-last-name");
-			startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));
-			batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));
-
-			if (patternFirst == null && patternLast == null) {
-				LOG.error("Invalid search key passed in method findAProfileScroll().");
-				throw new InvalidInputException("Invalid searchKey passed in method findAProfileScroll().");
-			}
-
-			try {
-				response = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
-				SolrDocumentList results = response.getResults();
-				
-				for (SolrDocument solrDocument : results) {
-					users.add(solrDocument);
-				}
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), e);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("Error occured while searching in findAProfileScroll(). Reason is ", e);
-				throw new NonFatalException("Error occured while searching in findAProfileScroll(). Reason is ", e);
-			}
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			return JSONUtil.toJSON(errorResponse);
-		}
-				
-		LOG.info("Method findAProfileScroll finished.");
-		return new Gson().toJson(users) ;
 	}
 }
 // JIRA SS-77 BY RM07 EOC

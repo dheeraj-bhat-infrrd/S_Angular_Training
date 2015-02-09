@@ -46,8 +46,8 @@
 								<div class="fp-wrapper clearfix">
 									<input id="find-pro-first-name" name="find-pro-first-name" class="fp-inp" placeholder="First Name">
 									<input id="find-pro-last-name" name="find-pro-last-name" class="fp-inp" placeholder="Last Name">
-									<input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
-									<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10">
+									<input id="find-pro-start-index" name="find-pro-start-index" type="hidden">
+									<input id="find-pro-row-size" name="find-pro-row-size" type="hidden">
 									<input id="find-pro-submit" type="button" class="fp-inp pro-btn" value="Search">
 								</div>
 							</form>
@@ -148,6 +148,9 @@
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
 		$(document).ready(function() {
+			$('#find-pro-row-size').val(rowSize);
+			$('#find-pro-start-index').val(startIndex);
+			
 			adjustTextContainerWidthOnResize();
 			
 			$(window).resize(function() {

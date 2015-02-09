@@ -25,7 +25,8 @@
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
 	<div class="overlay-loader hide"></div>
-    <div class="overlay-payment hide"></div>
+	<div class="overlay-payment hide"></div>
+
 	<div id="overlay-main" class="overlay-main hide">
 		<div class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
@@ -77,6 +78,32 @@
 								code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
+				<c:if test="${highestrole == 1}">
+				<!-- show the company settings only of the user has company admin as a role -->
+				<div class="header-links-item">
+					<a href="javascript:showMainContent('./showcompanysettings.do')">
+						<spring:message code="label.settings.company.key" />
+						</a>
+					</div>
+				</c:if>
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+					<div class="header-links-item" id="upgrade-plan" onclick="upgradePlan();">
+						<spring:message	code="label.header.upgrade.key" />
+					</div>
+				</c:if>
+					<div class="header-links-item">
+						<spring:message code="label.profilesetting.key" />
+					</div>
+					<div class="header-links-item">
+						<spring:message code="label.accountsetting.key" />
+					</div>
+					<div class="header-links-item" >
+						<a href="javascript:showMainContent('./showchangepasswordpage.do')">
+						<spring:message code="label.changepassword.key"/></a>
+					</div>
+					<div class="header-links-item" >
+						<a href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+					</div>
 			</div>
 		</div>
 	</div>
@@ -129,6 +156,11 @@
 						<div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
 						<spring:message code="label.changepassword.key"/>
 						</div>
+						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+								<spring:message	code="label.header.upgrade.key" />
+							</div>
+						</c:if>
 						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
 					</div>
 				</div>
