@@ -108,6 +108,7 @@ public interface CommonConstants {
 	public static final String SURVEY_COMPANY_COLUMN = "company";
 	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
+	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
 
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -136,6 +137,7 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
+	public static final String VERTICAL_COLUMN = "verticalsMaster";
 	
 	/**
 	 * Batch Constants
@@ -265,4 +267,9 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
 	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
+	
+	/*
+	 * Mongo constants
+	 */
+	public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 }

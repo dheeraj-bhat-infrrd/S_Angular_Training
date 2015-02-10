@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +41,7 @@ import com.realtech.socialsurvey.core.services.payment.exception.PaymentExceptio
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -75,6 +77,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Autowired
+	private SurveyBuilder surveyBuilder;
 
 	/**
 	 * Method to upload logo image for a company
@@ -258,7 +263,7 @@ public class OrganizationManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/addaccounttype", method = RequestMethod.POST)
-	public String addAccountType(Model model, HttpServletRequest request) {
+	public String addAccountType(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method addAccountType of UserManagementController called");
 		String strAccountType = request.getParameter("accounttype");
 		try {
@@ -273,6 +278,13 @@ public class OrganizationManagementController {
 			if (gateway.checkIfPaymentMade(user.getCompany())) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
+			}
+			
+			if(Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE){
+				LOG.debug("Since its a free account type returning no popup jsp");
+				//We add the default survey for this company
+				surveyBuilder.addDefaultSurveyToCompany(user);
+				return null;
 			}
 
 			model.addAttribute("accounttype", strAccountType);

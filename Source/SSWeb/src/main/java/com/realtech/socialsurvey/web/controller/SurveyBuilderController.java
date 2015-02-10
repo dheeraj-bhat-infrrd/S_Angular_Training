@@ -364,9 +364,9 @@ public class SurveyBuilderController {
 	public String fetchSurveyTemplates(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchSurveyTemplates of SurveyBuilderController called");
 		String templatesJson = null;
-
+		User user = sessionHelper.getCurrentUser();
 		try {
-			List<SurveyTemplate> surveytemplates = surveyBuilder.getSurveyTemplates();
+			List<SurveyTemplate> surveytemplates = surveyBuilder.getSurveyTemplates(user);
 			templatesJson = new Gson().toJson(surveytemplates);
 			LOG.info("Method fetchSurveyTemplates of SurveyBuilderController finished successfully");
 		}

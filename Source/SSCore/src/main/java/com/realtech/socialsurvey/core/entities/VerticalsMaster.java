@@ -40,6 +40,18 @@ public class VerticalsMaster implements Serializable {
 	//bi-directional many-to-one association to VerticalCrmMapping
 	@OneToMany(mappedBy="verticalsMaster")
 	private List<VerticalCrmMapping> verticalCrmMappings;
+	
+	//bi-directional many-to-one association to Survey
+	@OneToMany(mappedBy="verticalsMaster")
+	private List<Survey> surveys;
+
+	public List<Survey> getSurveys() {
+		return surveys;
+	}
+
+	public void setSurveys(List<Survey> surveys) {
+		this.surveys = surveys;
+	}
 
 	public VerticalsMaster() {
 	}

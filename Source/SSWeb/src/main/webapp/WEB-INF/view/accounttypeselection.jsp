@@ -330,17 +330,36 @@
 
         function selectAccountTypeCallBack(data,accountType,paymentAmount) {
             console.log("callback for selectAccountType called");
+            console.log("accountType : " + accountType);
+            console.log("data : " + data);
+            if(accountType == 1 && data == ""){
+            	console.log("Subscribing for a free account");
+            	var url = "./subscribe.do";
+                var $form = $("#account-type-selection-form");
+                var payLoad = $form.serialize();
+                $.ajax({
+                    url : url,
+                    type : "POST",
+                    data : payLoad,
+                    success : function(data) {
+                    	location.href="./landing.do";
+                    },
+                    error : function(e) {
+            			redirectErrorpage();
+            		}
+                });
+            }
+            else{
+            	 /* hide the progress icon */
+                hideOverlay();
 
-            /* hide the progress icon */
-            hideOverlay();
-
-            /* Replace the contents of account selection with payment page with selected account type contents*/
-            $("#payment-section").html(data);		
-            showPayment();
-            var selectedAccountType = $("#account-type-"+accountType).html();
-            $("#pu-acc-type-val").html(selectedAccountType);
-            $("#pu-acc-amount-val").html(paymentAmount);
-
+                /* Replace the contents of account selection with payment page with selected account type contents*/
+                $("#payment-section").html(data);		
+                showPayment();
+                var selectedAccountType = $("#account-type-"+accountType).html();
+                $("#pu-acc-type-val").html(selectedAccountType);
+                $("#pu-acc-amount-val").html(paymentAmount);
+            }
             console.log("callback for selectAccountType finished");
         }
         $(document).ready(function(){
