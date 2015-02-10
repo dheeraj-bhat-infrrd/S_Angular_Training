@@ -416,7 +416,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 */
 	@Override
 	@Transactional
-	public void subscribe(User user, Company company, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, CreditCardException, SubscriptionUnsuccessfulException {
+	public void subscribe(User user, int accountsMasterId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, SubscriptionUnsuccessfulException, CreditCardException {
 
 		String subscriptionId = null;
 		
@@ -424,13 +424,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("subscribe : user parameter is null!");
 			throw new InvalidInputException("subscribe : user parameter is null!");
 		}
+		
+		//Getting the company from the user
+		Company company = user.getCompany();
 
-		if (company == null) {
-			LOG.error("subscribe : company parameter is null!");
-			throw new InvalidInputException("subscribe : company parameter is null!");
-		}
-
-		if (accountsMasterId <= 0) {
+		if (accountsMasterId <= 0 || accountsMasterId > 5) {
 			LOG.error("subscribe : accountsMasterId parameter is invalid! parameter value : " + String.valueOf(accountsMasterId));
 			throw new InvalidInputException("subscribe : accountsMasterId parameter is invalid!parameter value : " + String.valueOf(accountsMasterId));
 		}
@@ -442,6 +440,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		LOG.info("Making a subscription!");
 		LOG.debug("BrainTreePaymentImpl : subscribe() : Executing method.");
+		
 		LOG.debug("Parameters provided : User : " + user.toString() + ", Company : " + company.toString() + ", paymentNonce : " + nonce);
 
 		LOG.debug("Fetching the planId string using property file");
@@ -467,8 +466,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			// If he doesnt add him to the vault and subscribe him
 			addCustomerWithPayment(company, nonce); 
 			LOG.info("Customer Added. Making subscription.");
-			subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanName);
-			
+			subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanName);				
 		}
 
 		LOG.info("Subscription successful. Updating the license table.");
@@ -481,6 +479,54 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.info("Reverted the subscription.");
 			throw e;
 		}
+	}
+	
+	@Override
+	@Transactional
+	public void subscribeForFreeAccount(User user,int accountsMasterId) throws InvalidInputException{
+		
+		if (user == null) {
+			LOG.error("subscribeForFreeAccount : user parameter is null!");
+			throw new InvalidInputException("subscribeForFreeAccount : user parameter is null!");
+		}
+		
+		if (accountsMasterId != CommonConstants.ACCOUNTS_MASTER_FREE) {
+			LOG.error("subscribeForFreeAccount : accountsMasterId parameter is invalid! parameter value : " + String.valueOf(accountsMasterId));
+			throw new InvalidInputException("subscribeForFreeAccount : accountsMasterId parameter is invalid!parameter value : " + String.valueOf(accountsMasterId));
+		}
+		
+		LOG.info("Creating a free subscrpition");
+		LOG.debug("Updating the license table");
+		AccountsMaster accountsMaster = accountsMasterDao.findById(AccountsMaster.class, accountsMasterId);
+		if (accountsMaster == null) {
+			LOG.error("updateLicenseTable : null returned by dao for accountsMaster");
+			throw new InvalidInputException("updateLicenseTable : null returned by dao for accountsMaster");
+		}
+
+		LOG.debug("BrainTreePaymentImpl : updateLicenseTable() : Executing method.");
+		LOG.debug("Parameters provided : accountsMasterId : " + accountsMasterId + ", company : " + user.getCompany().toString() + ", userId : " + user.getUserId());
+
+		LOG.debug("Updating LicenseDetail Table");
+		LicenseDetail licenseDetail = new LicenseDetail();
+		licenseDetail.setSubscriptionId(null);
+		licenseDetail.setAccountsMaster(accountsMaster);
+		licenseDetail.setCompany(user.getCompany());
+		licenseDetail.setCreatedBy(String.valueOf(user.getUserId()));
+		licenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
+		licenseDetail.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		licenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
+		licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
+		licenseDetail.setSubscriptionIdSource(CommonConstants.FREE_ACCOUNT);
+		licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
+		licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+		licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
+		licenseDetailDao.save(licenseDetail);
+		LOG.debug("License detail table updated. Updating the company entity.");
+		user.getCompany().setLicenseDetails(Arrays.asList(licenseDetail));
+		LOG.debug("Company entity updated.");
+		LOG.debug("LicenseDetail table updated");
+		LOG.info("Subscription successful!");
 	}
 
 	/**

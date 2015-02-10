@@ -62,8 +62,16 @@ public interface Payment {
 	 * @throws CreditCardException 
 	 * @throws NonFatalException
 	 */
-	public void subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, CreditCardException, SubscriptionUnsuccessfulException;
+	public void subscribe(User user, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, SubscriptionUnsuccessfulException, CreditCardException;
 	
+	/**
+	 * Method used to subscribe customer to a free account.
+	 * @param user
+	 * @param accountsMasterId
+	 * @throws InvalidInputException
+	 */
+	public void subscribeForFreeAccount(User user,int accountsMasterId) throws InvalidInputException;
+
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
 	 * @param paymentMethodToken

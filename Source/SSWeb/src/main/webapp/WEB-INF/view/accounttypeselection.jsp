@@ -142,6 +142,17 @@
                             </c:when>
                             <c:otherwise>
                             	<div class="clearfix payment-option-wrapper">
+                            		<div class="float-left payment-option-tab padding-left-25">
+	                                    <div class="payment-tab-main">
+	                                        <div class="payment-text-wrapper">
+	                                            <div class="payment-tab-header" id="account-type-free"><spring:message code="label.accounttype.freeaccount.key"/></div>
+	                                            <div class="payment-tab-price"><span class="payment-txt-price"><spring:message code="label.free.key"/></span> <span class="txt-thin"></span></div>
+	                                            <div class="payment-tab-line1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
+	                                        </div>
+	                                    </div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(1,'Free')"><spring:message code="label.accounttype.select.key"/></div>
+	                                </div>
 	                                <div class="float-left payment-option-tab padding-left-25">
 	                                    <div class="payment-tab-main">
 	                                        <div class="payment-text-wrapper">
@@ -151,7 +162,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(1,'$35')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(2,'$35')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab">
 	                                    <div class="payment-tab-main">
@@ -162,7 +173,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(2,'$45')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(3,'$45')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab">
 	                                    <div class="payment-tab-main">
@@ -173,7 +184,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(3,'$65')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(4,'$65')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab padding-right-25">
 	                                    <div class="payment-tab-main">
@@ -184,7 +195,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(4,'$99')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(5,'$99')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
                             </div>
                             </c:otherwise>
@@ -204,9 +215,9 @@
 					<span class="center-dot">.</span> 
 					<spring:message code="label.allrightscopyright.key"/>
                 </div>
+                </div>
                 </c:otherwise>
                 </c:choose>                
-            </div>
         </div>
     </div>
     <c:choose>
@@ -236,6 +247,7 @@
         function selectAccountType(accountType,paymentAmount) {
             console.log("selecting and saving account type");
             $('#account-type').val(accountType);
+            
             var url = "./addaccounttype.do";
 
             /* show the progress icon */
