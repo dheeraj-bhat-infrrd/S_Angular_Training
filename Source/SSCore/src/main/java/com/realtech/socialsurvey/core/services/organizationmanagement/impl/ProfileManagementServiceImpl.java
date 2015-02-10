@@ -122,6 +122,88 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return finalSettings;
 	}
 
+	@Override
+	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
+			long regionId) throws InvalidInputException {
+		LOG.info("Method finalizeProfileDetail() called from ProfileManagementService");
+		if (user == null) {
+			throw new InvalidInputException("User is not set.");
+		}
+		if (settings == null) {
+			throw new InvalidInputException("Invalid user settings.");
+		}
+		if (accountType == null) {
+			throw new InvalidInputException("Invalid account type.");
+		}
+
+		OrganizationUnitSettings finalSettings = null;
+		switch (accountType) {
+			case INDIVIDUAL:
+			case TEAM:
+				LOG.info("Individual/Team account type");
+				// Company Admin
+				if (user.isCompanyAdmin()) {
+					finalSettings = settings.getCompanySettings();
+				}
+
+				// Individual
+				else if (user.isAgent()) {
+					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings().get(agentId));
+				}
+				break;
+
+			case COMPANY:
+				LOG.info("Company account type");
+				// Company Admin
+				if (user.isCompanyAdmin()) {
+					finalSettings = settings.getCompanySettings();
+				}
+
+				// Branch Admin
+				else if (user.isBranchAdmin()) {
+					finalSettings = generateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+				}
+
+				// Individual
+				else if (user.isAgent()) {
+					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId), settings
+							.getAgentSettings().get(agentId));
+				}
+				break;
+
+			case ENTERPRISE:
+				LOG.info("Company account type");
+				// Company Admin
+				if (user.isCompanyAdmin()) {
+					finalSettings = settings.getCompanySettings();
+				}
+
+				// Region Admin
+				else if (user.isRegionAdmin()) {
+					finalSettings = generateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+				}
+
+				// Branch Admin
+				else if (user.isBranchAdmin()) {
+					finalSettings = generateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
+							.getBranchSettings().get(branchId));
+				}
+
+				// Individual
+				else if (user.isAgent()) {
+					finalSettings = generateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
+							.getBranchSettings().get(branchId), settings.getAgentSettings().get(agentId));
+				}
+				break;
+
+			default:
+				throw new InvalidInputException("Account type is invalid in finalizeProfileDetail");
+		}
+
+		LOG.info("Method finalizeProfileDetail() finished from ProfileManagementService");
+		return finalSettings;
+	}
+
 	private OrganizationUnitSettings generateRegionProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings)
 			throws InvalidInputException {
 		if (companySettings == null || regionSettings == null) {
