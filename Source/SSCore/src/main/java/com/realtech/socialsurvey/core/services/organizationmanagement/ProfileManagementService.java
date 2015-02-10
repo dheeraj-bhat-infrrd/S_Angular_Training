@@ -10,4 +10,6 @@ public interface ProfileManagementService {
 
 	public OrganizationUnitSettings finalizeProfileDetail(User user, AccountType accountType, UserSettings settings) throws InvalidInputException;
 
+	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
+			long regionId) throws InvalidInputException;
 }
