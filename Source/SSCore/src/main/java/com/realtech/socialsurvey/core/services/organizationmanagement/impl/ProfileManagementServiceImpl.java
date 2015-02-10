@@ -1,12 +1,18 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
@@ -18,9 +24,11 @@ import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 
 @DependsOn("generic")
@@ -31,7 +39,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-	
+
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("afterPropertiesSet called for profile management service");
@@ -220,7 +234,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 		}
 	}
-	
+
 	@Override
 	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException {
 		if (logo == null || logo.isEmpty()) {
@@ -305,6 +319,40 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS,
 				mediaTokens, unitSettings, collection);
 		LOG.info("Successfully updated the social media tokens.");
+	}
+
+	/**
+	 * Method to fetch all users under the specified branch of specified company
+	 */
+	@Override
+	@Transactional
+	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException {
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForBranch");
+		}
+		if (branchProfileName == null || branchProfileName.isEmpty()) {
+			throw new InvalidInputException("branchProfileName is null or empty in getIndividualsForBranch");
+		}
+		LOG.info("Method getIndividualsForBranch called for companyProfileName: " + companyProfileName + " branchProfileName:" + branchProfileName);
+		List<User> users = null;
+		OrganizationUnitSettings branchSettings = organizationManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+		if (branchSettings != null) {
+			LOG.debug("Fetching user profiles for branchId: " + branchSettings.getIden());
+
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(CommonConstants.BRANCH_ID_COLUMN, branchSettings.getIden());
+			List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+			if (userProfiles != null && !userProfiles.isEmpty()) {
+				users = new ArrayList<User>();
+				for (UserProfile userProfile : userProfiles) {
+					users.add(userProfile.getUser());
+				}
+				LOG.debug("Returning :" + users.size() + " individuals for branch : " + branchProfileName);
+			}
+		}
+		LOG.info("Method getIndividualsForBranch executed successfully");
+		return null;
 	}
 
 }

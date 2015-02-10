@@ -24,6 +24,17 @@ public interface ProfileManagementService {
 	 */
 	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException;
+	
+	/**
+	 * Method to fetch all users under the specified branch of specified company
+	 * 
+	 * @param companyProfileName
+	 * @param branchProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
+
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**

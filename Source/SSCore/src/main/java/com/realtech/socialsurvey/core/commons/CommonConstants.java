@@ -99,6 +99,7 @@ public interface CommonConstants {
 	public static final String REGION_COLUMN = "region";
 	public static final String REGION_ID_COLUMN = "regionId";
 	public static final String BRANCH_ID_COLUMN = "branchId";
+	public static final String BRANCH_NAME_COLUMN = "branch";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
 	public static final String REGION_NAME_COLUMN = "region";
 	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
@@ -256,7 +257,15 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE= 106;
 	public static final int ERROR_CODE_REGION_FETCH_PRECONDITION_FAILURE = 107;
 	public static final int ERROR_CODE_REGION_FETCH_SERVICE_FAILURE= 108;
-
+	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 109;
+	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_SERVICE_FAILURE= 110;
+	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_PRECONDITION_FAILURE = 111;
+	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_SERVICE_FAILURE= 112;
+	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 113;
+	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE= 114;
+	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_PRECONDITION_FAILURE = 115;
+	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE = 116;
+	
 	/**
 	 * Service codes
 	 */	
@@ -265,4 +274,8 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
 	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
+	public static final int SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS = 105;
+	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
+	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
+	public static final int SERVICE_CODE_FETCH_REGION_BRANCHES = 108;
 }

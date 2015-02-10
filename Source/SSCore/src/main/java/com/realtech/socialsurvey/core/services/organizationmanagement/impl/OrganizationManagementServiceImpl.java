@@ -61,7 +61,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-	
+
 	@Autowired
 	private HierarchyManagementService hierarchyManagementService;
 
@@ -845,46 +845,49 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		disabledAccountDao.update(disabledAccount);
 		LOG.info("Record successfully deleted from the database!");
 	}
-	
+
 	/**
 	 * Method to upgrade a default region to a region
+	 * 
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private Region upgradeDefaultRegion(Region region) throws InvalidInputException{
-		
+	private Region upgradeDefaultRegion(Region region) throws InvalidInputException {
+
 		LOG.info("Upgrading the default region to a user made region");
-		if( region == null){
+		if (region == null) {
 			LOG.error("upgradeDefaultRegion Region parameter is invalid or null");
 			throw new InvalidInputException("upgradeDefaultRegion Region parameter is invalid or null");
 		}
-		
+
 		LOG.debug("Changing the record to change the flag IS_DEFAULT_BY_SYSTEM ");
 		region.setIsDefaultBySystem(CommonConstants.STATUS_INACTIVE);
 		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		LOG.debug("Updating the database to show change from default region to region");
 		regionDao.update(region);
 		LOG.info(" Region upgrade successful. Returning the region");
-		
-		return region;		
+
+		return region;
 	}
-	
+
 	/**
 	 * Method to upgrade a default branch to a branch
+	 * 
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private Branch upgradeDefaultBranch(Branch branch) throws InvalidInputException{
-		
+	private Branch upgradeDefaultBranch(Branch branch) throws InvalidInputException {
+
 		LOG.info("Upgrading default branch to a user made branch");
-		if( branch == null){
+		if (branch == null) {
 			LOG.error("upgradeDefaultBranch Branch parameter is invalid or null");
 			throw new InvalidInputException("upgradeDefaultBranch Branch parameter is invalid or null");
 		}
-		
-		// Update the branch record in the database to make it into a user made branch by changing the
+
+		// Update the branch record in the database to make it into a user made branch by changing
+		// the
 		// IS_DEFAULT_BY_SYSTEM flag in the record
 		LOG.debug("Changing the record to change the flag IS_DEFAULT_BY_SYSTEM ");
 		branch.setIsDefaultBySystem(CommonConstants.STATUS_INACTIVE);
@@ -893,117 +896,123 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branchDao.update(branch);
 		LOG.info(" Branch upgrade successful. Returning the branch");
 		return branch;
-		
+
 	}
-	
+
 	/**
 	 * Function to check if only default region exists for a company
+	 * 
 	 * @param company
 	 * @return
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
-	private Region fetchDefaultRegion(Company company) throws InvalidInputException{
-		
+	private Region fetchDefaultRegion(Company company) throws InvalidInputException {
+
 		if (company == null) {
 			LOG.error(" fetchDefaultRegion : Company parameter is null");
 			throw new InvalidInputException(" fetchDefaultRegion : Company parameter is null");
 		}
-		
+
 		LOG.info("Checking if only default region exists");
 		Region defaultRegion = null;
-		
-		//We fetch all the regions for a particular company
+
+		// We fetch all the regions for a particular company
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
+
 		LOG.debug("Fetching all regions for company with id : " + company.getCompanyId());
 		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
-		
-		if(regionList.isEmpty() || regionList==null){
-			LOG.info("No regions found for company with id : " +  company.getCompanyId());
+
+		if (regionList.isEmpty() || regionList == null) {
+			LOG.info("No regions found for company with id : " + company.getCompanyId());
 			defaultRegion = null;
 		}
-		//Check if only default region exists
-		else if( regionList.size() == CommonConstants.STATUS_ACTIVE  && regionList.get(CommonConstants.INITIAL_INDEX).getIsDefaultBySystem() == CommonConstants.STATUS_ACTIVE){
-			//Only default region exists
+		// Check if only default region exists
+		else if (regionList.size() == CommonConstants.STATUS_ACTIVE
+				&& regionList.get(CommonConstants.INITIAL_INDEX).getIsDefaultBySystem() == CommonConstants.STATUS_ACTIVE) {
+			// Only default region exists
 			LOG.info("Only default region exists for company with id : " + company.getCompanyId());
 			defaultRegion = regionList.get(CommonConstants.INITIAL_INDEX);
-		}	
+		}
 		else {
 			// More than one regions exist so no default region exists. Return null.
 			LOG.info("More than one regions exist. So returning null");
 			defaultRegion = null;
 		}
 		return defaultRegion;
-		
+
 	}
-	
+
 	/**
 	 * Function to check if only default branch exists for a company
+	 * 
 	 * @param company
 	 * @return
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
-	private Branch fetchDefaultBranch(Company company) throws InvalidInputException{
-		
+	private Branch fetchDefaultBranch(Company company) throws InvalidInputException {
+
 		if (company == null) {
 			LOG.error(" fetchDefaultBranch : Company parameter is null");
 			throw new InvalidInputException(" fetchDefaultBranch : Company parameter is null");
 		}
-		
+
 		LOG.info("Checking if only default branch exists");
 		Branch defaultBranch = null;
-		
-		//We fetch all the branches for a particular company
+
+		// We fetch all the branches for a particular company
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
+
 		LOG.debug("Fetching all branches for company with id : " + company.getCompanyId());
 		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
-		
-		if(branchList.isEmpty() || branchList==null){
-			LOG.info("No branches found for company with id : " +  company.getCompanyId());
+
+		if (branchList.isEmpty() || branchList == null) {
+			LOG.info("No branches found for company with id : " + company.getCompanyId());
 			defaultBranch = null;
 		}
-		//Check if only default branch exists
-		else if( branchList.size() == CommonConstants.STATUS_ACTIVE  && branchList.get(CommonConstants.INITIAL_INDEX).getIsDefaultBySystem() == CommonConstants.STATUS_ACTIVE){
-			//Only default branch exists
+		// Check if only default branch exists
+		else if (branchList.size() == CommonConstants.STATUS_ACTIVE
+				&& branchList.get(CommonConstants.INITIAL_INDEX).getIsDefaultBySystem() == CommonConstants.STATUS_ACTIVE) {
+			// Only default branch exists
 			LOG.info("Only default branch exists for company with id : " + company.getCompanyId());
 			defaultBranch = branchList.get(CommonConstants.INITIAL_INDEX);
 		}
-		else{
+		else {
 			// More than one branches exist so no default branch exists. Return null.
 			LOG.info(branchList.size() + " branches found. So returning null.");
 			defaultBranch = null;
 		}
-		
+
 		return defaultBranch;
-		
+
 	}
-	
+
 	/**
 	 * Method to upgrade plan to Company
+	 * 
 	 * @param company
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
 	 */
-	private void upgradeToCompany(Company company) throws InvalidInputException, SolrException, NoRecordsFetchedException{
-		
+	private void upgradeToCompany(Company company) throws InvalidInputException, SolrException, NoRecordsFetchedException {
+
 		LOG.info("Upgrading to Company");
 		if (company == null) {
 			LOG.error(" upgradeToCompany : Company parameter is null");
 			throw new InvalidInputException(" upgradeToCompany : Company parameter is null");
 		}
-		
-		// In case of upgrading to Company plan we check if default branch exists and upgrade it to a branch
+
+		// In case of upgrading to Company plan we check if default branch exists and upgrade it to
+		// a branch
 		// We also add the branch settings to mongo collection BRANCH_SETTINGS and to solr.
-		
+
 		LOG.debug("checking if only default branch exists and fetching it");
 		Branch defaultBranch = fetchDefaultBranch(company);
-		if(defaultBranch != null){
+		if (defaultBranch != null) {
 			LOG.debug("Default branch exists. Upgrading it to branch");
 			Branch upgradedBranch = upgradeDefaultBranch(defaultBranch);
 			LOG.debug("Adding the upgraded branch to mongo collection BRANCH_SETTINGS");
@@ -1011,42 +1020,45 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Successfully added settings to mongo, adding the new branch to solr");
 			solrSearchService.addOrUpdateBranchToSolr(upgradedBranch);
 			LOG.debug("Solr update successful");
-		}	
+		}
 		else {
 			LOG.error("No default branch found for company with id : " + company.getCompanyId());
 			throw new NoRecordsFetchedException("No default branch found for company with id : " + company.getCompanyId());
 		}
-		
+
 		LOG.info("Databases upgraded successfully!");
 	}
-	
+
 	/**
 	 * Method to upgrade plan to Enterprise
+	 * 
 	 * @param company
 	 * @param fromAccountsMasterId
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
 	 */
-	private void upgradeToEnterprise(Company company,int fromAccountsMasterId) throws InvalidInputException, SolrException, NoRecordsFetchedException{
-		
+	private void upgradeToEnterprise(Company company, int fromAccountsMasterId) throws InvalidInputException, SolrException,
+			NoRecordsFetchedException {
+
 		LOG.info("Upgrading to Enterprise");
 		if (company == null) {
 			LOG.error(" upgradeToEnterprise : Company parameter is null");
 			throw new InvalidInputException(" upgradeToEnterprise : Company parameter is null");
 		}
-		if(fromAccountsMasterId <=0 || fromAccountsMasterId >3){
-			LOG.error(" upgradeToCompany : fromAccountsMaster parameter is invalid" );
+		if (fromAccountsMasterId <= 0 || fromAccountsMasterId > 3) {
+			LOG.error(" upgradeToCompany : fromAccountsMaster parameter is invalid");
 			throw new InvalidInputException(" upgradeToCompany : fromAccountsMaster parameter is invalid");
 		}
-		
-		// In case of upgrading to Enterprise plan we check if default branch exists and upgrade it to a branch
+
+		// In case of upgrading to Enterprise plan we check if default branch exists and upgrade it
+		// to a branch
 		// And then we upgrade find the default region and upgrade it user made region.
 		// We also add the branch settings to mongo collection BRANCH_SETTINGS and to solr.
-		
+
 		LOG.debug("checking if only default branch exists and fetching it");
 		Branch defaultBranch = fetchDefaultBranch(company);
-		if(defaultBranch != null){
+		if (defaultBranch != null) {
 			LOG.debug("Default branch exists. Upgrading it to branch");
 			Branch upgradedBranch = upgradeDefaultBranch(defaultBranch);
 			LOG.debug("Adding the upgraded branch to mongo collection BRANCH_SETTINGS");
@@ -1056,7 +1068,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Solr update successful");
 			LOG.debug("Fetching the default region");
 			Region defaultRegion = fetchDefaultRegion(company);
-			if(defaultRegion == null){
+			if (defaultRegion == null) {
 				LOG.error("No default region found for company with id : " + company.getCompanyId());
 				throw new NoRecordsFetchedException("No default region found for company with id : " + company.getCompanyId());
 			}
@@ -1067,15 +1079,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Successfully added settings to mongo, adding the new region to solr");
 			solrSearchService.addOrUpdateRegionToSolr(upgradedRegion);
 			LOG.debug("Solr update successful");
-		}	
+		}
 		else {
-			if(fromAccountsMasterId != 3){
+			if (fromAccountsMasterId != 3) {
 				LOG.error("No default branch found for company with id : " + company.getCompanyId());
 				throw new NoRecordsFetchedException("No default branch found for company with id : " + company.getCompanyId());
 			}
 			LOG.debug("Fetching the default region");
 			Region defaultRegion = fetchDefaultRegion(company);
-			if(defaultRegion == null){
+			if (defaultRegion == null) {
 				LOG.error("No default region found for company with id : " + company.getCompanyId());
 				throw new NoRecordsFetchedException("No default region found for company with id : " + company.getCompanyId());
 			}
@@ -1085,15 +1097,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			hierarchyManagementService.insertRegionSettings(upgradedRegion);
 			LOG.debug("Successfully added settings to mongo, adding the new region to solr");
 			solrSearchService.addOrUpdateRegionToSolr(upgradedRegion);
-			LOG.debug("Solr update successful");			
+			LOG.debug("Solr update successful");
 		}
-		
+
 		LOG.info("Databases upgraded successfully!");
 	}
-	
-	
+
 	/**
 	 * Method called to update databases on plan upgrade
+	 * 
 	 * @param company
 	 * @param newAccountsMasterPlanId
 	 * @throws NoRecordsFetchedException
@@ -1102,81 +1114,87 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 */
 	@Override
 	@Transactional
-	public void upgradeAccount(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException{
-		
-		if( company == null){
+	public void upgradeAccount(Company company, int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException {
+
+		if (company == null) {
 			LOG.error("upgradePlanAtBackend Company parameter is invalid or null");
 			throw new InvalidInputException("upgradePlanAtBackend Company parameter is invalid or null");
 		}
-		if(newAccountsMasterPlanId <= 0){
+		if (newAccountsMasterPlanId <= 0) {
 			LOG.error("upgradePlanAtBackend AccountsMaster id parameter is invalid");
 			throw new InvalidInputException("upgradePlanAtBackend AccountsMaster id parameter is invalid");
 		}
-		
-		//We fetch the license detail record to find the current plan
+
+		// We fetch the license detail record to find the current plan
 		LOG.info("Finding the current plan");
 		List<LicenseDetail> licenseDetails = null;
 		LicenseDetail currentLicenseDetail = null;
-		
+
 		LOG.debug("Making the database call to find record for company with id : " + company.getCompanyId());
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		licenseDetails = licenceDetailDao.findByKeyValue(LicenseDetail.class, queries);
-		
-		//Check if license details exist
+
+		// Check if license details exist
 		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.error("No license details records found for company with id : " + company.getCompanyId());
 			throw new NoRecordsFetchedException("No license details records found for company with id : " + company.getCompanyId());
 		}
-		
+
 		currentLicenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
 		LOG.debug("License detail object for company with id : " + company.getCompanyId() + " fetched");
 		int currentAccountsMasterId = currentLicenseDetail.getAccountsMaster().getAccountsMasterId();
-		
-		//Now we update the Region and Branch tables in the database to reflect changes
+
+		// Now we update the Region and Branch tables in the database to reflect changes
 		LOG.info("Updating the regions and the branches for plan upgrade");
-		
+
 		switch (newAccountsMasterPlanId) {
 			case CommonConstants.ACCOUNTS_MASTER_TEAM:
-				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >1 ) {
-					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid : value is : " + currentAccountsMasterId );
-					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
+				if (currentAccountsMasterId <= 0 || currentAccountsMasterId > 1) {
+					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid : value is : " + currentAccountsMasterId);
+					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
+							+ currentAccountsMasterId);
 				}
-				//In case of upgrading to the team account we need to change only the license details table and add default branch to solr.
+				// In case of upgrading to the team account we need to change only the license
+				// details table and add default branch to solr.
 				LOG.debug("checking if only default branch exists and fetching it");
 				Branch defaultBranch = fetchDefaultBranch(company);
-				if(defaultBranch != null){
+				if (defaultBranch != null) {
 					LOG.debug("Adding the new branch to solr");
 					solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
 					LOG.debug("Solr update successful");
-				}	
+				}
 				else {
 					LOG.error("No default branch found for company with id : " + company.getCompanyId());
 					throw new NoRecordsFetchedException("No default branch found for company with id : " + company.getCompanyId());
 				}
 				LOG.info("Databases updated to Team plan");
 				break;
-				
+
 			case CommonConstants.ACCOUNTS_MASTER_COMPANY:
-				// We check if the plan we are changing from and the plan we are changing to are correct
-				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >2 ) {
-					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
-					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
+				// We check if the plan we are changing from and the plan we are changing to are
+				// correct
+				if (currentAccountsMasterId <= 0 || currentAccountsMasterId > 2) {
+					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);
+					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
+							+ currentAccountsMasterId);
 				}
 				LOG.info("Calling the database update method for Company plan");
-				upgradeToCompany(company);		
+				upgradeToCompany(company);
 				LOG.info("Databases updated to Company plan");
 				break;
-				
+
 			case CommonConstants.ACCOUNTS_MASTER_ENTERPRISE:
-				// We check if the plan we are changing from and the plan we are changing to are correct
-				if (currentAccountsMasterId <= 0 || currentAccountsMasterId >3 ) {
-					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId );
-					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);			
+				// We check if the plan we are changing from and the plan we are changing to are
+				// correct
+				if (currentAccountsMasterId <= 0 || currentAccountsMasterId > 3) {
+					LOG.error(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : " + currentAccountsMasterId);
+					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
+							+ currentAccountsMasterId);
 				}
 				LOG.info("Calling the database update method for Enterprise plan");
-				upgradeToEnterprise(company,currentAccountsMasterId);
+				upgradeToEnterprise(company, currentAccountsMasterId);
 				LOG.info("Databases updated to Enterprise plan");
 				break;
 
@@ -1184,7 +1202,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				LOG.error(" upgradeAccount : Invalid accounts master id parameter given");
 				throw new InvalidInputException(" upgradeAccount : Invalid accounts master id parameter given");
 		}
-		LOG.info("Upgrade successful!");	
+		LOG.info("Upgrade successful!");
 	}
 
 	/**
@@ -1210,7 +1228,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Override
 	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException {
 		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
-
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getRegionByProfileName");
+		}
+		if (regionProfileName == null || regionProfileName.isEmpty()) {
+			throw new InvalidInputException("regionProfileName is null or empty in getRegionByProfileName");
+		}
 		/**
 		 * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
 		 * unique, whereas profileName is unique only within a company
@@ -1258,14 +1281,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings != null) {
 			long companyId = companySettings.getIden();
 			LOG.debug("Fetching regions for company : " + companyId);
-			
+
 			/**
 			 * Adding columns to be fetched in the list
 			 */
 			List<String> columnNames = new ArrayList<String>();
 			columnNames.add(CommonConstants.REGION_NAME_COLUMN);
 			columnNames.add(CommonConstants.REGION_ID_COLUMN);
-			
+
 			/**
 			 * Building criteria
 			 */
@@ -1315,6 +1338,97 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method getAllVerticalsMaster successfully finished");
 		return verticalsMasters;
+	}
+
+	/**
+	 * Method to fetch all the branches that are directly linked to a company
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException {
+		LOG.info("Method getBranchesUnderCompany called for companyProfileName : " + companyProfileName);
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getBranchesUnderCompany");
+		}
+		List<Branch> branches = null;
+		List<String> columnNames = new ArrayList<String>();
+		columnNames.add(CommonConstants.BRANCH_ID_COLUMN);
+		columnNames.add(CommonConstants.BRANCH_NAME_COLUMN);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+
+		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		if (companySettings != null) {
+			Company company = companyDao.findById(Company.class, companySettings.getIden());
+			queries.put(CommonConstants.COMPANY_COLUMN, company);
+			queries.put(CommonConstants.REGION_COLUMN, getDefaultRegionForCompany(company));
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO);
+
+			branches = branchDao.findProjectionsByKeyValue(Branch.class, columnNames, queries);
+		}
+		LOG.info("Method getBranchesUnderCompany executed sucessfully");
+
+		return branches;
+	}
+
+	/**
+	 * Method to get the default region of a company
+	 * 
+	 * @param company
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private Region getDefaultRegionForCompany(Company company) throws InvalidInputException {
+		LOG.info("Method getDefaultRegionForCompany called for :" + company);
+		Region region = null;
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.YES);
+		List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
+		if (regions == null || regions.isEmpty()) {
+			throw new InvalidInputException("No default region found for company :" + company);
+		}
+		region = regions.get(0);
+
+		LOG.info("Method getDefaultRegionForCompany excecuted successfully");
+		return region;
+	}
+
+	/**
+	 * Method to get list of branches linked to a region
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getBranchesForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
+			NoRecordsFetchedException {
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getBranchesForRegion");
+		}
+		if (regionProfileName == null || regionProfileName.isEmpty()) {
+			throw new InvalidInputException("regionProfileName is null or empty in getBranchesForRegion");
+		}
+		LOG.info("Method getBranchesForRegion called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
+		List<Branch> branches = null;
+		OrganizationUnitSettings regionSettings = getRegionByProfileName(companyProfileName, regionProfileName);
+		if (regionSettings != null) {
+			LOG.debug("fetching branches for region : " + regionSettings.getIden());
+			List<String> columnNames = new ArrayList<String>();
+			columnNames.add(CommonConstants.BRANCH_ID_COLUMN);
+			columnNames.add(CommonConstants.BRANCH_NAME_COLUMN);
+
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.REGION_COLUMN, regionDao.findById(Region.class, regionSettings.getIden()));
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO);
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+			branches = branchDao.findProjectionsByKeyValue(Branch.class, columnNames, queries);
+		}
+		else {
+			throw new NoRecordsFetchedException("No region settings found for regionProfileName : " + regionProfileName);
+		}
+		LOG.info("Method getBranchesForRegion executed successfully.");
+		return branches;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
