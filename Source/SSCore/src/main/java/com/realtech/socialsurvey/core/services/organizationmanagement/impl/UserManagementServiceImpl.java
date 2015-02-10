@@ -1256,6 +1256,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		canonicalUserSettings.setCompanySettings(companySettings);
 
 		switch (accountType) {
+			case FREE:
 			case INDIVIDUAL:
 			case TEAM:
 				LOG.debug("Individual/ Team account type");

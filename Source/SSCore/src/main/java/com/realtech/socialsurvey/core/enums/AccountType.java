@@ -8,7 +8,7 @@ import com.realtech.socialsurvey.core.exception.FatalException;
  */
 public enum AccountType {
 
-	INDIVIDUAL("Individual", 1), TEAM("Team", 2), COMPANY("Company", 3), ENTERPRISE("Enterprise", 4);
+	FREE("Free Account",1), INDIVIDUAL("Individual", 2), TEAM("Team", 3), COMPANY("Company", 4), ENTERPRISE("Enterprise", 5);
 
 	private String name;
 	private int value;

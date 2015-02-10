@@ -40,10 +40,11 @@ public interface CommonConstants {
 	/**
 	 *  Accounts master constants 
 	 */
-	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
-	public static final int ACCOUNTS_MASTER_TEAM = 2;
-	public static final int ACCOUNTS_MASTER_COMPANY = 3;
-	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
+	public static final int ACCOUNTS_MASTER_FREE = 1;
+	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 2;
+	public static final int ACCOUNTS_MASTER_TEAM = 3;
+	public static final int ACCOUNTS_MASTER_COMPANY = 4;
+	public static final int ACCOUNTS_MASTER_ENTERPRISE = 5;
 
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
@@ -92,6 +93,7 @@ public interface CommonConstants {
 	public static final String AUTO_PAYMENT_MODE = "A";
 	public static final int INITIAL_PAYMENT_RETRIES = 0;
 	public static final String PAYMENT_GATEWAY = "Braintree";
+	public static final String FREE_ACCOUNT = "Free Account";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
 	public static final String IS_OWNER_COLUMN = "isOwner";
@@ -160,7 +162,6 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
-	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
 
 	/**

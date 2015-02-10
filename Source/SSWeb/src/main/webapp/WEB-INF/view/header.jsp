@@ -86,7 +86,7 @@
 						</a>
 					</div>
 				</c:if>
-				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 5 && user.company.licenseDetails[0].accountsMaster.accountsMasterId > 1}">
 					<div class="header-links-item" id="upgrade-plan" onclick="upgradePlan();">
 						<spring:message	code="label.header.upgrade.key" />
 					</div>

@@ -158,6 +158,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		AccountType accountType = AccountType.getAccountType(accountTypeValue);
 		switch (accountType) {
+			case FREE:
+				addIndividualAccountType(user);
+				break;
 			case INDIVIDUAL:
 				addIndividualAccountType(user);
 				break;

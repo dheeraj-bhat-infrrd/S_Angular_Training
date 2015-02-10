@@ -95,7 +95,6 @@ public class PaymentController {
 
 			// Get the user object from the session and the company object from it
 			User user = sessionHelper.getCurrentUser();
-			Company company = user.getCompany();
 			AccountType accountType = null;
 
 			if (strAccountType == null || strAccountType.isEmpty()) {
@@ -109,9 +108,15 @@ public class PaymentController {
 			catch (NumberFormatException e) {
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
+			
 			try {
-				gateway.subscribe(user, company, accountTypeValue, nonce);
+				if(accountTypeValue == CommonConstants.ACCOUNTS_MASTER_FREE){
+					gateway.subscribeForFreeAccount(user, accountTypeValue);
+				}
+				else {
+					gateway.subscribe(user, accountTypeValue, nonce);
+				}
+
 			}
 			catch (InvalidInputException e) {
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + e.getMessage(), e);
