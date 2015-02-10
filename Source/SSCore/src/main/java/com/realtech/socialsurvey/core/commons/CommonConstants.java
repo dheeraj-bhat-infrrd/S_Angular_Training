@@ -94,6 +94,7 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
+	public static final String COMPANY_ID_COLUMN = "companyId";
 	public static final String IS_OWNER_COLUMN = "isOwner";
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
@@ -265,6 +266,8 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE= 114;
 	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_PRECONDITION_FAILURE = 115;
 	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE = 116;
+	public static final int ERROR_CODE_REGION_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 117;
+	public static final int ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE = 118;
 	
 	/**
 	 * Service codes
@@ -278,4 +281,5 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
 	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
 	public static final int SERVICE_CODE_FETCH_REGION_BRANCHES = 108;
+	public static final int SERVICE_CODE_FETCH_REGION_INDIVIDUALS = 109;
 }
