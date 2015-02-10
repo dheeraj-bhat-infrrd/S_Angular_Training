@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.rest;
 
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +61,8 @@ public class SurveyManagementController {
 			survey = new Gson().toJson(surveyQuestionDetails);
 		}
 		catch (NonFatalException e) {
-
+			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
+			return "{error:"+e.getMessage()+"}";
 		}
 		LOG.info("Service to get survey executed successfully");
 		return survey;
@@ -72,7 +74,30 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/data/storeAnswer")
 	public void storeSurveyAnswer(HttpServletRequest request) {
 		LOG.info("Method storeSurveyAnswer() started to store response of customer.");
+		// TODO store answer provided by customer in mongoDB.
+		String answer = request.getParameter("answer");
+		String question = request.getParameter("question");
+		String questionType = request.getParameter("questionType");
+		int stage = Integer.parseInt(request.getParameter("stage"));
+		String customerEmail = request.getParameter("customerEmail");
+		long agentId = Long.valueOf(request.getParameter("agentId"));
+		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
+	}
+	
+	/*
+	 * Method to store final feedback of the survey from customer.
+	 */
+	@RequestMapping(value = "/data/storeFeedback")
+	public void storeFeedback(HttpServletRequest request) {
+		LOG.info("Method storeFeedback() started to store response of customer.");
+		// TODO store answer provided by customer in mongoDB.
+		String feedback = request.getParameter("feedback");
+		String mood = request.getParameter("mood");
+		String customerEmail = request.getParameter("customerEmail");
+		long agentId = Long.valueOf(request.getParameter("agentId"));
+		surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
+		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
 
 	/*
@@ -83,6 +108,43 @@ public class SurveyManagementController {
 		model.addAttribute("agentId", agentIdStr);
 		model.addAttribute("customerEmailId", customerEmailId);
 		return "surveyQuestion";
+	}
+
+	/*
+	 * Method to store questions and other details into mongo initially.
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/triggersurvey/{customerEmail}/{companyIdStr}/{regionIdStr}/{branchIdStr}/{agentIdStr}/")
+	public String triggerSurvey(Model model, @PathVariable String customerEmail, @PathVariable String companyIdStr, @PathVariable String regionIdStr,
+			@PathVariable String branchIdStr, @PathVariable String agentIdStr) {
+		LOG.info("Method to store initial values for a survey, triggerSurvey() started");
+		try {
+			long agentId = 0;
+			long branchId = 0;
+			long regionId = 0;
+			long companyId = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+				branchId = Long.parseLong(branchIdStr);
+				regionId = Long.parseLong(regionIdStr);
+				companyId = Long.parseLong(companyIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
+				throw e;
+			}
+			try {
+				surveyHandler.storeInitialSurveyDetails(agentId, companyId, regionId, branchId, customerEmail, 0);
+			}
+			catch (SolrServerException e) {
+				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non Fatal exception caught in triggerSurvey() method of SurveyManagementController.", e);
+		}
+		LOG.info("Method to store initial values for a survey, triggerSurvey() finished");
+		return "Your survey has been initiated successfully!";
 	}
 }
 // JIRA SS-119 by RM-05 : EOC
