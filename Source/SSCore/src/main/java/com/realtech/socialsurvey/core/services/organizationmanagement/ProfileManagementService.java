@@ -11,6 +11,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 
 public interface ProfileManagementService {
 
@@ -24,7 +25,7 @@ public interface ProfileManagementService {
 	 */
 	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException;
-	
+
 	/**
 	 * Method to fetch all users under the specified branch of specified company
 	 * 
@@ -34,7 +35,6 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
-
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**
@@ -105,4 +105,26 @@ public interface ProfileManagementService {
 	 */
 	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
+
+	/**
+	 * Method to fetch all users under the specified region of specified company
+	 * 
+	 * @param companyProfileName
+	 * @param regionProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public List<User> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
+			NoRecordsFetchedException;
+
+	/**
+	 * Method to fetch all individuals directly linked to a company
+	 * 
+	 * @param companyProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public List<User> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
 }
