@@ -12,8 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyCompanyMapping;
@@ -23,6 +25,7 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
@@ -53,9 +56,15 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Autowired
 	private GenericDao<SurveyCompanyMapping, Long> surveyCompanyMappingDao;
+	
+	@Autowired
+	private GenericDao<VerticalsMaster, Integer> verticalsMasterDao;
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	@Override
 	@Transactional
@@ -120,11 +129,16 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			LOG.error("Invalid argument. Null value is passed for user.");
 			throw new InvalidInputException("Invalid argument. Null value is passed for user.", DisplayMessageConstants.GENERAL_ERROR);
 		}
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(user.getCompany().getCompanyId(), CommonConstants.COMPANY_SETTINGS_COLLECTION);
 		String surveyName = " Survey";
+		//Fetch the vertical masters from the table for the vertical
+		VerticalsMaster verticalsMaster = verticalsMasterDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, companySettings.getVertical()).get(CommonConstants.INITIAL_INDEX);
+		
 
 		// creating new survey and mapping to company
 		Survey survey = new Survey();
 		survey.setSurveyName(user.getCompany().getCompany() + surveyName);
+		survey.setVerticalsMaster(verticalsMaster);
 		survey.setStatus(CommonConstants.STATUS_ACTIVE);
 		survey.setCreatedBy(String.valueOf(user.getUserId()));
 		survey.setModifiedBy(String.valueOf(user.getUserId()));
@@ -393,9 +407,18 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public List<SurveyTemplate> getSurveyTemplates() throws InvalidInputException {
+	public List<SurveyTemplate> getSurveyTemplates(User user) throws InvalidInputException {
+		
+		//We fetch the vertical for the particular company from company settings
+		LOG.debug("Feting the company settings");
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(user.getCompany().getCompanyId(), CommonConstants.COMPANY_SETTINGS_COLLECTION);
+		//Fetch the vertical masters from the table for the vertical
+		LOG.debug("Fetching the verticals master record");
+		VerticalsMaster verticalsMaster = verticalsMasterDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, companySettings.getVertical()).get(CommonConstants.INITIAL_INDEX);
+				
 		HashMap<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEY_TEMPLATE);
+		queries.put(CommonConstants.VERTICAL_COLUMN, verticalsMaster);
 
 		List<Survey> surveys = surveyDao.findByKeyValue(Survey.class, queries);
 		List<SurveyTemplate> templates = new ArrayList<SurveyTemplate>();
@@ -651,6 +674,41 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			addQuestionToExistingSurvey(user, survey, questionDetails);
 		}
 		LOG.info("Method cloneSurveyFromTemplate() finished.");
+	}
+	
+	/**
+	 * Adds a default survey to the company based on the vertical of the company.
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public void addDefaultSurveyToCompany(User user) throws InvalidInputException {
+		if (user == null) {
+			LOG.error("addDefaultSurveyToCompany : Invalid company parameter passed.");
+			throw new InvalidInputException("addDefaultSurveyToCompany : Invalid company parameter passed.");
+		}
+		LOG.info("Adding default survey to company for user id : " + user.getUserId());
+		
+		//We fetch the vertical for the particular company from company settings
+		LOG.debug("Feting the company settings");
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(user.getCompany().getCompanyId(), CommonConstants.COMPANY_SETTINGS_COLLECTION);
+		//Fetch the vertical masters from the table for the vertical
+		LOG.debug("Fetching the verticals master record");
+		VerticalsMaster verticalsMaster = verticalsMasterDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, companySettings.getVertical()).get(CommonConstants.INITIAL_INDEX);
+		
+		//Next we get the default survey for a particular vertical
+		LOG.debug("Fetching the default survey");
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEY_TEMPLATE);
+		queries.put(CommonConstants.VERTICAL_COLUMN, verticalsMaster);
+		Survey defaultSurvey = surveyDao.findByKeyValue(Survey.class, queries).get(CommonConstants.INITIAL_INDEX);
+		
+		//Now we add the survey to the company
+		LOG.debug("Adding aurvey to company");
+		addSurveyToCompany(user, defaultSurvey, user.getCompany());
+		
+		LOG.info("Default survey added to the company");		
 	}
 }
 // JIRA: SS-32: By RM05: EOC

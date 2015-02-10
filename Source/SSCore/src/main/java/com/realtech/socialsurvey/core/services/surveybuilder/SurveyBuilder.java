@@ -102,7 +102,7 @@ public interface SurveyBuilder {
 	 * @param
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyTemplate> getSurveyTemplates() throws InvalidInputException;
+	public List<SurveyTemplate> getSurveyTemplates(User user) throws InvalidInputException;
 
 	/**
 	 * Method to fetch Survey from SurveyId
@@ -151,4 +151,11 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public List<SurveyQuestionDetails> getSurveyByAgenId(long agentId) throws InvalidInputException;
+	
+	/**
+	 * Adds a default survey to the company based on the vertical of the company.
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	public void addDefaultSurveyToCompany(User user) throws InvalidInputException;
 }
