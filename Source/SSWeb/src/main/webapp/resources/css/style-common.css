@@ -533,7 +533,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-header-row {
     height: 78px;
-    color: #fff;
+    color: #3e3e3e;
 }
 
 .hm-header-row-left {
@@ -552,8 +552,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-header-main-wrapper {
-    background-color: #26bdef;
-    margin-top: 83px;
+    background-color: #f9f9fb;
 }
 
 .hm-item-header {
@@ -1399,6 +1398,7 @@ button.paypal.is-active {
 }
 
 .prof-address {
+    font-family: 'OpenSansLight';
     line-height: 26px;
     font-size: 18px;
 }
@@ -1408,24 +1408,24 @@ button.paypal.is-active {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    font-weight: bold !important;
 }
 
 .prof-btn-survey {
-    font-family: 'opensanslight' !important;
-    background-color: #5CC8EF;
-    font-size: 13px;
+    background-color: #7AB400;
+    font-size: 15px;
     height: 40px;
     line-height: 40px;
-    width: 150px;
+    width: 250px;
     text-align: center;
     cursor: pointer;
     border-radius: 3px;
     color: #fff;
 }
+/*
 .prof-btn-survey:hover{
     background-color: #7AB400;
 }
+*/
 
 .prof-wrapper {
     height: 200px;
@@ -1450,6 +1450,7 @@ button.paypal.is-active {
     height: 50px;
     width: 40px;
     margin-right: 10px;
+    cursor: pointer;
 }
 
 .prof-left-row {
@@ -1487,13 +1488,13 @@ button.paypal.is-active {
 }
 
 .rt-content-main {
-    padding: 15px 30px 15px 30px;
+    padding: 15px 0px 15px 30px;
     margin-left: -15px;
     margin-right: -15px;
 }
 
 .panel-tweet-wrapper {
-    width: 50%;
+    width: 100%;
 }
 
 .tweet-icn {
@@ -1504,7 +1505,7 @@ button.paypal.is-active {
 
 .tweet-panel-left {
     padding-right: 15px;
-    border-right: 1px solid #dcdcdc;
+/*    border-right: 1px solid #dcdcdc;*/
 }
 
 .posts-wrapper {
@@ -2774,4 +2775,38 @@ button.paypal.is-active {
     cursor: pointer;
     width: 40px;
     height: 26px;
+}
+
+#recaptcha_image img#recaptcha_challenge_image {
+    width: 370px
+}
+
+.reg-captcha-img {
+    height: 58px;
+    border-bottom: 1px solid #DCDCDC;
+    background: none repeat scroll 0% 0% #FFF;
+}
+.review-count-left {
+    line-height: 60px;
+    height: 50px;
+    font-size: 12px;
+    color: #5CC8EF;
+}
+
+.prof-user-logo {
+    height: 150px;
+    background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 130px auto;
+}
+
+.prof-user-addline1 {
+    font-weight: bold;
+}
+
+.prof-user-address {
+    text-align: center;
+}
+
+.hm-hr-row-right {
+    margin-top: 15px;
 }
