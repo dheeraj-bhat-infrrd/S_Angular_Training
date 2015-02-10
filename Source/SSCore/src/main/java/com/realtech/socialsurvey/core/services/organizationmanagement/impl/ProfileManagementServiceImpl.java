@@ -4,13 +4,20 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.Association;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -22,13 +29,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileManagementServiceImpl.class);
 
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+	
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("afterPropertiesSet called for profile management service");
 	}
 
-	@Override
-	public OrganizationUnitSettings finalizeProfileDetail(User user, AccountType accountType, UserSettings settings) throws InvalidInputException {
+	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
+			long regionId) throws InvalidInputException {
 		LOG.info("Method finalizeProfileDetail() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -40,11 +50,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("Invalid account type.");
 		}
 
-		List<UserProfile> userProfiles = user.getUserProfiles();
 		OrganizationUnitSettings finalSettings = null;
-		long agentId;
-		long branchId;
-		long regionId;
 		switch (accountType) {
 			case INDIVIDUAL:
 			case TEAM:
@@ -56,7 +62,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				// Individual
 				else if (user.isAgent()) {
-					agentId = userProfiles.get(0).getAgentId();
 					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings().get(agentId));
 				}
 				break;
@@ -70,14 +75,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				// Branch Admin
 				else if (user.isBranchAdmin()) {
-					branchId = userProfiles.get(0).getBranchId();
 					finalSettings = generateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
 				}
 
 				// Individual
 				else if (user.isAgent()) {
-					agentId = userProfiles.get(0).getAgentId();
-					branchId = userProfiles.get(0).getBranchId();
 					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId), settings
 							.getAgentSettings().get(agentId));
 				}
@@ -92,23 +94,17 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				// Region Admin
 				else if (user.isRegionAdmin()) {
-					regionId = userProfiles.get(0).getRegionId();
 					finalSettings = generateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
 				}
 
 				// Branch Admin
 				else if (user.isBranchAdmin()) {
-					branchId = userProfiles.get(0).getBranchId();
-					regionId = userProfiles.get(0).getRegionId();
 					finalSettings = generateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
 							.getBranchSettings().get(branchId));
 				}
 
 				// Individual
 				else if (user.isAgent()) {
-					agentId = userProfiles.get(0).getAgentId();
-					branchId = userProfiles.get(0).getBranchId();
-					regionId = userProfiles.get(0).getRegionId();
 					finalSettings = generateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
 							.getBranchSettings().get(branchId), settings.getAgentSettings().get(agentId));
 				}
@@ -224,4 +220,91 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 		}
 	}
+	
+	@Override
+	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException {
+		if (logo == null || logo.isEmpty()) {
+			throw new InvalidInputException("Logo passed can not be null or empty");
+		}
+		LOG.info("Updating logo");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOGO, logo, companySettings,
+				collection);
+		LOG.info("Logo updated successfully");
+	}
+
+	@Override
+	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
+			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException {
+		if (contactDetailsSettings == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+		LOG.info("Updating contact detail information");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, unitSettings, collection);
+		LOG.info("Contact details updated successfully");
+		return contactDetailsSettings;
+	}
+
+	@Override
+	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
+			throws InvalidInputException {
+		if (associations == null || associations.isEmpty()) {
+			throw new InvalidInputException("Association name passed can not be null");
+		}
+		for (Association association : associations) {
+			if (association.getName() == null || association.getName().isEmpty()) {
+				associations.remove(association);
+			}
+		}
+		LOG.info("Adding associations");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
+				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		LOG.info("Associations added successfully");
+		return associations;
+	}
+
+	@Override
+	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
+			throws InvalidInputException {
+		if (achievements == null || achievements.isEmpty()) {
+			throw new InvalidInputException("Achievements passed can not be null or empty");
+		}
+		LOG.info("Adding achievements");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements,
+				unitSettings, collection);
+		LOG.info("Achievements added successfully");
+		return achievements;
+	}
+
+	@Override
+	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn) throws InvalidInputException {
+		if (authorisedIn == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+
+		Licenses licenses = unitSettings.getLicenses();
+		if (licenses == null) {
+			LOG.debug("Licenses not present for current profile, create a new license object");
+			licenses = new Licenses();
+		}
+		licenses.setAuthorized_in(authorisedIn);
+		LOG.info("Adding Licences list");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses,
+				unitSettings, collection);
+		LOG.info("Licence authorisations added successfully");
+		return licenses;
+	}
+
+	@Override
+	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
+			throws InvalidInputException {
+		if (mediaTokens == null) {
+			throw new InvalidInputException("Media tokens passed was null");
+		}
+		LOG.info("Updating the social media tokens in profile.");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SOCIAL_MEDIA_TOKENS,
+				mediaTokens, unitSettings, collection);
+		LOG.info("Successfully updated the social media tokens.");
+	}
+
 }
