@@ -43,7 +43,6 @@ import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -69,9 +68,6 @@ public class ProfileManagementController {
 
 	@Autowired
 	private UrlValidationHelper urlValidationHelper;
-
-	@Autowired
-	private OrganizationManagementService organizationManagementService;
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
@@ -160,7 +156,7 @@ public class ProfileManagementController {
 			}
 
 			try {
-				associations = organizationManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						unitSettings, associations);
 			}
 			catch (InvalidInputException e) {
@@ -212,7 +208,7 @@ public class ProfileManagementController {
 			contactDetailsSettings.setAddress2(address2);
 			// contactDetailsSettings.setZipcode(zipcode);
 			try {
-				organizationManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+				profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
 						contactDetailsSettings);
 			}
 			catch (InvalidInputException e) {
@@ -259,7 +255,7 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 			try {
-				achievements = organizationManagementService.addAchievements(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+				achievements = profileManagementService.addAchievements(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						unitSettings, achievements);
 			}
 			catch (InvalidInputException e) {
@@ -307,7 +303,7 @@ public class ProfileManagementController {
 			}
 			Licenses licenses = null;
 			try {
-				licenses = organizationManagementService.addLicences(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				licenses = profileManagementService.addLicences(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						authorisedIn);
 			}
 			catch (InvalidInputException e) {
@@ -350,7 +346,7 @@ public class ProfileManagementController {
 			ContactDetailsSettings contactDetailsSettings = unitSettings.getContact_details();
 			contactDetailsSettings.setAbout_me(aboutMe);
 			try {
-				contactDetailsSettings = organizationManagementService.updateContactDetails(
+				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings, contactDetailsSettings);
 			}
 			catch (InvalidInputException e) {
@@ -399,7 +395,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Error occurred while uploading logo.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			try {
-				organizationManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings, logoName);
+				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings, logoName);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("Error occurred while updating logo.", DisplayMessageConstants.GENERAL_ERROR, e);
@@ -479,7 +475,7 @@ public class ProfileManagementController {
 			mailIdSettings.setOthers(others);
 			contactDetailsSettings.setMail_ids(mailIdSettings);
 			try {
-				organizationManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						contactDetailsSettings);
 			}
 			catch (InvalidInputException e) {
@@ -563,7 +559,7 @@ public class ProfileManagementController {
 			phoneNumberSettings.setOthers(others);
 			contactDetailsSettings.setContact_numbers(phoneNumberSettings);
 			try {
-				organizationManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						contactDetailsSettings);
 			}
 			catch (InvalidInputException e) {
@@ -650,7 +646,7 @@ public class ProfileManagementController {
 			webAddressSettings.setOthers(others);
 			contactDetailsSettings.setWeb_addresses(webAddressSettings);
 			try {
-				organizationManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateContactDetails(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						contactDetailsSettings);
 			}
 			catch (InvalidInputException e) {
@@ -703,7 +699,7 @@ public class ProfileManagementController {
 			facebookToken.setFacebookPageLink(fbLink);
 			socialMediaTokens.setFacebookToken(facebookToken);
 			try {
-				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						socialMediaTokens);
 			}
 			catch (InvalidInputException e) {
@@ -754,7 +750,7 @@ public class ProfileManagementController {
 			twitterToken.setTwitterPageLink(twitterLink);
 			socialMediaTokens.setTwitterToken(twitterToken);
 			try {
-				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						socialMediaTokens);
 			}
 			catch (InvalidInputException e) {
@@ -805,7 +801,7 @@ public class ProfileManagementController {
 			linkedIntoken.setLinkedInPageLink(linkedinLink);
 			socialMediaTokens.setLinkedInToken(linkedIntoken);
 			try {
-				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						socialMediaTokens);
 			}
 			catch (InvalidInputException e) {
@@ -856,7 +852,7 @@ public class ProfileManagementController {
 			yelpToken.setYelpPageLink(yelpLink);
 			socialMediaTokens.setYelpToken(yelpToken);
 			try {
-				organizationManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
 						socialMediaTokens);
 			}
 			catch (InvalidInputException e) {
@@ -976,7 +972,7 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchprofile", method = RequestMethod.GET)
 	public String fetchProfileDetail(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile");
-		
+
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -984,13 +980,17 @@ public class ProfileManagementController {
 
 		OrganizationUnitSettings profile = null;
 		try {
-			profile = profileManagementService.finalizeProfileDetail(user, accountType, settings);
+			long agentId = user.getUserProfiles().get(0).getAgentId();
+			long branchId = user.getUserProfiles().get(0).getBranchId();
+			long regionId = user.getUserProfiles().get(0).getRegionId();
+			LOG.info("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
+			profile = profileManagementService.finalizeProfile(user, accountType, settings, agentId, branchId, regionId);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		
+
 		return new Gson().toJson(profile);
 	}
 }
