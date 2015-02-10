@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.commons;
 /**
  * Holds application level constants
  */
+
 public interface CommonConstants {
 
 	/**
@@ -35,6 +36,15 @@ public interface CommonConstants {
 	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
 	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
 	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
+	
+	/**
+	 *  Accounts master constants 
+	 */
+	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
+	public static final int ACCOUNTS_MASTER_TEAM = 2;
+	public static final int ACCOUNTS_MASTER_COMPANY = 3;
+	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
+
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
 	 */
@@ -118,6 +128,8 @@ public interface CommonConstants {
 	public static final String LOGIN_NAME = "loginName";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
+	public static final String CURRENT_LICENSE_ID = "currentplan";
+	public static final String UPGRADE_FLAG = "upgrade";
 	public static final String COUNTRY_CODE = "countryCode";
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
@@ -213,6 +225,17 @@ public interface CommonConstants {
 	public static final String ADDRESS2 = "address2";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
+	
+	/*
+	 * Payment detail constants
+	 */
+	public static final String CARD_NUMBER = "cardNumber";
+	public static final String CARD_TYPE = "cardType";
+	public static final String CARD_HOLDER_NAME = "cardHolderName";
+	public static final String ISSUING_BANK = "issuingBank";
+	public static final String IMAGE_URL = "imageUrl";
+	public static final String CLIENT_TOKEN = "clienttoken";
+	public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
 
 	// Survey Constants
 	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
