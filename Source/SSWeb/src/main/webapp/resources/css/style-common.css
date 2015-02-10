@@ -2434,9 +2434,41 @@ button.paypal.is-active {
     background: url(../images/no_star.png) no-repeat center;
 }
 
+.sq-smile-icn-wrapper {
+    float: left;
+    cursor: pointer;
+    width: 62px;
+    height: 62px;
+}
+
+.sq-happy-smile{
+	background: url(../images/icn-succ-msg.png) no-repeat center;
+}
+
+.sq-sad-smile{
+	background: url(../images/icn-err-msg.png) no-repeat center;
+}
+
+.sq-neutral-smile{
+	background: url(../images/icn-neutral-mood.png) no-repeat center;
+}
+
 .sq-full-star {
     background: url(../images/full_star.png) no-repeat center;
 }
+
+.sq-smile {
+    float: left;
+    cursor: pointer;
+    width: 62px;
+    height: 62px;
+    background: url(../images/icn-succ-grey.png) no-repeat center;
+}
+
+.sq-full-smile {
+    background: url(../images/icn-succ-msg.png) no-repeat center;
+}
+
 
 .sq-rat-wrapper {
     margin-bottom: 20px;
@@ -2444,6 +2476,11 @@ button.paypal.is-active {
 
 .sq-star-wrapper {
     width: 310px;
+    margin: 0 auto;
+}
+
+.sq-happy-wrapper {
+    width: 190px;
     margin: 0 auto;
 }
 
