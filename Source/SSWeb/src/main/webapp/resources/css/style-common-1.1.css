@@ -389,7 +389,12 @@ a, a:hover, a:visited{
 }
 
 .reg-cap-sound {
-    background: url(../images/audio.png) no-repeat center;
+    background: url(../images/Audio-and-Text.png) no-repeat;
+    background-position: 12px center;
+}
+
+.reg-cap-text {
+    background-position: -52px center !important;
 }
 
 .reg-cap-info {
