@@ -155,16 +155,17 @@ public interface OrganizationManagementService {
 	 * @throws PaymentException
 	 */
 	public void deleteDisabledAccount(long companyId) throws InvalidInputException, NoRecordsFetchedException;
-	
+
 	/**
 	 * Method called to update databases on plan upgrade
+	 * 
 	 * @param company
 	 * @param newAccountsMasterPlanId
 	 * @throws NoRecordsFetchedException
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public void upgradeAccount(Company company,int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
+	public void upgradeAccount(Company company, int newAccountsMasterPlanId) throws NoRecordsFetchedException, InvalidInputException, SolrException;
 
 	/**
 	 * Method to fetch the verticals master list
@@ -213,4 +214,24 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException;
+
+	/**
+	 * Method to get list of branches directly linked to a company
+	 * 
+	 * @param companyProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException;
+
+	/**
+	 * Method to get list of branches linked to a region
+	 * 
+	 * @param companyProfileName
+	 * @param regionProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
+	 */
+	public List<Branch> getBranchesForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException, NoRecordsFetchedException;
 }
