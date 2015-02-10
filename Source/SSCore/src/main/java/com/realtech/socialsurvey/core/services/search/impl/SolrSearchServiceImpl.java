@@ -387,6 +387,50 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return users;
 	}
 
+	@Override
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException, MalformedURLException {
+		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
+		if (patternFirst == null && patternLast == null) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		QueryResponse response = null;
+		try {
+			SolrQuery solrQuery = new SolrQuery();
+			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
+					CommonConstants.USER_EMAIL_ID_SOLR };
+			solrQuery.setFields(fields);
+
+			String query = "";
+			if (!patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+						+ patternLast + "*";
+			}
+			else if (!patternFirst.equals("") && patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
+			}
+			else if (patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+			}
+			solrQuery.setQuery(query);
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+
+			LOG.debug("Querying solr for searching users");
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			response = solrServer.query(solrQuery);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : "
+				+ response.getResults());
+		return response.getResults();
+	}
+
 	/**
 	 * Method to perform search of Users from solr based on the input pattern for user and company.
 	 * 
