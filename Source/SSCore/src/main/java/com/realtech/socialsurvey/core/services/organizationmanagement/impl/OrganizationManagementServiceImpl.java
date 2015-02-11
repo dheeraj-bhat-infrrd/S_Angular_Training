@@ -45,6 +45,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
@@ -103,6 +104,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
+
+	@Autowired
+	private ProfileManagementService profileManagementService;
 
 	@Autowired
 	private Utils utils;
@@ -1206,66 +1210,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	/**
-	 * JIRA:SS-117 by RM02 Method to get the company details based on profile name
-	 */
-	@Override
-	@Transactional
-	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
-		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
-		if (profileName == null || profileName.isEmpty()) {
-			throw new InvalidInputException("profile name is null or empty while getting company details");
-		}
-		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
-				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
-
-		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
-		return companySettings;
-	}
-
-	/**
-	 * Method to get the region based on profile name
-	 */
-	@Override
-	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException {
-		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
-		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			throw new InvalidInputException("companyProfileName is null or empty in getRegionByProfileName");
-		}
-		if (regionProfileName == null || regionProfileName.isEmpty()) {
-			throw new InvalidInputException("regionProfileName is null or empty in getRegionByProfileName");
-		}
-		/**
-		 * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
-		 * unique, whereas profileName is unique only within a company
-		 */
-		String profileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
-		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
-				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-
-		LOG.info("Method getRegionByProfileName excecuted successfully");
-		return regionSettings;
-	}
-
-	/**
-	 * Method to get the branch based on profile name
-	 */
-	@Override
-	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
-		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
-
-		/**
-		 * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
-		 * unique, whereas profileName is unique only within a company
-		 */
-		String profileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
-		OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
-				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-
-		LOG.info("Method getBranchByProfileName excecuted successfully");
-		return branchSettings;
-	}
-
-	/**
 	 * Method to fetch all regions of a company
 	 * 
 	 * @param companyProfileName
@@ -1276,7 +1220,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional
 	public List<Region> getRegionsForCompany(String companyProfileName) throws InvalidInputException {
 		LOG.info("Method getRegionsForCompany called for companyProfileName:" + companyProfileName);
-		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName(companyProfileName);
 		List<Region> regions = null;
 		if (companySettings != null) {
 			long companyId = companySettings.getIden();
@@ -1342,7 +1286,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	/**
 	 * Method to fetch all the branches that are directly linked to a company
-	 * @throws NoRecordsFetchedException 
+	 * 
+	 * @throws NoRecordsFetchedException
 	 */
 	@Override
 	@Transactional
@@ -1358,7 +1303,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		Map<String, Object> queries = new HashMap<String, Object>();
 
-		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		OrganizationUnitSettings companySettings = profileManagementService.getCompanyProfileByProfileName(companyProfileName);
 		if (companySettings != null) {
 			Company company = companyDao.findById(Company.class, companySettings.getIden());
 			queries.put(CommonConstants.COMPANY_COLUMN, company);
@@ -1379,7 +1324,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws NoRecordsFetchedException
 	 */
 	@Override
 	@Transactional
@@ -1409,7 +1354,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Override
 	@Transactional
 	public Branch getDefaultBranchForRegion(long regionId) throws InvalidInputException, NoRecordsFetchedException {
-		LOG.info("Method getDefaultBranchForRegion called for regionId : "+regionId);
+		LOG.info("Method getDefaultBranchForRegion called for regionId : " + regionId);
 		if (regionId <= 0l) {
 			throw new InvalidInputException("region id is invalid in getDefaultBranchForRegion");
 		}
@@ -1444,7 +1389,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method getBranchesForRegion called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
 		List<Branch> branches = null;
-		OrganizationUnitSettings regionSettings = getRegionByProfileName(companyProfileName, regionProfileName);
+		OrganizationUnitSettings regionSettings = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
 		if (regionSettings != null) {
 			LOG.debug("fetching branches for region : " + regionSettings.getIden());
 			List<String> columnNames = new ArrayList<String>();
