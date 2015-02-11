@@ -222,7 +222,7 @@ public class ProfileController {
 				LOG.debug("regions json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_BRANCHES_FETCH_SERVICE_FAILURE,
 						CommonConstants.SERVICE_CODE_FETCH_COMPANY_BRANCHES, "Something went wrong while fetching branches under company"),
 						e.getMessage());
@@ -255,8 +255,18 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS, "Profile name for company is invalid"),
 						"company profile name is null or empty while fetching all individuals for a company");
 			}
-			// TODO fetch individuals for a company
-
+			List<User> users = null;
+			try {
+				users = profileManagementService.getIndividualsForCompany(companyProfileName);
+				String json = new Gson().toJson(users);
+				LOG.debug("individuals json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS, "Error occurred while fetching individuals for company"),
+						e.getMessage());
+			}
 		}
 		catch (BaseRestException e) {
 			response = getErrorResponse(e);
@@ -296,12 +306,7 @@ public class ProfileController {
 				LOG.debug("branches json : " + json);
 				response = Response.ok(json).build();
 			}
-			catch (InvalidInputException e) {
-				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE,
-						CommonConstants.SERVICE_CODE_FETCH_REGION_BRANCHES, "Something went wrong while fetching branches under region"),
-						e.getMessage());
-			}
-			catch (NoRecordsFetchedException e) {
+			catch (InvalidInputException | NoRecordsFetchedException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE,
 						CommonConstants.SERVICE_CODE_FETCH_REGION_BRANCHES, "Something went wrong while fetching branches under region"),
 						e.getMessage());
@@ -325,8 +330,39 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/{companyProfileName}/region/{regionProfileName}/individuals")
 	public Response getIndividualsForRegion(@PathVariable String companyProfileName, @PathVariable String regionProfileName) {
-		// TODO implement this
-		return null;
+		LOG.info("Service to get all individuals directly linked to the specified region called");
+		Response response = null;
+		try {
+			if (companyProfileName == null || companyProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Profile name for company is invalid"),
+						"company profile name is null or empty while fetching all individuals for the region");
+			}
+			if (regionProfileName == null || regionProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Profile name for company is invalid"),
+						"region profile name is null or empty while fetching all individuals for the region");
+			}
+			List<User> users = null;
+			try {
+				users = profileManagementService.getIndividualsForRegion(companyProfileName, regionProfileName);
+				String json = new Gson().toJson(users);
+				LOG.debug("individuals json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Something went wrong while fetching individuals under region"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get all individuals directly linked to the specified region executed successfully");
+		return response;
 	}
 
 	/**

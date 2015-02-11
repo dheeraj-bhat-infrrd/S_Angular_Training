@@ -1342,10 +1342,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	/**
 	 * Method to fetch all the branches that are directly linked to a company
+	 * @throws NoRecordsFetchedException 
 	 */
 	@Override
 	@Transactional
-	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException {
+	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method getBranchesUnderCompany called for companyProfileName : " + companyProfileName);
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getBranchesUnderCompany");
@@ -1378,8 +1379,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
 	 */
-	private Region getDefaultRegionForCompany(Company company) throws InvalidInputException {
+	@Override
+	@Transactional
+	public Region getDefaultRegionForCompany(Company company) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method getDefaultRegionForCompany called for :" + company);
 		Region region = null;
 		Map<String, Object> queries = new HashMap<String, Object>();
@@ -1387,12 +1391,42 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.YES);
 		List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
 		if (regions == null || regions.isEmpty()) {
-			throw new InvalidInputException("No default region found for company :" + company);
+			throw new NoRecordsFetchedException("No default region found for company :" + company);
 		}
 		region = regions.get(0);
 
 		LOG.info("Method getDefaultRegionForCompany excecuted successfully");
 		return region;
+	}
+
+	/**
+	 * Method to fetch the default branch associated with a region
+	 * 
+	 * @param region
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	@Transactional
+	public Branch getDefaultBranchForRegion(long regionId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getDefaultBranchForRegion called for regionId : "+regionId);
+		if (regionId <= 0l) {
+			throw new InvalidInputException("region id is invalid in getDefaultBranchForRegion");
+		}
+		Branch branch = null;
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.REGION_COLUMN, regionDao.findById(Region.class, regionId));
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.YES);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
+		if (branches == null || branches.isEmpty()) {
+			// TODO add condition for max default branches
+			throw new NoRecordsFetchedException("No default branch present for regionId:" + regionId);
+		}
+		branch = branches.get(0);
+		LOG.info("Method getDefaultBranchForRegion finished");
+		return branch;
 	}
 
 	/**
