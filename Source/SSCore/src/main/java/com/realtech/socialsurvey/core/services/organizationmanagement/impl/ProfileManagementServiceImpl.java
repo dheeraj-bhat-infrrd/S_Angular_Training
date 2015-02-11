@@ -18,16 +18,20 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 
@@ -45,6 +49,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private GenericDao<UserProfile, Long> userProfileDao;
+
+	@Autowired
+	private GenericDao<Company, Long> companyDao;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -338,21 +345,93 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		OrganizationUnitSettings branchSettings = organizationManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
 		if (branchSettings != null) {
 			LOG.debug("Fetching user profiles for branchId: " + branchSettings.getIden());
-
-			Map<String, Object> queries = new HashMap<String, Object>();
-			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-			queries.put(CommonConstants.BRANCH_ID_COLUMN, branchSettings.getIden());
-			List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
-			if (userProfiles != null && !userProfiles.isEmpty()) {
-				users = new ArrayList<User>();
-				for (UserProfile userProfile : userProfiles) {
-					users.add(userProfile.getUser());
-				}
-				LOG.debug("Returning :" + users.size() + " individuals for branch : " + branchProfileName);
-			}
+			users = getUsersFromBranch(branchSettings.getIden());
 		}
 		LOG.info("Method getIndividualsForBranch executed successfully");
 		return null;
 	}
 
+	private List<User> getUsersFromBranch(long branchId) {
+		LOG.info("Method getUsersFromBranch called for branchId:" + branchId);
+		List<User> users = null;
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			users = new ArrayList<User>();
+			for (UserProfile userProfile : userProfiles) {
+				users.add(userProfile.getUser());
+			}
+			LOG.debug("Returning :" + users.size() + " individuals for branch : " + branchId);
+		}
+		LOG.info("Method getUsersFromBranch executed successfully");
+		return users;
+	}
+
+	/**
+	 * Method to fetch all users under the specified region of specified company
+	 * 
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	@Transactional
+	public List<User> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
+			NoRecordsFetchedException {
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForRegion");
+		}
+		if (regionProfileName == null || regionProfileName.isEmpty()) {
+			throw new InvalidInputException("regionProfileName is null or empty in getIndividualsForRegion");
+		}
+		LOG.info("Method getIndividualsForRegion called for companyProfileName:" + companyProfileName + " and branchProfileName:" + regionProfileName);
+		List<User> users = null;
+		OrganizationUnitSettings regionSettings = organizationManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+		if (regionSettings != null) {
+			Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionSettings.getIden());
+
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(CommonConstants.REGION_ID_COLUMN, regionSettings.getIden());
+			queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
+
+			LOG.debug("calling method to fetch user profiles under region :" + regionProfileName);
+			List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+
+			if (userProfiles != null && !userProfiles.isEmpty()) {
+				LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
+				users = new ArrayList<User>();
+				for (UserProfile userProfile : userProfiles) {
+					users.add(userProfile.getUser());
+				}
+			}
+		}
+
+		LOG.info("Method getIndividualsForRegion executed successfully");
+		return users;
+	}
+
+	/**
+	 * Method to fetch all individuals directly linked to a company
+	 */
+	@Override
+	@Transactional
+	public List<User> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException {
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForCompany");
+		}
+		LOG.info("Method getIndividualsForCompany called for companyProfileName: " + companyProfileName);
+		List<User> users = null;
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanyProfileByProfileName(companyProfileName);
+		if (companySettings != null) {
+			Region defaultRegion = organizationManagementService.getDefaultRegionForCompany(companyDao.findById(Company.class,
+					companySettings.getIden()));
+			if (defaultRegion != null) {
+				Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(defaultRegion.getRegionId());
+				users = getUsersFromBranch(defaultBranch.getBranchId());
+			}
+		}
+		LOG.info("Method getIndividualsForCompany executed successfully");
+		return users;
+	}
 }
