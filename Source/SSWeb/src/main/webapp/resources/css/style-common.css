@@ -1464,7 +1464,7 @@ button.paypal.is-active {
 }
 
 .left-panel-content {
-    padding: 0 10px;
+    padding: 0 10px 0 0;
 }
 
 .blue-text {
@@ -1513,7 +1513,7 @@ button.paypal.is-active {
 }
 
 .tweet-txt{
-    width: 302px;
+    width: 691px;
 }
 
 .tweet-text-main{
@@ -1538,23 +1538,23 @@ button.paypal.is-active {
     border-bottom: 0 !important;
 }
 .icn-mail {
-    background: url(../images/email.png) no-repeat center;
+    background: url(../images/mail.png) no-repeat center;
 }
 
 .icn-web {
-    background: url(../images/web.png) no-repeat center;
+    background: url(../images/website.png) no-repeat center;
 }
 
 .icn-mbl {
-    background: url(../images/phone.png) no-repeat center;
+    background: url(../images/mbl.png) no-repeat center;
 }
 
 .icn-phone {
-    background: url(../images/ph.png) no-repeat center;
+    background: url(../images/tele.png) no-repeat center;
 }
 
 .icn-fax {
-    background: url(../images/Print.png) no-repeat center;
+    background: url(../images/fax.png) no-repeat center;
 }
 
 .icn-fb {
@@ -2809,4 +2809,64 @@ button.paypal.is-active {
 
 .hm-hr-row-right {
     margin-top: 15px;
+}
+
+.icn-blog {
+    background: url(../images/blog.png) no-repeat center;
+}
+
+.bord-left-panel {
+    border-left: 1px solid #dcdcdc;
+}
+
+.lp-sub {
+    margin-left: 14px;
+}
+
+.flat-left-bord {
+    background: url(../images/line-flat.png) no-repeat;
+    background-position: left 18px;
+}
+
+.lp-sub-img {
+    float: left;
+    width: 30px;
+    height: 36px;
+    margin-right: 5px;
+}
+
+.lp-sub-txt {
+    line-height: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lp-sub-header {
+    padding: 0px 0px 0px 15px;
+}
+
+.icn-rgn {
+    background: url(../images/rgn.png) no-repeat center;
+}
+
+.icn-rgn-blue {
+    background: url(../images/rgn_blue.png) no-repeat center;
+}
+
+.icn-psn1 {
+    background: url(../images/Person1.png) no-repeat center;
+}
+
+.icn-psn2 {
+    background: url(../images/Person1.png) no-repeat center;
+}
+
+.mgn-left-0 {
+    margin-left: 0;
+}
+
+.prof-right-panel-wrapper {
+    border-left: 1px solid #dcdcdc;
+    margin-left: -16px !important;
 }

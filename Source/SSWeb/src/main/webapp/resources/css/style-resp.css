@@ -729,6 +729,13 @@
         margin: 0 auto;
         width: 100% !important;
     }
+    .left-panel-content-adj{
+        padding-left: 15px;
+    }
+    .prof-left-panel-wrapper, .row prof-right-panel-wrapper{
+        padding: 0px;
+        margin: 0;
+    }
 }
 
 
@@ -860,7 +867,7 @@
         white-space: nowrap;
     }
     .tweet-txt{
-        width: 162px;
+        width: 410px;
     }
     .prof-name{
         font-size: 20px;
@@ -929,7 +936,7 @@
         width: 10px;
     }
     .tweet-txt{
-        width: 235px;
+        width: 555px;
     }
     .cp-item-row-left{
 		width: 165px;
