@@ -177,36 +177,6 @@ public interface OrganizationManagementService {
 	// JIRA SS-97 by RM-06 : EOC
 
 	/**
-	 * JIRA SS-117 by RM-02 Method to fetch company profile when profile name is provided
-	 * 
-	 * @param collection
-	 * @param companySettings
-	 * @param logo
-	 * @throws InvalidInputException
-	 */
-	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
-
-	/**
-	 * Method to get the region profile based on region and company profile name
-	 * 
-	 * @param companyProfileName
-	 * @param regionProfileName
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException;
-
-	/**
-	 * Method to get the branch profile based on branch and company profile name
-	 * 
-	 * @param companyProfileName
-	 * @param branchProfileName
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException;
-
-	/**
 	 * Method to fetch all regions of a company
 	 * 
 	 * @param companyProfileName
