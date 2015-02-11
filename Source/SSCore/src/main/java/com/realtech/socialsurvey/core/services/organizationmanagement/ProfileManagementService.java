@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import com.realtech.socialsurvey.core.entities.Achievement;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -26,16 +27,6 @@ public interface ProfileManagementService {
 	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException;
 
-	/**
-	 * Method to fetch all users under the specified branch of specified company
-	 * 
-	 * @param companyProfileName
-	 * @param branchProfileName
-	 * @return
-	 * @throws InvalidInputException
-	 */
-	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
-
 	// JIRA SS-97 by RM-06 : BOC
 	/**
 	 * Method to update logo of a company
@@ -59,6 +50,9 @@ public interface ProfileManagementService {
 	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
 			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException;
 
+	public ContactDetailsSettings updateAgentContactDetails(String collection, AgentSettings agentSettings,
+			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException;
+
 	/**
 	 * Method to add an association
 	 * 
@@ -69,6 +63,9 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
+			throws InvalidInputException;
+
+	public List<Association> addAgentAssociations(String collection, AgentSettings agentSettings, List<Association> associations)
 			throws InvalidInputException;
 
 	/**
@@ -83,6 +80,9 @@ public interface ProfileManagementService {
 	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
 			throws InvalidInputException;
 
+	public List<Achievement> addAgentAchievements(String collection, AgentSettings agentSettings, List<Achievement> achievements)
+			throws InvalidInputException;
+
 	/**
 	 * Method to add licence details
 	 * 
@@ -95,6 +95,8 @@ public interface ProfileManagementService {
 	 */
 	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn) throws InvalidInputException;
 
+	public Licenses addAgentLicences(String collection, AgentSettings agentSettings, List<String> authorisedIn) throws InvalidInputException;
+
 	/**
 	 * Method to update social media tokens in profile
 	 * 
@@ -105,6 +107,16 @@ public interface ProfileManagementService {
 	 */
 	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
+
+	/**
+	 * Method to fetch all users under the specified branch of specified company
+	 * 
+	 * @param companyProfileName
+	 * @param branchProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
 
 	/**
 	 * Method to fetch all users under the specified region of specified company
