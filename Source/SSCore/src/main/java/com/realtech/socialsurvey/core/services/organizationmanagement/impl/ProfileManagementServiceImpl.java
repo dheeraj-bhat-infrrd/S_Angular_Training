@@ -242,6 +242,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 	}
 
+	// Logo
 	@Override
 	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException {
 		if (logo == null || logo.isEmpty()) {
@@ -253,19 +254,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Logo updated successfully");
 	}
 
-	@Override
-	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
-			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException {
-		if (contactDetailsSettings == null) {
-			throw new InvalidInputException("Contact details passed can not be null");
-		}
-		LOG.info("Updating contact detail information");
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
-				contactDetailsSettings, unitSettings, collection);
-		LOG.info("Contact details updated successfully");
-		return contactDetailsSettings;
-	}
-
+	// Associations
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
 			throws InvalidInputException {
@@ -285,6 +274,52 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
+	public List<Association> addAgentAssociations(String collection, AgentSettings agentSettings, List<Association> associations)
+			throws InvalidInputException {
+		if (associations == null || associations.isEmpty()) {
+			throw new InvalidInputException("Association name passed can not be null");
+		}
+		for (Association association : associations) {
+			if (association.getName() == null || association.getName().isEmpty()) {
+				associations.remove(association);
+			}
+		}
+		LOG.info("Adding associations");
+		organizationUnitSettingsDao
+				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, agentSettings);
+		LOG.info("Associations added successfully");
+		return associations;
+	}
+
+	// Contact details
+	@Override
+	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
+			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException {
+		if (contactDetailsSettings == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+		LOG.info("Updating contact detail information");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, unitSettings, collection);
+		LOG.info("Contact details updated successfully");
+		return contactDetailsSettings;
+	}
+
+	@Override
+	public ContactDetailsSettings updateAgentContactDetails(String collection, AgentSettings agentSettings,
+			ContactDetailsSettings contactDetailsSettings) throws InvalidInputException {
+		if (contactDetailsSettings == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+		LOG.info("Updating contact detail information");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, agentSettings);
+		LOG.info("Contact details updated successfully");
+		return contactDetailsSettings;
+	}
+
+	// Achievements
+	@Override
 	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
 			throws InvalidInputException {
 		if (achievements == null || achievements.isEmpty()) {
@@ -297,6 +332,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return achievements;
 	}
 
+	@Override
+	public List<Achievement> addAgentAchievements(String collection, AgentSettings agentSettings, List<Achievement> achievements)
+			throws InvalidInputException {
+		if (achievements == null || achievements.isEmpty()) {
+			throw new InvalidInputException("Achievements passed can not be null or empty");
+		}
+		LOG.info("Adding achievements");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ACHIEVEMENTS, achievements,
+				agentSettings);
+		LOG.info("Achievements added successfully");
+		return achievements;
+	}
+
+	// Licenses
 	@Override
 	public Licenses addLicences(String collection, OrganizationUnitSettings unitSettings, List<String> authorisedIn) throws InvalidInputException {
 		if (authorisedIn == null) {
@@ -316,6 +365,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return licenses;
 	}
 
+	@Override
+	public Licenses addAgentLicences(String collection, AgentSettings agentSettings, List<String> authorisedIn) throws InvalidInputException {
+		if (authorisedIn == null) {
+			throw new InvalidInputException("Contact details passed can not be null");
+		}
+
+		Licenses licenses = agentSettings.getLicenses();
+		if (licenses == null) {
+			LOG.debug("Licenses not present for current profile, create a new license object");
+			licenses = new Licenses();
+		}
+		licenses.setAuthorized_in(authorisedIn);
+		LOG.info("Adding Licences list");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LICENCES, licenses, agentSettings);
+		LOG.info("Licence authorisations added successfully");
+		return licenses;
+	}
+
+	// Social Tokens
 	@Override
 	public void updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException {
