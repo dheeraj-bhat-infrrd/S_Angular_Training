@@ -61,7 +61,7 @@ public class ProfileController {
 			}
 			OrganizationUnitSettings companyProfile = null;
 			try {
-				companyProfile = organizationManagementService.getCompanyProfileByProfileName(profileName);
+				companyProfile = profileManagementService.getCompanyProfileByProfileName(profileName);
 				String json = new Gson().toJson(companyProfile);
 				LOG.debug("companyProfile json : " + json);
 				response = Response.ok(json).build();
@@ -101,7 +101,7 @@ public class ProfileController {
 			}
 			OrganizationUnitSettings regionProfile = null;
 			try {
-				regionProfile = organizationManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
 				String json = new Gson().toJson(regionProfile);
 				LOG.debug("regionProfile json : " + json);
 				response = Response.ok(json).build();
@@ -141,7 +141,7 @@ public class ProfileController {
 			}
 			OrganizationUnitSettings branchProfile = null;
 			try {
-				branchProfile = organizationManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
 				String json = new Gson().toJson(branchProfile);
 				LOG.debug("branchProfile json : " + json);
 				response = Response.ok(json).build();
@@ -154,7 +154,6 @@ public class ProfileController {
 		catch (BaseRestException e) {
 			response = getErrorResponse(e);
 		}
-
 		LOG.info("Service to get branch profile executed successfully");
 		return response;
 	}

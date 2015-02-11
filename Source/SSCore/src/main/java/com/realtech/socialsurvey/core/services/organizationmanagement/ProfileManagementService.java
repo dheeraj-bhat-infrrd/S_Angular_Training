@@ -139,4 +139,34 @@ public interface ProfileManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<User> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method to get the region profile based on region and company profile name
+	 * 
+	 * @param companyProfileName
+	 * @param regionProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException;
+
+	/**
+	 * Method to get the branch profile based on branch and company profile name
+	 * 
+	 * @param companyProfileName
+	 * @param branchProfileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException;
+
+	/**
+	 * JIRA SS-117 by RM-02 Method to fetch company profile when profile name is provided
+	 * 
+	 * @param collection
+	 * @param companySettings
+	 * @param logo
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
 }

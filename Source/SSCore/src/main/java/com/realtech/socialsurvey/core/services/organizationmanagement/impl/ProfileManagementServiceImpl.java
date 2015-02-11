@@ -12,6 +12,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
@@ -52,6 +53,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
+
+	@Autowired
+	private GenericDao<Branch, Long> branchDao;
+
+	@Autowired
+	private Utils utils;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -410,7 +417,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsForBranch called for companyProfileName: " + companyProfileName + " branchProfileName:" + branchProfileName);
 		List<User> users = null;
-		OrganizationUnitSettings branchSettings = organizationManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+		OrganizationUnitSettings branchSettings = getBranchByProfileName(companyProfileName, branchProfileName);
 		if (branchSettings != null) {
 			LOG.debug("Fetching user profiles for branchId: " + branchSettings.getIden());
 			users = getUsersFromBranch(branchSettings.getIden());
@@ -454,7 +461,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsForRegion called for companyProfileName:" + companyProfileName + " and branchProfileName:" + regionProfileName);
 		List<User> users = null;
-		OrganizationUnitSettings regionSettings = organizationManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+		OrganizationUnitSettings regionSettings = getRegionByProfileName(companyProfileName, regionProfileName);
 		if (regionSettings != null) {
 			Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionSettings.getIden());
 
@@ -490,7 +497,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsForCompany called for companyProfileName: " + companyProfileName);
 		List<User> users = null;
-		OrganizationUnitSettings companySettings = organizationManagementService.getCompanyProfileByProfileName(companyProfileName);
+		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
 		if (companySettings != null) {
 			Region defaultRegion = organizationManagementService.getDefaultRegionForCompany(companyDao.findById(Company.class,
 					companySettings.getIden()));
@@ -501,5 +508,77 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsForCompany executed successfully");
 		return users;
+	}
+
+	/**
+	 * Method to get the region based on profile name
+	 */
+	@Override
+	@Transactional
+	public OrganizationUnitSettings getRegionByProfileName(String companyProfileName, String regionProfileName) throws InvalidInputException {
+		LOG.info("Method getRegionByProfileName called for companyProfileName:" + companyProfileName + " and regionProfileName:" + regionProfileName);
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("companyProfileName is null or empty in getRegionByProfileName");
+		}
+		if (regionProfileName == null || regionProfileName.isEmpty()) {
+			throw new InvalidInputException("regionProfileName is null or empty in getRegionByProfileName");
+		}
+		/**
+		 * generate profileUrl and fetch the region by profileUrl since profileUrl for any region is
+		 * unique, whereas profileName is unique only within a company
+		 */
+		String profileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
+		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.debug("Generating final region settings based on lock settings");
+		regionSettings = generateRegionProfile(companySettings, regionSettings);
+		LOG.info("Method getRegionByProfileName excecuted successfully");
+		return regionSettings;
+	}
+
+	/**
+	 * Method to get the branch based on profile name
+	 */
+	@Override
+	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
+		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
+
+		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
+		/**
+		 * generate profileUrl and fetch the branch by profileUrl since profileUrl for any branch is
+		 * unique, whereas profileName is unique only within a company
+		 */
+		String profileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
+		OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(profileUrl,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		LOG.debug("Fetching branch from db to identify the region");
+		Branch branch = branchDao.findById(Branch.class, branchSettings.getIden());
+		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getRegion()
+				.getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		
+		branchSettings = generateBranchProfile(companySettings, regionSettings, branchSettings);
+
+		LOG.info("Method getBranchByProfileName excecuted successfully");
+		return branchSettings;
+	}
+
+	/**
+	 * JIRA:SS-117 by RM02 Method to get the company details based on profile name
+	 */
+	@Override
+	@Transactional
+	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException {
+		LOG.info("Method getCompanyDetailsByProfileName called for profileName : " + profileName);
+		if (profileName == null || profileName.isEmpty()) {
+			throw new InvalidInputException("profile name is null or empty while getting company details");
+		}
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
+		return companySettings;
 	}
 }
