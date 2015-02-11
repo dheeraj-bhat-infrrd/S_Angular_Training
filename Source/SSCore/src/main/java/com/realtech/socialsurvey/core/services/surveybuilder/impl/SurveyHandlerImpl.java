@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyDetails.setRegionId(regionId);
 		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
 		surveyDetails.setReminderCount(reminderCount);
+		surveyDetails.setUpdatedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
 		mongoSurveyDetailsDao.updateEmailForExistingFeedback(agentId, customerEmail);
 		mongoSurveyDetailsDao.insertSurveyDetails(surveyDetails);
