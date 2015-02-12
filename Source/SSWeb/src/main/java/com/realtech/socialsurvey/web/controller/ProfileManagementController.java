@@ -82,43 +82,43 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfilePage() {
 		LOG.info("Started the profile page");
-		return JspResolver.COMPANY_PROFILE;
+		return JspResolver.PROFILE_EDIT_AGENT;
 	}
 
 	@RequestMapping(value = "/fetchcontactdetails", method = RequestMethod.GET)
 	public String fetchContactDetails() {
 		LOG.info("Fecthing contact details for profile");
-		return JspResolver.CONTACT_DETAILS_LIST;
+		return JspResolver.PROFILE_CONTACT_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
 	public String fetchAssociations() {
 		LOG.info("Fecthing association list for profile");
-		return JspResolver.ASSOCIATION_LIST;
+		return JspResolver.PROFILE_ASSOCIATIONS;
 	}
 
 	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
 	public String fetchAchievements() {
 		LOG.info("Fecthing achievement list for profile");
-		return JspResolver.ACHIEVEMENT_LIST;
+		return JspResolver.PROFILE_ACHIEVEMENTS;
 	}
 
 	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
 	public String fetchLicences() {
 		LOG.info("Fecthing license details for profile");
-		return JspResolver.LICENSE_LIST;
+		return JspResolver.PROFILE_LICENSES;
 	}
 
 	@RequestMapping(value = "/fetchaddressdetails", method = RequestMethod.GET)
 	public String fetchAddressDetails() {
 		LOG.info("Fecthing address details for rofile");
-		return JspResolver.ADDRESS_DETAILS;
+		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchprofileimage", method = RequestMethod.GET)
 	public String fetchProfileImage() {
 		LOG.info("Fecthing profile image");
-		return JspResolver.PROFILE_IMAGE_CONTENT;
+		return JspResolver.PROFILE_IMAGE;
 	}
 
 	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)

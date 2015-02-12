@@ -423,7 +423,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			users = getUsersFromBranch(branchSettings.getIden());
 		}
 		LOG.info("Method getIndividualsForBranch executed successfully");
-		return null;
+		return users;
 	}
 
 	private List<User> getUsersFromBranch(long branchId) {

@@ -1473,6 +1473,7 @@ button.paypal.is-active {
 
 .lp-row {
     line-height: 44px;
+    padding-left: 10px;
 }
 
 .lp-con-row-item {
@@ -2819,6 +2820,7 @@ button.paypal.is-active {
 }
 
 .reg-captcha-img {
+    width: 370px;
     height: 58px;
     border-bottom: 1px solid #DCDCDC;
     background: none repeat scroll 0% 0% #FFF;
@@ -2906,4 +2908,27 @@ button.paypal.is-active {
 .prof-right-panel-wrapper {
     border-left: 1px solid #dcdcdc;
     margin-left: -16px !important;
+}
+
+.lph-dd-content {
+    display: none;
+}
+
+.hdr-links {
+    line-height: 80px;
+    color: #fff;
+}
+
+.hdr-links a{
+    color: #fff !important;
+}
+
+.hdr-link-active {
+    font-weight: bold !important;
+}
+
+.hdr-link-item {
+    float: left;
+    padding: 0 15px;
+    cursor: pointer;
 }
