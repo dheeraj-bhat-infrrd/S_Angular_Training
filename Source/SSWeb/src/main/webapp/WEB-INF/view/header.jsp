@@ -66,13 +66,13 @@
 								code="label.header.company.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 1}">
+				<c:if test="${highestrole == 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId != 5}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
 								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1 && highestrole != 4}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId > 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId <5 && highestrole != 4}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
 								code="label.header.usermanagement.key" /></a>
@@ -124,7 +124,7 @@
 								code="label.header.company.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 1}">
+				<c:if test="${highestrole == 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId != 5}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
 								code="label.header.buildsurvey.key" /></a>

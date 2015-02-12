@@ -79,6 +79,7 @@ public interface CommonConstants {
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
+	public static final int EMPTY_LIST = 0;
 
 	/**
 	 * Hibernate entities and column name constants

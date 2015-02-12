@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
+import java.util.Map;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
@@ -140,9 +141,10 @@ public interface SurveyBuilder {
 	 * Method to clone Survey from template
 	 * 
 	 * @param questionId
+	 * @return 
 	 * @throws InvalidInputException
 	 */
-	public void cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException;
+	public Survey cloneSurveyFromTemplate(User user, long templateId, boolean needMappingOfQuestions) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to fetch Survey Questions.
@@ -158,4 +160,12 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public void addDefaultSurveyToCompany(User user) throws InvalidInputException;
+	
+	/**
+	 * Checks if the survey is default and clones it. If not leaves it as it is.
+	 * @param user
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public Map<Integer, Integer> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException;
 }

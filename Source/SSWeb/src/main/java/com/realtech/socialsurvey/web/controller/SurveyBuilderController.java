@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,6 +93,10 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
+			
+			//Check if survey is default one and clone it
+			surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			
 			// Getting the survey for user
 			Survey survey = surveyBuilder.checkForExistingSurvey(user);
 			if (survey == null) {
@@ -146,6 +151,10 @@ public class SurveyBuilderController {
 			LOG.error("InvalidInputException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_ANSWER, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		return message;
 	}
 
@@ -163,8 +172,18 @@ public class SurveyBuilderController {
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
 
-		try {
-			long surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
+		try {			
+			//Check if survey is default one and clone it
+			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			long surveyQuestionId;
+			
+			if(oldToNewQuestionMap != null){
+				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
+			}
+			else{
+				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
+
+			}
 			String questionType = request.getParameter("sb-question-edit-type");
 
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
@@ -209,6 +228,10 @@ public class SurveyBuilderController {
 			LOG.error("InvalidInputException while updating question. Reason: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
 		return message;
 	}
 
@@ -227,7 +250,18 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			long surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
+			
+			//Check if default survey is mapped and clone it
+			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			long surveyQuestionId;
+			
+			if(oldToNewQuestionMap != null){
+				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
+			}
+			else{
+				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
+
+			}
 
 			surveyBuilder.deactivateQuestionSurveyMapping(user, surveyQuestionId);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
@@ -241,6 +275,10 @@ public class SurveyBuilderController {
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while disabling Question from Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -260,12 +298,21 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
+			//Check if default survey is mapped and clone it
+			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			
 			String questionIdsStr = request.getParameter("questionIds");
 			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
 
 			LOG.info(questionIdsStr);
 			for (String questionIdStr : surveyQuestionIdStrs) {
-				surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
+				if(oldToNewQuestionMap != null){
+					surveyBuilder.deactivateQuestionSurveyMapping(user, oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
+				}
+				else{
+					surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
+
+				}
 			}
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
@@ -274,6 +321,10 @@ public class SurveyBuilderController {
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while disabling Questions from Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -293,10 +344,20 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			long questionId = Long.parseLong(request.getParameter("questionId"));
+			//Check if default survey is mapped and clone it
+			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			long surveyQuestionId;
+			
+			if(oldToNewQuestionMap != null){
+				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
+			}
+			else{
+				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
+
+			}
 			String reorderType = request.getParameter("reorderType");
 
-			surveyBuilder.reorderQuestion(user, questionId, reorderType);
+			surveyBuilder.reorderQuestion(user, surveyQuestionId, reorderType);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
 			LOG.info("Method reorderQuestion of SurveyBuilderController finished successfully");
@@ -308,6 +369,10 @@ public class SurveyBuilderController {
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while reordering Question from Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
 	}
@@ -425,7 +490,7 @@ public class SurveyBuilderController {
 		try {
 			long templateId = Long.parseLong(request.getParameter("templateId"));
 
-			surveyBuilder.cloneSurveyFromTemplate(user, templateId);
+			surveyBuilder.cloneSurveyFromTemplate(user, templateId, false);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
 			LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController finished successfully");

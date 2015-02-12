@@ -115,7 +115,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.info("Method checkForExistingSurvey() finished.");
 		if (!surveyCompanyMappingList.isEmpty()) {
 			SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappingList.get(CommonConstants.INITIAL_INDEX);
-			return surveyCompanyMapping.getSurvey();
+			Survey survey = surveyCompanyMapping.getSurvey();
+			return survey;
 		}
 		return null;
 	}
@@ -663,26 +664,29 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public void cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException {
+	public Survey cloneSurveyFromTemplate(User user, long templateId, boolean needMappingOfQuestions) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method cloneSurveyFromTemplate() started.");
 		if (user == null) {
 			LOG.error("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
 			throw new InvalidInputException("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
 		}
+
 		Survey survey = checkForExistingSurvey(user);
 		if (survey != null) {
 			deactivateSurveyCompanyMapping(user);
 		}
-		survey = createNewSurvey(user);
+		Survey newSurvey = createNewSurvey(user);
 
 		// fetching template
 		Survey surveyTemplate = surveyDao.findById(Survey.class, templateId);
 		List<SurveyQuestionDetails> surveyQuestionDetails = fetchSurveyQuestions(surveyTemplate);
 
 		for (SurveyQuestionDetails questionDetails : surveyQuestionDetails) {
-			addQuestionToExistingSurvey(user, survey, questionDetails);
+			addQuestionToExistingSurvey(user, newSurvey, questionDetails);
 		}
+		
 		LOG.info("Method cloneSurveyFromTemplate() finished.");
+		return newSurvey;
 	}
 	
 	/**
@@ -718,6 +722,55 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		addSurveyToCompany(user, defaultSurvey, user.getCompany());
 		
 		LOG.info("Default survey added to the company");		
+	}
+	
+	/**
+	 * Checks if the survey is default and clones it. If not leaves it as it is.
+	 * @param user
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Transactional
+	@Override
+	public Map<Integer, Integer> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException {
+		
+		if(user == null ){
+			LOG.error("checkIfSurveyIsDefaultAndClone : user parameter is null or invalid");
+			throw new InvalidInputException("checkIfSurveyIsDefaultAndClone : user parameter is null or invalid");
+		}
+		LOG.info(" checkIfSurveyIsDefaultAndClone called");
+		Map<Integer, Integer> oldToNewQuestionMap = null;
+		//We fetch the current survey of the company
+		LOG.debug("Fetching the current survey mapping for the user with id : " + user.getUserId());
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		SurveyCompanyMapping currentSurveyMapping = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries).get(CommonConstants.INITIAL_INDEX);
+		Map<Integer, Integer> oldToNewMapping = null;
+		//Now we check if it is a default survey
+		if( currentSurveyMapping.getSurvey().getStatus() == CommonConstants.STATUS_SURVEY_TEMPLATE ){
+			
+			//So it is a default survey
+			LOG.debug("A default survey is currently mapped to the company with id : " + user.getCompany().getCompanyId());
+			
+			//We clone the survey for the user
+			LOG.debug("Cloning the survey to template with id : " + currentSurveyMapping.getSurvey().getSurveyId());
+			Survey newSurvey = cloneSurveyFromTemplate(user, currentSurveyMapping.getSurvey().getSurveyId(),true);
+			
+			oldToNewMapping = new HashMap<>();
+			LOG.debug("Building map of old question ids to new question ids ");
+			for( int counter = 0; counter < currentSurveyMapping.getSurvey().getSurveyQuestionsMappings().size();counter++){
+				oldToNewMapping.put(currentSurveyMapping.getSurvey().getSurveyQuestionsMappings().get(counter).getSurveyQuestion().getSurveyQuestionsId(), newSurvey.getSurveyQuestionsMappings().get(counter).getSurveyQuestion().getSurveyQuestionsId());
+			}			
+				LOG.info("returning mapping of old to new questions");
+						
+			LOG.info("Survey cloned. Now all changes will be added to the users survey");
+		}
+		else{
+			LOG.info("Default survey not found, so no cloning required");
+		}
+		LOG.debug(" Method checkIfSurveyIsDefaultAndClone completed!");	
+		return oldToNewQuestionMap;
 	}
 }
 
