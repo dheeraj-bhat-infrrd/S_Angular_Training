@@ -31,9 +31,9 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
  * customers for questions specific to an agent.
  */
 @Repository
-public class SurveyDetailsDaoImpl implements SurveyDetailsDao {
+public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
-	private static final Logger LOG = LoggerFactory.getLogger(SurveyDetailsDaoImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(MongoSurveyDetailsDaoImpl.class);
 
 	public static final String SURVEY_DETAILS_COLLECTION = "SURVEY_DETAILS";
 
