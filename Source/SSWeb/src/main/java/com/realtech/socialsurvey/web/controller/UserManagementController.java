@@ -11,6 +11,7 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
+import com.google.code.linkedinapi.client.oauth.LinkedInAccessToken;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
+import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -68,8 +74,23 @@ public class UserManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+	
+	@Autowired
+	private LinkedInApiClientFactory linkedInApiClientFactory;
 
 	private final static int SOLR_BATCH_SIZE = 20;
+	
+	@Value("${LINKED_IN_API_KEY}")
+	private String linkedInApiKey;
+	
+	@Value("${LINKED_IN_API_SECRET}")
+	private String linkedInApiSecret;
+	
+	@Value("${LINKED_IN_OAUTH_TOKEN}")
+	private String linkedInOauthToken;
+	
+	@Value("${LINKED_IN_OAUTH_SECRET}")
+	private String linkedInOauthSecret;
 
 	// JIRA SS-42 BY RM05 BOC
 	/*
@@ -747,6 +768,7 @@ public class UserManagementController {
 	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
 	public String completeRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method completeRegistration() to complete registration of user started.");
+		LinkedInOAuthService oauthService;
 
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
@@ -757,6 +779,7 @@ public class UserManagementController {
 			String encryptedUrlParameters = request.getParameter("q");
 			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
+			String connectWithLinkedIn = request.getParameter("connectWithLinkedIn");
 			User user = null;
 
 			// form parameters validation
@@ -862,6 +885,18 @@ public class UserManagementController {
 			else {
 				// TODO: add logic for what happens when no user profile present
 			}
+			
+			if( connectWithLinkedIn != null && connectWithLinkedIn.equals("true") ){
+				LOG.info("Connecting to LinkedIn");
+				
+				oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+		        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://4bac54a5.ngrok.com/linkedinauth.do");
+				
+		        String authUrl = requestToken.getAuthorizationUrl();
+		        session.setAttribute("requestToken", requestToken);
+		        LOG.info("Redirecting to url : " + authUrl );
+		        return "redirect:"+authUrl;
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
@@ -944,6 +979,23 @@ public class UserManagementController {
 			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
 		LOG.debug("change password form parameters validated successfully");
+	}
+	
+	@RequestMapping(value="/linkedinauth", method = RequestMethod.GET)
+	public String authenticateLinkedInAccess(Model model,HttpServletRequest request){
+		
+		LOG.info("LinkedIn authentication url requested");
+		
+		LinkedInOAuthService oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+		String oauthVerifier = request.getParameter("oauth_verifier");
+		LOG.info("LinkedIn oauth verfier : " + oauthVerifier);
+        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://4bac54a5.ngrok.com/linkedinauth.do");
+		LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
+        
+        LOG.info("Access Token : " + accessToken.getToken());
+        LOG.info("Access Token Secret : " + accessToken.getTokenSecret());		
+		
+		return JspResolver.LOGIN;
 	}
 }
 // JIRA SS-77 BY RM07 EOC
