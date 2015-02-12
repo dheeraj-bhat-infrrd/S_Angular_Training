@@ -533,7 +533,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-header-row {
     height: 78px;
-    color: #fff;
+    color: #3e3e3e;
 }
 
 .hm-header-row-left {
@@ -552,8 +552,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-header-main-wrapper {
-    background-color: #26bdef;
-    margin-top: 83px;
+    background-color: #f9f9fb;
 }
 
 .hm-item-header {
@@ -1399,6 +1398,7 @@ button.paypal.is-active {
 }
 
 .prof-address {
+    font-family: 'OpenSansLight';
     line-height: 26px;
     font-size: 18px;
 }
@@ -1408,24 +1408,24 @@ button.paypal.is-active {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
-    font-weight: bold !important;
 }
 
 .prof-btn-survey {
-    font-family: 'opensanslight' !important;
-    background-color: #5CC8EF;
-    font-size: 13px;
+    background-color: #7AB400;
+    font-size: 15px;
     height: 40px;
     line-height: 40px;
-    width: 150px;
+    width: 250px;
     text-align: center;
     cursor: pointer;
     border-radius: 3px;
     color: #fff;
 }
+/*
 .prof-btn-survey:hover{
     background-color: #7AB400;
 }
+*/
 
 .prof-wrapper {
     height: 200px;
@@ -1450,6 +1450,7 @@ button.paypal.is-active {
     height: 50px;
     width: 40px;
     margin-right: 10px;
+    cursor: pointer;
 }
 
 .prof-left-row {
@@ -1463,7 +1464,7 @@ button.paypal.is-active {
 }
 
 .left-panel-content {
-    padding: 0 10px;
+    padding: 0 10px 0 0;
 }
 
 .blue-text {
@@ -1487,13 +1488,13 @@ button.paypal.is-active {
 }
 
 .rt-content-main {
-    padding: 15px 30px 15px 30px;
+    padding: 15px 0px 15px 30px;
     margin-left: -15px;
     margin-right: -15px;
 }
 
 .panel-tweet-wrapper {
-    width: 50%;
+    width: 100%;
 }
 
 .tweet-icn {
@@ -1504,7 +1505,7 @@ button.paypal.is-active {
 
 .tweet-panel-left {
     padding-right: 15px;
-    border-right: 1px solid #dcdcdc;
+/*    border-right: 1px solid #dcdcdc;*/
 }
 
 .posts-wrapper {
@@ -1512,7 +1513,7 @@ button.paypal.is-active {
 }
 
 .tweet-txt{
-    width: 302px;
+    width: 691px;
 }
 
 .tweet-text-main{
@@ -1537,23 +1538,23 @@ button.paypal.is-active {
     border-bottom: 0 !important;
 }
 .icn-mail {
-    background: url(../images/email.png) no-repeat center;
+    background: url(../images/mail.png) no-repeat center;
 }
 
 .icn-web {
-    background: url(../images/web.png) no-repeat center;
+    background: url(../images/website.png) no-repeat center;
 }
 
 .icn-mbl {
-    background: url(../images/phone.png) no-repeat center;
+    background: url(../images/mbl.png) no-repeat center;
 }
 
 .icn-phone {
-    background: url(../images/ph.png) no-repeat center;
+    background: url(../images/tele.png) no-repeat center;
 }
 
 .icn-fax {
-    background: url(../images/Print.png) no-repeat center;
+    background: url(../images/fax.png) no-repeat center;
 }
 
 .icn-fb {
@@ -2434,9 +2435,41 @@ button.paypal.is-active {
     background: url(../images/no_star.png) no-repeat center;
 }
 
+.sq-smile-icn-wrapper {
+    float: left;
+    cursor: pointer;
+    width: 62px;
+    height: 62px;
+}
+
+.sq-happy-smile{
+	background: url(../images/icn-succ-msg.png) no-repeat center;
+}
+
+.sq-sad-smile{
+	background: url(../images/icn-err-msg.png) no-repeat center;
+}
+
+.sq-neutral-smile{
+	background: url(../images/icn-neutral-mood.png) no-repeat center;
+}
+
 .sq-full-star {
     background: url(../images/full_star.png) no-repeat center;
 }
+
+.sq-smile {
+    float: left;
+    cursor: pointer;
+    width: 62px;
+    height: 62px;
+    background: url(../images/icn-succ-grey.png) no-repeat center;
+}
+
+.sq-full-smile {
+    background: url(../images/icn-succ-msg.png) no-repeat center;
+}
+
 
 .sq-rat-wrapper {
     margin-bottom: 20px;
@@ -2444,6 +2477,11 @@ button.paypal.is-active {
 
 .sq-star-wrapper {
     width: 310px;
+    margin: 0 auto;
+}
+
+.sq-happy-wrapper {
+    width: 190px;
     margin: 0 auto;
 }
 
@@ -2774,4 +2812,98 @@ button.paypal.is-active {
     cursor: pointer;
     width: 40px;
     height: 26px;
+}
+
+#recaptcha_image img#recaptcha_challenge_image {
+    width: 370px
+}
+
+.reg-captcha-img {
+    height: 58px;
+    border-bottom: 1px solid #DCDCDC;
+    background: none repeat scroll 0% 0% #FFF;
+}
+.review-count-left {
+    line-height: 60px;
+    height: 50px;
+    font-size: 12px;
+    color: #5CC8EF;
+}
+
+.prof-user-logo {
+    height: 150px;
+    background: url(../images/userInfoLogo.png) no-repeat center;
+    background-size: 130px auto;
+}
+
+.prof-user-addline1 {
+    font-weight: bold;
+}
+
+.prof-user-address {
+    text-align: center;
+}
+
+.hm-hr-row-right {
+    margin-top: 15px;
+}
+
+.icn-blog {
+    background: url(../images/blog.png) no-repeat center;
+}
+
+.bord-left-panel {
+    border-left: 1px solid #dcdcdc;
+}
+
+.lp-sub {
+    margin-left: 14px;
+}
+
+.flat-left-bord {
+    background: url(../images/line-flat.png) no-repeat;
+    background-position: left 18px;
+}
+
+.lp-sub-img {
+    float: left;
+    width: 30px;
+    height: 36px;
+    margin-right: 5px;
+}
+
+.lp-sub-txt {
+    line-height: 36px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.lp-sub-header {
+    padding: 0px 0px 0px 15px;
+}
+
+.icn-rgn {
+    background: url(../images/rgn.png) no-repeat center;
+}
+
+.icn-rgn-blue {
+    background: url(../images/rgn_blue.png) no-repeat center;
+}
+
+.icn-psn1 {
+    background: url(../images/Person1.png) no-repeat center;
+}
+
+.icn-psn2 {
+    background: url(../images/Person1.png) no-repeat center;
+}
+
+.mgn-left-0 {
+    margin-left: 0;
+}
+
+.prof-right-panel-wrapper {
+    border-left: 1px solid #dcdcdc;
+    margin-left: -16px !important;
 }
