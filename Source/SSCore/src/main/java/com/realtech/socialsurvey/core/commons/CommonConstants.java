@@ -245,6 +245,7 @@ public interface CommonConstants {
 	public static final String QUESTION_RATING = "range";
 	public static final int QUESTION_RATING_VALUE_TRUE = 1;
 	public static final int QUESTION_RATING_VALUE_FALSE = 0;
+	public static final int SURVEY_STAGE_COMPLETE = -1;
 
 	/**
 	 * Error codes
