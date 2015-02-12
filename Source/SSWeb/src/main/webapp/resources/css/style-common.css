@@ -2820,6 +2820,7 @@ button.paypal.is-active {
 }
 
 .reg-captcha-img {
+    width: 370px;
     height: 58px;
     border-bottom: 1px solid #DCDCDC;
     background: none repeat scroll 0% 0% #FFF;
