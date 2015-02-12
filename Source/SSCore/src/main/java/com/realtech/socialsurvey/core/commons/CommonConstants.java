@@ -110,6 +110,13 @@ public interface CommonConstants {
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
 
 	/**
+	 * Mongo entities and column name constants
+	 */
+	public static final String AGENT_ID_COLUMN = "agentId";
+	public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
+	public static final String UPDATED_ON = "updatedOn";
+	
+	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
 	public static final String ACCOUNT_TYPE_IN_SESSION = "accounttype";

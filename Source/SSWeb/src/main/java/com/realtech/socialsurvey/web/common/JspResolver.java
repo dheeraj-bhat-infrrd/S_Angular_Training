@@ -21,10 +21,10 @@ public interface JspResolver {
 	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
 	public static final String SURVEY_BUILDER = "surveyBuilder";
 	public static final String DASHBOARD = "dashboard";
-	public static final String USER_MANAGEMENT="usermanagement";
-	public static final String USER_DETAILS="userdetails";
-	public static final String USER_LIST="userslist";
-	public static final String USER_ID_ON_INVITE="useridoninvite";
+	public static final String USER_MANAGEMENT = "usermanagement";
+	public static final String USER_DETAILS = "userdetails";
+	public static final String USER_LIST = "userslist";
+	public static final String USER_ID_ON_INVITE = "useridoninvite";
 	public static final String EXISTING_BRANCHES = "existingbranches";
 	public static final String EXISTING_ENTERPRISE_REGIONS = "existingenterpriseregions";
 	public static final String EXISTING_ENTERPRISE_BRANCHES = "existingenterprisebranches";
@@ -34,14 +34,16 @@ public interface JspResolver {
 	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
 	public static final String CHANGE_PASSWORD = "changepassword";
 	public static final String UPGRADE_CONFIRMATION = "upgradeconfirmation";
-	public static final String COMPANY_PROFILE = "companyprofile";
-	public static final String CONTACT_DETAILS_LIST = "contactdetailslist";
-	public static final String ASSOCIATION_LIST = "associationlist";
-	public static final String ACHIEVEMENT_LIST = "achievementlist";
-	public static final String LICENSE_LIST = "licencelist";
-	public static final String ADDRESS_DETAILS = "addressdetails";
-	public static final String PROFILE_IMAGE_CONTENT = "profileimagecontent";
-	public static final String PROFILE_SOCIAL_LINKS = "profilesociallinks";
 	public static final String INDEX = "index";
 	public static final String PROFILE_LIST = "proList";
+
+	public static final String PROFILE_EDIT_ADMIN = "profile_edit_admin";
+	public static final String PROFILE_EDIT_AGENT = "profile_edit_agent";
+	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";
+	public static final String PROFILE_ASSOCIATIONS = "profile_associations";
+	public static final String PROFILE_ACHIEVEMENTS = "profile_achievements";
+	public static final String PROFILE_LICENSES = "profile_licenses";
+	public static final String PROFILE_ADDRESS_DETAILS = "profile_addressdetails";
+	public static final String PROFILE_IMAGE = "profile_profileimage";
+	public static final String PROFILE_SOCIAL_LINKS = "profile_sociallinks";
 }
