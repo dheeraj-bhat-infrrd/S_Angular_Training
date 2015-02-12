@@ -10,6 +10,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -686,7 +687,9 @@ public class MongoSurveyDetailsDaoImpl implements MongoSurveyDetailsDao {
 		return postCountSplit;
 	}
 
-	// Columns can only be from : {agentId/branchId/regionId}
+	// Method to get get count of surveys initiated by customers and agents separately.
+	//Columns can only be from : {agentId/branchId/regionId}
+	
 	@Override
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue) {
 		LOG.info("Method to count number of surveys initiators, getCountOfSurveyInitiators() started.");
@@ -714,9 +717,21 @@ public class MongoSurveyDetailsDaoImpl implements MongoSurveyDetailsDao {
 	}
 
 	/*
-	 * Return a list of feedbacks provided by customers.
+	 * Returns a list of feedbacks provided by customers. First sorted on score then on date (both
+	 * descending).
 	 */
-	/*
-	 * public Map<String,Integer> getAllFeedbacks(){ }
-	 */
+
+	public Map<String, Double> getAllFeedbacks() {
+		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
+		Map<String, Double> feedbackWithRating = new HashMap<>();
+		Query query = new Query();
+		query.with(new Sort(Sort.Direction.DESC, "score"));
+		query.with(new Sort(Sort.Direction.DESC, "updatedOn"));
+		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+		for (SurveyDetails survey : surveys) {
+			feedbackWithRating.put(survey.getReview(), survey.getScore());
+		}
+		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() finished.");
+		return feedbackWithRating;
+	}
 }
