@@ -787,14 +787,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		UserProfile userProfile;
 		if (userProfiles == null || userProfiles.isEmpty()) {
 			// Create a new entry in UserProfile to map user to the branch.
-			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
-					CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
-					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), userId, branchId, CommonConstants.DEFAULT_REGION_ID,
+					CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE,
+					String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
 		}
 		else {
 			userProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
 			if (userProfile.getStatus() == CommonConstants.STATUS_INACTIVE) {
 				userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+				userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 				userProfile.setModifiedBy(String.valueOf(admin.getUserId()));
 				userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			}

@@ -111,6 +111,18 @@
 	<div class="header-main-wrapper">
 		<div class="container clearfix header-container">
 			<div class="header-logo float-left" id="header-logo" style="cursor: pointer;"></div>
+            <div class="hdr-wrapper">
+                <div class="container hdr-container clearfix">
+                    <div class="float-left hdr-logo"></div>
+                    <div class="float-left hdr-links clearfix">
+                        <div class="hdr-link-item hdr-link-active"><a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a></div>
+                        <div class="hdr-link-item"><a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a></div>
+                        <div class="hdr-link-item"><a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a></div>
+                        <div class="hdr-link-item"><a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a></div>
+                    </div>
+                </div>
+            </div>
+<!--
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
@@ -119,8 +131,7 @@
 				<c:if
 					test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="header-links-item">
-						<a
-							href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message
 								code="label.header.company.key" /></a>
 					</div>
 				</c:if>
@@ -137,6 +148,8 @@
 					</div>
 				</c:if>
 			</div>
+-->
+            
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div class="float-left user-info-initial">
 					<span>${fn:substring(user.firstName, 0, 1)}</span>
