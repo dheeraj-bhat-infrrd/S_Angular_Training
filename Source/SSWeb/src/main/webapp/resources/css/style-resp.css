@@ -448,7 +448,6 @@
         display: none;
     }
     .left-panel-header{
-        border-bottom: 1px solid #dcdcdc;
         line-height: 40px;
         padding-left: 15px;
         color: #4A4A4A;
@@ -489,8 +488,8 @@
         border-right: 0;
     }
     .prof-right-panel-wrapper, .posts-wrapper{
-        margin: 0;
-        padding: 0;
+        margin: 0 !important;
+        padding: 0 !important;
     }
     .rt-content-main{
         padding: 0;
@@ -525,7 +524,7 @@
         margin-right: 0;
     }
     .tweet-txt{
-        min-width: 242px;
+        min-width: 235px;
         width: 85%;
     }
     .tweet-icn.icn-tweet.float-left{
@@ -733,7 +732,7 @@
         padding-left: 15px;
     }
     .prof-left-panel-wrapper, .row prof-right-panel-wrapper{
-        padding: 0px;
+        padding: 0px !important;
         margin: 0;
     }
 }
