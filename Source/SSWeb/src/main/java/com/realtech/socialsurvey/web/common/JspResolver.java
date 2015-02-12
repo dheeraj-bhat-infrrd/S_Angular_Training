@@ -37,12 +37,13 @@ public interface JspResolver {
 	public static final String INDEX = "index";
 	public static final String PROFILE_LIST = "proList";
 
-	public static final String COMPANY_PROFILE = "profile_company";
-	public static final String CONTACT_DETAILS_LIST = "profile_contactdetails";
-	public static final String ASSOCIATION_LIST = "profile_associations";
-	public static final String ACHIEVEMENT_LIST = "profile_achievements";
-	public static final String LICENSE_LIST = "profile_licenses";
-	public static final String ADDRESS_DETAILS = "profile_addressdetails";
-	public static final String PROFILE_IMAGE_CONTENT = "profile_profileimage";
+	public static final String PROFILE_EDIT_ADMIN = "profile_edit_admin";
+	public static final String PROFILE_EDIT_AGENT = "profile_edit_agent";
+	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";
+	public static final String PROFILE_ASSOCIATIONS = "profile_associations";
+	public static final String PROFILE_ACHIEVEMENTS = "profile_achievements";
+	public static final String PROFILE_LICENSES = "profile_licenses";
+	public static final String PROFILE_ADDRESS_DETAILS = "profile_addressdetails";
+	public static final String PROFILE_IMAGE = "profile_profileimage";
 	public static final String PROFILE_SOCIAL_LINKS = "profile_sociallinks";
 }
