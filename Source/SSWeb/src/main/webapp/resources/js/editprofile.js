@@ -152,7 +152,7 @@ function showAddressDetails() {
 
 function callBackShowAddressDetails(data) {
 	$('#prof-name-container').html(data);
-	initializeGoogleMap();
+	//initializeGoogleMap();
 	adjustImage();
 }
 

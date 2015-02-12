@@ -21,8 +21,8 @@ public interface CommonConstants {
 	// default company id for application. if any entity is linked to this id, then its an orphan
 	// entity
 	public static final long DEFAULT_COMPANY_ID = 1;
-	public static final String DEFAULT_BRANCH_NAME = "Defult Branch";
-	public static final String DEFAULT_REGION_NAME = "Defult Region";
+	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
+	public static final String DEFAULT_REGION_NAME = "Default Region";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
@@ -94,11 +94,13 @@ public interface CommonConstants {
 	public static final String PAYMENT_GATEWAY = "Braintree";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
+	public static final String COMPANY_ID_COLUMN = "companyId";
 	public static final String IS_OWNER_COLUMN = "isOwner";
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String REGION_ID_COLUMN = "regionId";
 	public static final String BRANCH_ID_COLUMN = "branchId";
+	public static final String BRANCH_NAME_COLUMN = "branch";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
 	public static final String REGION_NAME_COLUMN = "region";
 	public static final String SURVEY_QUESTION_COLUMN = "surveyQuestion";
@@ -263,7 +265,17 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE= 106;
 	public static final int ERROR_CODE_REGION_FETCH_PRECONDITION_FAILURE = 107;
 	public static final int ERROR_CODE_REGION_FETCH_SERVICE_FAILURE= 108;
-
+	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 109;
+	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_SERVICE_FAILURE= 110;
+	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_PRECONDITION_FAILURE = 111;
+	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_SERVICE_FAILURE= 112;
+	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 113;
+	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE= 114;
+	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_PRECONDITION_FAILURE = 115;
+	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE = 116;
+	public static final int ERROR_CODE_REGION_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 117;
+	public static final int ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE = 118;
+	
 	/**
 	 * Service codes
 	 */	
@@ -272,4 +284,9 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
 	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
+	public static final int SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS = 105;
+	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
+	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
+	public static final int SERVICE_CODE_FETCH_REGION_BRANCHES = 108;
+	public static final int SERVICE_CODE_FETCH_REGION_INDIVIDUALS = 109;
 }
