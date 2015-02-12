@@ -23,7 +23,7 @@
 		<dev.deployment.path>/Users/nishit/work/apps/jboss/jboss-eap-6.3/standalone/deployments</dev.deployment.path>
 
 		<!-- Spring -->
-		<spring-framework.version>3.2.4.RELEASE</spring-framework.version>
+		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
 		<spring.security>3.2.3.RELEASE</spring.security>
 
 		<!-- Hibernate / JPA -->
