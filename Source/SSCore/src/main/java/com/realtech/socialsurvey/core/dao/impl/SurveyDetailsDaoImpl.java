@@ -21,7 +21,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.MongoSurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 
@@ -31,9 +31,9 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
  * customers for questions specific to an agent.
  */
 @Repository
-public class MongoSurveyDetailsDaoImpl implements MongoSurveyDetailsDao {
+public class SurveyDetailsDaoImpl implements SurveyDetailsDao {
 
-	private static final Logger LOG = LoggerFactory.getLogger(MongoSurveyDetailsDaoImpl.class);
+	private static final Logger LOG = LoggerFactory.getLogger(SurveyDetailsDaoImpl.class);
 
 	public static final String SURVEY_DETAILS_COLLECTION = "SURVEY_DETAILS";
 

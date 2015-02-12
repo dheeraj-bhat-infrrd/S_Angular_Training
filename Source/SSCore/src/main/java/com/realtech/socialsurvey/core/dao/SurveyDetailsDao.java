@@ -4,7 +4,7 @@ import java.util.Map;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 
-public interface MongoSurveyDetailsDao {
+public interface SurveyDetailsDao {
 
 	public void insertSurveyDetails(SurveyDetails surveyDetails);
 
