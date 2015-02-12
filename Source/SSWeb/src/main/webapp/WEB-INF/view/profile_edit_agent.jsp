@@ -1,58 +1,50 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if
-	test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
-	<c:set
-		value="${cannonicalusersettings.companySettings.contact_details }"
-		var="contactDetails"></c:set>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
+	<c:set value="${cannonicalusersettings.companySettings.contact_details}" var="contactDetails"></c:set>
 </c:if>
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left">
-				${contactDetails.name }</div>
+			<div class="float-left hm-header-row-left">Read, Write and Share Reviews</div>
+			<div id="prof-edit-social-link" class="float-right hm-hr-row-right clearfix">
+				<!-- Call JavaScript function to load social page links -->
+			</div>
+			<input id="social-token-text" type="text" class="hide" placeholder="Social page link">
 		</div>
 	</div>
 </div>
+
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container">
 		<div class="row prof-pic-name-wrapper">
-			<div
-				class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
-				<div class="prog-img-container" id="prof-img-container">
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
+				<div id="prof-img-container" class="prog-img-container">
 					<!-- Call JavaScript function to populate profile image -->
 				</div>
 			</div>
-			<div
-				class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
 				<div id="prof-name-container" class="prof-name-container">
 					<!-- Call JavaScript function to populate the address details -->
 				</div>
 			</div>
-			<div id="map-canvas"
-				class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
-				<spring:message code="label.map.key" />
+			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
+				<div class="prof-user-logo"></div>
+				<div class="prof-user-address">
+					<input id="prof-user-address1" class="prof-user-addline1 prof-edditable" value="${contactDetails.address1}">
+					<input id="prof-user-address2" class="prof-user-addline2 prof-edditable" value="${contactDetails.address2}">
+				</div>
 			</div>
 		</div>
 
 		<div class="row">
-			<div
-				class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
-				<div class="prof-left-row bord-bot-dc prof-left-social">
-					<div id="prof-edit-social-link" class="social-wrapper clearfix">
-						<!-- Call JavaScript function to load social page links -->
-					</div>
-					<input id="social-token-text" type="text" class="hide"
-						placeholder="Social page link">
-				</div>
+			<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<div class="prof-left-row prof-left-info bord-bot-dc">
 					<div class="left-contact-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header">
-								<spring:message code="label.contactinformation.key" />
-							</div>
+							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key" /></div>
 						</div>
 						<div class="left-panel-content" id="contant-info-container">
 							<!-- contact info details to be populated dynamically -->
@@ -62,11 +54,8 @@
 				<div class="prof-left-row prof-left-assoc bord-bot-dc">
 					<div class="left-assoc-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header">
-								<spring:message code="label.membership.key" />
-							</div>
-							<div class="float-right icn-share icn-plus-open"
-								onclick="addAnAssociation();"></div>
+							<div class="float-left left-panel-header"><spring:message code="label.membership.key" /></div>
+							<div class="float-right icn-share icn-plus-open" onclick="addAnAssociation();"></div>
 						</div>
 						<div id="association-container" class="left-panel-content">
 							<!-- Call javascript function to populate association list -->
@@ -76,11 +65,8 @@
 				<div class="prof-left-row prof-left-ach bord-bot-dc">
 					<div class="left-ach-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header">
-								<spring:message code="label.achievement.key" />
-							</div>
-							<div class="float-right icn-share icn-plus-open"
-								onclick="addAnAchievement();"></div>
+							<div class="float-left left-panel-header"><spring:message code="label.achievement.key" /></div>
+							<div class="float-right icn-share icn-plus-open" onclick="addAnAchievement();"></div>
 						</div>
 						<div id="achievement-container" class="left-panel-content">
 							<!-- Achievement list to popluated by javascript -->
@@ -90,11 +76,8 @@
 				<div class="prof-left-row prof-left-auth bord-bot-dc">
 					<div class="left-auth-wrapper">
 						<div class="clearfix">
-							<div class="float-left left-panel-header">
-								<spring:message code="label.licenses.key" />
-							</div>
-							<div class="float-right icn-share icn-plus-open"
-								onclick="addAuthorisedIn();"></div>
+							<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
+							<div class="float-right icn-share icn-plus-open" onclick="addAuthorisedIn();"></div>
 						</div>
 						<div id="authorised-in-container" class="left-panel-content">
 							<!-- Call javascript function to populate authorised in list -->
@@ -102,14 +85,15 @@
 					</div>
 				</div>
 			</div>
-			<div
-				class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
+			
+			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div class="intro-wrapper rt-content-main bord-bot-dc">
-					<div class="main-con-header"><spring:message code="label.about.key" /> ${contactDetails.name }</div>
+					<div class="main-con-header"><spring:message code="label.about.key" /> ${contactDetails.name}</div>
 					<div class="intro-body" id="intro-body-text">
 						<c:choose>
-							<c:when
-								test="${not empty contactDetails.about_me && not empty fn:trim(contactDetails.about_me) }">${contactDetails.about_me }</c:when>
+							<c:when	test="${not empty contactDetails.about_me && not empty fn:trim(contactDetails.about_me)}">
+								${contactDetails.about_me}
+							</c:when>
 							<c:otherwise><spring:message code="label.aboutcompany.empty.key" /></c:otherwise>
 						</c:choose>
 					</div>
@@ -171,8 +155,7 @@
 				</div>
 				<div class="people-say-wrapper rt-content-main bord-bot-dc">
 					<div class="main-con-header">
-						<span class="ppl-say-txt-st">What people say</span> about Anna
-						Thomas
+						<span class="ppl-say-txt-st">What people say</span> about Anna Thomas
 					</div>
 					<div class="ppl-review-item">
 						<div class="ppl-header-wrapper clearfix">

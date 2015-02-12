@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao;
 import java.util.List;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.User;
 
 /**
  * Gets the organization settings
@@ -23,6 +24,13 @@ public interface OrganizationUnitSettingsDao {
 	 * @param agentSettings
 	 */
 	public void insertAgentSettings(AgentSettings agentSettings);
+
+	/**
+	 * Inserts agent settings
+	 * 
+	 * @param agentSettings
+	 */
+	public void insertAgentSettings(User user);
 
 	/**
 	 * Fetches the organization unit settings for the given identifier and collection name
@@ -52,6 +60,15 @@ public interface OrganizationUnitSettingsDao {
 	public void updateParticularKeyOrganizationUnitSettings(String keyToUpdate, Object updatedRecord, OrganizationUnitSettings unitSettings,
 			String collectionName);
 
+	/**
+	 * Updates a particular element in the collection
+	 * 
+	 * @param keyToUpdate
+	 * @param updatedRecord
+	 * @param agentSettings
+	 */
+	public void updateParticularKeyAgentSettings(String keyToUpdate, Object updatedRecord, AgentSettings agentSettings);
+	
 	/**
 	 * Fetchs the list of names of logos being used.
 	 * 
