@@ -151,7 +151,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(1,'Free')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(5,'Free')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab padding-left-25">
 	                                    <div class="payment-tab-main">
@@ -162,7 +162,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(2,'$35')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(1,'$35')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab">
 	                                    <div class="payment-tab-main">
@@ -173,7 +173,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(3,'$45')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(2,'$45')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab">
 	                                    <div class="payment-tab-main">
@@ -184,7 +184,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(4,'$65')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(3,'$65')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
 	                                <div class="float-left payment-option-tab padding-right-25">
 	                                    <div class="payment-tab-main">
@@ -195,7 +195,7 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(5,'$99')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(4,'$99')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
                             </div>
                             </c:otherwise>
@@ -332,7 +332,7 @@
             console.log("callback for selectAccountType called");
             console.log("accountType : " + accountType);
             console.log("data : " + data);
-            if(accountType == 1 && data == ""){
+            if(accountType == 5 && data == ""){
             	console.log("Subscribing for a free account");
             	var url = "./subscribe.do";
                 var $form = $("#account-type-selection-form");
