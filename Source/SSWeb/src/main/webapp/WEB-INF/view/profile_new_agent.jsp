@@ -134,82 +134,49 @@
                 </div>
                 <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     <div class="left-assoc-wrapper">
-                        <div class="left-panel-header">Our Company</div>
-                        <div class="left-panel-content left-panel-content-adj">
-                            <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0">
-                                <div class="lp-sub-header clearfix flat-left-bord">
-                                    <div class="lp-sub-img icn-company"></div>
-                                    <div class="lp-sub-txt">Northern Providential</div>
-                                    <div class="lpsub-2">
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Connecticut</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Rhode Island</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Washington</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Seattle</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l2 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn icn-rgn-blue"></div>
-                                                <div class="lp-sub-txt">Portland</div>
-                                                <div class="lpsub-2">
-                                                    <div class="lp-sub lp-sub-l3 bord-left-panel">
-                                                        <div class="lp-sub-header clearfix flat-left-bord">
-                                                            <div class="lp-sub-img icn-psn1"></div>
-                                                            <div class="lp-sub-txt">Gina</div>
-                                                            <div class="lpsub-2"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="lp-sub lp-sub-l3 bord-left-panel">
-                                                        <div class="lp-sub-header clearfix flat-left-bord">
-                                                            <div class="lp-sub-img icn-psn2"></div>
-                                                            <div class="lp-sub-txt">Matt</div>
-                                                            <div class="lpsub-2"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Northern Providential</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Northern Providential</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                
-                            </div>
+                        <div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Association</div>
+                        <div class="left-panel-content lph-dd-content">
+                            <div class="lp-assoc-row lp-row clearfix">National Association of Realtors</div>
+                            <div class="lp-assoc-row lp-row clearfix">Independant Association of Realtors</div>
+                            <div class="lp-assoc-row lp-row clearfix">National Association of Realtors</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prof-left-row prof-left-expertise bord-bot-dc">
+                    <div class="left-expertise-wrapper">
+                        <div class="left-panel-header lph-dd lph-dd-closed">Expertise</div>
+                        <div class="left-panel-content lph-dd-content">
+                            <div class="lp-exp-row lp-row clearfix">Buyer's Agent</div>
+                            <div class="lp-exp-row lp-row clearfix">Listing Agent</div>
+                            <div class="lp-exp-row lp-row clearfix">Foreclosure Agent</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prof-left-row prof-left-ach bord-bot-dc">
+                    <div class="left-ach-wrapper">
+                        <div class="left-panel-header lph-dd lph-dd-closed">Achievements</div>
+                        <div class="left-panel-content lph-dd-content">
+                            <div class="lp-ach-row lp-row clearfix">Market Leader</div>
+                            <div class="lp-ach-row lp-row clearfix">Top Seller</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prof-left-row prof-left-hob bord-bot-dc">
+                    <div class="left-hob-wrapper">
+                        <div class="left-panel-header lph-dd lph-dd-closed">Hobbies</div>
+                        <div class="left-panel-content lph-dd-content">
+                            <div class="lp-hob-row lp-row clearfix">Bowling</div>
+                            <div class="lp-hob-row lp-row clearfix">Designing</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="prof-left-row prof-left-auth bord-bot-dc">
+                    <div class="left-auth-wrapper">
+                        <div class="left-panel-header lph-dd lph-dd-closed">Authorised In</div>
+                        <div class="left-panel-content lph-dd-content">
+                            <div class="lp-auth-row lp-row clearfix">California (<span class="blue-text">CA#1234556789</span>)</div>
+                            <div class="lp-auth-row lp-row clearfix">N. Carolina (<span class="blue-text">CA#1234556789</span>)</div>
+                            <div class="lp-auth-row lp-row clearfix">N. Jersey (<span class="blue-text">CA#1234556789</span>)</div>
                         </div>
                     </div>
                 </div>
@@ -345,6 +312,10 @@
         $('.inc-more').click(function(){
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
+        });
+        
+        $('.lph-dd').click(function(){
+            $(this).next('.lph-dd-content').slideToggle(200);
         });
         
         function adjustImage(){
