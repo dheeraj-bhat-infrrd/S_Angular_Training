@@ -12,6 +12,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/surveyBuilder.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
 <script>
 	$('#logout-section').click(function(e) {
 		logoutuser();
