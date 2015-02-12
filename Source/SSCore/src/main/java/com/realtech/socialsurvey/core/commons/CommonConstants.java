@@ -40,11 +40,11 @@ public interface CommonConstants {
 	/**
 	 *  Accounts master constants 
 	 */
-	public static final int ACCOUNTS_MASTER_FREE = 1;
-	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 2;
-	public static final int ACCOUNTS_MASTER_TEAM = 3;
-	public static final int ACCOUNTS_MASTER_COMPANY = 4;
-	public static final int ACCOUNTS_MASTER_ENTERPRISE = 5;
+	public static final int ACCOUNTS_MASTER_FREE = 5;
+	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
+	public static final int ACCOUNTS_MASTER_TEAM = 2;
+	public static final int ACCOUNTS_MASTER_COMPANY = 3;
+	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
 
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
