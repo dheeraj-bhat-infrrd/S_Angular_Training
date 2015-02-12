@@ -127,9 +127,23 @@ public class OrganizationManagementController {
 		String country = request.getParameter("country");
 		String countryCode = request.getParameter("countrycode");
 		String vertical = request.getParameter("vertical");
-		
+
 		try {
-			validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo,vertical);
+			try {
+				validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo, vertical);
+			}
+			catch (InvalidInputException e) {
+				List<VerticalsMaster> verticalsMasters = null;
+				try {
+					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+					model.addAttribute("verticals", verticalsMasters);
+				}
+				catch (InvalidInputException e1) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e1);
+				}
+				throw new InvalidInputException("Invalid input exception occured while validating form parameters",e.getErrorCode(),e);
+			}
 			String address = getCompleteAddress(address1, address2);
 
 			HttpSession session = request.getSession(false);
@@ -164,16 +178,6 @@ public class OrganizationManagementController {
 					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 
 			LOG.debug("Successfully executed service to add company details");
-			List<VerticalsMaster> verticalsMasters = null;
-			try {
-				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-			model.addAttribute("verticals",verticalsMasters);
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
@@ -195,7 +199,7 @@ public class OrganizationManagementController {
 	 * @throws InvalidInputException
 	 */
 	private void validateCompanyInfoParams(String companyName, String address, String country, String countryCode, String zipCode,
-			String companyContactNo,String vertical) throws InvalidInputException {
+			String companyContactNo, String vertical) throws InvalidInputException {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
@@ -224,8 +228,8 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 		}
-		if(vertical == null || vertical.isEmpty()){
-			throw new InvalidInputException("Vertical selected is not valid",DisplayMessageConstants.INVALID_VERTICAL);
+		if (vertical == null || vertical.isEmpty()) {
+			throw new InvalidInputException("Vertical selected is not valid", DisplayMessageConstants.INVALID_VERTICAL);
 		}
 		LOG.debug("Returning from validateCompanyInfoParams after validating parameters");
 	}
@@ -688,7 +692,7 @@ public class OrganizationManagementController {
 			jsonMessage.put("message", message);
 		}
 		catch (JSONException e) {
-			LOG.error("Exception occured while building json response : " + e.getMessage(),e);
+			LOG.error("Exception occured while building json response : " + e.getMessage(), e);
 		}
 
 		LOG.info("Returning json response : " + jsonMessage.toString());
@@ -851,5 +855,5 @@ public class OrganizationManagementController {
 		return JspResolver.UPGRADE_CONFIRMATION;
 	}
 }
-	
+
 // JIRA: SS-24 BY RM02 EOC
