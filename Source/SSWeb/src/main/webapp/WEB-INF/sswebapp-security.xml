@@ -25,6 +25,7 @@
 		<intercept-url pattern="/resetPassword.do" access="permitAll" />
 
 		<intercept-url pattern="/testpage.do" access="permitAll" />
+		<intercept-url pattern="/linkedinauth.do" access="permitAll" />
 		
 		<intercept-url pattern="/*.do" access="isAuthenticated()" />
 

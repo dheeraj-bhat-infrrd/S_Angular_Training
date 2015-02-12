@@ -17,6 +17,11 @@
 	<bean id="multipartResolver"
         class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
 	</bean>
+	
+	<bean id="linkedInApiClientFactory" class="com.google.code.linkedinapi.client.LinkedInApiClientFactory" factory-method="newInstance">
+         <constructor-arg value="api-key"/> 
+         <constructor-arg value="api-secret"/> 
+	</bean>
 
 	<!-- Define the MongoTemplate which handles connectivity with MongoDB -->
 
