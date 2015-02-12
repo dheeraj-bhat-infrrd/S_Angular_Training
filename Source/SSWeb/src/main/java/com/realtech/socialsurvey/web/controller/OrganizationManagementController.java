@@ -280,10 +280,11 @@ public class OrganizationManagementController {
 				return JspResolver.PAYMENT_ALREADY_MADE;
 			}
 			
+			//We add the default survey for this company
+			surveyBuilder.addDefaultSurveyToCompany(user);
+			
 			if(Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE){
 				LOG.debug("Since its a free account type returning no popup jsp");
-				//We add the default survey for this company
-				surveyBuilder.addDefaultSurveyToCompany(user);
 				return null;
 			}
 

@@ -63,6 +63,7 @@ public final class DisplayMessageConstants {
 	public static final String CARD_UPDATE_UNSUCCESSFUL = "CARD_UPDATE_UNSUCCESSFUL";
 	public static final String CREDIT_CARD_INVALID = "CREDIT_CARD_INVALID";
 	public static final String INVALID_SURVEY_ANSWER = "INVALID_SURVEY_ANSWER";
+	public static final String NO_SURVEY_FOUND = "NO_SURVEY_FOUND";
 	
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
