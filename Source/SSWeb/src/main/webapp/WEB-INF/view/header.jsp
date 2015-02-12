@@ -19,6 +19,8 @@
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
 </head>
 <body>
     <div id="toast-container" class="toast-container">
@@ -108,21 +110,11 @@
 		</div>
 	</div>
 
+<!--
 	<div class="header-main-wrapper">
 		<div class="container clearfix header-container">
 			<div class="header-logo float-left" id="header-logo" style="cursor: pointer;"></div>
-            <div class="hdr-wrapper">
-                <div class="container hdr-container clearfix">
-                    <div class="float-left hdr-logo"></div>
-                    <div class="float-left hdr-links clearfix">
-                        <div class="hdr-link-item hdr-link-active"><a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a></div>
-                        <div class="hdr-link-item"><a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a></div>
-                        <div class="hdr-link-item"><a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a></div>
-                        <div class="hdr-link-item"><a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a></div>
-                    </div>
-                </div>
-            </div>
-<!--
+            
 			<div id="header-links" class="header-links float-left clearfix">
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message
@@ -148,45 +140,94 @@
 					</div>
 				</c:if>
 			</div>
--->
             
-			<div id="header-user-info" class="header-user-info float-right clearfix">
-				<div class="float-left user-info-initial">
-					<span>${fn:substring(user.firstName, 0, 1)}</span>
-					<div class="initial-dd-wrapper hide blue-arrow-bot">
-						<c:if test="${highestrole == 1}">
-							<!-- show the company settings only of the user has company admin as a role -->
-							<div class="initial-dd-item" id="company-setting">
-								<spring:message code="label.settings.company.key" />
-							</div>
-						</c:if>
-						<div class="initial-dd-item" id="profile-setting">
-							<spring:message code="label.profilesetting.key" />
-						</div>
-						<div class="initial-dd-item" id="account-setting">
-							<spring:message code="label.accountsetting.key" />
-						</div>
-						<div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
-						<spring:message code="label.changepassword.key"/>
-						</div>
-						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
-								<spring:message	code="label.header.upgrade.key" />
-							</div>
-						</c:if>
-						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
-					</div>
-				</div>
+                <div id="header-user-info" class="header-user-info float-right clearfix">
+                    <div class="float-left user-info-initial">
+                        <span>${fn:substring(user.firstName, 0, 1)}</span>
+                        <div class="initial-dd-wrapper hide blue-arrow-bot">
+                            <c:if test="${highestrole == 1}">
+                                 show the company settings only of the user has company admin as a role 
+                                <div class="initial-dd-item" id="company-setting">
+                                    <spring:message code="label.settings.company.key" />
+                                </div>
+                            </c:if>
+                            <div class="initial-dd-item" id="profile-setting">
+                                <spring:message code="label.profilesetting.key" />
+                            </div>
+                            <div class="initial-dd-item" id="account-setting">
+                                <spring:message code="label.accountsetting.key" />
+                            </div>
+                            <div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
+                            <spring:message code="label.changepassword.key"/>
+                            </div>
+                            <c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+                                <div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+                                    <spring:message	code="label.header.upgrade.key" />
+                                </div>
+                            </c:if>
+                            <a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+                        </div>
+                    </div>
 
 
-				<c:if test="${displaylogo != null}">
-					<div class="float-left user-info-seperator"></div>
-					<div class="float-left user-info-logo"
-						style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
-				</c:if>
+                    <c:if test="${displaylogo != null}">
+                        <div class="float-left user-info-seperator"></div>
+                        <div class="float-left user-info-logo"
+                            style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+                    </c:if>
 
-			</div>
-			<div id="header-menu-icn"
-				class="header-menu-icn icn-menu hide float-right"></div>
+                </div>
+                <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
 		</div>
 	</div>
+-->
+    
+    <div class="hdr-wrapper">
+        <div class="container hdr-container clearfix">
+            <div class="float-left hdr-logo"></div>
+            <div class="float-left hdr-links clearfix">
+                <div class="hdr-link-item hdr-link-active"><a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a></div>
+                <div class="hdr-link-item"><a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a></div>
+                <div class="hdr-link-item"><a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a></div>
+                <div class="hdr-link-item"><a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a></div>
+            </div>
+
+            <div id="header-user-info" class="header-user-info float-right clearfix">
+                <div class="float-left user-info-initial">
+                    <span>${fn:substring(user.firstName, 0, 1)}</span>
+                    <div class="initial-dd-wrapper hide blue-arrow-bot">
+                        <c:if test="${highestrole == 1}">
+                            <!-- show the company settings only of the user has company admin as a role -->
+                            <div class="initial-dd-item" id="company-setting">
+                                <spring:message code="label.settings.company.key" />
+                            </div>
+                        </c:if>
+                        <div class="initial-dd-item" id="profile-setting">
+                            <spring:message code="label.profilesetting.key" />
+                        </div>
+                        <div class="initial-dd-item" id="account-setting">
+                            <spring:message code="label.accountsetting.key" />
+                        </div>
+                        <div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
+                        <spring:message code="label.changepassword.key"/>
+                        </div>
+                        <c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+                            <div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+                                <spring:message	code="label.header.upgrade.key" />
+                            </div>
+                        </c:if>
+                        <a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+                    </div>
+                </div>
+
+
+                <c:if test="${displaylogo != null}">
+                    <div class="float-left user-info-seperator"></div>
+                    <div class="float-left user-info-logo"
+                        style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+                </c:if>
+
+            </div>
+            <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
+        </div>
+    </div>
