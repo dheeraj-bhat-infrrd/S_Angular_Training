@@ -15,7 +15,7 @@
 			<div id="prof-edit-social-link" class="float-right hm-hr-row-right clearfix">
 				<!-- Call JavaScript function to load social page links -->
 			</div>
-			<input id="social-token-text" type="text" class="hide" placeholder="<spring:message code="label.socialpage.key" />">
+			<input id="social-token-text" type="text" class="hide" placeholder="<spring:message code="label.socialpage.placeholder.key" />">
 		</div>
 	</div>
 </div>
