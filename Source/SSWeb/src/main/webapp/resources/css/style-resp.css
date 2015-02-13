@@ -704,21 +704,42 @@
         margin-right: 5px;
     }
     .sq-star-wrapper{
-        width: 210px;
+        width: 250px;
+    }
+    .sq-txt-area{
+        width: 100%;
+    }
+    .sq-smile{
+        width: 50px;
+    }
+    .hdr-links{
+        display: none;
     }
     .sq-star{
-        width: 42px;
+        width: 50px;
         height: 42px;
-        background-size: 32px !important;
+        background-size: 40px !important;
     }
     .sq-slider-wrapper {
         width: 80%;
         margin: 0 auto;
     }
+    .sq-mcq-wrapper{
+        width: 100%;
+    }
+    .sq-mcq-ans-wrapper{
+        width: 85%;
+        min-width: 225px;
+    }
+    .sq-mcq-chk-wrapper{
+        width: 15%;
+        min-width: 40px;
+    }
     .prof-img-wrapper{
         display: block;
-        margin: 10px auto 0;
+        margin: 0px auto;
         float: none;
+        padding: 2px;
         width: 100% !important;
     }
     .prof-name-wrapper{
