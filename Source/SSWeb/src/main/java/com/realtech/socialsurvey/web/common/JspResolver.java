@@ -46,4 +46,5 @@ public interface JspResolver {
 	public static final String PROFILE_ADDRESS_DETAILS = "profile_addressdetails";
 	public static final String PROFILE_IMAGE = "profile_profileimage";
 	public static final String PROFILE_SOCIAL_LINKS = "profile_sociallinks";
+	public static final String PROFILE_COMPANY = "profile_new";
 }

@@ -225,7 +225,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="people-say-wrapper rt-content-main bord-bot-dc">
+                <div class="people-say-wrapper rt-content-main">
                     <div class="main-con-header"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
                     <div class="ppl-review-item">
                         <div class="ppl-header-wrapper clearfix">
@@ -255,6 +255,9 @@
                             </div>
                             <div class="float-left icn-share icn-remove icn-rem-size hide"></div>
                         </div>
+                    </div>
+                    <div class="profile-addl-links clearfix">
+                        <span class="p-a-l-item">100 additional reviews not recommended</span>
                     </div>
                 </div>
             </div>
