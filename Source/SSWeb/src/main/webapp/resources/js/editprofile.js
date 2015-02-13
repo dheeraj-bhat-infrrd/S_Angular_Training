@@ -38,12 +38,14 @@ $(document).on('change', '#prof-image-edit', function() {
 
 // Function to call when the company profile page is loaded
 function startCompanyProfilePage() {
-	callAjaxGET("./fetchaboutme.do", callBackShowAboutMe);
+	// callAjaxGET("./fetchaboutme.do", callBackShowAboutMe);
+	// callAjaxGET("./fetchbasicdetails.do", callBackShowAddressDetails);
+	// callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
 	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
+
 	showAssociationList();
 	showAchievementList();
 	showLicenceList();
-	showAddressDetails();
 	showProfileImage();
 	showProfileSocialLinks();
 }
@@ -93,7 +95,7 @@ function callBackOnEditAdboutMeDetails(data) {
 }
 
 
-// TODO Update Contact details
+// Update Contact details
 function callBackShowContactDetails(data) {
 	$('#contant-info-container').html(data);
 	adjustImage();
@@ -121,7 +123,7 @@ function callBackShowContactDetails(data) {
 
 function callBackOnUpdateMailIds(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
 		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	}
 
@@ -151,7 +153,7 @@ $(document).on('blur', '#contant-info-container input[data-phone-number]', funct
 
 function callBackOnUpdatePhoneNumbers(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
 		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	}
 
@@ -186,6 +188,7 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 			return false;
 		}
 		webAddresses = JSON.stringify(webAddresses);
+		console.log(webAddresses);
 		var payload = {
 			"webAddresses" : webAddresses
 		};
@@ -195,7 +198,7 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 
 function callBackOnUpdateWebAddresses(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
 		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	}
 
@@ -203,7 +206,43 @@ function callBackOnUpdateWebAddresses(data) {
 	showToast();
 }
 
+// TODO Update Logo
 
+// TODO Update Address detail
+function callBackShowAddressDetails(data) {
+	$('#prof-address-container').html(data);
+	adjustImage();
+}
+
+$(document).on('blur', '#prof-address-container input', function() {
+	delay(function() {
+		var profName = $('#prof-name').val().trim();
+		var profAddress1 = $('#prof-address1').val().trim();
+		var profAddress2 = $('#prof-address2').val().trim();
+		var country = $('#prof-country').val().trim();
+		var zipCode = $('#prof-zipcode').val().trim();
+		var payload = {
+			"profName" : profName,
+			"address1" : profAddress1,
+			"address2" : profAddress2,
+			"country" : country,
+			"zipCode" : zipCode
+		};
+		callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
+	}, 0);
+});
+
+function callBackUpdateAddressDetails(data) {
+	$('#prof-message-header').html(data);
+	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
+		callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
+	}
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+}
+
+// TODO Update Basic detail
 
 
 
@@ -237,16 +276,6 @@ function callBackShowLicenceList(data) {
 	adjustImage();
 }
 
-// Function to populate address details container
-function showAddressDetails() {
-	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
-}
-
-function callBackShowAddressDetails(data) {
-	$('#prof-name-container').html(data);
-	//initializeGoogleMap();
-	adjustImage();
-}
 
 // Function to populate profile logo container
 function showProfileImage() {
@@ -459,48 +488,8 @@ function callBackUpdateLicenseAuthorizations(data) {
 	}
 }
 
-/*$(document).on('keyup', '#prof-name-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateAddressDetails();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateAddressDetails();
-	}, 3000);
-});*/
 
-$(document).on('blur', '#prof-name-container input', function() {
-	delay(function() {
-		updateAddressDetails();
-	}, 0);
-});
 
-// Function to update addresses
-function updateAddressDetails() {
-	var profName = $('#prof-name').val().trim();
-	var profAddress1 = $('#prof-address1').val().trim();
-	var profAddress2 = $('#prof-address2').val().trim();
-	//var zipcode = profAddress2.substr(-5);
-	//profAddress2 = profAddress2.substr(0,profAddress2.length-7);
-	var payload = {
-		"profName" : profName,
-		"address1" : profAddress1,
-		"address2" : profAddress2
-	};
-	callAjaxPostWithPayloadData("./updateprofileaddress.do",
-			callBackUpdateAddressDetails, payload);
-}
-
-function callBackUpdateAddressDetails(data) {
-	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showAddressDetails();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
-}
 
 // Function to update logo image
 function updateLogoImage(payload) {

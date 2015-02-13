@@ -12,8 +12,13 @@
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-web"></div>
-	<input class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}"
-		placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
+	<div>
+		<input class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}"
+			placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
+	  	<div>
+	  		<input type="button" value="lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;">
+	  	</div>
+	</div>
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-phone"></div>

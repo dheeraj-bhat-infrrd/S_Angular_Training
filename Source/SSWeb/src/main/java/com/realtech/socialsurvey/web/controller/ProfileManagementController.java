@@ -80,8 +80,26 @@ public class ProfileManagementController {
 	private SolrSearchService solrSearchService;
 
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
-	public String showProfilePage() {
-		LOG.info("Started the profile page");
+	public String showProfilePage(Model model, HttpServletRequest request) {
+		LOG.info("Starting the ProfileEdit page");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+		OrganizationUnitSettings profile = null;
+		try {
+			long agentId = user.getUserProfiles().get(0).getAgentId();
+			long branchId = user.getUserProfiles().get(0).getBranchId();
+			long regionId = user.getUserProfiles().get(0).getRegionId();
+			LOG.info("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
+			profile = profileManagementService.finalizeProfile(user, accountType, settings, agentId, branchId, regionId);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		model.addAttribute("userprofile", new Gson().toJson(profile));
 		return JspResolver.PROFILE_EDIT_AGENT;
 	}
 
@@ -115,9 +133,15 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_LICENSES;
 	}
 
+	@RequestMapping(value = "/fetchbasicdetails", method = RequestMethod.GET)
+	public String fetchBasicDetails() {
+		LOG.info("Fecthing basic details for rofile");
+		return JspResolver.PROFILE_BASIC_DETAILS;
+	}
+
 	@RequestMapping(value = "/fetchaddressdetails", method = RequestMethod.GET)
 	public String fetchAddressDetails() {
-		LOG.info("Fecthing address details for rofile");
+		LOG.info("Fecthing basic details for rofile");
 		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
@@ -338,11 +362,19 @@ public class ProfileManagementController {
 			String name = request.getParameter("profName");
 			String address1 = request.getParameter(CommonConstants.ADDRESS1);
 			String address2 = request.getParameter(CommonConstants.ADDRESS2);
+			String country = request.getParameter(CommonConstants.COUNTRY);
+			String zipcode = request.getParameter(CommonConstants.ZIPCODE);
 			if (name == null || name.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 			if (address1 == null || address1.isEmpty()) {
 				throw new InvalidInputException("Address 1 passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			if (country == null || country.isEmpty()) {
+				throw new InvalidInputException("country passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			if (zipcode == null || zipcode.isEmpty()) {
+				throw new InvalidInputException("zipcode passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			if (user.isCompanyAdmin()) {
@@ -351,9 +383,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
@@ -365,10 +395,7 @@ public class ProfileManagementController {
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
-				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
@@ -381,9 +408,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
@@ -396,9 +421,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
@@ -418,6 +441,17 @@ public class ProfileManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	// Update address details
+	private void updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2, String country,
+			String zipcode) {
+		contactDetailsSettings.setName(name);
+		contactDetailsSettings.setAddress(address1 + ", " + address2);
+		contactDetailsSettings.setAddress1(address1);
+		contactDetailsSettings.setAddress2(address2);
+		contactDetailsSettings.setCountry(country);
+		contactDetailsSettings.setZipcode(zipcode);
 	}
 
 	/**
@@ -826,7 +860,6 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updatephonenumbers", method = RequestMethod.POST)
 	public String updatePhoneNumbers(Model model, HttpServletRequest request) {
 		LOG.info("Update phone numbers");
@@ -1394,31 +1427,5 @@ public class ProfileManagementController {
 		}
 		LOG.info("Method findAProfileScroll finished.");
 		return new Gson().toJson(users);
-	}
-
-	@ResponseBody
-	@RequestMapping(value = "/fetchprofile", method = RequestMethod.GET)
-	public String fetchProfileDetail(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing profile");
-
-		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-
-		OrganizationUnitSettings profile = null;
-		try {
-			long agentId = user.getUserProfiles().get(0).getAgentId();
-			long branchId = user.getUserProfiles().get(0).getBranchId();
-			long regionId = user.getUserProfiles().get(0).getRegionId();
-			LOG.info("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
-			profile = profileManagementService.finalizeProfile(user, accountType, settings, agentId, branchId, regionId);
-		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-
-		return new Gson().toJson(profile);
 	}
 }
