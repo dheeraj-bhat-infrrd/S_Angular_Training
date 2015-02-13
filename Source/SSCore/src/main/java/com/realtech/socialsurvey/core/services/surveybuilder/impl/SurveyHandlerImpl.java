@@ -1,13 +1,14 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.MongoSurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -25,7 +26,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 	private SolrSearchService solrSearchService;
 
 	@Autowired
-	private MongoSurveyDetailsDao mongoSurveyDetailsDao;
+	private SurveyDetailsDao surveyDetailsDao;
 
 	/**
 	 * Method to store question and answer format into mongo.
@@ -54,9 +55,10 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyDetails.setRegionId(regionId);
 		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
 		surveyDetails.setReminderCount(reminderCount);
+		surveyDetails.setUpdatedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
-		mongoSurveyDetailsDao.updateEmailForExistingFeedback(agentId, customerEmail);
-		mongoSurveyDetailsDao.insertSurveyDetails(surveyDetails);
+		surveyDetailsDao.updateEmailForExistingFeedback(agentId, customerEmail);
+		surveyDetailsDao.insertSurveyDetails(surveyDetails);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
 	}
 
@@ -76,7 +78,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyResponse.setAnswer(answer);
 		surveyResponse.setQuestion(question);
 		surveyResponse.setQuestionType(questionType);
-		mongoSurveyDetailsDao.updateCustomerResponse(agentId, customerEmail, surveyResponse, stage);
+		surveyDetailsDao.updateCustomerResponse(agentId, customerEmail, surveyResponse, stage);
 		LOG.info("Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
 	
@@ -86,8 +88,8 @@ public class SurveyHandlerImpl implements SurveyHandler {
 	@Override
 	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review){
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started.");
-		mongoSurveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review);
-		mongoSurveyDetailsDao.updateFinalScore(agentId, customerEmail);
+		surveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review);
+		surveyDetailsDao.updateFinalScore(agentId, customerEmail);
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
 }
