@@ -10,6 +10,7 @@
 <div class="hm-header-main-wrapper">
 	<div id="principal-detail">
 		<input id="profile-user-id" name="profile-user-id" type="hidden" value="${user.userId}">
+		<input id="profile-user" name="profile-user-id" type="hidden" value="${userprofile}">
 	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
@@ -31,11 +32,11 @@
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
-				<div id="prof-name-container" class="prof-name-container">
+				<div id="prof-basic-container" class="prof-name-container">
 					<input id="prof-name" class="prof-name prof-edditable" value="${contactdetail.name}">
 					<div class="prof-address">
 						<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${companyvertical}">
-						<input id="prof-detail" class="prof-addline2 prof-edditable" value="Chairman's mason">
+						<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}">
 					</div>
 					<div class="prof-rating clearfix">
 						<div class="st-rating-wrapper maring-0 clearfix float-left">
@@ -49,7 +50,13 @@
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
-				<div class="prof-user-logo"></div>
+				<!-- <div class="prof-user-logo"></div> -->
+				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
+					<div id="prof-logo-container" class="prog-img-container">
+						<!-- Call JavaScript function to populate profile image -->
+					</div>
+				</div>
+				
 				<div id="prof-address-container" class="prof-user-address">
 					<input id="prof-name" class="prof-user-addline1 prof-edditable" value="${contactdetail.name}">
 					<input id="prof-address1" class="prof-user-addline1 prof-edditable" value="${contactdetail.address1}">
@@ -72,39 +79,47 @@
 						</div>
 					</div>
 				</div>
-				<div class="prof-left-row prof-left-assoc bord-bot-dc">
-					<div class="left-assoc-wrapper">
-						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.membership.key" /></div>
-							<div class="float-right icn-share icn-plus-open" onclick="addAnAssociation();"></div>
+				
+				<c:choose>
+					<c:when	test="${user.agent}">
+						<div class="prof-left-row prof-left-assoc bord-bot-dc">
+							<div class="left-assoc-wrapper">
+								<div class="clearfix">
+									<div class="float-left left-panel-header"><spring:message code="label.membership.key" /></div>
+									<div class="float-right icn-share icn-plus-open" onclick="addAnAssociation();"></div>
+								</div>
+								<div id="association-container" class="left-panel-content">
+									<!-- Call javascript function to populate association list -->
+								</div>
+							</div>
 						</div>
-						<div id="association-container" class="left-panel-content">
-							<!-- Call javascript function to populate association list -->
+						<div class="prof-left-row prof-left-ach bord-bot-dc">
+							<div class="left-ach-wrapper">
+								<div class="clearfix">
+									<div class="float-left left-panel-header"><spring:message code="label.achievement.key" /></div>
+									<div class="float-right icn-share icn-plus-open" onclick="addAnAchievement();"></div>
+								</div>
+								<div id="achievement-container" class="left-panel-content">
+									<!--  Call javascript function to populate Achievement list -->
+								</div>
+							</div>
 						</div>
-					</div>
-				</div>
-				<div class="prof-left-row prof-left-ach bord-bot-dc">
-					<div class="left-ach-wrapper">
-						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.achievement.key" /></div>
-							<div class="float-right icn-share icn-plus-open" onclick="addAnAchievement();"></div>
+						<div class="prof-left-row prof-left-auth bord-bot-dc">
+							<div class="left-auth-wrapper">
+								<div class="clearfix">
+									<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
+									<div class="float-right icn-share icn-plus-open" onclick="addAuthorisedIn();"></div>
+								</div>
+								<div id="authorised-in-container" class="left-panel-content">
+									<!-- Call javascript function to populate authorised in list -->
+								</div>
+							</div>
 						</div>
-						<div id="achievement-container" class="left-panel-content">
-							<!--  Call javascript function to populate Achievement list -->
-						</div>
-					</div>
-				</div>
-				<div class="prof-left-row prof-left-auth bord-bot-dc">
-					<div class="left-auth-wrapper">
-						<div class="clearfix">
-							<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
-							<div class="float-right icn-share icn-plus-open" onclick="addAuthorisedIn();"></div>
-						</div>
-						<div id="authorised-in-container" class="left-panel-content">
-							<!-- Call javascript function to populate authorised in list -->
-						</div>
-					</div>
-				</div>
+					</c:when>
+					<c:otherwise>
+						<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
+					</c:otherwise>
+				</c:choose>
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">

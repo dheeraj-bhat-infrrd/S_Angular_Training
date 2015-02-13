@@ -5,7 +5,7 @@
 <input id="prof-name" class="prof-name prof-edditable" value="${contactdetail.name}">
 <div class="prof-address">
 	<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${companyvertical}">
-	<input id="prof-detail" class="prof-addline2 prof-edditable" value="Chairman's mason">
+	<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}">
 </div>
 <div class="prof-rating clearfix">
 	<div class="st-rating-wrapper maring-0 clearfix float-left">

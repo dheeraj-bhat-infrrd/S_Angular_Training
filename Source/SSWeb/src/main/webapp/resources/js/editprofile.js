@@ -36,22 +36,19 @@ $(document).on('change', '#prof-image-edit', function() {
 	updateLogoImage(formData);
 });
 
-// Function to call when the company profile page is loaded
+// TODO Function to call when the company profile page is loaded
 function startCompanyProfilePage() {
-	// callAjaxGET("./fetchaboutme.do", callBackShowAboutMe);
-	// callAjaxGET("./fetchbasicdetails.do", callBackShowAddressDetails);
-	// callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
 	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-
-	showAssociationList();
-	showAchievementList();
-	showLicenceList();
 	showProfileImage();
 	showProfileSocialLinks();
+
+	// showAssociationList();
+	// showAchievementList();
+	// showLicenceList();
 }
 
 
-// Update AboutMe details
+// TODO Update AboutMe details
 function callBackShowAboutMe(data) {
 	$('#intro-about-me').html(data);
 	adjustImage();
@@ -95,41 +92,11 @@ function callBackOnEditAdboutMeDetails(data) {
 }
 
 
-// Update Contact details
+// TODO Update Contact details
 function callBackShowContactDetails(data) {
 	$('#contant-info-container').html(data);
 	adjustImage();
 }
-
-// Email id's in contact details
-/*$(document).on('blur', '#contant-info-container input[data-email]', function() {
-	delay(function() {
-		var mailIds = [];
-		$('#contant-info-container input[data-email]').each(function() {
-			if (this.value != "") {
-				var mailId = {};
-				mailId.key = $(this).attr("data-email");
-				mailId.value = this.value;
-				mailIds.push(mailId);
-			}
-		});
-		mailIds = JSON.stringify(mailIds);
-		var payload = {
-			"mailIds" : mailIds
-		};
-		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds,	payload);
-	}, 0);
-});
-
-function callBackOnUpdateMailIds(data) {
-	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
-		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	}
-
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-}*/
 
 // Phone numbers in contact details
 $(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
@@ -206,8 +173,6 @@ function callBackOnUpdateWebAddresses(data) {
 	showToast();
 }
 
-// TODO Update Logo
-
 // TODO Update Address detail
 function callBackShowAddressDetails(data) {
 	$('#prof-address-container').html(data);
@@ -234,19 +199,86 @@ $(document).on('blur', '#prof-address-container input', function() {
 
 function callBackUpdateAddressDetails(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
-		callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
-	}
+	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
+	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
 
+
 // TODO Update Basic detail
+function callBackShowBasicDetails(response) {
+	$('#prof-basic-container').html(response);
+	adjustImage();
+}
+
+$(document).on('blur', '#prof-basic-container input', function() {
+	delay(function() {
+		var profName = $('#prof-name').val().trim();
+		var profTitle = $('#prof-title').val().trim();
+		var payload = {
+			"profName" : profName,
+			"profTitle" : profTitle
+		};
+		callAjaxPostWithPayloadData("./updatebasicprofile.do", callBackUpdateBasicDetails, payload);
+	}, 0);
+});
+
+function callBackUpdateBasicDetails(data) {
+	$('#prof-message-header').html(data);
+	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
+	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+}
 
 
+// TODO Function to update logo image
+function updateLogoImage(payload) {
+	callAjaxPOSTWithTextData("./addoruploadlogo.do", callBackOnLogoUpload,
+			false, payload);
+}
 
-// Function to populate associations container
+function callBackOnLogoUpload(data) {
+	$('#prof-message-header').html(data);
+	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+		showProfileImage();
+	}else{
+		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
+	}
+}
+
+function showProfileImage() {
+	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
+}
+
+function callBackShowProfileImage(data) {
+	$('#prof-img-container').html(data);
+	var logoImageUrl = $('#prof-image').css("background-image");
+	if (logoImageUrl == undefined || logoImageUrl == "none") {
+		return;
+	}
+	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
+		var userInfoDivider = $('<div>').attr({
+			"class" : "float-left user-info-seperator"
+		});
+		var userInfoLogo = $('<div>').attr({
+			"class" : "float-left user-info-logo"
+		}).css({
+			"background" : logoImageUrl + " no-repeat center",
+			"background-size" : "100% auto"
+		});
+		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
+	} else {
+		$('.user-info-logo').css("background-image", logoImageUrl);
+	}
+	adjustImage();
+}
+
+
+// TODO Function to populate associations container
 function showAssociationList() {
 	callAjaxGET("./fetchassociations.do", callBackShowAssociationList);
 }
@@ -276,34 +308,6 @@ function callBackShowLicenceList(data) {
 	adjustImage();
 }
 
-
-// Function to populate profile logo container
-function showProfileImage() {
-	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
-}
-
-function callBackShowProfileImage(data) {
-	$('#prof-img-container').html(data);
-	var logoImageUrl = $('#prof-image').css("background-image");
-	if (logoImageUrl == undefined || logoImageUrl == "none") {
-		return;
-	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
-		var userInfoDivider = $('<div>').attr({
-			"class" : "float-left user-info-seperator"
-		});
-		var userInfoLogo = $('<div>').attr({
-			"class" : "float-left user-info-logo"
-		}).css({
-			"background" : logoImageUrl + " no-repeat center",
-			"background-size" : "100% auto"
-		});
-		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	} else {
-		$('.user-info-logo').css("background-image", logoImageUrl);
-	}
-	adjustImage();
-}
 
 //Function to show social media links
 function showProfileSocialLinks() {
@@ -488,23 +492,6 @@ function callBackUpdateLicenseAuthorizations(data) {
 	}
 }
 
-
-
-
-// Function to update logo image
-function updateLogoImage(payload) {
-	callAjaxPOSTWithTextData("./addoruploadlogo.do", callBackOnLogoUpload,
-			false, payload);
-}
-
-function callBackOnLogoUpload(data) {
-	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showProfileImage();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
-}
 
 // Update Social links
 $('body').on('click','#prof-edit-social-link .icn-fb',function(){
