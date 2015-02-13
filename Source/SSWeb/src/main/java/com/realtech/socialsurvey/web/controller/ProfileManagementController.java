@@ -99,8 +99,8 @@ public class ProfileManagementController {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		model.addAttribute("userprofile", new Gson().toJson(profile));
-		return JspResolver.PROFILE_EDIT_AGENT;
+		model.addAttribute("userprofile", profile);
+		return JspResolver.PROFILE_EDIT;
 	}
 
 	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
@@ -113,24 +113,6 @@ public class ProfileManagementController {
 	public String fetchContactDetails() {
 		LOG.info("Fecthing contact details for profile");
 		return JspResolver.PROFILE_CONTACT_DETAILS;
-	}
-
-	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
-	public String fetchAssociations() {
-		LOG.info("Fecthing association list for profile");
-		return JspResolver.PROFILE_ASSOCIATIONS;
-	}
-
-	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
-	public String fetchAchievements() {
-		LOG.info("Fecthing achievement list for profile");
-		return JspResolver.PROFILE_ACHIEVEMENTS;
-	}
-
-	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
-	public String fetchLicences() {
-		LOG.info("Fecthing license details for profile");
-		return JspResolver.PROFILE_LICENSES;
 	}
 
 	@RequestMapping(value = "/fetchbasicdetails", method = RequestMethod.GET)
@@ -157,94 +139,25 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
-	/**
-	 * Method to update associations in profile
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
-	public String updateAssociations(Model model, HttpServletRequest request) {
-		LOG.info("Updating associations list");
-		User user = sessionHelper.getCurrentUser();
-		List<Association> associations = null;
+	// Only for agent
+	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
+	public String fetchAssociations() {
+		LOG.info("Fecthing association list for profile");
+		return JspResolver.PROFILE_ASSOCIATIONS;
+	}
 
-		try {
-			HttpSession session = request.getSession(false);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null) {
-				throw new InvalidInputException("No user settings found in session");
-			}
+	// Only for agent
+	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
+	public String fetchAchievements() {
+		LOG.info("Fecthing achievement list for profile");
+		return JspResolver.PROFILE_ACHIEVEMENTS;
+	}
 
-			String payload = request.getParameter("associationList");
-			try {
-				if (payload == null || payload.isEmpty()) {
-					throw new InvalidInputException("Association passed was null or empty");
-				}
-				ObjectMapper mapper = new ObjectMapper();
-				associations = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, Association.class));
-			}
-			catch (IOException ioException) {
-				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
-			}
-
-			if (user.isCompanyAdmin()) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
-				if (companySettings == null) {
-					throw new InvalidInputException("No company settings found in current session");
-				}
-				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
-						companySettings, associations);
-				companySettings.setAssociations(associations);
-				userSettings.setCompanySettings(companySettings);
-			}
-			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
-				if (regionSettings == null) {
-					throw new InvalidInputException("No Region settings found in current session");
-				}
-				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-						regionSettings, associations);
-				regionSettings.setAssociations(associations);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
-			}
-			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
-				if (branchSettings == null) {
-					throw new InvalidInputException("No Branch settings found in current session");
-				}
-				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-						branchSettings, associations);
-				branchSettings.setAssociations(associations);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
-			}
-			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
-				if (agentSettings == null) {
-					throw new InvalidInputException("No Agent settings found in current session");
-				}
-				associations = profileManagementService.addAgentAssociations(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-						agentSettings, associations);
-				agentSettings.setAssociations(associations);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
-			}
-			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
-			}
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			LOG.info("Associations updated successfully");
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-		return JspResolver.MESSAGE_HEADER;
+	// Only for agent
+	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
+	public String fetchLicences() {
+		LOG.info("Fecthing license details for profile");
+		return JspResolver.PROFILE_LICENSES;
 	}
 
 	/**
@@ -336,6 +249,108 @@ public class ProfileManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to update profile addresses in profile
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updatebasicprofile", method = RequestMethod.POST)
+	public String updateBasicDetial(Model model, HttpServletRequest request) {
+		LOG.info("Updating contact detail info");
+		User user = sessionHelper.getCurrentUser();
+		ContactDetailsSettings contactDetailsSettings = null;
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			// Get the profile address parameters
+			String name = request.getParameter("profName");
+			String title = request.getParameter("profTitle");
+			if (name == null || name.isEmpty()) {
+				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			if (title == null || title.isEmpty()) {
+				throw new InvalidInputException("Title passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				contactDetailsSettings = companySettings.getContact_details();
+				updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
+				companySettings.setContact_details(contactDetailsSettings);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
+				regionSettings.setContact_details(contactDetailsSettings);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				contactDetailsSettings = branchSettings.getContact_details();
+				updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
+				branchSettings.setContact_details(contactDetailsSettings);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				contactDetailsSettings = agentSettings.getContact_details();
+				updateBasicDetail(contactDetailsSettings, name, title);
+				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
+				agentSettings.setContact_details(contactDetailsSettings);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("Profile addresses updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating profile basic details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	// Update address details
+	private void updateBasicDetail(ContactDetailsSettings contactDetailsSettings, String name, String title) {
+		contactDetailsSettings.setName(name);
+		contactDetailsSettings.setTitle(title);
 	}
 
 	/**
@@ -540,6 +555,96 @@ public class ProfileManagementController {
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating achievement details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to update associations in profile
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
+	public String updateAssociations(Model model, HttpServletRequest request) {
+		LOG.info("Updating associations list");
+		User user = sessionHelper.getCurrentUser();
+		List<Association> associations = null;
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String payload = request.getParameter("associationList");
+			try {
+				if (payload == null || payload.isEmpty()) {
+					throw new InvalidInputException("Association passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				associations = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, Association.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, associations);
+				companySettings.setAssociations(associations);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, associations);
+				regionSettings.setAssociations(associations);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, associations);
+				branchSettings.setAssociations(associations);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				associations = profileManagementService.addAgentAssociations(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+						agentSettings, associations);
+				agentSettings.setAssociations(associations);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("Associations updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.MESSAGE_HEADER;

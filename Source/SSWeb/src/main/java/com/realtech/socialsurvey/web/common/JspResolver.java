@@ -37,8 +37,7 @@ public interface JspResolver {
 	public static final String INDEX = "index";
 	public static final String PROFILE_LIST = "proList";
 
-	public static final String PROFILE_EDIT_ADMIN = "profile_edit_admin";
-	public static final String PROFILE_EDIT_AGENT = "profile_edit_agent";
+	public static final String PROFILE_EDIT = "profile_edit";
 	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";
 	public static final String PROFILE_ABOUT_ME = "profile_aboutme";
 	public static final String PROFILE_ASSOCIATIONS = "profile_associations";
