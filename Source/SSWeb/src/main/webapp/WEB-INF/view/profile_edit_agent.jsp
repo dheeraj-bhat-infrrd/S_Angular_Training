@@ -1,18 +1,21 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
 	<c:set value="${cannonicalusersettings.companySettings.contact_details}" var="contactDetails"></c:set>
 </c:if>
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
+	<div id="principal-detail">
+		<input id="profile-user-id" name="profile-user-id" type="hidden" value="${user.userId}">
+	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left">Read, Write and Share Reviews</div>
+			<div class="float-left hm-header-row-left"><spring:message code="label.header.key" /></div>
 			<div id="prof-edit-social-link" class="float-right hm-hr-row-right clearfix">
 				<!-- Call JavaScript function to load social page links -->
 			</div>
-			<input id="social-token-text" type="text" class="hide" placeholder="Social page link">
+			<input id="social-token-text" type="text" class="hide" placeholder="<spring:message code="label.socialpage.key" />">
 		</div>
 	</div>
 </div>
@@ -69,7 +72,7 @@
 							<div class="float-right icn-share icn-plus-open" onclick="addAnAchievement();"></div>
 						</div>
 						<div id="achievement-container" class="left-panel-content">
-							<!-- Achievement list to popluated by javascript -->
+							<!--  Call javascript function to populate Achievement list -->
 						</div>
 					</div>
 				</div>
@@ -87,17 +90,8 @@
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
-				<div class="intro-wrapper rt-content-main bord-bot-dc">
-					<div class="main-con-header"><spring:message code="label.about.key" /> ${contactDetails.name}</div>
-					<div class="intro-body" id="intro-body-text">
-						<c:choose>
-							<c:when	test="${not empty contactDetails.about_me && not empty fn:trim(contactDetails.about_me)}">
-								${contactDetails.about_me}
-							</c:when>
-							<c:otherwise><spring:message code="label.aboutcompany.empty.key" /></c:otherwise>
-						</c:choose>
-					</div>
-					<textarea class="sb-txtarea hide" id="intro-body-text-edit"></textarea>
+				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc">
+					<!-- Call JavaScript function to populate aboutme details -->
 				</div>
 				<div class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
@@ -215,6 +209,7 @@
 		adjustImage();
 		$(window).resize(adjustImage);
 		startCompanyProfilePage();
+		
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
 			$(this).hide();
 			$(this).parent().find('.ppl-share-social,.icn-remove').show();

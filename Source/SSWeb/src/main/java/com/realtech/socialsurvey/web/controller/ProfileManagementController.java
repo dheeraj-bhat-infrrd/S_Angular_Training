@@ -85,6 +85,12 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_EDIT_AGENT;
 	}
 
+	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
+	public String fetchProfileAboutMe() {
+		LOG.info("Fecthing profile aboutme");
+		return JspResolver.PROFILE_ABOUT_ME;
+	}
+
 	@RequestMapping(value = "/fetchcontactdetails", method = RequestMethod.GET)
 	public String fetchContactDetails() {
 		LOG.info("Fecthing contact details for profile");
