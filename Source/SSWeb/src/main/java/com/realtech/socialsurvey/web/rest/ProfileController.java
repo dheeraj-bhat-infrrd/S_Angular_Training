@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -16,6 +17,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
@@ -26,6 +28,9 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.JspResolver;
 
 /**
  * JIRA:SS-117 by RM02 Class with rest services for fetching various profiles
@@ -156,6 +161,49 @@ public class ProfileController {
 		}
 		LOG.info("Service to get branch profile executed successfully");
 		return response;
+	}
+
+	/**
+	 * Service to get the profile of an individual
+	 * 
+	 * @param individualProfileName
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/individual/{individualProfileName}")
+	public Response getIndividualProfile(@PathVariable String companyProfileName, @PathVariable String individualProfileName) {
+		LOG.info("Service to get profile of individual called for individualProfileName : " + individualProfileName);
+		Response response = null;
+		try {
+			if (companyProfileName == null || companyProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_ALL_REGIONS, "Profile name for company is invalid"),
+						"company profile name is null or empty while fetching profile for individual");
+			}
+			if (individualProfileName == null || individualProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE,
+						"Profile name for individual is invalid"), "individual profile name is null or empty");
+			}
+			OrganizationUnitSettings individualProfile = null;
+			try {
+				individualProfile = profileManagementService.getIndividualByProfileName(companyProfileName, individualProfileName);
+				String json = new Gson().toJson(individualProfile);
+				LOG.debug("individualProfile json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+
+		LOG.info("Service to get profile of individual finished");
+		return response;
+
 	}
 
 	/**

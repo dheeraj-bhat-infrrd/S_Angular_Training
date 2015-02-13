@@ -36,9 +36,9 @@ public interface CommonConstants {
 	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
 	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
 	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
-	
+
 	/**
-	 *  Accounts master constants 
+	 * Accounts master constants
 	 */
 	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
 	public static final int ACCOUNTS_MASTER_TEAM = 2;
@@ -115,7 +115,7 @@ public interface CommonConstants {
 	public static final String AGENT_ID_COLUMN = "agentId";
 	public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
 	public static final String UPDATED_ON = "updatedOn";
-	
+
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -143,7 +143,7 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
-	
+
 	/**
 	 * Batch Constants
 	 */
@@ -196,7 +196,7 @@ public interface CommonConstants {
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
 	public static final String CRM_SOURCE_ENCOMPASS = "ENCOMPASS";
 	public static final String CRM_SOURCE_DOTLOOP = "DOTLOOP";
-	
+
 	// mail content
 	public static final String SURVEY_MAIL_BODY_CATEGORY = "SURVEY_MAIL_BODY_CATEGORY";
 	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
@@ -234,7 +234,7 @@ public interface CommonConstants {
 	public static final String ADDRESS2 = "address2";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
-	
+
 	/*
 	 * Payment detail constants
 	 */
@@ -260,25 +260,27 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_COMPANY_PROFILE_PRECONDITION_FAILURE = 101;
 	public static final int ERROR_CODE_COMPANY_PROFILE_SERVICE_FAILURE = 102;
 	public static final int ERROR_CODE_REGION_PROFILE_PRECONDITION_FAILURE = 103;
-	public static final int ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE= 104;
+	public static final int ERROR_CODE_REGION_PROFILE_SERVICE_FAILURE = 104;
 	public static final int ERROR_CODE_BRANCH_PROFILE_PRECONDITION_FAILURE = 105;
-	public static final int ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE= 106;
+	public static final int ERROR_CODE_BRANCH_PROFILE_SERVICE_FAILURE = 106;
 	public static final int ERROR_CODE_REGION_FETCH_PRECONDITION_FAILURE = 107;
-	public static final int ERROR_CODE_REGION_FETCH_SERVICE_FAILURE= 108;
+	public static final int ERROR_CODE_REGION_FETCH_SERVICE_FAILURE = 108;
 	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 109;
-	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_SERVICE_FAILURE= 110;
+	public static final int ERROR_CODE_COMPANY_INDIVIDUALS_FETCH_SERVICE_FAILURE = 110;
 	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_PRECONDITION_FAILURE = 111;
-	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_SERVICE_FAILURE= 112;
+	public static final int ERROR_CODE_COMPANY_BRANCHES_FETCH_SERVICE_FAILURE = 112;
 	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 113;
-	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE= 114;
+	public static final int ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE = 114;
 	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_PRECONDITION_FAILURE = 115;
 	public static final int ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE = 116;
 	public static final int ERROR_CODE_REGION_INDIVIDUALS_FETCH_PRECONDITION_FAILURE = 117;
 	public static final int ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE = 118;
-	
+	public static final int ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE = 119;
+	public static final int ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE = 120;
+
 	/**
 	 * Service codes
-	 */	
+	 */
 	public static final int SERVICE_CODE_GENERAL = 100;
 	public static final int SERVICE_CODE_COMPANY_PROFILE = 101;
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
@@ -289,4 +291,5 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
 	public static final int SERVICE_CODE_FETCH_REGION_BRANCHES = 108;
 	public static final int SERVICE_CODE_FETCH_REGION_INDIVIDUALS = 109;
+	public static final int SERVICE_CODE_INDIVIDUAL_PROFILE = 110;
 }
