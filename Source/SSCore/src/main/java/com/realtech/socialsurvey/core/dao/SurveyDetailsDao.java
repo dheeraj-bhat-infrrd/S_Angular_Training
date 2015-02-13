@@ -16,8 +16,6 @@ public interface SurveyDetailsDao {
 
 	public void updateFinalScore(long agentId, String customerEmail);
 
-	public double getRatingOfAgentForPastNdays(long agentId, int noOfDays);
-
 	public Map<String, Long> getCountOfCustomersByMood();
 
 	public Map<String, Long> getCountOfCustomersByMoodForAgent(long agentId);
@@ -61,5 +59,7 @@ public interface SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCountForCompany(long companyId);
 
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue);
+
+	double getRatingForPastNdays(String columnName, long columnValue, int noOfDays);
 
 }
