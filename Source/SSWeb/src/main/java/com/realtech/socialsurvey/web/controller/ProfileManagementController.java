@@ -140,13 +140,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
 	public String updateAssociations(Model model, HttpServletRequest request) {
 		LOG.info("Updating associations list");
 		User user = sessionHelper.getCurrentUser();
 		List<Association> associations = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -215,14 +213,14 @@ public class ProfileManagementController {
 			}
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Associations updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -231,13 +229,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/addorupdateaboutme", method = RequestMethod.POST)
 	public String addOrUpdateAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Update about me details");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -308,14 +304,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("About me details updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating about me details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -325,13 +321,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updateprofileaddress", method = RequestMethod.POST)
 	public String updateProfileAddress(Model model, HttpServletRequest request) {
 		LOG.info("Updating contact detail info");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -416,14 +410,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Profile addresses updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating profile address. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -433,13 +427,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updateachievements", method = RequestMethod.POST)
 	public String updateAchievements(Model model, HttpServletRequest request) {
 		LOG.info("Updating achievements list");
 		User user = sessionHelper.getCurrentUser();
 		List<Achievement> achievements = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -509,14 +501,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Achievements updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating achievement details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -525,13 +517,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updatelicenses", method = RequestMethod.POST)
 	public String updateProfileLicenses(Model model, HttpServletRequest request) {
 		LOG.info("Update profile licences");
 		User user = sessionHelper.getCurrentUser();
 		Licenses licenses = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -602,14 +592,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Licence details updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -619,13 +609,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @param fileLocal
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/addoruploadlogo", method = RequestMethod.POST)
 	public String addOrUpdateLogo(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Update profile logo");
 		User user = sessionHelper.getCurrentUser();
 		String logoName = "";
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -691,13 +679,14 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setLogoInSession(session, userSettings);
 			LOG.info("Logo uploaded successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -706,13 +695,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
 	public String updateEmailds(Model model, HttpServletRequest request) {
 		LOG.info("Update mail ids");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -791,14 +778,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Maild ids updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating Mail ids. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// Update mail ids
@@ -845,7 +832,6 @@ public class ProfileManagementController {
 		LOG.info("Update phone numbers");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -924,14 +910,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Contact numbers updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating contact numbers. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// update phone numbers
@@ -974,13 +960,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updatewebaddresses", method = RequestMethod.POST)
 	public String updateWebAddresses(Model model, HttpServletRequest request) {
 		LOG.info("Update web addresses");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -992,6 +976,7 @@ public class ProfileManagementController {
 			List<MiscValues> webAddresses = null;
 			try {
 				String payload = request.getParameter("webAddresses");
+				LOG.info(payload);
 				if (payload == null || payload.isEmpty()) {
 					throw new InvalidInputException("Web addresses passed was null or empty");
 				}
@@ -1059,14 +1044,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Web addresses updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating web addresses. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// update web addresses

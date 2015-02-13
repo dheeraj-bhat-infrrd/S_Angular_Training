@@ -24,7 +24,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	$(this).removeClass('prof-name-edit');
 });
 
-// image upload
+// Profile image upload
 $(document).on('click', '#prof-image-upload', function() {
 	$('#prof-image-edit').click();
 });
@@ -52,7 +52,6 @@ function startCompanyProfilePage() {
 // Update AboutMe details
 function callBackShowAboutMe(data) {
 	$('#intro-about-me').html(data);
-	//initializeGoogleMap();
 	adjustImage();
 }
 
@@ -70,37 +69,38 @@ $(document).on('blur', '#intro-body-text-edit', function() {
 	}
 	delay(function() {
 		var payload = {
-			"aboutMe" : aboutMe
+				"aboutMe" : aboutMe
 		};
 		callAjaxPostWithPayloadData("./addorupdateaboutme.do", callBackOnEditAdboutMeDetails, payload);
-	}, 3000);
-	$('#intro-body-text-edit').hide();
-	var textContent = $('#intro-body-text-edit').val().trim();
-	$('#intro-body-text').text(textContent);
-	$('#intro-body-text').show();
+	}, 0);
 });
 
 function callBackOnEditAdboutMeDetails(data) {
 	$('#prof-message-header').html(data);
-	$("#overlay-toast").html(data);
+	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
+		$('#intro-body-text-edit').hide();
+		var textContent = $('#intro-body-text-edit').val().trim();
+		$('#intro-body-text').text(textContent);
+		$('#intro-body-text').show();
+	}
+	else {
+		$('#intro-body-text-edit').hide();
+		$('#intro-body-text').show();
+	}
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-	
-	callAjaxGET("./fetchaboutme.do", callBackShowAboutMe);
 }
 
 
 // TODO Update Contact details
-function showContactDetails() {
-	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-}
-
 function callBackShowContactDetails(data) {
 	$('#contant-info-container').html(data);
 	adjustImage();
 }
 
-// Function to update email id's in contact details
-$(document).on('blur', '#contant-info-container input[data-email]', function() {
+// Email id's in contact details
+/*$(document).on('blur', '#contant-info-container input[data-email]', function() {
 	delay(function() {
 		var mailIds = [];
 		$('#contant-info-container input[data-email]').each(function() {
@@ -122,96 +122,86 @@ $(document).on('blur', '#contant-info-container input[data-email]', function() {
 function callBackOnUpdateMailIds(data) {
 	$('#prof-message-header').html(data);
 	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showContactDetails();
-	} else {
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
+		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	}
-}
 
-// Function to update phone numbers in contact details
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+}*/
+
+// Phone numbers in contact details
 $(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
 	delay(function() {
-		updatePhoneNumbersInContactDetails();
+		var phoneNumbers = [];
+		$('#contant-info-container input[data-phone-number]').each(function() {
+			if (this.value != "") {
+				var phoneNumber = {};
+				phoneNumber.key = $(this).attr("data-phone-number");
+				phoneNumber.value = this.value;
+				phoneNumbers.push(phoneNumber);
+			}
+		});
+		phoneNumbers = JSON.stringify(phoneNumbers);
+		var payload = {
+			"phoneNumbers" : phoneNumbers
+		};
+		callAjaxPostWithPayloadData("./updatephonenumbers.do", callBackOnUpdatePhoneNumbers, payload);
 	}, 0);
 });
-
-function updatePhoneNumbersInContactDetails() {
-	var phoneNumbers = [];
-	$('#contant-info-container input[data-phone-number]').each(function() {
-		if (this.value != "") {
-			var phoneNumber = {};
-			phoneNumber.key = $(this).attr("data-phone-number");
-			phoneNumber.value = this.value;
-			phoneNumbers.push(phoneNumber);
-		}
-	});
-	phoneNumbers = JSON.stringify(phoneNumbers);
-	var payload = {
-		"phoneNumbers" : phoneNumbers
-	};
-	callAjaxPostWithPayloadData("./updatephonenumbers.do",
-			callBackOnUpdatePhoneNumbers, payload);
-}
 
 function callBackOnUpdatePhoneNumbers(data) {
 	$('#prof-message-header').html(data);
 	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showContactDetails();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
+		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	}
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 }
 
 // Function to update web addresses in contact details
-$(document).on('blur', '#contant-info-container input[data-web-address]',
-		function() {
-			delay(function() {
-				updateWebAddressesInContactDetails();
-			}, 0);
-		});
-
-function updateWebAddressesInContactDetails() {
-	var webAddresses = [];
-	var i = 0;
-	var webAddressValid = true;
-	$('#contant-info-container input[data-web-address]').each(function() {
-		var link = $.trim(this.value);
-		if (link != "") {
-			if(isValidUrl(link)){
+$(document).on('blur', '#contant-info-container input[data-web-address]', function() {
+	delay(function() {
+		var webAddresses = [];
+		var i = 0;
+		var webAddressValid = true;
+		$('#contant-info-container input[data-web-address]').each(function() {
+			var link = $.trim(this.value);
+			console.log(link);
+			if (link != "") {
+				if (isValidUrl(link)) {
 					var webAddress = {};
 					webAddress.key = $(this).attr("data-web-address");
 					webAddress.value = link;
 					webAddresses[i++] = webAddress;
-			}else{
-				return;
-				$(this).focus();
-				webAddressValid = false;
+				} else {
+					return;
+					$(this).focus();
+					webAddressValid = false;
+				}
 			}
-				
+		});
+		if (!webAddressValid) {
+			alert("Invalid web address");
+			return false;
 		}
-	});
-	if(!webAddressValid){
-		alert("Invalid web address");
-		return false;
-	}
-	webAddresses = JSON.stringify(webAddresses);
-	var payload = {
-		"webAddresses" : webAddresses
-	};
-	callAjaxPostWithPayloadData("./updatewebaddresses.do",
-			callBackOnUpdateWebAddresses, payload);
-}
+		webAddresses = JSON.stringify(webAddresses);
+		var payload = {
+			"webAddresses" : webAddresses
+		};
+		callAjaxPostWithPayloadData("./updatewebaddresses.do", callBackOnUpdateWebAddresses, payload);
+	}, 0);
+});
 
 function callBackOnUpdateWebAddresses(data) {
 	$('#prof-message-header').html(data);
 	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showContactDetails();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
+		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	}
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 }
-
-
 
 
 

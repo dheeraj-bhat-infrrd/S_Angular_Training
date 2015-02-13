@@ -7,7 +7,8 @@
 </c:if>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mail"></div>
-	<input class="float-left lp-con-row-item prof-edditable-sin" data-email="work" value="${mailIds.work}" readonly="readonly">
+	<%-- <input class="float-left lp-con-row-item prof-edditable-sin" data-email="work" value="${mailIds.work}" readonly="readonly"> --%>
+	<div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div>
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-web"></div>
