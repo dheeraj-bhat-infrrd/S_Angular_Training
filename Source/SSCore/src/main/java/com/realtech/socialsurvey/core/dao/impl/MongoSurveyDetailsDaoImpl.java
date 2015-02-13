@@ -61,8 +61,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
-		update.set("customerEmail", customerEmail + "#" + new Timestamp(System.currentTimeMillis()));
-		update.set(CommonConstants.UPDATED_ON, new Date());
+		update.set(CommonConstants.CUSTOMER_EMAIL_COLUMN, customerEmail + "#" + new Timestamp(System.currentTimeMillis()));
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateEmailForExistingFeedback() to insert details of survey finished.");
 	}
@@ -78,7 +78,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
 		update.set("stage", stage);
-		update.set(CommonConstants.UPDATED_ON, new Date());
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		update.pull("surveyResponse", new BasicDBObject("question", surveyResponse.getQuestion()));
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		mongoTemplate.updateMulti(query, new Update().push("surveyResponse", surveyResponse), SURVEY_DETAILS_COLLECTION);
@@ -99,7 +99,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set("stage", CommonConstants.SURVEY_STAGE_COMPLETE);
 		update.set("mood", mood);
 		update.set("review", review);
-		update.set(CommonConstants.UPDATED_ON, new Date());
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
 	}
@@ -115,13 +115,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		ratingType.add("sb-range-smiles");
 		ratingType.add("sb-range-scale");
 		ratingType.add("sb-range-star");
-		query.addCriteria(Criteria.where("agentId").is(agentId));
-		query.addCriteria(Criteria.where("customerEmail").is(customerEmail));
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		query.addCriteria(Criteria.where("surveyResponse.questionType").in(ratingType));
 		List<SurveyResponse> surveyResponse = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION)
 				.get(CommonConstants.INITIAL_INDEX).getSurveyResponse();
-		int noOfResponse = 0;
-		int answer = 0;
+		double noOfResponse = 0;
+		double answer = 0;
 		for (SurveyResponse response : surveyResponse) {
 			if (response.getQuestionType().equals(ratingType.get(CommonConstants.INITIAL_INDEX))
 					|| response.getQuestionType().equals(ratingType.get(1)) || response.getQuestionType().equals(ratingType.get(2))) {
@@ -132,8 +132,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			}
 		}
 		Update update = new Update();
-		update.set("score", answer / noOfResponse);
-		update.set(CommonConstants.UPDATED_ON, new Date());
+		update.set(CommonConstants.SCORE_COLUMN, answer / noOfResponse);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to calculate and update final score based upon rating questions finished.");
 	}
@@ -283,7 +283,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getCountOfCustomersByMoodForBranch(long branchId) {
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForBranch() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("branchId").is(branchId)), Aggregation.group("mood").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.BRANCH_ID_COLUMN).is(branchId)), Aggregation.group("mood").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> moodSplit = new HashMap<>();
@@ -301,7 +301,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getCountOfCustomersByMoodForRegion(long regionId) {
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForRegion() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("regionId").is(regionId)), Aggregation.group("mood").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.group("mood").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> moodSplit = new HashMap<>();
@@ -319,7 +319,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getCountOfCustomersByMoodForCompany(long companyId) {
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForCompany() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("companyId").is(companyId)), Aggregation.group("mood").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId)), Aggregation.group("mood").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> moodSplit = new HashMap<>();
@@ -392,7 +392,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getCountOfCustomersByReminderMailsForRegion(long regionId) {
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForRegion() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("regionId").is(regionId)), Aggregation.group("reminderCount").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.group("reminderCount").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> reminderCountSplit = new HashMap<>();
@@ -410,7 +410,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getCountOfCustomersByReminderMailsForCompany(long companyId) {
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForCompany() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("companyId").is(companyId)), Aggregation.group("reminderCount").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId)), Aggregation.group("reminderCount").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> reminderCountSplit = new HashMap<>();
@@ -467,7 +467,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForBranch() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
 				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where("branchId").is(branchId)), Aggregation.group("stage").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.BRANCH_ID_COLUMN).is(branchId)), Aggregation.group("stage").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> stageCountSplit = new HashMap<>();
@@ -486,7 +486,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForRegion() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
 				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where("regionId").is(regionId)), Aggregation.group("stage").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.group("stage").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> stageCountSplit = new HashMap<>();
@@ -505,7 +505,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForCompany() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
 				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where("companyId").is(companyId)), Aggregation.group("stage").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId)), Aggregation.group("stage").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> stageCountSplit = new HashMap<>();
@@ -528,26 +528,30 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		// Returns max value for date in the month set in Calendar instance.
 		calendar.set(year, month, calendar.getActualMaximum(5));
 		Date endDate = calendar.getTime();
-		Query query = new Query(Criteria.where(CommonConstants.UPDATED_ON).gte(startDate));
-		query.addCriteria(Criteria.where(CommonConstants.UPDATED_ON).lte(endDate));
+		Query query = new Query(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
 		LOG.info("Method to get count of total number of surveys taken so far, getTotalSurveyCount() finished.");
 		return mongoTemplate.count(query, SurveyDetails.class);
 	}
 
 	@Override
-	public double getRatingOfAgentForPastNdays(long agentId, int noOfDays) {
+	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
 		Calendar calendar = Calendar.getInstance();
 		Date endDate = calendar.getTime();
 		calendar.add(5, noOfDays * (-1));
 		Date startDate = calendar.getTime();
-		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)
-				.andOperator(Criteria.where(CommonConstants.UPDATED_ON).lte(endDate), Criteria.where(CommonConstants.UPDATED_ON).gte(startDate)));
+		if(noOfDays==-1){
+			calendar.setTimeInMillis(0);
+			startDate=calendar.getTime();
+		}
+		Query query = new Query(Criteria.where(columnName).is(columnValue)
+				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate), Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
 				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.UPDATED_ON).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.UPDATED_ON).gte(startDate)), Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)),
-				Aggregation.group(CommonConstants.AGENT_ID_COLUMN).sum("score").as("total_score") //
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
+						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
+				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
 		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
@@ -570,7 +574,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		calendar.set(year, month, calendar.getActualMaximum(5));
 		Date endDate = calendar.getTime();
 		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)
-				.andOperator(Criteria.where(CommonConstants.UPDATED_ON).lte(endDate), Criteria.where(CommonConstants.UPDATED_ON).gte(startDate)));
+				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate), Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
 		long count = mongoTemplate.count(query, SurveyDetails.class);
 		if (count < 3) {
 			LOG.info("Agent " + agentId + " does not qualify for calculation of rating. Returning...");
@@ -578,9 +582,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
 				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.UPDATED_ON).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.UPDATED_ON).gte(startDate)), Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)),
-				Aggregation.group(CommonConstants.AGENT_ID_COLUMN).sum("score").as("total_score") //
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
+						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)),
+				Aggregation.group(CommonConstants.AGENT_ID_COLUMN).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
 		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
@@ -596,8 +600,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCount() {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.unwind("sharedOn"), //
-				Aggregation.group("sharedOn").count().as("count") //
+				Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
+				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> postCountSplit = new HashMap<>();
@@ -615,8 +619,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCountForAgent(long agentId) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForAgent() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)), Aggregation.unwind("sharedOn"), //
-				Aggregation.group("sharedOn").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
+				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> postCountSplit = new HashMap<>();
@@ -634,8 +638,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCountForBranch(long branchId) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForBranch() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("branchId").is(branchId)), Aggregation.unwind("sharedOn"), //
-				Aggregation.group("sharedOn").count().as("count") //
+				Aggregation.match(Criteria.where(CommonConstants.BRANCH_ID_COLUMN).is(branchId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
+				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> postCountSplit = new HashMap<>();
@@ -653,7 +657,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCountForRegion(long regionId) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForRegion() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("regionId").is(regionId)), Aggregation.unwind("sharedOn"), //
+				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
 				Aggregation.group("sharedOn").count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
@@ -672,8 +676,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public Map<String, Long> getSocialPostsCountForCompany(long companyId) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForCompany() started.");
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("companyId").is(companyId)), Aggregation.unwind("sharedOn"), //
-				Aggregation.group("sharedOn").count().as("count") //
+				Aggregation.match(Criteria.where("companyId").is(companyId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
+				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
 		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> postCountSplit = new HashMap<>();
@@ -719,14 +723,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	/*
 	 * Returns a list of feedbacks provided by customers. First sorted on score then on date (both
 	 * descending).
+	 * ColumnName can be "agentId/branchId/regionId/companyId".
+	 * ColumnValue should be value for respective column.
 	 */
 
-	public Map<String, Double> getAllFeedbacks() {
+	public Map<String, Double> getAllFeedbacks(String columnName, String columNValue) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
 		Map<String, Double> feedbackWithRating = new HashMap<>();
 		Query query = new Query();
-		query.with(new Sort(Sort.Direction.DESC, "score"));
-		query.with(new Sort(Sort.Direction.DESC, "updatedOn"));
+		if(columnName!=null){
+			query.addCriteria(Criteria.where(columnName).is(columNValue));
+		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 		for (SurveyDetails survey : surveys) {
 			feedbackWithRating.put(survey.getReview(), survey.getScore());
