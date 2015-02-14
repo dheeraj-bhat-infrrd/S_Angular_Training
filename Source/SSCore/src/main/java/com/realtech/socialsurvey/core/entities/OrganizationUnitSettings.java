@@ -16,6 +16,7 @@ public class OrganizationUnitSettings {
 	private float profile_completion;
 	private String profileName;
 	private String profileUrl;
+	private String profileImageUrl;
 	private String logo;
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
@@ -72,6 +73,14 @@ public class OrganizationUnitSettings {
 
 	public void setProfileUrl(String profileUrl) {
 		this.profileUrl = profileUrl;
+	}
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	public String getLogo() {
@@ -213,10 +222,11 @@ public class OrganizationUnitSettings {
 	@Override
 	public String toString() {
 		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
-				+ profileName + ", profileUrl=" + profileUrl + ", logo=" + logo + ", isLocationEnabled=" + isLocationEnabled + ", isAccountDisabled="
-				+ isAccountDisabled + ", contact_details=" + contact_details + ", vertical=" + vertical + ", crm_info=" + crm_info
-				+ ", mail_content=" + mail_content + ", licenses=" + licenses + ", associations=" + associations + ", achievements=" + achievements
-				+ ", survey_settings=" + survey_settings + ", socialMediaTokens=" + socialMediaTokens + ", lockSettings=" + lockSettings
-				+ ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn + ", modifiedOn=" + modifiedOn + "]";
+				+ profileName + ", profileUrl=" + profileUrl + ", profileImageUrl=" + profileImageUrl + ", logo=" + logo + ", isLocationEnabled="
+				+ isLocationEnabled + ", isAccountDisabled=" + isAccountDisabled + ", contact_details=" + contact_details + ", vertical=" + vertical
+				+ ", crm_info=" + crm_info + ", mail_content=" + mail_content + ", licenses=" + licenses + ", associations=" + associations
+				+ ", achievements=" + achievements + ", survey_settings=" + survey_settings + ", socialMediaTokens=" + socialMediaTokens
+				+ ", lockSettings=" + lockSettings + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn
+				+ ", modifiedOn=" + modifiedOn + "]";
 	}
 }
