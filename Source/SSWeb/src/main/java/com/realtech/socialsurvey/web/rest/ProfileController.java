@@ -159,6 +159,49 @@ public class ProfileController {
 	}
 
 	/**
+	 * Service to get the profile of an individual
+	 * 
+	 * @param individualProfileName
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/individual/{individualProfileName}")
+	public Response getIndividualProfile(@PathVariable String companyProfileName, @PathVariable String individualProfileName) {
+		LOG.info("Service to get profile of individual called for individualProfileName : " + individualProfileName);
+		Response response = null;
+		try {
+			if (companyProfileName == null || companyProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_ALL_REGIONS, "Profile name for company is invalid"),
+						"company profile name is null or empty while fetching profile for individual");
+			}
+			if (individualProfileName == null || individualProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE,
+						"Profile name for individual is invalid"), "individual profile name is null or empty");
+			}
+			OrganizationUnitSettings individualProfile = null;
+			try {
+				individualProfile = profileManagementService.getIndividualByProfileName(companyProfileName, individualProfileName);
+				String json = new Gson().toJson(individualProfile);
+				LOG.debug("individualProfile json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_PROFILE_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_PROFILE, "Profile name for individual is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+
+		LOG.info("Service to get profile of individual finished");
+		return response;
+
+	}
+
+	/**
 	 * Service to fetch all regions for company whose profile name is specified
 	 * 
 	 * @param companyProfileName

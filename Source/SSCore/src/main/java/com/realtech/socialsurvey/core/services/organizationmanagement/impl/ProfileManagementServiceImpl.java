@@ -58,6 +58,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	private GenericDao<Branch, Long> branchDao;
 
 	@Autowired
+	private GenericDao<User, Long> userDao;
+
+	@Autowired
 	private Utils utils;
 
 	@Override
@@ -568,9 +571,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.debug("Fetching branch from db to identify the region");
 		Branch branch = branchDao.findById(Branch.class, branchSettings.getIden());
-		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getRegion()
-				.getRegionId(), MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-		
+		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getRegion().getRegionId(),
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
 		branchSettings = generateBranchProfile(companySettings, regionSettings, branchSettings);
 
 		LOG.info("Method getBranchByProfileName excecuted successfully");
@@ -592,5 +595,35 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Successfully executed method getCompanyDetailsByProfileName. Returning :" + companySettings);
 		return companySettings;
+	}
+
+	/**
+	 * Method to get profile of an individual
+	 */
+	@Override
+	public OrganizationUnitSettings getIndividualByProfileName(String companyProfileName, String agentProfileName) throws InvalidInputException {
+		LOG.info("Method getIndividualByProfileName called for companyProfileName:" + companyProfileName + " and agentProfileName:"
+				+ agentProfileName);
+		OrganizationUnitSettings agentSettings = null;
+
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			throw new InvalidInputException("company profile name is null or empty while getting agent settings");
+		}
+		if (agentProfileName == null || agentProfileName.isEmpty()) {
+			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
+		}
+		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		User user = userDao.findById(User.class, agentSettings.getIden());
+		List<UserProfile> userProfiles = user.getUserProfiles();
+
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			UserProfile userProfile = userProfiles.get(0);
+			
+		}
+		// TODO fetch final agent settings based on the locks
+
+		LOG.info("Method getIndividualByProfileName executed successfully");
+		return agentSettings;
 	}
 }

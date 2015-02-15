@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -78,6 +79,28 @@ public class ProfileManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+
+	/**
+	 * Method to return company profile page
+	 * 
+	 * @param profileName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/companyprofile/{profileName}", method = RequestMethod.GET)
+	public String initCompanyProfilePage(@PathVariable String profileName, Model model) {
+		LOG.info("Service to initiate company profile page called");
+		String message = null;
+		if (profileName == null || profileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("companyProfileName", profileName);
+		LOG.info("Service to initiate company profile page executed successfully");
+		return JspResolver.PROFILE_COMPANY;
+	}
 
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfilePage(Model model, HttpServletRequest request) {
