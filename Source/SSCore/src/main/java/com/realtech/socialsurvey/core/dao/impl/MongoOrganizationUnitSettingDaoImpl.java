@@ -40,6 +40,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_PROFILE_NAME = "profileName";
 	public static final String KEY_PROFILE_URL = "profileUrl";
 	public static final String KEY_LOGO = "logo";
+	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
 	public static final String KEY_CONTACT_DETAILS = "contact_details";
 	public static final String KEY_ASSOCIATION = "associations";
 	public static final String KEY_ACHIEVEMENTS = "achievements";

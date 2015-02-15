@@ -133,9 +133,15 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_IMAGE;
 	}
 
+	@RequestMapping(value = "/fetchprofilelogo", method = RequestMethod.GET)
+	public String fetchProfileLogo() {
+		LOG.info("Fecthing profile logo");
+		return JspResolver.PROFILE_LOGO;
+	}
+
 	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
 	public String fetchProfileSocialLinks() {
-		LOG.info("Fecthing profile image");
+		LOG.info("Fecthing profile links");
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
@@ -748,7 +754,7 @@ public class ProfileManagementController {
 	 * @param request
 	 * @param fileLocal
 	 */
-	@RequestMapping(value = "/addoruploadlogo", method = RequestMethod.POST)
+	@RequestMapping(value = "/updatelogo", method = RequestMethod.POST)
 	public String addOrUpdateLogo(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Update profile logo");
 		User user = sessionHelper.getCurrentUser();
@@ -809,6 +815,93 @@ public class ProfileManagementController {
 				}
 				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, logoName);
 				agentSettings.setLogo(logoName);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			sessionHelper.setLogoInSession(session, userSettings);
+			LOG.info("Logo uploaded successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to add or update profile logo
+	 * 
+	 * @param model
+	 * @param request
+	 * @param fileLocal
+	 */
+	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
+	public String updateProfileImage(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
+		LOG.info("Update profile image");
+		User user = sessionHelper.getCurrentUser();
+		String imageName = "";
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String logoFileName = request.getParameter("logoFileName");
+			try {
+				if (logoFileName == null || logoFileName.isEmpty()) {
+					throw new InvalidInputException("Logo passed is null or empty");
+				}
+				imageName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Error occurred while updating logo.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, imageName);
+				companySettings.setProfileImageUrl(imageName);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, imageName);
+				regionSettings.setProfileImageUrl(imageName);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, imageName);
+				branchSettings.setProfileImageUrl(imageName);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, imageName);
+				agentSettings.setProfileImageUrl(imageName);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {

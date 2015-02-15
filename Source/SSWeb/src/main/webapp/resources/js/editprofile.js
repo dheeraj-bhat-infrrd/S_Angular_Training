@@ -24,22 +24,21 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	$(this).removeClass('prof-name-edit');
 });
 
-// Profile image upload
-$(document).on('click', '#prof-image-upload', function() {
-	$('#prof-image-edit').click();
+$(document).on('click', '.ep-lock', function() {
+	if($(this).val() == 'lock') {
+		$(this).val('unlock');
+	}
+	else if($(this).val() == 'unlock') {
+		$(this).val('lock');
+	}
 });
 
-$(document).on('change', '#prof-image-edit', function() {
-	var formData = new FormData();
-	formData.append("logo", $(this).prop("files")[0]);
-	formData.append("logoFileName", $(this).prop("files")[0].name);
-	updateLogoImage(formData);
-});
 
 // TODO Function to call when the company profile page is loaded
 function startCompanyProfilePage() {
+	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
+	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
 	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	showProfileImage();
 	showProfileSocialLinks();
 
 	// showAssociationList();
@@ -235,25 +234,7 @@ function callBackUpdateBasicDetails(data) {
 }
 
 
-// TODO Function to update logo image
-function updateLogoImage(payload) {
-	callAjaxPOSTWithTextData("./addoruploadlogo.do", callBackOnLogoUpload,
-			false, payload);
-}
-
-function callBackOnLogoUpload(data) {
-	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showProfileImage();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
-}
-
-function showProfileImage() {
-	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
-}
-
+// TODO Function to update profile image
 function callBackShowProfileImage(data) {
 	$('#prof-img-container').html(data);
 	var logoImageUrl = $('#prof-image').css("background-image");
@@ -275,6 +256,67 @@ function callBackShowProfileImage(data) {
 		$('.user-info-logo').css("background-image", logoImageUrl);
 	}
 	adjustImage();
+}
+
+/*$(document).on('click', '#prof-image-upload', function() {
+	$('#prof-image-edit').click();
+});*/
+
+$(document).on('change', '#prof-image-edit', function() {
+	var formData = new FormData();
+	formData.append("logo", $(this).prop("files")[0]);
+	formData.append("logoFileName", $(this).prop("files")[0].name);
+	callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
+});
+
+function callBackOnProfileImageUpload(data) {
+	$('#prof-message-header').html(data);
+	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+}
+
+
+//TODO Function to update profile logo image
+function callBackShowProfileLogo(data) {
+	$('#prof-logo-container').html(data);
+	var logoImageUrl = $('#prof-logo').css("background-image");
+	if (logoImageUrl == undefined || logoImageUrl == "none") {
+		return;
+	}
+	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
+		var userInfoDivider = $('<div>').attr({
+			"class" : "float-left user-info-seperator"
+		});
+		var userInfoLogo = $('<div>').attr({
+			"class" : "float-left user-info-logo"
+		}).css({
+			"background" : logoImageUrl + " no-repeat center",
+			"background-size" : "100% auto"
+		});
+		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
+	} else {
+		$('.user-info-logo').css("background-image", logoImageUrl);
+	}
+	adjustImage();
+}
+
+/*$(document).on('click', '#prof-logo-upload', function() {
+	$('#prof-logo-edit').click();
+});*/
+
+$(document).on('change', '#prof-logo-edit', function() {
+	var formData = new FormData();
+	formData.append("logo", $(this).prop("files")[0]);
+	formData.append("logoFileName", $(this).prop("files")[0].name);
+	callAjaxPOSTWithTextData("./updatelogo.do", callBackOnLogoUpload, false, formData);
+});
+
+function callBackOnLogoUpload(data) {
+	$('#prof-message-header').html(data);
+	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileImage);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 }
 
 
