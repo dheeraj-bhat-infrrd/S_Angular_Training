@@ -170,4 +170,14 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings getCompanyProfileByProfileName(String profileName) throws InvalidInputException;
+
+	/**
+	 * Method to get profile of an individual
+	 * 
+	 * @param companyProfileName
+	 * @param profileName
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getIndividualByProfileName(String companyProfileName, String profileName) throws InvalidInputException;
 }
