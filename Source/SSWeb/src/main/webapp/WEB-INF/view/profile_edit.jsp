@@ -14,7 +14,7 @@
 	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left"><spring:message code="label.header.key" /></div>
+			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
 			<div id="prof-edit-social-link" class="float-right hm-hr-row-right clearfix">
 				<!-- Call JavaScript function to load social page links -->
 			</div>

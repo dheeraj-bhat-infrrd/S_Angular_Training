@@ -7,14 +7,12 @@
 </c:if>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mail"></div>
-	<%-- <input class="float-left lp-con-row-item prof-edditable-sin" data-email="work" value="${mailIds.work}" readonly="readonly"> --%>
 	<div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div>
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-web"></div>
 	<div>
-		<input class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}"
-			placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
+		<input class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
 	  	<div>
 	  		<input type="button" value="lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;">
 	  	</div>
@@ -22,15 +20,28 @@
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-phone"></div>
-	<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
+	<div>
+		<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
+	  	<div>
+	  		<input type="button" value="lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;">
+	  	</div>
+	</div>
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-mbl"></div>
-	<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${ contactNumbers.personal}"
-		placeholder='<spring:message code="label.personalnumber.placeholder.key"/>'>
+	<div>
+		<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personalnumber.placeholder.key"/>'>
+	  	<div>
+	  		<input type="button" value="lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;">
+	  	</div>
+	</div>
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-fax"></div>
-	<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}"
-		placeholder='<spring:message code="label.fax.placeholder.key"/>'>
+	<div>
+		<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
+	  	<div>
+	  		<input type="button" value="lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;">
+	  	</div>
+	</div>
 </div>

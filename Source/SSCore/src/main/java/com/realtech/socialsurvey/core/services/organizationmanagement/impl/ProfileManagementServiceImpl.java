@@ -261,6 +261,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Logo updated successfully");
 	}
 
+	// ProfileImage
+	@Override
+	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String image) throws InvalidInputException {
+		if (image == null || image.isEmpty()) {
+			throw new InvalidInputException("image passed can not be null or empty");
+		}
+		LOG.info("Updating image");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image,
+				companySettings, collection);
+		LOG.info("Image updated successfully");
+	}
+
 	// Associations
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
