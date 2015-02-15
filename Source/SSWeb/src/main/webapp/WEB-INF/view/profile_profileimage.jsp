@@ -1,8 +1,11 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:if test="${not empty profile && not empty profile.profileImageUrl}">
+	<c:set value="${profile.profileImageUrl}" var="profileimage"></c:set>
+</c:if>
 <c:choose>
-	<c:when test="${not empty displayimage}">
-		<div id="prof-image" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${displayimage}) no-repeat center;">
+	<c:when test="${not empty profileimage}">
+		<div id="prof-image" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center;">
 			<div class="prof-download-contact clearfix cursor-pointer">
 				<div id="prof-image-upload" class="clearfix prof-dowload-width">
 					<div class="float-left inc-dl"></div>

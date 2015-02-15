@@ -2,15 +2,22 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
-<c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
-	<c:set value="${cannonicalusersettings.companySettings.contact_details}" var="contactdetail"></c:set>
-	<c:set value="${cannonicalusersettings.companySettings.vertical}" var="companyvertical"></c:set>
+<c:if test="${not empty profile && not empty profile.contact_details}">
+	<c:set value="${profile.contact_details}" var="contactdetail"></c:set>
+</c:if>
+<c:if test="${not empty contactdetail}">
+	<c:set value="${contactdetail.mail_ids}" var="mailIds"></c:set>
+	<c:set value="${contactdetail.contact_numbers}" var="contactNumbers"></c:set>
+	<c:set value="${contactdetail.web_addresses}" var="webAddresses"></c:set>
 </c:if>
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
 	<div id="principal-detail">
 		<input id="profile-user-id" name="profile-user-id" type="hidden" value="${user.userId}">
-		<input id="profile-user" name="profile-user-id" type="hidden" value="${userprofile}">
+		<input id="profile-user" type="hidden" value="${profile}">
+		<input id="profile-user-mail" type="hidden" value="${mailIds.work}">
+		<input id="profile-user-contact" type="hidden" value="${contactNumbers.work}">
+		<input id="profile-user-web" type="hidden" value="${webAddresses.work}">
 	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
@@ -35,8 +42,8 @@
 				<div id="prof-basic-container" class="prof-name-container">
 					<input id="prof-name" class="prof-name prof-edditable" value="${contactdetail.name}">
 					<div class="prof-address">
-						<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${companyvertical}">
-						<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}">
+						<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${profile.vertical}">
+						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}">
 					</div>
 					<div class="prof-rating clearfix">
 						<div class="st-rating-wrapper maring-0 clearfix float-left">
@@ -75,7 +82,38 @@
 							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key" /></div>
 						</div>
 						<div class="left-panel-content" id="contant-info-container">
-							<!-- contact info details to be populated dynamically -->
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-mail"></div>
+								<div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-web"></div>
+								<div>
+									<input class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
+	  								<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+	  							</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-phone"></div>
+								<div>
+									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
+									<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+								</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-mbl"></div>
+								<div>
+									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personalnumber.placeholder.key"/>'>
+									<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+								</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-fax"></div>
+								<div>
+									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
+									<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+								</div>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -251,6 +289,13 @@
 		$(window).resize(adjustImage);
 		startCompanyProfilePage();
 		
+		$('.ep-lock').click(function() {
+			$(this).val(function(i, text){
+		        text === "Lock" ? "Unlock" : "Lock";
+		        $(this).val(text);
+		    });
+		});
+
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
 			$(this).hide();
 			$(this).parent().find('.ppl-share-social,.icn-remove').show();
