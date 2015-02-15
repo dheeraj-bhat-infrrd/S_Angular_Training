@@ -56,6 +56,7 @@ public interface CommonConstants {
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
+	public static final String START_SURVEY = "rest/survey/start";
 
 	/**
 	 * Status constants
@@ -114,7 +115,11 @@ public interface CommonConstants {
 	 */
 	public static final String AGENT_ID_COLUMN = "agentId";
 	public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
-	public static final String UPDATED_ON = "updatedOn";
+	public static final String MODIFIED_ON_COLUMN = "modifiedOn";
+	public static final String SCORE_COLUMN = "score";
+	public static final String SHARED_ON_COLUMN = "sharedOn";
+	public static final String COMPANY_ID_COLUMN = "companyId";
+	
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
