@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
-	<c:set value="${cannonicalusersettings.companySettings.socialMediaTokens}" var="socialMediaTokens"></c:set>
+<c:if test="${not empty profile && not empty profile.socialMediaTokens}">
+	<c:set value="${profile.socialMediaTokens}" var="socialMediaTokens"></c:set>
 </c:if>
 <c:if test="${not empty socialMediaTokens}">
 	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>

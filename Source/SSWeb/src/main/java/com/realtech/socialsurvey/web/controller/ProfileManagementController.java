@@ -122,7 +122,7 @@ public class ProfileManagementController {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		model.addAttribute("userprofile", profile);
+		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_EDIT;
 	}
 

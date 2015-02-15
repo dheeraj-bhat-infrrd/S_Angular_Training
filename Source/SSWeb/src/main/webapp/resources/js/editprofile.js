@@ -24,15 +24,6 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	$(this).removeClass('prof-name-edit');
 });
 
-$(document).on('click', '.ep-lock', function() {
-	if($(this).val() == 'lock') {
-		$(this).val('unlock');
-	}
-	else if($(this).val() == 'unlock') {
-		$(this).val('lock');
-	}
-});
-
 
 // TODO Function to call when the company profile page is loaded
 function startCompanyProfilePage() {
@@ -40,7 +31,6 @@ function startCompanyProfilePage() {
 	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
 	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	showProfileSocialLinks();
-
 	// showAssociationList();
 	// showAchievementList();
 	// showLicenceList();
