@@ -165,6 +165,15 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
+	@RequestMapping(value = "/fetchaddressdetailsedit", method = RequestMethod.GET)
+	public String fetchAddressDetailsEdit(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing basic details for rofile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
+		return JspResolver.PROFILE_ADDRESS_DETAILS_EDIT;
+	}
+
 	@RequestMapping(value = "/fetchprofileimage", method = RequestMethod.GET)
 	public String fetchProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile image");
@@ -259,7 +268,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(unitSettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -272,7 +281,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+			long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -285,7 +294,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+			long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -356,7 +365,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -369,7 +378,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -382,7 +391,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -468,7 +477,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -481,7 +490,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -494,7 +503,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -576,7 +585,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -587,7 +596,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -598,7 +607,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -667,7 +676,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -678,7 +687,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -689,7 +698,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -757,7 +766,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -768,7 +777,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -779,7 +788,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -846,7 +855,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -856,7 +865,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -866,7 +875,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -933,7 +942,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -943,7 +952,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -953,7 +962,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1024,7 +1033,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1037,7 +1046,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1050,7 +1059,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1155,7 +1164,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1168,7 +1177,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1181,7 +1190,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1289,7 +1298,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1302,7 +1311,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1315,7 +1324,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1726,7 +1735,7 @@ public class ProfileManagementController {
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				long regionId = user.getUserProfiles().get(0).getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1739,7 +1748,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				long branchId = user.getUserProfiles().get(0).getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
