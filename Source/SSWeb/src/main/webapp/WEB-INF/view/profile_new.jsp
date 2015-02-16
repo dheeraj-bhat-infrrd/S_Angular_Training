@@ -235,7 +235,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="people-say-wrapper rt-content-main bord-bot-dc">
+                <div class="people-say-wrapper rt-content-main bord-bot-dc" id="reviews-container">
                     <div class="main-con-header" id="prof-reviews-header"><!-- <span class="ppl-say-txt-st">What people say</span> about Anna Thomas --></div>
                     <div id="prof-review-item">
 	                   <!--  reviews get populated here --> 
@@ -258,6 +258,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
 
 <script>
     $(document).ready(function(){
@@ -265,7 +266,7 @@
         fetchCompanyProfile();
         $(window).resize(adjustImage);
         
-        $('.icn-plus-open').click(function(){
+        /* $('.icn-plus-open').click(function(){
             $(this).hide();
             $(this).parent().find('.ppl-share-social,.icn-remove').show();
         });
@@ -274,8 +275,7 @@
             $(this).hide();
             $(this).parent().find('.ppl-share-social').hide();
             $(this).parent().find('.icn-plus-open').show();
-        });
-        
+        }); */        
         $('.icn-person').click(function(){
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
