@@ -26,7 +26,7 @@ function paintCompanyProfile(data) {
 	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
 	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
 	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
-	            headContentHtml = headContentHtml +'	<div class="float-left review-count-left">'+250 +'Reviews</div>';
+	            headContentHtml = headContentHtml +'	<div class="float-left review-count-left" id="prof-company-review-count"></div>';
 	            headContentHtml = headContentHtml +'	</div>';
 	            headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
 	            headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
@@ -36,9 +36,11 @@ function paintCompanyProfile(data) {
 	            var addressHtml = '<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
 	            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
 	            $("#prof-company-address").html(addressHtml);
-	            console.log("logo : "+result.logo);
 	            if(result.logo != undefined) {
 	            	$("#prof-company-logo").css("background", "url("+result.logo+")");
+	            }
+	            if(result.profileImageUrl != undefined) {
+	            	 $("#prof-image").css("background", "url("+result.profileImageUrl+")");
 	            }
 	            
 	            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
@@ -94,10 +96,23 @@ function paintCompanyProfile(data) {
 			}         
 		}
 		fetchCompanyRegions();
+		fetchReviewsForCompany(result.iden);
+		fetchAverageRatings(result.iden);
 	}
 }
 
-function fetchCompanyRegions(start,numOfrows) {
+function fetchAverageRatings(companyId) {
+	var url = window.location.origin +'/rest/profile/ratings/company/'+companyId;
+	callAjaxGET(url, paintAverageRatings, true);
+}
+
+function paintAverageRatings(data) {
+	var responseJson = $.parseJSON(data);
+	console.log(responseJson);
+}
+
+
+function fetchCompanyRegions() {
 	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/regions';
 	callAjaxGET(url, paintCompanyRegions, true);
 }
@@ -106,5 +121,83 @@ function paintCompanyRegions(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		console.log(response);
+	}
+}
+
+function fetchCompanyIndividuals() {
+	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/individuals';
+	callAjaxGET(url, paintCompanyIndividuals, true);
+}
+
+function paintCompanyIndividuals() {
+	var response= $.parseJSON(data);
+	if(response != undefined) {
+		console.log(response);
+	}
+}
+
+function fetchCompanyBranches() {
+	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/branches';
+	callAjaxGET(url, paintCompanyBranches, true);
+}
+
+function paintCompanyBranches(data) {
+	var response= $.parseJSON(data);
+	if(response != undefined) {
+		console.log(response);
+	}
+}
+function fetchReviewsForCompany(companyId) {
+	var url = window.location.origin +'/rest/profile/reviews/company/'+companyId;
+	callAjaxGET(url, paintReviewsForCompany, true);
+}
+
+function paintReviewsForCompany(data) {
+	var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {
+		var result = $.parseJSON(responseJson.entity);
+		var reviewsHtml = "";
+		if(result != undefined && result.length > 0) {
+			var reviewsSizeHtml = result.length;
+			if(result.length == 1) {
+				reviewsSizeHtml = reviewsSizeHtml +' Review';
+			}else {
+				reviewsSizeHtml = reviewsSizeHtml +' Reviews';
+			}
+			$("#prof-company-review-count").html(reviewsSizeHtml);
+			$.each(result,function(i, reviewItem) {
+				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
+				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
+				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';        
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">12<sup>th</sup>Sept 2014</div>';        
+				reviewsHtml=  reviewsHtml+'    </div>';
+				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
+				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix">';
+				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
+				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
+				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
+				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
+				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
+				reviewsHtml=  reviewsHtml+'       </div>';
+				reviewsHtml=  reviewsHtml+'   </div>';
+				reviewsHtml=  reviewsHtml+'	</div>';
+				reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+				reviewsHtml=  reviewsHtml+'		<div class="ppl-share-wrapper clearfix">';
+				reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
+				reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
+				reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
+				reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb"></div>';
+				reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit"></div>';
+				reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin"></div>';
+				reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp"></div>';
+				reviewsHtml=  reviewsHtml+'    	</div>';
+				reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+				reviewsHtml=  reviewsHtml+'	</div>';
+				reviewsHtml=  reviewsHtml+'</div>';
+			});
+			
+			$("#prof-review-item").html(reviewsHtml);
+		}
 	}
 }

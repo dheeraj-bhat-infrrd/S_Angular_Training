@@ -56,7 +56,7 @@
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
                 <div class="prog-img-container">
                     <div id="prof-image" class="prof-image pos-relative"></div>
-                    <div class="prof-rating-mobile-wrapper hide">
+                    <!-- <div class="prof-rating-mobile-wrapper hide">
                         <div class="st-rating-wrapper maring-0 clearfix">
                             <div class="rating-star icn-full-star"></div>
                             <div class="rating-star icn-full-star"></div>
@@ -64,36 +64,18 @@
                             <div class="rating-star icn-no-star"></div>
                             <div class="rating-star icn-no-star"></div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
                 <div class="prof-name-container" id="prof-company-head-content">
-                    <!-- <div class="prof-name">Anna Thomas</div>
-                    <div class="prof-address">
-                        <div class="prof-addline1">Real Estate</div>
-                        <div class="prof-addline2">Chairman's Jacob Mason</div>
-                    </div>
-                    <div class="prof-rating clearfix">
-                        <div class="st-rating-wrapper maring-0 clearfix float-left">
-                            <div class="rating-star icn-full-star"></div>
-                            <div class="rating-star icn-full-star"></div>
-                            <div class="rating-star icn-half-star"></div>
-                            <div class="rating-star icn-no-star"></div>
-                            <div class="rating-star icn-no-star"></div>
-                        </div>
-                        <div class="float-left review-count-left">250 Reviews</div>
-                    </div>
-                    <div class="prof-btn-wrapper">
-                        <div class="prof-btn-survey">Read Write and Share Reviews</div>
-                    </div> -->
+                    <!-- -->
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
                 <div class="prof-user-logo" id="prof-company-logo"></div>
                 <div class="prof-user-address" id="prof-company-address">
-                    <!-- <div class="prof-user-addline1">Providential Utah Real Estate</div>
-                    <div class="prof-user-addline2">574 South State Street<br/>Orem, UT 94058</div> -->
+                    <!-- address comes here -->
                 </div>
             </div>
         </div>
@@ -105,30 +87,7 @@
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header">Contact Information</div>
                         <div class="left-panel-content" id="prof-contact-information">
-                            <!-- <div class="lp-con-row lp-row clearfix">
-                                <div class="float-left lp-con-icn icn-mail"></div>
-                                <div class="float-left lp-con-row-item">Contact Us</div>
-                            </div>
-                            <div class="lp-con-row lp-row clearfix">
-                                <div class="float-left lp-con-icn icn-web"></div>
-                                <div class="float-left lp-con-row-item blue-text">Our Website</div>
-                            </div>
-                            <div class="lp-con-row lp-row clearfix">
-                                <div class="float-left lp-con-icn icn-blog"></div>
-                                <div class="float-left lp-con-row-item blue-text">Our Blogs</div>
-                            </div>
-                            <div class="lp-con-row lp-row clearfix">
-                                <div class="float-left lp-con-icn icn-mbl"></div>
-                                <div class="float-left lp-con-row-item">+1 (801) 123456789</div>
-                            </div>
-                            <div class="lp-con-row lp-row clearfix">
-                                <div class="float-left lp-con-icn icn-phone"></div>
-                                <div class="float-left lp-con-row-item">+1 (801) 123456789</div>
-                            </div>
-                            <div class="lp-con-row lp-row clearfix">
-                                <div class="float-left lp-con-icn icn-fax"></div>
-                                <div class="float-left lp-con-row-item">+1 (801) 123456789</div>
-                            </div> -->
+                            <!--  -->
                         </div>
                     </div>
                 </div>
@@ -261,34 +220,8 @@
                 </div>
                 <div class="people-say-wrapper rt-content-main bord-bot-dc">
                     <div class="main-con-header" id="prof-reviews-header"><!-- <span class="ppl-say-txt-st">What people say</span> about Anna Thomas --></div>
-                    <div class="ppl-review-item">
-                        <div class="ppl-header-wrapper clearfix">
-                            <div class="float-left ppl-header-left">
-                                <div class="ppl-head-1">Matt & Gina Conelly - Lehi, UT</div>
-                                <div class="ppl-head-2">12<sup>th</sup> Sept 2014</div>
-                            </div>
-                            <div class="float-right ppl-header-right">
-                                <div class="st-rating-wrapper maring-0 clearfix">
-                                    <div class="rating-star icn-full-star"></div>
-                                    <div class="rating-star icn-full-star"></div>
-                                    <div class="rating-star icn-half-star"></div>
-                                    <div class="rating-star icn-no-star"></div>
-                                    <div class="rating-star icn-no-star"></div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="ppl-content">Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las.</div>
-                        <div class="ppl-share-wrapper clearfix">
-                            <div class="float-left blue-text ppl-share-shr-txt">Share</div>
-                            <div class="float-left icn-share icn-plus-open"></div>
-                            <div class="float-left clearfix ppl-share-social hide">
-                                <div class="float-left ppl-share-icns icn-fb"></div>
-                                <div class="float-left ppl-share-icns icn-twit"></div>
-                                <div class="float-left ppl-share-icns icn-lin"></div>
-                                <div class="float-left ppl-share-icns icn-yelp"></div>
-                            </div>
-                            <div class="float-left icn-share icn-remove icn-rem-size hide"></div>
-                        </div>
+                    <div id="prof-review-item">
+	                   <!--  reviews get populated here --> 
                     </div>
                 </div>
             </div>

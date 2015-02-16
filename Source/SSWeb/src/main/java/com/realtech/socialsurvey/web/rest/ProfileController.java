@@ -15,6 +15,8 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SurveyDetail;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
@@ -451,7 +453,76 @@ public class ProfileController {
 
 		LOG.info("Service to get all individuals in a branch executed successfully");
 		return response;
+	}
 
+	/**
+	 * @param companyId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/reviews/company/{companyId}")
+	public Response getReviewsForCompany(@PathVariable long companyId) {
+		LOG.info("Service to fetch reviews of company called for companyId:" + companyId);
+		Response response = null;
+		try {
+			if (companyId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Company id for company is invalid"),
+						"company id is not valid while fetching all reviews for a company");
+			}
+			try {
+				List<SurveyDetails> reviews = profileManagementService.getReviewsForCompany(companyId);
+				String json = new Gson().toJson(reviews);
+				LOG.debug("reviews json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching individuals under branch"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+
+		LOG.info("Service to fetch reviews of company completed successfully");
+		return response;
+	}
+
+	/**
+	 * Service to fetch average ratings for company
+	 * 
+	 * @param companyId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/ratings/company/{companyId}")
+	public Response getAverageRatingForCompany(@PathVariable long companyId) {
+		LOG.info("Service to get average rating of company called ");
+		Response response = null;
+		try {
+			if (companyId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_AVERAGE_RATINGS, "Company id for company is invalid"),
+						"company id is not valid while fetching average ratings for a company");
+			}
+			try {
+				double averageRating = profileManagementService.getAverageRatingForCompany(companyId);
+				String json = new Gson().toJson(averageRating);
+				LOG.debug("averageRating json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_AVERAGE_RATINGS, "Something went wrong while fetching average ratings for company"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get average rating of company executed successfully ");
+		return response;
 	}
 
 	/**
