@@ -71,6 +71,7 @@ public class SessionHelper {
 		if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) {
 			// setting the logo name
 			setLogo(session, userSettings);
+			setProfileImage(session, userSettings);
 			// check for the mail content
 			setMailContent(session, userSettings);
 			// set the highest role from the user's profiles
@@ -83,6 +84,7 @@ public class SessionHelper {
 	public void setLogoInSession(HttpSession session, UserSettings userSettings){
 		LOG.info("Setting logo in session");
 		setLogo(session, userSettings);
+		setProfileImage(session, userSettings);
 		LOG.info("Logo successfully updated in session");
 	}
 	
@@ -102,6 +104,20 @@ public class SessionHelper {
 		}
 	}
 	
+	private void setProfileImage(HttpSession session, UserSettings userSettings){
+		LOG.debug("Setting profile image name in the session");
+		// check if company has a logo
+		if (userSettings.getCompanySettings().getProfileImageUrl() != null) {
+			LOG.debug("Settings profile image from company settings");
+			String imageUrl = endpoint + "/" + bucket + "/" + userSettings.getCompanySettings().getProfileImageUrl();
+			session.setAttribute(CommonConstants.IMAGE_DISPLAY_IN_SESSION, imageUrl);
+		}
+		else {
+			LOG.debug("Could not find profile image settings in company. Checking in lower heirarchy.");
+			// TODO: Check the lower level hierarchy for logo
+		}
+	}
+
 	private void setMailContent(HttpSession session, UserSettings userSettings){
 		LOG.debug("Setting mail content in the session");
 		String body = null;

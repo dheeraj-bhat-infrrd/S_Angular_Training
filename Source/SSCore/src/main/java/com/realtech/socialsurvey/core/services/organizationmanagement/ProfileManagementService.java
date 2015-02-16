@@ -38,6 +38,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
+	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
 
 	/**
 	 * Method to update company contact information
