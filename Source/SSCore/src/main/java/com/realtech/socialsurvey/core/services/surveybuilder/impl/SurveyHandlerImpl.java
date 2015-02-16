@@ -53,7 +53,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 	 */
 	@Override
 	@Transactional
-	public Integer storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
 			throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException {
 
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() started.");
@@ -100,7 +100,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 			return null;
 		}
 		else {
-			return survey.getStage();
+			return survey;
 		}
 	}
 

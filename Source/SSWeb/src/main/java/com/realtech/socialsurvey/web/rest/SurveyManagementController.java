@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -139,14 +141,23 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
-				stage = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0);
+				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0);
+				if(survey!=null){
+					stage = survey.getStage();
+					for(SurveyQuestionDetails surveyDetails:surveyQuestionDetails){
+						for(SurveyResponse surveyResponse:survey.getSurveyResponse()){
+							if(surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())){
+								surveyDetails.setCustomerResponse(surveyResponse.getAnswer());
+							}
+						}
+					}
+				}
 			}
 			catch (SolrServerException e) {
 				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
 			}
-			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
-	//		survey = new Gson().toJson(surveyQuestionDetails);
 			surveyAndStage.put("stage", stage);
 			surveyAndStage.put("survey", surveyQuestionDetails);
 		}
@@ -158,7 +169,7 @@ public class SurveyManagementController {
 		return new Gson().toJson(surveyAndStage);
 	}
 
-	private Integer storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
+	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
 			throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
 		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount);
 	}
