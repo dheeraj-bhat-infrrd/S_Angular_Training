@@ -796,7 +796,7 @@
         display: block !important;
     }
     .overlay-toast{
-        display: none;
+       // display: none;
     }
     .header-slider-wrapper{
         display: none;

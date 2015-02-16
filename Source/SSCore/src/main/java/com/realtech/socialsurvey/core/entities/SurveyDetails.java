@@ -18,7 +18,8 @@ public class SurveyDetails {
 	private String review;
 	private String mood;
 	private Date updatedOn;
-	List<String> sharedOn;
+	private List<String> sharedOn;
+	private String initiatedBy;
 	private List<SurveyResponse> surveyResponse;
 	
 	public long getAgentId() {
@@ -104,6 +105,12 @@ public class SurveyDetails {
 	}
 	public void setSharedOn(List<String> sharedOn) {
 		this.sharedOn = sharedOn;
+	}
+	public String getInitiatedBy() {
+		return initiatedBy;
+	}
+	public void setInitiatedBy(String initiatedBy) {
+		this.initiatedBy = initiatedBy;
 	}
 	public List<SurveyResponse> getSurveyResponse() {
 		return surveyResponse;
