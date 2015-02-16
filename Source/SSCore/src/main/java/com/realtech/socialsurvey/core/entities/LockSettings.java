@@ -13,7 +13,7 @@ public class LockSettings {
 	private boolean isSocialTokensLocked;
 	private boolean isSurveySettingsLocked;
 
-	public boolean isLogoLocked() {
+	public boolean getIsLogoLocked() {
 		return isLogoLocked;
 	}
 

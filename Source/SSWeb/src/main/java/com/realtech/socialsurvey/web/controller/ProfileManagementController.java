@@ -105,6 +105,12 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfilePage(Model model, HttpServletRequest request) {
 		LOG.info("Starting the ProfileEdit page");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+		return JspResolver.PROFILE_EDIT;
+	}
+
+	private OrganizationUnitSettings fetchProfile(Model model, HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -122,70 +128,96 @@ public class ProfileManagementController {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		model.addAttribute("profile", profile);
-		return JspResolver.PROFILE_EDIT;
+		return profile;
 	}
 
 	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
-	public String fetchProfileAboutMe() {
+	public String fetchProfileAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile aboutme");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_ABOUT_ME;
 	}
 
 	@RequestMapping(value = "/fetchcontactdetails", method = RequestMethod.GET)
-	public String fetchContactDetails() {
+	public String fetchContactDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing contact details for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_CONTACT_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchbasicdetails", method = RequestMethod.GET)
-	public String fetchBasicDetails() {
+	public String fetchBasicDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing basic details for rofile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_BASIC_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchaddressdetails", method = RequestMethod.GET)
-	public String fetchAddressDetails() {
+	public String fetchAddressDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing basic details for rofile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchprofileimage", method = RequestMethod.GET)
-	public String fetchProfileImage() {
+	public String fetchProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile image");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_IMAGE;
 	}
 
 	@RequestMapping(value = "/fetchprofilelogo", method = RequestMethod.GET)
-	public String fetchProfileLogo() {
+	public String fetchProfileLogo(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile logo");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_LOGO;
 	}
 
 	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
-	public String fetchProfileSocialLinks() {
+	public String fetchProfileSocialLinks(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile links");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
 	// Only for agent
 	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
-	public String fetchAssociations() {
+	public String fetchAssociations(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing association list for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_ASSOCIATIONS;
 	}
 
 	// Only for agent
 	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
-	public String fetchAchievements() {
+	public String fetchAchievements(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing achievement list for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_ACHIEVEMENTS;
 	}
 
 	// Only for agent
 	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
-	public String fetchLicences() {
+	public String fetchLicences(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing license details for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_LICENSES;
 	}
 

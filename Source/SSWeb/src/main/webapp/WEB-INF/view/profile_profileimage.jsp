@@ -5,8 +5,9 @@
 </c:if>
 <c:choose>
 	<c:when test="${not empty profileimage}">
+		<div class="prof-img-lock-item prof-img-lock"></div>
 		<div id="prof-image" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center;">
-			<div class="prof-download-contact clearfix cursor-pointer">
+			<div class="prof-download-contact clearfix cursor-pointer hide">
 				<div id="prof-image-upload" class="clearfix prof-dowload-width">
 					<div class="float-left inc-dl"></div>
 					<div class="float-left txt-download">
@@ -18,7 +19,7 @@
 	</c:when>
 	<c:otherwise>
 		<div id="prof-image" class="prof-image prof-image-edit pos-relative cursor-pointer"	style="background-image:initial; background: no-repeat center;">
-			<div class="prof-download-contact clearfix cursor-pointer">
+			<div class="prof-download-contact clearfix cursor-pointer hide">
 				<div id="prof-image-upload" class="clearfix prof-dowload-width">
 					<div class="float-left inc-dl"></div>
 					<div class="float-left txt-download">
@@ -29,8 +30,8 @@
 		</div>
 	</c:otherwise>
 </c:choose>
-<form enctype="multipart/form-data">
-	<input type="file" id="prof-image-edit" style="display: block;">
+<form class="form_contact_image" enctype="multipart/form-data">
+	<input type="file" class="con_img_inp_file" id="prof-image-edit">
 </form>
 <div class="prof-rating-mobile-wrapper hide">
 	<div class="st-rating-wrapper maring-0 clearfix">
