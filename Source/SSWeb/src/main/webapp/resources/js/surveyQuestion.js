@@ -348,6 +348,7 @@ $('.sq-np-item-prev').click(function() {
 	if (qno == 0) {
 		return;
 	}
+	$("#submit").hide();
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
 	qno--;
