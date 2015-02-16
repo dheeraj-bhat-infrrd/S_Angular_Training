@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.util.List;
 import java.util.Map;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
@@ -61,5 +62,7 @@ public interface SurveyDetailsDao {
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue);
 
 	double getRatingForPastNdays(String columnName, long columnValue, int noOfDays);
+
+	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue);
 
 }

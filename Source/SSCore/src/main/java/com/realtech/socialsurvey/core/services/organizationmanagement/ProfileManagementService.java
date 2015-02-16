@@ -8,6 +8,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -179,4 +180,22 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings getIndividualByProfileName(String companyProfileName, String profileName) throws InvalidInputException;
+
+	/**
+	 * Method to get aggregated reviews of all agents of a company
+	 * 
+	 * @param companyId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<SurveyDetails> getReviewsForCompany(long companyId) throws InvalidInputException;
+
+	/**
+	 * Method to get the average rating of all individuals of a company
+	 * 
+	 * @param companyId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public double getAverageRatingForCompany(long companyId) throws InvalidInputException;
 }
