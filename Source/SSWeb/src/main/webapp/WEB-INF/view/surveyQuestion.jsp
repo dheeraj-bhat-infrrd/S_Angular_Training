@@ -194,7 +194,7 @@
 <script>
 	$(document).ready(
 			function() {
-				/* var survQuesNo = 1;
+				var survQuesNo = 1;
 				var nextQ, prevQ;
 
                 adjustMinHeight();
@@ -217,6 +217,11 @@
                     }
                 );
                 
+                $('.sq-pts-red').click(function(){
+                	$('.sq-pts-item-hover').removeClass('showHoverTab');
+                	$('.pts-hover-1').addClass('showHoverTab');
+                });
+                
                 $('.sq-pts-org').hover(
                     function(){
                         $('.pts-hover-2').show();
@@ -224,6 +229,11 @@
                         $('.pts-hover-2').hide();
                     }
                 );
+                
+                $('.sq-pts-org').click(function(){
+                	$('.sq-pts-item-hover').removeClass('showHoverTab');
+                	$('.pts-hover-2').addClass('showHoverTab');
+                });
                 
                 $('.sq-pts-lgreen').hover(
                     function(){
@@ -233,6 +243,11 @@
                     }
                 );
                 
+                $('.sq-pts-lgreen').click(function(){
+                	$('.sq-pts-item-hover').removeClass('showHoverTab');
+                	$('.pts-hover-3').addClass('showHoverTab');
+                });
+                
                 $('.sq-pts-military').hover(
                     function(){
                         $('.pts-hover-4').show();
@@ -240,6 +255,11 @@
                         $('.pts-hover-4').hide();
                     }
                 );
+                
+                $('.sq-pts-military').click(function(){
+                	$('.sq-pts-item-hover').removeClass('showHoverTab');
+                	$('.pts-hover-4').addClass('showHoverTab');
+                });
                 
                 $('.sq-pts-dgreen').hover(
                     function(){
@@ -249,6 +269,11 @@
                     }
                 );
                 
+                $('.sq-pts-dgreen').click(function(){
+                	$('.sq-pts-item-hover').removeClass('showHoverTab');
+                	$('.pts-hover-5').addClass('showHoverTab');
+                });
+                
 				$('.st-checkbox-on').click(function() {
 					$(this).hide();
 					$(this).parent().find('.st-checkbox-off').show();
@@ -257,7 +282,7 @@
 				$('.st-checkbox-off').click(function() {
 					$(this).hide();
 					$(this).parent().find('.st-checkbox-on').show();
-				}); */
+				});
 				$("div[data-ques-type]").hide();
 				$("div[data-ques-type='user-details']").show();
 //				initSurvey($('#prof-container').attr("data-agentId"));
