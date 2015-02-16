@@ -191,7 +191,7 @@ public interface OrganizationManagementService {
 	 * @param companyProfileName
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws NoRecordsFetchedException
 	 */
 	public List<Branch> getBranchesUnderCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
 
@@ -223,7 +223,16 @@ public interface OrganizationManagementService {
 	 * @param company
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws NoRecordsFetchedException
 	 */
 	public Region getDefaultRegionForCompany(Company company) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method to get all branches under the region whose regionId is providedf
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Branch> getBranchesByRegionId(long regionId) throws InvalidInputException;
 }
