@@ -214,7 +214,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	private void updateSettings(OrganizationUnitSettings higherSettings, OrganizationUnitSettings lowerSettings, LockSettings finalLock) {
 		LockSettings lock = higherSettings.getLockSettings();
 		if (lock != null) {
-			if (lock.isLogoLocked() && !finalLock.isLogoLocked()) {
+			if (lock.getIsLogoLocked() && !finalLock.getIsLogoLocked()) {
 				lowerSettings.setLogo(higherSettings.getLogo());
 				finalLock.setLogoLocked(true);
 			}
@@ -267,6 +267,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOGO, logo, companySettings,
 				collection);
 		LOG.info("Logo updated successfully");
+	}
+
+	// ProfileImage
+	@Override
+	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String image) throws InvalidInputException {
+		if (image == null || image.isEmpty()) {
+			throw new InvalidInputException("image passed can not be null or empty");
+		}
+		LOG.info("Updating image");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_IMAGE, image,
+				companySettings, collection);
+		LOG.info("Image updated successfully");
 	}
 
 	// Associations

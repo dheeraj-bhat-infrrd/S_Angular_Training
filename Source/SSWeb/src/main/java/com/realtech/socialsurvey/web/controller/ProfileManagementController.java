@@ -103,143 +103,122 @@ public class ProfileManagementController {
 	}
 
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
-	public String showProfilePage() {
-		LOG.info("Started the profile page");
-		return JspResolver.PROFILE_EDIT_AGENT;
+	public String showProfilePage(Model model, HttpServletRequest request) {
+		LOG.info("Starting the ProfileEdit page");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+		return JspResolver.PROFILE_EDIT;
+	}
+
+	private OrganizationUnitSettings fetchProfile(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+		OrganizationUnitSettings profile = null;
+		try {
+			long agentId = user.getUserProfiles().get(0).getAgentId();
+			long branchId = user.getUserProfiles().get(0).getBranchId();
+			long regionId = user.getUserProfiles().get(0).getRegionId();
+			LOG.info("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
+			profile = profileManagementService.finalizeProfile(user, accountType, settings, agentId, branchId, regionId);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return profile;
+	}
+
+	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
+	public String fetchProfileAboutMe(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing profile aboutme");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+		return JspResolver.PROFILE_ABOUT_ME;
 	}
 
 	@RequestMapping(value = "/fetchcontactdetails", method = RequestMethod.GET)
-	public String fetchContactDetails() {
+	public String fetchContactDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing contact details for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_CONTACT_DETAILS;
 	}
 
-	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
-	public String fetchAssociations() {
-		LOG.info("Fecthing association list for profile");
-		return JspResolver.PROFILE_ASSOCIATIONS;
-	}
-
-	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
-	public String fetchAchievements() {
-		LOG.info("Fecthing achievement list for profile");
-		return JspResolver.PROFILE_ACHIEVEMENTS;
-	}
-
-	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
-	public String fetchLicences() {
-		LOG.info("Fecthing license details for profile");
-		return JspResolver.PROFILE_LICENSES;
+	@RequestMapping(value = "/fetchbasicdetails", method = RequestMethod.GET)
+	public String fetchBasicDetails(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing basic details for rofile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+		return JspResolver.PROFILE_BASIC_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchaddressdetails", method = RequestMethod.GET)
-	public String fetchAddressDetails() {
-		LOG.info("Fecthing address details for rofile");
+	public String fetchAddressDetails(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing basic details for rofile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchprofileimage", method = RequestMethod.GET)
-	public String fetchProfileImage() {
+	public String fetchProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile image");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_IMAGE;
 	}
 
+	@RequestMapping(value = "/fetchprofilelogo", method = RequestMethod.GET)
+	public String fetchProfileLogo(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing profile logo");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
+		return JspResolver.PROFILE_LOGO;
+	}
+
 	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
-	public String fetchProfileSocialLinks() {
-		LOG.info("Fecthing profile image");
+	public String fetchProfileSocialLinks(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing profile links");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
-	/**
-	 * Method to update associations in profile
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@ResponseBody
-	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
-	public String updateAssociations(Model model, HttpServletRequest request) {
-		LOG.info("Updating associations list");
-		User user = sessionHelper.getCurrentUser();
-		List<Association> associations = null;
-		String message = "";
+	// Only for agent
+	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
+	public String fetchAssociations(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing association list for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
 
-		try {
-			HttpSession session = request.getSession(false);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null) {
-				throw new InvalidInputException("No user settings found in session");
-			}
+		return JspResolver.PROFILE_ASSOCIATIONS;
+	}
 
-			String payload = request.getParameter("associationList");
-			try {
-				if (payload == null || payload.isEmpty()) {
-					throw new InvalidInputException("Association passed was null or empty");
-				}
-				ObjectMapper mapper = new ObjectMapper();
-				associations = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, Association.class));
-			}
-			catch (IOException ioException) {
-				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
-			}
+	// Only for agent
+	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
+	public String fetchAchievements(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing achievement list for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
 
-			if (user.isCompanyAdmin()) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
-				if (companySettings == null) {
-					throw new InvalidInputException("No company settings found in current session");
-				}
-				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
-						companySettings, associations);
-				companySettings.setAssociations(associations);
-				userSettings.setCompanySettings(companySettings);
-			}
-			else if (user.isRegionAdmin()) {
-				long regionId = Integer.parseInt(request.getParameter("region-id"));
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
-				if (regionSettings == null) {
-					throw new InvalidInputException("No Region settings found in current session");
-				}
-				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-						regionSettings, associations);
-				regionSettings.setAssociations(associations);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
-			}
-			else if (user.isBranchAdmin()) {
-				long branchId = Integer.parseInt(request.getParameter("branch-id"));
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
-				if (branchSettings == null) {
-					throw new InvalidInputException("No Branch settings found in current session");
-				}
-				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-						branchSettings, associations);
-				branchSettings.setAssociations(associations);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
-			}
-			else if (user.isAgent()) {
-				long agentId = Integer.parseInt(request.getParameter("agent-id"));
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
-				if (agentSettings == null) {
-					throw new InvalidInputException("No Agent settings found in current session");
-				}
-				associations = profileManagementService.addAgentAssociations(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-						agentSettings, associations);
-				agentSettings.setAssociations(associations);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
-			}
-			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
-			}
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			LOG.info("Associations updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-		}
-		return message;
+		return JspResolver.PROFILE_ACHIEVEMENTS;
+	}
+
+	// Only for agent
+	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
+	public String fetchLicences(Model model, HttpServletRequest request) {
+		LOG.info("Fecthing license details for profile");
+		OrganizationUnitSettings profile = fetchProfile(model, request);
+		model.addAttribute("profile", profile);
+
+		return JspResolver.PROFILE_LICENSES;
 	}
 
 	/**
@@ -248,13 +227,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/addorupdateaboutme", method = RequestMethod.POST)
 	public String addOrUpdateAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Update about me details");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -325,14 +302,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("About me details updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating about me details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -342,13 +319,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
-	@RequestMapping(value = "/updateprofileaddress", method = RequestMethod.POST)
-	public String updateProfileAddress(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/updatebasicprofile", method = RequestMethod.POST)
+	public String updateBasicDetial(Model model, HttpServletRequest request) {
 		LOG.info("Updating contact detail info");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -359,13 +334,12 @@ public class ProfileManagementController {
 
 			// Get the profile address parameters
 			String name = request.getParameter("profName");
-			String address1 = request.getParameter(CommonConstants.ADDRESS1);
-			String address2 = request.getParameter(CommonConstants.ADDRESS2);
+			String title = request.getParameter("profTitle");
 			if (name == null || name.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			if (address1 == null || address1.isEmpty()) {
-				throw new InvalidInputException("Address 1 passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			if (title == null || title.isEmpty()) {
+				throw new InvalidInputException("Title passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			if (user.isCompanyAdmin()) {
@@ -374,9 +348,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
 				companySettings.setContact_details(contactDetailsSettings);
@@ -388,10 +360,7 @@ public class ProfileManagementController {
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
-				contactDetailsSettings = regionSettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
 				regionSettings.setContact_details(contactDetailsSettings);
@@ -404,9 +373,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
 				branchSettings.setContact_details(contactDetailsSettings);
@@ -419,9 +386,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
-				contactDetailsSettings.setName(name);
-				contactDetailsSettings.setAddress1(address1);
-				contactDetailsSettings.setAddress2(address2);
+				updateBasicDetail(contactDetailsSettings, name, title);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
@@ -433,14 +398,136 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Profile addresses updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating profile address. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating profile basic details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	// Update address details
+	private void updateBasicDetail(ContactDetailsSettings contactDetailsSettings, String name, String title) {
+		contactDetailsSettings.setName(name);
+		contactDetailsSettings.setTitle(title);
+	}
+
+	/**
+	 * Method to update profile addresses in profile
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updateprofileaddress", method = RequestMethod.POST)
+	public String updateProfileAddress(Model model, HttpServletRequest request) {
+		LOG.info("Updating contact detail info");
+		User user = sessionHelper.getCurrentUser();
+		ContactDetailsSettings contactDetailsSettings = null;
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			// Get the profile address parameters
+			String name = request.getParameter("profName");
+			String address1 = request.getParameter(CommonConstants.ADDRESS1);
+			String address2 = request.getParameter(CommonConstants.ADDRESS2);
+			String country = request.getParameter(CommonConstants.COUNTRY);
+			String zipcode = request.getParameter(CommonConstants.ZIPCODE);
+			if (name == null || name.isEmpty()) {
+				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			if (address1 == null || address1.isEmpty()) {
+				throw new InvalidInputException("Address 1 passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			if (country == null || country.isEmpty()) {
+				throw new InvalidInputException("country passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			if (zipcode == null || zipcode.isEmpty()) {
+				throw new InvalidInputException("zipcode passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				contactDetailsSettings = companySettings.getContact_details();
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
+				companySettings.setContact_details(contactDetailsSettings);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
+				regionSettings.setContact_details(contactDetailsSettings);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				contactDetailsSettings = branchSettings.getContact_details();
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = profileManagementService.updateContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
+				branchSettings.setContact_details(contactDetailsSettings);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				contactDetailsSettings = agentSettings.getContact_details();
+				updateAddressDetail(contactDetailsSettings, name, address1, address2, country, zipcode);
+				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
+						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
+				agentSettings.setContact_details(contactDetailsSettings);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("Profile addresses updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	// Update address details
+	private void updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2, String country,
+			String zipcode) {
+		contactDetailsSettings.setName(name);
+		contactDetailsSettings.setAddress(address1 + ", " + address2);
+		contactDetailsSettings.setAddress1(address1);
+		contactDetailsSettings.setAddress2(address2);
+		contactDetailsSettings.setCountry(country);
+		contactDetailsSettings.setZipcode(zipcode);
 	}
 
 	/**
@@ -450,13 +537,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updateachievements", method = RequestMethod.POST)
 	public String updateAchievements(Model model, HttpServletRequest request) {
 		LOG.info("Updating achievements list");
 		User user = sessionHelper.getCurrentUser();
 		List<Achievement> achievements = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -526,14 +611,104 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Achievements updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating achievement details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to update associations in profile
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
+	public String updateAssociations(Model model, HttpServletRequest request) {
+		LOG.info("Updating associations list");
+		User user = sessionHelper.getCurrentUser();
+		List<Association> associations = null;
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String payload = request.getParameter("associationList");
+			try {
+				if (payload == null || payload.isEmpty()) {
+					throw new InvalidInputException("Association passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				associations = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, Association.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, associations);
+				companySettings.setAssociations(associations);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, associations);
+				regionSettings.setAssociations(associations);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, associations);
+				branchSettings.setAssociations(associations);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				associations = profileManagementService.addAgentAssociations(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+						agentSettings, associations);
+				agentSettings.setAssociations(associations);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			LOG.info("Associations updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -542,13 +717,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updatelicenses", method = RequestMethod.POST)
 	public String updateProfileLicenses(Model model, HttpServletRequest request) {
 		LOG.info("Update profile licences");
 		User user = sessionHelper.getCurrentUser();
 		Licenses licenses = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -619,14 +792,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Licence details updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -636,13 +809,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @param fileLocal
 	 */
-	@ResponseBody
-	@RequestMapping(value = "/addoruploadlogo", method = RequestMethod.POST)
+	@RequestMapping(value = "/updatelogo", method = RequestMethod.POST)
 	public String addOrUpdateLogo(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Update profile logo");
 		User user = sessionHelper.getCurrentUser();
 		String logoName = "";
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -708,13 +879,101 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setLogoInSession(session, userSettings);
 			LOG.info("Logo uploaded successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to add or update profile logo
+	 * 
+	 * @param model
+	 * @param request
+	 * @param fileLocal
+	 */
+	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
+	public String updateProfileImage(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
+		LOG.info("Update profile image");
+		User user = sessionHelper.getCurrentUser();
+		String imageName = "";
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String logoFileName = request.getParameter("logoFileName");
+			try {
+				if (logoFileName == null || logoFileName.isEmpty()) {
+					throw new InvalidInputException("Logo passed is null or empty");
+				}
+				imageName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Error occurred while updating logo.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, imageName);
+				companySettings.setProfileImageUrl(imageName);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Integer.parseInt(request.getParameter("region-id"));
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, imageName);
+				regionSettings.setProfileImageUrl(imageName);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Integer.parseInt(request.getParameter("branch-id"));
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, imageName);
+				branchSettings.setProfileImageUrl(imageName);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = Integer.parseInt(request.getParameter("agent-id"));
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, imageName);
+				agentSettings.setProfileImageUrl(imageName);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			sessionHelper.setLogoInSession(session, userSettings);
+			LOG.info("Logo uploaded successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	/**
@@ -723,13 +982,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
 	public String updateEmailds(Model model, HttpServletRequest request) {
 		LOG.info("Update mail ids");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -808,14 +1065,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Maild ids updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating Mail ids. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// Update mail ids
@@ -856,13 +1113,11 @@ public class ProfileManagementController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updatephonenumbers", method = RequestMethod.POST)
 	public String updatePhoneNumbers(Model model, HttpServletRequest request) {
 		LOG.info("Update phone numbers");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -941,14 +1196,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Contact numbers updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating contact numbers. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// update phone numbers
@@ -991,13 +1246,11 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/updatewebaddresses", method = RequestMethod.POST)
 	public String updateWebAddresses(Model model, HttpServletRequest request) {
 		LOG.info("Update web addresses");
 		User user = sessionHelper.getCurrentUser();
 		ContactDetailsSettings contactDetailsSettings = null;
-		String message = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -1009,6 +1262,7 @@ public class ProfileManagementController {
 			List<MiscValues> webAddresses = null;
 			try {
 				String payload = request.getParameter("webAddresses");
+				LOG.info(payload);
 				if (payload == null || payload.isEmpty()) {
 					throw new InvalidInputException("Web addresses passed was null or empty");
 				}
@@ -1076,14 +1330,14 @@ public class ProfileManagementController {
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Web addresses updated successfully");
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating associations. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			LOG.error("NonFatalException while updating web addresses. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return message;
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// update web addresses
@@ -1426,31 +1680,5 @@ public class ProfileManagementController {
 		}
 		LOG.info("Method findAProfileScroll finished.");
 		return new Gson().toJson(users);
-	}
-
-	@ResponseBody
-	@RequestMapping(value = "/fetchprofile", method = RequestMethod.GET)
-	public String fetchProfileDetail(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing profile");
-
-		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-
-		OrganizationUnitSettings profile = null;
-		try {
-			long agentId = user.getUserProfiles().get(0).getAgentId();
-			long branchId = user.getUserProfiles().get(0).getBranchId();
-			long regionId = user.getUserProfiles().get(0).getRegionId();
-			LOG.info("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
-			profile = profileManagementService.finalizeProfile(user, accountType, settings, agentId, branchId, regionId);
-		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-
-		return new Gson().toJson(profile);
 	}
 }

@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<c:if test="${not empty cannonicalusersettings && not empty cannonicalusersettings.companySettings}">
-	<c:set value="${cannonicalusersettings.companySettings.socialMediaTokens}" var="socialMediaTokens"></c:set>
+<c:if test="${not empty profile && not empty profile.socialMediaTokens}">
+	<c:set value="${profile.socialMediaTokens}" var="socialMediaTokens"></c:set>
 </c:if>
 <c:if test="${not empty socialMediaTokens}">
 	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>
@@ -12,3 +12,4 @@
 <div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 <div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
 <div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+<input id="social-token-text" type="text" class="social-token-text hide" placeholder="<spring:message code="label.socialpage.placeholder.key" />">
