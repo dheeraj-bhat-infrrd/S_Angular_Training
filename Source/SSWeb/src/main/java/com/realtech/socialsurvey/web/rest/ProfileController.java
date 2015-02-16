@@ -15,7 +15,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.SurveyDetail;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
@@ -362,6 +361,13 @@ public class ProfileController {
 
 		LOG.info("Service to fetch all the branches inside a region of company executed successfully");
 		return response;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/region/{regionProfileName}/branches")
+	public Response getBranchesByRegionId(){
+		return null;
+		
 	}
 
 	/**

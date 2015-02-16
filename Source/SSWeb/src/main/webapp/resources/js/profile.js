@@ -108,7 +108,7 @@ function fetchAverageRatings(companyId) {
 
 function paintAverageRatings(data) {
 	var responseJson = $.parseJSON(data);
-	console.log(responseJson);
+	//console.log(responseJson);
 }
 
 
@@ -120,7 +120,20 @@ function fetchCompanyRegions() {
 function paintCompanyRegions(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
-		console.log(response);
+		var result = $.parseJSON(response.entity);
+		console.log(result);
+		if(result != undefined && result.length > 0) {
+			var regionsHtml = "";
+			$.each(result,function(i, region) {
+				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-regionid = '+region.regionId+' id="comp-region-id-"'+region.regionId+'>';
+				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
+				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company"></div>';
+				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
+				regionsHtml = regionsHtml+'	</div>';
+				regionsHtml = regionsHtml+'</div>';
+			});
+			$("#comp-regions-content").html(regionsHtml);
+		}
 	}
 }
 
@@ -131,9 +144,9 @@ function fetchCompanyIndividuals() {
 
 function paintCompanyIndividuals() {
 	var response= $.parseJSON(data);
-	if(response != undefined) {
+	/*if(response != undefined) {
 		console.log(response);
-	}
+	}*/
 }
 
 function fetchCompanyBranches() {
@@ -143,9 +156,9 @@ function fetchCompanyBranches() {
 
 function paintCompanyBranches(data) {
 	var response= $.parseJSON(data);
-	if(response != undefined) {
+	/*if(response != undefined) {
 		console.log(response);
-	}
+	}*/
 }
 function fetchReviewsForCompany(companyId) {
 	var url = window.location.origin +'/rest/profile/reviews/company/'+companyId;
