@@ -11,6 +11,7 @@ import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -80,6 +81,12 @@ public class ProfileManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+	
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
 
 	/**
 	 * Method to return company profile page
@@ -840,6 +847,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
 				logoName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
+				logoName = endpoint + "/" + bucket + "/" +logoName;
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("Error occurred while updating logo.", DisplayMessageConstants.GENERAL_ERROR, e);
@@ -927,6 +935,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
 				imageName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
+				imageName = endpoint + "/" + bucket + "/" +imageName;
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("Error occurred while updating logo.", DisplayMessageConstants.GENERAL_ERROR, e);

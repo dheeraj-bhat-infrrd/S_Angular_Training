@@ -94,8 +94,12 @@
                 <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     <div class="left-assoc-wrapper">
                         <div class="left-panel-header">Our Company</div>
-                        <div class="left-panel-content left-panel-content-adj">
-                            <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0">
+                        <!-- hidden fields to capture which region/branch is expanded -->
+                        <input type="hidden" id="regionid-hidden"/>
+                        <input type="hidden" id="branchid-hidden"/>
+                        
+                        <div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+                            <!-- <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0" id="comp-regions">
                                 <div class="lp-sub-header clearfix flat-left-bord">
                                     <div class="lp-sub-img icn-company"></div>
                                     <div class="lp-sub-txt">Northern Providential</div>
@@ -168,6 +172,19 @@
                                 </div>
                                 
                                 
+                            </div> -->
+                            
+                            <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-regions" id="comp-region-id">
+                                <div class="lp-sub-header clearfix flat-left-bord">
+                                    <div class="lp-sub-img icn-company"></div>
+                                    <div class="lp-sub-txt">Northern Providential</div>
+                                </div>
+                            </div>
+                            <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-regions" id="comp-region-id">
+                                <div class="lp-sub-header clearfix flat-left-bord">
+                                    <div class="lp-sub-img icn-company"></div>
+                                    <div class="lp-sub-txt">Southern Providential</div>
+                                </div>
                             </div>
                         </div>
                     </div>
