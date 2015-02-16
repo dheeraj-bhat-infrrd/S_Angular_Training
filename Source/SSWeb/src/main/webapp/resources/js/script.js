@@ -14,6 +14,9 @@ var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
 
+var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
+var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
+
 function validateForm(id) {
 	var validate = true;
 	

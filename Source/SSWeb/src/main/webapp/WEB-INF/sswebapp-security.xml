@@ -11,6 +11,7 @@
 		authentication-manager-ref="authenticationManager">
 		<intercept-url pattern="/" access="permitAll" />
 		<intercept-url pattern="/findapro.do" access="permitAll" />
+		<intercept-url pattern="/findaproscroll.do" access="permitAll" />
 		<intercept-url pattern="/fetchprofile.do" access="permitAll" />
 		<intercept-url pattern="/companyprofile.do" access="permitAll" />
 		
