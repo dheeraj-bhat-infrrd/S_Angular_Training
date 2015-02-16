@@ -41,6 +41,21 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	private MongoTemplate mongoTemplate;
 
 	/*
+	 * Method to fetch survey details on the basis of agentId and customer email.
+	 */
+	@Override
+	public SurveyDetails getSurveyByAgentIdAndCustomerEmail(long agentId, String customerEmail) {
+		LOG.info("Method getSurveyByAgentIdAndCustomerEmail() to insert details of survey started.");
+		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+		if(surveys==null || surveys.size()==0)
+			return null;
+		LOG.info("Method insertSurveyDetails() to insert details of survey finished.");
+		return surveys.get(CommonConstants.INITIAL_INDEX);
+	}
+	
+	/*
 	 * Method to insert survey details into the SURVEY_DETAILS collection.
 	 */
 	@Override
