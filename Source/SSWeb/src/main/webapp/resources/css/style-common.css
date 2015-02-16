@@ -3071,8 +3071,6 @@ button.paypal.is-active {
     left: 80%;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 .prog-img-container{
 	position: relative;
 }
@@ -3082,7 +3080,7 @@ button.paypal.is-active {
 	bottom: 0;
 	width: 100%;
 	opacity: 0;
-	z-index: 9999999;
+	z-index: 999;
 	background-color: #fff;
 	height: 100%;
 }
@@ -3120,7 +3118,7 @@ button.paypal.is-active {
 
 .lp-ach-item-txt{
 	width: 78%;
-=======
+}
 .sq-i-container{
 	width: 400px;
 }
@@ -3142,7 +3140,6 @@ button.paypal.is-active {
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
     padding: 0 10px;
->>>>>>> upstream/master
 }
 
 .lp-edit-locks-locked {
@@ -3154,6 +3151,18 @@ button.paypal.is-active {
 	float: left;
 }
 
+.prof-name-lock{
+	cursor: pointer;
+	width: 46px;
+	height: 33px;
+	background: url(../images/locks.png) no-repeat;
+	background-position: -118px center;
+}
+
+.prof-name-unlock{
+	background-position: 10px center;
+}
+
 .main-con-header-adj{
 	margin-bottom: 5px;
 	line-height: 33px;
@@ -3161,6 +3170,12 @@ button.paypal.is-active {
 
 .abt-locks-adj{
 	height: 33px;
+	width: 33px;
+	background: url(../images/locks.png) no-repeat;
+	background-position: -123px center;
+}
+.abt-locks-adj-locked{
+	background-position: 4px center;
 }
 
 .lp-prog-img-container{
@@ -3184,11 +3199,15 @@ button.paypal.is-active {
 	height: 46px;
 	background-color: rgba(255,255,255,0.6);
 	border-radius: 50%;
+	z-index: 99999;
 }
 
 .prof-img-lock{
 	background: rgba(255,255,255,0.6) url(../images/locks.png) no-repeat;
-	background-position: 10px center;
+	background-position: -123px center;
+}
+.prof-img-lock-locked{
+	background-position: 4px center;
 }
 
 .prof-edit-social-link{
@@ -3197,6 +3216,7 @@ button.paypal.is-active {
 
 .social-token-text{
 	position: absolute;
+	z-index: 9999999999999;
 	top: 63px;
 	left: -30px;
 	height: 40px;
@@ -3230,6 +3250,22 @@ button.paypal.is-active {
 .prof-addr-center {
 	text-align: center;
 }
+
+.prof-edit-icn{
+	position: relative;
+}
+
+.prf-edit-img{
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 32px;
+	border-radius: 50%;
+	cursor:pointer;
+	height: 32px;
+	background: rgba(215, 64, 64, 0.6);
+}
+
 .btn-com{
     background-color: #5CC7EF !important;
 }

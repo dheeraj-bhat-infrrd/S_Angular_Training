@@ -3,15 +3,13 @@ package com.realtech.socialsurvey.core.entities;
 public class LockSettings {
 
 	private boolean isLogoLocked;
-	private boolean isLocationLocked;
-	private boolean isVerticalLocked;
-	private boolean isCRMInfoLocked;
-	private boolean isMailContentLocked;
-	private boolean isLicensesLocked;
-	private boolean isAssociationsLocked;
-	private boolean isAcheivementsLocked;
-	private boolean isSocialTokensLocked;
-	private boolean isSurveySettingsLocked;
+	private boolean isDisplayNameLocked;
+	private boolean isWebAddressLocked;
+	private boolean isWorkPhoneLocked;
+	private boolean isPersonalPhoneLocked;
+	private boolean isFaxPhoneLocked;
+	private boolean isAboutMeLocked;
+	private boolean isAddressLocked;
 
 	public boolean getIsLogoLocked() {
 		return isLogoLocked;
@@ -21,75 +19,60 @@ public class LockSettings {
 		this.isLogoLocked = isLogoLocked;
 	}
 
-	public boolean isLocationLocked() {
-		return isLocationLocked;
+	public boolean getIsDisplayNameLocked() {
+		return isDisplayNameLocked;
 	}
 
-	public void setLocationLocked(boolean isLocationLocked) {
-		this.isLocationLocked = isLocationLocked;
+	public void setDisplayNameLocked(boolean isDisplayNameLocked) {
+		this.isDisplayNameLocked = isDisplayNameLocked;
 	}
 
-	public boolean isVerticalLocked() {
-		return isVerticalLocked;
+	public boolean getIsWebAddressLocked() {
+		return isWebAddressLocked;
 	}
 
-	public void setVerticalLocked(boolean isVerticalLocked) {
-		this.isVerticalLocked = isVerticalLocked;
+	public void setWebAddressLocked(boolean isWebAddressLocked) {
+		this.isWebAddressLocked = isWebAddressLocked;
 	}
 
-	public boolean isCRMInfoLocked() {
-		return isCRMInfoLocked;
+	public boolean getIsWorkPhoneLocked() {
+		return isWorkPhoneLocked;
 	}
 
-	public void setCRMInfoLocked(boolean isCRMInfoLocked) {
-		this.isCRMInfoLocked = isCRMInfoLocked;
+	public void setWorkPhoneLocked(boolean isWorkPhoneLocked) {
+		this.isWorkPhoneLocked = isWorkPhoneLocked;
 	}
 
-	public boolean isMailContentLocked() {
-		return isMailContentLocked;
+	public boolean getIsPersonalPhoneLocked() {
+		return isPersonalPhoneLocked;
 	}
 
-	public void setMailContentLocked(boolean isMailContentLocked) {
-		this.isMailContentLocked = isMailContentLocked;
+	public void setPersonalPhoneLocked(boolean isPersonalPhoneLocked) {
+		this.isPersonalPhoneLocked = isPersonalPhoneLocked;
 	}
 
-	public boolean isLicensesLocked() {
-		return isLicensesLocked;
+	public boolean getIsFaxPhoneLocked() {
+		return isFaxPhoneLocked;
 	}
 
-	public void setLicensesLocked(boolean isLicensesLocked) {
-		this.isLicensesLocked = isLicensesLocked;
+	public void setFaxPhoneLocked(boolean isFaxPhoneLocked) {
+		this.isFaxPhoneLocked = isFaxPhoneLocked;
 	}
 
-	public boolean isAssociationsLocked() {
-		return isAssociationsLocked;
+	public boolean getIsAboutMeLocked() {
+		return isAboutMeLocked;
 	}
 
-	public void setAssociationsLocked(boolean isAssociationsLocked) {
-		this.isAssociationsLocked = isAssociationsLocked;
+	public void setAboutMeLocked(boolean isAboutMeLocked) {
+		this.isAboutMeLocked = isAboutMeLocked;
 	}
 
-	public boolean isAcheivementsLocked() {
-		return isAcheivementsLocked;
+	public boolean getIsAddressLocked() {
+		return isAddressLocked;
 	}
 
-	public void setAcheivementsLocked(boolean isAcheivementsLocked) {
-		this.isAcheivementsLocked = isAcheivementsLocked;
+	public void setAddressLocked(boolean isAddressLocked) {
+		this.isAddressLocked = isAddressLocked;
 	}
 
-	public boolean isSocialTokensLocked() {
-		return isSocialTokensLocked;
-	}
-
-	public void setSocialTokensLocked(boolean isSocialTokensLocked) {
-		this.isSocialTokensLocked = isSocialTokensLocked;
-	}
-
-	public boolean isSurveySettingsLocked() {
-		return isSurveySettingsLocked;
-	}
-
-	public void setSurveySettingsLocked(boolean isSurveySettingsLocked) {
-		this.isSurveySettingsLocked = isSurveySettingsLocked;
-	}
 }

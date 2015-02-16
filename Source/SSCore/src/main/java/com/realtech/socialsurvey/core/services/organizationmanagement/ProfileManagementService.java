@@ -6,6 +6,7 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -41,6 +42,8 @@ public interface ProfileManagementService {
 
 	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
 
+	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings,
+			LockSettings lockSettings) throws InvalidInputException;
 	/**
 	 * Method to update company contact information
 	 * 

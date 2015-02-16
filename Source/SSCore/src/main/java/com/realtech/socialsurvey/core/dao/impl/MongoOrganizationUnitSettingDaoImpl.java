@@ -36,6 +36,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LOCATION_ENABLED = "isLocationEnabled";
 	public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
+	public static final String KEY_LOCK_SETTINGS = "lockSettings";
 
 	public static final String KEY_PROFILE_NAME = "profileName";
 	public static final String KEY_PROFILE_URL = "profileUrl";
