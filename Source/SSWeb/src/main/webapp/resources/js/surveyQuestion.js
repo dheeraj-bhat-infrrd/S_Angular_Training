@@ -197,13 +197,12 @@ function showFeedbackPage(mood) {
 		$("#ques-text-textarea").html(question);
 		break;
 	case "sad":
-		question = "Please let us know what went wrong so that you dont get disappointed next time!";
+		question = "Please let us know what went wrong so that you don't get disappointed next time!";
 		$("#ques-text-textarea").html(question);
 		break;
 	}
 	$("#prev-textarea-smiley").removeClass("sq-np-item-disabled");
 	$("#next-textarea-smiley").addClass("sq-np-item-disabled");
-	$("#next-textarea-smiley").hide();
 	$("#submit").show();
 }
 
@@ -257,82 +256,93 @@ $('.sq-star').click(function() {
 
 // Code to be executed on click of next for all types of questions.
 
-$('.sq-np-item-next').click(
-		function() {
-
-			if (questionDetails.questionType == "sb-sel-mcq"
-					&& customerResponse != undefined) {
-				storeCustomerAnswer(customerResponse);
-			} else if (questionDetails.questionType == "sb-sel-desc"
-					&& customerResponse != undefined) {
-				customerResponse = $("#text-area").val();
-				if (customerResponse == undefined) {
-					customerResponse = "";
-				}
-				storeCustomerAnswer(customerResponse);
-			} else if (questionDetails.questionType == "sb-range-star"){
-				if($('#next-star').hasClass("sq-np-item-disabled")){
-					$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-					showToast();
-					return;
-				}
-			}
-			else if(questionDetails.questionType == "sb-range-smiles"){
-				if($('#next-smile').hasClass("sq-np-item-disabled")){
-					$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-					showToast();
-					return;
-				}
-			}
-			else if(questionDetails.questionType == "sb-range-scale") {
-				if($('#next-scale').hasClass("sq-np-item-disabled")){
-					$('#overlay-toast').html('Please answer the question. You can not skip a rating question.');
-					showToast();
-					return;
-				}
-			}
-			$(".sq-star").removeClass('sq-full-star');
-			qno++;
-			paintSurveyPageFromJson();
-
-			if (questionDetails.questionType == "sb-range-star") {
-				var starVal = parseInt(questionDetails.customerResponse);
-				if (!isNaN(starVal)) {
-					$("#next-star").removeClass("sq-np-item-disabled");
-					$('#sq-stars').find('.sq-star').each(function(index) {
-						if (index < starVal) {
-							$(this).addClass('sq-full-star');
+$('.sq-np-item-next')
+		.click(
+				function() {
+					if (questionDetails.questionType == "sb-sel-mcq"
+							&& customerResponse != undefined) {
+						storeCustomerAnswer(customerResponse);
+					} else if (questionDetails.questionType == "sb-sel-desc"
+							&& customerResponse != undefined) {
+						customerResponse = $("#text-area").val();
+						if (customerResponse == undefined) {
+							customerResponse = "";
 						}
-					});
-				}
-			}
-			if (questionDetails.questionType == "sb-range-smiles") {
-				var smileVal = parseInt(questionDetails.customerResponse);
-				if (!isNaN(smileVal)) {
-					$("#next-smile").removeClass("sq-np-item-disabled");
-					$('#sq-smiles').find('.sq-smile').each(function(index) {
-						if (index < smileVal) {
-							$(this).addClass('sq-full-smile');
+						storeCustomerAnswer(customerResponse);
+					} else if (questionDetails.questionType == "sb-range-star") {
+						if ($('#next-star').hasClass("sq-np-item-disabled")) {
+							$('#overlay-toast')
+									.html(
+											'Please answer the question. You can not skip a rating question.');
+							showToast();
+							return;
 						}
-					});
-				}
-			}
-			if (questionDetails.questionType == "sb-range-scale") {
-				var value = parseInt(questionDetails.customerResponse);
-				if (!isNaN(value)) {
-					$("#next-scale").removeClass("sq-np-item-disabled");
-					$('#range-slider-value').html(value);
-				}
-			}
-			if (questionDetails.questionType == "sb-sel-mcq") {
-				customerResponse = "";
-			}
+					} else if (questionDetails.questionType == "sb-range-smiles") {
+						if ($('#next-smile').hasClass("sq-np-item-disabled")) {
+							$('#overlay-toast')
+									.html(
+											'Please answer the question. You can not skip a rating question.');
+							showToast();
+							return;
+						}
+					} else if (questionDetails.questionType == "sb-range-scale") {
+						if ($('#next-scale').hasClass("sq-np-item-disabled")) {
+							$('#overlay-toast')
+									.html(
+											'Please answer the question. You can not skip a rating question.');
+							showToast();
+							return;
+						}
+					} else if (questionDetails.questionType == "sb-master") {
+						return;
+					}
+					$(".sq-star").removeClass('sq-full-star');
+					qno++;
+					paintSurveyPageFromJson();
 
-		});
+					if (questionDetails.questionType == "sb-range-star") {
+						var starVal = parseInt(questionDetails.customerResponse);
+						if (!isNaN(starVal)) {
+							$("#next-star").removeClass("sq-np-item-disabled");
+							$('#sq-stars').find('.sq-star').each(
+									function(index) {
+										if (index < starVal) {
+											$(this).addClass('sq-full-star');
+										}
+									});
+						}
+					}
+					if (questionDetails.questionType == "sb-range-smiles") {
+						var smileVal = parseInt(questionDetails.customerResponse);
+						if (!isNaN(smileVal)) {
+							$("#next-smile").removeClass("sq-np-item-disabled");
+							$('#sq-smiles').find('.sq-smile').each(
+									function(index) {
+										if (index < smileVal) {
+											$(this).addClass('sq-full-smile');
+										}
+									});
+						}
+					}
+					if (questionDetails.questionType == "sb-range-scale") {
+						var value = parseInt(questionDetails.customerResponse);
+						if (!isNaN(value)) {
+							$("#next-scale").removeClass("sq-np-item-disabled");
+							$('#range-slider-value').html(value);
+						}
+					}
+					if (questionDetails.questionType == "sb-sel-mcq") {
+						customerResponse = "";
+					}
+
+				});
 
 // Code to be executed on click of previous for star and smile questions.
 
 $('.sq-np-item-prev').click(function() {
+	if (qno == 0) {
+		return;
+	}
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
 	qno--;
@@ -412,10 +422,16 @@ $('#start-btn').click(function() {
 	initSurvey(firstName, lastName, email, agentId, agentName);
 });
 
-$('#submit').click(function() {
-	var feedback = $("#text-area").val();
-	updateCustomeResponse(feedback);
-});
+$('#submit')
+		.click(
+				function() {
+					var feedback = $("#text-area").val();
+					updateCustomeResponse(feedback);
+					$('#overlay-toast')
+							.html(
+									'Congratulations! Your survey has been submitted successfully.');
+					showToast();
+				});
 
 $('input[type="range"]').rangeslider({
 	polyfill : false,
