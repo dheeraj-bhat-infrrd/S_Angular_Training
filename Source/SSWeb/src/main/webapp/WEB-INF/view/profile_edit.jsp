@@ -1,29 +1,44 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
+<!-- Setting page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <c:if test="${not empty profile && not empty profile.contact_details}">
+	<c:set value="${profile.logo}" var="profilelogo"></c:set>
+	<c:set value="${profile.profileImageUrl}" var="profileimage"></c:set>
 	<c:set value="${profile.contact_details}" var="contactdetail"></c:set>
+	<c:set value="${profile.lockSettings}" var="lock"></c:set>
+	<c:set value="${profile.socialMediaTokens}" var="socialMediaTokens"></c:set>
 </c:if>
+
 <c:if test="${not empty contactdetail}">
 	<c:set value="${contactdetail.mail_ids}" var="mailIds"></c:set>
 	<c:set value="${contactdetail.contact_numbers}" var="contactNumbers"></c:set>
 	<c:set value="${contactdetail.web_addresses}" var="webAddresses"></c:set>
 </c:if>
+<c:if test="${not empty socialMediaTokens}">
+	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>
+	<c:set value="${socialMediaTokens.twitterToken}" var="twitterToken"></c:set>
+	<c:set value="${socialMediaTokens.linkedInToken}" var="linkedInToken"></c:set>
+	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
+</c:if>
+
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
 	<div id="principal-detail">
 		<input id="profile-user-id" name="profile-user-id" type="hidden" value="${user.userId}">
 		<input id="profile-user" type="hidden" value="${profile}">
-		<input id="profile-user-mail" type="hidden" value="${mailIds.work}">
-		<input id="profile-user-contact" type="hidden" value="${contactNumbers.work}">
-		<input id="profile-user-web" type="hidden" value="${webAddresses}">
 	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
 			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-				<!-- Call JavaScript function to load social page links -->
+				<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
+				<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
+				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 			</div>
 		</div>
 	</div>
@@ -34,15 +49,40 @@
 		<div class="row prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
-					<div class="prof-img-lock-item prof-img-lock"></div>
-					<!-- Call JavaScript function to populate profile image -->
+					<c:choose>
+						<c:when test="${not empty profileimage}">
+							<div id="prof-image" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center;"></div>
+						</c:when>
+						<c:otherwise>
+							<div id="prof-image" class="prof-image prof-image-edit pos-relative cursor-pointer"	style="background-image:initial; background: no-repeat center;"></div>
+						</c:otherwise>
+					</c:choose>
+					<form class="form_contact_image" enctype="multipart/form-data">
+						<input type="file" class="con_img_inp_file" id="prof-image-edit">
+					</form>
+					<div class="prof-rating-mobile-wrapper hide">
+						<div class="st-rating-wrapper maring-0 clearfix">
+							<div class="rating-star icn-full-star"></div>
+							<div class="rating-star icn-full-star"></div>
+							<div class="rating-star icn-half-star"></div>
+							<div class="rating-star icn-no-star"></div>
+							<div class="rating-star icn-no-star"></div>
+						</div>
+					</div>
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
 					<div class="float-left lp-edit-wrapper clearfix float-left">
 						<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-						<div state="unlocked" class="rp-edit-locks float-left lp-edit-locks-locked"></div>
+						<c:choose>
+							<c:when	test="${lock.isDisplayNameLocked && not user.agent}">
+								<div id="prof-name-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+							</c:when>
+							<c:when	test="${not lock.isDisplayNameLocked && not user.agent}">
+								<div id="prof-name-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
+							</c:when>
+						</c:choose>
 					</div>
 					<div class="prof-address">
 						<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${profile.vertical}">
@@ -60,22 +100,32 @@
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
-				<!-- <div class="prof-user-logo"></div> -->
-				<div id="" class="lp-prog-img-container" style="position: relative;">
-					<div id="prof-image" class="prof-image-rp prof-image-edit pos-relative cursor-pointer">
-						
-					</div>
+				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
+					<c:choose>
+						<c:when test="${not empty profilelogo}">
+							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center;"></div>
+							<c:choose>
+								<c:when	test="${lock.isLogoLocked && not user.agent}">
+									<div id="prof-logo-lock" data-state="locked" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+								</c:when>
+								<c:when	test="${not lock.isLogoLocked && not user.agent}">
+									<div id="prof-logo-lock" data-state="unlocked" class="prof-img-lock-item prof-img-lock"></div>
+								</c:when>
+							</c:choose>
+						</c:when>
+						<c:otherwise>
+							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
+						</c:otherwise>
+					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
-						<input type="file" class="con_img_inp_file" id="prof-image-edit">
+						<input type="file" id="prof-logo-edit" class="con_img_inp_file">
 					</form>
 				</div>
 				
-				<div id="prof-address-container" class="prof-user-address">
-					<input id="prof-name" class="prof-user-addline1 prof-edditable prof-addr-center" value="${contactdetail.name}">
-					<input id="prof-address1" class="prof-user-addline1 prof-edditable prof-addr-center" value="${contactdetail.address1}">
-					<input id="prof-address2" class="prof-user-addline2 prof-edditable prof-addr-center" value="${contactdetail.address2}">
-					<input id="prof-country" class="prof-user-addline2 prof-edditable prof-addr-center" value="${contactdetail.country}">
-					<input id="prof-zipcode" class="prof-user-addline2 prof-edditable prof-addr-center" value="${contactdetail.zipcode}">
+				<div id="prof-address-container" class="prof-user-address prof-edit-icn">
+					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
+					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.address}</div>
+					<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
 				</div>
 			</div>
 		</div>
@@ -95,29 +145,57 @@
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-web"></div>
 								<div>
-									<input class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
-	  								<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+									<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
+									<c:choose>
+										<c:when	test="${lock.isWebAddressLocked && not user.agent}">
+											<div id="web-address-work-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not lock.isWebAddressLocked && not user.agent}">
+											<div id="web-address-work-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
 	  							</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-phone"></div>
 								<div class="float-left lp-edit-wrapper clearfix float-left">
-									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
-									<div state="unlocked" class="lp-edit-locks float-left"></div>
+									<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
+									<c:choose>
+										<c:when	test="${lock.isWorkPhoneLocked && not user.agent}">
+											<div id="phone-number-work-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not lock.isWorkPhoneLocked && not user.agent}">
+											<div id="phone-number-work-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
 								</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mbl"></div>
 								<div class="float-left lp-edit-wrapper clearfix float-left">
-									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
-									<div state="unlocked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+									<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}">
+									<c:choose>
+										<c:when	test="${lock.isPersonalPhoneLocked && not user.agent}">
+											<div id="phone-number-personal-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not lock.isPersonalPhoneLocked && not user.agent}">
+											<div id="phone-number-personal-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
 								</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-fax"></div>
 								<div>
-									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
-									<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+									<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
+									<c:choose>
+										<c:when	test="${lock.isFaxPhoneLocked && not user.agent}">
+											<div id="phone-number-fax-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not lock.isFaxPhoneLocked && not user.agent}">
+											<div id="phone-number-fax-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
 								</div>
 							</div>
 						</div>
@@ -125,7 +203,7 @@
 				</div>
 				
 				<c:choose>
-					<c:when	test="${user.companyAdmin}">
+					<c:when	test="${user.agent}">
 						<div class="prof-left-row prof-left-assoc bord-bot-dc">
 							<div class="left-assoc-wrapper">
 								<div class="clearfix">
@@ -172,8 +250,15 @@
 						<div class="float-left">
 							<spring:message code="label.about.key" /> ${contactdetail.name}
 						</div>
-						<div class="float-right">
-							<div state="unlocked" class="abt-locks-adj lp-edit-locks-locked"></div>
+						<div class="float-left">
+							<c:choose>
+								<c:when	test="${lock.isAboutMeLocked && not user.agent}">
+									<div id="aboutme-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+								</c:when>
+								<c:when	test="${not lock.isAboutMeLocked && not user.agent}">
+									<div id="aboutme-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
+								</c:when>
+							</c:choose>
 						</div>
 					</div>
 					<div class="intro-body" id="intro-body-text">
@@ -302,13 +387,6 @@
 		$(window).resize(adjustImage);
 		startCompanyProfilePage();
 		
-		$('.ep-lock').click(function() {
-			$(this).val(function(i, text){
-		        text === "Lock" ? "Unlock" : "Lock";
-		        $(this).val(text);
-		    });
-		});
-
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
 			$(this).hide();
 			$(this).parent().find('.ppl-share-social,.icn-remove').show();

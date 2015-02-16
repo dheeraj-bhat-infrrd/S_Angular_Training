@@ -9,28 +9,84 @@ var delay = (function() {
 
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
-	$(this).addClass('prof-name-edit');
+	var lockId = $(this).attr("id") + "-lock";
+	if($('#' + lockId).attr('data-state') == 'unlocked') {
+		$(this).addClass('prof-name-edit');
+	}
 });
 
 $(document).on('blur', '.prof-edditable', function() {
-	$(this).removeClass('prof-name-edit');
+	var lockId = $(this).attr("id") + "-lock";
+	if($('#' + lockId).attr('data-state') == 'unlocked') {
+		$(this).removeClass('prof-name-edit');
+	}
 });
 
 $(document).on('focus', '.prof-edditable-sin', function() {
-	$(this).addClass('prof-name-edit');
+	var lockId = $(this).attr("id") + "-lock";
+	if($('#' + lockId).attr('data-state') == 'unlocked') {
+		$(this).addClass('prof-name-edit');
+	}
 });
 
 $(document).on('blur', '.prof-edditable-sin', function() {
-	$(this).removeClass('prof-name-edit');
+	var lockId = $(this).attr("id") + "-lock";
+	if($('#' + lockId).attr('data-state') == 'unlocked') {
+		$(this).removeClass('prof-name-edit');
+	}
 });
 
 
+// TODO Lock Settings
+$('.lp-edit-locks').click(function() {
+	var id = $(this).attr("id");
+
+	if($(this).hasClass('lp-edit-locks-locked')) {
+		$(this).removeClass('lp-edit-locks-locked');
+		$(this).attr('data-state', 'unlocked');
+		updateLockSettings(id, false);
+
+	} else {
+		$(this).addClass('lp-edit-locks-locked');
+		$(this).attr('data-state', 'locked');
+		updateLockSettings(id, true);
+	}
+});
+
+$('.prof-img-lock-item').click(function() {
+	var id = $(this).attr("id");
+
+	if($(this).hasClass('prof-img-lock-locked')) {
+		$(this).removeClass('prof-img-lock-locked');
+		$(this).attr('data-state', 'unlocked');
+		updateLockSettings(id, false);
+
+	} else {
+		$(this).addClass('prof-img-lock-locked');
+		$(this).attr('data-state', 'locked');
+		updateLockSettings(id, true);
+	}
+});
+
+function updateLockSettings(id, state) {
+	if (id == undefined || id == "") {
+		return;
+	}
+	delay(function() {
+		var payload = {
+			"id" : id,
+			"state" : state
+		};
+		callAjaxPostWithPayloadData("./updatelocksettings.do", callBackUpdateLock, payload);
+	}, 0);
+}
+
+function callBackUpdateLock () {
+	console.log("updated");
+}
+
 // TODO Function to call when the company profile page is loaded
 function startCompanyProfilePage() {
-	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
-	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
-	// callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	showProfileSocialLinks();
 	// showAssociationList();
 	// showAchievementList();
 	// showLicenceList();
@@ -44,23 +100,27 @@ function callBackShowAboutMe(data) {
 }
 
 $(document).on('click', '#intro-body-text', function() {
-	$(this).hide();
-	var textContent = $(this).text().trim();
-	$('#intro-body-text-edit').val(textContent);
-	$('#intro-body-text-edit').show();
+	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
+		$(this).hide();
+		var textContent = $(this).text().trim();
+		$('#intro-body-text-edit').val(textContent);
+		$('#intro-body-text-edit').show();
+	}
 });
 
 $(document).on('blur', '#intro-body-text-edit', function() {
-	var aboutMe = $('#intro-body-text-edit').val().trim();
-	if (aboutMe == undefined || aboutMe == "") {
-		return;
-	}
-	delay(function() {
-		var payload = {
+	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
+		var aboutMe = $('#intro-body-text-edit').val().trim();
+		if (aboutMe == undefined || aboutMe == "") {
+			return;
+		}
+		delay(function() {
+			var payload = {
 				"aboutMe" : aboutMe
-		};
-		callAjaxPostWithPayloadData("./addorupdateaboutme.do", callBackOnEditAdboutMeDetails, payload);
-	}, 0);
+			};
+			callAjaxPostWithPayloadData("./addorupdateaboutme.do", callBackOnEditAdboutMeDetails, payload);
+		}, 0);
+	}
 });
 
 function callBackOnEditAdboutMeDetails(data) {
