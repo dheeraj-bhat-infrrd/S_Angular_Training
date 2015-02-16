@@ -267,7 +267,7 @@ $('.sq-np-item-next').click(
 
 			if (questionDetails.questionType == "sb-range-star") {
 				var starVal = parseInt(questionDetails.customerResponse);
-				if (starVal != undefined) {
+				if (!isNaN(starVal)) {
 					$("#next-star").removeClass("sq-np-item-disabled");
 					$('#sq-stars').find('.sq-star').each(function(index) {
 						if (index < starVal) {
@@ -278,7 +278,7 @@ $('.sq-np-item-next').click(
 			}
 			if (questionDetails.questionType == "sb-range-smiles") {
 				var smileVal = parseInt(questionDetails.customerResponse);
-				if (smileVal != undefined) {
+				if (!isNaN(smileVal)) {
 					$("#next-smile").removeClass("sq-np-item-disabled");
 					$('#sq-smiles').find('.sq-smile').each(function(index) {
 						if (index < smileVal) {
@@ -289,7 +289,7 @@ $('.sq-np-item-next').click(
 			}
 			if (questionDetails.questionType == "sb-range-scale") {
 				var value = parseInt(questionDetails.customerResponse);
-				if (value != undefined) {
+				if (!isNaN(value)) {
 					$("#next-scale").removeClass("sq-np-item-disabled");
 					$('#range-slider-value').html(value);
 				}

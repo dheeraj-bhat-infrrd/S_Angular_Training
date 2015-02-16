@@ -412,7 +412,26 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		return fetchSurveyQuestions(survey);
 	}
+	
+	@Override
+	@Transactional
+	public void changeSurveyStatus(User user, int status) throws InvalidInputException {
+		LOG.debug("Method changeSurveyStatus() started.");
+		if (user == null) {
+			LOG.error("Invalid argument passed. user cannot be null.");
+			throw new InvalidInputException("Invalid argument passed. User is null in method changeSurveyStatus.");
+		}
+		Survey survey = checkForExistingSurvey(user);
+		if (survey == null) {
+			survey = createNewSurvey(user);
+		}
 
+		survey.setStatus(status);
+		surveyDao.saveOrUpdate(survey);
+		surveyDao.flush();
+		LOG.debug("Method changeSurveyStatus() finished.");
+	}
+	
 	@Override
 	@Transactional
 	public List<SurveyTemplate> getSurveyTemplates(User user) throws InvalidInputException {
@@ -440,6 +459,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 			templates.add(template);
 		}
+	
 		return templates;
 	}
 
