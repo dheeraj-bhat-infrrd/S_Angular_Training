@@ -17,51 +17,25 @@ public interface SurveyDetailsDao {
 
 	public void updateFinalScore(long agentId, String customerEmail);
 
-	public Map<String, Long> getCountOfCustomersByMood();
+	public Map<String, Long> getCountOfCustomersByMood(String columnName, long columnValue);
 
-	public Map<String, Long> getCountOfCustomersByMoodForAgent(long agentId);
+	public Map<String, Long> getCountOfCustomersByReminderMails(String columnName, long columnValue);
 
-	public Map<String, Long> getCountOfCustomersByMoodForBranch(long branchId);
-
-	public Map<String, Long> getCountOfCustomersByMoodForRegion(long regionId);
-
-	public Map<String, Long> getCountOfCustomersByMoodForCompany(long companyId);
-
-	public Map<String, Long> getCountOfCustomersByReminderMails();
-
-	public Map<String, Long> getCountOfCustomersByReminderMailsForAgent(long agentId);
-
-	public Map<String, Long> getCountOfCustomersByReminderMailsForBranch(long branchId);
-
-	public Map<String, Long> getCountOfCustomersByReminderMailsForRegion(long regionId);
-
-	public Map<String, Long> getCountOfCustomersByReminderMailsForCompany(long companyId);
-
-	public Map<String, Long> getCountOfCustomersByStage();
-
-	public Map<String, Long> getCountOfCustomersByStageForAgent(long agentId);
-
-	public Map<String, Long> getCountOfCustomersByStageForBranch(long branchId);
-
-	public Map<String, Long> getCountOfCustomersByStageForRegion(long regionId);
-
-	public Map<String, Long> getCountOfCustomersByStageForCompany(long companyId);
-
+	public Map<String, Long> getCountOfCustomersByStage(String columnName, long columnValue);
+	
 	public long getTotalSurveyCountByMonth(int year, int month);
 
-	public Map<String, Long> getSocialPostsCount();
-
-	public Map<String, Long> getSocialPostsCountForAgent(long agentId);
-
-	public Map<String, Long> getSocialPostsCountForBranch(long branchId);
-
-	public Map<String, Long> getSocialPostsCountForRegion(long regionId);
-
-	public Map<String, Long> getSocialPostsCountForCompany(long companyId);
+	public Map<String, Long> getSocialPostsCount(String columnName, long columnValue);
 
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue);
 
-	double getRatingForPastNdays(String columnName, long columnValue, int noOfDays);
+	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays);
+
+	public long getIncompleteSurveyCount(String columnName, long columnValue);
+
+	public long getCompletedSurveyCount(String columnName, long columnValue);
+
+	public long getSentSurveyCount(String columnName, long columnValue);
 
 	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue);
 
