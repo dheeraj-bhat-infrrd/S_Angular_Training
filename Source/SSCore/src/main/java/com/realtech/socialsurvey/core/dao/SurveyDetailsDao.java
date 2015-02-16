@@ -6,6 +6,8 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 
 public interface SurveyDetailsDao {
 
+	public SurveyDetails getSurveyByAgentIdAndCustomerEmail(long agentId, String customerEmail);
+	
 	public void insertSurveyDetails(SurveyDetails surveyDetails);
 
 	public void updateEmailForExistingFeedback(long agentId, String customerEmail);

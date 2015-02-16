@@ -301,6 +301,7 @@ $('.sq-np-item-next')
 						return;
 					}
 					$(".sq-star").removeClass('sq-full-star');
+					$(".sq-smile").removeClass('sq-full-smile');
 					qno++;
 					paintSurveyPageFromJson();
 
