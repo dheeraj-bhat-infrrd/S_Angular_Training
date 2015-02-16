@@ -37,10 +37,10 @@ function paintCompanyProfile(data) {
 	            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
 	            $("#prof-company-address").html(addressHtml);
 	            if(result.logo != undefined) {
-	            	$("#prof-company-logo").css("background", "url("+result.logo+")");
+	            	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
 	            }
 	            if(result.profileImageUrl != undefined) {
-	            	 $("#prof-image").css("background", "url("+result.profileImageUrl+")");
+	            	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
 	            }
 	            
 	            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
@@ -269,11 +269,15 @@ function paintReviewsForCompany(data) {
 				reviewsSizeHtml = reviewsSizeHtml +' Reviews';
 			}
 			$("#prof-company-review-count").html(reviewsSizeHtml);
+			$("#prof-company-review-count").click(function(){
+				$(window).scrollTop($('#reviews-container').offset().top);
+			});
+			
 			$.each(result,function(i, reviewItem) {
 				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
 				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';        
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';
 				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">12<sup>th</sup>Sept 2014</div>';        
 				reviewsHtml=  reviewsHtml+'    </div>';
 				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
@@ -300,10 +304,22 @@ function paintReviewsForCompany(data) {
 				reviewsHtml=  reviewsHtml+'	</div>';
 				reviewsHtml=  reviewsHtml+'</div>';
 			});
+			
+			$("#prof-review-item").html(reviewsHtml);
+			
 			$(".review-ratings").each(function() {
 				changeRatingPattern($(this).data("rating"), $(this));
 			});
-			$("#prof-review-item").html(reviewsHtml);
+			$('.icn-plus-open').click(function(){
+	            $(this).hide();
+	            $(this).parent().find('.ppl-share-social,.icn-remove').show();
+	        });
+	        
+	        $('.icn-remove').click(function(){
+	            $(this).hide();
+	            $(this).parent().find('.ppl-share-social').hide();
+	            $(this).parent().find('.icn-plus-open').show();
+	        });
 		}
 	}
 }
