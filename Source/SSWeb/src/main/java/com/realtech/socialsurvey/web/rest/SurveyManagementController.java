@@ -17,6 +17,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -41,6 +42,9 @@ public class SurveyManagementController {
 
 	@Autowired
 	private URLGenerator urlGenerator;
+	
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	/*
 	 * Method to store answer to the current question of the survey.
@@ -83,10 +87,24 @@ public class SurveyManagementController {
 		return getApplicationBaseUrl()+"rest/survey/showsurveypage/"+agentId;
 	}
 	
-	@RequestMapping(value="/showsurveypage/{agentId}")
-	public String initiateSurvey(Model model, @PathVariable String agentId){
+	@RequestMapping(value="/showsurveypage/{agentIdStr}")
+	public String initiateSurvey(Model model, @PathVariable String agentIdStr){
 		LOG.info("Method to start survey initiateSurvey() started.");
+		if(agentIdStr==null || agentIdStr.isEmpty()){
+			LOG.error("Invalid agentId passed. Agent Id can not be null or empty.");
+			return "errorpage500";
+		}
+		Long agentId = Long.parseLong(agentIdStr);
+		String agentName = "";
+		try {
+			agentName = solrSearchService.getUserDisplayNameById(agentId);
+		}
+		catch (SolrException | NoRecordsFetchedException | SolrServerException e) {
+			LOG.error("Error occured while fetching display name of agent. Error is : "+e);
+			return "errorpage500";
+		}
 		model.addAttribute("agentId", agentId);
+		model.addAttribute("agentName", agentName);
 		LOG.info("Method to start survey initiateSurvey() finished.");
 		return "surveyQuestion";
 	}
