@@ -428,7 +428,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException {
+	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForBranch");
 		}
@@ -436,31 +436,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("branchProfileName is null or empty in getIndividualsForBranch");
 		}
 		LOG.info("Method getIndividualsForBranch called for companyProfileName: " + companyProfileName + " branchProfileName:" + branchProfileName);
-		List<User> users = null;
+		List<AgentSettings> users = null;
 		OrganizationUnitSettings branchSettings = getBranchByProfileName(companyProfileName, branchProfileName);
 		if (branchSettings != null) {
 			LOG.debug("Fetching user profiles for branchId: " + branchSettings.getIden());
-			users = getUsersFromBranch(branchSettings.getIden());
+			users = getIndividualsByBranchId(branchSettings.getIden());
 		}
 		LOG.info("Method getIndividualsForBranch executed successfully");
-		return users;
-	}
-
-	private List<User> getUsersFromBranch(long branchId) {
-		LOG.info("Method getUsersFromBranch called for branchId:" + branchId);
-		List<User> users = null;
-		Map<String, Object> queries = new HashMap<String, Object>();
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
-		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
-		if (userProfiles != null && !userProfiles.isEmpty()) {
-			users = new ArrayList<User>();
-			for (UserProfile userProfile : userProfiles) {
-				users.add(userProfile.getUser());
-			}
-			LOG.debug("Returning :" + users.size() + " individuals for branch : " + branchId);
-		}
-		LOG.info("Method getUsersFromBranch executed successfully");
 		return users;
 	}
 
@@ -471,7 +453,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<User> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
+	public List<AgentSettings> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
 			NoRecordsFetchedException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForRegion");
@@ -480,7 +462,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("regionProfileName is null or empty in getIndividualsForRegion");
 		}
 		LOG.info("Method getIndividualsForRegion called for companyProfileName:" + companyProfileName + " and branchProfileName:" + regionProfileName);
-		List<User> users = null;
+		List<AgentSettings> users = null;
 		OrganizationUnitSettings regionSettings = getRegionByProfileName(companyProfileName, regionProfileName);
 		if (regionSettings != null) {
 			Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionSettings.getIden());
@@ -495,9 +477,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 			if (userProfiles != null && !userProfiles.isEmpty()) {
 				LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
-				users = new ArrayList<User>();
+				users = new ArrayList<AgentSettings>();
 				for (UserProfile userProfile : userProfiles) {
-					users.add(userProfile.getUser());
+					users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
 				}
 			}
 		}
@@ -511,19 +493,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	@Transactional
-	public List<User> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException {
+	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException {
 		if (companyProfileName == null || companyProfileName.isEmpty()) {
 			throw new InvalidInputException("companyProfileName is null or empty in getIndividualsForCompany");
 		}
 		LOG.info("Method getIndividualsForCompany called for companyProfileName: " + companyProfileName);
-		List<User> users = null;
+		List<AgentSettings> users = null;
 		OrganizationUnitSettings companySettings = getCompanyProfileByProfileName(companyProfileName);
 		if (companySettings != null) {
 			Region defaultRegion = organizationManagementService.getDefaultRegionForCompany(companyDao.findById(Company.class,
 					companySettings.getIden()));
 			if (defaultRegion != null) {
 				Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(defaultRegion.getRegionId());
-				users = getUsersFromBranch(defaultBranch.getBranchId());
+				users = getIndividualsByBranchId(defaultBranch.getBranchId());
 			}
 		}
 		LOG.info("Method getIndividualsForCompany executed successfully");
@@ -656,6 +638,26 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LOG.info("Method getAverageRatingForCompany executed successfully");
 		return averageRating;
+	}
+
+	@Override
+	@Transactional
+	public List<AgentSettings> getIndividualsByBranchId(long branchId) throws InvalidInputException {
+		LOG.info("Method getIndividualsByBranchId called for branchId:" + branchId);
+		List<AgentSettings> users = null;
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			users = new ArrayList<AgentSettings>();
+			for (UserProfile userProfile : userProfiles) {
+				users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
+			}
+			LOG.debug("Returning :" + users.size() + " individuals for branch : " + branchId);
+		}
+		LOG.info("Method getIndividualsByBranchId executed successfully");
+		return null;
 	}
 
 }

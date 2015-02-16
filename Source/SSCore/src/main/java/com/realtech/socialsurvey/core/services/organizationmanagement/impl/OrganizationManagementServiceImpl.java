@@ -1393,22 +1393,35 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		List<Branch> branches = null;
 		OrganizationUnitSettings regionSettings = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
 		if (regionSettings != null) {
-			LOG.debug("fetching branches for region : " + regionSettings.getIden());
-			List<String> columnNames = new ArrayList<String>();
-			columnNames.add(CommonConstants.BRANCH_ID_COLUMN);
-			columnNames.add(CommonConstants.BRANCH_NAME_COLUMN);
-
-			Map<String, Object> queries = new HashMap<String, Object>();
-			queries.put(CommonConstants.REGION_COLUMN, regionDao.findById(Region.class, regionSettings.getIden()));
-			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO);
-			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-
-			branches = branchDao.findProjectionsByKeyValue(Branch.class, columnNames, queries);
+			branches = getBranchesByRegionId(regionSettings.getIden());
 		}
 		else {
 			throw new NoRecordsFetchedException("No region settings found for regionProfileName : " + regionProfileName);
 		}
 		LOG.info("Method getBranchesForRegion executed successfully.");
+		return branches;
+	}
+
+	@Override
+	@Transactional
+	public List<Branch> getBranchesByRegionId(long regionId) throws InvalidInputException {
+		LOG.info("Method getBranchesByRegionId called for regionId:" + regionId);
+
+		if (regionId <= 0l) {
+			throw new InvalidInputException("region id is invalid while fetching branches");
+		}
+		List<Branch> branches = null;
+		List<String> columnNames = new ArrayList<String>();
+		columnNames.add(CommonConstants.BRANCH_ID_COLUMN);
+		columnNames.add(CommonConstants.BRANCH_NAME_COLUMN);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.REGION_COLUMN, regionDao.findById(Region.class, regionId));
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		branches = branchDao.findProjectionsByKeyValue(Branch.class, columnNames, queries);
+		LOG.info("Method getBranchesByRegionId completed successfully");
 		return branches;
 	}
 }

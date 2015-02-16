@@ -275,9 +275,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * 
 	 * @param encryptedUrlParams
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException {
+	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException, SolrException {
 		LOG.info("Method to verify account called for encryptedUrlParams");
 		Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
 		if (urlParams == null || urlParams.isEmpty()) {
@@ -743,10 +744,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	/**
 	 * Method to update a user's status
+	 * @throws SolrException 
 	 */
 	@Override
 	@Transactional
-	public void updateUserStatus(long userId, int status) throws InvalidInputException {
+	public void updateUserStatus(long userId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status);
 		User user = userDao.findById(User.class, userId);
 		if (user == null) {
@@ -757,6 +759,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		userDao.update(user);
 
+		//Updating status of user into Solr.
+		solrSearchService.addUserToSolr(user);
 		LOG.info("Successfully completed method to update user status");
 	}
 

@@ -38,6 +38,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateLogo(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
+
 	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
 
 	/**
@@ -118,7 +119,16 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<User> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
+	public List<AgentSettings> getIndividualsForBranch(String companyProfileName, String branchProfileName) throws InvalidInputException;
+
+	/**
+	 * Method to fetch all users under the specified branch of specified company
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<AgentSettings> getIndividualsByBranchId(long branchId) throws InvalidInputException;
 
 	/**
 	 * Method to fetch all users under the specified region of specified company
@@ -129,7 +139,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public List<User> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
+	public List<AgentSettings> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
 			NoRecordsFetchedException;
 
 	/**
@@ -140,7 +150,7 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public List<User> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
+	public List<AgentSettings> getIndividualsForCompany(String companyProfileName) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to get the region profile based on region and company profile name
