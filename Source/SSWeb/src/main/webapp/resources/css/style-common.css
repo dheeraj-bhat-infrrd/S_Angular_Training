@@ -3057,6 +3057,7 @@ button.paypal.is-active {
     margin-left: 80%;
 }
 
+<<<<<<< HEAD
 .prog-img-container{
 	position: relative;
 }
@@ -3190,4 +3191,23 @@ button.paypal.is-active {
 
 .prof-addr-center {
 	text-align: center;
+}
+.btn-com{
+    background-color: #5CC7EF !important;
+}
+.btn-com:hover{
+    background-color: #7AB400 !important;
+}
+.btn-com:active {
+    background-color: #70A501 !important;
+}
+.btn-com-disabled{
+    cursor: auto !important;
+    background-color: #5CC7EF !important;
+}
+.btn-com-disabled:hover{
+    background-color: #5CC7EF !important;
+}
+.btn-com-disabled:active {
+    background-color: #5CC7EF !important;
 }
