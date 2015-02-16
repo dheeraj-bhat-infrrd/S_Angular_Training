@@ -29,7 +29,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 function startCompanyProfilePage() {
 	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
 	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
-	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
+	// callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 	showProfileSocialLinks();
 	// showAssociationList();
 	// showAchievementList();
@@ -83,7 +83,7 @@ function callBackOnEditAdboutMeDetails(data) {
 
 // TODO Update Contact details
 function callBackShowContactDetails(data) {
-	$('#contant-info-container').html(data);
+	// $('#contant-info-container').html(data);
 	adjustImage();
 }
 
@@ -374,7 +374,8 @@ function addAnAchievement() {
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
 		"placeholder" : "New Achievement"
 	});
-	$('#achievement-container').append(newAchievement);
+	var temp = '<input class="float-left lp-ach-item-txt lp-ach-row lp-row clearfix prof-edditable-sin" value="temp"><div class="float-left lp-ach-item-img"></div>';
+	$('#achievement-container').append(temp);
 	newAchievement.focus();
 }
 
@@ -653,7 +654,7 @@ function adjustImage() {
 	}
 	else {
 		$('.prof-name-container,#prof-image').height(200);
-		var rowW = $('.lp-con-row').width() - 50;
+		var rowW = $('.lp-con-row').width() - 50 - 50; // left image-50; right-locks-50
 		$('.lp-con-row-item').width(rowW + 'px');
 		// $('.lp-con-row-item').width('auto');
 		$('.footer-main-wrapper').show();

@@ -12,3 +12,4 @@
 <div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 <div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
 <div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+<input id="social-token-text" type="text" class="social-token-text hide" placeholder="<spring:message code="label.socialpage.placeholder.key" />">

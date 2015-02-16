@@ -209,7 +209,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	private void updateSettings(OrganizationUnitSettings higherSettings, OrganizationUnitSettings lowerSettings, LockSettings finalLock) {
 		LockSettings lock = higherSettings.getLockSettings();
 		if (lock != null) {
-			if (lock.isLogoLocked() && !finalLock.isLogoLocked()) {
+			if (lock.getIsLogoLocked() && !finalLock.getIsLogoLocked()) {
 				lowerSettings.setLogo(higherSettings.getLogo());
 				finalLock.setLogoLocked(true);
 			}

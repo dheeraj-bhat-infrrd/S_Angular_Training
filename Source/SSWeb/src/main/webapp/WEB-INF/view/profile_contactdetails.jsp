@@ -20,11 +20,9 @@
 </div>
 <div class="lp-con-row lp-row clearfix">
 	<div class="float-left lp-con-icn icn-phone"></div>
-	<div>
+	<div class="float-left lp-edit-wrapper clearfix float-left">
 		<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
-	  	<div>
-	  		<input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;">
-	  	</div>
+		<div state="unlocked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 	</div>
 </div>
 <div class="lp-con-row lp-row clearfix">

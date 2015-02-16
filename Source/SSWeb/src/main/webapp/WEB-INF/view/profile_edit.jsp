@@ -17,15 +17,14 @@
 		<input id="profile-user" type="hidden" value="${profile}">
 		<input id="profile-user-mail" type="hidden" value="${mailIds.work}">
 		<input id="profile-user-contact" type="hidden" value="${contactNumbers.work}">
-		<input id="profile-user-web" type="hidden" value="${webAddresses.work}">
+		<input id="profile-user-web" type="hidden" value="${webAddresses}">
 	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
-			<div id="prof-edit-social-link" class="float-right hm-hr-row-right clearfix">
+			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 				<!-- Call JavaScript function to load social page links -->
 			</div>
-			<input id="social-token-text" type="text" class="hide" placeholder="<spring:message code="label.socialpage.placeholder.key" />">
 		</div>
 	</div>
 </div>
@@ -34,13 +33,17 @@
 	<div class="container">
 		<div class="row prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
-				<div id="prof-img-container" class="prog-img-container">
+				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
+					<div class="prof-img-lock-item prof-img-lock"></div>
 					<!-- Call JavaScript function to populate profile image -->
 				</div>
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
-					<input id="prof-name" class="prof-name prof-edditable" value="${contactdetail.name}">
+					<div class="float-left lp-edit-wrapper clearfix float-left">
+						<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
+						<div state="unlocked" class="rp-edit-locks float-left lp-edit-locks-locked"></div>
+					</div>
 					<div class="prof-address">
 						<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${profile.vertical}">
 						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}">
@@ -58,18 +61,21 @@
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
 				<!-- <div class="prof-user-logo"></div> -->
-				<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
-					<div id="prof-logo-container" class="prog-img-container">
-						<!-- Call JavaScript function to populate profile image -->
+				<div id="" class="lp-prog-img-container" style="position: relative;">
+					<div id="prof-image" class="prof-image-rp prof-image-edit pos-relative cursor-pointer">
+						
 					</div>
+					<form class="form_contact_image" enctype="multipart/form-data">
+						<input type="file" class="con_img_inp_file" id="prof-image-edit">
+					</form>
 				</div>
 				
 				<div id="prof-address-container" class="prof-user-address">
-					<input id="prof-name" class="prof-user-addline1 prof-edditable" value="${contactdetail.name}">
-					<input id="prof-address1" class="prof-user-addline1 prof-edditable" value="${contactdetail.address1}">
-					<input id="prof-address2" class="prof-user-addline2 prof-edditable" value="${contactdetail.address2}">
-					<input id="prof-country" class="prof-user-addline2 prof-edditable" value="${contactdetail.country}">
-					<input id="prof-zipcode" class="prof-user-addline2 prof-edditable" value="${contactdetail.zipcode}">
+					<input id="prof-name" class="prof-user-addline1 prof-edditable prof-addr-center" value="${contactdetail.name}">
+					<input id="prof-address1" class="prof-user-addline1 prof-edditable prof-addr-center" value="${contactdetail.address1}">
+					<input id="prof-address2" class="prof-user-addline2 prof-edditable prof-addr-center" value="${contactdetail.address2}">
+					<input id="prof-country" class="prof-user-addline2 prof-edditable prof-addr-center" value="${contactdetail.country}">
+					<input id="prof-zipcode" class="prof-user-addline2 prof-edditable prof-addr-center" value="${contactdetail.zipcode}">
 				</div>
 			</div>
 		</div>
@@ -95,16 +101,16 @@
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-phone"></div>
-								<div>
+								<div class="float-left lp-edit-wrapper clearfix float-left">
 									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
-									<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+									<div state="unlocked" class="lp-edit-locks float-left"></div>
 								</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mbl"></div>
-								<div>
-									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personalnumber.placeholder.key"/>'>
-									<div><input type="button" value="Lock" class="ep-lock ep-lock-btn ep-ulock-btn" style="height: 24px;line-height: 20px;"></div>
+								<div class="float-left lp-edit-wrapper clearfix float-left">
+									<input class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
+									<div state="unlocked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
@@ -119,7 +125,7 @@
 				</div>
 				
 				<c:choose>
-					<c:when	test="${user.agent}">
+					<c:when	test="${user.companyAdmin}">
 						<div class="prof-left-row prof-left-assoc bord-bot-dc">
 							<div class="left-assoc-wrapper">
 								<div class="clearfix">
@@ -162,7 +168,14 @@
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc">
-					<div class="main-con-header"><spring:message code="label.about.key" /> ${contactdetail.name}</div>
+					<div class="main-con-header main-con-header-adj clearfix">
+						<div class="float-left">
+							<spring:message code="label.about.key" /> ${contactdetail.name}
+						</div>
+						<div class="float-right">
+							<div state="unlocked" class="abt-locks-adj lp-edit-locks-locked"></div>
+						</div>
+					</div>
 					<div class="intro-body" id="intro-body-text">
 						<c:choose>
 							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">${contactdetail.about_me}</c:when>
