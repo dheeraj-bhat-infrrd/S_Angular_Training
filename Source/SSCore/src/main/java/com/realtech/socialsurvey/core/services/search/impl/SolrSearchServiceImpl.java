@@ -398,7 +398,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		try {
 			SolrQuery solrQuery = new SolrQuery();
-			String[] fields = { CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
+			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
 					CommonConstants.USER_EMAIL_ID_SOLR };
 			solrQuery.setFields(fields);
 
