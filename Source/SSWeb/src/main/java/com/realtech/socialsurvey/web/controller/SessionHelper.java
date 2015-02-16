@@ -109,7 +109,7 @@ public class SessionHelper {
 		// check if company has a logo
 		if (userSettings.getCompanySettings().getProfileImageUrl() != null) {
 			LOG.debug("Settings profile image from company settings");
-			String imageUrl = endpoint + "/" + bucket + "/" + userSettings.getCompanySettings().getProfileImageUrl();
+			String imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
 			session.setAttribute(CommonConstants.IMAGE_DISPLAY_IN_SESSION, imageUrl);
 		}
 		else {

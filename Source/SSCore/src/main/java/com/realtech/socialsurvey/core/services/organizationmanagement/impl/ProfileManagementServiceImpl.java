@@ -218,41 +218,29 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				lowerSettings.setLogo(higherSettings.getLogo());
 				finalLock.setLogoLocked(true);
 			}
-			if (lock.isLocationLocked() && !finalLock.isLocationLocked()) {
-				lowerSettings.setLocationEnabled(higherSettings.getIsLocationEnabled());
-				finalLock.setLocationLocked(true);
+			if (lock.getIsDisplayNameLocked() && !finalLock.getIsDisplayNameLocked()) {
+				lowerSettings.getContact_details().setName(higherSettings.getContact_details().getName());
+				finalLock.setDisplayNameLocked(true);
 			}
-			if (lock.isVerticalLocked() && !finalLock.isVerticalLocked()) {
-				lowerSettings.setVertical(higherSettings.getVertical());
-				finalLock.setVerticalLocked(true);
+			if (lock.getIsWebAddressLocked() && !finalLock.getIsWebAddressLocked()) {
+				lowerSettings.getContact_details().getWeb_addresses().setWork(higherSettings.getContact_details().getWeb_addresses().getWork());
+				finalLock.setLogoLocked(true);
 			}
-			if (lock.isCRMInfoLocked() && !finalLock.isCRMInfoLocked()) {
-				lowerSettings.setCrm_info(higherSettings.getCrm_info());
-				finalLock.setCRMInfoLocked(true);
+			if (lock.getIsWorkPhoneLocked() && !finalLock.getIsWorkPhoneLocked()) {
+				lowerSettings.getContact_details().getContact_numbers().setWork(higherSettings.getContact_details().getContact_numbers().getWork());
+				finalLock.setWorkPhoneLocked(true);
 			}
-			if (lock.isMailContentLocked() && !finalLock.isMailContentLocked()) {
-				lowerSettings.setMail_content(higherSettings.getMail_content());
-				finalLock.setMailContentLocked(true);
+			if (lock.getIsPersonalPhoneLocked() && !finalLock.getIsPersonalPhoneLocked()) {
+				lowerSettings.getContact_details().getContact_numbers().setPersonal(higherSettings.getContact_details().getContact_numbers().getPersonal());
+				finalLock.setPersonalPhoneLocked(true);
 			}
-			if (lock.isLicensesLocked() && !finalLock.isLicensesLocked()) {
-				lowerSettings.setLicenses(higherSettings.getLicenses());
-				finalLock.setLicensesLocked(true);
+			if (lock.getIsFaxPhoneLocked() && !finalLock.getIsFaxPhoneLocked()) {
+				lowerSettings.getContact_details().getContact_numbers().setFax(higherSettings.getContact_details().getContact_numbers().getFax());
+				finalLock.setFaxPhoneLocked(true);
 			}
-			if (lock.isAssociationsLocked() && !finalLock.isAssociationsLocked()) {
-				lowerSettings.setAssociations(higherSettings.getAssociations());
-				finalLock.setAssociationsLocked(true);
-			}
-			if (lock.isAcheivementsLocked() && !finalLock.isAcheivementsLocked()) {
-				lowerSettings.setAchievements(higherSettings.getAchievements());
-				finalLock.setAcheivementsLocked(true);
-			}
-			if (lock.isSocialTokensLocked() && !finalLock.isSocialTokensLocked()) {
-				lowerSettings.setSocialMediaTokens(higherSettings.getSocialMediaTokens());
-				finalLock.setSocialTokensLocked(true);
-			}
-			if (lock.isSurveySettingsLocked() && !finalLock.isSurveySettingsLocked()) {
-				lowerSettings.setSurvey_settings(higherSettings.getSurvey_settings());
-				finalLock.setSurveySettingsLocked(true);
+			if (lock.getIsAboutMeLocked() && !finalLock.getIsAboutMeLocked()) {
+				lowerSettings.getContact_details().setAbout_me(higherSettings.getContact_details().getAbout_me());
+				finalLock.setAboutMeLocked(true);
 			}
 		}
 	}
@@ -318,6 +306,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return associations;
 	}
 
+	// Lock Settings
+	@Override
+	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings,
+			LockSettings lockSettings) throws InvalidInputException {
+		if (lockSettings == null) {
+			throw new InvalidInputException("LockSettings passed can not be null");
+		}
+		LOG.info("Updating lock detail information");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS,
+				lockSettings, unitSettings, collection);
+		LOG.info("lock details updated successfully");
+		return lockSettings;
+	}
+	
 	// Contact details
 	@Override
 	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
