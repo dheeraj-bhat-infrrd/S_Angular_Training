@@ -228,7 +228,16 @@ function callBackShowAddressDetails(data) {
 	adjustImage();
 }
 
-$(document).on('blur', '#prof-address-container input', function() {
+$('#prof-address-container').click(function(){
+	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails);
+});
+
+function callBackEditAddressDetails(data) {
+	var header = "Edit Address Detail";
+	createPopupConfirm(header, data);
+}
+
+$(document).on('blur', '#prof-address-edit-container input', function() {
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profAddress1 = $('#prof-address1').val().trim();
@@ -244,6 +253,9 @@ $(document).on('blur', '#prof-address-container input', function() {
 		};
 		callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
 	}, 0);
+
+	overlayRevert();
+	$('#overlay-continue').unbind('click');
 });
 
 function callBackUpdateAddressDetails(data) {
@@ -253,6 +265,31 @@ function callBackUpdateAddressDetails(data) {
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+}
+
+$('#overlay-cancel').click(function(){
+	$('#overlay-continue').unbind('click');
+	overlayRevert();
+	$('#othercategory').val('');
+});
+
+function createPopupConfirm(header, body) {
+	$('#overlay-header').html(header);
+	$('#overlay-text').html(body);
+	$('#overlay-continue').html("Ok");
+	$('#overlay-cancel').html("Cancel");
+
+	$('#overlay-main').show();
+}
+function overlayRevert() {
+	$('#overlay-main').hide();
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
 }
 
 

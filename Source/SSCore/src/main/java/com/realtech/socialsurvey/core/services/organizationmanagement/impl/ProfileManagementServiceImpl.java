@@ -122,7 +122,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				break;
 
 			case ENTERPRISE:
-				LOG.info("Company account type");
+				LOG.info("Enterprise account type");
 				// Company Admin
 				if (user.isCompanyAdmin()) {
 					finalSettings = settings.getCompanySettings();
@@ -214,31 +214,31 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	private void updateSettings(OrganizationUnitSettings higherSettings, OrganizationUnitSettings lowerSettings, LockSettings finalLock) {
 		LockSettings lock = higherSettings.getLockSettings();
 		if (lock != null) {
-			if (lock.getIsLogoLocked() && !finalLock.getIsLogoLocked()) {
+			if (lock.getIsLogoLocked() && !finalLock.getIsLogoLocked() && higherSettings.getLogo() != null) {
 				lowerSettings.setLogo(higherSettings.getLogo());
 				finalLock.setLogoLocked(true);
 			}
-			if (lock.getIsDisplayNameLocked() && !finalLock.getIsDisplayNameLocked()) {
+			if (lock.getIsDisplayNameLocked() && !finalLock.getIsDisplayNameLocked() && higherSettings.getContact_details().getName() != null) {
 				lowerSettings.getContact_details().setName(higherSettings.getContact_details().getName());
 				finalLock.setDisplayNameLocked(true);
 			}
-			if (lock.getIsWebAddressLocked() && !finalLock.getIsWebAddressLocked()) {
+			if (lock.getIsWebAddressLocked() && !finalLock.getIsWebAddressLocked() && lowerSettings.getContact_details().getWeb_addresses() != null) {
 				lowerSettings.getContact_details().getWeb_addresses().setWork(higherSettings.getContact_details().getWeb_addresses().getWork());
 				finalLock.setLogoLocked(true);
 			}
-			if (lock.getIsWorkPhoneLocked() && !finalLock.getIsWorkPhoneLocked()) {
+			if (lock.getIsWorkPhoneLocked() && !finalLock.getIsWorkPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
 				lowerSettings.getContact_details().getContact_numbers().setWork(higherSettings.getContact_details().getContact_numbers().getWork());
 				finalLock.setWorkPhoneLocked(true);
 			}
-			if (lock.getIsPersonalPhoneLocked() && !finalLock.getIsPersonalPhoneLocked()) {
+			if (lock.getIsPersonalPhoneLocked() && !finalLock.getIsPersonalPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
 				lowerSettings.getContact_details().getContact_numbers().setPersonal(higherSettings.getContact_details().getContact_numbers().getPersonal());
 				finalLock.setPersonalPhoneLocked(true);
 			}
-			if (lock.getIsFaxPhoneLocked() && !finalLock.getIsFaxPhoneLocked()) {
+			if (lock.getIsFaxPhoneLocked() && !finalLock.getIsFaxPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
 				lowerSettings.getContact_details().getContact_numbers().setFax(higherSettings.getContact_details().getContact_numbers().getFax());
 				finalLock.setFaxPhoneLocked(true);
 			}
-			if (lock.getIsAboutMeLocked() && !finalLock.getIsAboutMeLocked()) {
+			if (lock.getIsAboutMeLocked() && !finalLock.getIsAboutMeLocked() && higherSettings.getContact_details().getAbout_me() != null) {
 				lowerSettings.getContact_details().setAbout_me(higherSettings.getContact_details().getAbout_me());
 				finalLock.setAboutMeLocked(true);
 			}
