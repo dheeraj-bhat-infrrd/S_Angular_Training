@@ -138,117 +138,77 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to calculate and update final score based upon rating questions finished.");
 	}
 
-	// ///////// Methods to get aggregated data from SURVEY_DETAILS collection starting.
+	// JIRA SS-137 and 158 BY RM-05 : BOC
 
-	public long getSentSurveyCount() {
-		LOG.info("Method to get count of total number of surveys sent so far, getTotalSurveyCount() started.");
-		LOG.info("Method to get count of total number of surveys sent so far, getTotalSurveyCount() finished.");
-		return mongoTemplate.count(null, SurveyDetails.class);
-	}
+	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
 
-	public long getCompletedSurveyCount() {
-		LOG.info("Method to get count of total number of surveys taken so far, getTotalSurveyCount() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
-		LOG.info("Method to get count of total number of surveys taken so far, getTotalSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getIncompleteSurveyCount() {
-		LOG.info("Method to get count of total number of surveys taken so far, getIncompleteSurveyCount() started.");
-		LOG.info("Method to get count of total number of surveys taken so far, getIncompleteSurveyCount() finished.");
-		return (getSentSurveyCount() - getCompletedSurveyCount());
-	}
-
-	public long getSentSurveyCountByAgent(long agentId) {
-		LOG.info("Method to get count of total number of surveys sent so far by agent , getSentSurveyCountByAgent() started.");
-		LOG.info("Method to get count of total number of surveys sent so far by agent, getSentSurveyCountByAgent() finished.");
-		Query query = new Query(Criteria.where("agentId").is(agentId));
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getCompletedSurveyCountByAgent(long agentId) {
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByAgent() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
-		query.addCriteria(Criteria.where("agentId").is(agentId));
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByAgent() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getIncompleteSurveyCountByAgent(long agentId) {
-		LOG.info("Method to get count of total number of incomplete surveys so far by agent, getIncompleteSurveyCountByAgent() started.");
-		LOG.info("Method to get count of total number of incomplete surveys so far by agent, getIncompleteSurveyCountByAgent() finished.");
-		return (getSentSurveyCountByAgent(agentId) - getCompletedSurveyCountByAgent(agentId));
-	}
-
-	public long getSentSurveyCountByBranch(long branchId) {
-		LOG.info("Method to get count of total number of surveys sent so far by agent , getSentSurveyCountByBranch() started.");
-		Query query = new Query(Criteria.where("branchId").is(branchId));
-		LOG.info("Method to get count of total number of surveys sent so far by agent, getSentSurveyCountByBranch() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getCompletedSurveyCountByBranch(long branchId) {
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByBranch() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
-		query.addCriteria(Criteria.where("agentId").is(branchId));
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByBranch() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getIncompleteSurveyCountByBranch(long branchId) {
-		LOG.info("Method to get count of total number of incomplete surveys so far in branch, getIncompleteSurveyCountByBranch() started.");
-		LOG.info("Method to get count of total number of incomplete surveys so far in branch, getIncompleteSurveyCountByBranch() finished.");
-		return (getSentSurveyCountByBranch(branchId) - getCompletedSurveyCountByBranch(branchId));
-	}
-
-	public long getSentSurveyCountByRegion(long regionId) {
-		LOG.info("Method to get count of total number of surveys sent so far by agent , getCompletedSurveyCountByRegion() started.");
-		Query query = new Query(Criteria.where("branchId").is(regionId));
-		LOG.info("Method to get count of total number of surveys sent so far by agent, getCompletedSurveyCountByRegion() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getCompletedSurveyCountByRegion(long regionId) {
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByRegion() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
-		query.addCriteria(Criteria.where("agentId").is(regionId));
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByRegion() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getIncompleteSurveyCountByRegion(long regionId) {
-		LOG.info("Method to get count of total number of incomplete surveys so far in region, getIncompleteSurveyCountByRegion() started.");
-		LOG.info("Method to get count of total number of incomplete surveys so far in region, getIncompleteSurveyCountByRegion() finished.");
-		return (getSentSurveyCountByBranch(regionId) - getCompletedSurveyCountByBranch(regionId));
-	}
-
-	public long getSentSurveyCountByCompany(long companyId) {
-		LOG.info("Method to get count of total number of surveys sent so far by company, getSentSurveyCountByCompany() started.");
-		Query query = new Query(Criteria.where("companyId").is(companyId));
-		LOG.info("Method to get count of total number of surveys sent so far by company, getSentSurveyCountByCompany() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getCompletedSurveyCountByCompany(long companyId) {
-		LOG.info("Method to get count of total number of surveys taken so far by company, getCompletedSurveyCountByRegion() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
-		query.addCriteria(Criteria.where("companyId").is(companyId));
-		LOG.info("Method to get count of total number of surveys taken so far by agent, getCompletedSurveyCountByRegion() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
-	}
-
-	public long getIncompleteSurveyCountByCompany(long companyId) {
-		LOG.info("Method to get count of total number of incomplete surveys so far in company, getIncompleteSurveyCountByCompany() started.");
-		LOG.info("Method to get count of total number of incomplete surveys so far in company, getIncompleteSurveyCountByCompany() finished.");
-		return (getSentSurveyCountByBranch(companyId) - getCompletedSurveyCountByBranch(companyId));
-	}
+	// This method returns all the surveys that have been sent to or started by customers so far.
+	// If columnName field is passed null value it returns count of all the survey.
+	// columnName field can contain either of "agentId/branchId/regionId/companyId".
+	// columnValue field can contain respective values for the columnName.
 
 	@Override
-	public Map<String, Long> getCountOfCustomersByMood() {
+	public long getSentSurveyCount(String columnName, long columnValue) {
+		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() started.");
+		Query query;
+		if (columnName == null) {
+			query = null;
+		}
+		else {
+			query = new Query(Criteria.where(columnName).is(columnValue));
+		}
+		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() finished.");
+		return mongoTemplate.count(query, SurveyDetails.class);
+	}
+
+	// This method returns all the surveys that have been completed by customers so far.
+	// If columnName field is passed null value it returns count of all the survey.
+	// "columnName" field can contain either of "agentId/branchId/regionId/companyId".
+	// "columnValue" field can contain respective values for the columnName.
+
+	@Override
+	public long getCompletedSurveyCount(String columnName, long columnValue) {
+		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started.");
+		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished.");
+		return mongoTemplate.count(query, SurveyDetails.class);
+	}
+
+	// This method returns all the surveys that are not yet completed by customers.
+	// If columnName field is passed null value it returns count of all the survey.
+	// "columnName" field can contain either of "agentId/branchId/regionId/companyId".
+	// "columnValue" field can contain respective values for the columnName.
+
+	@Override
+	public long getIncompleteSurveyCount(String columnName, long columnValue) {
+		LOG.info("Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() started.");
+		Query query = new Query(Criteria.where("stage").ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		LOG.info("Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() finished.");
+		return mongoTemplate.count(query, SurveyDetails.class);
+	}
+
+	// This method returns a map of customers count based upon their mood.
+	// Map contains Mood --> Customers count mapping for each mood for a given
+	// agent/branch/region/company.
+
+	@Override
+	public Map<String, Long> getCountOfCustomersByMood(String columnName, long columnValue) {
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMood() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.group("mood").count().as("count") //
-		);
+		TypedAggregation<SurveyDetails> aggregation;
+		if (columnName == null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.group(CommonConstants.MOOD_COLUMN).count().as("count"));
+		}
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.group(CommonConstants.MOOD_COLUMN).count().as("count"));
+		}
+
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> moodSplit = new HashMap<>();
 		if (result != null) {
@@ -261,84 +221,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return moodSplit;
 	}
 
-	@Override
-	public Map<String, Long> getCountOfCustomersByMoodForAgent(long agentId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForAgent() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)), Aggregation.group("mood").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> moodSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> moodCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject o : moodCount) {
-				moodSplit.put(o.get("_id").toString(), Long.parseLong(o.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForAgent() finished.");
-		return moodSplit;
-	}
+	// This method returns the customers' count based upon the number of reminder mails sent to
+	// them.
 
 	@Override
-	public Map<String, Long> getCountOfCustomersByMoodForBranch(long branchId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForBranch() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.BRANCH_ID_COLUMN).is(branchId)), Aggregation.group("mood").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> moodSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> moodCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject o : moodCount) {
-				moodSplit.put(o.get("_id").toString(), Long.parseLong(o.get("count").toString()));
-			}
+	public Map<String, Long> getCountOfCustomersByReminderMails(String columnName, long columnValue) {
+		LOG.info("Method to get customers according to the number of reminder emails sent, getCountOfCustomersByReminderMails() started.");
+		TypedAggregation<SurveyDetails> aggregation;
+		if (columnName == null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.group(CommonConstants.REMINDER_COUNT_COLUMN).count()
+					.as("count"));
 		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForBranch() finished.");
-		return moodSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByMoodForRegion(long regionId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForRegion() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.group("mood").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> moodSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> moodCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject o : moodCount) {
-				moodSplit.put(o.get("_id").toString(), Long.parseLong(o.get("count").toString()));
-			}
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.group(CommonConstants.REMINDER_COUNT_COLUMN).count().as("count"));
 		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForRegion() finished.");
-		return moodSplit;
-	}
 
-	@Override
-	public Map<String, Long> getCountOfCustomersByMoodForCompany(long companyId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForCompany() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId)), Aggregation.group("mood").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> moodSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> moodCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject o : moodCount) {
-				moodSplit.put(o.get("_id").toString(), Long.parseLong(o.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMoodForCompany() finished.");
-		return moodSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByReminderMails() {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMails() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.group("reminderCount").count().as("count") //
-		);
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> reminderCountSplit = new HashMap<>();
 		if (result != null) {
@@ -347,90 +245,25 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				reminderCountSplit.put(reminder.get("_id").toString(), Long.parseLong(reminder.get("count").toString()));
 			}
 		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMails() finished.");
+		LOG.info("Method to get customers according to the number of reminder emails sent, getCountOfCustomersByReminderMails() finished.");
 		return reminderCountSplit;
 	}
 
-	@Override
-	public Map<String, Long> getCountOfCustomersByReminderMailsForAgent(long agentId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForAgent() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)), Aggregation.group("reminderCount").count()
-						.as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> reminderCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> reminderCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject reminder : reminderCount) {
-				reminderCountSplit.put(reminder.get("_id").toString(), Long.parseLong(reminder.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForAgent() finished.");
-		return reminderCountSplit;
-	}
+	// This method returns the customers' count based upon their current stage i.e. number of
+	// questions they have answered so far.
 
 	@Override
-	public Map<String, Long> getCountOfCustomersByReminderMailsForBranch(long branchId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForBranch() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("branchId").is(branchId)), Aggregation.group("reminderCount").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> reminderCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> reminderCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject reminder : reminderCount) {
-				reminderCountSplit.put(reminder.get("_id").toString(), Long.parseLong(reminder.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForBranch() finished.");
-		return reminderCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByReminderMailsForRegion(long regionId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForRegion() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.group("reminderCount").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> reminderCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> reminderCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject reminder : reminderCount) {
-				reminderCountSplit.put(reminder.get("_id").toString(), Long.parseLong(reminder.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForRegion() finished.");
-		return reminderCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByReminderMailsForCompany(long companyId) {
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForCompany() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId)), Aggregation.group("reminderCount").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> reminderCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> reminderCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject reminder : reminderCount) {
-				reminderCountSplit.put(reminder.get("_id").toString(), Long.parseLong(reminder.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to their mood, getCountOfCustomersByReminderMailsForCompany() finished.");
-		return reminderCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByStage() {
+	public Map<String, Long> getCountOfCustomersByStage(String columnName, long columnValue) {
 		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStage() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.group("stage").count().as("count") //
-		);
+		TypedAggregation<SurveyDetails> aggregation;
+		if (columnName == null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.group(CommonConstants.STAGE_COLUMN).count()
+					.as("count"));
+		}
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.group(CommonConstants.STAGE_COLUMN).count().as("count"));
+		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> stageCountSplit = new HashMap<>();
 		if (result != null) {
@@ -443,85 +276,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return stageCountSplit;
 	}
 
-	@Override
-	public Map<String, Long> getCountOfCustomersByStageForAgent(long agentId) {
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForAgent() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)), Aggregation.group("stage").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> stageCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> stageCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject stage : stageCount) {
-				stageCountSplit.put(stage.get("_id").toString(), Long.parseLong(stage.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForAgent() finished.");
-		return stageCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByStageForBranch(long branchId) {
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForBranch() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where(CommonConstants.BRANCH_ID_COLUMN).is(branchId)), Aggregation.group("stage").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> stageCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> stageCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject stage : stageCount) {
-				stageCountSplit.put(stage.get("_id").toString(), Long.parseLong(stage.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForBranch() finished.");
-		return stageCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByStageForRegion(long regionId) {
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForRegion() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.group("stage").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> stageCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> stageCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject stage : stageCount) {
-				stageCountSplit.put(stage.get("_id").toString(), Long.parseLong(stage.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForRegion() finished.");
-		return stageCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getCountOfCustomersByStageForCompany(long companyId) {
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForCompany() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("stage").ne(-1)), //
-				Aggregation.match(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId)), Aggregation.group("stage").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> stageCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> stageCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject stage : stageCount) {
-				stageCountSplit.put(stage.get("_id").toString(), Long.parseLong(stage.get("count").toString()));
-			}
-		}
-		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStageForCompany() finished.");
-		return stageCountSplit;
-	}
+	// Method to return number of surveys taken in a given month of a particular year.
 
 	@Override
 	public long getTotalSurveyCountByMonth(int year, int month) {
-		LOG.info("Method to get count of total number of surveys taken so far, getTotalSurveyCount() started.");
+		LOG.info("Method to get count of total number of surveys taken in a given month and year, getTotalSurveyCountByMonth() started.");
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year, month, 1);
 		Date startDate = calendar.getTime();
@@ -530,9 +289,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Date endDate = calendar.getTime();
 		Query query = new Query(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
 		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
-		LOG.info("Method to get count of total number of surveys taken so far, getTotalSurveyCount() finished.");
+		LOG.info("Method to get count of total number of surveys taken in a given month and year, getTotalSurveyCountByMonth() finished.");
 		return mongoTemplate.count(query, SurveyDetails.class);
 	}
+
+	// Method to get aggregated rating of an agent/branch/region/company for past number of days
+	// provided as parameter.
 
 	@Override
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
@@ -541,18 +303,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Date endDate = calendar.getTime();
 		calendar.add(5, noOfDays * (-1));
 		Date startDate = calendar.getTime();
-		if(noOfDays==-1){
+		if (noOfDays == -1) {
 			calendar.setTimeInMillis(0);
-			startDate=calendar.getTime();
+			startDate = calendar.getTime();
 		}
-		Query query = new Query(Criteria.where(columnName).is(columnValue)
-				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate), Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
-				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
-				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
-		);
+		Query query = new Query(Criteria
+				.where(columnName)
+				.is(columnValue)
+				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
+		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+				CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
+				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group(columnName)
+				.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		long a = mongoTemplate.count(query, SurveyDetails.class);
@@ -565,7 +328,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	}
 
 	// January is denoted with 0.
-	public double getRatingOfAgentByMonth(long agentId, int year, int month) {
+	public double getRatingByMonth(String columnName, long columnValue, int year, int month) {
 		LOG.info("Method getRatingOfAgentByMonth(), to calculate rating of agent started.");
 		Calendar calendar = Calendar.getInstance();
 		calendar.set(year, month, 1);
@@ -573,19 +336,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		// Returns max value for date in the month set in Calendar instance.
 		calendar.set(year, month, calendar.getActualMaximum(5));
 		Date endDate = calendar.getTime();
-		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)
-				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate), Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
+		Query query = new Query(Criteria
+				.where(columnName)
+				.is(columnValue)
+				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
 		long count = mongoTemplate.count(query, SurveyDetails.class);
 		if (count < 3) {
-			LOG.info("Agent " + agentId + " does not qualify for calculation of rating. Returning...");
+			LOG.info(columnName + " " + columnValue + " does not qualify for calculation of rating. Returning...");
 			return -1;
 		}
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
-				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)),
-				Aggregation.group(CommonConstants.AGENT_ID_COLUMN).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
-		);
+		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+				CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
+				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation
+				.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score"));
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		double rating = 0;
@@ -596,13 +360,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return rating;
 	}
 
+	// Method to get count of posts shared by customers on various social networking sites for
+	// "agent/branch/region/company/all".
+	// Returns a map of Social Networking Site and posts count on that site.
+
 	@Override
-	public Map<String, Long> getSocialPostsCount() {
+	public Map<String, Long> getSocialPostsCount(String columnName, long columnValue) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
-				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
-		);
+		TypedAggregation<SurveyDetails> aggregation;
+		if (columnName == null) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation
+					.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
+		}
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
+		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> postCountSplit = new HashMap<>();
 		if (result != null) {
@@ -615,98 +388,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return postCountSplit;
 	}
 
-	@Override
-	public Map<String, Long> getSocialPostsCountForAgent(long agentId) {
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForAgent() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
-				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForAgent() finished.");
-		return postCountSplit;
-	}
+	// Method to get count of surveys initiated by customers and agents separately.
+	// Columns can only be from : {agentId/branchId/regionId}
 
-	@Override
-	public Map<String, Long> getSocialPostsCountForBranch(long branchId) {
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForBranch() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.BRANCH_ID_COLUMN).is(branchId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
-				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForBranch() finished.");
-		return postCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getSocialPostsCountForRegion(long regionId) {
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForRegion() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.REGION_ID_COLUMN).is(regionId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
-				Aggregation.group("sharedOn").count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForRegion() finished.");
-		return postCountSplit;
-	}
-
-	@Override
-	public Map<String, Long> getSocialPostsCountForCompany(long companyId) {
-		LOG.info("Method to count number of social posts by customers, getSocialPostsCountForCompany() started.");
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-				Aggregation.match(Criteria.where("companyId").is(companyId)), Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), //
-				Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count") //
-		);
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
-		LOG.info("Method to count number of social posts by customers, getSoctiatorialPostsCountForCompany() finished.");
-		return postCountSplit;
-	}
-
-	// Method to get get count of surveys initiated by customers and agents separately.
-	//Columns can only be from : {agentId/branchId/regionId}
-	
 	@Override
 	public Map<String, Long> getCountOfSurveyInitiators(String columnName, long columnValue) {
 		LOG.info("Method to count number of surveys initiators, getCountOfSurveyInitiators() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 		if (columnName == null) {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-					Aggregation.group("initiator").count().as("count") //
-			);
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.group(CommonConstants.INITIATED_BY_COLUMN).count()
+					.as("count"));
 		}
 		else {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, //
-					Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group("initiator").count().as("count") //
-			);
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
+					Aggregation.group(CommonConstants.INITIATED_BY_COLUMN).count().as("count"));
 		}
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		Map<String, Long> initiatorCountSplit = new HashMap<>();
@@ -722,16 +417,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	/*
 	 * Returns a list of feedbacks provided by customers. First sorted on score then on date (both
-	 * descending).
-	 * ColumnName can be "agentId/branchId/regionId/companyId".
-	 * ColumnValue should be value for respective column.
+	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
+	 * value for respective column.
 	 */
 
 	public Map<String, Double> getAllFeedbacks(String columnName, String columNValue) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
 		Map<String, Double> feedbackWithRating = new HashMap<>();
 		Query query = new Query();
-		if(columnName!=null){
+		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columNValue));
 		}
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
@@ -743,4 +437,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() finished.");
 		return feedbackWithRating;
 	}
+
+	// JIRA SS-137 and 158 : EOC
 }

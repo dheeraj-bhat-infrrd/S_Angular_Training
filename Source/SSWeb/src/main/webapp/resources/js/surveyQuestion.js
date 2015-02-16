@@ -19,9 +19,10 @@ $(document).on('click', '.sq-np-item-next', function() {
  * Function to initiate survey. It hits controller to get list of all the
  * questions which are shown one after one to the customer.
  */
-function initSurvey(firstName, lastName, email, agentId) {
+function initSurvey(firstName, lastName, email, agentId, agentName) {
 	var success = false;
 	this.agentId = agentId;
+	this.agentName = agentName;
 	customerEmail = email;
 	var payload = {
 		"agentId" : agentId,
@@ -196,7 +197,7 @@ function showFeedbackPage(mood) {
 		$("#ques-text-textarea").html(question);
 		break;
 	case "sad":
-		question = "Please let us know what went wrong so that you dont get disappointed next time!";
+		question = "Please let us know what went wrong so that you don't get disappointed next time!";
 		$("#ques-text-textarea").html(question);
 		break;
 	}
@@ -253,63 +254,95 @@ $('.sq-star').click(function() {
 	storeCustomerAnswer(starVal);
 });
 
-// Code to be executed on click of next for star questions.
+// Code to be executed on click of next for all types of questions.
 
-$('.sq-np-item-next').click(
-		function() {
-			if (questionDetails.questionType == "sb-sel-mcq"
-					&& customerResponse != undefined) {
-				storeCustomerAnswer(customerResponse);
-			}
-			if (questionDetails.questionType == "sb-sel-desc"
-					&& customerResponse != undefined) {
-				customerResponse = $("#text-area").val();
-				if (customerResponse == undefined) {
-					customerResponse = "";
-				}
-				storeCustomerAnswer(customerResponse);
-			}
-			$(".sq-star").removeClass('sq-full-star');
-			qno++;
-			paintSurveyPageFromJson();
+$('.sq-np-item-next')
+		.click(
+				function() {
+					if (questionDetails.questionType == "sb-sel-mcq"
+							&& customerResponse != undefined) {
+						storeCustomerAnswer(customerResponse);
+					} else if (questionDetails.questionType == "sb-sel-desc"
+							&& customerResponse != undefined) {
+						customerResponse = $("#text-area").val();
+						if (customerResponse == undefined) {
+							customerResponse = "";
+						}
+						storeCustomerAnswer(customerResponse);
+					} else if (questionDetails.questionType == "sb-range-star") {
+						if ($('#next-star').hasClass("sq-np-item-disabled")) {
+							$('#overlay-toast')
+									.html(
+											'Please answer the question. You can not skip a rating question.');
+							showToast();
+							return;
+						}
+					} else if (questionDetails.questionType == "sb-range-smiles") {
+						if ($('#next-smile').hasClass("sq-np-item-disabled")) {
+							$('#overlay-toast')
+									.html(
+											'Please answer the question. You can not skip a rating question.');
+							showToast();
+							return;
+						}
+					} else if (questionDetails.questionType == "sb-range-scale") {
+						if ($('#next-scale').hasClass("sq-np-item-disabled")) {
+							$('#overlay-toast')
+									.html(
+											'Please answer the question. You can not skip a rating question.');
+							showToast();
+							return;
+						}
+					} else if (questionDetails.questionType == "sb-master") {
+						return;
+					}
+					$(".sq-star").removeClass('sq-full-star');
+					qno++;
+					paintSurveyPageFromJson();
 
-			if (questionDetails.questionType == "sb-range-star") {
-				var starVal = parseInt(questionDetails.customerResponse);
-				if (!isNaN(starVal)) {
-					$("#next-star").removeClass("sq-np-item-disabled");
-					$('#sq-stars').find('.sq-star').each(function(index) {
-						if (index < starVal) {
-							$(this).addClass('sq-full-star');
+					if (questionDetails.questionType == "sb-range-star") {
+						var starVal = parseInt(questionDetails.customerResponse);
+						if (!isNaN(starVal)) {
+							$("#next-star").removeClass("sq-np-item-disabled");
+							$('#sq-stars').find('.sq-star').each(
+									function(index) {
+										if (index < starVal) {
+											$(this).addClass('sq-full-star');
+										}
+									});
 						}
-					});
-				}
-			}
-			if (questionDetails.questionType == "sb-range-smiles") {
-				var smileVal = parseInt(questionDetails.customerResponse);
-				if (!isNaN(smileVal)) {
-					$("#next-smile").removeClass("sq-np-item-disabled");
-					$('#sq-smiles').find('.sq-smile').each(function(index) {
-						if (index < smileVal) {
-							$(this).addClass('sq-full-smile');
+					}
+					if (questionDetails.questionType == "sb-range-smiles") {
+						var smileVal = parseInt(questionDetails.customerResponse);
+						if (!isNaN(smileVal)) {
+							$("#next-smile").removeClass("sq-np-item-disabled");
+							$('#sq-smiles').find('.sq-smile').each(
+									function(index) {
+										if (index < smileVal) {
+											$(this).addClass('sq-full-smile');
+										}
+									});
 						}
-					});
-				}
-			}
-			if (questionDetails.questionType == "sb-range-scale") {
-				var value = parseInt(questionDetails.customerResponse);
-				if (!isNaN(value)) {
-					$("#next-scale").removeClass("sq-np-item-disabled");
-					$('#range-slider-value').html(value);
-				}
-			}
-			if (questionDetails.questionType == "sb-sel-mcq") {
-				customerResponse = "";
-			}
-		});
+					}
+					if (questionDetails.questionType == "sb-range-scale") {
+						var value = parseInt(questionDetails.customerResponse);
+						if (!isNaN(value)) {
+							$("#next-scale").removeClass("sq-np-item-disabled");
+							$('#range-slider-value').html(value);
+						}
+					}
+					if (questionDetails.questionType == "sb-sel-mcq") {
+						customerResponse = "";
+					}
+
+				});
 
 // Code to be executed on click of previous for star and smile questions.
 
 $('.sq-np-item-prev').click(function() {
+	if (qno == 0) {
+		return;
+	}
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
 	qno--;
@@ -385,13 +418,20 @@ $('#start-btn').click(function() {
 	var lastName = $('#lastName').val().trim();
 	var email = $('#email').val().trim();
 	var agentId = $('#prof-container').attr("data-agentId");
-	initSurvey(firstName, lastName, email, agentId);
+	var agentName = $('#prof-container').attr("data-agentName");
+	initSurvey(firstName, lastName, email, agentId, agentName);
 });
 
-$('#submit').click(function() {
-	var feedback = $("#text-area").val();
-	updateCustomeResponse(feedback);
-});
+$('#submit')
+		.click(
+				function() {
+					var feedback = $("#text-area").val();
+					updateCustomeResponse(feedback);
+					$('#overlay-toast')
+							.html(
+									'Congratulations! Your survey has been submitted successfully.');
+					showToast();
+				});
 
 $('input[type="range"]').rangeslider({
 	polyfill : false,
@@ -411,4 +451,44 @@ $('input[type="range"]').rangeslider({
 		$('#range-slider-value').html(value);
 		storeCustomerAnswer(value);
 	},
+});
+
+$('.sq-pts-red').click(function() {
+	$('.sq-pts-item-hover').removeClass('showHoverTab');
+	$('.pts-hover-1').addClass('showHoverTab');
+	var answer = $('.sq-pts-red').html();
+	storeCustomerAnswer(answer);
+	$("#next-scale").removeClass("sq-np-item-disabled");
+});
+
+$('.sq-pts-org').click(function() {
+	$('.sq-pts-item-hover').removeClass('showHoverTab');
+	$('.pts-hover-2').addClass('showHoverTab');
+	var answer = $('.sq-pts-org').html();
+	storeCustomerAnswer(answer);
+	$("#next-scale").removeClass("sq-np-item-disabled");
+});
+
+$('.sq-pts-lgreen').click(function() {
+	$('.sq-pts-item-hover').removeClass('showHoverTab');
+	$('.pts-hover-3').addClass('showHoverTab');
+	var answer = $('.sq-pts-lgreen').html();
+	storeCustomerAnswer(answer);
+	$("#next-scale").removeClass("sq-np-item-disabled");
+});
+
+$('.sq-pts-military').click(function() {
+	$('.sq-pts-item-hover').removeClass('showHoverTab');
+	$('.pts-hover-4').addClass('showHoverTab');
+	var answer = $('.sq-pts-military').html();
+	storeCustomerAnswer(answer);
+	$("#next-scale").removeClass("sq-np-item-disabled");
+});
+
+$('.sq-pts-dgreen').click(function() {
+	$('.sq-pts-item-hover').removeClass('showHoverTab');
+	$('.pts-hover-5').addClass('showHoverTab');
+	var answer = $('.sq-pts-dgreen').html();
+	storeCustomerAnswer(answer);
+	$("#next-scale").removeClass("sq-np-item-disabled");
 });

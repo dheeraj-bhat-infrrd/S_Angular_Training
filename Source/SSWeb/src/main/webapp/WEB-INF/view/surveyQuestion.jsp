@@ -1,16 +1,106 @@
-<jsp:include page="header.jsp" />
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="UTF-8"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><spring:message code="label.login.title.key" /></title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style-common.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+</head>
+<body>
+    <div id="toast-container" class="toast-container">
+	   <span id="overlay-toast" class="overlay-toast"></span>
+    </div>
+	<div class="overlay-loader hide"></div>
+	<div class="overlay-payment hide"></div>
 
-<div class="hm-header-main-wrapper">
-	<div class="container">
-		<div class="hm-header-row clearfix">
-			<div class="float-left hm-header-row-left survery-header-2">Customer Feedback
-				Survey</div>
+	<div id="overlay-main" class="overlay-main hide">
+		<div class="overlay-disable-wrapper">
+			<div id="overlay-header" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="overlay-text" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-continue" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-cancel" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
+    
+    <div class="hdr-wrapper">
+        <div class="container hdr-container clearfix">
+            <div class="float-left hdr-logo"></div>
+            
+
+            <div id="header-user-info" class="header-user-info float-right clearfix">
+                <%-- <div class="float-left user-info-initial">
+                    <span>${fn:substring(user.firstName, 0, 1)}</span>
+                    <div class="initial-dd-wrapper hide blue-arrow-bot">
+                        <c:if test="${highestrole == 1}">
+                            <!-- show the company settings only of the user has company admin as a role -->
+                            <div class="initial-dd-item" id="company-setting">
+                                <spring:message code="label.settings.company.key" />
+                            </div>
+                        </c:if>
+                        <div class="initial-dd-item" id="profile-setting">
+                            <spring:message code="label.profilesetting.key" />
+                        </div>
+                        <div class="initial-dd-item" id="account-setting">
+                            <spring:message code="label.accountsetting.key" />
+                        </div>
+                        <div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
+                        <spring:message code="label.changepassword.key"/>
+                        </div>
+                        <c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+                            <div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+                                <spring:message	code="label.header.upgrade.key" />
+                            </div>
+                        </c:if>
+                        <a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+                    </div>
+                </div> --%>
 
 
-<div id="prof-container" data-agentId="${agentId}"
+                <c:if test="${displaylogo != null}">
+                    <div class="float-left user-info-seperator"></div>
+                    <div class="float-left user-info-logo"
+                        style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+                </c:if>
+
+            </div>
+            <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
+        </div>
+    </div>
+
+
+<div id="prof-container" data-agentId="${agentId}" data-agentName="${agentName}"
 	class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 	<div class="container">
 		<div class="sq-ques-wrapper">
@@ -23,7 +113,7 @@
 				</div>
 				<div class="sq-bord-bot-sm"></div>
 				<div class="sq-rat-wrapper">
-					<div id="sq-stars" class="sq-star-wrapper sq-i-container clearfix">
+					<div class="sq-star-wrapper sq-i-container clearfix">
 						<div class="clearfix sq-info-wrapper">
 							<div class="sq-i-lbl float-left">First Name</div>
 							<div class="sq-i-txt float-left">
@@ -217,11 +307,6 @@
                     }
                 );
                 
-                $('.sq-pts-red').click(function(){
-                	$('.sq-pts-item-hover').removeClass('showHoverTab');
-                	$('.pts-hover-1').addClass('showHoverTab');
-                });
-                
                 $('.sq-pts-org').hover(
                     function(){
                         $('.pts-hover-2').show();
@@ -229,11 +314,6 @@
                         $('.pts-hover-2').hide();
                     }
                 );
-                
-                $('.sq-pts-org').click(function(){
-                	$('.sq-pts-item-hover').removeClass('showHoverTab');
-                	$('.pts-hover-2').addClass('showHoverTab');
-                });
                 
                 $('.sq-pts-lgreen').hover(
                     function(){
@@ -243,11 +323,6 @@
                     }
                 );
                 
-                $('.sq-pts-lgreen').click(function(){
-                	$('.sq-pts-item-hover').removeClass('showHoverTab');
-                	$('.pts-hover-3').addClass('showHoverTab');
-                });
-                
                 $('.sq-pts-military').hover(
                     function(){
                         $('.pts-hover-4').show();
@@ -256,11 +331,6 @@
                     }
                 );
                 
-                $('.sq-pts-military').click(function(){
-                	$('.sq-pts-item-hover').removeClass('showHoverTab');
-                	$('.pts-hover-4').addClass('showHoverTab');
-                });
-                
                 $('.sq-pts-dgreen').hover(
                     function(){
                         $('.pts-hover-5').show();
@@ -268,11 +338,6 @@
                         $('.pts-hover-5').hide();
                     }
                 );
-                
-                $('.sq-pts-dgreen').click(function(){
-                	$('.sq-pts-item-hover').removeClass('showHoverTab');
-                	$('.pts-hover-5').addClass('showHoverTab');
-                });
                 
 				$('.st-checkbox-on').click(function() {
 					$(this).hide();
