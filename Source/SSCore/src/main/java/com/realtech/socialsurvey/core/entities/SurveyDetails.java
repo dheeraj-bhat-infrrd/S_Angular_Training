@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
 import java.util.List;
 
 public class SurveyDetails {
@@ -16,6 +17,8 @@ public class SurveyDetails {
 	private double score;
 	private String review;
 	private String mood;
+	private Date updatedOn;
+	List<String> sharedOn;
 	private List<SurveyResponse> surveyResponse;
 	
 	public long getAgentId() {
@@ -89,6 +92,18 @@ public class SurveyDetails {
 	}
 	public void setMood(String mood) {
 		this.mood = mood;
+	}
+	public Date getUpdatedOn() {
+		return updatedOn;
+	}
+	public void setUpdatedOn(Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+	public List<String> getSharedOn() {
+		return sharedOn;
+	}
+	public void setSharedOn(List<String> sharedOn) {
+		this.sharedOn = sharedOn;
 	}
 	public List<SurveyResponse> getSurveyResponse() {
 		return surveyResponse;

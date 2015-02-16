@@ -98,6 +98,15 @@ public interface SurveyBuilder {
 	public List<SurveyQuestionDetails> getAllActiveQuestionsOfMappedSurvey(User user) throws InvalidInputException;
 
 	/**
+	 * Method to mark survey as active/inactive in SURVEY
+	 * 
+	 * @param user
+	 * @param status
+	 * @throws InvalidInputException
+	 */
+	public void changeSurveyStatus(User user, int status) throws InvalidInputException;
+
+	/**
 	 * Method to fetch list of all Default Surveys
 	 * 
 	 * @param
