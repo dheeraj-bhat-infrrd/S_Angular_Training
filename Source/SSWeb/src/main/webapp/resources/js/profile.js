@@ -20,7 +20,7 @@ function paintCompanyProfile(data) {
 	            headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
 	            headContentHtml = headContentHtml +' </div>';
 	            headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
-	            headContentHtml = headContentHtml + '	<div class="st-rating-wrapper maring-0 clearfix float-left">';
+	            headContentHtml = headContentHtml + '	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">';
 	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
 	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
 	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
@@ -95,9 +95,9 @@ function paintCompanyProfile(data) {
 	            $("#prof-contact-information").html(contactInfoHtml);
 			}         
 		}
+		fetchAverageRatings(result.iden);
 		fetchCompanyRegions();
 		fetchReviewsForCompany(result.iden);
-		fetchAverageRatings(result.iden);
 	}
 }
 
@@ -108,7 +108,30 @@ function fetchAverageRatings(companyId) {
 
 function paintAverageRatings(data) {
 	var responseJson = $.parseJSON(data);
-	//console.log(responseJson);
+	if(responseJson != undefined) {
+		var rating = $.parseJSON(responseJson.entity);
+		changeRatingPattern(rating,$("#rating-avg-comp"));
+	}
+}
+
+function changeRatingPattern(rating, ratingParent) {
+	var counter = 0;
+	ratingParent.children().each(function() {
+		$(this).addClass("icn-no-star");
+		$(this).removeClass("icn-half-star");
+		$(this).removeClass("icn-full-star");
+
+		if (rating >= counter) {
+			if (rating - counter >= 1) {
+				$(this).removeClass("icn-no-star");
+				$(this).addClass("icn-full-star");
+			} else if (rating - counter == 0.5) {
+				$(this).removeClass("icn-no-star");
+				$(this).addClass("icn-half-star");
+			}
+		}
+		counter++;
+	});
 }
 
 
@@ -129,10 +152,78 @@ function paintCompanyRegions(data) {
 				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company"></div>';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
+				regionsHtml = regionsHtml+'	   <div class="lpsub-2 hide" id="comp-region-branches-'+region.regionId+'"></div>';
 				regionsHtml = regionsHtml+'	</div>';
 				regionsHtml = regionsHtml+'</div>';
 			});
 			$("#comp-regions-content").html(regionsHtml);
+			
+			$(".comp-region").click(function(){
+				fetchBranchesForRegion($(this).data('regionid'));
+			});
+		}
+	}
+}
+
+function fetchBranchesForRegion(regionId) {
+	var url = window.location.origin +'/rest/profile/region/'+regionId+'/branches';
+	$("#regionid-hidden").val(regionId);
+	callAjaxGET(url, paintBranchesForRegion, true);
+}
+
+function paintBranchesForRegion(data) {
+	var responseJson = $.parseJSON(data);
+	var branchesHtml = "";
+	var regionId = $("#regionid-hidden").val();
+	if(responseJson != undefined) {
+		var result = $.parseJSON(responseJson.entity);
+		if(result != undefined && result.length > 0) {
+			$.each(result,function(i,branch) {
+				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-branch" data-branchid="'+branch.branchId+'">';
+				branchesHtml = branchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
+				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
+				branchesHtml = branchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
+				branchesHtml = branchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-"'+branch.branchId+'></div>';
+				branchesHtml = branchesHtml +'	</div>';
+				branchesHtml = branchesHtml +'</div>' ;
+			});
+			
+			$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
+			
+			$(".comp-branch").click(function(){
+				$(".comp-region").unbind("click");
+				console.log($(this));
+				fetchIndividualForBranch($(this).data('branchid'));
+			});
+		}
+	}
+}
+
+function fetchIndividualForBranch(branchId) {
+	var url=window.location.origin +'/rest/profile/branch/'+branchId+'/individuals';
+	$("#branchid-hidden").val(branchId);
+	callAjaxGET(url, paintIndividualForBranch, true);
+}
+
+function paintIndividualForBranch(data) {
+	var responseJson = $.parseJSON(data);
+	var individualsHtml = "";
+	var branchId = $("#branchid-hidden").val();
+	if(responseJson != undefined && responseJson.entity != "") {
+		var result = $.parseJSON(responseJson.entity);
+		if(result != undefined && result.length > 0) {
+			$.each(result,function(i,individual) {
+				if(result.contact_details != undefined){
+					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel">';
+					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img icn-psn1"></div>';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
+					individualsHtml=  individualsHtml+'    		<div class="lpsub-2"></div>';
+					individualsHtml=  individualsHtml+'		</div>';
+					individualsHtml=  individualsHtml+'</div>';
+				}
+			});
+			$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
 		}
 	}
 }
@@ -186,7 +277,7 @@ function paintReviewsForCompany(data) {
 				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">12<sup>th</sup>Sept 2014</div>';        
 				reviewsHtml=  reviewsHtml+'    </div>';
 				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
-				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix">';
+				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
 				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
 				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
 				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
@@ -209,7 +300,9 @@ function paintReviewsForCompany(data) {
 				reviewsHtml=  reviewsHtml+'	</div>';
 				reviewsHtml=  reviewsHtml+'</div>';
 			});
-			
+			$(".review-ratings").each(function() {
+				changeRatingPattern($(this).data("rating"), $(this));
+			});
 			$("#prof-review-item").html(reviewsHtml);
 		}
 	}

@@ -94,6 +94,10 @@
                 <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     <div class="left-assoc-wrapper">
                         <div class="left-panel-header">Our Company</div>
+                        <!-- hidden fields to capture which region/branch is expanded -->
+                        <input type="hidden" id="regionid-hidden"/>
+                        <input type="hidden" id="branchid-hidden"/>
+                        
                         <div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
                             <!-- <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0" id="comp-regions">
                                 <div class="lp-sub-header clearfix flat-left-bord">

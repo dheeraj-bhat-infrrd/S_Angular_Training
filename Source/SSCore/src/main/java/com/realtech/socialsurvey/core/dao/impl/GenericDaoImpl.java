@@ -306,8 +306,9 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> findProjectionsByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries) {
+		Criteria crit = null;
 		try {
-			Criteria crit = getSession().createCriteria(dataClass);
+			crit = getSession().createCriteria(dataClass);
 			ProjectionList projections = Projections.projectionList();
 			for (String columnName : columnNames) {
 				projections.add(Projections.property(columnName).as(columnName));
@@ -317,12 +318,12 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			for (Entry<String, Object> query : queries.entrySet()) {
 				crit.add(Restrictions.eq(query.getKey(), query.getValue()));
 			}
-			return (List<T>) crit.setResultTransformer(Transformers.aliasToBean(dataClass)).list();
 		}
 		catch (HibernateException e) {
 			LOG.error("HibernateException caught in findProjectionsByKeyValue(). Reason: " + e.getMessage(), e);
 			throw new DatabaseException("HibernateException caught in findProjectionsByKeyValue().", e);
 		}
+		return crit.setResultTransformer(Transformers.aliasToBean(dataClass)).list();
 	}
 }
 // JIRA: SS-8: By RM05: EOC

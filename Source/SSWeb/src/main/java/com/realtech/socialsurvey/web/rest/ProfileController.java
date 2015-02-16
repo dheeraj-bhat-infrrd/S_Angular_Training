@@ -12,11 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
@@ -298,7 +298,7 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS, "Profile name for company is invalid"),
 						"company profile name is null or empty while fetching all individuals for a company");
 			}
-			List<User> users = null;
+			List<AgentSettings> users = null;
 			try {
 				users = profileManagementService.getIndividualsForCompany(companyProfileName);
 				String json = new Gson().toJson(users);
@@ -362,12 +362,71 @@ public class ProfileController {
 		LOG.info("Service to fetch all the branches inside a region of company executed successfully");
 		return response;
 	}
-	
+
+	/**
+	 * Service to fetch branches when regionId is provided
+	 * 
+	 * @param regionId
+	 * @return
+	 */
 	@ResponseBody
-	@RequestMapping(value = "/region/{regionProfileName}/branches")
-	public Response getBranchesByRegionId(){
-		return null;
-		
+	@RequestMapping(value = "/region/{regionId}/branches")
+	public Response getBranchesByRegionId(@PathVariable long regionId) {
+		LOG.info("Service to fetch branches for a region called for regionId :" + regionId);
+		Response response = null;
+		try {
+			if (regionId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_BRANCHES_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_BRANCHES, "Region id is invalid"),
+						"region id is invalid while fetching all branches for the region");
+			}
+			try {
+				List<Branch> branches = organizationManagementService.getBranchesByRegionId(regionId);
+				String json = new Gson().toJson(branches);
+				LOG.debug("branches json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_BRANCHES_FETCH_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_BRANCHES, "Something went wrong while fetching individuals under region"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		return response;
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/branch/{branchId}/individuals")
+	public Response getIndividualsByBranchId(@PathVariable long branchId) {
+		LOG.info("Service to fetcg individuals for branch called for branchId:" + branchId);
+		Response response = null;
+		try {
+			if (branchId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS, "Branch id is invalid"),
+						"branch id is invalid while fetching all individuals for the branch");
+			}
+			try {
+				List<AgentSettings> individuals = profileManagementService.getIndividualsByBranchId(branchId);
+				String json = new Gson().toJson(individuals);
+				LOG.debug("individuals json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_INDIVIDUALS_FETCH_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS, "Something went wrong while fetching individuals under branch"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to fetch individuals for branch executed successfully");
+		return response;
 	}
 
 	/**
@@ -395,7 +454,7 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Profile name for company is invalid"),
 						"region profile name is null or empty while fetching all individuals for the region");
 			}
-			List<User> users = null;
+			List<AgentSettings> users = null;
 			try {
 				users = profileManagementService.getIndividualsForRegion(companyProfileName, regionProfileName);
 				String json = new Gson().toJson(users);
@@ -440,7 +499,7 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS, "Profile name for branch is invalid"),
 						"branch profile name is null or empty while fetching all individuals for a branch");
 			}
-			List<User> users = null;
+			List<AgentSettings> users = null;
 			try {
 				users = profileManagementService.getIndividualsForBranch(companyProfileName, branchProfileName);
 				String json = new Gson().toJson(users);
