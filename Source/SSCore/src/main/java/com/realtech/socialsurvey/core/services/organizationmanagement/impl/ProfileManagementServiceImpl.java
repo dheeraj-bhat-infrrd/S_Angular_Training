@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -27,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -59,6 +61,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private GenericDao<User, Long> userDao;
+
+	@Autowired
+	private SurveyDetailsDao surveyDetailsDao;
 
 	@Autowired
 	private Utils utils;
@@ -619,11 +624,38 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		if (userProfiles != null && !userProfiles.isEmpty()) {
 			UserProfile userProfile = userProfiles.get(0);
-			
+
 		}
 		// TODO fetch final agent settings based on the locks
 
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
 	}
+
+	/**
+	 * Method to get aggregated reviews of all agents of a company
+	 */
+	@Override
+	public List<SurveyDetails> getReviewsForCompany(long companyId) throws InvalidInputException {
+		LOG.info("Method getReviewsForCompany called for companyId:" + companyId);
+		List<SurveyDetails> surveyDetails = surveyDetailsDao.getAllFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId);
+		LOG.info("Method getReviewsForCompany executed successfully");
+		return surveyDetails;
+	}
+
+	/**
+	 * Method to get average rating for individuals of a company
+	 */
+	@Override
+	public double getAverageRatingForCompany(long companyId) throws InvalidInputException {
+		LOG.info("Method getAverageRatingForCompany called for companyId:" + companyId);
+		if (companyId <= 0l) {
+			throw new InvalidInputException("Company id is invalid for getting average rating os a company");
+		}
+		double averageRating = surveyDetailsDao.getRatingForPastNdays(CommonConstants.COMPANY_ID_COLUMN, companyId, -1);
+
+		LOG.info("Method getAverageRatingForCompany executed successfully");
+		return averageRating;
+	}
+
 }
