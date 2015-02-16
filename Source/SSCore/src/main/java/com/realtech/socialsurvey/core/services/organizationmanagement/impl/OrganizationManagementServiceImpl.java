@@ -300,6 +300,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
+		companySettings.setModifiedOn(System.currentTimeMillis());
+		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 		// TODO set lock settings
 		companySettings.setLockSettings(new LockSettings());
 		LOG.debug("Inserting company settings.");
