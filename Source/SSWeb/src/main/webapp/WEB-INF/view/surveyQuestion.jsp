@@ -109,7 +109,7 @@
 				<div class="sq-top-img"></div>
 				<!-- <div class="sq-main-txt">Survey Question</div> -->
 				<div class="sq-ques">
-					<i><span id="ques-text" class="sq-ques-txt">Please fill in your details to take survey</span></i>
+					<i><span  class="sq-ques-txt">Please fill in your details to take survey</span></i>
 				</div>
 				<div class="sq-bord-bot-sm"></div>
 				<div class="sq-rat-wrapper">
