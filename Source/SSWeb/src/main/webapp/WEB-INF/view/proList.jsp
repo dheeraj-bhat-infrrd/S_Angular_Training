@@ -95,7 +95,7 @@
 												<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>
 											</div>
 											<div class="float-left ctnt-list-item-btn-wrap">
-												<div class="ctnt-review-btn"><spring:message code="label.reviewbutton.key" /></div>
+												<div class="ctnt-review-btn" user="${user.userId}"><spring:message code="label.reviewbutton.key" /></div>
 											</div>
 										</div>
 									</c:forEach>

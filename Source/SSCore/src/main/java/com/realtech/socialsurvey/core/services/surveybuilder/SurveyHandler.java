@@ -16,9 +16,9 @@ public interface SurveyHandler {
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 */
-	public void storeInitialSurveyDetails(long agentId, long companyId, long regionId, long branchId, String customerEmail, int reminderCount)
+/*	public void storeInitialSurveyDetails(long agentId, long companyId, long regionId, long branchId, String customerEmail, int reminderCount)
 			throws InvalidInputException, SolrException, NoRecordsFetchedException, SolrServerException;
-
+*/
 	/*
 	 * Method to update answers to all the questions and current stage in MongoDB.
 	 * @param agentId
@@ -34,4 +34,9 @@ public interface SurveyHandler {
 	 * Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS.
 	 */
 	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review);
+
+	public String storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount) throws SolrException, NoRecordsFetchedException,
+			SolrServerException, InvalidInputException;
+
+	public String getApplicationBaseUrl();
 }
