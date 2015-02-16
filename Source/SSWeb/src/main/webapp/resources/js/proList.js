@@ -95,7 +95,7 @@ function infiniteScrollCallback(response) {
 						+ '<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>'
 					+ '</div>'
 					+ '<div class="float-left ctnt-list-item-btn-wrap">'
-						+ '<div class="ctnt-review-btn">Review</div>'
+						+ '<div class="ctnt-review-btn user="'+user+'">Review</div>'
 					+ '</div>'
 				+ '</div>';
 			loopStatus ++;
@@ -105,3 +105,24 @@ function infiniteScrollCallback(response) {
 		$('#fp-users-size').val(loopStatus);
 	}
 }
+
+$('.ctnt-review-btn').click(function() {
+	var payload = {
+			"userId" : $(this).attr('user')
+		};
+	$.ajax({
+		url : "./../rest/survey/redirecttodetailspage",
+		type : "GET",
+		data : payload,
+		datatype : "html",
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				window.open(data.responseText);
+			}
+		}
+	});
+});

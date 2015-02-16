@@ -7,6 +7,7 @@ var qno = 0;
 var data;
 var questionDetails;
 var agentId;
+var agentName;
 var customerResponse;
 var customerEmail;
 var mood;
@@ -18,15 +19,22 @@ $(document).on('click', '.sq-np-item-next', function() {
  * Function to initiate survey. It hits controller to get list of all the
  * questions which are shown one after one to the customer.
  */
-function initSurvey(agentId, customerEmailId) {
+function initSurvey(firstName, lastName, email, agentId) {
 	var success = false;
 	this.agentId = agentId;
-	customerEmail = customerEmailId;
+	customerEmail = email;
+	var payload = {
+		"agentId" : agentId,
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"customerEmail" : email
+	};
 	$.ajax({
 		// TODO provide mapping
-		url : "./../data/" + agentId + "/" + customerEmailId,
+		url : "./../triggersurvey",
 		type : "GET",
 		dataType : "JSON",
+		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
 				success = true;
@@ -119,7 +127,7 @@ function paintSurveyPageFromJson() {
 		$("#next-textarea-smiley").addClass("sq-np-item-disabled");
 		$("#skip-ques-mcq").hide();
 	}
-	$(".sq-main-txt").html("Survey for Agent Id "+agentId);
+	$(".sq-main-txt").html("Survey for " + agentName);
 }
 
 /*
@@ -294,6 +302,9 @@ $('.sq-np-item-next').click(
 					$('#range-slider-value').html(value);
 				}
 			}
+			if (questionDetails.questionType == "sb-sel-mcq") {
+				customerResponse = "";
+			}
 		});
 
 // Code to be executed on click of previous for star and smile questions.
@@ -369,28 +380,35 @@ $('.sq-sad-smile').click(function() {
 	showFeedbackPage(mood);
 });
 
-$('.sq-btn-continue').click(function() {
+$('#start-btn').click(function() {
+	var firstName = $('#firstName').val().trim();
+	var lastName = $('#lastName').val().trim();
+	var email = $('#email').val().trim();
+	var agentId = $('#prof-container').attr("data-agentId");
+	initSurvey(firstName, lastName, email, agentId);
+});
+
+$('#submit').click(function() {
 	var feedback = $("#text-area").val();
 	updateCustomeResponse(feedback);
 });
 
-$('input[type="range"]').rangeslider(
-		{
-			polyfill : false,
+$('input[type="range"]').rangeslider({
+	polyfill : false,
 
-			// Default CSS classes
-			rangeClass : 'rangeslider',
-			fillClass : 'rangeslider__fill',
-			handleClass : 'rangeslider__handle',
+	// Default CSS classes
+	rangeClass : 'rangeslider',
+	fillClass : 'rangeslider__fill',
+	handleClass : 'rangeslider__handle',
 
-			onSlide : function(position, value) {
-				//$('div[quest-no="' + survQuesNo + '"]').find(
-					//	'.sq-slider-val').html(value);
-				$('#range-slider-value').html(value);
-			},
-			// Callback function
-			onSlideEnd : function(position, value) {
-				$('#range-slider-value').html(value);
-				storeCustomerAnswer(value);
-			},
-		});
+	onSlide : function(position, value) {
+		// $('div[quest-no="' + survQuesNo + '"]').find(
+		// '.sq-slider-val').html(value);
+		$('#range-slider-value').html(value);
+	},
+	// Callback function
+	onSlideEnd : function(position, value) {
+		$('#range-slider-value').html(value);
+		storeCustomerAnswer(value);
+	},
+});
