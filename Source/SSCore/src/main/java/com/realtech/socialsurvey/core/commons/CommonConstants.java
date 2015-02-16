@@ -117,6 +117,10 @@ public interface CommonConstants {
 	public static final String SCORE_COLUMN = "score";
 	public static final String SHARED_ON_COLUMN = "sharedOn";
 	public static final String COMPANY_ID_COLUMN = "companyId";
+	public static final String INITIATED_BY_COLUMN = "initiatedBy";
+	public static final String STAGE_COLUMN = "stage";
+	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
+	public static final String MOOD_COLUMN = "mood";
 	
 	
 	/**
