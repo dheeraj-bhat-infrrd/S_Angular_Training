@@ -10,18 +10,22 @@
 						</div>
 						<div class="float-left">
 							<c:choose>
-								<c:when	test="${lock.isAboutMeLocked && not user.agent}">
-									<div id="aboutme-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+								<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
+									${contactdetail.about_me}
 								</c:when>
-								<c:when	test="${not lock.isAboutMeLocked && not user.agent}">
-									<div id="aboutme-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
-								</c:when>
+								<c:otherwise>
+									<spring:message code="label.aboutcompany.empty.key" />
+									<input type="hidden" id="aboutme-status" value="new"/>
+								</c:otherwise>
 							</c:choose>
 						</div>
 					</div>
 					<div class="intro-body" id="intro-body-text">
 						<c:choose>
-							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">${contactdetail.about_me}</c:when>
+							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
+								${contactdetail.about_me}
+								<input type="hidden" id="aboutme-status" value="edited"/>
+							</c:when>
 							<c:otherwise><spring:message code="label.aboutcompany.empty.key" /></c:otherwise>
 						</c:choose>
 					</div>

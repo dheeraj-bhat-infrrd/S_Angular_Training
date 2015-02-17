@@ -355,9 +355,6 @@ public class ProfileManagementController {
 			if (name == null || name.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			if (title == null || title.isEmpty()) {
-				throw new InvalidInputException("Title passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
-			}
 
 			if (user.isCompanyAdmin()) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
@@ -417,7 +414,7 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Profile addresses updated successfully");
 			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					messageUtils.getDisplayMessage(DisplayMessageConstants.BASIC_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating profile basic details. Reason :" + nonFatalException.getMessage(), nonFatalException);
@@ -985,7 +982,7 @@ public class ProfileManagementController {
 			}
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			sessionHelper.setLogoInSession(session, userSettings);
+			sessionHelper.setProfileImageInSession(session, userSettings);
 			LOG.info("Logo uploaded successfully");
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -1399,49 +1396,85 @@ public class ProfileManagementController {
 		contactDetailsSettings.setWeb_addresses(webAddressSettings);
 	}
 
-	// TODO
-	@ResponseBody
 	@RequestMapping(value = "/updatefacebooklink", method = RequestMethod.POST)
 	public String updateFacebookLink(Model model, HttpServletRequest request) {
 		LOG.info("Updating Facebook link");
-		String fbLink = request.getParameter("fblink");
-		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		SocialMediaTokens socialMediaTokens = null;
+		
 		try {
-			if (fbLink == null || fbLink.isEmpty()) {
-				throw new InvalidInputException("Facebook link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
+
+			String fbLink = request.getParameter("fblink");
 			try {
+				if (fbLink == null || fbLink.isEmpty()) {
+					throw new InvalidInputException("Facebook link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
 				urlValidationHelper.validateUrl(fbLink);
 			}
 			catch (IOException ioException) {
 				throw new InvalidInputException("Facebook link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null) {
-				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+							socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
 			}
-			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
-			if (unitSettings == null) {
-				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+							socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
-			if (socialMediaTokens == null) {
-				LOG.debug("No social media token in profile added");
-				socialMediaTokens = new SocialMediaTokens();
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+							socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			FacebookToken facebookToken = new FacebookToken();
-			facebookToken.setFacebookPageLink(fbLink);
-			socialMediaTokens.setFacebookToken(facebookToken);
-			try {
-				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
-						socialMediaTokens);
+			else if (user.isAgent()) {
+				long agentId = user.getUserProfiles().get(0).getAgentId();
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+							socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
-						DisplayMessageConstants.GENERAL_ERROR, e);
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating fb token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			unitSettings.setSocialMediaTokens(socialMediaTokens);
-			userSettings.setCompanySettings(unitSettings);
+			
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Facebook link updated successfully");
 		}
@@ -1452,47 +1485,96 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	private SocialMediaTokens updateFacebookToken(SocialMediaTokens socialMediaTokens, String fbLink) {
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		FacebookToken facebookToken = new FacebookToken();
+		facebookToken.setFacebookPageLink(fbLink);
+		socialMediaTokens.setFacebookToken(facebookToken);
+		return socialMediaTokens;
+	}
+
 	@RequestMapping(value = "/updatetwitterlink", method = RequestMethod.POST)
 	public String updateTwitterLink(Model model, HttpServletRequest request) {
+		LOG.info("Updating Facebook link");
+		User user = sessionHelper.getCurrentUser();
+		SocialMediaTokens socialMediaTokens = null;
 
-		String twitterLink = request.getParameter("twitterlink");
-		HttpSession session = request.getSession(false);
 		try {
-			if (twitterLink == null || twitterLink.isEmpty()) {
-				throw new InvalidInputException("Twitter link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
+
+			String twitterLink = request.getParameter("twitterlink");
 			try {
+				if (twitterLink == null || twitterLink.isEmpty()) {
+					throw new InvalidInputException("Twitter link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
 				urlValidationHelper.validateUrl(twitterLink);
 			}
 			catch (IOException ioException) {
 				throw new InvalidInputException("LinkedIn link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null) {
-				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+							socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
 			}
-			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
-			if (unitSettings == null) {
-				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+							socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
-			if (socialMediaTokens == null) {
-				LOG.debug("No social media token in profile added");
-				socialMediaTokens = new SocialMediaTokens();
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+							socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			TwitterToken twitterToken = new TwitterToken();
-			twitterToken.setTwitterPageLink(twitterLink);
-			socialMediaTokens.setTwitterToken(twitterToken);
-			try {
-				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
-						socialMediaTokens);
+			else if (user.isAgent()) {
+				long agentId = user.getUserProfiles().get(0).getAgentId();
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+							socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
-						DisplayMessageConstants.GENERAL_ERROR, e);
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating twitter token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			unitSettings.setSocialMediaTokens(socialMediaTokens);
-			userSettings.setCompanySettings(unitSettings);
+			
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("Twitter link updated successfully");
 		}
@@ -1503,47 +1585,96 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	private SocialMediaTokens updateTwitterToken(SocialMediaTokens socialMediaTokens, String twitterLink) {
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		TwitterToken twitterToken = new TwitterToken();
+		twitterToken.setTwitterPageLink(twitterLink);
+		socialMediaTokens.setTwitterToken(twitterToken);
+		return socialMediaTokens;
+	}
+
 	@RequestMapping(value = "/updatelinkedinlink", method = RequestMethod.POST)
 	public String updateLinkedInLink(Model model, HttpServletRequest request) {
+		LOG.info("Updating Linkedin link");
+		User user = sessionHelper.getCurrentUser();
+		SocialMediaTokens socialMediaTokens = null;
 
-		String linkedinLink = request.getParameter("linkedinlink");
-		HttpSession session = request.getSession(false);
 		try {
-			if (linkedinLink == null || linkedinLink.isEmpty()) {
-				throw new InvalidInputException("LinkedIn link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
+
+			String linkedinLink = request.getParameter("linkedinlink");
 			try {
+				if (linkedinLink == null || linkedinLink.isEmpty()) {
+					throw new InvalidInputException("LinkedIn link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
 				urlValidationHelper.validateUrl(linkedinLink);
 			}
 			catch (IOException ioException) {
 				throw new InvalidInputException("LinkedIn link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null) {
-				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = upadteLinkedinToken(linkedinLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+							socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
 			}
-			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
-			if (unitSettings == null) {
-				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = upadteLinkedinToken(linkedinLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+							socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
-			if (socialMediaTokens == null) {
-				LOG.debug("No social media token in profile added");
-				socialMediaTokens = new SocialMediaTokens();
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = upadteLinkedinToken(linkedinLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+							socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			LinkedInToken linkedIntoken = new LinkedInToken();
-			linkedIntoken.setLinkedInPageLink(linkedinLink);
-			socialMediaTokens.setLinkedInToken(linkedIntoken);
-			try {
-				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
-						socialMediaTokens);
+			else if (user.isAgent()) {
+				long agentId = user.getUserProfiles().get(0).getAgentId();
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = upadteLinkedinToken(linkedinLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+							socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
-						DisplayMessageConstants.GENERAL_ERROR, e);
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in upadting linkedin token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			unitSettings.setSocialMediaTokens(socialMediaTokens);
-			userSettings.setCompanySettings(unitSettings);
+			
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("LinkedIn link updated successfully");
 		}
@@ -1554,47 +1685,96 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	private SocialMediaTokens upadteLinkedinToken(String linkedinLink, SocialMediaTokens socialMediaTokens) {
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		LinkedInToken linkedIntoken = new LinkedInToken();
+		linkedIntoken.setLinkedInPageLink(linkedinLink);
+		socialMediaTokens.setLinkedInToken(linkedIntoken);
+		return socialMediaTokens;
+	}
+
 	@RequestMapping(value = "/updateyelplink", method = RequestMethod.POST)
 	public String updateYelpLink(Model model, HttpServletRequest request) {
+		LOG.info("Updating Yelp link");
+		User user = sessionHelper.getCurrentUser();
+		SocialMediaTokens socialMediaTokens = null;
 
-		String yelpLink = request.getParameter("yelplink");
-		HttpSession session = request.getSession(false);
 		try {
-			if (yelpLink == null || yelpLink.isEmpty()) {
-				throw new InvalidInputException("Yelp link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
+
+			String yelpLink = request.getParameter("yelplink");
 			try {
+				if (yelpLink == null || yelpLink.isEmpty()) {
+					throw new InvalidInputException("Yelp link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
 				urlValidationHelper.validateUrl(yelpLink);
 			}
 			catch (IOException ioException) {
 				throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings == null) {
-				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = upadteYelpLink(yelpLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+							socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
 			}
-			OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
-			if (unitSettings == null) {
-				throw new InvalidInputException("No company settings found in current session", DisplayMessageConstants.GENERAL_ERROR);
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = upadteYelpLink(yelpLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+							socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			SocialMediaTokens socialMediaTokens = unitSettings.getSocialMediaTokens();
-			if (socialMediaTokens == null) {
-				LOG.debug("No social media token in profile added");
-				socialMediaTokens = new SocialMediaTokens();
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = upadteYelpLink(yelpLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+							socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			YelpToken yelpToken = new YelpToken();
-			yelpToken.setYelpPageLink(yelpLink);
-			socialMediaTokens.setYelpToken(yelpToken);
-			try {
-				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
-						socialMediaTokens);
+			else if (user.isAgent()) {
+				long agentId = user.getUserProfiles().get(0).getAgentId();
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = upadteYelpLink(yelpLink, socialMediaTokens);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+							socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Invalid input exception ocurred while updating social media tokens",
-						DisplayMessageConstants.GENERAL_ERROR, e);
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating yelp token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			unitSettings.setSocialMediaTokens(socialMediaTokens);
-			userSettings.setCompanySettings(unitSettings);
+			
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			LOG.info("YelpLinked in link updated successfully");
 		}
@@ -1605,7 +1785,18 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	// TODO JIRA SS-97 by RM-06 : EOC
+	private SocialMediaTokens upadteYelpLink(String yelpLink, SocialMediaTokens socialMediaTokens) {
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		YelpToken yelpToken = new YelpToken();
+		yelpToken.setYelpPageLink(yelpLink);
+		socialMediaTokens.setYelpToken(yelpToken);
+		return socialMediaTokens;
+	}
+
+	// JIRA SS-97 by RM-06 : EOC
 
 	/*
 	 * Method to find a user on the basis of email id provided.
@@ -1726,18 +1917,19 @@ public class ProfileManagementController {
 			// Get the profile address parameters
 			String fieldId = request.getParameter("id");
 			boolean fieldState = Boolean.parseBoolean(request.getParameter("state"));
-			LOG.info(fieldId + fieldState);
 			if (fieldId == null || fieldId.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
+			
+			OrganizationUnitSettings lockedDetail = fetchProfile(model, request);
 			if (user.isCompanyAdmin()) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				lockSettings = companySettings.getLockSettings();
-				updateLockSettings(lockSettings, fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, lockSettings);
 				companySettings.setLockSettings(lockSettings);
@@ -1750,7 +1942,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				lockSettings = regionSettings.getLockSettings();
-				updateLockSettings(lockSettings, fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, lockSettings);
 				regionSettings.setLockSettings(lockSettings);
@@ -1763,9 +1955,10 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				lockSettings = branchSettings.getLockSettings();
-				updateLockSettings(lockSettings, fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
+				LOG.info(lockSettings.getIsDisplayNameLocked()+"");
 				branchSettings.setLockSettings(lockSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -1774,9 +1967,8 @@ public class ProfileManagementController {
 			}
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			LOG.info("Profile addresses updated successfully");
 			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
@@ -1785,28 +1977,42 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	private void updateLockSettings(LockSettings lockSettings, String fieldId, boolean status) {
+	private void updateLockSettings(LockSettings lockSettings, LockSettings lockedDetail, String fieldId, boolean status) {
 		switch (fieldId) {
 			case "prof-name-lock":
-				lockSettings.setDisplayNameLocked(status);
+				if (!lockedDetail.getIsDisplayNameLocked()) {
+					lockSettings.setDisplayNameLocked(status);
+				}
 				break;
 			case "prof-logo-lock":
-				lockSettings.setLogoLocked(status);
+				if (!lockedDetail.getIsLogoLocked()) {
+					lockSettings.setLogoLocked(status);
+				}
 				break;
 			case "web-address-work-lock":
-				lockSettings.setWebAddressLocked(status);;
+				if (!lockedDetail.getIsWebAddressLocked()) {
+					lockSettings.setWebAddressLocked(status);;
+				}
 				break;
 			case "phone-number-work-lock":
-				lockSettings.setWorkPhoneLocked(status);
+				if (!lockedDetail.getIsWorkPhoneLocked()) {
+					lockSettings.setWorkPhoneLocked(status);
+				}
 				break;
 			case "phone-number-personal-lock":
-				lockSettings.setPersonalPhoneLocked(status);
+				if (!lockedDetail.getIsPersonalPhoneLocked()) {
+					lockSettings.setPersonalPhoneLocked(status);
+				}
 				break;
 			case "phone-number-fax-lock":
-				lockSettings.setFaxPhoneLocked(status);
+				if (!lockedDetail.getIsFaxPhoneLocked()) {
+					lockSettings.setFaxPhoneLocked(status);
+				}
 				break;
 			case "aboutme-lock":
-				lockSettings.setAboutMeLocked(status);
+				if (!lockedDetail.getIsAboutMeLocked()) {
+					lockSettings.setAboutMeLocked(status);
+				}
 				break;
 		}
 	}
