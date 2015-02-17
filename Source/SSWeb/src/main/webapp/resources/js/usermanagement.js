@@ -3,11 +3,13 @@ var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
 var batchSize = 20;
+var isAddUser = true;
 
 $(document).on('click', '.um-user-row', function() {
 	if (!isUserManagementAuthorized)
 		return false;
 	console.log("user row clicked");
+	isAddUser = false;
 	var userId = this.id;
 	userId = userId.substr("um-user-".length);
 	paintUserDetailsForm(userId);
@@ -16,7 +18,7 @@ $(document).on('click', '.tm-table-remove-icn', function(event) {
 	if (!isUserManagementAuthorized)
 		return false;
 	event.stopPropagation();
-	var userId = $(this).closest('.um-user-row').attr("id");
+	var userId = $(this).closest('.row').attr("data-id");
 	userId = userId.substr("um-user-".length);
 	confirmDeleteUser(userId);
 });
@@ -46,12 +48,24 @@ function selectBranch(element) {
 	$('#um-assignto').attr("branchId", branchId);
 }
 
-$(document).on('click', '#um-assignto-con .icn-save', function() {
+$(document).on('click', '#um-add-user', function() {
 	if (!isUserManagementAuthorized) {
 		return false;
 	}
+	var userId;
+	if (isAddUser) {
+		// TODO Add code to create a new user.
+		if (!validateUserInviteDetails()) {
+			return false;
+		}
+		inviteUser();
+		isAddUser=false;
+		userId = $('#mh-userId').val();
+	}else{
+		userId = $('#um-user-details-container').attr("data-id");
+	}
 	var branchId = $('#um-assignto').attr("branchId");
-	var userId = $(this).closest('.row').attr("id");
+	
 	if (!validateUserInviteDetails()) {
 		return false;
 	}
@@ -61,14 +75,16 @@ $(document).on('click', '#um-assignto-con .icn-save', function() {
 	assignUserToBranch(userId, branchId);
 });
 
-$(document).on('click', '#um-emailid-con .icn-save', function() {
+$(document).on('click', '#um-clear-user-form', function() {
 	if (!isUserManagementAuthorized) {
 		return false;
 	}
-	if (!validateUserInviteDetails()) {
+	isAddUser=true;
+	paintUserDetailsForm("");
+	/*if (!validateUserInviteDetails()) {
 		return false;
 	}
-	inviteUser();
+	inviteUser();*/
 });
 
 /*
@@ -180,6 +196,7 @@ function inviteUser() {
 		url : "./invitenewuser.do",
 		type : "POST",
 		dataType : "html",
+		async : false,
 		data : payload,
 		success : function(data) {
 			$('#message-header').html(data);

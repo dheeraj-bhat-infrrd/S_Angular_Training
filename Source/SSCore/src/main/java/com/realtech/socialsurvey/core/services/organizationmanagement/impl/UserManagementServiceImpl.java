@@ -275,9 +275,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * 
 	 * @param encryptedUrlParams
 	 * @throws InvalidInputException
+	 * @throws SolrException 
 	 */
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException {
+	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException, SolrException {
 		LOG.info("Method to verify account called for encryptedUrlParams");
 		Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
 		if (urlParams == null || urlParams.isEmpty()) {
@@ -476,7 +477,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	private void populateProfileMastersMap() {
 		LOG.debug("Getting all profile masters from database and storing in map");
-		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAll(ProfilesMaster.class);
+		List<ProfilesMaster> profileMasterList = profilesMasterDao.findAllActive(ProfilesMaster.class);
 		if (profileMasterList != null && !profileMasterList.isEmpty()) {
 			for (ProfilesMaster profilesMaster : profileMasterList) {
 				profileMasters.put(profilesMaster.getProfileId(), profilesMaster);
@@ -664,6 +665,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	/**
 	 * Method to create profile for a region admin
 	 */
+	@Transactional
 	@Override
 	public User assignRegionAdmin(User assigneeUser, long regionId, long userId) throws InvalidInputException {
 		if (assigneeUser == null) {
@@ -742,10 +744,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	/**
 	 * Method to update a user's status
+	 * @throws SolrException 
 	 */
 	@Override
 	@Transactional
-	public void updateUserStatus(long userId, int status) throws InvalidInputException {
+	public void updateUserStatus(long userId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status);
 		User user = userDao.findById(User.class, userId);
 		if (user == null) {
@@ -756,6 +759,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		userDao.update(user);
 
+		//Updating status of user into Solr.
+		solrSearchService.addUserToSolr(user);
 		LOG.info("Successfully completed method to update user status");
 	}
 
@@ -786,14 +791,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		UserProfile userProfile;
 		if (userProfiles == null || userProfiles.isEmpty()) {
 			// Create a new entry in UserProfile to map user to the branch.
-			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, branchId,
-					CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
-					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), userId, branchId, CommonConstants.DEFAULT_REGION_ID,
+					CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE,
+					String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
 		}
 		else {
 			userProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
 			if (userProfile.getStatus() == CommonConstants.STATUS_INACTIVE) {
 				userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
+				userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 				userProfile.setModifiedBy(String.valueOf(admin.getUserId()));
 				userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			}
