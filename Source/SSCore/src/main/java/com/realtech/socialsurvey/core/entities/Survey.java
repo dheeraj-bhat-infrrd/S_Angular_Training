@@ -43,6 +43,9 @@ public class Survey implements Serializable {
 
 	@Column(name = "STATUS")
 	private int status;
+	
+	@Column(name = "IS_SURVEY_BUILDING_COMPLETE")
+	private int isSurveyBuildingComplete;
 
 	@Column(name = "SURVEY_NAME")
 	private String surveyName;
@@ -60,6 +63,14 @@ public class Survey implements Serializable {
 	private List<SurveyQuestionsMapping> surveyQuestionsMappings;
 
 	public Survey() {}
+	
+	public int getIsSurveyBuildingComplete() {
+		return isSurveyBuildingComplete;
+	}
+
+	public void setIsSurveyBuildingComplete(int isSurveyBuildingComplete) {
+		this.isSurveyBuildingComplete = isSurveyBuildingComplete;
+	}
 
 	public long getSurveyId() {
 		return this.surveyId;

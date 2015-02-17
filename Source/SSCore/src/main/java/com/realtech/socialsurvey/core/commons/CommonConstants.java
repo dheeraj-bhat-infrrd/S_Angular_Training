@@ -45,6 +45,15 @@ public interface CommonConstants {
 	public static final int ACCOUNTS_MASTER_TEAM = 2;
 	public static final int ACCOUNTS_MASTER_COMPANY = 3;
 	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
+	
+	/**
+	 *  Verticals master constants 
+	 */
+	public static final int VERTICALS_MASTER_CUSTOM = -1;
+	public static final int VERTICALS_MASTER_BANKING = 1;
+	public static final int VERTICALS_MASTER_MORTGAGE = 2;
+	public static final int VERTICALS_MASTER_REALTOR = 3;
+	
 
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
@@ -151,7 +160,6 @@ public interface CommonConstants {
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
 	public static final String VERTICAL_COLUMN = "verticalsMaster";
-	
 	/**
 	 * Batch Constants
 	 */
