@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
@@ -12,7 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -42,7 +47,7 @@ public class SurveyManagementController {
 
 	@Autowired
 	private URLGenerator urlGenerator;
-	
+
 	@Autowired
 	private SolrSearchService solrSearchService;
 
@@ -62,7 +67,7 @@ public class SurveyManagementController {
 		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
 	}
-	
+
 	/*
 	 * Method to store final feedback of the survey from customer.
 	 */
@@ -77,20 +82,20 @@ public class SurveyManagementController {
 		surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
-	
+
 	@ResponseBody
-	@RequestMapping(value="/redirecttodetailspage")
-	public String showDetailsPage(Model model, HttpServletRequest request){
+	@RequestMapping(value = "/redirecttodetailspage")
+	public String showDetailsPage(Model model, HttpServletRequest request) {
 		LOG.info("Method to redirect to survey page started.");
 		String agentId = request.getParameter("userId");
 		LOG.info("Method to redirect to survey page started.");
-		return getApplicationBaseUrl()+"rest/survey/showsurveypage/"+agentId;
+		return getApplicationBaseUrl() + "rest/survey/showsurveypage/" + agentId;
 	}
-	
-	@RequestMapping(value="/showsurveypage/{agentIdStr}")
-	public String initiateSurvey(Model model, @PathVariable String agentIdStr){
+
+	@RequestMapping(value = "/showsurveypage/{agentIdStr}")
+	public String initiateSurvey(Model model, @PathVariable String agentIdStr) {
 		LOG.info("Method to start survey initiateSurvey() started.");
-		if(agentIdStr==null || agentIdStr.isEmpty()){
+		if (agentIdStr == null || agentIdStr.isEmpty()) {
 			LOG.error("Invalid agentId passed. Agent Id can not be null or empty.");
 			return "errorpage500";
 		}
@@ -100,7 +105,7 @@ public class SurveyManagementController {
 			agentName = solrSearchService.getUserDisplayNameById(agentId);
 		}
 		catch (SolrException | NoRecordsFetchedException | SolrServerException e) {
-			LOG.error("Error occured while fetching display name of agent. Error is : "+e);
+			LOG.error("Error occured while fetching display name of agent. Error is : " + e);
 			return "errorpage500";
 		}
 		model.addAttribute("agentId", agentId);
@@ -108,25 +113,27 @@ public class SurveyManagementController {
 		LOG.info("Method to start survey initiateSurvey() finished.");
 		return "surveyQuestion";
 	}
-	
+
 	/*
 	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/triggersurvey")
-	public String triggerSurvey(HttpServletRequest request){
+	public String triggerSurvey(HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-		String survey=null;
+//		String survey = null;
+		Integer stage = null;
+		Map<String, Object> surveyAndStage = new HashMap<>();
 		try {
 			long agentId = 0;
 			String customerEmail;
 			String firstName;
 			String lastName;
 			try {
-				String user = request.getParameter("agentId");
+				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
-				customerEmail = request.getParameter("customerEmail");
+				customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
 				firstName = request.getParameter("firstName");
 				lastName = request.getParameter("lastName");
 			}
@@ -134,29 +141,40 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
-				storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0);
+				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0);
+				if(survey!=null){
+					stage = survey.getStage();
+					for(SurveyQuestionDetails surveyDetails:surveyQuestionDetails){
+						for(SurveyResponse surveyResponse:survey.getSurveyResponse()){
+							if(surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())){
+								surveyDetails.setCustomerResponse(surveyResponse.getAnswer());
+							}
+						}
+					}
+				}
 			}
 			catch (SolrServerException e) {
 				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
 			}
-			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
-			// surveyHandler.storeInitialSurveyAnswers(surveyDetails);
-			survey = new Gson().toJson(surveyQuestionDetails);
+			surveyAndStage.put("stage", stage);
+			surveyAndStage.put("survey", surveyQuestionDetails);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
 			return "{error:" + e.getMessage() + "}";
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-		return survey;
+		return new Gson().toJson(surveyAndStage);
 	}
-		
-	private String storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException{
+
+	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
+			throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
 		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount);
 	}
-	
-	private String getApplicationBaseUrl(){
+
+	private String getApplicationBaseUrl() {
 		return surveyHandler.getApplicationBaseUrl();
 	}
 }

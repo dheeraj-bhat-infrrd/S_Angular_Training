@@ -11,6 +11,7 @@ var agentName;
 var customerResponse;
 var customerEmail;
 var mood;
+var stage;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -52,7 +53,10 @@ function initSurvey(firstName, lastName, email, agentId, agentName) {
 }
 
 function paintSurveyPage(jsonData) {
-	data = jsonData.responseJSON;
+	data = jsonData.responseJSON.survey;
+	stage = jsonData.responseJSON.stage;
+	if(stage!=undefined)
+		qno=stage;
 	paintSurveyPageFromJson();
 }
 
@@ -297,6 +301,7 @@ $('.sq-np-item-next')
 						return;
 					}
 					$(".sq-star").removeClass('sq-full-star');
+					$(".sq-smile").removeClass('sq-full-smile');
 					qno++;
 					paintSurveyPageFromJson();
 
@@ -343,6 +348,7 @@ $('.sq-np-item-prev').click(function() {
 	if (qno == 0) {
 		return;
 	}
+	$("#submit").hide();
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
 	qno--;

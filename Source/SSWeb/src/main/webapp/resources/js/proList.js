@@ -14,7 +14,7 @@ function adjustTextContainerWidthOnResize() {
 //Function to validate the first name pattern
 function validateProFirstNamePattern(elementId) {
 	if ($('#' + elementId).val() != "") {
-		if (nameRegex.test($('#' + elementId).val()) == true) {
+		if (firstNamePatternRegex.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			$('#overlay-toast').html('Please enter a first name pattern.');
@@ -31,7 +31,7 @@ function validateProFirstNamePattern(elementId) {
 // Function to validate the last name pattern
 function validateProLastNamePattern(elementId) {
 	if ($('#' + elementId).val() != "") {
-		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+		if (lastNamePatternRegEx.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			$('#overlay-toast').html('Please enter a valid last name pattern.');

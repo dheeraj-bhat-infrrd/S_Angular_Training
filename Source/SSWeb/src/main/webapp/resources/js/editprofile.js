@@ -7,64 +7,78 @@ var delay = (function() {
 	};
 })();
 
+function startCompanyProfilePage() {
+	showAssociationList();
+	showAchievementList();
+	showLicenceList();
+}
+
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).addClass('prof-name-edit');
 	}
 });
 
 $(document).on('blur', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 $(document).on('focus', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).addClass('prof-name-edit');
 	}
 });
 
 $(document).on('blur', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 
 // TODO Lock Settings
-$('.lp-edit-locks').click(function() {
-	var id = $(this).attr("id");
+$(document).on('click', '.lp-edit-locks', function(e) {
+	e.stopImmediatePropagation();
+	var lockId = $(this).attr("id");
+	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if($(this).hasClass('lp-edit-locks-locked')) {
 		$(this).removeClass('lp-edit-locks-locked');
 		$(this).attr('data-state', 'unlocked');
-		updateLockSettings(id, false);
-
+		updateLockSettings(lockId, false);
+		$("#" + fieldId).attr("readonly", false);
+		
 	} else {
 		$(this).addClass('lp-edit-locks-locked');
 		$(this).attr('data-state', 'locked');
-		updateLockSettings(id, true);
+		updateLockSettings(lockId, true);
+		$("#" + fieldId).attr("readonly", true);
 	}
 });
 
-$('.prof-img-lock-item').click(function() {
-	var id = $(this).attr("id");
+$(document).on('click', '.prof-img-lock-item', function(e) {
+	e.stopImmediatePropagation();
+	var lockId = $(this).attr("id");
+	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if($(this).hasClass('prof-img-lock-locked')) {
 		$(this).removeClass('prof-img-lock-locked');
 		$(this).attr('data-state', 'unlocked');
-		updateLockSettings(id, false);
+		updateLockSettings(lockId, false);
+		$("#" + fieldId).attr("disabled", false);
 
 	} else {
 		$(this).addClass('prof-img-lock-locked');
 		$(this).attr('data-state', 'locked');
-		updateLockSettings(id, true);
+		updateLockSettings(lockId, true);
+		$("#" + fieldId).attr("disabled", true);
 	}
 });
 
@@ -82,14 +96,7 @@ function updateLockSettings(id, state) {
 }
 
 function callBackUpdateLock () {
-	console.log("updated");
-}
-
-// TODO Function to call when the company profile page is loaded
-function startCompanyProfilePage() {
-	// showAssociationList();
-	// showAchievementList();
-	// showLicenceList();
+	showMainContent('./showprofilepage.do');
 }
 
 
@@ -103,6 +110,9 @@ $(document).on('click', '#intro-body-text', function() {
 	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
 		$(this).hide();
 		var textContent = $(this).text().trim();
+		if ($('#aboutme-status').val() == 'new') {
+			textContent = "";
+		}
 		$('#intro-body-text-edit').val(textContent);
 		$('#intro-body-text-edit').show();
 	}
@@ -110,6 +120,7 @@ $(document).on('click', '#intro-body-text', function() {
 
 $(document).on('blur', '#intro-body-text-edit', function() {
 	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
+		
 		var aboutMe = $('#intro-body-text-edit').val().trim();
 		if (aboutMe == undefined || aboutMe == "") {
 			return;
@@ -143,7 +154,7 @@ function callBackOnEditAdboutMeDetails(data) {
 
 // TODO Update Contact details
 function callBackShowContactDetails(data) {
-	// $('#contant-info-container').html(data);
+	$('#contant-info-container').html(data);
 	adjustImage();
 }
 
@@ -152,7 +163,7 @@ $(document).on('blur', '#contant-info-container input[data-phone-number]', funct
 	delay(function() {
 		var phoneNumbers = [];
 		$('#contant-info-container input[data-phone-number]').each(function() {
-			if (this.value != "") {
+			if (this.value != "" && phoneRegex.test(this.value) == true && !$(this).is('[readonly]')) {
 				var phoneNumber = {};
 				phoneNumber.key = $(this).attr("data-phone-number");
 				phoneNumber.value = this.value;
@@ -169,9 +180,7 @@ $(document).on('blur', '#contant-info-container input[data-phone-number]', funct
 
 function callBackOnUpdatePhoneNumbers(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
-		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	}
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -185,9 +194,8 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 		var webAddressValid = true;
 		$('#contant-info-container input[data-web-address]').each(function() {
 			var link = $.trim(this.value);
-			console.log(link);
 			if (link != "") {
-				if (isValidUrl(link)) {
+				if (isValidUrl(link) && !$(this).is('[readonly]')) {
 					var webAddress = {};
 					webAddress.key = $(this).attr("data-web-address");
 					webAddress.value = link;
@@ -214,9 +222,7 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 
 function callBackOnUpdateWebAddresses(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
-		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	}
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -228,7 +234,8 @@ function callBackShowAddressDetails(data) {
 	adjustImage();
 }
 
-$('#prof-address-container').click(function(){
+$(document).on('click', '#prof-address-container', function(e) {
+	e.stopImmediatePropagation();
 	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails);
 });
 
@@ -237,13 +244,13 @@ function callBackEditAddressDetails(data) {
 	createPopupConfirm(header, data);
 }
 
-$(document).on('blur', '#prof-address-edit-container input', function() {
+$(document).on('click', '#overlay-continue', function() {
 	delay(function() {
-		var profName = $('#prof-name').val().trim();
-		var profAddress1 = $('#prof-address1').val().trim();
-		var profAddress2 = $('#prof-address2').val().trim();
-		var country = $('#prof-country').val().trim();
-		var zipCode = $('#prof-zipcode').val().trim();
+		var profName = $('#prof-name').val();
+		var profAddress1 = $('#prof-address1').val();
+		var profAddress2 = $('#prof-address2').val();
+		var country = $('#prof-country').val();
+		var zipCode = $('#prof-zipcode').val();
 		var payload = {
 			"profName" : profName,
 			"address1" : profAddress1,
@@ -254,7 +261,6 @@ $(document).on('blur', '#prof-address-edit-container input', function() {
 		callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
 	}, 0);
 
-	overlayRevert();
 	$('#overlay-continue').unbind('click');
 });
 
@@ -265,6 +271,8 @@ function callBackUpdateAddressDetails(data) {
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+
+	overlayRevert();
 }
 
 $('#overlay-cancel').click(function(){
@@ -324,32 +332,15 @@ function callBackUpdateBasicDetails(data) {
 // TODO Function to update profile image
 function callBackShowProfileImage(data) {
 	$('#prof-img-container').html(data);
-	var logoImageUrl = $('#prof-image').css("background-image");
-	if (logoImageUrl == undefined || logoImageUrl == "none") {
+	var profileImageUrl = $('#prof-image-edit').css("background-image");
+	if (profileImageUrl == undefined || profileImageUrl == "none") {
 		return;
-	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
-		var userInfoDivider = $('<div>').attr({
-			"class" : "float-left user-info-seperator"
-		});
-		var userInfoLogo = $('<div>').attr({
-			"class" : "float-left user-info-logo"
-		}).css({
-			"background" : logoImageUrl + " no-repeat center",
-			"background-size" : "100% auto"
-		});
-		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	} else {
-		$('.user-info-logo').css("background-image", logoImageUrl);
 	}
 	adjustImage();
 }
 
-/*$(document).on('click', '#prof-image-upload', function() {
-	$('#prof-image-edit').click();
-});*/
-
-$(document).on('change', '#prof-image-edit', function() {
+$(document).on('change', '#prof-image', function(e) {
+	e.stopImmediatePropagation();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -359,6 +350,7 @@ $(document).on('change', '#prof-image-edit', function() {
 function callBackOnProfileImageUpload(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
+	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
@@ -367,7 +359,7 @@ function callBackOnProfileImageUpload(data) {
 //TODO Function to update profile logo image
 function callBackShowProfileLogo(data) {
 	$('#prof-logo-container').html(data);
-	var logoImageUrl = $('#prof-logo').css("background-image");
+	var logoImageUrl = $('#prof-logo-edit').css("background-image");
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
@@ -388,11 +380,8 @@ function callBackShowProfileLogo(data) {
 	adjustImage();
 }
 
-/*$(document).on('click', '#prof-logo-upload', function() {
-	$('#prof-logo-edit').click();
-});*/
-
-$(document).on('change', '#prof-logo-edit', function() {
+$(document).on('change', '#prof-logo', function(e) {
+	e.stopImmediatePropagation();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -459,10 +448,21 @@ function addAnAssociation() {
 		"placeholder" : "New Associaion"
 	});
 	$('#association-container').append(newAssociation);
+
+	var newAssociationButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#association-container').append(newAssociationButton);
+
 	newAssociation.focus();
 }
 
 // Function to append an achievement
+$(document).on('click', '.lp-ach-item-img', function(e) {
+	$(this).prev().remove();
+	$(this).remove();
+});
+
 function addAnAchievement() {
 	if ($('#achievement-container > input').length <= 0) {
 		$('#achievement-container').empty();
@@ -471,8 +471,13 @@ function addAnAchievement() {
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
 		"placeholder" : "New Achievement"
 	});
-	var temp = '<input class="float-left lp-ach-item-txt lp-ach-row lp-row clearfix prof-edditable-sin" value="temp"><div class="float-left lp-ach-item-img"></div>';
-	$('#achievement-container').append(temp);
+	$('#achievement-container').append(newAchievement);
+
+	var newAchievementButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#achievement-container').append(newAchievementButton);
+
 	newAchievement.focus();
 }
 
@@ -485,20 +490,14 @@ function addAuthorisedIn() {
 		"placeholder" : "Authorized in"
 	});
 	$('#authorised-in-container').append(newAuthorisation);
+
+	var newAuthorizationButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#authorised-in-container').append(newAuthorizationButton);
+
 	newAuthorisation.focus();
 }
-
-/*$(document).on('keyup', '#association-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateAssociations();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateAssociations();
-	}, 3000);
-});*/
 
 $(document).on('blur', '#association-container input', function() {
 	delay(function() {
@@ -526,24 +525,11 @@ function updateAssociations() {
 
 function callBackUpdateAssociations(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showAssociationList();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
-}
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 
-/*$(document).on('keyup', '#achievement-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateAchievements();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateAchievements();
-	}, 3000);
-});*/
+	showAssociationList();
+}
 
 $(document).on('blur', '#achievement-container input', function() {
 	delay(function() {
@@ -571,24 +557,11 @@ function updateAchievements() {
 
 function callBackUpdateAchievements(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showAchievementList();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
-}
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 
-/*$(document).on('keyup', '#authorised-in-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateLicenseAuthorizations();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateLicenseAuthorizations();
-	}, 3000);
-});*/
+	showAchievementList();
+}
 
 $(document).on('blur', '#authorised-in-container input', function() {
 	delay(function() {
@@ -615,11 +588,10 @@ function updateLicenseAuthorizations() {
 
 function callBackUpdateLicenseAuthorizations(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showLicenceList();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showLicenceList();
 }
 
 
@@ -630,7 +602,7 @@ $('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add facebook link",
 		"value" : link,
-		"onblur" : "updateFacebookLink(this.value);"
+		"onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -640,7 +612,7 @@ $('body').on('click','#prof-edit-social-link .icn-twit',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add Twitter link",
 		"value" : link,
-		"onblur" : "updateTwitterLink(this.value);"
+		"onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -650,7 +622,7 @@ $('body').on('click','#prof-edit-social-link .icn-lin',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add LinkedIn link",
 		"value" : link,
-		"onblur" : "updateLinkedInLink(this.value);"
+		"onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -660,7 +632,7 @@ $('body').on('click','#prof-edit-social-link .icn-yelp',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add Yelp link",
 		"value" : link,
-		"onblur" : "updateYelpLink(this.value);"
+		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -671,12 +643,16 @@ function updateFacebookLink(link) {
 	if(isValidUrl(link)){
         callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateFacebookLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
 function callBackUpdateFacebookLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -687,12 +663,16 @@ function updateTwitterLink(link) {
 	if(isValidUrl(link)){
         	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateTwitterLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
 function callBackUpdateTwitterLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -703,12 +683,16 @@ function updateLinkedInLink(link) {
 	if(isValidUrl(link)){
 		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateLinkedInLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
 function callBackUpdateLinkedInLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -719,14 +703,20 @@ function updateYelpLink(link) {
 	if(isValidUrl(link)){
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateYelpLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
 function callBackUpdateYelpLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
+
+
 
 function isValidUrl(url){
 	var myVariable = url;
@@ -762,8 +752,6 @@ function adjustImage() {
 function initializeGoogleMap() {
     var mapCanvas = document.getElementById('map-canvas');
     var geocoder = new google.maps.Geocoder();
-    /*var address1 = $('#prof-address1').val().trim();
-	var address2 = $('#prof-address2').val().trim();*/
 	var address = "Raremile technologies,HSR layout,bangalore, 560102";
 	var latitude = 45;
 	var longitude = -73;
