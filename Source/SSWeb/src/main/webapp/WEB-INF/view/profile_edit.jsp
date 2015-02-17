@@ -211,7 +211,7 @@
 				</div>
 				
 				<c:choose>
-					<c:when	test="${user.branchAdmin}">
+					<c:when	test="${user.agent}">
 						<div class="prof-left-row prof-left-assoc bord-bot-dc">
 							<div class="left-assoc-wrapper">
 								<div class="clearfix">
