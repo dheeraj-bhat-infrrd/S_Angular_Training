@@ -308,9 +308,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return mongoTemplate.count(query, SurveyDetails.class);
 	}
 
-	// Method to get aggregated rating of an agent/branch/region/company for past number of days
-	// provided as parameter.
-
 	@Override
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
@@ -327,10 +324,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				.is(columnValue)
 				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
 						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
-				CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
-				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group(columnName)
-				.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
+				SurveyDetails.class, //
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
+						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
+				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
+		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		long a = mongoTemplate.count(query, SurveyDetails.class);
@@ -341,6 +340,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
 	}
+
 
 	// January is denoted with 0.
 	public double getRatingByMonth(String columnName, long columnValue, int year, int month) {
@@ -436,22 +436,21 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * value for respective column.
 	 */
 
-	public Map<String, Double> getAllFeedbacks(String columnName, String columNValue) {
+	@Override
+	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
-		Map<String, Double> feedbackWithRating = new HashMap<>();
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columNValue));
 		}
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
-		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
-		for (SurveyDetails survey : surveys) {
-			feedbackWithRating.put(survey.getReview(), survey.getScore());
-		}
+		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() finished.");
-		return feedbackWithRating;
+		return surveysWithReviews;
 	}
+
 
 	// JIRA SS-137 and 158 : EOC
 }
