@@ -2,8 +2,6 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +53,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 	 */
 	@Override
 	@Transactional
-	public String storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
 			throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException {
 
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() started.");
@@ -75,15 +73,14 @@ public class SurveyHandlerImpl implements SurveyHandler {
 			}
 		}
 
-		Map<String, String> urlParams = new HashMap<>();
-		urlParams.put("branchId", branchId + "");
-		urlParams.put("agentId", agentId + "");
-		urlParams.put("agentName", agentName);
-		urlParams.put("companyId", companyId + "");
-		urlParams.put("branchId", branchId + "");
-		urlParams.put("regionId", regionId + "");
-		urlParams.put("customerEmail", customerEmail);
-		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.START_SURVEY);
+		/*
+		 * Map<String, String> urlParams = new HashMap<>(); urlParams.put("branchId", branchId +
+		 * ""); urlParams.put("agentId", agentId + ""); urlParams.put("agentName", agentName);
+		 * urlParams.put("companyId", companyId + ""); urlParams.put("branchId", branchId + "");
+		 * urlParams.put("regionId", regionId + ""); urlParams.put("customerEmail", customerEmail);
+		 * String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl +
+		 * CommonConstants.START_SURVEY);
+		 */
 
 		SurveyDetails surveyDetails = new SurveyDetails();
 		surveyDetails.setAgentId(agentId);
@@ -96,10 +93,15 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyDetails.setReminderCount(reminderCount);
 		surveyDetails.setUpdatedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
-		surveyDetailsDao.updateEmailForExistingFeedback(agentId, customerEmail);
-		surveyDetailsDao.insertSurveyDetails(surveyDetails);
+		SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
-		return url;
+		if (survey == null) {
+			surveyDetailsDao.insertSurveyDetails(surveyDetails);
+			return null;
+		}
+		else {
+			return survey;
+		}
 	}
 
 	/*
