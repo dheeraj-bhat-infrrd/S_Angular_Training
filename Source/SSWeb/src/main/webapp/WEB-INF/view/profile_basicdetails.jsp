@@ -7,7 +7,7 @@
 <div class="float-left lp-edit-wrapper clearfix float-left">
 						<c:choose>
 							<c:when	test="${lock.isDisplayNameLocked && not user.agent}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name} readonly">
+								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly/>
 								<div id="prof-name-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 							</c:when>
 							<c:when	test="${not lock.isDisplayNameLocked && not user.agent}">
