@@ -2520,7 +2520,7 @@ button.paypal.is-active {
 }
 
 .sq-np-item:first-child {
-    border-right: 1px solid #C8C8C8;
+/*    border-right: 1px solid #C8C8C8;*/
 }
 
 .sq-np-item-next {
