@@ -2520,11 +2520,16 @@ button.paypal.is-active {
 }
 
 .sq-np-item:first-child {
-    border-right: 1px solid #C8C8C8;
+/*    border-right: 1px solid #C8C8C8;*/
 }
 
 .sq-np-item-next {
     padding: 0 50px 0 40px;
+    border-radius: 0 20px 20px 0;
+}
+
+.sq-np-item-prev {
+    border-radius: 0 20px 20px 0;
 }
 
 .sq-btn-wrapper {
@@ -2548,12 +2553,9 @@ button.paypal.is-active {
 }
 
 .sq-np-item-prev {
+    border-radius: 20px 0 0 20px;
     text-align: left;
     width: 130px;
-}
-.sq-np-item-disabled {
-    color: #EFEFEF !important;
-    cursor: default !important;
 }
 
 .sq-slider-wrapper {
@@ -3027,6 +3029,7 @@ button.paypal.is-active {
 	margin-left: -8px;
 }
 .pts-wrap-adj {
+	position: relative;
     margin-bottom: 2px;
     border: 0;
     height: 40px;
@@ -3041,18 +3044,106 @@ button.paypal.is-active {
     padding: 10px;
 }
 
+.pts-hover-1 {
+	position: absolute;
+	left: 0%;
+}
+
 .pts-hover-2 {
-    margin-left: 20%;
+	position: absolute;
+	left: 20%;
 }
 
 .pts-hover-3 {
-    margin-left: 40%;
+	position: absolute;
+    left: 40%;
 }
 
 .pts-hover-4 {
-    margin-left: 60%;
+	position: absolute;
+    left: 60%;
+}
+
+.sq-i-txt input{
+	background: none !important;
 }
 
 .pts-hover-5 {
-    margin-left: 80%;
+	position: absolute;
+    left: 80%;
+}
+
+.sq-i-container{
+	width: 400px;
+}
+.sq-info-wrapper {
+	margin-bottom: 20px;
+}
+
+.sq-i-lbl.float-left {
+	width: 75px;
+	text-align: right;
+	margin-right: 15px;
+	line-height: 40px;
+}
+
+.sq-i-txt-fld {
+	width: 300px;
+	height: 40px;
+	border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    padding: 0 10px;
+}
+
+.btn-com{
+    background-color: #5CC7EF !important;
+}
+
+.btn-com:hover{
+    background-color: #7AB400 !important;
+}
+
+.btn-com:active {
+    background-color: #70A501 !important;
+}
+
+.btn-com-disabled{
+    cursor: auto !important;
+    background-color: #5CC7EF !important;
+}
+
+.btn-com-disabled:hover{
+    background-color: #5CC7EF !important;
+}
+
+.btn-com-disabled:active {
+    background-color: #5CC7EF !important;
+}
+
+.sq-np-item-disabled {
+    color: #EFEFEF !important;
+    cursor: default !important;
+    background-color: #5CC7EF !important;
+}
+
+.showHoverTab{
+	display: block !important;
+}
+
+.err-nw-wrapper{
+    display: none;
+    background-color: #E57C66;
+    color: #fff;
+    line-height: 50px;
+    text-align: center;
+}
+
+.err-new-close{
+    display: inline-block;
+    margin-right: 10px;
+    height: 50px;
+    margin-bottom: -20px;
+    width: 32px;
+    background: url(../images/close.png) no-repeat center;
 }
