@@ -246,11 +246,11 @@ function callBackEditAddressDetails(data) {
 
 $(document).on('click', '#overlay-continue', function() {
 	delay(function() {
-		var profName = $('#prof-name').val().trim();
-		var profAddress1 = $('#prof-address1').val().trim();
-		var profAddress2 = $('#prof-address2').val().trim();
-		var country = $('#prof-country').val().trim();
-		var zipCode = $('#prof-zipcode').val().trim();
+		var profName = $('#prof-name').val();
+		var profAddress1 = $('#prof-address1').val();
+		var profAddress2 = $('#prof-address2').val();
+		var country = $('#prof-country').val();
+		var zipCode = $('#prof-zipcode').val();
 		var payload = {
 			"profName" : profName,
 			"address1" : profAddress1,
@@ -261,7 +261,6 @@ $(document).on('click', '#overlay-continue', function() {
 		callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
 	}, 0);
 
-	overlayRevert();
 	$('#overlay-continue').unbind('click');
 });
 
@@ -272,6 +271,8 @@ function callBackUpdateAddressDetails(data) {
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+
+	overlayRevert();
 }
 
 $('#overlay-cancel').click(function(){
