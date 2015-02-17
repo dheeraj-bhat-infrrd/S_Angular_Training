@@ -7,64 +7,76 @@ var delay = (function() {
 	};
 })();
 
+function startCompanyProfilePage() {
+	// showAssociationList();
+	// showAchievementList();
+	// showLicenceList();
+}
+
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).addClass('prof-name-edit');
 	}
 });
 
 $(document).on('blur', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 $(document).on('focus', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).addClass('prof-name-edit');
 	}
 });
 
 $(document).on('blur', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked') {
+	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 
 // TODO Lock Settings
-$('.lp-edit-locks').click(function() {
-	var id = $(this).attr("id");
+$(document).on('click', '.lp-edit-locks', function() {
+	var lockId = $(this).attr("id");
+	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if($(this).hasClass('lp-edit-locks-locked')) {
 		$(this).removeClass('lp-edit-locks-locked');
 		$(this).attr('data-state', 'unlocked');
-		updateLockSettings(id, false);
-
+		updateLockSettings(lockId, false);
+		$("#" + fieldId).attr("readonly", false);
+		
 	} else {
 		$(this).addClass('lp-edit-locks-locked');
 		$(this).attr('data-state', 'locked');
-		updateLockSettings(id, true);
+		updateLockSettings(lockId, true);
+		$("#" + fieldId).attr("readonly", true);
 	}
 });
 
-$('.prof-img-lock-item').click(function() {
-	var id = $(this).attr("id");
+$(document).on('click', '.prof-img-lock-item', function() {
+	var lockId = $(this).attr("id");
+	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if($(this).hasClass('prof-img-lock-locked')) {
 		$(this).removeClass('prof-img-lock-locked');
 		$(this).attr('data-state', 'unlocked');
-		updateLockSettings(id, false);
+		updateLockSettings(lockId, false);
+		$("#" + fieldId).attr("disabled", false);
 
 	} else {
 		$(this).addClass('prof-img-lock-locked');
 		$(this).attr('data-state', 'locked');
-		updateLockSettings(id, true);
+		updateLockSettings(lockId, true);
+		$("#" + fieldId).attr("disabled", true);
 	}
 });
 
@@ -82,14 +94,7 @@ function updateLockSettings(id, state) {
 }
 
 function callBackUpdateLock () {
-	console.log("updated");
-}
-
-// TODO Function to call when the company profile page is loaded
-function startCompanyProfilePage() {
-	// showAssociationList();
-	// showAchievementList();
-	// showLicenceList();
+	console.log("updated lock settings");
 }
 
 
@@ -103,6 +108,9 @@ $(document).on('click', '#intro-body-text', function() {
 	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
 		$(this).hide();
 		var textContent = $(this).text().trim();
+		if ($('#aboutme-status').val() == 'new') {
+			textContent = "";
+		}
 		$('#intro-body-text-edit').val(textContent);
 		$('#intro-body-text-edit').show();
 	}
@@ -110,6 +118,7 @@ $(document).on('click', '#intro-body-text', function() {
 
 $(document).on('blur', '#intro-body-text-edit', function() {
 	if ($('#aboutme-lock').attr('data-state') == 'unlocked') {
+		
 		var aboutMe = $('#intro-body-text-edit').val().trim();
 		if (aboutMe == undefined || aboutMe == "") {
 			return;
@@ -152,7 +161,7 @@ $(document).on('blur', '#contant-info-container input[data-phone-number]', funct
 	delay(function() {
 		var phoneNumbers = [];
 		$('#contant-info-container input[data-phone-number]').each(function() {
-			if (this.value != "") {
+			if (this.value != "" && phoneRegex.test(this.value) == true && !$(this).is('[readonly]')) {
 				var phoneNumber = {};
 				phoneNumber.key = $(this).attr("data-phone-number");
 				phoneNumber.value = this.value;
@@ -185,9 +194,8 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 		var webAddressValid = true;
 		$('#contant-info-container input[data-web-address]').each(function() {
 			var link = $.trim(this.value);
-			console.log(link);
 			if (link != "") {
-				if (isValidUrl(link)) {
+				if (isValidUrl(link) && !$(this).is('[readonly]')) {
 					var webAddress = {};
 					webAddress.key = $(this).attr("data-web-address");
 					webAddress.value = link;
@@ -228,7 +236,8 @@ function callBackShowAddressDetails(data) {
 	adjustImage();
 }
 
-$('#prof-address-container').click(function(){
+$(document).on('click', '#prof-address-container', function(e) {
+	e.stopImmediatePropagation();
 	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails);
 });
 
@@ -237,7 +246,7 @@ function callBackEditAddressDetails(data) {
 	createPopupConfirm(header, data);
 }
 
-$(document).on('blur', '#prof-address-edit-container input', function() {
+$(document).on('click', '#overlay-continue', function() {
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profAddress1 = $('#prof-address1').val().trim();
@@ -324,32 +333,15 @@ function callBackUpdateBasicDetails(data) {
 // TODO Function to update profile image
 function callBackShowProfileImage(data) {
 	$('#prof-img-container').html(data);
-	var logoImageUrl = $('#prof-image').css("background-image");
-	if (logoImageUrl == undefined || logoImageUrl == "none") {
+	var profileImageUrl = $('#prof-image-edit').css("background-image");
+	if (profileImageUrl == undefined || profileImageUrl == "none") {
 		return;
-	}
-	if ($('#header-user-info').find('.user-info-logo').length <= 0) {
-		var userInfoDivider = $('<div>').attr({
-			"class" : "float-left user-info-seperator"
-		});
-		var userInfoLogo = $('<div>').attr({
-			"class" : "float-left user-info-logo"
-		}).css({
-			"background" : logoImageUrl + " no-repeat center",
-			"background-size" : "100% auto"
-		});
-		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
-	} else {
-		$('.user-info-logo').css("background-image", logoImageUrl);
 	}
 	adjustImage();
 }
 
-/*$(document).on('click', '#prof-image-upload', function() {
-	$('#prof-image-edit').click();
-});*/
-
-$(document).on('change', '#prof-image-edit', function() {
+$(document).on('change', '#prof-image', function(e) {
+	e.stopImmediatePropagation();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -359,6 +351,7 @@ $(document).on('change', '#prof-image-edit', function() {
 function callBackOnProfileImageUpload(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
+	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
@@ -367,7 +360,7 @@ function callBackOnProfileImageUpload(data) {
 //TODO Function to update profile logo image
 function callBackShowProfileLogo(data) {
 	$('#prof-logo-container').html(data);
-	var logoImageUrl = $('#prof-logo').css("background-image");
+	var logoImageUrl = $('#prof-logo-edit').css("background-image");
 	if (logoImageUrl == undefined || logoImageUrl == "none") {
 		return;
 	}
@@ -388,11 +381,8 @@ function callBackShowProfileLogo(data) {
 	adjustImage();
 }
 
-/*$(document).on('click', '#prof-logo-upload', function() {
-	$('#prof-logo-edit').click();
-});*/
-
-$(document).on('change', '#prof-logo-edit', function() {
+$(document).on('change', '#prof-logo', function(e) {
+	e.stopImmediatePropagation();
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -488,18 +478,6 @@ function addAuthorisedIn() {
 	newAuthorisation.focus();
 }
 
-/*$(document).on('keyup', '#association-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateAssociations();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateAssociations();
-	}, 3000);
-});*/
-
 $(document).on('blur', '#association-container input', function() {
 	delay(function() {
 		updateAssociations();
@@ -533,18 +511,6 @@ function callBackUpdateAssociations(data) {
 	}
 }
 
-/*$(document).on('keyup', '#achievement-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateAchievements();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateAchievements();
-	}, 3000);
-});*/
-
 $(document).on('blur', '#achievement-container input', function() {
 	delay(function() {
 		updateAchievements();
@@ -577,18 +543,6 @@ function callBackUpdateAchievements(data) {
 		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
 	}
 }
-
-/*$(document).on('keyup', '#authorised-in-container input', function(e) {
-	if (e.which == 13) {
-		delay(function() {
-			updateLicenseAuthorizations();
-		}, 0);
-		return;
-	}
-	delay(function() {
-		updateLicenseAuthorizations();
-	}, 3000);
-});*/
 
 $(document).on('blur', '#authorised-in-container input', function() {
 	delay(function() {
@@ -630,7 +584,7 @@ $('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add facebook link",
 		"value" : link,
-		"onblur" : "updateFacebookLink(this.value);"
+		"onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -640,7 +594,7 @@ $('body').on('click','#prof-edit-social-link .icn-twit',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add Twitter link",
 		"value" : link,
-		"onblur" : "updateTwitterLink(this.value);"
+		"onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -650,7 +604,7 @@ $('body').on('click','#prof-edit-social-link .icn-lin',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add LinkedIn link",
 		"value" : link,
-		"onblur" : "updateLinkedInLink(this.value);"
+		"onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -660,7 +614,7 @@ $('body').on('click','#prof-edit-social-link .icn-yelp',function(){
 	$('#social-token-text').attr({
 		"placeholder" : "Add Yelp link",
 		"value" : link,
-		"onblur" : "updateYelpLink(this.value);"
+		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
 	});
 });
 
@@ -671,7 +625,8 @@ function updateFacebookLink(link) {
 	if(isValidUrl(link)){
         callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateFacebookLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
@@ -687,7 +642,8 @@ function updateTwitterLink(link) {
 	if(isValidUrl(link)){
         	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateTwitterLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
@@ -703,7 +659,8 @@ function updateLinkedInLink(link) {
 	if(isValidUrl(link)){
 		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateLinkedInLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
@@ -719,7 +676,8 @@ function updateYelpLink(link) {
 	if(isValidUrl(link)){
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateYelpLink, payload);
 	}else{
-		alert("enter a valid url");
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
 	}
 }
 
@@ -727,6 +685,8 @@ function callBackUpdateYelpLink(data) {
 	$('#prof-message-header').html(data);
 	showProfileSocialLinks();
 }
+
+
 
 function isValidUrl(url){
 	var myVariable = url;

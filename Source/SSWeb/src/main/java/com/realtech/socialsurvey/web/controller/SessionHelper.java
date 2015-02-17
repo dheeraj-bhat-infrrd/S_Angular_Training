@@ -80,10 +80,14 @@ public class SessionHelper {
 	}
 
 	// JIRA SS-97 by RM-06 : BOC
-
 	public void setLogoInSession(HttpSession session, UserSettings userSettings) {
 		LOG.info("Setting logo in session");
 		setLogo(session, userSettings);
+		LOG.info("Logo successfully updated in session");
+	}
+
+	public void setProfileImageInSession(HttpSession session, UserSettings userSettings) {
+		LOG.info("Setting logo in session");
 		setProfileImage(session, userSettings);
 		LOG.info("Logo successfully updated in session");
 	}

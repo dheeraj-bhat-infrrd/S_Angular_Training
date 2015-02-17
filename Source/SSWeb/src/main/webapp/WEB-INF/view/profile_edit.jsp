@@ -74,19 +74,20 @@
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
 					<div class="float-left lp-edit-wrapper clearfix float-left">
-						<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
 						<c:choose>
 							<c:when	test="${lock.isDisplayNameLocked && not user.agent}">
+								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
 								<div id="prof-name-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 							</c:when>
 							<c:when	test="${not lock.isDisplayNameLocked && not user.agent}">
+								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
 								<div id="prof-name-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
 							</c:when>
 						</c:choose>
 					</div>
 					<div class="prof-address">
 						<input id="prof-vertical" class="prof-addline1 prof-edditable" value="${profile.vertical}">
-						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}">
+						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
 					</div>
 					<div class="prof-rating clearfix">
 						<div class="st-rating-wrapper maring-0 clearfix float-left">
@@ -103,13 +104,19 @@
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center;"></div>
 							<c:choose>
 								<c:when	test="${lock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="locked" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+									<form class="form_contact_image" enctype="multipart/form-data">
+										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
+									</form>
 								</c:when>
 								<c:when	test="${not lock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="unlocked" class="prof-img-lock-item prof-img-lock"></div>
+									<form class="form_contact_image" enctype="multipart/form-data">
+										<input type="file" id="prof-logo" class="con_img_inp_file">
+									</form>
 								</c:when>
 							</c:choose>
 						</c:when>
@@ -117,12 +124,9 @@
 							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
 						</c:otherwise>
 					</c:choose>
-					<form class="form_contact_image" enctype="multipart/form-data">
-						<input type="file" id="prof-logo-edit" class="con_img_inp_file">
-					</form>
 				</div>
 				
-				<div id="prof-address-container" class="prof-user-address prof-edit-icn">
+				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer">
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.address}</div>
 					<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
@@ -145,12 +149,13 @@
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-web"></div>
 								<div>
-									<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
 									<c:choose>
 										<c:when	test="${lock.isWebAddressLocked && not user.agent}">
+											<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>' readonly>
 											<div id="web-address-work-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not lock.isWebAddressLocked && not user.agent}">
+											<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
 											<div id="web-address-work-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
 										</c:when>
 									</c:choose>
@@ -159,12 +164,13 @@
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-phone"></div>
 								<div class="float-left lp-edit-wrapper clearfix float-left">
-									<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}">
 									<c:choose>
 										<c:when	test="${lock.isWorkPhoneLocked && not user.agent}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
 											<div id="phone-number-work-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not lock.isWorkPhoneLocked && not user.agent}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
 											<div id="phone-number-work-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
 										</c:when>
 									</c:choose>
@@ -173,12 +179,13 @@
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mbl"></div>
 								<div class="float-left lp-edit-wrapper clearfix float-left">
-									<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}">
 									<c:choose>
 										<c:when	test="${lock.isPersonalPhoneLocked && not user.agent}">
+											<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>' readonly>
 											<div id="phone-number-personal-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not lock.isPersonalPhoneLocked && not user.agent}">
+											<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>'>
 											<div id="phone-number-personal-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
 										</c:when>
 									</c:choose>
@@ -187,12 +194,13 @@
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-fax"></div>
 								<div>
-									<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
 									<c:choose>
 										<c:when	test="${lock.isFaxPhoneLocked && not user.agent}">
+											<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>' readonly>
 											<div id="phone-number-fax-lock" data-state="locked" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not lock.isFaxPhoneLocked && not user.agent}">
+											<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
 											<div id="phone-number-fax-lock" data-state="unlocked" class="lp-edit-locks float-left"></div>
 										</c:when>
 									</c:choose>
@@ -263,8 +271,13 @@
 					</div>
 					<div class="intro-body" id="intro-body-text">
 						<c:choose>
-							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">${contactdetail.about_me}</c:when>
-							<c:otherwise><spring:message code="label.aboutcompany.empty.key" /></c:otherwise>
+							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
+								${contactdetail.about_me}
+							</c:when>
+							<c:otherwise>
+								<spring:message code="label.aboutcompany.empty.key" />
+								<input type="hidden" id="aboutme-status" value="new"/>
+							</c:otherwise>
 						</c:choose>
 					</div>
 					<textarea class="sb-txtarea hide" id="intro-body-text-edit"></textarea>
