@@ -1921,7 +1921,6 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			
 			OrganizationUnitSettings lockedDetail = fetchProfile(model, request);
 			if (user.isCompanyAdmin()) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
@@ -1929,7 +1928,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				lockSettings = companySettings.getLockSettings();
-				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), user, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, lockSettings);
 				companySettings.setLockSettings(lockSettings);
@@ -1942,7 +1941,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				lockSettings = regionSettings.getLockSettings();
-				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), user, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, lockSettings);
 				regionSettings.setLockSettings(lockSettings);
@@ -1955,7 +1954,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				lockSettings = branchSettings.getLockSettings();
-				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), user, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
 				LOG.info(lockSettings.getIsDisplayNameLocked()+"");
@@ -1977,40 +1976,40 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	private void updateLockSettings(LockSettings lockSettings, LockSettings lockedDetail, String fieldId, boolean status) {
+	private void updateLockSettings(LockSettings lockSettings, LockSettings lockedDetail, User user, String fieldId, boolean status) {
 		switch (fieldId) {
 			case "prof-name-lock":
-				if (!lockedDetail.getIsDisplayNameLocked()) {
+				if (!lockedDetail.getIsDisplayNameLocked() || user.isCompanyAdmin()) {
 					lockSettings.setDisplayNameLocked(status);
 				}
 				break;
 			case "prof-logo-lock":
-				if (!lockedDetail.getIsLogoLocked()) {
+				if (!lockedDetail.getIsLogoLocked() || user.isCompanyAdmin()) {
 					lockSettings.setLogoLocked(status);
 				}
 				break;
 			case "web-address-work-lock":
-				if (!lockedDetail.getIsWebAddressLocked()) {
+				if (!lockedDetail.getIsWebAddressLocked() || user.isCompanyAdmin()) {
 					lockSettings.setWebAddressLocked(status);;
 				}
 				break;
 			case "phone-number-work-lock":
-				if (!lockedDetail.getIsWorkPhoneLocked()) {
+				if (!lockedDetail.getIsWorkPhoneLocked() || user.isCompanyAdmin()) {
 					lockSettings.setWorkPhoneLocked(status);
 				}
 				break;
 			case "phone-number-personal-lock":
-				if (!lockedDetail.getIsPersonalPhoneLocked()) {
+				if (!lockedDetail.getIsPersonalPhoneLocked() || user.isCompanyAdmin()) {
 					lockSettings.setPersonalPhoneLocked(status);
 				}
 				break;
 			case "phone-number-fax-lock":
-				if (!lockedDetail.getIsFaxPhoneLocked()) {
+				if (!lockedDetail.getIsFaxPhoneLocked() || user.isCompanyAdmin()) {
 					lockSettings.setFaxPhoneLocked(status);
 				}
 				break;
 			case "aboutme-lock":
-				if (!lockedDetail.getIsAboutMeLocked()) {
+				if (!lockedDetail.getIsAboutMeLocked() || user.isCompanyAdmin()) {
 					lockSettings.setAboutMeLocked(status);
 				}
 				break;
