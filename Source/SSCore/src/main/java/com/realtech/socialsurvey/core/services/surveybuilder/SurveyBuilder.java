@@ -153,7 +153,7 @@ public interface SurveyBuilder {
 	 * @return 
 	 * @throws InvalidInputException
 	 */
-	public Survey cloneSurveyFromTemplate(User user, long templateId, boolean needMappingOfQuestions) throws InvalidInputException, NoRecordsFetchedException;
+	public Survey cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to fetch Survey Questions.
@@ -176,5 +176,5 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public Map<Integer, Integer> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException;
+	public Map<Long, Long> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException;
 }

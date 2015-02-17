@@ -45,6 +45,18 @@ public class VerticalsMaster implements Serializable {
 	@OneToMany(mappedBy="verticalsMaster")
 	private List<Survey> surveys;
 
+	//bi-directional many-to-one association to Survey
+	@OneToMany(mappedBy="verticalsMaster")
+	private List<Survey> companies;
+	
+	public List<Survey> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(List<Survey> companies) {
+		this.companies = companies;
+	}
+
 	public List<Survey> getSurveys() {
 		return surveys;
 	}

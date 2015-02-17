@@ -174,11 +174,12 @@ public class SurveyBuilderController {
 
 		try {			
 			//Check if survey is default one and clone it
-			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			long surveyQuestionId;
 			
 			if(oldToNewQuestionMap != null){
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
+				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
 			else{
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
@@ -252,11 +253,12 @@ public class SurveyBuilderController {
 		try {
 			
 			//Check if default survey is mapped and clone it
-			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			long surveyQuestionId;
 			
 			if(oldToNewQuestionMap != null){
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
+				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
 			else{
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
@@ -299,7 +301,7 @@ public class SurveyBuilderController {
 
 		try {
 			//Check if default survey is mapped and clone it
-			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			
 			String questionIdsStr = request.getParameter("questionIds");
 			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
@@ -307,6 +309,7 @@ public class SurveyBuilderController {
 			LOG.info(questionIdsStr);
 			for (String questionIdStr : surveyQuestionIdStrs) {
 				if(oldToNewQuestionMap != null){
+					LOG.info(" Mapping question id : " + questionIdStr + " to : " + oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
 					surveyBuilder.deactivateQuestionSurveyMapping(user, oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
 				}
 				else{
@@ -345,11 +348,12 @@ public class SurveyBuilderController {
 
 		try {
 			//Check if default survey is mapped and clone it
-			Map<Integer, Integer> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			long surveyQuestionId;
 			
 			if(oldToNewQuestionMap != null){
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
+				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
 			else{
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
@@ -403,11 +407,11 @@ public class SurveyBuilderController {
 			int activeRatingQues = (int) surveyBuilder.countActiveRatingQuestionsInSurvey(user);
 			if (activeRatingQues < minRatingQuestions) {
 				LOG.info("Marking Survey as inactive");
-				surveyBuilder.changeSurveyStatus(user, CommonConstants.STATUS_INACTIVE);
+				surveyBuilder.changeSurveyStatus(user, CommonConstants.NO);
 				status = "Add " + (minRatingQuestions - activeRatingQues) + " more rating questions to activate the survey";
 			} else {
 				LOG.info("Marking Survey as active");
-				surveyBuilder.changeSurveyStatus(user, CommonConstants.STATUS_ACTIVE);
+				surveyBuilder.changeSurveyStatus(user, CommonConstants.YES);
 			}
 			surveyDetail.setStatus(status);
 
@@ -495,7 +499,7 @@ public class SurveyBuilderController {
 		try {
 			long templateId = Long.parseLong(request.getParameter("templateId"));
 
-			surveyBuilder.cloneSurveyFromTemplate(user, templateId, false);
+			surveyBuilder.cloneSurveyFromTemplate(user, templateId);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_TEMPLATE_CLONE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
 			LOG.info("Method activateSurveyFromTemplate of SurveyBuilderController finished successfully");
