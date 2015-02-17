@@ -9,7 +9,7 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><spring:message code="label.login.title.key" /></title>
+<title><spring:message code="label.survey.title.key" /></title>
 <link rel="stylesheet"
 	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 <link rel="stylesheet"
@@ -157,8 +157,8 @@
 					</div>
 				</div>
 				<div class="sq-np-wrapper clearfix">
-					<div id="prev-star" class="float-left sq-np-item sq-np-item-prev">Previous</div>
-					<div id="next-star" class="float-left sq-np-item sq-np-item-next">Next</div>
+					<div id="prev-star" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+					<div id="next-star" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 				</div>
 			</div>
 			<div data-ques-type="smiley" class="sq-quest-item hide">
@@ -179,8 +179,8 @@
 					</div>
 				</div>
 				<div class="sq-np-wrapper clearfix">
-					<div id="prev-smile" class="float-left sq-np-item sq-np-item-prev">Previous</div>
-					<div id="next-smile" class="float-left sq-np-item sq-np-item-next">Next</div>
+					<div id="prev-smile" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+					<div id="next-smile" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 				</div>
 			</div>
 
@@ -210,8 +210,8 @@
            
 				</div>
 				<div class="sq-np-wrapper clearfix">
-					<div id="prev-scale" class="float-left sq-np-item sq-np-item-prev">Previous</div>
-					<div id="next-scale" class="float-left sq-np-item sq-np-item-next">Next</div>
+					<div id="prev-scale" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+					<div id="next-scale" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 				</div>
 			</div>
 
@@ -237,9 +237,9 @@
 				</div>
 				<div class="sq-np-wrapper clearfix">
 					<div id="prev-textarea-smiley"
-						class="float-left sq-np-item sq-np-item-prev">Previous</div>
+						class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
 					<div id="next-textarea-smiley"
-						class="float-left sq-np-item sq-np-item-next">Next</div>
+						class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 				</div>
 				<div class="sq-btn-wrapper">
 					<div id="submit" class="sq-btn-continue hide">Submit</div>
@@ -264,8 +264,8 @@
 					</div>
 				</div>
 				<div class="sq-np-wrapper clearfix">
-					<div id="prev-mcq" class="float-left sq-np-item sq-np-item-prev">Previous</div>
-					<div id="next-mcq" class="float-left sq-np-item sq-np-item-next sq-np-item-disabled">Next</div>
+					<div id="prev-mcq" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+					<div id="next-mcq" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 				</div>
 			</div>
 		</div>
