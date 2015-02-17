@@ -65,11 +65,31 @@ public class PaymentController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/payment")
+	@RequestMapping(value = "/paymentpage")
 	public String paymentPage(Model model, HttpServletResponse response, HttpServletRequest request) {
-
 		LOG.info("Returning payment page with client token");
+		
+		LOG.debug("Getting the account type from the request");
+		String strAccountType = request.getParameter("accounttype");
+
+		try{			
+			if (strAccountType == null || strAccountType.isEmpty()) {
+				LOG.error("Account type passed is null or empty while returning the payment page");
+				throw new InvalidInputException("Account type passed is null or empty while returning the payment page");
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while returning the payment page. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}		
+		
+		LOG.debug("Adding the model attributes");
+		model.addAttribute("accounttype", strAccountType);
+		model.addAttribute(CommonConstants.PAID_PLAN_UPGRADE_FLAG, CommonConstants.YES);
 		model.addAttribute("clienttoken", gateway.getClientToken());
+		
+		LOG.info("Returning the payment page");
 		return JspResolver.PAYMENT;
 	}
 

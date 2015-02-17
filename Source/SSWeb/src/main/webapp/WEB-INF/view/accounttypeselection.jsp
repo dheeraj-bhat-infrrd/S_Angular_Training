@@ -6,6 +6,7 @@
 
 <c:choose>
    	<c:when test="${ upgrade == 1}"></c:when>
+   	<c:when test="${ paidUpgrade == 1 }"></c:when>
    	<c:otherwise>
    		<!DOCTYPE">
 		<html>
@@ -27,6 +28,13 @@
 </c:choose>
 <c:choose>
 <c:when test="${ upgrade ==1 }"></c:when>
+<c:when test="${ paidUpgrade == 1 }">
+	<div class="overlay-payment overlay-main hide" id="inner-payment">
+	 	<div id="payment-section" class="payment-section">
+			<!-- Payment page comes here through ajax  -->
+		</div>
+	 </div>
+</c:when>
 <c:otherwise>
 	<div class="overlay-payment overlay-main hide">
 	 	<div id="payment-section" class="payment-section">
@@ -39,6 +47,10 @@
  	<c:choose>
  	<c:when test="${ upgrade ==1 }">
  		<div class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
+        <div class="container">
+ 	</c:when>
+ 	<c:when test="${ paidUpgrade == 1 }">
+ 		<div class="hm-main-content-wrapper margin-top-25 margin-bottom-25" id="account-selection-popup">
         <div class="container">
  	</c:when>
  	<c:otherwise>
@@ -142,6 +154,7 @@
                             </c:when>
                             <c:otherwise>
                             	<div class="clearfix payment-option-wrapper">
+                            		<c:if test="${ empty paidUpgrade }">
                             		<div class="float-left payment-option-tab padding-left-25">
 	                                    <div class="payment-tab-main">
 	                                        <div class="payment-text-wrapper">
@@ -150,9 +163,10 @@
 	                                            <div class="payment-tab-line1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
-	                                    </div>
+	                                    </div>	                 
 	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(5,'Free')"><spring:message code="label.accounttype.select.key"/></div>
 	                                </div>
+	                                </c:if>
 	                                <div class="float-left payment-option-tab padding-left-25">
 	                                    <div class="payment-tab-main">
 	                                        <div class="payment-text-wrapper">
@@ -162,7 +176,14 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(1,'$35')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <c:choose>
+		                                    <c:when test="${ paidUpgrade == 1}">
+	                                    		<div class="btn-payment-sel" onclick="javascript:makePaidUpgrade(1,'$35')"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                    </c:when>
+		                                    <c:otherwise>
+	                                    		<div class="btn-payment-sel" onclick="javascript:selectAccountType(1,'$35')"><spring:message code="label.accounttype.select.key"/></div>
+		                                    </c:otherwise>
+		                                </c:choose>
 	                                </div>
 	                                <div class="float-left payment-option-tab">
 	                                    <div class="payment-tab-main">
@@ -173,8 +194,15 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(2,'$45')"><spring:message code="label.accounttype.select.key"/></div>
-	                                </div>
+										<c:choose>
+		                                    <c:when test="${ paidUpgrade == 1}">
+	                                    		<div class="btn-payment-sel" onclick="javascript:makePaidUpgrade(2,'$45')"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                    </c:when>
+		                                    <c:otherwise>
+	                                    		<div class="btn-payment-sel" onclick="javascript:selectAccountType(2,'$45')"><spring:message code="label.accounttype.select.key"/></div>
+		                                    </c:otherwise>
+		                                </c:choose>	                                
+		                            </div>
 	                                <div class="float-left payment-option-tab">
 	                                    <div class="payment-tab-main">
 	                                        <div class="payment-text-wrapper">
@@ -184,7 +212,14 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(3,'$65')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <c:choose>
+		                                    <c:when test="${ paidUpgrade == 1}">
+	                                    		<div class="btn-payment-sel" onclick="javascript:makePaidUpgrade(3,'$65')"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                    </c:when>
+		                                    <c:otherwise>
+	                                    		<div class="btn-payment-sel" onclick="javascript:selectAccountType(3,'$65')"><spring:message code="label.accounttype.select.key"/></div>
+		                                    </c:otherwise>
+		                                </c:choose>
 	                                </div>
 	                                <div class="float-left payment-option-tab padding-right-25">
 	                                    <div class="payment-tab-main">
@@ -195,8 +230,20 @@
 	                                            <div class="payment-tab-line2">Lorem ipsum dore it leer Lorem ipsu leer Lorem ipsum dore it </div>
 	                                        </div>
 	                                    </div>
-	                                    <div class="btn-payment-sel" onclick="javascript:selectAccountType(4,'$99')"><spring:message code="label.accounttype.select.key"/></div>
+	                                    <c:choose>
+		                                    <c:when test="${ paidUpgrade == 1}">
+	                                    		<div class="btn-payment-sel" onclick="javascript:makePaidUpgrade(4,'$99')"><spring:message code="label.accounttype.upgrade.button.key"/></div>
+		                                    </c:when>
+		                                    <c:otherwise>
+	                                    		<div class="btn-payment-sel" onclick="javascript:selectAccountType(4,'$99')"><spring:message code="label.accounttype.select.key"/></div>
+		                                    </c:otherwise>
+		                                </c:choose>
 	                                </div>
+	                                <c:if test="${ paidUpgrade == 1 }">
+	                                	<div class="float-left ol-btn-wrapper">
+						                    <div id="ol-btn-cancel" class="ol-btn">Cancel</div>
+						                </div>
+	                                </c:if>
                             </div>
                             </c:otherwise>
                             </c:choose>
@@ -207,6 +254,7 @@
                 </div>
                 <c:choose>
                 <c:when test="${ upgrade == 1 }"></c:when>
+                <c:when test="${ paidUpgrade == 1 }"></c:when>
                 <c:otherwise>
                 <div class="footer-copyright text-center">
                     <spring:message code="label.copyright.key"/> 
@@ -222,6 +270,7 @@
     </div>
     <c:choose>
     <c:when test="${ upgrade ==1  }"></c:when>
+    <c:when test="${ paidUpgrade == 1 }"></c:when>
     <c:otherwise>
 	    <script	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 		<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
@@ -249,6 +298,30 @@
             $('#account-type').val(accountType);
             
             var url = "./addaccounttype.do";
+
+            /* show the progress icon */
+            showOverlay();
+
+            var $form = $("#account-type-selection-form");
+            var payLoad = $form.serialize();
+            $.ajax({
+                url : url,
+                type : "POST",
+                data : payLoad,
+                success : function(data) {
+                    selectAccountTypeCallBack(data,accountType,paymentAmount);
+                },
+                error : function(e) {
+                    console.error("error : " + e);
+                }
+            });
+        }
+        
+        function makePaidUpgrade(accountType,paymentAmount){
+        	console.log("upgrading to paid account");
+            $('#account-type').val(accountType);
+            
+            var url = "./paymentpage.do";
 
             /* show the progress icon */
             showOverlay();
@@ -332,6 +405,7 @@
             console.log("callback for selectAccountType called");
             console.log("accountType : " + accountType);
             console.log("data : " + data);
+            var paidUpgrade = '<c:out value="${paidUpgrade}"/>';
             if(accountType == 5 && data == ""){
             	console.log("Subscribing for a free account");
             	var url = "./subscribe.do";
@@ -352,6 +426,10 @@
             else{
             	 /* hide the progress icon */
                 hideOverlay();
+            	 
+            	if(paidUpgrade == 1){
+            		$("#account-selection-popup").css("display","none");
+            	}
 
                 /* Replace the contents of account selection with payment page with selected account type contents*/
                 $("#payment-section").html(data);		
