@@ -75,4 +75,10 @@ public class LockSettings {
 		this.isAddressLocked = isAddressLocked;
 	}
 
+	@Override
+	public String toString() {
+		return "LockSettings [isLogoLocked=" + isLogoLocked + ", isDisplayNameLocked=" + isDisplayNameLocked + ", isWebAddressLocked="
+				+ isWebAddressLocked + ", isWorkPhoneLocked=" + isWorkPhoneLocked + ", isPersonalPhoneLocked=" + isPersonalPhoneLocked
+				+ ", isFaxPhoneLocked=" + isFaxPhoneLocked + ", isAboutMeLocked=" + isAboutMeLocked + ", isAddressLocked=" + isAddressLocked + "]";
+	}
 }
