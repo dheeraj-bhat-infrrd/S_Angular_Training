@@ -2902,6 +2902,12 @@ button.paypal.is-active {
     background: url(../images/rgn_blue.png) no-repeat center;
 }
 
+.lp-pers-img {
+	width:32px;
+	height:32px;
+	border-radius:50%;
+}
+
 .icn-psn1 {
     background: url(../images/Person1.png) no-repeat center;
 }
@@ -3317,7 +3323,7 @@ button.paypal.is-active {
 	height: 40px;
 	border-radius: 3px;
 	box-shadow: 0px 2px 2px 0px #e3e3e3;
-
+}
 .err-nw-wrapper{
     display: none;
     background-color: #E57C66;
@@ -3333,4 +3339,5 @@ button.paypal.is-active {
     margin-bottom: -20px;
     width: 32px;
     background: url(../images/close.png) no-repeat center;
+
 }
