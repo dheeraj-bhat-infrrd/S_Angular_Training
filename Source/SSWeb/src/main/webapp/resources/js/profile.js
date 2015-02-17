@@ -99,6 +99,7 @@ function paintCompanyProfile(data) {
 		fetchCompanyRegions();
 		fetchReviewsForCompany(result.iden);
 		fetchCompanyIndividuals();
+		//fetchCompanyBranches();
 	}
 }
 
@@ -251,10 +252,9 @@ function fetchCompanyIndividuals() {
 	callAjaxGET(url, paintCompanyIndividuals, true);
 }
 
-function paintCompanyIndividuals() {
+function paintCompanyIndividuals(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
-		console.log(response);
 		var result = $.parseJSON(response.entity);
 		if(result != undefined && result.length > 0) {
 			var compIndividualsHtml = "";
@@ -262,7 +262,7 @@ function paintCompanyIndividuals() {
 				if(compIndividual.contact_details != undefined){
 					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-individual" data-agentid = '+compIndividual.iden+'>';
 					compIndividualsHtml = compIndividualsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
 					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-txt">'+compIndividual.contact_details.name+'</div>';
 					compIndividualsHtml = compIndividualsHtml+'	</div>';
 					compIndividualsHtml = compIndividualsHtml+'</div>';
@@ -280,9 +280,33 @@ function fetchCompanyBranches() {
 }
 
 function paintCompanyBranches(data) {
-	var response= $.parseJSON(data);
+	var response = $.parseJSON(data);
 	if(response != undefined) {
-		console.log(response);
+		var result = $.parseJSON(response.entity);
+		if(result != undefined && result.length > 0) {
+			var compBranchesHtml = "";
+			$.each(result,function(i,branch) {
+				compBranchesHtml = compBranchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				compBranchesHtml = compBranchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
+				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
+				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
+				compBranchesHtml = compBranchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
+				compBranchesHtml = compBranchesHtml +'	</div>';
+				compBranchesHtml = compBranchesHtml +'</div>' ;
+			});
+			
+			$("#comp-regions-content").append(compBranchesHtml).slideDown(200);
+			$(".comp-region-branch").click(function(e){
+				e.stopPropagation();
+				if($(this).data("openstatus") == "closed") {
+					fetchIndividualForBranch($(this).data('branchid'));
+					$(this).data("openstatus","open");
+				}else {
+					$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
+					$(this).data("openstatus","closed");
+				}
+			});
+		}
 	}
 }
 function fetchReviewsForCompany(companyId) {
