@@ -1,20 +1,145 @@
-<jsp:include page="header.jsp" />
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="UTF-8"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title><spring:message code="label.login.title.key" /></title>
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style-common.css">
+<link rel="stylesheet"
+	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
+     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+</head>
+<body>
+    <div id="toast-container" class="toast-container">
+	   <span id="overlay-toast" class="overlay-toast"></span>
+    </div>
+	<div class="overlay-loader hide"></div>
+	<div class="overlay-payment hide"></div>
 
-<div class="hm-header-main-wrapper">
-	<div class="container">
-		<div class="hm-header-row clearfix">
-			<div class="float-left hm-header-row-left survery-header-2">Customer Feedback
-				Survey</div>
+	<div id="overlay-main" class="overlay-main hide">
+		<div class="overlay-disable-wrapper">
+			<div id="overlay-header" class="ol-header">
+				<!-- Populated by javascript -->
+			</div>
+			<div class="ol-content">
+				<div id="overlay-text" class="ol-txt">
+					<!-- Populated by javascript -->
+				</div>
+				<div class="clearfix">
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-continue" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+					<div class="float-left ol-btn-wrapper">
+						<div id="overlay-cancel" class="ol-btn cursor-pointer">
+							<!-- Populated by javascript -->
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
-</div>
+    
+    <div class="hdr-wrapper">
+        <div class="container hdr-container clearfix">
+            <div class="float-left hdr-logo"></div>
+            
+
+            <div id="header-user-info" class="header-user-info float-right clearfix">
+                <%-- <div class="float-left user-info-initial">
+                    <span>${fn:substring(user.firstName, 0, 1)}</span>
+                    <div class="initial-dd-wrapper hide blue-arrow-bot">
+                        <c:if test="${highestrole == 1}">
+                            <!-- show the company settings only of the user has company admin as a role -->
+                            <div class="initial-dd-item" id="company-setting">
+                                <spring:message code="label.settings.company.key" />
+                            </div>
+                        </c:if>
+                        <div class="initial-dd-item" id="profile-setting">
+                            <spring:message code="label.profilesetting.key" />
+                        </div>
+                        <div class="initial-dd-item" id="account-setting">
+                            <spring:message code="label.accountsetting.key" />
+                        </div>
+                        <div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
+                        <spring:message code="label.changepassword.key"/>
+                        </div>
+                        <c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+                            <div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+                                <spring:message	code="label.header.upgrade.key" />
+                            </div>
+                        </c:if>
+                        <a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+                    </div>
+                </div> --%>
 
 
-<div id="prof-container" data-agentId="${agentId}"
-	data-customerEmailId="${customerEmailId}"
+                <c:if test="${displaylogo != null}">
+                    <div class="float-left user-info-seperator"></div>
+                    <div class="float-left user-info-logo"
+                        style="background: url(${displaylogo}) no-repeat center; background-size: 100% auto;"></div>
+                </c:if>
+
+            </div>
+            <div id="header-menu-icn" class="header-menu-icn icn-menu hide float-right"></div>
+        </div>
+    </div>
+
+
+<div id="prof-container" data-agentId="${agentId}" data-agentName="${agentName}"
 	class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 	<div class="container">
 		<div class="sq-ques-wrapper">
+			
+			<div data-ques-type="user-details" class="sq-quest-item">
+				<div class="sq-top-img"></div>
+				<!-- <div class="sq-main-txt">Survey Question</div> -->
+				<div class="sq-ques">
+					<i><span  class="sq-ques-txt">Please fill in your details to take survey</span></i>
+				</div>
+				<div class="sq-bord-bot-sm"></div>
+				<div class="sq-rat-wrapper">
+					<div class="sq-star-wrapper sq-i-container clearfix">
+						<div class="clearfix sq-info-wrapper">
+							<div class="sq-i-lbl float-left">First Name</div>
+							<div class="sq-i-txt float-left">
+								<input id="firstName" class="sq-i-txt-fld">
+							</div>
+						</div>
+						<div class="clearfix sq-info-wrapper">
+							<div class="sq-i-lbl float-left">Last Name</div>
+							<div class="sq-i-txt float-left">
+								<input id="lastName" class="sq-i-txt-fld">
+							</div>
+						</div>
+						<div class="clearfix sq-info-wrapper">
+							<div class="sq-i-lbl float-left">Email</div>
+							<div class="sq-i-txt float-left">
+								<input id="email" class="sq-i-txt-fld">
+							</div>
+						</div>
+						<div class="sq-btn-wrapper">
+							<div id="start-btn" class="sq-btn-continue">Start</div>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			
 			<div data-ques-type="stars" class="sq-quest-item">
 				<div class="sq-top-img"></div>
 				<div class="sq-main-txt">Survey Question</div>
@@ -31,23 +156,10 @@
 						<div star-no="5" class="sq-star"></div>
 					</div>
 				</div>
-				<!-- Commented code to skip question. -->
-				<!-- <div class="sq-skip-main">
-					<div id="skip-ques" class="sq-skip-wrapper clearfix">
-						<div class="float-left sq-skip-chk st-checkbox-on hide"></div>
-						<div class="float-left sq-skip-chk st-checkbox-off"></div>
-						<div class="float-left sq-skip-txt">
-							<i>Skip this question</i>
-						</div>
-					</div>
-				</div> -->
 				<div class="sq-np-wrapper clearfix">
 					<div id="prev-star" class="float-left sq-np-item sq-np-item-prev">Previous</div>
 					<div id="next-star" class="float-left sq-np-item sq-np-item-next">Next</div>
 				</div>
-				<!-- <div class="sq-btn-wrapper">
-					<div class="sq-btn-continue">Continue</div>
-				</div> -->
 			</div>
 			<div data-ques-type="smiley" class="sq-quest-item hide">
 				<div class="sq-top-img"></div>
@@ -66,23 +178,10 @@
 						<div smile-no="5" class="sq-smile"></div>
 					</div>
 				</div>
-				<!-- Commented code for skip question -->
-				<!-- <div class="sq-skip-main">
-					<div class="sq-skip-wrapper clearfix">
-						<div class="float-left sq-skip-chk st-checkbox-on hide"></div>
-						<div class="float-left sq-skip-chk st-checkbox-off"></div>
-						<div class="float-left sq-skip-txt">
-							<i>Skip this question</i>
-						</div>
-					</div>
-				</div> -->
 				<div class="sq-np-wrapper clearfix">
 					<div id="prev-smile" class="float-left sq-np-item sq-np-item-prev">Previous</div>
 					<div id="next-smile" class="float-left sq-np-item sq-np-item-next">Next</div>
 				</div>
-				<!-- <div class="sq-btn-wrapper">
-					<div class="sq-btn-continue">Continue</div>
-				</div> -->
 			</div>
 
 			<!-- Div for rating questions of  scale  -->
@@ -108,31 +207,12 @@
                         <div value="4" class="sq-pts-item sq-pts-military">4</div>
                         <div value="5" class="sq-pts-item sq-pts-dgreen">5</div>
                     </div>
-                    
-<!--
-					<div class="sq-slider-wrapper clearfix">
-						<div id="range-slider-value" class="sq-slider-val">1</div>
-						<input type="range" min="1" max="5" step="1" value="1"
-							data-rangeslider>
-					</div>
--->
+           
 				</div>
-				<!-- <div class="sq-skip-main">
-					<div class="sq-skip-wrapper clearfix">
-						<div class="float-left sq-skip-chk st-checkbox-on hide"></div>
-						<div class="float-left sq-skip-chk st-checkbox-off"></div>
-						<div class="float-left sq-skip-txt">
-							<i>Skip this question</i>
-						</div>
-					</div>
-				</div> -->
 				<div class="sq-np-wrapper clearfix">
 					<div id="prev-scale" class="float-left sq-np-item sq-np-item-prev">Previous</div>
 					<div id="next-scale" class="float-left sq-np-item sq-np-item-next">Next</div>
 				</div>
-				<!-- <div class="sq-btn-wrapper">
-					<div class="sq-btn-continue">Continue</div>
-				</div> -->
 			</div>
 
 			<!-- For text area -->
@@ -155,15 +235,6 @@
 					</div>
 
 				</div>
-				<!-- <div class="sq-skip-main">
-					<div class="sq-skip-wrapper clearfix">
-						<div class="float-left sq-skip-chk st-checkbox-on hide"></div>
-						<div class="float-left sq-skip-chk st-checkbox-off"></div>
-						<div class="float-left sq-skip-txt">
-							<i>Skip this question</i>
-						</div>
-					</div>
-				</div> -->
 				<div class="sq-np-wrapper clearfix">
 					<div id="prev-textarea-smiley"
 						class="float-left sq-np-item sq-np-item-prev">Previous</div>
@@ -189,53 +260,13 @@
 				<div class="sq-bord-bot-sm"></div>
 				<div class="sq-rat-wrapper">
 					<div id="answer-options" class="sq-mcq-wrapper">
-						<!-- <div class="sq-mcq-item clearfix">
-                            <div class="sq-mcq-chk-wrapper float-left">
-                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
-                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
-                            </div>
-                            <div class="sq-mcq-ans-wrapper float-left">lorem ipsum dore it ler. lorem ipsum dore</div>
-                        </div> -->
-						<!-- <div class="sq-mcq-item clearfix">
-                            <div class="sq-mcq-chk-wrapper float-left">
-                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
-                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
-                            </div>
-                            <div class="sq-mcq-ans-wrapper float-left">lorem ipsum dore it ler vdore it lerdore it lerdore it lervdore it ler dore it ler. lorem ipsum dore</div>
-                        </div>
-                        <div class="sq-mcq-item clearfix">
-                            <div class="sq-mcq-chk-wrapper float-left">
-                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
-                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
-                            </div>
-                            <div class="sq-mcq-ans-wrapper float-left">lorem. lorem ipsum dore</div>
-                        </div>
-                        <div class="sq-mcq-item clearfix">
-                            <div class="sq-mcq-chk-wrapper float-left">
-                                <div class="float-left sq-mcq-chk st-mcq-chk-on hide"></div>
-                                <div class="float-left sq-mcq-chk st-mcq-chk-off"></div>
-                            </div>
-                            <div class="sq-mcq-ans-wrapper float-left">lorem ipsum dore it ler. lorem ipsum dore</div>
-                        </div> -->
+						
 					</div>
 				</div>
-				<!-- Commented code for skip a question -->
-				<!-- <div class="sq-skip-main">
-					<div id="skip-ques-mcq" class="sq-skip-wrapper clearfix">
-						<div class="float-left sq-skip-chk st-checkbox-on hide"></div>
-						<div class="float-left sq-skip-chk st-checkbox-off"></div>
-						<div class="float-left sq-skip-txt">
-							<i>Skip this question</i>
-						</div>
-					</div>
-				</div> -->
 				<div class="sq-np-wrapper clearfix">
 					<div id="prev-mcq" class="float-left sq-np-item sq-np-item-prev">Previous</div>
 					<div id="next-mcq" class="float-left sq-np-item sq-np-item-next sq-np-item-disabled">Next</div>
 				</div>
-				<!-- <div class="sq-btn-wrapper">
-					<div class="sq-btn-continue">Continue</div>
-				</div> -->
 			</div>
 		</div>
 	</div>
@@ -267,19 +298,6 @@
                     }
                     $('.min-height-container').css('min-height',minH+'px');
                 }
-                
-				/* $('.st-mcq-chk-on').click(function(){
-				    $(this).hide();
-				    $(this).parent().find('.st-mcq-chk-off').show();
-				    //var temp = $(this).parent().attr('qno');
-				});
-				
-				$('.st-mcq-chk-off').click(function(){
-				    $('.sq-mcq-wrapper').find('.st-mcq-chk-on').hide();
-				    $('.sq-mcq-wrapper').find('.st-mcq-chk-off').show();
-				    $(this).hide();
-				    $(this).parent().find('.st-mcq-chk-on').show();
-				}); */
                 
                 $('.sq-pts-red').hover(
                     function(){
@@ -330,28 +348,9 @@
 					$(this).hide();
 					$(this).parent().find('.st-checkbox-on').show();
 				});
-
-				/*$('.sq-np-item-next').click(function(){
-				    if(!$(this).hasClass('sq-np-item-disabled')){
-				        survQuesNo = $(this).parent().parent().attr('quest-no');
-				        nextQ = parseInt(survQuesNo) + 1;
-				        $(this).parent().parent().hide();
-				        $(this).parent().parent().parent().find('div[quest-no="'+nextQ+'"]').show();
-				    }
-				});
-				
-				$('.sq-np-item-prev').click(function(){
-				    if(!$(this).hasClass('sq-np-item-disabled')){
-				        survQuesNo = $(this).parent().parent().attr('quest-no');
-				        prevQ = parseInt(survQuesNo) - 1;
-				        $(this).parent().parent().hide();
-				        $(this).parent().parent().parent().find('div[quest-no="'+prevQ+'"]').show();
-				        survQuesNo = prevQ;
-				    }
-				});
-				 */
-				initSurvey($('#prof-container').attr("data-agentId"), $(
-						'#prof-container').attr("data-customerEmailId"));
+				$("div[data-ques-type]").hide();
+				$("div[data-ques-type='user-details']").show();
+//				initSurvey($('#prof-container').attr("data-agentId"));
 			});
 </script>
 
