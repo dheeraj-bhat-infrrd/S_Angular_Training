@@ -659,7 +659,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			LOG.debug("Returning :" + users.size() + " individuals for branch : " + branchId);
 		}
 		LOG.info("Method getIndividualsByBranchId executed successfully");
-		return null;
+		return users;
 	}
 
 }

@@ -20,6 +20,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -309,6 +310,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked")
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
 		Calendar calendar = Calendar.getInstance();
@@ -332,10 +334,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		long a = mongoTemplate.count(query, SurveyDetails.class);
+		long a = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		double rating = 0;
 		if (result != null && a > 0) {
-			rating = ((long) result.getRawResults().get("total_score")) / a;
+			List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get("result");
+			rating = (double) basicDBObject.get(0).get("total_score")/a;
 		}
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
