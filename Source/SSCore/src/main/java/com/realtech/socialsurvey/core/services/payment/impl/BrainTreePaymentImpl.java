@@ -194,26 +194,46 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		LOG.debug("BrainTreePaymentImpl : updateLicenseTable() : Executing method.");
 		LOG.debug("Parameters provided : accountsMasterId : " + accountsMasterId + ", company : " + company.toString() + ", userId : " + user.getUserId());
+		
+		LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+		if(currentLicenseDetail != null && currentLicenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE){
+			currentLicenseDetail.setSubscriptionId(subscriptionId);
+			currentLicenseDetail.setAccountsMaster(accountsMaster);
+			currentLicenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
+			currentLicenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			currentLicenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
+			currentLicenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
+			currentLicenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
+			currentLicenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+			currentLicenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
+			licenseDetailDao.update(currentLicenseDetail);
+			LOG.debug("License detail table updated. Updating the company entity.");
+			company.setLicenseDetails(Arrays.asList(currentLicenseDetail));
+			LOG.debug("Company entity updated.");
 
-		LOG.debug("Updating LicenseDetail Table");
-		LicenseDetail licenseDetail = new LicenseDetail();
-		licenseDetail.setSubscriptionId(subscriptionId);
-		licenseDetail.setAccountsMaster(accountsMaster);
-		licenseDetail.setCompany(company);
-		licenseDetail.setCreatedBy(String.valueOf(user.getUserId()));
-		licenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
-		licenseDetail.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		licenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
-		licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
-		licenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
-		licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
-		licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
-		licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
-		licenseDetailDao.save(licenseDetail);
-		LOG.debug("License detail table updated. Updating the company entity.");
-		company.setLicenseDetails(Arrays.asList(licenseDetail));
-		LOG.debug("Company entity updated.");
+		}
+		else{
+			LOG.debug("Updating LicenseDetail Table");
+			LicenseDetail licenseDetail = new LicenseDetail();
+			licenseDetail.setSubscriptionId(subscriptionId);
+			licenseDetail.setAccountsMaster(accountsMaster);
+			licenseDetail.setCompany(company);
+			licenseDetail.setCreatedBy(String.valueOf(user.getUserId()));
+			licenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
+			licenseDetail.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+			licenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
+			licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
+			licenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
+			licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
+			licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+			licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
+			licenseDetailDao.save(licenseDetail);
+			LOG.debug("License detail table updated. Updating the company entity.");
+			company.setLicenseDetails(Arrays.asList(licenseDetail));
+			LOG.debug("Company entity updated.");
+		}
+		
 		LOG.debug("LicenseDetail table updated");
 	}
 
@@ -384,8 +404,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("subscribeCustomer : customerId : " + customerId + " for planId : " + planId + " Status : " + result.isSuccess()
 					+ " Message : " + result.getMessage());
 			if (result.isSuccess()) {
-				LOG.info("Subscription successful, subscription id : " + subscriptionId);
 				subscriptionId = result.getTarget().getId();
+				LOG.info("Subscription successful, subscription id : " + subscriptionId);
 			}
 			else {
 				LOG.error("Subscription Unsuccessful : message : " + result.getMessage());

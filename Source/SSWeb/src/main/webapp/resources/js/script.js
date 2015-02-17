@@ -694,3 +694,20 @@ function upgradePlan(){
 	    		}
 	    	});
 }
+
+function upgradeToPaidPlan(){
+	 console.log("upgrade plan button clicked");
+	 var url = "./upgradetopaidplanpage.do";
+	    
+	    $.ajax({
+	    	url: url,
+	    	type: "GET",
+	    	success: function(data){
+	        	$('#outer-payment').html(data);
+	        	$('#outer-payment').show();
+	        	},
+	        error : function(e) {
+	    			console.log(e);
+	    		}
+	    	});
+}

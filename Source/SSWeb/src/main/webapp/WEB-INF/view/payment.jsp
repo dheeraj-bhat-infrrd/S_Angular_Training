@@ -36,6 +36,7 @@
     			}
     		</style>
 </c:when>
+<c:when test="${ paidUpgrade == 1 }"></c:when>
 <c:otherwise>
 	<!DOCTYPE">
 	<html>
@@ -385,6 +386,7 @@
    
    <c:choose>
    <c:when test="${ paymentChange == 1 }"></c:when>
+   <c:when test="${ paidUpgrade == 1 }"></c:when>
    <c:otherwise>
 	    <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 	    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>

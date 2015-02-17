@@ -160,6 +160,7 @@ public interface CommonConstants {
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
 	public static final String VERTICAL_COLUMN = "verticalsMaster";
+	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade"; 
 	/**
 	 * Batch Constants
 	 */

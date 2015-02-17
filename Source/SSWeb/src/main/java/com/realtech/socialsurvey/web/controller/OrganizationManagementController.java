@@ -279,7 +279,7 @@ public class OrganizationManagementController {
 			User user = sessionHelper.getCurrentUser();
 
 			LOG.debug("Checking if payment has already been made.");
-			if (gateway.checkIfPaymentMade(user.getCompany())) {
+			if (gateway.checkIfPaymentMade(user.getCompany()) && user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
 			}
@@ -817,7 +817,29 @@ public class OrganizationManagementController {
 
 		LOG.debug("Adding the current plan in the model and the upgrade flag");
 		model.addAttribute(CommonConstants.CURRENT_LICENSE_ID, currentLicenseDetail.getAccountsMaster().getAccountsMasterId());
-		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.STATUS_ACTIVE);
+		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.YES);
+
+		LOG.info("Returning the upgrade account selection page");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
+
+	}
+	
+	/**
+	 * Method for displaying the upgrade page to upgrade from free account
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/upgradetopaidplanpage", method = RequestMethod.GET)
+	public String upgradeToPaidPlanPage(HttpServletRequest request, Model model) {
+
+		LOG.info("Upgrade page requested.");
+
+		LOG.debug("Retrieveing the user from session to get his current plan details");
+
+		LOG.debug("Adding the current plan in the model and the upgrade flag");
+		model.addAttribute(CommonConstants.PAID_PLAN_UPGRADE_FLAG, CommonConstants.YES);
 
 		LOG.info("Returning the upgrade account selection page");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
