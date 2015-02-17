@@ -148,7 +148,7 @@ function paintCompanyRegions(data) {
 		if(result != undefined && result.length > 0) {
 			var regionsHtml = "";
 			$.each(result,function(i, region) {
-				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-regionid = '+region.regionId+' id="comp-region-id-"'+region.regionId+'>';
+				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-regionid = '+region.regionId+'>';
 				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company"></div>';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
@@ -183,7 +183,7 @@ function paintBranchesForRegion(data) {
 				branchesHtml = branchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
-				branchesHtml = branchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-"'+branch.branchId+'></div>';
+				branchesHtml = branchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
 				branchesHtml = branchesHtml +'	</div>';
 				branchesHtml = branchesHtml +'</div>' ;
 			});
@@ -213,7 +213,7 @@ function paintIndividualForBranch(data) {
 		var result = $.parseJSON(responseJson.entity);
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,individual) {
-				if(result.contact_details != undefined){
+				if(individual.contact_details != undefined){
 					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel">';
 					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
 					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img icn-psn1"></div>';
@@ -235,9 +235,9 @@ function fetchCompanyIndividuals() {
 
 function paintCompanyIndividuals() {
 	var response= $.parseJSON(data);
-	/*if(response != undefined) {
+	if(response != undefined) {
 		console.log(response);
-	}*/
+	}
 }
 
 function fetchCompanyBranches() {
@@ -247,9 +247,9 @@ function fetchCompanyBranches() {
 
 function paintCompanyBranches(data) {
 	var response= $.parseJSON(data);
-	/*if(response != undefined) {
+	if(response != undefined) {
 		console.log(response);
-	}*/
+	}
 }
 function fetchReviewsForCompany(companyId) {
 	var url = window.location.origin +'/rest/profile/reviews/company/'+companyId;
@@ -274,11 +274,13 @@ function paintReviewsForCompany(data) {
 			});
 			
 			$.each(result,function(i, reviewItem) {
+				var d = Date.parse(reviewItem.updatedOn);
 				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
 				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">12<sup>th</sup>Sept 2014</div>';        
+				//reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">12<sup>th</sup>Sept 2014</div>';    
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+d.getDate() +" "+ d.getMonthName()+" "+d.getFullYear()+'</div>'; 
 				reviewsHtml=  reviewsHtml+'    </div>';
 				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
