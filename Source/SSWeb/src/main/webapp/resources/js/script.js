@@ -677,3 +677,20 @@ $(window).resize(function(){
        $('body').removeClass('body-no-scroll');
    }
 });
+
+function upgradePlan(){
+	 console.log("upgrade plan button clicked");
+	 var url = "./upgradepage.do";
+	    
+	    $.ajax({
+	    	url: url,
+	    	type: "GET",
+	    	success: function(data){
+	        	$('.overlay-payment').html(data);
+	        	$('.overlay-payment').show();
+	        	},
+	        error : function(e) {
+	    			console.log(e);
+	    		}
+	    	});
+}

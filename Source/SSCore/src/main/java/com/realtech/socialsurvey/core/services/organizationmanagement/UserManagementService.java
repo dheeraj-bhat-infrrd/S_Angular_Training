@@ -28,7 +28,7 @@ public interface UserManagementService {
 
 	public User assignRegionAdmin(User user, long regionId, long userId) throws InvalidInputException;
 
-	public void updateUserStatus(long userId, int status) throws InvalidInputException;
+	public void updateUserStatus(long userId, int status) throws InvalidInputException, SolrException;
 
 	// JIRA SS-42 BY RM02 BOC
 
@@ -120,7 +120,7 @@ public interface UserManagementService {
 
 	public void updateProfileCompletionStage(User user, int profilesMasterId, String profileCompletionStage) throws InvalidInputException;
 
-	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException;
+	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException, SolrException;
 	
 	//JIRA SS-42 by RM-06:BOC
 	

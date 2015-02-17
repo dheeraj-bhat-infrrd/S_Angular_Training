@@ -60,6 +60,7 @@ function validateRegistrationForm(id) {
 		return false;
 
 	}
+	
 	if (!validateRegPassword('reg-pwd')) {
 		$('#reg-pwd').focus();
 		return false;
@@ -67,6 +68,27 @@ function validateRegistrationForm(id) {
 	if (!validateRegConfirmPassword('reg-pwd', 'reg-conf-pwd')) {
 		$('#reg-conf-pwd').focus();
 		return false;
+	}
+	return true;
+}
+
+function validatePreRegistrationForm(id) {
+	// hide the server error
+	$("#serverSideerror").hide();
+	// Validate form input elements
+	if (!validateRegFirstName('reg-fname')) {
+		$('#reg-fname').focus();
+		return false;
+	}
+	if (!validateRegLastName('reg-lname')) {
+		$('#reg-lname').focus();
+		return false;
+
+	}
+	if (!validateRegEmailId('reg-email')) {
+		$('#reg-email').focus();
+		return false;
+
 	}
 	return true;
 }
@@ -163,4 +185,47 @@ function validateRegConfirmPassword(pwdId, confirmPwdId) {
 		return false;
 	}
 
+}
+
+// Find a professional
+//Function to validate the first name pattern
+function validateProFirstNamePattern(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (nameRegex.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter a first name pattern.');
+			showToast();
+			return false;
+		}
+	} else {
+		$('#overlay-toast').html('Please enter a first name pattern.');
+		showToast();
+		return false;
+	}
+}
+
+// Function to validate the last name pattern
+function validateProLastNamePattern(elementId) {
+	if ($('#' + elementId).val() != "") {
+		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+			return true;
+		} else {
+			$('#overlay-toast').html('Please enter a valid last name pattern.');
+			showToast();
+			return false;
+		}
+	} else {
+		return false;
+	}
+}
+
+// Function to validate registration form
+function validateFindProForm(id) {
+	$("#serverSideerror").hide();
+	if (!validateProFirstNamePattern('find-pro-first-name') && !validateProLastNamePattern('find-pro-last-name')) {
+		$('#find-pro-first-name').focus();
+		return false;
+	}
+	return true;
 }
