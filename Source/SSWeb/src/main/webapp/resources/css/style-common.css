@@ -2900,6 +2900,12 @@ button.paypal.is-active {
     background: url(../images/rgn_blue.png) no-repeat center;
 }
 
+.lp-pers-img {
+	width:32px;
+	height:32px;
+	border-radius:50%;
+}
+
 .icn-psn1 {
     background: url(../images/Person1.png) no-repeat center;
 }
