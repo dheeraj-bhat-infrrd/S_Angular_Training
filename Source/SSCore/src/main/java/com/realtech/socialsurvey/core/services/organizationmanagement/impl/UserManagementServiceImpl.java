@@ -1419,6 +1419,232 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Method isAssigningAllowed() finsihed.");
 		return false;
 	}
+	
+	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException{
+		
+		LOG.debug("Fetching the default region for company");
+		if(company == null){
+			LOG.error("fetchDefaultRegion : Company parameter is null");
+			throw new InvalidInputException("fetchDefaultRegion : Company parameter is null");			
+		}
+		
+		Region defaultRegion = null;
+		
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		LOG.debug("Making database call to fetch default region");
+		List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
+		
+		if( regions==null || regions.size() != CommonConstants.MAX_DEFAULT_REGIONS ){
+			LOG.error("No default regions found for company with id : " + company.getCompanyId());
+			throw new NoRecordsFetchedException("No default regions found for company with id : " + company.getCompanyId());
+		}		
+		
+		LOG.debug("Default region exists.");
+		defaultRegion = regions.get(CommonConstants.INITIAL_INDEX);
+		
+		LOG.debug("Returning default region with id : " + defaultRegion.getRegionId());
+		return defaultRegion;
+	}
+	
+	private Branch fetchDefaultBranch(Region region,Company company) throws InvalidInputException, NoRecordsFetchedException{
+		
+		LOG.debug("Fetching the default branch for region");
+		if(region == null){
+			LOG.error("fetchDefaultBranch : Region parameter is null");
+			throw new InvalidInputException("fetchDefaultBranch : Region parameter is null");			
+		}
+		if(company == null){
+			LOG.error("fetchDefaultBranch : Company parameter is null");
+			throw new InvalidInputException("fetchDefaultBranch : Company parameter is null");			
+		}
+		
+		Branch defaultBranch = null;
+		
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		
+		LOG.debug("Making database call to fetch default branch");
+		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
+		
+		if( branches==null || branches.size() != CommonConstants.MAX_DEFAULT_BRANCHES ){
+			LOG.error("No default branches found for region with id : " + region.getRegionId());
+			throw new NoRecordsFetchedException("No default branches found for region with id : " + region.getRegionId());
+		}		
+		
+		LOG.debug("Default branch exists.");
+		defaultBranch = branches.get(CommonConstants.INITIAL_INDEX);
+		
+		LOG.debug("Returning default branch with id : " + defaultBranch.getBranchId());
+		return defaultBranch;
+	}
+	
+	/**
+	 * Assign a user directly under the company.
+	 * @param admin
+	 * @param userId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	@Override
+	public void assignUserToCompany(User admin, long userId) throws InvalidInputException, NoRecordsFetchedException, SolrException {
+		if (admin == null) {
+			LOG.error("assignUserToCompany : admin parameter is null");
+			throw new InvalidInputException("assignUserToCompany : admin parameter is null");
+		}
+		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
+		User user = userDao.findById(User.class, userId);
+
+		if (user == null) {
+			LOG.error("No records fetched for user with id : " + userId);
+			throw new NoRecordsFetchedException("No records fetched for user with id : " + userId);
+		}
+		//Checking if admin can assign a user to the given branch.
+		if(!admin.isCompanyAdmin()){
+			LOG.error("User : " + admin.getUserId() + " is not authorized to assign users to company " + admin.getCompany().getCompanyId());
+			throw new InvalidInputException("User : " + admin.getUserId() + " is not authorized to assign users to company " + admin.getCompany().getCompanyId());
+		}
+		
+		//Fetch the default region for company
+		LOG.debug("Fetching default region for company with id :" + admin.getCompany().getCompanyId());
+		Region defaultRegion = fetchDefaultRegion(admin.getCompany());
+		
+		//Fetch the default branch for the region
+		LOG.debug("Fetching default branch for region with id : " + defaultRegion.getRegionId());
+		Branch defaultBranch = fetchDefaultBranch(defaultRegion, admin.getCompany());		
+		
+		UserProfile userProfile;
+		// Create a new entry in UserProfile to map user to the branch.
+		LOG.debug("Updating the User Profile table");
+		userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, defaultBranch.getBranchId(),
+					defaultRegion.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
+					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+		
+		userProfileDao.saveOrUpdate(userProfile);
+		LOG.debug("UserProfile table updated");
+		
+		if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.debug("Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName());
+			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(user);
+		}
+		setProfilesOfUser(user);
+		LOG.debug("Adding user to solr");
+		solrSearchService.addUserToSolr(user);
+		LOG.info("Method to assign user to a company finished for user : " + admin.getUserId());		
+	}
+	
+	/**
+	 * Checks if a user can add users to a particular region
+	 * @param admin
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	private boolean canAddUsersToRegion(User admin, long regionId) throws InvalidInputException{
+		
+		LOG.debug("Method canAddUsersToRegion() called to check if current user is authorized to assign a user to the given region");
+
+		if (admin == null) {
+			LOG.error("canAddUsersToRegion : admin parameter is null");
+			throw new InvalidInputException("canAddUsersToRegion : admin parameter is null");
+		}
+		if(regionId <= 0 ){
+			LOG.error("canAddUsersToRegion : regionId parameter is null");
+			throw new InvalidInputException("canAddUsersToRegion : regionId parameter is null");
+		}
+		
+		LOG.debug("Fetching the region from the database for region id : " + regionId);
+		Region region = regionDao.findById(Region.class, regionId);
+		if(admin.isCompanyAdmin()){
+			LOG.debug("User is a corporate admin. returning true");
+			return true;
+		}
+		LOG.debug("Checking the user profiles to see if he is a region admin");
+		for(UserProfile adminProfile:admin.getUserProfiles()){
+			if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin() && region.getRegionId()==adminProfile.getRegionId()){
+				LOG.debug("User is region admin. Returning true");
+				return true;			
+			}
+		}
+		LOG.debug("User not allowed to add users to region with id : " + regionId);
+		return false;
+		
+	}
+	
+	/**
+	 * Assign a user directly to a region 
+	 * @param admin
+	 * @param userId
+	 * @param regionId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	@Override
+	public void assignUserToRegion(User admin, long userId, long regionId) throws InvalidInputException, NoRecordsFetchedException, SolrException {
+		
+		if (admin == null) {
+			LOG.error("assignUserToRegion : admin parameter is null");
+			throw new InvalidInputException("assignUserToRegion : admin parameter is null");
+		}
+		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
+		User user = userDao.findById(User.class, userId);
+
+		if (user == null) {
+			LOG.error("No records fetched for user with id : " + userId);
+			throw new NoRecordsFetchedException("No records fetched for user with id : " + userId);
+		}
+		if(regionId <= 0 ){
+			LOG.error("assignUserToRegion : regionId parameter is null");
+			throw new InvalidInputException("assignUserToRegion : regionId parameter is null");
+		}
+		//Checking if admin can assign a user to the given region.
+		if(!canAddUsersToRegion(admin,regionId)){
+			LOG.error("User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId);
+			throw new InvalidInputException("User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId);
+		}
+		
+		//Get the region from the database
+		LOG.debug("Fetching the region from the database for region id : " + regionId);
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No records fetched for region with id : " + regionId);
+			throw new NoRecordsFetchedException("No records fetched for region with id : " + regionId);
+		}
+		
+		//Fetch the default branch for the region
+		LOG.debug("Fetching the default branch for region with id : " + regionId);
+		Branch defaultBranch = fetchDefaultBranch(region, admin.getCompany());
+		
+		UserProfile userProfile;
+		// Create a new entry in UserProfile to map user to the branch.
+		LOG.debug("Updating the User Profile table");
+		userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, defaultBranch.getBranchId(),
+					region.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
+					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+		
+		userProfileDao.saveOrUpdate(userProfile);
+		LOG.debug("UserProfile table updated");
+		
+		if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.debug("Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName());
+			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(user);
+		}
+		setProfilesOfUser(user);
+		LOG.debug("Adding user to solr");
+		solrSearchService.addUserToSolr(user);
+		LOG.info("Method to assign user to a company finished for user : " + admin.getUserId());
+		
+	}
 
 	/*
 	 * 
