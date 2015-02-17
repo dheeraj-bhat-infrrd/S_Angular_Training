@@ -163,11 +163,15 @@
             }
             
             console.log("Loading captcha");
-            Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-', 'recaptcha', {
-            	theme : 'white',
-            	callback : captchaLoaded
-            	});
-            console.log("Captcha loaded");
+            try{
+	            Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-', 'recaptcha', {
+	            	theme : 'white',
+	            	callback : captchaLoaded
+	            	});
+	            console.log("Captcha loaded");
+       		}catch(error){
+       			console.log("Could not load captcha");
+       		}
             
             /* $('#login-form input').keypress(function(e){
 	        	// detect enter
