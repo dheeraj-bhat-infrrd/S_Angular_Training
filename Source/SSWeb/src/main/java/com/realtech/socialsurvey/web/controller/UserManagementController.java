@@ -145,7 +145,7 @@ public class UserManagementController {
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
-						if (accountType.getValue() == CommonConstants.ACCOUNT_TYPE_TEAM) {
+						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {							
 							String branches = solrSearchService.searchBranches("", admin.getCompany(),0,0);
 							branches = branches.substring(1, branches.length() - 1);
 							JSONObject defaultBranch = new JSONObject(branches);
@@ -197,7 +197,7 @@ public class UserManagementController {
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			Long accountTypeVal = accountType.getValue();
+			int accountTypeVal = accountType.getValue();
 			model.addAttribute("accounttypeval", accountTypeVal);
 			if (userIdStr == null) {
 				LOG.error("Invalid user id passed in method findUserByUserId().");

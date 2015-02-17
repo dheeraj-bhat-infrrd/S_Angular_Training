@@ -14,10 +14,14 @@ public class OrganizationUnitSettings {
 	private String id;
 	private long iden;
 	private float profile_completion;
+	private String profileName;
+	private String profileUrl;
+	private String profileImageUrl;
 	private String logo;
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
 	private ContactDetailsSettings contact_details;
+	private String vertical;
 	private CRMInfo crm_info;
 	private MailContentSettings mail_content;
 	private Licenses licenses;
@@ -25,6 +29,7 @@ public class OrganizationUnitSettings {
 	private List<Achievement> achievements;
 	private SurveySettings survey_settings;
 	private SocialMediaTokens socialMediaTokens;
+	private LockSettings lockSettings;
 	private String createdBy;
 	private String modifiedBy;
 	private long createdOn;
@@ -52,6 +57,30 @@ public class OrganizationUnitSettings {
 
 	public void setProfile_completion(float profile_completion) {
 		this.profile_completion = profile_completion;
+	}
+	
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
+	
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
+	}
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
 	}
 
 	public String getLogo() {
@@ -84,6 +113,14 @@ public class OrganizationUnitSettings {
 
 	public void setContact_details(ContactDetailsSettings contact_details) {
 		this.contact_details = contact_details;
+	}
+
+	public String getVertical() {
+		return vertical;
+	}
+
+	public void setVertical(String vertical) {
+		this.vertical = vertical;
 	}
 
 	public CRMInfo getCrm_info() {
@@ -137,6 +174,14 @@ public class OrganizationUnitSettings {
 	public SocialMediaTokens getSocialMediaTokens() {
 		return socialMediaTokens;
 	}
+	
+	public LockSettings getLockSettings() {
+		return lockSettings;
+	}
+
+	public void setLockSettings(LockSettings lockSettings) {
+		this.lockSettings = lockSettings;
+	}
 
 	public void setSocialMediaTokens(SocialMediaTokens socialMediaTokens) {
 		this.socialMediaTokens = socialMediaTokens;
@@ -176,12 +221,12 @@ public class OrganizationUnitSettings {
 
 	@Override
 	public String toString() {
-		return "iden: " + iden + "\t profile_completion: " + profile_completion + "\t logo: " + logo + "\t contact_details: "
-				+ (contact_details != null ? contact_details.toString() : "null") + "\t crm_info: "
-				+ (crm_info != null ? crm_info.toString() : "null") + "\t licenses: " + (licenses != null ? licenses.toString() : "null")
-				+ "\t associations: " + (associations != null ? associations.toString() : "") + "\t achievements: "
-				+ (achievements != null ? achievements.toString() : "null") + "\t survey_setings: "
-				+ (survey_settings != null ? survey_settings.toString() : "");
+		return "OrganizationUnitSettings [id=" + id + ", iden=" + iden + ", profile_completion=" + profile_completion + ", profileName="
+				+ profileName + ", profileUrl=" + profileUrl + ", profileImageUrl=" + profileImageUrl + ", logo=" + logo + ", isLocationEnabled="
+				+ isLocationEnabled + ", isAccountDisabled=" + isAccountDisabled + ", contact_details=" + contact_details + ", vertical=" + vertical
+				+ ", crm_info=" + crm_info + ", mail_content=" + mail_content + ", licenses=" + licenses + ", associations=" + associations
+				+ ", achievements=" + achievements + ", survey_settings=" + survey_settings + ", socialMediaTokens=" + socialMediaTokens
+				+ ", lockSettings=" + lockSettings + ", createdBy=" + createdBy + ", modifiedBy=" + modifiedBy + ", createdOn=" + createdOn
+				+ ", modifiedOn=" + modifiedOn + "]";
 	}
-
 }
