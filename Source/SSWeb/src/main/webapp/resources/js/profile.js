@@ -98,6 +98,7 @@ function paintCompanyProfile(data) {
 		fetchAverageRatings(result.iden);
 		fetchCompanyRegions();
 		fetchReviewsForCompany(result.iden);
+		fetchCompanyIndividuals();
 	}
 }
 
@@ -144,11 +145,10 @@ function paintCompanyRegions(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		var result = $.parseJSON(response.entity);
-		console.log(result);
 		if(result != undefined && result.length > 0) {
 			var regionsHtml = "";
 			$.each(result,function(i, region) {
-				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-regionid = '+region.regionId+'>';
+				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-openstatus="closed" data-regionid = '+region.regionId+'>';
 				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company"></div>';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
@@ -159,7 +159,14 @@ function paintCompanyRegions(data) {
 			$("#comp-regions-content").html(regionsHtml);
 			
 			$(".comp-region").click(function(){
-				fetchBranchesForRegion($(this).data('regionid'));
+				if($(this).data("openstatus") == "closed") {
+					fetchBranchesForRegion($(this).data('regionid'));
+					$(this).data("openstatus","open");
+				}else {
+					$('#comp-region-branches-'+$(this).data('regionid')).slideUp(200);
+					$(this).data("openstatus","closed");
+				}
+				
 			});
 		}
 	}
@@ -179,7 +186,7 @@ function paintBranchesForRegion(data) {
 		var result = $.parseJSON(responseJson.entity);
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,branch) {
-				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-branch" data-branchid="'+branch.branchId+'">';
+				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				branchesHtml = branchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
@@ -190,10 +197,15 @@ function paintBranchesForRegion(data) {
 			
 			$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
 			
-			$(".comp-branch").click(function(){
-				$(".comp-region").unbind("click");
-				console.log($(this));
-				fetchIndividualForBranch($(this).data('branchid'));
+			$(".comp-region-branch").click(function(e){
+				e.stopPropagation();
+				if($(this).data("openstatus") == "closed") {
+					fetchIndividualForBranch($(this).data('branchid'));
+					$(this).data("openstatus","open");
+				}else {
+					$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
+					$(this).data("openstatus","closed");
+				}
 			});
 		}
 	}
@@ -216,16 +228,22 @@ function paintIndividualForBranch(data) {
 				if(individual.contact_details != undefined){
 					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel">';
 					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img icn-psn1"></div>';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
-					individualsHtml=  individualsHtml+'    		<div class="lpsub-2"></div>';
 					individualsHtml=  individualsHtml+'		</div>';
 					individualsHtml=  individualsHtml+'</div>';
 				}
 			});
 			$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
+			paintProfileImage("individual-prof-image");
 		}
 	}
+}
+
+function paintProfileImage(imgDivClass) {
+	$("."+imgDivClass).each(function(){
+		$(this).css("background", "url("+$(this).data('imageurl')+") no-repeat center");
+	});
 }
 
 function fetchCompanyIndividuals() {
@@ -237,6 +255,22 @@ function paintCompanyIndividuals() {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		console.log(response);
+		var result = $.parseJSON(response.entity);
+		if(result != undefined && result.length > 0) {
+			var compIndividualsHtml = "";
+			$.each(result,function(i, compIndividual) {
+				if(compIndividual.contact_details != undefined){
+					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-individual" data-agentid = '+compIndividual.iden+'>';
+					compIndividualsHtml = compIndividualsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-txt">'+compIndividual.contact_details.name+'</div>';
+					compIndividualsHtml = compIndividualsHtml+'	</div>';
+					compIndividualsHtml = compIndividualsHtml+'</div>';
+				}
+			});
+			$("#comp-regions-content").append(compIndividualsHtml);
+			paintProfileImage("comp-individual-prof-image");
+		}
 	}
 }
 

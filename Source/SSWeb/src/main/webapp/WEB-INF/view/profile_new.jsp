@@ -29,8 +29,8 @@
             <div class="hdr-link-item">User Management</div> -->
         </div>
         <div class="float-right clearfix hdr-btns-wrapper">
-            <div class="float-left hdr-log-btn hdr-log-reg-btn">Sign In</div>
-            <div class="float-left hdr-reg-btn hdr-log-reg-btn">Join Us</div>
+            <div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key"/></div>
+            <div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key"/></div>
         </div>
     </div>
 </div>
@@ -39,7 +39,7 @@
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row hm-header-row-main clearfix">
-            <div class="float-left hm-header-row-left">Read, Write and Share Reviews</div>
+            <div class="float-left hm-header-row-left"><spring:message code="label.readwritesharereviews.key"/></div>
             <div class="float-right hm-hr-row-right clearfix">
                 <div class="float-left social-item-icon icn-fb"></div>
                 <div class="float-left social-item-icon icn-twit"></div>
@@ -85,7 +85,7 @@
                 
                 <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">
-                        <div class="left-panel-header">Contact Information</div>
+                        <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
                             <!--  -->
                         </div>
@@ -93,7 +93,7 @@
                 </div>
                 <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     <div class="left-assoc-wrapper">
-                        <div class="left-panel-header">Our Company</div>
+                        <div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
                         <!-- hidden fields to capture which region/branch is expanded -->
                         <input type="hidden" id="regionid-hidden"/>
                         <input type="hidden" id="branchid-hidden"/>
@@ -170,22 +170,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                
                             </div> -->
-                            
-                            <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-regions" id="comp-region-id">
-                                <div class="lp-sub-header clearfix flat-left-bord">
-                                    <div class="lp-sub-img icn-company"></div>
-                                    <div class="lp-sub-txt">Northern Providential</div>
-                                </div>
-                            </div>
-                            <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-regions" id="comp-region-id">
-                                <div class="lp-sub-header clearfix flat-left-bord">
-                                    <div class="lp-sub-img icn-company"></div>
-                                    <div class="lp-sub-txt">Southern Providential</div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
