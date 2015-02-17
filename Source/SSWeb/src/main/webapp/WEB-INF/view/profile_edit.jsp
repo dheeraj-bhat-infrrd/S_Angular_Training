@@ -26,10 +26,6 @@
 
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
-	<div id="principal-detail">
-		<input id="profile-user-id" name="profile-user-id" type="hidden" value="${user.userId}">
-		<input id="profile-user" type="hidden" value="${profile}">
-	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
@@ -128,8 +124,12 @@
 				
 				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer">
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
-					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.address}</div>
-					<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
+					<c:if test="${not empty contactdetail.address}">
+						<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.address}</div>
+					</c:if>
+					<c:if test="${not empty contactdetail.country && not empty contactdetail.zipcode}">
+						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
+					</c:if>
 				</div>
 			</div>
 		</div>
@@ -211,7 +211,7 @@
 				</div>
 				
 				<c:choose>
-					<c:when	test="${user.agent}">
+					<c:when	test="${user.branchAdmin}">
 						<div class="prof-left-row prof-left-assoc bord-bot-dc">
 							<div class="left-assoc-wrapper">
 								<div class="clearfix">

@@ -8,9 +8,9 @@ var delay = (function() {
 })();
 
 function startCompanyProfilePage() {
-	// showAssociationList();
-	// showAchievementList();
-	// showLicenceList();
+	showAssociationList();
+	showAchievementList();
+	showLicenceList();
 }
 
 // Toggle text editor
@@ -44,7 +44,8 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 
 
 // TODO Lock Settings
-$(document).on('click', '.lp-edit-locks', function() {
+$(document).on('click', '.lp-edit-locks', function(e) {
+	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
@@ -62,7 +63,8 @@ $(document).on('click', '.lp-edit-locks', function() {
 	}
 });
 
-$(document).on('click', '.prof-img-lock-item', function() {
+$(document).on('click', '.prof-img-lock-item', function(e) {
+	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
@@ -94,7 +96,7 @@ function updateLockSettings(id, state) {
 }
 
 function callBackUpdateLock () {
-	console.log("updated lock settings");
+	showMainContent('./showprofilepage.do');
 }
 
 
@@ -152,7 +154,7 @@ function callBackOnEditAdboutMeDetails(data) {
 
 // TODO Update Contact details
 function callBackShowContactDetails(data) {
-	// $('#contant-info-container').html(data);
+	$('#contant-info-container').html(data);
 	adjustImage();
 }
 
@@ -178,9 +180,7 @@ $(document).on('blur', '#contant-info-container input[data-phone-number]', funct
 
 function callBackOnUpdatePhoneNumbers(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
-		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	}
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -222,9 +222,7 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 
 function callBackOnUpdateWebAddresses(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('error-message')) {
-		callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
-	}
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
@@ -449,10 +447,21 @@ function addAnAssociation() {
 		"placeholder" : "New Associaion"
 	});
 	$('#association-container').append(newAssociation);
+
+	var newAssociationButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#association-container').append(newAssociationButton);
+
 	newAssociation.focus();
 }
 
 // Function to append an achievement
+$(document).on('click', '.lp-ach-item-img', function(e) {
+	$(this).prev().remove();
+	$(this).remove();
+});
+
 function addAnAchievement() {
 	if ($('#achievement-container > input').length <= 0) {
 		$('#achievement-container').empty();
@@ -461,8 +470,13 @@ function addAnAchievement() {
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
 		"placeholder" : "New Achievement"
 	});
-	var temp = '<input class="float-left lp-ach-item-txt lp-ach-row lp-row clearfix prof-edditable-sin" value="temp"><div class="float-left lp-ach-item-img"></div>';
-	$('#achievement-container').append(temp);
+	$('#achievement-container').append(newAchievement);
+
+	var newAchievementButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#achievement-container').append(newAchievementButton);
+
 	newAchievement.focus();
 }
 
@@ -475,6 +489,12 @@ function addAuthorisedIn() {
 		"placeholder" : "Authorized in"
 	});
 	$('#authorised-in-container').append(newAuthorisation);
+
+	var newAuthorizationButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#authorised-in-container').append(newAuthorizationButton);
+
 	newAuthorisation.focus();
 }
 
@@ -504,11 +524,10 @@ function updateAssociations() {
 
 function callBackUpdateAssociations(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showAssociationList();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showAssociationList();
 }
 
 $(document).on('blur', '#achievement-container input', function() {
@@ -537,11 +556,10 @@ function updateAchievements() {
 
 function callBackUpdateAchievements(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showAchievementList();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showAchievementList();
 }
 
 $(document).on('blur', '#authorised-in-container input', function() {
@@ -569,11 +587,10 @@ function updateLicenseAuthorizations() {
 
 function callBackUpdateLicenseAuthorizations(data) {
 	$('#prof-message-header').html(data);
-	if ($('#prof-message-header #display-msg-div').hasClass('success-message')) {
-		showLicenceList();
-	}else{
-		createPopupInfo("Error!",$('#prof-message-header #display-msg-div p').text());
-	}
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showLicenceList();
 }
 
 
@@ -632,6 +649,9 @@ function updateFacebookLink(link) {
 
 function callBackUpdateFacebookLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -649,6 +669,9 @@ function updateTwitterLink(link) {
 
 function callBackUpdateTwitterLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -666,6 +689,9 @@ function updateLinkedInLink(link) {
 
 function callBackUpdateLinkedInLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -683,6 +709,9 @@ function updateYelpLink(link) {
 
 function callBackUpdateYelpLink(data) {
 	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
 	showProfileSocialLinks();
 }
 
@@ -722,8 +751,6 @@ function adjustImage() {
 function initializeGoogleMap() {
     var mapCanvas = document.getElementById('map-canvas');
     var geocoder = new google.maps.Geocoder();
-    /*var address1 = $('#prof-address1').val().trim();
-	var address2 = $('#prof-address2').val().trim();*/
 	var address = "Raremile technologies,HSR layout,bangalore, 560102";
 	var latitude = 45;
 	var longitude = -73;

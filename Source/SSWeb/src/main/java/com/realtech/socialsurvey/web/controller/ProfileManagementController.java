@@ -578,7 +578,39 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isAgent()) {
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				achievements = profileManagementService.addAchievements(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, achievements);
+				companySettings.setAchievements(achievements);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				achievements = profileManagementService.addAchievements(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, achievements);
+				regionSettings.setAchievements(achievements);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				achievements = profileManagementService.addAchievements(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, achievements);
+				branchSettings.setAchievements(achievements);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
 				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
@@ -637,7 +669,39 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isAgent()) {
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, associations);
+				companySettings.setAssociations(associations);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, associations);
+				regionSettings.setAssociations(associations);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				associations = profileManagementService.addAssociations(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, associations);
+				branchSettings.setAssociations(associations);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
 				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
@@ -695,7 +759,39 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isAgent()) {
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				licenses = profileManagementService.addLicences(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						authorisedIn);
+				companySettings.setLicenses(licenses);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				licenses = profileManagementService.addLicences(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						authorisedIn);
+				regionSettings.setLicenses(licenses);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				licenses = profileManagementService.addLicences(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						authorisedIn);
+				branchSettings.setLicenses(licenses);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
 				long agentId = user.getUserProfiles().get(0).getAgentId();
 				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
 				if (agentSettings == null) {
@@ -1821,18 +1917,19 @@ public class ProfileManagementController {
 			// Get the profile address parameters
 			String fieldId = request.getParameter("id");
 			boolean fieldState = Boolean.parseBoolean(request.getParameter("state"));
-			LOG.info(fieldId + fieldState);
 			if (fieldId == null || fieldId.isEmpty()) {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
+			
+			OrganizationUnitSettings lockedDetail = fetchProfile(model, request);
 			if (user.isCompanyAdmin()) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				lockSettings = companySettings.getLockSettings();
-				updateLockSettings(lockSettings, fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, lockSettings);
 				companySettings.setLockSettings(lockSettings);
@@ -1845,7 +1942,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				lockSettings = regionSettings.getLockSettings();
-				updateLockSettings(lockSettings, fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, lockSettings);
 				regionSettings.setLockSettings(lockSettings);
@@ -1858,9 +1955,10 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				lockSettings = branchSettings.getLockSettings();
-				updateLockSettings(lockSettings, fieldId, fieldState);
+				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
+				LOG.info(lockSettings.getIsDisplayNameLocked()+"");
 				branchSettings.setLockSettings(lockSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -1869,9 +1967,8 @@ public class ProfileManagementController {
 			}
 
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			LOG.info("Profile addresses updated successfully");
 			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
@@ -1880,28 +1977,42 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	private void updateLockSettings(LockSettings lockSettings, String fieldId, boolean status) {
+	private void updateLockSettings(LockSettings lockSettings, LockSettings lockedDetail, String fieldId, boolean status) {
 		switch (fieldId) {
 			case "prof-name-lock":
-				lockSettings.setDisplayNameLocked(status);
+				if (!lockedDetail.getIsDisplayNameLocked()) {
+					lockSettings.setDisplayNameLocked(status);
+				}
 				break;
 			case "prof-logo-lock":
-				lockSettings.setLogoLocked(status);
+				if (!lockedDetail.getIsLogoLocked()) {
+					lockSettings.setLogoLocked(status);
+				}
 				break;
 			case "web-address-work-lock":
-				lockSettings.setWebAddressLocked(status);;
+				if (!lockedDetail.getIsWebAddressLocked()) {
+					lockSettings.setWebAddressLocked(status);;
+				}
 				break;
 			case "phone-number-work-lock":
-				lockSettings.setWorkPhoneLocked(status);
+				if (!lockedDetail.getIsWorkPhoneLocked()) {
+					lockSettings.setWorkPhoneLocked(status);
+				}
 				break;
 			case "phone-number-personal-lock":
-				lockSettings.setPersonalPhoneLocked(status);
+				if (!lockedDetail.getIsPersonalPhoneLocked()) {
+					lockSettings.setPersonalPhoneLocked(status);
+				}
 				break;
 			case "phone-number-fax-lock":
-				lockSettings.setFaxPhoneLocked(status);
+				if (!lockedDetail.getIsFaxPhoneLocked()) {
+					lockSettings.setFaxPhoneLocked(status);
+				}
 				break;
 			case "aboutme-lock":
-				lockSettings.setAboutMeLocked(status);
+				if (!lockedDetail.getIsAboutMeLocked()) {
+					lockSettings.setAboutMeLocked(status);
+				}
 				break;
 		}
 	}
