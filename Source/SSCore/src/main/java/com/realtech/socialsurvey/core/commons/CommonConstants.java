@@ -21,8 +21,8 @@ public interface CommonConstants {
 	// default company id for application. if any entity is linked to this id, then its an orphan
 	// entity
 	public static final long DEFAULT_COMPANY_ID = 1;
-	public static final String DEFAULT_BRANCH_NAME = "Defult Branch";
-	public static final String DEFAULT_REGION_NAME = "Defult Region";
+	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
+	public static final String DEFAULT_REGION_NAME = "Default Region";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
