@@ -390,7 +390,7 @@ $(document).on('change', '#prof-logo', function(e) {
 
 function callBackOnLogoUpload(data) {
 	$('#prof-message-header').html(data);
-	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileImage);
+	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
