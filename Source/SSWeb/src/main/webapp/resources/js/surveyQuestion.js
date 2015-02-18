@@ -260,7 +260,7 @@ function paintMcqAnswer(answer) {
 	return divToPopulate;
 }
 
-function paintListOptions(answer) {
+function paintListOptions(agentName) {
 	var divToPopulate = "<option value='select'>--Select an Option--"
 			+ "<option value='transacted'>Transacted with " + agentName
 			+ "<option value='enquired'>Enquired with " + agentName;
@@ -350,10 +350,6 @@ $('.sq-np-item-next')
 						} else {
 							var feedback = $("#text-area").val();
 							updateCustomeResponse(feedback);
-							$('#overlay-toast')
-									.html(
-											'Congratulations! Your survey has been submitted successfully.');
-							showToast();
 							$("div[data-ques-type]").hide();
 							$("div[data-ques-type='error']").show();
 							$('#content-head').html('Survey Completed');
@@ -361,7 +357,7 @@ $('.sq-np-item-next')
 									.html(
 											"Congratulations! You have completed survey for "
 													+ agentName
-													+ "!\nThanks for your participation!.");
+													+ ".\nThanks for your participation!.");
 						}
 						return;
 					}
