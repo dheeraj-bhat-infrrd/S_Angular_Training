@@ -97,9 +97,9 @@ function paintCompanyProfile(data) {
 		}
 		fetchAverageRatings(result.iden);
 		fetchCompanyRegions();
-		fetchReviewsForCompany(result.iden);
+		fetchCompanyBranches();
 		fetchCompanyIndividuals();
-		//fetchCompanyBranches();
+		fetchReviewsForCompany(result.iden);
 	}
 }
 
@@ -197,19 +197,26 @@ function paintBranchesForRegion(data) {
 			});
 			
 			$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
-			
-			$(".comp-region-branch").click(function(e){
-				e.stopPropagation();
-				if($(this).data("openstatus") == "closed") {
-					fetchIndividualForBranch($(this).data('branchid'));
-					$(this).data("openstatus","open");
-				}else {
-					$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
-					$(this).data("openstatus","closed");
-				}
-			});
+			bindClickToFetchBranchIndividuals("comp-region-branch");
 		}
 	}
+}
+
+/**
+ * Method to bind the element whose class is provided to fetch individuals under that branch
+ * @param bindingClass
+ */
+function bindClickToFetchBranchIndividuals(bindingClass) {
+	$("."+bindingClass).click(function(e){
+		e.stopPropagation();
+		if($(this).data("openstatus") == "closed") {
+			fetchIndividualForBranch($(this).data('branchid'));
+			$(this).data("openstatus","open");
+		}else {
+			$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
+			$(this).data("openstatus","closed");
+		}
+	});
 }
 
 function fetchIndividualForBranch(branchId) {
@@ -286,7 +293,7 @@ function paintCompanyBranches(data) {
 		if(result != undefined && result.length > 0) {
 			var compBranchesHtml = "";
 			$.each(result,function(i,branch) {
-				compBranchesHtml = compBranchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				compBranchesHtml = compBranchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				compBranchesHtml = compBranchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
 				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
 				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
@@ -295,17 +302,8 @@ function paintCompanyBranches(data) {
 				compBranchesHtml = compBranchesHtml +'</div>' ;
 			});
 			
-			$("#comp-regions-content").append(compBranchesHtml).slideDown(200);
-			$(".comp-region-branch").click(function(e){
-				e.stopPropagation();
-				if($(this).data("openstatus") == "closed") {
-					fetchIndividualForBranch($(this).data('branchid'));
-					$(this).data("openstatus","open");
-				}else {
-					$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
-					$(this).data("openstatus","closed");
-				}
-			});
+			$("#comp-regions-content").append(compBranchesHtml);
+			bindClickToFetchBranchIndividuals("comp-branch");
 		}
 	}
 }
