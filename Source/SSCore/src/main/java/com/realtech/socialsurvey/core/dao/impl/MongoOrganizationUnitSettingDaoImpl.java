@@ -18,7 +18,6 @@ import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
-import com.realtech.socialsurvey.core.entities.User;
 
 /**
  * Mongo implementation of settings
@@ -66,20 +65,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	@Override
 	public void insertAgentSettings(AgentSettings agentSettings) {
 		LOG.info("Inserting agent settings: " + agentSettings.toString());
-		mongoTemplate.insert(agentSettings, AGENT_SETTINGS_COLLECTION);
-		LOG.info("Inserted into agent settings");
-	}
-
-	@Override
-	public void insertAgentSettings(User user) {
-		LOG.info("Inserting agent settings. User id: " + user.getUserId());
-		AgentSettings agentSettings = new AgentSettings();
-		agentSettings.setIden(user.getUserId());
-		agentSettings.setCreatedBy(user.getCreatedBy());
-		agentSettings.setCreatedOn(System.currentTimeMillis());
-		agentSettings.setModifiedBy(user.getModifiedBy());
-		agentSettings.setModifiedOn(System.currentTimeMillis());
-
 		mongoTemplate.insert(agentSettings, AGENT_SETTINGS_COLLECTION);
 		LOG.info("Inserted into agent settings");
 	}
