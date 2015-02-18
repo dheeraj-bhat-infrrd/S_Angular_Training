@@ -49,7 +49,9 @@ function paintCompanyProfile(data) {
 	            }
 	            
 	            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
-	            companyIntroHtml = companyIntroHtml + '<div class="intro-body">'+contactDetails.about_me+'</div>';
+	            if(contactDetails.about_me != undefined) {
+	            	companyIntroHtml = companyIntroHtml + '<div class="intro-body">'+contactDetails.about_me+'</div>';
+	            }
 	            $("#prof-company-intro").html(companyIntroHtml);
 	            
 	            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
@@ -414,6 +416,10 @@ function paintAllReviewsCount(data) {
 	}
 }
 
+/**
+ * Method 
+ * @param data
+ */
 function paintHiddenReviewsCount(data) {
 	var responseJson = $.parseJSON(data);
 	if(responseJson != undefined) {
