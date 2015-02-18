@@ -353,8 +353,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				lowerSettings.getContact_details().getContact_numbers().setWork(higherSettings.getContact_details().getContact_numbers().getWork());
 				finalLock.setWorkPhoneLocked(true);
 			}
-			if (lock.getIsPersonalPhoneLocked() && !finalLock.getIsPersonalPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
-				lowerSettings.getContact_details().getContact_numbers().setPersonal(higherSettings.getContact_details().getContact_numbers().getPersonal());
+			if (lock.getIsPersonalPhoneLocked() && !finalLock.getIsPersonalPhoneLocked()
+					&& lowerSettings.getContact_details().getContact_numbers() != null) {
+				lowerSettings.getContact_details().getContact_numbers()
+						.setPersonal(higherSettings.getContact_details().getContact_numbers().getPersonal());
 				finalLock.setPersonalPhoneLocked(true);
 			}
 			if (lock.getIsFaxPhoneLocked() && !finalLock.getIsFaxPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
@@ -431,18 +433,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	// Lock Settings
 	@Override
-	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings,
-			LockSettings lockSettings) throws InvalidInputException {
+	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings, LockSettings lockSettings)
+			throws InvalidInputException {
 		if (lockSettings == null) {
 			throw new InvalidInputException("LockSettings passed can not be null");
 		}
 		LOG.info("Updating lock detail information");
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS,
-				lockSettings, unitSettings, collection);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LOCK_SETTINGS, lockSettings,
+				unitSettings, collection);
 		LOG.info("lock details updated successfully");
 		return lockSettings;
 	}
-	
+
 	// Contact details
 	@Override
 	public ContactDetailsSettings updateContactDetails(String collection, OrganizationUnitSettings unitSettings,
@@ -743,9 +745,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to get aggregated reviews of all agents of a company
 	 */
 	@Override
-	public List<SurveyDetails> getReviewsForCompany(long companyId) throws InvalidInputException {
-		LOG.info("Method getReviewsForCompany called for companyId:" + companyId);
-		List<SurveyDetails> surveyDetails = surveyDetailsDao.getAllFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId);
+	public List<SurveyDetails> getReviewsForCompany(long companyId,double startScore, double limitScore) throws InvalidInputException {
+		LOG.info("Method getReviewsForCompany called for companyId:" + companyId+" and limitScore:"+limitScore);
+		List<SurveyDetails> surveyDetails = surveyDetailsDao.getAllFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId,startScore,limitScore);
 		LOG.info("Method getReviewsForCompany executed successfully");
 		return surveyDetails;
 	}
@@ -783,6 +785,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsByBranchId executed successfully");
 		return users;
+	}
+
+	@Override
+	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore) {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 
 }
