@@ -45,7 +45,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 		success : function(data) {
 			if (data.errCode == undefined)
 				success = true;
-			else{
+			else {
 				$("div[data-ques-type]").hide();
 				$("div[data-ques-type='error']").show();
 				$('#content').html(data.errMessage);
@@ -79,11 +79,12 @@ function paintSurveyPage(jsonData) {
  */
 function paintSurveyPageFromJson() {
 	$("div[data-ques-type]").hide();
-	if(qno==-1){
+	if (qno == -1) {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#content-head').html('Survey');
-		$('#content').html("You have already taken survey for "+agentName+"!");
+		$('#content').html(
+				"You have already taken survey for " + agentName + "!");
 	}
 	questionDetails = data[qno];
 	var question = questionDetails.question;
@@ -260,9 +261,9 @@ function paintMcqAnswer(answer) {
 }
 
 function paintListOptions(answer) {
-	var divToPopulate = "<option value='select'>--Select an Option--" +
-				"<option value='transacted'>Transacted with "+agentName
-				+"<option value='enquired'>Enquired with "+agentName;
+	var divToPopulate = "<option value='select'>--Select an Option--"
+			+ "<option value='transacted'>Transacted with " + agentName
+			+ "<option value='enquired'>Enquired with " + agentName;
 	return divToPopulate;
 }
 
@@ -281,6 +282,23 @@ function bindMcqCheckButton() {
 	});
 }
 
+function paintRangeScale() {
+	if (questionDetails.questionType == "sb-range-scale") {
+		var value = parseInt(questionDetails.customerResponse);
+		if (value == $('.sq-pts-red').html()) {
+			$('.pts-hover-1').addClass('showHoverTab');
+		} else if (value == $('.sq-pts-org').html()) {
+			$('.pts-hover-2').addClass('showHoverTab');
+		} else if (value == $('.sq-pts-lgreen').html()) {
+			$('.pts-hover-3').addClass('showHoverTab');
+		} else if (value == $('.sq-pts-military').html()) {
+			$('.pts-hover-4').addClass('showHoverTab');
+		} else if (value == $('.sq-pts-dgreen').html()) {
+			$('.pts-hover-5').addClass('showHoverTab');
+		}
+	}
+}
+
 // Starting click events.
 
 // Code to be executed on click of stars of rating question.
@@ -292,7 +310,7 @@ $('.sq-star').click(function() {
 	$(this).parent().find('.sq-star').each(function(index) {
 		if (index < starVal) {
 			$(this).addClass('sq-full-star');
-			$(this).addClass('sq-full-star-click'); 
+			$(this).addClass('sq-full-star-click');
 		}
 	});
 	if (qno != data.length - 1) {
@@ -301,19 +319,19 @@ $('.sq-star').click(function() {
 	storeCustomerAnswer(starVal);
 });
 
-$('.sq-star').hover(function(){
+$('.sq-star').hover(function() {
 	var smileVal = $(this).attr('star-no');
 	$(this).parent().find('.sq-star').each(function(index) {
 		if (index < smileVal) {
 			$(this).addClass('sq-full-star');
 		}
 	});
-},function(){
+}, function() {
 	var smileVal = $(this).attr('star-no');
 	$(this).parent().find('.sq-star').each(function(index) {
 		if (index < smileVal) {
-			if( $(this).hasClass('sq-full-star-click') ){}
-			else{
+			if ($(this).hasClass('sq-full-star-click')) {
+			} else {
 				$(this).removeClass('sq-full-star');
 				$(this).removeClass('sq-full-star-click');
 			}
@@ -326,11 +344,10 @@ $('.sq-star').hover(function(){
 $('.sq-np-item-next')
 		.click(
 				function() {
-					if (questionDetails.questionType == "sb-master"){
-						if(isSmileTypeQuestion){
+					if (questionDetails.questionType == "sb-master") {
+						if (isSmileTypeQuestion) {
 							showFeedbackPage(mood);
-						}
-						else{
+						} else {
 							var feedback = $("#text-area").val();
 							updateCustomeResponse(feedback);
 							$('#overlay-toast')
@@ -340,10 +357,15 @@ $('.sq-np-item-next')
 							$("div[data-ques-type]").hide();
 							$("div[data-ques-type='error']").show();
 							$('#content-head').html('Survey Completed');
-							$('#content').html("Congratulations! You have completed survey for "+agentName+"!\nThanks for your participation!.");
+							$('#content')
+									.html(
+											"Congratulations! You have completed survey for "
+													+ agentName
+													+ "!\nThanks for your participation!.");
 						}
 						return;
 					}
+
 					if (questionDetails.questionType == "sb-sel-mcq"
 							&& customerResponse != undefined) {
 						storeCustomerAnswer(customerResponse);
@@ -410,13 +432,7 @@ $('.sq-np-item-next')
 									});
 						}
 					}
-					if (questionDetails.questionType == "sb-range-scale") {
-						var value = parseInt(questionDetails.customerResponse);
-						if (!isNaN(value)) {
-							$("#next-scale").removeClass("btn-com-disabled");
-							$('#range-slider-value').html(value);
-						}
-					}
+					paintRangeScale();
 					if (questionDetails.questionType == "sb-sel-mcq") {
 						customerResponse = "";
 					}
@@ -432,7 +448,7 @@ $('.sq-np-item-prev').click(function() {
 	$("#next-textarea-smiley").html("Next");
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
-	if(isSmileTypeQuestion)
+	if (isSmileTypeQuestion)
 		qno--;
 	isSmileTypeQuestion = true;
 	paintSurveyPageFromJson();
@@ -444,6 +460,7 @@ $('.sq-np-item-prev').click(function() {
 			}
 		});
 	}
+	paintRangeScale();
 	if (questionDetails.questionType == "sb-range-smiles") {
 		var starVal = parseInt(questionDetails.customerResponse);
 		$('#sq-smiles').find('.sq-smile').each(function(index) {
@@ -486,19 +503,19 @@ $('.sq-smile').click(function() {
 	$("#next-star").removeClass("btn-com-disabled");
 });
 
-$('.sq-smile').hover(function(){
+$('.sq-smile').hover(function() {
 	var smileVal = $(this).attr('smile-no');
 	$(this).parent().find('.sq-smile').each(function(index) {
 		if (index < smileVal) {
 			$(this).addClass('sq-full-smile');
 		}
 	});
-},function(){
+}, function() {
 	var smileVal = $(this).attr('smile-no');
 	$(this).parent().find('.sq-smile').each(function(index) {
 		if (index < smileVal) {
-			if( $(this).hasClass('sq-full-smile-click') ){}
-			else{
+			if ($(this).hasClass('sq-full-smile-click')) {
+			} else {
 				$(this).removeClass('sq-full-smile');
 				$(this).removeClass('sq-full-smile-click');
 			}
