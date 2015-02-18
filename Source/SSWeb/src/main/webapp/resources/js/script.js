@@ -30,11 +30,25 @@ $(document).ready(function(){
 
 function showError(msg){
     $('#err-nw-txt').html(msg);
+    $('#err-nw-wrapper').removeClass('bg-black-info');
     $('#err-nw-wrapper').slideDown(200);
 }
 
 function hideError(){
     $('#err-nw-wrapper').slideUp(200);
+}
+
+function showInfo(msg){
+    $('#err-nw-txt').html(msg);
+    $('#err-nw-wrapper').slideDown(200);
+    $('#err-nw-wrapper').addClass('bg-black-info');
+}
+
+function hideInfo(){
+    $('#err-nw-wrapper').slideUp(200);
+    setTimeout(function(){
+        $('#err-nw-wrapper').removeClass('bg-black-info');
+    },200);
 }
 
 function validateForm(id) {
