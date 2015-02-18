@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.ErrorCodes;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
 
 // JIRA SS-119 by RM-05 : BOC
 @Controller
@@ -144,7 +147,7 @@ public class SurveyManagementController {
 
 	@ResponseBody
 	@RequestMapping(value = "/triggersurvey")
-	public String triggerSurvey(HttpServletRequest request) {
+	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 //		String survey = null;
 		Integer stage = null;
@@ -156,6 +159,7 @@ public class SurveyManagementController {
 			String lastName;
 			String captchaResponse;
 			String challengeField;
+			String custRelationWithAgent;
 			try {
 				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
@@ -164,10 +168,11 @@ public class SurveyManagementController {
 				lastName = request.getParameter("lastName");
 				captchaResponse = request.getParameter("captchaResponse");
 				challengeField = request.getParameter("recaptcha_challenge_field");
+				custRelationWithAgent = request.getParameter("relationship");
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+				throw e;
 			}
 			if(!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)){
 				LOG.error("Captcha Validation failed!");
@@ -175,7 +180,7 @@ public class SurveyManagementController {
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
-				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0);
+				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent);
 				if(survey!=null){
 					stage = survey.getStage();
 					for(SurveyQuestionDetails surveyDetails:surveyQuestionDetails){
@@ -189,21 +194,30 @@ public class SurveyManagementController {
 			}
 			catch (SolrServerException e) {
 				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
+				ErrorResponse errorResponse = new ErrorResponse();
+				errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+				errorResponse.setErrMessage("Agent not found.");
+				String errorMessage = JSONUtil.toJSON(errorResponse);
+				return errorMessage;
 			}
 			surveyAndStage.put("stage", stage);
 			surveyAndStage.put("survey", surveyQuestionDetails);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
-			return e.getMessage();
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage("No survey found!");
+			String errorMessage = new Gson().toJson(errorResponse);
+			return errorMessage;
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 		return new Gson().toJson(surveyAndStage);
 	}
 
-	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
+	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent)
 			throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
-		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount);
+		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent);
 	}
 
 	private String getApplicationBaseUrl() {
