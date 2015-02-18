@@ -119,8 +119,14 @@ public class ProfileManagementController {
 
 		LockSettings higherSettings = null;
 		try {
-			long branchId = user.getUserProfiles().get(0).getBranchId();
-			long regionId = user.getUserProfiles().get(0).getRegionId();
+			long branchId = 0;
+			long regionId = 0;
+			if (settings.getBranchSettings().size() > 0) {
+				branchId = user.getUserProfiles().get(0).getBranchId();
+			}
+			if (settings.getRegionSettings().size() > 0) {
+				regionId = user.getUserProfiles().get(0).getRegionId();
+			}
 			LOG.info("branchId: " + branchId + ", regionId: " + regionId);
 			higherSettings = profileManagementService.finalizeHigherLockSettings(user, accountType, settings, branchId, regionId);
 		}
@@ -139,9 +145,18 @@ public class ProfileManagementController {
 
 		OrganizationUnitSettings profile = null;
 		try {
-			long agentId = user.getUserProfiles().get(0).getAgentId();
-			long branchId = user.getUserProfiles().get(0).getBranchId();
-			long regionId = user.getUserProfiles().get(0).getRegionId();
+			long agentId = 0;
+			long branchId = 0;
+			long regionId = 0;
+			if (settings.getAgentSettings().size() > 0) {
+				agentId = user.getUserProfiles().get(0).getAgentId();
+			}
+			if (settings.getBranchSettings().size() > 0) {
+				branchId = user.getUserProfiles().get(0).getBranchId();
+			}
+			if (settings.getRegionSettings().size() > 0) {
+				regionId = user.getUserProfiles().get(0).getRegionId();
+			}
 			LOG.info("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
 			profile = profileManagementService.finalizeProfile(user, accountType, settings, agentId, branchId, regionId);
 		}

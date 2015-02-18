@@ -25,7 +25,9 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
@@ -1676,7 +1678,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		agentSettings.setModifiedBy(user.getModifiedBy());
 		agentSettings.setModifiedOn(System.currentTimeMillis());
 
+		MailIdSettings mail_ids = new MailIdSettings();
+		mail_ids.setWork(user.getEmailId());
 		
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(user.getFirstName());
+		contactSettings.setMail_ids(mail_ids);
+		
+		agentSettings.setContact_details(contactSettings);
+
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
 	}
