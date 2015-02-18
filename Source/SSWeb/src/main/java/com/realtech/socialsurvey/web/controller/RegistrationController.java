@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -52,8 +51,6 @@ public class RegistrationController {
 	private SessionHelper sessionHelper;
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
-	@Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	@RequestMapping(value = "/invitation")
 	public String initInvitationPage(Model model) {
@@ -241,7 +238,7 @@ public class RegistrationController {
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
-				organizationUnitSettingsDao.insertAgentSettings(user);
+				userManagementService.insertAgentSettings(user);
 				LOG.debug("Added newly added user {} to mongo", user.getFirstName());
 
 				LOG.debug("Adding newly added user {} to solr", user.getFirstName());

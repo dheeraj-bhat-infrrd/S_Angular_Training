@@ -621,7 +621,16 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS_COUNT, "Company id is invalid"),
 						"company id is not valid while fetching reviews count for a company");
 			}
-			//TODO implement this
+			if (minScore == null) {
+				minScore = CommonConstants.MIN_RATING_SCORE;
+			}
+			if (maxScore == null) {
+				maxScore = CommonConstants.MAX_RATING_SCORE;
+			}
+			long reviewsCount = profileManagementService.getReviewsCountForCompany(companyId, minScore, maxScore);
+			String json = new Gson().toJson(reviewsCount);
+			LOG.debug("reviews count json : " + json);
+			response = Response.ok(json).build();
 
 		}
 		catch (BaseRestException e) {
