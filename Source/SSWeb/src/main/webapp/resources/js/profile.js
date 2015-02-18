@@ -3,6 +3,8 @@
  */
 var companyProfileName = $("#company-profile-name").val();
 var currentProfileIden = "";
+var startIndex = 0;
+var numOfRows = 5;
 
 function fetchCompanyProfile() {
 	var url = window.location.origin +'/rest/profile/'+companyProfileName;
@@ -391,6 +393,12 @@ function paintReviewsForCompany(data) {
 		}
 	}
 }
+
+$(window).scroll(function(){
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)){
+		fetchReviewsForCompany(companyId, minScore);
+	}
+});
 
 function fetchReviewsCountForCompany(companyId,callBackFunction,minScore) {
 	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount';
