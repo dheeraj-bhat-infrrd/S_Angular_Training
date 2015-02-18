@@ -138,6 +138,9 @@
                     <div id="prof-review-item">
 	                   <!--  reviews get populated here --> 
                     </div>
+                    <div id="prof-hidden-review-count" class="prof-hidden-review-link">
+	                   <!--  count of hidden reviews get populated here --> 
+                    </div>
                 </div>
             </div>
         </div>

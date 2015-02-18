@@ -111,6 +111,7 @@ public final class DisplayMessageConstants {
 	public static final String WEB_ADDRESSES_UPDATE_SUCCESSFUL = "WEB_ADDRESSES_UPDATE_SUCCESSFUL";
 	public static final String LOCK_UPDATE_SUCCESSFUL = "LOCK_UPDATE_SUCCESSFUL";
 	public static final String LOGO_UPLOAD_SUCCESSFUL = "LOGO_UPLOAD_SUCCESSFUL";
+	public static final String PROFILE_IMAGE_UPLOAD_SUCCESSFUL = "PROFILE_IMAGE_UPLOAD_SUCCESSFUL";
 	
 	public static final String SURVEY_CREATION_SUCCESSFUL = "SURVEY_CREATION_SUCCESSFUL";
 	public static final String SURVEY_ALREADY_EXISTS = "SURVEY_ALREADY_EXISTS";
