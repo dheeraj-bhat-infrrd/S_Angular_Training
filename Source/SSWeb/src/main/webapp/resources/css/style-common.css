@@ -3339,5 +3339,37 @@ button.paypal.is-active {
     margin-bottom: -20px;
     width: 32px;
     background: url(../images/close.png) no-repeat center;
+}
 
+.reg-cap-nw-adj{
+    margin-right: 10px;
+    overflow: visible !important;
+}
+
+.reg-cap-nw-adj .reg-cap-nw-adj-container{
+    float: right;
+    width: 300px;
+    overflow: hidden;
+    border: 1px solid #e3e3e3;
+    border-radius: 3px;
+    box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.reg-cap-nw-adj .reg-captcha-img{
+    width: 300px;
+    height: 58px;
+}
+
+.reg-cap-nw-adj #recaptcha_challenge_image{
+    width: 300px !important;
+}
+
+.reg-cap-nw-adj .reg-cap-txt{
+    width: 184px;
+}
+
+.reg-cap-nw-adj .sq-btn-continue{
+    position: relative;
+    left: 30px;
+    margin-top: 25px;
 }

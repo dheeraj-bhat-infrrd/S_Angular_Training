@@ -21,7 +21,10 @@ import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
@@ -50,6 +53,12 @@ public class SurveyManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+	
+	@Autowired
+	private CaptchaValidation captchaValidation;
+	
+	@Autowired
+	private EmailServices emailServices;
 
 	/*
 	 * Method to store answer to the current question of the survey.
@@ -75,11 +84,26 @@ public class SurveyManagementController {
 	public void storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
 		// TODO store answer provided by customer in mongoDB.
-		String feedback = request.getParameter("feedback");
+		try{
+			String feedback = request.getParameter("feedback");
 		String mood = request.getParameter("mood");
 		String customerEmail = request.getParameter("customerEmail");
 		long agentId = Long.valueOf(request.getParameter("agentId"));
 		surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
+		
+		//Sending email to the customer telling about successful completion of survey.
+		SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+		try {
+			emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+		}
+		catch (InvalidInputException | UndeliveredEmailException e) {
+			LOG.error("Exception occurred while trying to send survey completion mail to : "+customerEmail);
+			throw e;
+		}
+	}catch(NonFatalException e){
+		LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ",e);
+		return;
+	}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
 
@@ -130,16 +154,24 @@ public class SurveyManagementController {
 			String customerEmail;
 			String firstName;
 			String lastName;
+			String captchaResponse;
+			String challengeField;
 			try {
 				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
 				customerEmail = request.getParameter(CommonConstants.CUSTOMER_EMAIL_COLUMN);
 				firstName = request.getParameter("firstName");
 				lastName = request.getParameter("lastName");
+				captchaResponse = request.getParameter("captchaResponse");
+				challengeField = request.getParameter("recaptcha_challenge_field");
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			if(!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)){
+				LOG.error("Captcha Validation failed!");
+				throw new InvalidInputException("Captcha Validation failed!",DisplayMessageConstants.INVALID_CAPTCHA);
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
@@ -163,7 +195,7 @@ public class SurveyManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
-			return "{error:" + e.getMessage() + "}";
+			return e.getMessage();
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 		return new Gson().toJson(surveyAndStage);
