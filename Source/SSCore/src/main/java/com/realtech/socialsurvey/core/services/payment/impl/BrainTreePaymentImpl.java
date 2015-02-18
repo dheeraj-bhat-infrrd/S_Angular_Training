@@ -195,8 +195,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.debug("BrainTreePaymentImpl : updateLicenseTable() : Executing method.");
 		LOG.debug("Parameters provided : accountsMasterId : " + accountsMasterId + ", company : " + company.toString() + ", userId : " + user.getUserId());
 		
-		LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
-		if(currentLicenseDetail != null && currentLicenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE){
+		//Check if the license details are already present in case of free account and update them instead of adding a new record
+		List<LicenseDetail> currentLicenseDetails = user.getCompany().getLicenseDetails();
+		
+		if(currentLicenseDetails != null && currentLicenseDetails.size() == CommonConstants.MAX_LICENSE_DETAILS_RECORDS_PER_COMPANY && currentLicenseDetails.get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE){
+			LicenseDetail currentLicenseDetail = currentLicenseDetails.get(CommonConstants.INITIAL_INDEX);
 			currentLicenseDetail.setSubscriptionId(subscriptionId);
 			currentLicenseDetail.setAccountsMaster(accountsMaster);
 			currentLicenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
