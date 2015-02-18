@@ -142,8 +142,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method finalizeHigherLockSettings() finished from ProfileManagementService");
 		return higherLockSettings;
 	}
-	
-	private LockSettings generateBranchLock(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings) throws InvalidInputException {
+
+	private LockSettings generateBranchLock(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings)
+			throws InvalidInputException {
 		if (companySettings == null) {
 			throw new InvalidInputException("No Settings found");
 		}
@@ -745,9 +746,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to get aggregated reviews of all agents of a company
 	 */
 	@Override
-	public List<SurveyDetails> getReviewsForCompany(long companyId,double startScore, double limitScore) throws InvalidInputException {
-		LOG.info("Method getReviewsForCompany called for companyId:" + companyId+" and limitScore:"+limitScore);
-		List<SurveyDetails> surveyDetails = surveyDetailsDao.getAllFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId,startScore,limitScore);
+	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore) throws InvalidInputException {
+		LOG.info("Method getReviewsForCompany called for companyId:" + companyId + " and limitScore:" + limitScore);
+		List<SurveyDetails> surveyDetails = surveyDetailsDao.getFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId, startScore, limitScore);
 		LOG.info("Method getReviewsForCompany executed successfully");
 		return surveyDetails;
 	}
@@ -789,8 +790,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore) {
-		// TODO Auto-generated method stub
-		return 0;
+		LOG.info("Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:" + maxScore);
+		long reviewsCount = 0;
+		reviewsCount = surveyDetailsDao.getFeedBacksCount(CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore);
+		LOG.info("Method getReviewsCountForCompany executed successfully");
+		return reviewsCount;
 	}
 
 }
