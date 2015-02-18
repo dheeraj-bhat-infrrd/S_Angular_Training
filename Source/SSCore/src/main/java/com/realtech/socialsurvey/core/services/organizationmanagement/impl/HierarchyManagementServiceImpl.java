@@ -446,34 +446,6 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	}
 
 	/**
-	 * Method to insert branch settings into mongo
-	 * 
-	 * @param branch
-	 * @throws InvalidInputException
-	 */
-	public void insertBranchSettings(Branch branch) throws InvalidInputException {
-		LOG.info("Method to insert branch settings called for branch : " + branch);
-		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
-		organizationSettings.setIden(branch.getBranchId());
-		organizationSettings.setCreatedBy(branch.getCreatedBy());
-		organizationSettings.setCreatedOn(System.currentTimeMillis());
-		organizationSettings.setModifiedBy(branch.getModifiedBy());
-		organizationSettings.setModifiedOn(System.currentTimeMillis());
-		/**
-		 * Calling method to generate and set profile name and profile url
-		 */
-		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
-		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
-
-		organizationSettings.setContact_details(contactSettings);
-		// TODO set lock settings
-		organizationSettings.setLockSettings(new LockSettings());
-		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
-				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-		LOG.info("Method to insert branch settings finished for branch : " + branch);
-	}
-
-	/**
 	 * Method to generate profile name and profile url for a branch and also set them in
 	 * organization unit settings
 	 * 
@@ -605,37 +577,6 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
-	}
-
-	/**
-	 * Method to insert region settings into mongo
-	 * 
-	 * @param region
-	 * @throws InvalidInputException
-	 */
-	public void insertRegionSettings(Region region) throws InvalidInputException {
-		LOG.info("Method for inserting region settings called for region : " + region);
-		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
-		organizationSettings.setIden(region.getRegionId());
-		organizationSettings.setCreatedBy(region.getCreatedBy());
-		organizationSettings.setCreatedOn(System.currentTimeMillis());
-		organizationSettings.setModifiedBy(region.getModifiedBy());
-		organizationSettings.setModifiedOn(System.currentTimeMillis());
-
-		/**
-		 * Calling method to generate and set region profile name and url
-		 */
-		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
-
-		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
-
-		organizationSettings.setContact_details(contactSettings);
-		// TODO set lock settings
-		organizationSettings.setLockSettings(new LockSettings());
-		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
-				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-
-		LOG.info("Method for inserting region settings finished");
 	}
 
 	/**
@@ -836,6 +777,59 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		// TODO Auto-generated method stub
 		return true;
 	}
+	
+	/**
+	 * Method to insert region settings into mongo
+	 * 
+	 * @param region
+	 * @throws InvalidInputException
+	 */
+	public void insertRegionSettings(Region region) throws InvalidInputException {
+		LOG.info("Method for inserting region settings called for region : " + region);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(region.getRegionId());
+		organizationSettings.setCreatedBy(region.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(region.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
 
+		// Calling method to generate and set region profile name and url
+		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
+
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
+		organizationSettings.setContact_details(contactSettings);
+		organizationSettings.setLockSettings(new LockSettings());
+
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		LOG.info("Method for inserting region settings finished");
+	}
+
+	/**
+	 * Method to insert branch settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertBranchSettings(Branch branch) throws InvalidInputException {
+		LOG.info("Method to insert branch settings called for branch : " + branch);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(branch.getBranchId());
+		organizationSettings.setCreatedBy(branch.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(branch.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
+
+		// Calling method to generate and set profile name and profile url
+		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
+
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationSettings.setContact_details(contactSettings);
+		organizationSettings.setLockSettings(new LockSettings());
+
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		LOG.info("Method to insert branch settings finished for branch : " + branch);
+	}
 }
 // JIRA SS-37 BY RM02 EOC
