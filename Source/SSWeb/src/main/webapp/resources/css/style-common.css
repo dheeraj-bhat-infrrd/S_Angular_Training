@@ -3180,3 +3180,10 @@ button.paypal.is-active {
     left: 30px;
     margin-top: 25px;
 }
+
+.sq-img-adj{
+    position: absolute;
+    top: 0;
+    width: 50px;
+    height: 40px;
+}
