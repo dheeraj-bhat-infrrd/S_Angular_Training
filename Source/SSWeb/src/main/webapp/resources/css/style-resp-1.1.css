@@ -270,6 +270,18 @@
     .fp-inp{
     	width:150px;
     }
+    .hdr-logo{
+        width: 150px;
+        background: url(../images/ss-logo.png) no-repeat center;
+        background-size: 80%;
+    }
+    .hdr-link-item{
+        padding: 0 6px;
+        font-size: 13px;
+    }
+    .hdr-log-reg-btn{
+        padding: 0 15px;
+    }
 }
 
 
@@ -331,6 +343,8 @@
 		width:537px !important;
 	}
 }
+
+
 
 
 

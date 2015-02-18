@@ -451,7 +451,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param branch
 	 * @throws InvalidInputException
 	 */
-	private void insertBranchSettings(Branch branch) throws InvalidInputException {
+	public void insertBranchSettings(Branch branch) throws InvalidInputException {
 		LOG.info("Method to insert branch settings called for branch : " + branch);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(branch.getBranchId());
@@ -594,6 +594,14 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
+		
+		LOG.debug("Adding a default branch under the newly created region");
+		Branch defaultBranch = organizationManagementService.addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
+		LOG.debug("Added default branch for region : " + region.getRegionId() + " with branch id : " + defaultBranch.getBranchId());
+		
+		LOG.debug("Updating Solr with newly inserted default branch");
+		solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
+		LOG.debug("Solr updated with new default branch");
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
@@ -605,7 +613,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 * @param region
 	 * @throws InvalidInputException
 	 */
-	private void insertRegionSettings(Region region) throws InvalidInputException {
+	public void insertRegionSettings(Region region) throws InvalidInputException {
 		LOG.info("Method for inserting region settings called for region : " + region);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(region.getRegionId());

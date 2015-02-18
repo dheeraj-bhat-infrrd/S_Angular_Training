@@ -14,6 +14,26 @@ var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
 var maxPwdLength = 15;
 
+$(document).ready(function(){
+    if($('.err-nw-wrapper').length == 0){
+        var errorDiv = $("<div id='err-nw-wrapper' class='err-nw-wrapper'>");
+            var closeSpan = $('<span class="err-new-close">');
+            var textSpan = $('<span id="err-nw-txt">');
+            errorDiv.append(closeSpan);
+            errorDiv.append(textSpan);
+        $('.hm-header-main-wrapper').after(errorDiv);
+    }
+});
+
+function showError(msg){
+    $('#err-nw-txt').html(msg);
+    $('#err-nw-wrapper').slideDown(200);
+}
+
+function hideError(){
+    $('#err-nw-wrapper').slideUp(200);
+}
+
 function validateForm(id) {
 	var validate = true;
 	
@@ -677,3 +697,37 @@ $(window).resize(function(){
        $('body').removeClass('body-no-scroll');
    }
 });
+
+function upgradePlan(){
+	 console.log("upgrade plan button clicked");
+	 var url = "./upgradepage.do";
+	    
+	    $.ajax({
+	    	url: url,
+	    	type: "GET",
+	    	success: function(data){
+	        	$('.overlay-payment').html(data);
+	        	$('.overlay-payment').show();
+	        	},
+	        error : function(e) {
+	    			console.log(e);
+	    		}
+	    	});
+}
+
+function upgradeToPaidPlan(){
+	 console.log("upgrade plan button clicked");
+	 var url = "./upgradetopaidplanpage.do";
+	    
+	    $.ajax({
+	    	url: url,
+	    	type: "GET",
+	    	success: function(data){
+	        	$('#outer-payment').html(data);
+	        	$('#outer-payment').show();
+	        	},
+	        error : function(e) {
+	    			console.log(e);
+	    		}
+	    	});
+}

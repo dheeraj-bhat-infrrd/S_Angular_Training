@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -165,7 +166,18 @@ public class RegistrationController {
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
 		String emailId = request.getParameter("emailId");
+		
+		String captchaResponse = request.getParameter("captchaResponse");
+		String challengeField = request.getParameter("recaptcha_challenge_field");
+		String remoteAddress = request.getRemoteAddr();
+		
 		try {
+			
+			if(!captchaValidation.isCaptchaValid(remoteAddress, challengeField, captchaResponse)){
+				LOG.error("Captcha Validation failed!");
+				throw new InvalidInputException("Captcha Validation failed!",DisplayMessageConstants.INVALID_CAPTCHA);
+			}
+			LOG.debug("Captcha validation complete!");
 			LOG.debug("Validating form elements");
 			validateFormParameters(firstName, lastName, emailId);
 			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
@@ -288,6 +300,11 @@ public class RegistrationController {
 			LOG.error("InvalidInputException while verifying account. Reason : " + e.getMessage(), e);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		catch (SolrException e) {
+			LOG.error("SolrException while verifying account. Reason : " + e.getMessage(), e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage("SolrException", DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
 		return JspResolver.LOGIN;

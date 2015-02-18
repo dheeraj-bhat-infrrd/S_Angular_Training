@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.commons;
 /**
  * Holds application level constants
  */
+
 public interface CommonConstants {
 
 	/**
@@ -20,8 +21,8 @@ public interface CommonConstants {
 	// default company id for application. if any entity is linked to this id, then its an orphan
 	// entity
 	public static final long DEFAULT_COMPANY_ID = 1;
-	public static final String DEFAULT_BRANCH_NAME = "Defult Branch";
-	public static final String DEFAULT_REGION_NAME = "Defult Region";
+	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
+	public static final String DEFAULT_REGION_NAME = "Default Region";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
@@ -35,6 +36,25 @@ public interface CommonConstants {
 	public static final int PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID = 3;
 	public static final int PROFILES_MASTER_AGENT_PROFILE_ID = 4;
 	public static final int PROFILES_MASTER_NO_PROFILE_ID = 10;
+	
+	/**
+	 *  Accounts master constants 
+	 */
+	public static final int ACCOUNTS_MASTER_FREE = 5;
+	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
+	public static final int ACCOUNTS_MASTER_TEAM = 2;
+	public static final int ACCOUNTS_MASTER_COMPANY = 3;
+	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
+	
+	/**
+	 *  Verticals master constants 
+	 */
+	public static final int VERTICALS_MASTER_CUSTOM = -1;
+	public static final int VERTICALS_MASTER_BANKING = 1;
+	public static final int VERTICALS_MASTER_MORTGAGE = 2;
+	public static final int VERTICALS_MASTER_REALTOR = 3;
+	
+
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
 	 */
@@ -46,6 +66,7 @@ public interface CommonConstants {
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
+	public static final String START_SURVEY = "rest/survey/start";
 
 	/**
 	 * Status constants
@@ -68,6 +89,9 @@ public interface CommonConstants {
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
+	public static final int EMPTY_LIST = 0;
+	public static final int MAX_DEFAULT_REGIONS=1;
+	public static final int MAX_DEFAULT_BRANCHES=1;
 
 	/**
 	 * Hibernate entities and column name constants
@@ -82,6 +106,7 @@ public interface CommonConstants {
 	public static final String AUTO_PAYMENT_MODE = "A";
 	public static final int INITIAL_PAYMENT_RETRIES = 0;
 	public static final String PAYMENT_GATEWAY = "Braintree";
+	public static final String FREE_ACCOUNT = "Free Account";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
 	public static final String IS_OWNER_COLUMN = "isOwner";
@@ -96,7 +121,23 @@ public interface CommonConstants {
 	public static final String SURVEY_COMPANY_COLUMN = "company";
 	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
+	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
 
+	/**
+	 * Mongo entities and column name constants
+	 */
+	public static final String AGENT_ID_COLUMN = "agentId";
+	public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
+	public static final String MODIFIED_ON_COLUMN = "modifiedOn";
+	public static final String SCORE_COLUMN = "score";
+	public static final String SHARED_ON_COLUMN = "sharedOn";
+	public static final String COMPANY_ID_COLUMN = "companyId";
+	public static final String INITIATED_BY_COLUMN = "initiatedBy";
+	public static final String STAGE_COLUMN = "stage";
+	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
+	public static final String MOOD_COLUMN = "mood";
+	
+	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -118,11 +159,14 @@ public interface CommonConstants {
 	public static final String LOGIN_NAME = "loginName";
 	public static final String HIGHEST_ROLE_ID_IN_SESSION = "highestrole";
 	public static final String PAYMENT_NONCE = "payment_method_nonce";
+	public static final String CURRENT_LICENSE_ID = "currentplan";
+	public static final String UPGRADE_FLAG = "upgrade";
 	public static final String COUNTRY_CODE = "countryCode";
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
-	
+	public static final String VERTICAL_COLUMN = "verticalsMaster";
+	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade"; 
 	/**
 	 * Batch Constants
 	 */
@@ -148,8 +192,8 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
-	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
+	public static final int MAX_LICENSE_DETAILS_RECORDS_PER_COMPANY = 1;
 
 	/**
 	 * Logo related config
@@ -213,12 +257,24 @@ public interface CommonConstants {
 	public static final String ADDRESS2 = "address2";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
+	
+	/*
+	 * Payment detail constants
+	 */
+	public static final String CARD_NUMBER = "cardNumber";
+	public static final String CARD_TYPE = "cardType";
+	public static final String CARD_HOLDER_NAME = "cardHolderName";
+	public static final String ISSUING_BANK = "issuingBank";
+	public static final String IMAGE_URL = "imageUrl";
+	public static final String CLIENT_TOKEN = "clienttoken";
+	public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
 
 	// Survey Constants
 	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
 	public static final String QUESTION_RATING = "range";
 	public static final int QUESTION_RATING_VALUE_TRUE = 1;
 	public static final int QUESTION_RATING_VALUE_FALSE = 0;
+	public static final int SURVEY_STAGE_COMPLETE = -1;
 
 	/**
 	 * Error codes
@@ -241,4 +297,9 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
 	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
+	
+	/*
+	 * Mongo constants
+	 */
+	public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 }

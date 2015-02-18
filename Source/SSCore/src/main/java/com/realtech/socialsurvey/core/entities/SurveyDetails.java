@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.Date;
 import java.util.List;
 
 public class SurveyDetails {
@@ -10,12 +11,15 @@ public class SurveyDetails {
 	private String customerName;
 	private String customerEmail;
 	private long companyId;
-	private long regionID;
+	private long regionId;
 	private long branchId;
 	private int stage;
 	private double score;
 	private String review;
 	private String mood;
+	private Date updatedOn;
+	private List<String> sharedOn;
+	private String initiatedBy;
 	private List<SurveyResponse> surveyResponse;
 	
 	public long getAgentId() {
@@ -54,11 +58,11 @@ public class SurveyDetails {
 	public void setCompanyId(long companyId) {
 		this.companyId = companyId;
 	}
-	public long getRegionID() {
-		return regionID;
+	public long getRegionId() {
+		return regionId;
 	}
-	public void setRegionID(long regionID) {
-		this.regionID = regionID;
+	public void setRegionId(long regionId) {
+		this.regionId = regionId;
 	}
 	public long getBranchId() {
 		return branchId;
@@ -89,6 +93,24 @@ public class SurveyDetails {
 	}
 	public void setMood(String mood) {
 		this.mood = mood;
+	}
+	public Date getUpdatedOn() {
+		return updatedOn;
+	}
+	public void setUpdatedOn(Date updatedOn) {
+		this.updatedOn = updatedOn;
+	}
+	public List<String> getSharedOn() {
+		return sharedOn;
+	}
+	public void setSharedOn(List<String> sharedOn) {
+		this.sharedOn = sharedOn;
+	}
+	public String getInitiatedBy() {
+		return initiatedBy;
+	}
+	public void setInitiatedBy(String initiatedBy) {
+		this.initiatedBy = initiatedBy;
 	}
 	public List<SurveyResponse> getSurveyResponse() {
 		return surveyResponse;
