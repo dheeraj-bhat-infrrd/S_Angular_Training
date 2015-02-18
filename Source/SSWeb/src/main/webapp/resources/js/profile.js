@@ -2,6 +2,7 @@
  * 
  */
 var companyProfileName = $("#company-profile-name").val();
+var currentProfileIden = "";
 
 function fetchCompanyProfile() {
 	var url = window.location.origin +'/rest/profile/'+companyProfileName;
@@ -14,10 +15,14 @@ function paintCompanyProfile(data) {
 		var result = $.parseJSON(response.entity);
 		var headContentHtml = "";
 		if(result != undefined) {
+			currentProfileIden = result.iden;
 			var contactDetails = result.contact_details;
 			if(contactDetails != undefined){
 				headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 	            headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
+	            if(contactDetails.title != undefined) {
+	            	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.title+'</div>';
+	            }
 	            headContentHtml = headContentHtml +' </div>';
 	            headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
 	            headContentHtml = headContentHtml + '	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">';
@@ -99,12 +104,17 @@ function paintCompanyProfile(data) {
 		fetchCompanyRegions();
 		fetchCompanyBranches();
 		fetchCompanyIndividuals();
-		
 		var minScore = 0;
 		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
 			minScore = result.survey_settings.show_survey_above_score;
 		}
+		fetchReviewsCountForCompany(result.iden, paintAllReviewsCount);
 		fetchReviewsForCompany(result.iden,minScore);
+		
+		/**
+		 * calling method to populate count of hidden reviews
+		 */
+		fetchReviewsCountForCompany(result.iden,paintHiddenReviewsCount,minScore);
 	}
 }
 
@@ -327,17 +337,6 @@ function paintReviewsForCompany(data) {
 		var result = $.parseJSON(responseJson.entity);
 		var reviewsHtml = "";
 		if(result != undefined && result.length > 0) {
-			var reviewsSizeHtml = result.length;
-			if(result.length == 1) {
-				reviewsSizeHtml = reviewsSizeHtml +' Review';
-			}else {
-				reviewsSizeHtml = reviewsSizeHtml +' Reviews';
-			}
-			$("#prof-company-review-count").html(reviewsSizeHtml);
-			$("#prof-company-review-count").click(function(){
-				$(window).scrollTop($('#reviews-container').offset().top);
-			});
-			
 			$.each(result,function(i, reviewItem) {
 				var d = Date.parse(reviewItem.updatedOn);
 				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
@@ -388,5 +387,49 @@ function paintReviewsForCompany(data) {
 	            $(this).parent().find('.icn-plus-open').show();
 	        });
 		}
+	}
+}
+
+function fetchReviewsCountForCompany(companyId,callBackFunction,minScore) {
+	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount';
+	if(minScore != undefined) {
+		url = url +"?minScore="+minScore;
+	}
+	callAjaxGET(url, callBackFunction, true);
+}
+
+function paintAllReviewsCount(data) {
+	var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {
+		var reviewsSizeHtml = responseJson.entity;
+		if(reviewsSizeHtml <= 1) {
+			reviewsSizeHtml = reviewsSizeHtml +' Review';
+		}else {
+			reviewsSizeHtml = reviewsSizeHtml +' Reviews';
+		}
+		$("#prof-company-review-count").html(reviewsSizeHtml);
+		$("#prof-company-review-count").click(function(){
+			$(window).scrollTop($('#reviews-container').offset().top);
+		});
+	}
+}
+
+function paintHiddenReviewsCount(data) {
+	var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {
+		var reviewsSizeHtml = responseJson.entity;
+		if(reviewsSizeHtml > 0) {
+			if(reviewsSizeHtml == 1) {
+				reviewsSizeHtml = reviewsSizeHtml +' additional review not recommended';
+			}else {
+				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
+			}
+		}
+		$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
+		$("#prof-hidden-review-count").click(function(){
+			$(this).hide();
+			fetchReviewsForCompany(currentProfileIden);
+			$(window).scrollTop($('#reviews-container').offset().top);
+		});
 	}
 }

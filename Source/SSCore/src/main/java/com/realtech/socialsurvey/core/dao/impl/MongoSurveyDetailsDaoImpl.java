@@ -439,13 +439,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 */
 
 	@Override
-	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue, double startScore, double limitScore) {
-		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
+	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, double startScore, double limitScore) {
+		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
-			query.addCriteria(Criteria.where(columnName).is(columNValue));
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		if (startScore > -1 && limitScore > -1) {
+		if (startScore > 0 && limitScore > 0) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 		}
@@ -453,8 +453,25 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
-		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() finished.");
+		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished.");
 		return surveysWithReviews;
+	}
+
+	@Override
+	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore) {
+		LOG.info("Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue + " startScore:" + startScore
+				+ " limitScore:" + limitScore);
+		Query query = new Query();
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		if (startScore > 0 && limitScore > 0) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method getFeedBacksCount executed successfully");
+		return feedBackCount;
 	}
 
 	// JIRA SS-137 and 158 : EOC
