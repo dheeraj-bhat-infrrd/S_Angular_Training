@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 @DependsOn("generic")
 @Component
@@ -67,6 +68,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private Utils utils;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -599,6 +603,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 			queries.put(CommonConstants.REGION_ID_COLUMN, regionSettings.getIden());
 			queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
+			queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+					userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 
 			LOG.debug("calling method to fetch user profiles under region :" + regionProfileName);
 			List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
@@ -776,6 +782,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 		if (userProfiles != null && !userProfiles.isEmpty()) {
 			users = new ArrayList<AgentSettings>();

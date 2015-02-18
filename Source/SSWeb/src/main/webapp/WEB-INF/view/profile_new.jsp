@@ -135,7 +135,7 @@
                 </div>
                 <div class="people-say-wrapper rt-content-main bord-bot-dc" id="reviews-container">
                     <div class="main-con-header" id="prof-reviews-header"><!-- <span class="ppl-say-txt-st">What people say</span> about Anna Thomas --></div>
-                    <div id="prof-review-item">
+                    <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here --> 
                     </div>
                     <div id="prof-hidden-review-count" class="prof-hidden-review-link">
