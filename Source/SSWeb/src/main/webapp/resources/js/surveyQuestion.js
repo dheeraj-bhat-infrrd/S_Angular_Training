@@ -12,6 +12,7 @@ var customerResponse;
 var customerEmail;
 var mood;
 var stage;
+var isSmileTypeQuestion;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -20,7 +21,8 @@ $(document).on('click', '.sq-np-item-next', function() {
  * Function to initiate survey. It hits controller to get list of all the
  * questions which are shown one after one to the customer.
  */
-function initSurvey(firstName, lastName, email, agentId, agentName) {
+function initSurvey(firstName, lastName, email, agentId, agentName,
+		captchaResponse, recaptcha_challenge_field) {
 	var success = false;
 	this.agentId = agentId;
 	this.agentName = agentName;
@@ -29,7 +31,9 @@ function initSurvey(firstName, lastName, email, agentId, agentName) {
 		"agentId" : agentId,
 		"firstName" : firstName,
 		"lastName" : lastName,
-		"customerEmail" : email
+		"customerEmail" : email,
+		"captchaResponse" : captchaResponse,
+		"recaptcha_challenge_field" : recaptcha_challenge_field
 	};
 	$.ajax({
 		// TODO provide mapping
@@ -47,7 +51,9 @@ function initSurvey(firstName, lastName, email, agentId, agentName) {
 			}
 		},
 		error : function(e) {
-			console.error("error : " + e);
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast();
 		}
 	});
 }
@@ -55,8 +61,8 @@ function initSurvey(firstName, lastName, email, agentId, agentName) {
 function paintSurveyPage(jsonData) {
 	data = jsonData.responseJSON.survey;
 	stage = jsonData.responseJSON.stage;
-	if(stage!=undefined)
-		qno=stage;
+	if (stage != undefined)
+		qno = stage;
 	paintSurveyPageFromJson();
 }
 
@@ -191,6 +197,9 @@ function showFeedbackPage(mood) {
 	$("#text-area").show();
 	$("#text-area").val("");
 	$("#smiles-final").hide();
+	$("#next-textarea-smiley").html("Finish");
+	$("#next-textarea-smiley").removeClass("btn-com-disabled");
+	isSmileTypeQuestion = false;
 	switch (mood) {
 	case "happy":
 		question = "Please share your kind words about us!";
@@ -206,22 +215,35 @@ function showFeedbackPage(mood) {
 		break;
 	}
 	$("#prev-textarea-smiley").removeClass("btn-com-disabled");
-	$("#next-textarea-smiley").addClass("btn-com-disabled");
-	$("#submit").show();
 }
 
 /*
  * This is used to render all the possible choices for an MCQ.
  */
 function paintMcqAnswer(answer) {
-	var divToPopulate = "<div data-answer='" + answer
-			+ "' class='sq-mcq-item clearfix'>"
-			+ "<div class='sq-mcq-chk-wrapper float-left'>"
-			+ "<div class='float-left sq-mcq-chk st-mcq-chk-on hide'>"
-			+ "</div>" + "<div class='float-left sq-mcq-chk st-mcq-chk-off'>"
-			+ "</div>" + "</div>"
-			+ "<div class='sq-mcq-ans-wrapper float-left'>" + answer
-			+ "</div></div>";
+	var divToPopulate;
+	customerResponse = questionDetails.customerResponse;
+	if (answer == customerResponse) {
+		divToPopulate = "<div data-answer='" + answer
+				+ "' class='sq-mcq-item clearfix'>"
+				+ "<div class='sq-mcq-chk-wrapper float-left'>"
+				+ "<div class='float-left sq-mcq-chk st-mcq-chk-on'>"
+				+ "</div>"
+				+ "<div class='float-left sq-mcq-chk st-mcq-chk-off hide'>"
+				+ "</div>" + "</div>"
+				+ "<div class='sq-mcq-ans-wrapper float-left'>" + answer
+				+ "</div></div>";
+	} else {
+		divToPopulate = "<div data-answer='" + answer
+				+ "' class='sq-mcq-item clearfix'>"
+				+ "<div class='sq-mcq-chk-wrapper float-left'>"
+				+ "<div class='float-left sq-mcq-chk st-mcq-chk-on hide'>"
+				+ "</div>"
+				+ "<div class='float-left sq-mcq-chk st-mcq-chk-off'>"
+				+ "</div>" + "</div>"
+				+ "<div class='sq-mcq-ans-wrapper float-left'>" + answer
+				+ "</div></div>";
+	}
 	return divToPopulate;
 }
 
@@ -263,6 +285,20 @@ $('.sq-star').click(function() {
 $('.sq-np-item-next')
 		.click(
 				function() {
+					if (questionDetails.questionType == "sb-master"){
+						if(isSmileTypeQuestion){
+							showFeedbackPage(mood);
+						}
+						else{
+							var feedback = $("#text-area").val();
+							updateCustomeResponse(feedback);
+							$('#overlay-toast')
+									.html(
+											'Congratulations! Your survey has been submitted successfully.');
+							showToast();
+						}
+						return;
+					}
 					if (questionDetails.questionType == "sb-sel-mcq"
 							&& customerResponse != undefined) {
 						storeCustomerAnswer(customerResponse);
@@ -348,10 +384,12 @@ $('.sq-np-item-prev').click(function() {
 	if (qno == 0) {
 		return;
 	}
-	$("#submit").hide();
+	$("#next-textarea-smiley").html("Next");
 	$(".sq-star").removeClass('sq-full-star');
 	$(".sq-smile").removeClass('sq-full-smile');
-	qno--;
+	if(isSmileTypeQuestion)
+		qno--;
+	isSmileTypeQuestion = true;
 	paintSurveyPageFromJson();
 	if (questionDetails.questionType == "sb-range-star") {
 		var starVal = parseInt(questionDetails.customerResponse);
@@ -404,61 +442,47 @@ $('.sq-smile').click(function() {
 $('.sq-happy-smile').click(function() {
 	// Update customer's mood in db and ask for cutomer's kind words.
 	mood = "happy";
-	showFeedbackPage(mood);
+	$('#next-textarea-smiley').removeClass("btn-com-disabled");
+	isSmileTypeQuestion = true;
 });
 $('.sq-neutral-smile').click(function() {
 	// Update customer's mood in db and ask for feedback that could have made
 	// him happy.
 	mood = "neutral";
-	showFeedbackPage(mood);
+	$('#next-textarea-smiley').removeClass("btn-com-disabled");
+	isSmileTypeQuestion = true;
 });
 $('.sq-sad-smile').click(function() {
 	// Update customer's mood in db and ask what went wrong during the entire
 	// course.
 	mood = "sad";
-	showFeedbackPage(mood);
+	$('#next-textarea-smiley').removeClass("btn-com-disabled");
+	isSmileTypeQuestion = true;
 });
 
-$('#start-btn').click(function() {
-	var firstName = $('#firstName').val().trim();
-	var lastName = $('#lastName').val().trim();
-	var email = $('#email').val().trim();
-	if(!validateUserFirstName('firstName')){
-		$('#overlay-toast')
-		.html(
-				'Please enter valid First Name!');
-		showToast();
-		return;
-	}
-	if(!validateUserFirstName('lastName')){
-		$('#overlay-toast')
-		.html(
-				'Please enter valid Last Name!');
-		showToast();
-		return;
-	}
-	if(!validateUserEmailId('email')){
-		$('#overlay-toast')
-		.html(
-				'Please enter valid Email Id!');
-		showToast();
-		return;
-	}
-	var agentId = $('#prof-container').attr("data-agentId");
-	var agentName = $('#prof-container').attr("data-agentName");
-	initSurvey(firstName, lastName, email, agentId, agentName);
-});
-
-$('#submit')
-		.click(
-				function() {
-					var feedback = $("#text-area").val();
-					updateCustomeResponse(feedback);
-					$('#overlay-toast')
-							.html(
-									'Congratulations! Your survey has been submitted successfully.');
-					showToast();
-				});
+$('#start-btn').click(
+		function() {
+			var firstName = $('#firstName').val().trim();
+			var lastName = $('#lastName').val().trim();
+			var email = $('#email').val().trim();
+			var captchaResponse = $('#captcha-text').val();
+			var recaptcha_challenge_field = $('#recaptcha_challenge_field')
+					.val();
+			if (!validateUserFirstName('firstName')) {
+				$('#overlay-toast').html('Please enter valid First Name!');
+				showToast();
+				return;
+			}
+			if (!validateUserEmailId('email')) {
+				$('#overlay-toast').html('Please enter valid Email Id!');
+				showToast();
+				return;
+			}
+			var agentId = $('#prof-container').attr("data-agentId");
+			var agentName = $('#prof-container').attr("data-agentName");
+			initSurvey(firstName, lastName, email, agentId, agentName,
+					captchaResponse, recaptcha_challenge_field);
+		});
 
 $('input[type="range"]').rangeslider({
 	polyfill : false,
