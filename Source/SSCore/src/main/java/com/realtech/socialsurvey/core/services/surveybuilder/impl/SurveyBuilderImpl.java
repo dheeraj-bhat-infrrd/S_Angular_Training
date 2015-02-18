@@ -779,7 +779,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyCompanyMapping currentSurveyMapping = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries).get(CommonConstants.INITIAL_INDEX);
 		
 		//Now we check if it is a default survey
-		if( currentSurveyMapping.getSurvey().getVerticalsMaster().getVerticalsMasterId() > CommonConstants.VERTICALS_MASTER_CUSTOM ){
+		if( currentSurveyMapping.getSurvey().getVerticalsMaster().getVerticalsMasterId() != CommonConstants.VERTICALS_MASTER_CUSTOM ){
 			
 			//So it is a default survey
 			LOG.debug("A default survey is currently mapped to the company with id : " + user.getCompany().getCompanyId());
