@@ -428,7 +428,7 @@
 						console.log("Info button clicked");
 						$("#recaptcha_whatsthis").click();
 					});
-					$("#cust-agnt-rel").html(paintListOptions());
+					$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
 				});
 	</script>
 

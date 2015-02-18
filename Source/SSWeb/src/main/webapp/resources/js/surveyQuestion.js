@@ -260,7 +260,7 @@ function paintMcqAnswer(answer) {
 	return divToPopulate;
 }
 
-function paintListOptions(answer) {
+function paintListOptions(agentName) {
 	var divToPopulate = "<option value='select'>--Select an Option--"
 			+ "<option value='transacted'>Transacted with " + agentName
 			+ "<option value='enquired'>Enquired with " + agentName;
