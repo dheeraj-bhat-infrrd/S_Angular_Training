@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.payment;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.Map;
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
@@ -11,11 +12,15 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
  * Handles the payment options for the application
@@ -53,10 +58,20 @@ public interface Payment {
 	 * @param nonce
 	 * @return
 	 * @throws NoRecordsFetchedException 
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws CreditCardException 
 	 * @throws NonFatalException
 	 */
-	public boolean subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException;
+	public void subscribe(User user, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, SubscriptionUnsuccessfulException, CreditCardException;
 	
+	/**
+	 * Method used to subscribe customer to a free account.
+	 * @param user
+	 * @param accountsMasterId
+	 * @throws InvalidInputException
+	 */
+	public void subscribeForFreeAccount(User user,int accountsMasterId) throws InvalidInputException;
+
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
 	 * @param paymentMethodToken
@@ -138,7 +153,41 @@ public interface Payment {
 	 * @throws SubscriptionPastDueException 
 	 * @throws PaymentException 
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
+	 * @throws SolrException 
+	 * @throws UndeliveredEmailException 
 	 */
-	public void upgradePlanForSubscription(Company company,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
-
+	public void upgradePlanForSubscription(User user,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException;
+	
+	/**
+	 * Fetches the current card details for a particular subscription
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 */
+	public Map<String, String> getCurrentPaymentDetails(String subscriptionId) throws InvalidInputException, NoRecordsFetchedException, PaymentException;
+		
+	/**
+	 * Changes the card for a particular customer and subscription
+	 * @param subscriptionId
+	 * @param paymentNonce
+	 * @param customerId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 * @throws CreditCardException 
+	 * @throws CardUpdateUnsuccessfulException 
+	 */
+	public void changePaymentMethod(String subscriptionId,String paymentNonce, String customerId) throws InvalidInputException, NoRecordsFetchedException, PaymentException, CreditCardException, CardUpdateUnsuccessfulException;
+	
+	/**
+	 * Returns the balance amount while upgrading from one plan to another
+	 * @param fromAccountsMasterId
+	 * @param toAccountsMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId,int toAccountsMasterId) throws InvalidInputException;
 }

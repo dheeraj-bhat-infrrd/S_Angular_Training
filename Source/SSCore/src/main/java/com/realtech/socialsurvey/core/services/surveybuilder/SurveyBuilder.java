@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import java.util.List;
+import java.util.Map;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyQuestion;
@@ -97,12 +98,21 @@ public interface SurveyBuilder {
 	public List<SurveyQuestionDetails> getAllActiveQuestionsOfMappedSurvey(User user) throws InvalidInputException;
 
 	/**
+	 * Method to mark survey as active/inactive in SURVEY
+	 * 
+	 * @param user
+	 * @param status
+	 * @throws InvalidInputException
+	 */
+	public void changeSurveyStatus(User user, int status) throws InvalidInputException;
+
+	/**
 	 * Method to fetch list of all Default Surveys
 	 * 
 	 * @param
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyTemplate> getSurveyTemplates() throws InvalidInputException;
+	public List<SurveyTemplate> getSurveyTemplates(User user) throws InvalidInputException;
 
 	/**
 	 * Method to fetch Survey from SurveyId
@@ -140,9 +150,10 @@ public interface SurveyBuilder {
 	 * Method to clone Survey from template
 	 * 
 	 * @param questionId
+	 * @return 
 	 * @throws InvalidInputException
 	 */
-	public void cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException;
+	public Survey cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to fetch Survey Questions.
@@ -151,4 +162,19 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public List<SurveyQuestionDetails> getSurveyByAgenId(long agentId) throws InvalidInputException;
+	
+	/**
+	 * Adds a default survey to the company based on the vertical of the company.
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	public void addDefaultSurveyToCompany(User user) throws InvalidInputException;
+	
+	/**
+	 * Checks if the survey is default and clones it. If not leaves it as it is.
+	 * @param user
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public Map<Long, Long> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException;
 }

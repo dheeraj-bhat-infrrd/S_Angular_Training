@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.SolrSearchUtils;
@@ -137,7 +138,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			query.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_ACTIVE);
 			query.setStart(start);
-			
+
 			if (rows > 0) {
 				query.setRows(rows);
 			}
@@ -277,8 +278,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery(CommonConstants.USER_LOGIN_NAME_SOLR+":" + loginNamePattern);
-			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR+":" + company.getCompanyId(), CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.setQuery(CommonConstants.USER_LOGIN_NAME_SOLR + ":" + loginNamePattern);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_ACTIVE);
 
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
@@ -305,8 +307,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * @throws UnsupportedEncodingException
 	 */
 	@Override
-	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException
-			{
+	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException {
 		LOG.info("Method searchUsersByLoginNameOrName called for pattern :" + pattern);
 		if (pattern == null) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Users");
@@ -314,14 +315,15 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByLoginNameOrName() called for parameter : " + pattern);
 		String usersResult = null;
 		QueryResponse response = null;
-		pattern = pattern+"*";
+		pattern = pattern + "*";
 		try {
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery("displayName:" + pattern + " OR "+CommonConstants.USER_FIRST_NAME_SOLR+":" + pattern + " OR "+CommonConstants.USER_LAST_NAME_SOLR+":" + pattern + " OR "+CommonConstants.USER_LOGIN_NAME_SOLR+":" + pattern);
+			solrQuery.setQuery("displayName:" + pattern + " OR " + CommonConstants.USER_FIRST_NAME_SOLR + ":" + pattern + " OR "
+					+ CommonConstants.USER_LAST_NAME_SOLR + ":" + pattern + " OR " + CommonConstants.USER_LOGIN_NAME_SOLR + ":" + pattern);
 			solrQuery.addFilterQuery("companyId:" + companyId);
-			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_ACTIVE + " OR "+CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "+CommonConstants.STATUS_SOLR+":"
-					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -385,6 +387,50 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return users;
 	}
 
+	@Override
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException, MalformedURLException {
+		LOG.info("Method searchUsersByFirstOrLastName() called for pattern :" + patternFirst + ", " + patternLast);
+		if (patternFirst == null && patternLast == null) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		QueryResponse response = null;
+		try {
+			SolrQuery solrQuery = new SolrQuery();
+			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
+					CommonConstants.USER_EMAIL_ID_SOLR };
+			solrQuery.setFields(fields);
+
+			String query = "";
+			if (!patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*" + " OR " + CommonConstants.USER_LAST_NAME_SOLR + ":"
+						+ patternLast + "*";
+			}
+			else if (!patternFirst.equals("") && patternLast.equals("")) {
+				query = CommonConstants.USER_FIRST_NAME_SOLR + ":" + patternFirst + "*";
+			}
+			else if (patternFirst.equals("") && !patternLast.equals("")) {
+				query = CommonConstants.USER_LAST_NAME_SOLR + ":" + patternLast + "*";
+			}
+			solrQuery.setQuery(query);
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+
+			LOG.debug("Querying solr for searching users");
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			response = solrServer.query(solrQuery);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByFirstOrLastName() called for parameter : " + patternFirst + ", " + patternLast + " returning : "
+				+ response.getResults());
+		return response.getResults();
+	}
+
 	/**
 	 * Method to perform search of Users from solr based on the input pattern for user and company.
 	 * 
@@ -404,9 +450,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
-			solrQuery.setQuery(CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_ACTIVE + " OR "+CommonConstants.STATUS_SOLR+":" + CommonConstants.STATUS_NOT_VERIFIED + " OR "+CommonConstants.STATUS_SOLR+":"
-					+ CommonConstants.STATUS_TEMPORARILY_INACTIVE);
-			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR+":" + companyId);
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 			LOG.debug("Querying solr for searching users");
@@ -441,7 +487,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
-			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName()+" "+user.getLastName());
+			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
 			if (user.getCompany() != null)
 				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
@@ -488,5 +534,27 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while removing user from solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method removeUserFromSolr() to remove user id {} from solr finished successfully.", userIdToRemove);
+	}
+
+	/*
+	 * Method to fetch display name of a user from solr based upon user id provided.
+	 */
+	@Override
+	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException {
+		LOG.info("Method to fetch user from solr based upon user id, searchUserById() started.");
+		QueryResponse response = null;
+		SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+		SolrQuery solrQuery = new SolrQuery();
+		solrQuery.setQuery(CommonConstants.USER_ID_SOLR +":"+ userId);
+		LOG.debug("Querying solr for searching users");
+		response = solrServer.query(solrQuery);
+		SolrDocumentList results = response.getResults();
+		if (results == null || results.size() == 0) {
+			LOG.error("No record found in Solr for userid {}  in method getUserDisplayNameById()", userId);
+			throw new NoRecordsFetchedException("No record found in Solr for userid " + userId + " in method getUserDisplayNameById()");
+		}
+		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString(); 
+		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
+		return displayName;
 	}
 }

@@ -20,10 +20,12 @@
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>
 		<servlet.version>2.5</servlet.version>
-		<dev.deployment.path>/Users/nishit/work/apps/jboss/jboss-eap-6.3/standalone/deployments</dev.deployment.path>
+
+		<dev.deployment.path>E:\sw\jboss-as-7.1.1.Final\standalone\deployments</dev.deployment.path>
+
 
 		<!-- Spring -->
-		<spring-framework.version>3.2.4.RELEASE</spring-framework.version>
+		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
 		<spring.security>3.2.3.RELEASE</spring.security>
 
 		<!-- Hibernate / JPA -->
