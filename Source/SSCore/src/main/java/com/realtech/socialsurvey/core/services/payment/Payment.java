@@ -70,7 +70,7 @@ public interface Payment {
 	 * @param accountsMasterId
 	 * @throws InvalidInputException
 	 */
-	public void subscribeForFreeAccount(User user,int accountsMasterId) throws InvalidInputException;
+	//public void subscribeForFreeAccount(User user,int accountsMasterId) throws InvalidInputException;
 
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
