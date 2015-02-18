@@ -197,19 +197,26 @@ function paintBranchesForRegion(data) {
 			});
 			
 			$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
-			
-			$(".comp-region-branch").click(function(e){
-				e.stopPropagation();
-				if($(this).data("openstatus") == "closed") {
-					fetchIndividualForBranch($(this).data('branchid'));
-					$(this).data("openstatus","open");
-				}else {
-					$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
-					$(this).data("openstatus","closed");
-				}
-			});
+			bindClickToFetchBranchIndividuals("comp-region-branch");
 		}
 	}
+}
+
+/**
+ * Method to bind the element whose class is provided to fetch individuals under that branch
+ * @param bindingClass
+ */
+function bindClickToFetchBranchIndividuals(bindingClass) {
+	$("."+bindingClass).click(function(e){
+		e.stopPropagation();
+		if($(this).data("openstatus") == "closed") {
+			fetchIndividualForBranch($(this).data('branchid'));
+			$(this).data("openstatus","open");
+		}else {
+			$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
+			$(this).data("openstatus","closed");
+		}
+	});
 }
 
 function fetchIndividualForBranch(branchId) {
@@ -296,16 +303,7 @@ function paintCompanyBranches(data) {
 			});
 			
 			$("#comp-regions-content").append(compBranchesHtml);
-			$(".comp-branch").click(function(e){
-				e.stopPropagation();
-				if($(this).data("openstatus") == "closed") {
-					fetchIndividualForBranch($(this).data('branchid'));
-					$(this).data("openstatus","open");
-				}else {
-					$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
-					$(this).data("openstatus","closed");
-				}
-			});
+			bindClickToFetchBranchIndividuals("comp-branch");
 		}
 	}
 }
