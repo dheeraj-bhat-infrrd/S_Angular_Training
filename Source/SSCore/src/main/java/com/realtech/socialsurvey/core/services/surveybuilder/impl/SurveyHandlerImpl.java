@@ -53,7 +53,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 	 */
 	@Override
 	@Transactional
-	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount)
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent)
 			throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException {
 
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() started.");
@@ -85,6 +85,7 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyDetails.setReminderCount(reminderCount);
 		surveyDetails.setUpdatedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
+		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
 		SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
 		if (survey == null) {
