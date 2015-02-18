@@ -130,13 +130,7 @@ public class PaymentController {
 			}
 			
 			try {
-				if(accountTypeValue == CommonConstants.ACCOUNTS_MASTER_FREE){
-					gateway.subscribeForFreeAccount(user, accountTypeValue);
-				}
-				else {
-					gateway.subscribe(user, accountTypeValue, nonce);
-				}
-
+				gateway.subscribe(user, accountTypeValue, nonce);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("PaymentController subscribeForPlan() : InvalidInput Exception thrown : " + e.getMessage(), e);
