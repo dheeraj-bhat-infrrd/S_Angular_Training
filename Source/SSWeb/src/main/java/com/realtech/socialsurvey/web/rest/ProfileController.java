@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.rest;
 
 import java.util.List;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
@@ -521,13 +522,16 @@ public class ProfileController {
 	}
 
 	/**
+	 * Service to fetch the reviews within the rating score specified
+	 * 
 	 * @param companyId
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/reviews/company/{companyId}")
-	public Response getReviewsForCompany(@PathVariable long companyId) {
-		LOG.info("Service to fetch reviews of company called for companyId:" + companyId);
+	@RequestMapping(value = "/company/{companyId}/reviews")
+	public Response getReviewsForCompany(@PathVariable long companyId, @QueryParam(value = "minScore") Double minScore,
+			@QueryParam(value = "maxScore") Double maxScore) {
+		LOG.info("Service to fetch reviews of company called for companyId:" + companyId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
 		Response response = null;
 		try {
 			if (companyId <= 0l) {
@@ -535,15 +539,21 @@ public class ProfileController {
 						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Company id for company is invalid"),
 						"company id is not valid while fetching all reviews for a company");
 			}
+			if (minScore == null) {
+				minScore = CommonConstants.MIN_RATING_SCORE;
+			}
+			if (maxScore == null) {
+				maxScore = CommonConstants.MAX_RATING_SCORE;
+			}
 			try {
-				List<SurveyDetails> reviews = profileManagementService.getReviewsForCompany(companyId);
+				List<SurveyDetails> reviews = profileManagementService.getReviewsForCompany(companyId, minScore, maxScore);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
 			}
 			catch (InvalidInputException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
-						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching individuals under branch"), e.getMessage());
+						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews for a company"), e.getMessage());
 			}
 		}
 		catch (BaseRestException e) {
@@ -561,7 +571,7 @@ public class ProfileController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/ratings/company/{companyId}")
+	@RequestMapping(value = "/company/{companyId}/ratings")
 	public Response getAverageRatingForCompany(@PathVariable long companyId) {
 		LOG.info("Service to get average rating of company called ");
 		Response response = null;
@@ -588,6 +598,38 @@ public class ProfileController {
 		}
 		LOG.info("Service to get average rating of company executed successfully ");
 		return response;
+	}
+
+	/**
+	 * Service to fetch count of reviews based on ratings specified
+	 * 
+	 * @param companyId
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/company/{companyId}/reviewcount")
+	public Response getReviewCount(@PathVariable long companyId, @QueryParam(value = "minScore") Double minScore,
+			@QueryParam(value = "maxScore") Double maxScore) {
+		LOG.info("Service to fetch the reviews count called for companyId :" + companyId + " ,minScore:" + minScore + " and maxScore:" + maxScore);
+		Response response = null;
+		try {
+			if (companyId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS_COUNT, "Company id is invalid"),
+						"company id is not valid while fetching reviews count for a company");
+			}
+			//TODO implement this
+
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to fetch the reviews count executed successfully");
+		return response;
+
 	}
 
 	/**

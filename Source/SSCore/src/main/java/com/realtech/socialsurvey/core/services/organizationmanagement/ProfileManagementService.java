@@ -42,8 +42,9 @@ public interface ProfileManagementService {
 
 	public void updateProfileImage(String collection, OrganizationUnitSettings companySettings, String logo) throws InvalidInputException;
 
-	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings,
-			LockSettings lockSettings) throws InvalidInputException;
+	public LockSettings updateLockSettings(String collection, OrganizationUnitSettings unitSettings, LockSettings lockSettings)
+			throws InvalidInputException;
+
 	/**
 	 * Method to update company contact information
 	 * 
@@ -199,10 +200,12 @@ public interface ProfileManagementService {
 	 * Method to get aggregated reviews of all agents of a company
 	 * 
 	 * @param companyId
+	 * @param startScore
+	 * @param limitScore
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyDetails> getReviewsForCompany(long companyId) throws InvalidInputException;
+	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore) throws InvalidInputException;
 
 	/**
 	 * Method to get the average rating of all individuals of a company
@@ -212,4 +215,14 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public double getAverageRatingForCompany(long companyId) throws InvalidInputException;
+
+	/**
+	 * Method to get the reviews count for a company within limit of rating score specified
+	 * 
+	 * @param companyId
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 */
+	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore);
 }

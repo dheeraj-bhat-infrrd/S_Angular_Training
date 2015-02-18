@@ -50,12 +50,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
-		if(surveys==null || surveys.size()==0)
+		if (surveys == null || surveys.size() == 0)
 			return null;
 		LOG.info("Method insertSurveyDetails() to insert details of survey finished.");
 		return surveys.get(CommonConstants.INITIAL_INDEX);
 	}
-	
+
 	/*
 	 * Method to insert survey details into the SURVEY_DETAILS collection.
 	 */
@@ -338,12 +338,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		double rating = 0;
 		if (result != null && a > 0) {
 			List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get("result");
-			rating = (double) basicDBObject.get(0).get("total_score")/a;
+			rating = (double) basicDBObject.get(0).get("total_score") / a;
 		}
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
 	}
-
 
 	// January is denoted with 0.
 	public double getRatingByMonth(String columnName, long columnValue, int year, int month) {
@@ -366,8 +365,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
 				CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
-				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation
-				.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group(columnName)
+				.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		double rating = 0;
@@ -436,15 +435,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	/*
 	 * Returns a list of feedbacks provided by customers. First sorted on score then on date (both
 	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
-	 * value for respective column.
+	 * value for respective column. limitScore is the max score under which reviews have to be shown
 	 */
 
 	@Override
-	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue) {
+	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue, double startScore, double limitScore) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columNValue));
+		}
+		if (startScore > -1 && limitScore > -1) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 		}
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
@@ -453,7 +456,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() finished.");
 		return surveysWithReviews;
 	}
-
 
 	// JIRA SS-137 and 158 : EOC
 }
