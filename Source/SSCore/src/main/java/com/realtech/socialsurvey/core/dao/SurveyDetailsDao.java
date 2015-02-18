@@ -39,6 +39,8 @@ public interface SurveyDetailsDao {
 
 	public long getSentSurveyCount(String columnName, long columnValue);
 
-	public List<SurveyDetails> getAllFeedbacks(String columnName, long columNValue, double startScore, double limitScore);
+	public List<SurveyDetails> getFeedbacks(String columnName, long columNValue, double startScore, double limitScore);
+	
+	public long getFeedBacksCount(String columnName,long columnValue,double startScore,double limitScore);
 
 }
