@@ -73,19 +73,11 @@ public class SurveyHandlerImpl implements SurveyHandler {
 			}
 		}
 
-		/*
-		 * Map<String, String> urlParams = new HashMap<>(); urlParams.put("branchId", branchId +
-		 * ""); urlParams.put("agentId", agentId + ""); urlParams.put("agentName", agentName);
-		 * urlParams.put("companyId", companyId + ""); urlParams.put("branchId", branchId + "");
-		 * urlParams.put("regionId", regionId + ""); urlParams.put("customerEmail", customerEmail);
-		 * String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl +
-		 * CommonConstants.START_SURVEY);
-		 */
-
 		SurveyDetails surveyDetails = new SurveyDetails();
 		surveyDetails.setAgentId(agentId);
 		surveyDetails.setAgentName(agentName);
 		surveyDetails.setBranchId(branchId);
+		surveyDetails.setCustomerName(firstName+" "+lastName);
 		surveyDetails.setCompanyId(companyId);
 		surveyDetails.setCustomerEmail(customerEmail);
 		surveyDetails.setRegionId(regionId);
@@ -134,6 +126,14 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review);
 		surveyDetailsDao.updateFinalScore(agentId, customerEmail);
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
+	}
+	
+	public SurveyDetails getSurveyDetails(long agentId, String customerEmail){
+		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email started.");
+		SurveyDetails surveyDetails;
+		surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
+		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email finished.");
+		return surveyDetails;
 	}
 
 	@Override
