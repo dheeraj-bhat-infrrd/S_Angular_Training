@@ -19,7 +19,18 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 public interface ProfileManagementService {
 
 	/**
-	 * Finalize profile settings
+	 * Finalize Lock settings in the hierarchy
+	 * 
+	 * @param user
+	 * @param accountType
+	 * @param settings
+	 * @throws InvalidInputException
+	 */
+	public LockSettings finalizeHigherLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
+			throws InvalidInputException;
+
+	/**
+	 * Finalize profile settings in the hierarchy
 	 * 
 	 * @param user
 	 * @param accountType
@@ -29,6 +40,7 @@ public interface ProfileManagementService {
 	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException;
 
+	
 	// JIRA SS-97 by RM-06 : BOC
 	/**
 	 * Method to update logo of a company

@@ -39,5 +39,7 @@ public interface SurveyHandler {
 	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount) throws SolrException, NoRecordsFetchedException,
 			SolrServerException, InvalidInputException;
 
+	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
+	
 	public String getApplicationBaseUrl();
 }
