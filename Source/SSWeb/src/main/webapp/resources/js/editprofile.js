@@ -7,37 +7,33 @@ var delay = (function() {
 	};
 })();
 
-function startCompanyProfilePage() {
-	showAssociationList();
-	showAchievementList();
-	showLicenceList();
-}
-
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).addClass('prof-name-edit');
+		$('#prof-all-lock').val('modified');
 	}
 });
 
 $(document).on('blur', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 $(document).on('focus', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).addClass('prof-name-edit');
+		$('#prof-all-lock').val('modified');
 	}
 });
 
 $(document).on('blur', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
@@ -49,17 +45,22 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
-	if($(this).hasClass('lp-edit-locks-locked')) {
-		$(this).removeClass('lp-edit-locks-locked');
-		$(this).attr('data-state', 'unlocked');
-		updateLockSettings(lockId, false);
-		$("#" + fieldId).attr("readonly", false);
-		
+	if ($(this).attr('data-control') == 'user') {
+		if($(this).hasClass('lp-edit-locks-locked')) {
+			$(this).removeClass('lp-edit-locks-locked');
+			$(this).attr('data-state', 'unlocked');
+			updateLockSettings(lockId, false);
+			$("#" + fieldId).attr("readonly", false);
+			
+		} else {
+			$(this).addClass('lp-edit-locks-locked');
+			$(this).attr('data-state', 'locked');
+			updateLockSettings(lockId, true);
+			$("#" + fieldId).attr("readonly", true);
+		}
 	} else {
-		$(this).addClass('lp-edit-locks-locked');
-		$(this).attr('data-state', 'locked');
-		updateLockSettings(lockId, true);
-		$("#" + fieldId).attr("readonly", true);
+		$('#overlay-toast').html("Settings locked by Admin");
+		showToast();
 	}
 });
 
@@ -68,17 +69,22 @@ $(document).on('click', '.prof-img-lock-item', function(e) {
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
-	if($(this).hasClass('prof-img-lock-locked')) {
-		$(this).removeClass('prof-img-lock-locked');
-		$(this).attr('data-state', 'unlocked');
-		updateLockSettings(lockId, false);
-		$("#" + fieldId).attr("disabled", false);
+	if ($(this).attr('data-control') == 'user') {
+		if($(this).hasClass('prof-img-lock-locked')) {
+			$(this).removeClass('prof-img-lock-locked');
+			$(this).attr('data-state', 'unlocked');
+			updateLockSettings(lockId, false);
+			$("#" + fieldId).attr("disabled", false);
 
+		} else {
+			$(this).addClass('prof-img-lock-locked');
+			$(this).attr('data-state', 'locked');
+			updateLockSettings(lockId, true);
+			$("#" + fieldId).attr("disabled", true);
+		}
 	} else {
-		$(this).addClass('prof-img-lock-locked');
-		$(this).attr('data-state', 'locked');
-		updateLockSettings(lockId, true);
-		$("#" + fieldId).attr("disabled", true);
+		$('#overlay-toast').html("Settings locked by Admin");
+		showToast();
 	}
 });
 
@@ -100,7 +106,7 @@ function callBackUpdateLock () {
 }
 
 
-// TODO Update AboutMe details
+// Update AboutMe details
 function callBackShowAboutMe(data) {
 	$('#intro-about-me').html(data);
 	adjustImage();
@@ -152,7 +158,7 @@ function callBackOnEditAdboutMeDetails(data) {
 }
 
 
-// TODO Update Contact details
+// Update Contact details
 function callBackShowContactDetails(data) {
 	$('#contant-info-container').html(data);
 	adjustImage();
@@ -160,6 +166,10 @@ function callBackShowContactDetails(data) {
 
 // Phone numbers in contact details
 $(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
+	if ($('#prof-all-lock').val() != 'modified') {
+		return;
+	}
+
 	delay(function() {
 		var phoneNumbers = [];
 		$('#contant-info-container input[data-phone-number]').each(function() {
@@ -179,6 +189,7 @@ $(document).on('blur', '#contant-info-container input[data-phone-number]', funct
 });
 
 function callBackOnUpdatePhoneNumbers(data) {
+	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 
@@ -188,6 +199,10 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
+	if ($('#prof-all-lock').val() != 'modified') {
+		return;
+	}
+
 	delay(function() {
 		var webAddresses = [];
 		var i = 0;
@@ -221,6 +236,7 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 });
 
 function callBackOnUpdateWebAddresses(data) {
+	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
 
@@ -228,7 +244,7 @@ function callBackOnUpdateWebAddresses(data) {
 	showToast();
 }
 
-// TODO Update Address detail
+// Update Address detail
 function callBackShowAddressDetails(data) {
 	$('#prof-address-container').html(data);
 	adjustImage();
@@ -288,6 +304,7 @@ function createPopupConfirm(header, body) {
 	$('#overlay-cancel').html("Cancel");
 
 	$('#overlay-main').show();
+	$('#overlay-continue').unbind('click');
 }
 function overlayRevert() {
 	$('#overlay-main').hide();
@@ -301,13 +318,17 @@ function overlayRevert() {
 }
 
 
-// TODO Update Basic detail
+// Update Basic detail
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
+	if ($('#prof-all-lock').val() != 'modified') {
+		return;
+	}
+
 	delay(function() {
 		var profName = $('#prof-name').val().trim();
 		var profTitle = $('#prof-title').val().trim();
@@ -320,6 +341,7 @@ $(document).on('blur', '#prof-basic-container input', function() {
 });
 
 function callBackUpdateBasicDetails(data) {
+	$('#prof-all-lock').val('locked');
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchbasicdetails.do", callBackShowBasicDetails);
 	callAjaxGET("./fetchaddressdetails.do", callBackShowAddressDetails);
@@ -396,7 +418,7 @@ function callBackOnLogoUpload(data) {
 }
 
 
-// TODO Function to populate associations container
+// Function to populate associations container
 function showAssociationList() {
 	callAjaxGET("./fetchassociations.do", callBackShowAssociationList);
 }

@@ -73,6 +73,139 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("afterPropertiesSet called for profile management service");
 	}
 
+	@Override
+	public LockSettings finalizeHigherLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
+			throws InvalidInputException {
+		LOG.info("Method finalizeHigherLockSettings() called from ProfileManagementService");
+		if (user == null) {
+			throw new InvalidInputException("User is not set.");
+		}
+		if (settings == null) {
+			throw new InvalidInputException("Invalid user settings.");
+		}
+		if (accountType == null) {
+			throw new InvalidInputException("Invalid account type.");
+		}
+
+		LockSettings higherLockSettings = null;
+		// Company Admin
+		if (user.isCompanyAdmin()) {
+			higherLockSettings = new LockSettings();
+		}
+
+		switch (accountType) {
+			case INDIVIDUAL:
+			case TEAM:
+				LOG.info("Individual/Team account type");
+				// Individual
+				if (user.isAgent()) {
+					higherLockSettings = settings.getCompanySettings().getLockSettings();
+				}
+				break;
+
+			case COMPANY:
+				LOG.info("Company account type");
+				// Branch Admin
+				if (user.isBranchAdmin()) {
+					higherLockSettings = settings.getCompanySettings().getLockSettings();
+				}
+
+				// Individual
+				else if (user.isAgent()) {
+					higherLockSettings = generateAgentLock(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+				}
+				break;
+
+			case ENTERPRISE:
+				LOG.info("Enterprise account type");
+				// Region Admin
+				if (user.isRegionAdmin()) {
+					higherLockSettings = settings.getCompanySettings().getLockSettings();
+				}
+
+				// Branch Admin
+				else if (user.isBranchAdmin()) {
+					higherLockSettings = generateBranchLock(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+				}
+
+				// Individual
+				else if (user.isAgent()) {
+					higherLockSettings = generateAgentLock(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
+							.getBranchSettings().get(branchId));
+				}
+				break;
+
+			default:
+				throw new InvalidInputException("Account type is invalid in finalizeHigherLockSettings");
+		}
+
+		LOG.info("Method finalizeHigherLockSettings() finished from ProfileManagementService");
+		return higherLockSettings;
+	}
+	
+	private LockSettings generateBranchLock(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("No Settings found");
+		}
+
+		// Company Lock settings
+		LockSettings branchLock = companySettings.getLockSettings();
+
+		// Region Lock settings
+		if (regionSettings != null) {
+			updateLockSettings(regionSettings.getLockSettings(), branchLock);
+		}
+		return branchLock;
+	}
+
+	private LockSettings generateAgentLock(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
+			OrganizationUnitSettings branchSettings) throws InvalidInputException {
+		if (companySettings == null) {
+			throw new InvalidInputException("No Settings found");
+		}
+
+		// Company Lock settings
+		LockSettings agentLock = companySettings.getLockSettings();
+
+		// Region Lock settings
+		if (regionSettings != null) {
+			updateLockSettings(regionSettings.getLockSettings(), agentLock);
+		}
+
+		// Branch Lock settings
+		if (branchSettings != null) {
+			updateLockSettings(branchSettings.getLockSettings(), agentLock);
+		}
+		return agentLock;
+	}
+
+	private void updateLockSettings(LockSettings higherSettings, LockSettings lowerSettings) {
+		if (higherSettings != null) {
+			if (higherSettings.getIsLogoLocked()) {
+				lowerSettings.setLogoLocked(true);
+			}
+			if (higherSettings.getIsDisplayNameLocked()) {
+				lowerSettings.setDisplayNameLocked(true);
+			}
+			if (higherSettings.getIsWebAddressLocked()) {
+				lowerSettings.setLogoLocked(true);
+			}
+			if (higherSettings.getIsWorkPhoneLocked()) {
+				lowerSettings.setWorkPhoneLocked(true);
+			}
+			if (higherSettings.getIsPersonalPhoneLocked()) {
+				lowerSettings.setPersonalPhoneLocked(true);
+			}
+			if (higherSettings.getIsFaxPhoneLocked()) {
+				lowerSettings.setFaxPhoneLocked(true);
+			}
+			if (higherSettings.getIsAboutMeLocked()) {
+				lowerSettings.setAboutMeLocked(true);
+			}
+		}
+	}
+
+	@Override
 	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException {
 		LOG.info("Method finalizeProfileDetail() called from ProfileManagementService");
@@ -87,30 +220,25 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		OrganizationUnitSettings finalSettings = null;
+		// Company Admin
+		if (user.isCompanyAdmin()) {
+			return settings.getCompanySettings();
+		}
+
 		switch (accountType) {
 			case INDIVIDUAL:
 			case TEAM:
 				LOG.info("Individual/Team account type");
-				// Company Admin
-				if (user.isCompanyAdmin()) {
-					finalSettings = settings.getCompanySettings();
-				}
-
 				// Individual
-				else if (user.isAgent()) {
+				if (user.isAgent()) {
 					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings().get(agentId));
 				}
 				break;
 
 			case COMPANY:
 				LOG.info("Company account type");
-				// Company Admin
-				if (user.isCompanyAdmin()) {
-					finalSettings = settings.getCompanySettings();
-				}
-
 				// Branch Admin
-				else if (user.isBranchAdmin()) {
+				if (user.isBranchAdmin()) {
 					finalSettings = generateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
 				}
 
@@ -123,13 +251,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 			case ENTERPRISE:
 				LOG.info("Enterprise account type");
-				// Company Admin
-				if (user.isCompanyAdmin()) {
-					finalSettings = settings.getCompanySettings();
-				}
-
 				// Region Admin
-				else if (user.isRegionAdmin()) {
+				if (user.isRegionAdmin()) {
 					finalSettings = generateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
 				}
 
