@@ -31,5 +31,7 @@ public final class EmailTemplateConstants {
 	public static final String ACCOUNT_DISABLED_MAIL_BODY = "AccountDisabledMailBody.html";
 	public static final String ACCOUNT_UPGRADE_MAIL_SUBJECT = "AccountUpgradeMailSubject.txt";
 	public static final String ACCOUNT_UPGRADE_MAIL_BODY = "AccountUpgradeMailBody.html";
+	public static final String SURVEY_COMPLETION_MAIL_SUBJECT = "SurveyCompletionMailSubject.txt";
+	public static final String SURVEY_COMPLETION_MAIL_BODY = "SurveyCompletionMailBody.html";
 
 }

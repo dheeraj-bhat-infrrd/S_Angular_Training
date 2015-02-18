@@ -6,10 +6,7 @@
 <c:choose>
 	<c:when test="${not empty achievements}">
 		<c:forEach items="${achievements}" var="achievement">
-		<div class="clearfix lp-ach-wrp">
 			<input class="float-left lp-ach-item-txt lp-ach-row lp-row clearfix prof-edditable-sin" value="${achievement.achievement}">
-			<div class="float-left lp-ach-item-img"></div>
-		</div>
 		</c:forEach>
 	</c:when>
 	<c:otherwise>

@@ -110,6 +110,27 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_COMPANY;
 	}
 
+	// TODO
+	private LockSettings fetchHigherLockSettings(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+		LockSettings higherSettings = null;
+		try {
+			long branchId = user.getUserProfiles().get(0).getBranchId();
+			long regionId = user.getUserProfiles().get(0).getRegionId();
+			LOG.info("branchId: " + branchId + ", regionId: " + regionId);
+			higherSettings = profileManagementService.finalizeHigherLockSettings(user, accountType, settings, branchId, regionId);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return higherSettings;
+	}
+
 	private OrganizationUnitSettings fetchProfile(Model model, HttpServletRequest request) {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
@@ -130,10 +151,13 @@ public class ProfileManagementController {
 		}
 		return profile;
 	}
-
+	
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfilePage(Model model, HttpServletRequest request) {
 		LOG.info("Starting the ProfileEdit page");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_EDIT;
@@ -142,6 +166,9 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
 	public String fetchProfileAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile aboutme");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_ABOUT_ME;
@@ -150,6 +177,9 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchcontactdetails", method = RequestMethod.GET)
 	public String fetchContactDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing contact details for profile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_CONTACT_DETAILS;
@@ -158,6 +188,9 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchbasicdetails", method = RequestMethod.GET)
 	public String fetchBasicDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing basic details for rofile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
 		return JspResolver.PROFILE_BASIC_DETAILS;
@@ -166,45 +199,55 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchaddressdetails", method = RequestMethod.GET)
 	public String fetchAddressDetails(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing basic details for rofile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchaddressdetailsedit", method = RequestMethod.GET)
 	public String fetchAddressDetailsEdit(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing basic details for rofile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_ADDRESS_DETAILS_EDIT;
 	}
 
 	@RequestMapping(value = "/fetchprofileimage", method = RequestMethod.GET)
 	public String fetchProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile image");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_IMAGE;
 	}
 
 	@RequestMapping(value = "/fetchprofilelogo", method = RequestMethod.GET)
 	public String fetchProfileLogo(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile logo");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_LOGO;
 	}
 
 	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
 	public String fetchProfileSocialLinks(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing profile links");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
@@ -212,9 +255,11 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
 	public String fetchAssociations(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing association list for profile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_ASSOCIATIONS;
 	}
 
@@ -222,9 +267,11 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
 	public String fetchAchievements(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing achievement list for profile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_ACHIEVEMENTS;
 	}
 
@@ -232,9 +279,11 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
 	public String fetchLicences(Model model, HttpServletRequest request) {
 		LOG.info("Fecthing license details for profile");
+		LockSettings higherLock = fetchHigherLockSettings(model, request);
+		model.addAttribute("higherLock", higherLock);
+
 		OrganizationUnitSettings profile = fetchProfile(model, request);
 		model.addAttribute("profile", profile);
-
 		return JspResolver.PROFILE_LICENSES;
 	}
 
@@ -994,6 +1043,87 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+/*	@RequestMapping(value = "/updateprofileimagecrop", method = RequestMethod.POST)
+	public String updateProfileImageCropped(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
+		LOG.info("Update profile image");
+		User user = sessionHelper.getCurrentUser();
+		String imageName = "";
+
+		try {
+			HttpSession session = request.getSession(false);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String logoFileName = request.getParameter("logoFileName");
+			try {
+				if (logoFileName == null || logoFileName.isEmpty()) {
+					throw new InvalidInputException("Logo passed is null or empty");
+				}
+				imageName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
+				imageName = endpoint + "/" + bucket + "/" +imageName;
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("Error occurred while updating logo.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, imageName);
+				companySettings.setProfileImageUrl(imageName);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = user.getUserProfiles().get(0).getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, imageName);
+				regionSettings.setProfileImageUrl(imageName);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = user.getUserProfiles().get(0).getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, imageName);
+				branchSettings.setProfileImageUrl(imageName);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				long agentId = user.getUserProfiles().get(0).getAgentId();
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, imageName);
+				agentSettings.setProfileImageUrl(imageName);
+				userSettings.getAgentSettings().put(agentId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+			sessionHelper.setProfileImageInSession(session, userSettings);
+			LOG.info("Logo uploaded successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}*/
+	
 	/**
 	 * Method to update email id for profile
 	 * 
@@ -1921,14 +2051,14 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			OrganizationUnitSettings lockedDetail = fetchProfile(model, request);
+			LockSettings higherLock = fetchHigherLockSettings(model, request);
 			if (user.isCompanyAdmin()) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				lockSettings = companySettings.getLockSettings();
-				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), user, fieldId, fieldState);
+				lockSettings = updateLockSettings(lockSettings, higherLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						companySettings, lockSettings);
 				companySettings.setLockSettings(lockSettings);
@@ -1941,7 +2071,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				lockSettings = regionSettings.getLockSettings();
-				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), user, fieldId, fieldState);
+				lockSettings = updateLockSettings(lockSettings, higherLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, lockSettings);
 				regionSettings.setLockSettings(lockSettings);
@@ -1954,7 +2084,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				lockSettings = branchSettings.getLockSettings();
-				updateLockSettings(lockSettings, lockedDetail.getLockSettings(), user, fieldId, fieldState);
+				lockSettings = updateLockSettings(lockSettings, higherLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
 				LOG.info(lockSettings.getIsDisplayNameLocked()+"");
@@ -1976,43 +2106,44 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	private void updateLockSettings(LockSettings lockSettings, LockSettings lockedDetail, User user, String fieldId, boolean status) {
+	private LockSettings updateLockSettings(LockSettings lockSettings, LockSettings higherLock, String fieldId, boolean status) {
 		switch (fieldId) {
 			case "prof-name-lock":
-				if (!lockedDetail.getIsDisplayNameLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsDisplayNameLocked()) {
 					lockSettings.setDisplayNameLocked(status);
 				}
 				break;
 			case "prof-logo-lock":
-				if (!lockedDetail.getIsLogoLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsLogoLocked()) {
 					lockSettings.setLogoLocked(status);
 				}
 				break;
 			case "web-address-work-lock":
-				if (!lockedDetail.getIsWebAddressLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsWebAddressLocked()) {
 					lockSettings.setWebAddressLocked(status);;
 				}
 				break;
 			case "phone-number-work-lock":
-				if (!lockedDetail.getIsWorkPhoneLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsWorkPhoneLocked()) {
 					lockSettings.setWorkPhoneLocked(status);
 				}
 				break;
 			case "phone-number-personal-lock":
-				if (!lockedDetail.getIsPersonalPhoneLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsPersonalPhoneLocked()) {
 					lockSettings.setPersonalPhoneLocked(status);
 				}
 				break;
 			case "phone-number-fax-lock":
-				if (!lockedDetail.getIsFaxPhoneLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsFaxPhoneLocked()) {
 					lockSettings.setFaxPhoneLocked(status);
 				}
 				break;
 			case "aboutme-lock":
-				if (!lockedDetail.getIsAboutMeLocked() || user.isCompanyAdmin()) {
+				if (!higherLock.getIsAboutMeLocked()) {
 					lockSettings.setAboutMeLocked(status);
 				}
 				break;
 		}
+		return lockSettings;
 	}
 }
