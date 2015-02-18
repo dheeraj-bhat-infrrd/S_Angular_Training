@@ -43,12 +43,12 @@ public class SurveyCompanyMapping implements Serializable {
 	private int status;
 
 	// bi-directional many-to-one association to Survey
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "SURVEY_ID")
 	private Survey survey;
 
 	// bi-directional many-to-one association to Company
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
