@@ -99,78 +99,7 @@
                         <input type="hidden" id="branchid-hidden"/>
                         
                         <div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-                            <!-- <div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0" id="comp-regions">
-                                <div class="lp-sub-header clearfix flat-left-bord">
-                                    <div class="lp-sub-img icn-company"></div>
-                                    <div class="lp-sub-txt">Northern Providential</div>
-                                    <div class="lpsub-2">
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Connecticut</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Rhode Island</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Washington</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Seattle</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l2 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn icn-rgn-blue"></div>
-                                                <div class="lp-sub-txt">Portland</div>
-                                                <div class="lpsub-2">
-                                                    <div class="lp-sub lp-sub-l3 bord-left-panel">
-                                                        <div class="lp-sub-header clearfix flat-left-bord">
-                                                            <div class="lp-sub-img icn-psn1"></div>
-                                                            <div class="lp-sub-txt">Gina</div>
-                                                            <div class="lpsub-2"></div>
-                                                        </div>
-                                                    </div>
-                                                    <div class="lp-sub lp-sub-l3 bord-left-panel">
-                                                        <div class="lp-sub-header clearfix flat-left-bord">
-                                                            <div class="lp-sub-img icn-psn2"></div>
-                                                            <div class="lp-sub-txt">Matt</div>
-                                                            <div class="lpsub-2"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Northern Providential</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                        <div class="lp-sub lp-sub-l1 bord-left-panel">
-                                            <div class="lp-sub-header clearfix flat-left-bord">
-                                                <div class="lp-sub-img icn-rgn"></div>
-                                                <div class="lp-sub-txt">Northern Providential</div>
-                                                <div class="lpsub-2"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div> -->
+                            <!--Company hierarchy is displayed here  -->
                         </div>
                     </div>
                 </div>
@@ -185,22 +114,6 @@
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Tweets</div>
                         <div class="tweet-panel tweet-panel-left">
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
-                                <div class="tweet-icn icn-tweet float-left"></div>
-                                <div class="tweet-txt float-left">
-                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
-                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
-                                </div>
-                            </div>
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
-                                <div class="tweet-icn icn-tweet float-left"></div>
-                                <div class="tweet-txt float-left">
-                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
-                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
-                                </div>
-                            </div>
                             <div class="tweet-panel-item bord-bot-dc clearfix">
                                 <div class="tweet-icn icn-tweet float-left"></div>
                                 <div class="tweet-txt float-left">
@@ -251,16 +164,6 @@
         fetchCompanyProfile();
         $(window).resize(adjustImage);
         
-        /* $('.icn-plus-open').click(function(){
-            $(this).hide();
-            $(this).parent().find('.ppl-share-social,.icn-remove').show();
-        });
-        
-        $('.icn-remove').click(function(){
-            $(this).hide();
-            $(this).parent().find('.ppl-share-social').hide();
-            $(this).parent().find('.icn-plus-open').show();
-        }); */        
         $('.icn-person').click(function(){
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');

@@ -81,6 +81,8 @@ public interface CommonConstants {
 	public static final String IS_UNASSIGN_ADMIN = "NO";
 	public static final int MAX_DEFAULT_REGIONS=1;
 	public static final int MAX_DEFAULT_BRANCHES=1;
+	public static final double MIN_RATING_SCORE = 1;
+	public static final double MAX_RATING_SCORE = 5;
 
 	/**
 	 * Hibernate entities and column name constants
@@ -291,7 +293,8 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE = 122;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE = 123;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE = 124;
-
+	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_FAILURE = 125;
+	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
 	/**
 	 * Service codes
 	 */
@@ -308,4 +311,5 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_INDIVIDUAL_PROFILE = 110;
 	public static final int SERVICE_CODE_COMPANY_REVIEWS = 111;
 	public static final int SERVICE_CODE_COMPANY_AVERAGE_RATINGS = 112;
+	public static final int SERVICE_CODE_COMPANY_REVIEWS_COUNT = 113;
 }

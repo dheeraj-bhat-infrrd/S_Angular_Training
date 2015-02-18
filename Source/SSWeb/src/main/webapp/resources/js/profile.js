@@ -99,12 +99,17 @@ function paintCompanyProfile(data) {
 		fetchCompanyRegions();
 		fetchCompanyBranches();
 		fetchCompanyIndividuals();
-		fetchReviewsForCompany(result.iden);
+		
+		var minScore = 0;
+		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+			minScore = result.survey_settings.show_survey_above_score;
+		}
+		fetchReviewsForCompany(result.iden,minScore);
 	}
 }
 
 function fetchAverageRatings(companyId) {
-	var url = window.location.origin +'/rest/profile/ratings/company/'+companyId;
+	var url = window.location.origin +'/rest/profile/company/'+companyId+'/ratings';
 	callAjaxGET(url, paintAverageRatings, true);
 }
 
@@ -307,8 +312,12 @@ function paintCompanyBranches(data) {
 		}
 	}
 }
-function fetchReviewsForCompany(companyId) {
-	var url = window.location.origin +'/rest/profile/reviews/company/'+companyId;
+
+function fetchReviewsForCompany(companyId,minScore) {
+	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviews';
+	if(minScore != undefined) {
+		url = url +"?minScore="+minScore;
+	}
 	callAjaxGET(url, paintReviewsForCompany, true);
 }
 
