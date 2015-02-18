@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
@@ -70,9 +69,6 @@ public class UserManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
-
-	@Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	// JIRA SS-42 BY RM05 BOC
 	/*
@@ -146,7 +142,7 @@ public class UserManagementController {
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
 						
 						LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
-						organizationUnitSettingsDao.insertAgentSettings(user);
+						userManagementService.insertAgentSettings(user);
 						LOG.debug("Added newly added user {} to mongo", user.getFirstName());
 
 						LOG.debug("Adding newly added user {} to solr", user.getFirstName());
@@ -850,7 +846,7 @@ public class UserManagementController {
 			HttpSession session = request.getSession(true);
 
 			LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
-			organizationUnitSettingsDao.insertAgentSettings(user);
+			userManagementService.insertAgentSettings(user);
 			LOG.debug("Added newly added user {} to mongo", user.getFirstName());
 
 			LOG.debug("Adding newly registered user to principal session");

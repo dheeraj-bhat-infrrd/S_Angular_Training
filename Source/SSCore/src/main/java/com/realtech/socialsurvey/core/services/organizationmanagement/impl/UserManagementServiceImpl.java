@@ -1664,4 +1664,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method isModifiableByCurrentUser() finished to check if {} can modify {}", admin.getFirstName(), user.getFirstName());
 		return false;
 	}*/
+	
+
+	@Override
+	public void insertAgentSettings(User user) {
+		LOG.info("Inserting agent settings. User id: " + user.getUserId());
+		AgentSettings agentSettings = new AgentSettings();
+		agentSettings.setIden(user.getUserId());
+		agentSettings.setCreatedBy(user.getCreatedBy());
+		agentSettings.setCreatedOn(System.currentTimeMillis());
+		agentSettings.setModifiedBy(user.getModifiedBy());
+		agentSettings.setModifiedOn(System.currentTimeMillis());
+
+		
+		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
+		LOG.info("Inserted into agent settings");
+	}
 }
