@@ -431,6 +431,43 @@ public class ProfileController {
 	}
 
 	/**
+	 * Service to fetch individuals for the provided region id
+	 * 
+	 * @param regionId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/region/{regionId}/individuals")
+	public Response getIndividualsByRegionId(@PathVariable long regionId) {
+		LOG.info("Service to fetch individuals for region called for regionId:" + regionId);
+		Response response = null;
+		try {
+			if (regionId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Region id is invalid"),
+						"region id is invalid while fetching all individuals for the region");
+			}
+			try {
+				List<AgentSettings> individuals = profileManagementService.getIndividualsByRegionId(regionId);
+				String json = new Gson().toJson(individuals);
+				LOG.debug("individuals json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_INDIVIDUALS_FETCH_SERVICE_FAILURE,
+						CommonConstants.SERVICE_CODE_FETCH_REGION_INDIVIDUALS, "Something went wrong while fetching individuals under region"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to fetch individuals for region executed successfully");
+		return response;
+	}
+
+	/**
 	 * Service to get all individuals directly linked to the specified region
 	 * 
 	 * @param companyProfileName

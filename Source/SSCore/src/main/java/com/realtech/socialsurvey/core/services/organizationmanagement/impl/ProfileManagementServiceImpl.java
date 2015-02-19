@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 @DependsOn("generic")
 @Component
@@ -67,6 +68,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private Utils utils;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -626,23 +630,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		List<AgentSettings> users = null;
 		OrganizationUnitSettings regionSettings = getRegionByProfileName(companyProfileName, regionProfileName);
 		if (regionSettings != null) {
-			Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionSettings.getIden());
-
-			Map<String, Object> queries = new HashMap<String, Object>();
-			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-			queries.put(CommonConstants.REGION_ID_COLUMN, regionSettings.getIden());
-			queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
-
-			LOG.debug("calling method to fetch user profiles under region :" + regionProfileName);
-			List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
-
-			if (userProfiles != null && !userProfiles.isEmpty()) {
-				LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
-				users = new ArrayList<AgentSettings>();
-				for (UserProfile userProfile : userProfiles) {
-					users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
-				}
-			}
+			users = getIndividualsByRegionId(regionSettings.getIden());
 		}
 
 		LOG.info("Method getIndividualsForRegion executed successfully");
@@ -809,6 +797,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 		if (userProfiles != null && !userProfiles.isEmpty()) {
 			users = new ArrayList<AgentSettings>();
@@ -828,6 +818,40 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		reviewsCount = surveyDetailsDao.getFeedBacksCount(CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore);
 		LOG.info("Method getReviewsCountForCompany executed successfully");
 		return reviewsCount;
+	}
+
+	/**
+	 * Method to fetch all users under the specified region
+	 */
+	@Override
+	@Transactional
+	public List<AgentSettings> getIndividualsByRegionId(long regionId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getIndividualsByRegionId called for regionId: " + regionId);
+		List<AgentSettings> users = null;
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is not set for getIndividualsByRegionId");
+		}
+		Branch defaultBranch = organizationManagementService.getDefaultBranchForRegion(regionId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.REGION_ID_COLUMN, regionId);
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, defaultBranch.getBranchId());
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
+
+		LOG.debug("calling method to fetch user profiles under region :" + regionId);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			LOG.debug("Obtained userProfiles with size : " + userProfiles.size());
+			users = new ArrayList<AgentSettings>();
+			for (UserProfile userProfile : userProfiles) {
+				users.add(organizationUnitSettingsDao.fetchAgentSettingsById(userProfile.getUser().getUserId()));
+			}
+		}
+		LOG.info("Method getIndividualsByRegionId executed successfully");
+		return users;
 	}
 
 }
