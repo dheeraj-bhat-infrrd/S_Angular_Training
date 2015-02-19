@@ -567,7 +567,8 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/company/{companyId}/reviews")
 	public Response getReviewsForCompany(@PathVariable long companyId, @QueryParam(value = "minScore") Double minScore,
-			@QueryParam(value = "maxScore") Double maxScore) {
+			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
 		LOG.info("Service to fetch reviews of company called for companyId:" + companyId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
 		Response response = null;
 		try {
@@ -582,8 +583,14 @@ public class ProfileController {
 			if (maxScore == null) {
 				maxScore = CommonConstants.MAX_RATING_SCORE;
 			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
 			try {
-				List<SurveyDetails> reviews = profileManagementService.getReviewsForCompany(companyId, minScore, maxScore);
+				List<SurveyDetails> reviews = profileManagementService.getReviewsForCompany(companyId, minScore, maxScore, start, numRows);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();

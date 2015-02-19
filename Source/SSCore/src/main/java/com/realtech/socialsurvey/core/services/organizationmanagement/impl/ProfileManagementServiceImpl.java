@@ -734,9 +734,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to get aggregated reviews of all agents of a company
 	 */
 	@Override
-	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore) throws InvalidInputException {
+	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore, int startIndex, int numOfRows)
+			throws InvalidInputException {
 		LOG.info("Method getReviewsForCompany called for companyId:" + companyId + " and limitScore:" + limitScore);
-		List<SurveyDetails> surveyDetails = surveyDetailsDao.getFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId, startScore, limitScore);
+		List<SurveyDetails> surveyDetails = surveyDetailsDao.getFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId,startIndex,numOfRows, startScore, limitScore);
 		LOG.info("Method getReviewsForCompany executed successfully");
 		return surveyDetails;
 	}

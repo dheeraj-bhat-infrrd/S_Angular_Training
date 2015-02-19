@@ -163,7 +163,7 @@ public interface ProfileManagementService {
 	 * @param branchId
 	 * @return
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws NoRecordsFetchedException
 	 */
 	public List<AgentSettings> getIndividualsByRegionId(long regionId) throws InvalidInputException, NoRecordsFetchedException;
 
@@ -223,10 +223,13 @@ public interface ProfileManagementService {
 	 * @param companyId
 	 * @param startScore
 	 * @param limitScore
+	 * @param startIndex
+	 * @param numOfRows
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore) throws InvalidInputException;
+	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore, int startIndex, int numOfRows)
+			throws InvalidInputException;
 
 	/**
 	 * Method to get the average rating of all individuals of a company
