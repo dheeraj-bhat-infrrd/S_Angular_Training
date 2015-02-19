@@ -12,13 +12,13 @@
 						</div>
 						<div class="float-left">
 							<c:choose>
-								<c:when	test="${higherLock.isAboutMeLocked && not user.agent}">
-									<div id="aboutme-lock" data-state="locked" data-control="higher" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+								<c:when	test="${parentLock.isAboutMeLocked && not user.agent}">
+									<div id="aboutme-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</c:when>
-								<c:when	test="${not higherLock.isAboutMeLocked && lock.isAboutMeLocked && not user.agent}">
+								<c:when	test="${not parentLock.isAboutMeLocked && lock.isAboutMeLocked && not user.agent}">
 									<div id="aboutme-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</c:when>
-								<c:when	test="${not higherLock.isAboutMeLocked && not lock.isAboutMeLocked && not user.agent}">
+								<c:when	test="${not parentLock.isAboutMeLocked && not lock.isAboutMeLocked && not user.agent}">
 									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 								</c:when>
 							</c:choose>

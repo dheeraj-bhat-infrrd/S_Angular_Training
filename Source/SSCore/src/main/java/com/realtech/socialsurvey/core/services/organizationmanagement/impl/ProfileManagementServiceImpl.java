@@ -74,9 +74,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public LockSettings finalizeHigherLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
+	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
 			throws InvalidInputException {
-		LOG.info("Method finalizeHigherLockSettings() called from ProfileManagementService");
+		LOG.info("Method aggregateParentLockSettings() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
 		}
@@ -87,129 +87,144 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("Invalid account type.");
 		}
 
-		LockSettings higherLockSettings = null;
-		// Company Admin
+		LockSettings parentLockSettings = null;
+		// If user is Company Admin, Lock settings would be default
 		if (user.isCompanyAdmin()) {
-			higherLockSettings = new LockSettings();
+			LOG.debug("Setting default LockSettings for Company Admin");
+			parentLockSettings = new LockSettings();
 		}
 
-		switch (accountType) {
-			case INDIVIDUAL:
-			case TEAM:
-				LOG.info("Individual/Team account type");
-				// Individual
-				if (user.isAgent()) {
-					higherLockSettings = settings.getCompanySettings().getLockSettings();
-				}
-				break;
+		// If user is not Company Admin, Lock settings need to be aggregated
+		else {
+			switch (accountType) {
+				case INDIVIDUAL:
+				case TEAM:
+					// Individual
+					if (user.isAgent()) {
+						LOG.debug("Setting company LockSettings for Agent of Individual/Team account type");
+						parentLockSettings = settings.getCompanySettings().getLockSettings();
+					}
+					break;
 
-			case COMPANY:
-				LOG.info("Company account type");
-				// Branch Admin
-				if (user.isBranchAdmin()) {
-					higherLockSettings = settings.getCompanySettings().getLockSettings();
-				}
+				case COMPANY:
+					// Branch Admin
+					if (user.isBranchAdmin()) {
+						LOG.debug("Setting company LockSettings for Branch Admin of Company account type");
+						parentLockSettings = settings.getCompanySettings().getLockSettings();
+					}
 
-				// Individual
-				else if (user.isAgent()) {
-					higherLockSettings = generateAgentLock(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
-				}
-				break;
+					// Individual
+					else if (user.isAgent()) {
+						LOG.debug("Aggregating LockSettings till Branch for Agent of Company account type");
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+					}
+					break;
 
-			case ENTERPRISE:
-				LOG.info("Enterprise account type");
-				// Region Admin
-				if (user.isRegionAdmin()) {
-					higherLockSettings = settings.getCompanySettings().getLockSettings();
-				}
+				case ENTERPRISE:
+					// Region Admin
+					if (user.isRegionAdmin()) {
+						LOG.debug("Setting company LockSettings for Region Admin of Enterprise account type");
+						parentLockSettings = settings.getCompanySettings().getLockSettings();
+					}
 
-				// Branch Admin
-				else if (user.isBranchAdmin()) {
-					higherLockSettings = generateBranchLock(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
-				}
+					// Branch Admin
+					else if (user.isBranchAdmin()) {
+						LOG.debug("Aggregating LockSettings till Region for Branch Admin of Enterprise account type");
+						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+					}
 
-				// Individual
-				else if (user.isAgent()) {
-					higherLockSettings = generateAgentLock(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-							.getBranchSettings().get(branchId));
-				}
-				break;
+					// Individual
+					else if (user.isAgent()) {
+						LOG.debug("Aggregating LockSettings till Branch for Agent of Enterprise account type");
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
+								.getBranchSettings().get(branchId));
+					}
+					break;
 
-			default:
-				throw new InvalidInputException("Account type is invalid in finalizeHigherLockSettings");
+				default:
+					throw new InvalidInputException("Account type is invalid in aggregateParentLockSettings");
+			}
 		}
-
-		LOG.info("Method finalizeHigherLockSettings() finished from ProfileManagementService");
-		return higherLockSettings;
+		LOG.info("Method aggregateParentLockSettings() finished from ProfileManagementService");
+		return parentLockSettings;
 	}
 
-	private LockSettings generateBranchLock(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings)
+	private LockSettings lockSettingsTillRegion(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings)
 			throws InvalidInputException {
+		LOG.debug("Method lockSettingsTillRegion() called from ProfileManagementService");
 		if (companySettings == null) {
 			throw new InvalidInputException("No Settings found");
 		}
 
-		// Company Lock settings
-		LockSettings branchLock = companySettings.getLockSettings();
+		// Fetching Company Lock settings
+		LockSettings parentLock = companySettings.getLockSettings();
 
-		// Region Lock settings
+		// Aggregate Region Lock settings if exists
 		if (regionSettings != null) {
-			updateLockSettings(regionSettings.getLockSettings(), branchLock);
+			parentLock = aggregateLockSettings(regionSettings.getLockSettings(), parentLock);
 		}
-		return branchLock;
+		LOG.debug("Method lockSettingsTillRegion() finished from ProfileManagementService");
+		return parentLock;
 	}
 
-	private LockSettings generateAgentLock(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
+	private LockSettings lockSettingsTillBranch(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
 			OrganizationUnitSettings branchSettings) throws InvalidInputException {
+		LOG.debug("Method lockSettingsTillBranch() called from ProfileManagementService");
 		if (companySettings == null) {
 			throw new InvalidInputException("No Settings found");
 		}
 
-		// Company Lock settings
-		LockSettings agentLock = companySettings.getLockSettings();
+		// Fetching Company Lock settings
+		LockSettings parentLock = companySettings.getLockSettings();
 
-		// Region Lock settings
+		// Aggregate Region Lock settings if exists
 		if (regionSettings != null) {
-			updateLockSettings(regionSettings.getLockSettings(), agentLock);
+			parentLock = aggregateLockSettings(regionSettings.getLockSettings(), parentLock);
 		}
 
-		// Branch Lock settings
+		// Aggregate Branch Lock settings if exists
 		if (branchSettings != null) {
-			updateLockSettings(branchSettings.getLockSettings(), agentLock);
+			parentLock = aggregateLockSettings(branchSettings.getLockSettings(), parentLock);
 		}
-		return agentLock;
+		LOG.debug("Method lockSettingsTillBranch() finished from ProfileManagementService");
+		return parentLock;
 	}
 
-	private void updateLockSettings(LockSettings higherSettings, LockSettings lowerSettings) {
-		if (higherSettings != null) {
-			if (higherSettings.getIsLogoLocked()) {
-				lowerSettings.setLogoLocked(true);
+	private LockSettings aggregateLockSettings(LockSettings higherLock, LockSettings parentLock) {
+		LOG.debug("Method aggregateLockSettings() called from ProfileManagementService");
+		
+		// Aggregate parentLockSettings with higherLockSettings
+		if (higherLock != null) {
+			if (higherLock.getIsLogoLocked()) {
+				parentLock.setLogoLocked(true);
 			}
-			if (higherSettings.getIsDisplayNameLocked()) {
-				lowerSettings.setDisplayNameLocked(true);
+			if (higherLock.getIsDisplayNameLocked()) {
+				parentLock.setDisplayNameLocked(true);
 			}
-			if (higherSettings.getIsWebAddressLocked()) {
-				lowerSettings.setLogoLocked(true);
+			if (higherLock.getIsWebAddressLocked()) {
+				parentLock.setLogoLocked(true);
 			}
-			if (higherSettings.getIsWorkPhoneLocked()) {
-				lowerSettings.setWorkPhoneLocked(true);
+			if (higherLock.getIsWorkPhoneLocked()) {
+				parentLock.setWorkPhoneLocked(true);
 			}
-			if (higherSettings.getIsPersonalPhoneLocked()) {
-				lowerSettings.setPersonalPhoneLocked(true);
+			if (higherLock.getIsPersonalPhoneLocked()) {
+				parentLock.setPersonalPhoneLocked(true);
 			}
-			if (higherSettings.getIsFaxPhoneLocked()) {
-				lowerSettings.setFaxPhoneLocked(true);
+			if (higherLock.getIsFaxPhoneLocked()) {
+				parentLock.setFaxPhoneLocked(true);
 			}
-			if (higherSettings.getIsAboutMeLocked()) {
-				lowerSettings.setAboutMeLocked(true);
+			if (higherLock.getIsAboutMeLocked()) {
+				parentLock.setAboutMeLocked(true);
 			}
 		}
+		LOG.debug("Method aggregateLockSettings() finished from ProfileManagementService");
+		return parentLock;
 	}
 
 	@Override
-	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
+	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException {
-		LOG.info("Method finalizeProfileDetail() called from ProfileManagementService");
+		LOG.info("Method aggregateUserProfile() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
 		}
@@ -220,155 +235,173 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("Invalid account type.");
 		}
 
-		OrganizationUnitSettings finalSettings = null;
-		// Company Admin
+		OrganizationUnitSettings userProfile = null;
+		// If user is Company Admin, returning CompanyAdmin Profile
 		if (user.isCompanyAdmin()) {
-			return settings.getCompanySettings();
+			LOG.debug("Setting Company Profile for Company Admin");
+			userProfile = settings.getCompanySettings();
 		}
+		
+		// If user is not Company Admin, Profile need to be aggregated
+		else {
+			switch (accountType) {
+				case INDIVIDUAL:
+				case TEAM:
+					// Individual
+					if (user.isAgent()) {
+						LOG.debug("Aggregate Profile for Agent of Individual/Team account type");
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings().get(agentId));
+					}
+					break;
 
-		switch (accountType) {
-			case INDIVIDUAL:
-			case TEAM:
-				LOG.info("Individual/Team account type");
-				// Individual
-				if (user.isAgent()) {
-					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings().get(agentId));
-				}
-				break;
+				case COMPANY:
+					LOG.info("Company account type");
+					// Branch Admin
+					if (user.isBranchAdmin()) {
+						LOG.debug("Aggregate Profile for BranchAdmin of Company account type");
+						userProfile = aggregateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
+					}
 
-			case COMPANY:
-				LOG.info("Company account type");
-				// Branch Admin
-				if (user.isBranchAdmin()) {
-					finalSettings = generateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
-				}
+					// Individual
+					else if (user.isAgent()) {
+						LOG.debug("Aggregate Profile for Agent of Company account type");
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId), settings
+								.getAgentSettings().get(agentId));
+					}
+					break;
 
-				// Individual
-				else if (user.isAgent()) {
-					finalSettings = generateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId), settings
-							.getAgentSettings().get(agentId));
-				}
-				break;
+				case ENTERPRISE:
+					LOG.info("Enterprise account type");
+					// Region Admin
+					if (user.isRegionAdmin()) {
+						LOG.debug("Aggregate Profile for RegionAdmin of Enterprise account type");
+						userProfile = aggregateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
+					}
 
-			case ENTERPRISE:
-				LOG.info("Enterprise account type");
-				// Region Admin
-				if (user.isRegionAdmin()) {
-					finalSettings = generateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
-				}
+					// Branch Admin
+					else if (user.isBranchAdmin()) {
+						LOG.debug("Aggregate Profile for BranchAdmin of Enterprise account type");
+						userProfile = aggregateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
+								.getBranchSettings().get(branchId));
+					}
 
-				// Branch Admin
-				else if (user.isBranchAdmin()) {
-					finalSettings = generateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-							.getBranchSettings().get(branchId));
-				}
+					// Individual
+					else if (user.isAgent()) {
+						LOG.debug("Aggregate Profile for Agent of Enterprise account type");
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
+								.getBranchSettings().get(branchId), settings.getAgentSettings().get(agentId));
+					}
+					break;
 
-				// Individual
-				else if (user.isAgent()) {
-					finalSettings = generateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-							.getBranchSettings().get(branchId), settings.getAgentSettings().get(agentId));
-				}
-				break;
-
-			default:
-				throw new InvalidInputException("Account type is invalid in finalizeProfileDetail");
+				default:
+					throw new InvalidInputException("Account type is invalid in aggregateUserProfile");
+			}
 		}
-
-		LOG.info("Method finalizeProfileDetail() finished from ProfileManagementService");
-		return finalSettings;
+		LOG.info("Method aggregateUserProfile() finished from ProfileManagementService");
+		return userProfile;
 	}
 
-	private OrganizationUnitSettings generateRegionProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings)
+	private OrganizationUnitSettings aggregateRegionProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings)
 			throws InvalidInputException {
+		LOG.debug("Method aggregateRegionProfile() called from ProfileManagementService");
 		if (companySettings == null || regionSettings == null) {
 			throw new InvalidInputException("No Settings found");
 		}
 
-		// Company Lock settings
-		LockSettings regionLock = new LockSettings();
-		updateSettings(companySettings, regionSettings, regionLock);
+		// Aggregate Company Profile settings
+		LockSettings userLock = new LockSettings();
+		regionSettings = aggregateProfileData(companySettings, regionSettings, userLock);
 
-		regionSettings.setLockSettings(regionLock);
+		regionSettings.setLockSettings(userLock);
+		LOG.debug("Method aggregateRegionProfile() finished from ProfileManagementService");
 		return regionSettings;
 	}
 
-	private OrganizationUnitSettings generateBranchProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
+	private OrganizationUnitSettings aggregateBranchProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
 			OrganizationUnitSettings branchSettings) throws InvalidInputException {
+		LOG.debug("Method aggregateBranchProfile() called from ProfileManagementService");
 		if (companySettings == null || branchSettings == null) {
 			throw new InvalidInputException("No Settings found");
 		}
 
-		// Company Lock settings
-		LockSettings branchLock = new LockSettings();
-		updateSettings(companySettings, branchSettings, branchLock);
+		// Aggregate Company Profile settings
+		LockSettings userLock = new LockSettings();
+		branchSettings = aggregateProfileData(companySettings, branchSettings, userLock);
 
-		// Region Lock settings
+		// Aggregate Region Profile settings if exists
 		if (regionSettings != null) {
-			updateSettings(regionSettings, branchSettings, branchLock);
+			branchSettings = aggregateProfileData(regionSettings, branchSettings, userLock);
 		}
 
-		branchSettings.setLockSettings(branchLock);
+		branchSettings.setLockSettings(userLock);
+		LOG.debug("Method aggregateBranchProfile() finished from ProfileManagementService");
 		return branchSettings;
 	}
 
-	private AgentSettings generateAgentProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
-			OrganizationUnitSettings branchSettings, AgentSettings agentSettings) throws InvalidInputException {
+	private OrganizationUnitSettings aggregateAgentProfile(OrganizationUnitSettings companySettings, OrganizationUnitSettings regionSettings,
+			OrganizationUnitSettings branchSettings, OrganizationUnitSettings agentSettings) throws InvalidInputException {
+		LOG.debug("Method aggregateAgentProfile() called from ProfileManagementService");
 		if (companySettings == null || agentSettings == null) {
 			throw new InvalidInputException("No Settings found");
 		}
 
-		// Company Lock settings
-		LockSettings agentLock = new LockSettings();
-		updateSettings(companySettings, agentSettings, agentLock);
+		// Aggregate Company Profile settings
+		LockSettings userLock = new LockSettings();
+		agentSettings = aggregateProfileData(companySettings, agentSettings, userLock);
 
-		// Region Lock settings
+		// Aggregate Region Profile settings if exists
 		if (regionSettings != null) {
-			updateSettings(regionSettings, agentSettings, agentLock);
+			agentSettings = aggregateProfileData(regionSettings, agentSettings, userLock);
 		}
 
-		// Branch Lock settings
+		// Aggregate Branch Profile settings if exists
 		if (branchSettings != null) {
-			updateSettings(branchSettings, agentSettings, agentLock);
+			agentSettings = aggregateProfileData(branchSettings, agentSettings, userLock);
 		}
 
-		agentSettings.setLockSettings(agentLock);
+		agentSettings.setLockSettings(userLock);
+		LOG.debug("Method aggregateAgentProfile() finished from ProfileManagementService");
 		return agentSettings;
 	}
 
-	private void updateSettings(OrganizationUnitSettings higherSettings, OrganizationUnitSettings lowerSettings, LockSettings finalLock) {
-		LockSettings lock = higherSettings.getLockSettings();
-		if (lock != null) {
-			if (lock.getIsLogoLocked() && !finalLock.getIsLogoLocked() && higherSettings.getLogo() != null) {
-				lowerSettings.setLogo(higherSettings.getLogo());
-				finalLock.setLogoLocked(true);
+	private OrganizationUnitSettings aggregateProfileData(OrganizationUnitSettings parentProfile, OrganizationUnitSettings userProfile,
+			LockSettings userLock) {
+		LOG.debug("Method aggregateProfileData() called from ProfileManagementService");
+
+		// Aggregate parentProfile data with userProfile
+		LockSettings parentLock = parentProfile.getLockSettings();
+		if (parentLock != null) {
+			if (parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() && parentProfile.getLogo() != null) {
+				userProfile.setLogo(parentProfile.getLogo());
+				userLock.setLogoLocked(true);
 			}
-			if (lock.getIsDisplayNameLocked() && !finalLock.getIsDisplayNameLocked() && higherSettings.getContact_details().getName() != null) {
-				lowerSettings.getContact_details().setName(higherSettings.getContact_details().getName());
-				finalLock.setDisplayNameLocked(true);
+			if (parentLock.getIsDisplayNameLocked() && !userLock.getIsDisplayNameLocked() && parentProfile.getContact_details().getName() != null) {
+				userProfile.getContact_details().setName(parentProfile.getContact_details().getName());
+				userLock.setDisplayNameLocked(true);
 			}
-			if (lock.getIsWebAddressLocked() && !finalLock.getIsWebAddressLocked() && lowerSettings.getContact_details().getWeb_addresses() != null) {
-				lowerSettings.getContact_details().getWeb_addresses().setWork(higherSettings.getContact_details().getWeb_addresses().getWork());
-				finalLock.setLogoLocked(true);
+			if (parentLock.getIsWebAddressLocked() && !userLock.getIsWebAddressLocked() && userProfile.getContact_details().getWeb_addresses() != null) {
+				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
+				userLock.setLogoLocked(true);
 			}
-			if (lock.getIsWorkPhoneLocked() && !finalLock.getIsWorkPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
-				lowerSettings.getContact_details().getContact_numbers().setWork(higherSettings.getContact_details().getContact_numbers().getWork());
-				finalLock.setWorkPhoneLocked(true);
+			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
+				userProfile.getContact_details().getContact_numbers().setWork(parentProfile.getContact_details().getContact_numbers().getWork());
+				userLock.setWorkPhoneLocked(true);
 			}
-			if (lock.getIsPersonalPhoneLocked() && !finalLock.getIsPersonalPhoneLocked()
-					&& lowerSettings.getContact_details().getContact_numbers() != null) {
-				lowerSettings.getContact_details().getContact_numbers()
-						.setPersonal(higherSettings.getContact_details().getContact_numbers().getPersonal());
-				finalLock.setPersonalPhoneLocked(true);
+			if (parentLock.getIsPersonalPhoneLocked() && !userLock.getIsPersonalPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
+				userProfile.getContact_details().getContact_numbers().setPersonal(parentProfile.getContact_details().getContact_numbers().getPersonal());
+				userLock.setPersonalPhoneLocked(true);
 			}
-			if (lock.getIsFaxPhoneLocked() && !finalLock.getIsFaxPhoneLocked() && lowerSettings.getContact_details().getContact_numbers() != null) {
-				lowerSettings.getContact_details().getContact_numbers().setFax(higherSettings.getContact_details().getContact_numbers().getFax());
-				finalLock.setFaxPhoneLocked(true);
+			if (parentLock.getIsFaxPhoneLocked() && !userLock.getIsFaxPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
+				userProfile.getContact_details().getContact_numbers().setFax(parentProfile.getContact_details().getContact_numbers().getFax());
+				userLock.setFaxPhoneLocked(true);
 			}
-			if (lock.getIsAboutMeLocked() && !finalLock.getIsAboutMeLocked() && higherSettings.getContact_details().getAbout_me() != null) {
-				lowerSettings.getContact_details().setAbout_me(higherSettings.getContact_details().getAbout_me());
-				finalLock.setAboutMeLocked(true);
+			if (parentLock.getIsAboutMeLocked() && !userLock.getIsAboutMeLocked() && parentProfile.getContact_details().getAbout_me() != null) {
+				userProfile.getContact_details().setAbout_me(parentProfile.getContact_details().getAbout_me());
+				userLock.setAboutMeLocked(true);
 			}
 		}
+		LOG.debug("Method aggregateProfileData() finished from ProfileManagementService");
+		return userProfile;
 	}
 
 	// Logo
@@ -663,7 +696,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 
 		LOG.debug("Generating final region settings based on lock settings");
-		regionSettings = generateRegionProfile(companySettings, regionSettings);
+		regionSettings = aggregateRegionProfile(companySettings, regionSettings);
 		LOG.info("Method getRegionByProfileName excecuted successfully");
 		return regionSettings;
 	}
@@ -689,7 +722,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getRegion().getRegionId(),
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 
-		branchSettings = generateBranchProfile(companySettings, regionSettings, branchSettings);
+		branchSettings = aggregateBranchProfile(companySettings, regionSettings, branchSettings);
 
 		LOG.info("Method getBranchByProfileName excecuted successfully");
 		return branchSettings;
