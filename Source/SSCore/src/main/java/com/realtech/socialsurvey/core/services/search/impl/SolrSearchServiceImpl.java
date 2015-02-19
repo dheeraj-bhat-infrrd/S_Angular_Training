@@ -568,9 +568,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to edit user in solr called for user : " + userId);
 
 		try {
+			// Setting values to Map with instruction
 			Map<String, String> editKeyValues = new HashMap<String, String>();
 			editKeyValues.put(SOLR_EDIT_REPLACE, value);
 
+			// Adding fields to be updated
 			SolrInputDocument document = new SolrInputDocument();
 			document.setField(CommonConstants.USER_ID_SOLR, userId);
 			document.setField(key, editKeyValues);
