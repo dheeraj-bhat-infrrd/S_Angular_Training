@@ -40,7 +40,6 @@ public interface ProfileManagementService {
 	public OrganizationUnitSettings finalizeProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
 			long regionId) throws InvalidInputException;
 
-	
 	// JIRA SS-97 by RM-06 : BOC
 	/**
 	 * Method to update logo of a company
@@ -157,6 +156,16 @@ public interface ProfileManagementService {
 	 */
 	public List<AgentSettings> getIndividualsForRegion(String companyProfileName, String regionProfileName) throws InvalidInputException,
 			NoRecordsFetchedException;
+
+	/**
+	 * Method to fetch all users under the specified region
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
+	 */
+	public List<AgentSettings> getIndividualsByRegionId(long regionId) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to fetch all individuals directly linked to a company
