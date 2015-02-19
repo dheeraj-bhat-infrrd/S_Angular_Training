@@ -163,70 +163,70 @@ public class ProfileManagementController {
 	
 	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
 	public String fetchProfileAboutMe(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing profile aboutme");
+		LOG.info("Fetching profile aboutme");
 		return JspResolver.PROFILE_ABOUT_ME;
 	}
 
 	@RequestMapping(value = "/fetchcontactdetails", method = RequestMethod.GET)
 	public String fetchContactDetails(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing contact details for profile");
+		LOG.info("Fetching contact details for profile");
 		return JspResolver.PROFILE_CONTACT_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchbasicdetails", method = RequestMethod.GET)
 	public String fetchBasicDetails(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing basic details for rofile");
+		LOG.info("Fetching Basic details for profile");
 		return JspResolver.PROFILE_BASIC_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchaddressdetails", method = RequestMethod.GET)
 	public String fetchAddressDetails(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing basic details for rofile");
+		LOG.info("Fetching Address details for profile");
 		return JspResolver.PROFILE_ADDRESS_DETAILS;
 	}
 
 	@RequestMapping(value = "/fetchaddressdetailsedit", method = RequestMethod.GET)
 	public String fetchAddressDetailsEdit(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing basic details for rofile");
+		LOG.info("Fetching Address details for Edit for profile");
 		return JspResolver.PROFILE_ADDRESS_DETAILS_EDIT;
 	}
 
 	@RequestMapping(value = "/fetchprofileimage", method = RequestMethod.GET)
 	public String fetchProfileImage(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing profile image");
+		LOG.info("Fetching profile image");
 		return JspResolver.PROFILE_IMAGE;
 	}
 
 	@RequestMapping(value = "/fetchprofilelogo", method = RequestMethod.GET)
 	public String fetchProfileLogo(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing profile logo");
+		LOG.info("Fetching profile logo");
 		return JspResolver.PROFILE_LOGO;
 	}
 
 	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
 	public String fetchProfileSocialLinks(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing profile links");
+		LOG.info("Fetching profile links");
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
 	// Only for agent
 	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
 	public String fetchAssociations(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing association list for profile");
+		LOG.info("Fetching association list for profile");
 		return JspResolver.PROFILE_ASSOCIATIONS;
 	}
 
 	// Only for agent
 	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
 	public String fetchAchievements(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing achievement list for profile");
+		LOG.info("Fetching achievement list for profile");
 		return JspResolver.PROFILE_ACHIEVEMENTS;
 	}
 
 	// Only for agent
 	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
 	public String fetchLicences(Model model, HttpServletRequest request) {
-		LOG.info("Fecthing license details for profile");
+		LOG.info("Fetching license details for profile");
 		return JspResolver.PROFILE_LICENSES;
 	}
 
@@ -538,6 +538,8 @@ public class ProfileManagementController {
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
+				
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
