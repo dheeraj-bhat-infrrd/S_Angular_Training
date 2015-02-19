@@ -19,6 +19,7 @@
 </head>
 <body>
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
+<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
