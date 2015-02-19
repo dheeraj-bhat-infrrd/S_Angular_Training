@@ -9,31 +9,31 @@
 						<c:when test="${not empty profilelogo}">
 							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center;"></div>
 							<c:choose>
-								<c:when	test="${higherLock.isLogoLocked && not user.agent}">
-									<div id="prof-logo-lock" data-state="locked" data-control="higher" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+								<c:when	test="${parentLock.isLogoLocked && not user.agent}">
+									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
 									</form>
 								</c:when>
-								<c:when	test="${higherLock.isLogoLocked && user.agent}">
-									<div id="prof-logo-lock" data-state="locked" data-control="higher" class="hide prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+								<c:when	test="${parentLock.isLogoLocked && user.agent}">
+									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="hide prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
 									</form>
 								</c:when>
-								<c:when	test="${not higherLock.isLogoLocked && user.agent}">
+								<c:when	test="${not parentLock.isLogoLocked && user.agent}">
 									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="hide prof-img-lock-item prof-img-lock"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file">
 									</form>
 								</c:when>
-								<c:when	test="${not higherLock.isLogoLocked && lock.isLogoLocked && not user.agent}">
+								<c:when	test="${not parentLock.isLogoLocked && lock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="locked" data-control="user" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
 									</form>
 								</c:when>
-								<c:when	test="${not higherLock.isLogoLocked && not lock.isLogoLocked && not user.agent}">
+								<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file">

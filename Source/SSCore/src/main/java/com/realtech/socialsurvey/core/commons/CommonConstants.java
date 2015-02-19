@@ -155,6 +155,8 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
+	public static final String PARENT_LOCK = "parentLock";
+	public static final String USER_PROFILE = "profile";
 
 	/**
 	 * Batch Constants
