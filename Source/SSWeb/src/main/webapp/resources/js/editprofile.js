@@ -164,14 +164,14 @@ function callBackShowContactDetails(data) {
 
 // Phone numbers in contact details
 $(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || !phoneRegex.test(this.value) || $(this).is('[readonly]')) {
 		return;
 	}
 
 	delay(function() {
 		var phoneNumbers = [];
 		$('#contant-info-container input[data-phone-number]').each(function() {
-			if (this.value != "" && phoneRegex.test(this.value) == true && !$(this).is('[readonly]')) {
+			if (this.value != "" && phoneRegex.test(this.value) && !$(this).is('[readonly]')) {
 				var phoneNumber = {};
 				phoneNumber.key = $(this).attr("data-phone-number");
 				phoneNumber.value = this.value;
@@ -197,7 +197,7 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || !isValidUrl($(this).val().trim()) || $(this).is('[readonly]')) {
 		return;
 	}
 
@@ -258,12 +258,16 @@ function callBackEditAddressDetails(data) {
 }
 
 $(document).on('click', '#overlay-continue', function() {
+	var profName = $('#prof-name').val();
+	var profAddress1 = $('#prof-address1').val();
+	var profAddress2 = $('#prof-address2').val();
+	var country = $('#prof-country').val();
+	var zipCode = $('#prof-zipcode').val();
+	if (!profName || !profAddress1 || !country || !zipCode) {
+		return;
+	}
+	
 	delay(function() {
-		var profName = $('#prof-name').val();
-		var profAddress1 = $('#prof-address1').val();
-		var profAddress2 = $('#prof-address2').val();
-		var country = $('#prof-country').val();
-		var zipCode = $('#prof-zipcode').val();
 		var payload = {
 			"profName" : profName,
 			"address1" : profAddress1,
@@ -538,8 +542,7 @@ function updateAssociations() {
 	var payload = {
 		"associationList" : associationList
 	};
-	callAjaxPostWithPayloadData("./updateassociations.do",
-			callBackUpdateAssociations, payload);
+	callAjaxPostWithPayloadData("./updateassociations.do", callBackUpdateAssociations, payload);
 }
 
 function callBackUpdateAssociations(data) {
