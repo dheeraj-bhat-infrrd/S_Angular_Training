@@ -40,8 +40,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 
 
 // TODO Lock Settings
-$(document).on('click', '.lp-edit-locks', function(e) {
-	e.stopImmediatePropagation();
+$(document).on('click', '.lp-edit-locks', function() {
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
@@ -64,8 +63,7 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 	}
 });
 
-$(document).on('click', '.prof-img-lock-item', function(e) {
-	e.stopImmediatePropagation();
+$(document).on('click', '.prof-img-lock-item', function() {
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
@@ -166,7 +164,7 @@ function callBackShowContactDetails(data) {
 
 // Phone numbers in contact details
 $(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
-	if ($('#prof-all-lock').val() != 'modified') {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
 		return;
 	}
 
@@ -199,7 +197,7 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
-	if ($('#prof-all-lock').val() != 'modified') {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
 		return;
 	}
 
@@ -250,8 +248,7 @@ function callBackShowAddressDetails(data) {
 	adjustImage();
 }
 
-$(document).on('click', '#prof-address-container', function(e) {
-	e.stopImmediatePropagation();
+$(document).on('click', '#prof-address-container', function() {
 	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails);
 });
 
@@ -325,7 +322,7 @@ function callBackShowBasicDetails(response) {
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
-	if ($('#prof-all-lock').val() != 'modified') {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val()) {
 		return;
 	}
 
@@ -361,8 +358,7 @@ function callBackShowProfileImage(data) {
 	adjustImage();
 }
 
-$(document).on('change', '#prof-image', function(e) {
-	e.stopImmediatePropagation();
+$(document).on('change', '#prof-image', function() {
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -402,8 +398,7 @@ function callBackShowProfileLogo(data) {
 	adjustImage();
 }
 
-$(document).on('change', '#prof-logo', function(e) {
-	e.stopImmediatePropagation();
+$(document).on('change', '#prof-logo', function() {
 	var formData = new FormData();
 	formData.append("logo", $(this).prop("files")[0]);
 	formData.append("logoFileName", $(this).prop("files")[0].name);
@@ -480,7 +475,7 @@ function addAnAssociation() {
 }
 
 // Function to append an achievement
-$(document).on('click', '.lp-ach-item-img', function(e) {
+$(document).on('click', '.lp-ach-item-img', function() {
 	$(this).prev().remove();
 	$(this).remove();
 });
@@ -535,6 +530,8 @@ function updateAssociations() {
 			var asssociation = {};
 			asssociation.name = this.value;
 			associationList.push(asssociation);
+		} else {
+			return;
 		}
 	});
 	associationList = JSON.stringify(associationList);
@@ -567,6 +564,8 @@ function updateAchievements() {
 			var achievement = {};
 			achievement.achievement = this.value;
 			achievementList.push(achievement);
+		} else {
+			return;
 		}
 	});
 	achievementList = JSON.stringify(achievementList);
@@ -598,6 +597,8 @@ function updateLicenseAuthorizations() {
 		if (this.value != "") {
 			var licence = this.value;
 			licenceList.push(licence);
+		} else {
+			return;
 		}
 	});
 	licenceList = JSON.stringify(licenceList);

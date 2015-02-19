@@ -15,14 +15,11 @@
 <script>
 	$('#company-setting').click(function(e) {
 		showMainContent('./showcompanysettings.do');
-		e.stopImmediatePropagation();
 	});
 	$('#header-logo').click(function(e){
 		showMainContent('./dashboard.do');
-		e.stopImmediatePropagation();
 	});
 	$('#profile-setting').click(function(e) {
 		showMainContent('./showprofilepage.do');
-		e.stopImmediatePropagation();
 	});
 </script>
