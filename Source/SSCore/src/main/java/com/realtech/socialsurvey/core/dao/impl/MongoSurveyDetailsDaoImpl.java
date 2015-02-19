@@ -16,6 +16,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
@@ -439,7 +440,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 */
 
 	@Override
-	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, double startScore, double limitScore) {
+	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
@@ -448,6 +449,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (startScore > 0 && limitScore > 0) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		if (start > -1) {
+			query.skip(start);
+		}
+		if (rows > -1) {
+			query.limit(rows);
 		}
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
