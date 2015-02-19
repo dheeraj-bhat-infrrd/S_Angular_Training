@@ -316,7 +316,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LockSettings userLock = new LockSettings();
 		regionSettings = aggregateProfileData(companySettings, regionSettings, userLock);
 
+		// Aggregate Region Profile Settings
+		// to reflect lockSettings of Region
+		regionSettings = aggregateProfileData(regionSettings, regionSettings, userLock);
 		regionSettings.setLockSettings(userLock);
+
 		LOG.debug("Method aggregateRegionProfile() finished from ProfileManagementService");
 		return regionSettings;
 	}
@@ -336,8 +340,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (regionSettings != null) {
 			branchSettings = aggregateProfileData(regionSettings, branchSettings, userLock);
 		}
-
+		
+		// Aggregate Branch Profile Settings
+		// to reflect lockSettings of Branch
+		branchSettings = aggregateProfileData(branchSettings, branchSettings, userLock);
 		branchSettings.setLockSettings(userLock);
+
 		LOG.debug("Method aggregateBranchProfile() finished from ProfileManagementService");
 		return branchSettings;
 	}
@@ -363,7 +371,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			agentSettings = aggregateProfileData(branchSettings, agentSettings, userLock);
 		}
 
+		// No Aggregation needed Agent Profile Settings
+		// manully setting since agent do not have lockSettings
 		agentSettings.setLockSettings(userLock);
+		
 		LOG.debug("Method aggregateAgentProfile() finished from ProfileManagementService");
 		return agentSettings;
 	}

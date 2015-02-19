@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -40,7 +42,7 @@ import com.realtech.socialsurvey.core.utils.SolrSearchUtils;
 public class SolrSearchServiceImpl implements SolrSearchService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SolrSearchServiceImpl.class);
-
+	private static final String SOLR_EDIT_REPLACE = "set";
 	@Value("${SOLR_REGION_URL}")
 	private String solrRegionUrl;
 
@@ -556,5 +558,31 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString(); 
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
 		return displayName;
+	}
+	
+	/**
+	 * Method to edit User in solr
+	 */
+	@Override
+	public void editUserInSolr(long userId, String key, String value) throws SolrException {
+		LOG.info("Method to edit user in solr called for user : " + userId);
+
+		try {
+			Map<String, String> editKeyValues = new HashMap<String, String>();
+			editKeyValues.put(SOLR_EDIT_REPLACE, value);
+
+			SolrInputDocument document = new SolrInputDocument();
+			document.setField(CommonConstants.USER_ID_SOLR, userId);
+			document.setField(key, editKeyValues);
+
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			solrServer.add(document);
+			solrServer.commit();
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while editing user in solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method to edit user in solr finished for user : " + userId);
 	}
 }
