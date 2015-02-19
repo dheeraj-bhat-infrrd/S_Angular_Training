@@ -212,7 +212,7 @@
 							<div class="sq-pts-item-hover pts-hover-3 pts-arr-bot">Good</div>
 							<div class="sq-pts-item-hover pts-hover-4 pts-arr-bot">V
 								Good</div>
-							<div class="sq-pts-item-hover pts-hover-5 pts-arr-bot">Exccellent</div>
+							<div class="sq-pts-item-hover pts-hover-5 pts-arr-bot">Excellent</div>
 						</div>
 						<div class="sq-slider-wrapper clearfix">
 							<div value="1" class="sq-pts-item sq-pts-red">1</div>
@@ -428,7 +428,7 @@
 						console.log("Info button clicked");
 						$("#recaptcha_whatsthis").click();
 					});
-					$("#cust-agnt-rel").html(paintListOptions());
+					$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
 				});
 	</script>
 
