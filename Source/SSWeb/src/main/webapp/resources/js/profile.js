@@ -116,9 +116,11 @@ function paintCompanyProfile(data) {
 		fetchReviewsForCompany(result.iden,minScore);
 		
 		/**
-		 * calling method to populate count of hidden reviews
+		 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 		 */
-		fetchReviewsCountForCompany(result.iden,paintHiddenReviewsCount,minScore);
+		if(minScore > 0){
+			fetchReviewsCountForCompany(result.iden,paintHiddenReviewsCount,minScore);
+		}		
 	}
 }
 
@@ -181,6 +183,7 @@ function paintCompanyRegions(data) {
 			$(".comp-region").click(function(){
 				if($(this).data("openstatus") == "closed") {
 					fetchBranchesForRegion($(this).data('regionid'));
+					fetchIndividualsForRegion($(this).data('regionid'));
 					$(this).data("openstatus","open");
 				}else {
 					$('#comp-region-branches-'+$(this).data('regionid')).slideUp(200);
@@ -229,7 +232,7 @@ function bindClickToFetchBranchIndividuals(bindingClass) {
 	$("."+bindingClass).click(function(e){
 		e.stopPropagation();
 		if($(this).data("openstatus") == "closed") {
-			fetchIndividualForBranch($(this).data('branchid'));
+			fetchIndividualsForBranch($(this).data('branchid'));
 			$(this).data("openstatus","open");
 		}else {
 			$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
@@ -238,7 +241,7 @@ function bindClickToFetchBranchIndividuals(bindingClass) {
 	});
 }
 
-function fetchIndividualForBranch(branchId) {
+function fetchIndividualsForBranch(branchId) {
 	var url=window.location.origin +'/rest/profile/branch/'+branchId+'/individuals';
 	$("#branchid-hidden").val(branchId);
 	callAjaxGET(url, paintIndividualForBranch, true);
@@ -266,6 +269,37 @@ function paintIndividualForBranch(data) {
 		}
 	}
 }
+
+function fetchIndividualsForRegion(regionId) {
+	var url = window.location.origin +'/rest/profile/region/'+regionId+'/individuals';
+	$("#regionid-hidden").val(regionId);
+	callAjaxGET(url, paintIndividualsForRegion, true);
+}
+
+function paintIndividualsForRegion(data) {
+	var responseJson = $.parseJSON(data);
+	var individualsHtml = "";
+	var regionId = $("#regionid-hidden").val();
+	if(responseJson != undefined && responseJson.entity != "") {
+			var result = $.parseJSON(responseJson.entity);
+			if(result != undefined && result.length > 0) {
+				$.each(result,function(i,individual) {
+					if(individual.contact_details != undefined){
+						individualsHtml = individualsHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-region-branch" data-openstatus="closed" data-agentid="'+individual.branchId+'">';
+						individualsHtml = individualsHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
+						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+						individualsHtml = individualsHtml +'		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
+						individualsHtml = individualsHtml +'	</div>';
+						individualsHtml = individualsHtml +'</div>' ;
+					}
+				});
+				
+				$("#comp-region-branches-"+regionId).append(individualsHtml).slideDown(200);
+				paintProfileImage("individual-prof-image");
+		}
+	}
+}
+
 
 function paintProfileImage(imgDivClass) {
 	$("."+imgDivClass).each(function(){
@@ -400,13 +434,14 @@ $(window).scroll(function(){
 	}
 });
 
-function fetchReviewsCountForCompany(companyId,callBackFunction,minScore) {
+function fetchReviewsCountForCompany(companyId,callBackFunction,maxScore) {
 	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount';
-	if(minScore != undefined) {
-		url = url +"?minScore="+minScore;
+	if(maxScore != undefined) {
+		url = url +"?maxScore="+maxScore;
 	}
 	callAjaxGET(url, callBackFunction, true);
 }
+
 
 function paintAllReviewsCount(data) {
 	var responseJson = $.parseJSON(data);
