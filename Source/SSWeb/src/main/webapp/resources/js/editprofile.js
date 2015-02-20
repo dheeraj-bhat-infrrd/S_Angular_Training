@@ -40,7 +40,8 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 
 
 // TODO Lock Settings
-$(document).on('click', '.lp-edit-locks', function() {
+$(document).on('click', '.lp-edit-locks', function(e) {
+	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
@@ -63,7 +64,8 @@ $(document).on('click', '.lp-edit-locks', function() {
 	}
 });
 
-$(document).on('click', '.prof-img-lock-item', function() {
+$(document).on('click', '.prof-img-lock-item', function(e) {
+	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
 	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
@@ -90,6 +92,8 @@ function updateLockSettings(id, state) {
 	if (id == undefined || id == "") {
 		return;
 	}
+	
+	console.log(id + state);
 	delay(function() {
 		var payload = {
 			"id" : id,

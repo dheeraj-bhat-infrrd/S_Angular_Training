@@ -439,6 +439,9 @@ public class ProfileManagementController {
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(agentId, agentSettings);
+
+				// Modify Agent details in Solr
+				solrSearchService.editUserInSolr(agentId, CommonConstants.ABOUT_ME_SOLR, aboutMe);
 			}
 			else {
 				throw new InvalidInputException("Error occurred while checking user details.", DisplayMessageConstants.GENERAL_ERROR);
@@ -539,7 +542,9 @@ public class ProfileManagementController {
 				agentSettings.setContact_details(contactDetailsSettings);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 				
+				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
@@ -660,6 +665,11 @@ public class ProfileManagementController {
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
+
+				// Modify Agent details in Solr
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
@@ -811,12 +821,12 @@ public class ProfileManagementController {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
-			String profileImageName = request.getParameter("logoFileName");
+			String profileImageUrl = request.getParameter("logoFileName");
 			try {
-				if (profileImageName == null || profileImageName.isEmpty()) {
+				if (profileImageUrl == null || profileImageUrl.isEmpty()) {
 					throw new InvalidInputException("Profile Image passed is null or empty");
 				}
-				imageName = fileUploadService.fileUploadHandler(fileLocal, profileImageName);
+				imageName = fileUploadService.fileUploadHandler(fileLocal, profileImageUrl);
 				imageName = endpoint + "/" + bucket + "/" +imageName;
 			}
 			catch (NonFatalException e) {
@@ -863,6 +873,9 @@ public class ProfileManagementController {
 				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, imageName);
 				agentSettings.setProfileImageUrl(imageName);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
+
+				// Modify Agent details in Solr
+				solrSearchService.editUserInSolr(agentId, CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
