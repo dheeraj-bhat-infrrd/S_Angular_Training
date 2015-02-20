@@ -42,7 +42,7 @@
 	                        </div>
 	                        <div class="h-inp-wrapper">
                                 <div class="m-inp-img m-inp-img-pwd"></div>
-	                            <input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password" value="raremile@">
+	                            <input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password">
 	                        </div>
 	                    </div>
 	                    <div class="float-left h-login-btn-wrapper">
@@ -221,15 +221,10 @@
                 loginUser();
             });
            
-            $('#reg-submit').click(function() {
-				event.preventDefault();
+            $('#reg-submit').click(function(e) {
+				e.preventDefault();
 				submitRegistrationForm();
 			});
-            
-            $('#find-pro-submit').click(function() {
-            	event.preventDefault();
-            	submitFindProForm();
-            });
             
             // Form validation for login page
             $('#login-user-id').blur(function() {
@@ -316,6 +311,11 @@
 				console.log("Info button clicked");
 				$("#recaptcha_whatsthis").click();
 			});
+            
+            $('#find-pro-submit').click(function(e) {
+            	e.preventDefault();
+            	submitFindProForm();
+            });
             
             function submitFindProForm() {
 				console.log("Submitting Find a Profile form");

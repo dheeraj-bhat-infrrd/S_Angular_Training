@@ -53,8 +53,8 @@ function validateFindProForm(id) {
 	return true;
 }
 
-$('#find-pro-submit').click(function() {
-	event.preventDefault();
+$('#find-pro-submit').click(function(e) {
+	e.preventDefault();
 	if(validateFindProForm('find-pro-form')){
 		console.log("Submitting Find a Profile form");
 		$('#find-pro-form').submit();
