@@ -400,8 +400,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		try {
 			SolrQuery solrQuery = new SolrQuery();
-			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_FIRST_NAME_SOLR, CommonConstants.USER_LAST_NAME_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR,
-					CommonConstants.USER_EMAIL_ID_SOLR };
+			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR, CommonConstants.TITLE_SOLR,
+					CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR, CommonConstants.PROFILE_URL_SOLR };
 			solrQuery.setFields(fields);
 
 			String query = "";
@@ -568,9 +568,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to edit user in solr called for user : " + userId);
 
 		try {
+			// Setting values to Map with instruction
 			Map<String, String> editKeyValues = new HashMap<String, String>();
 			editKeyValues.put(SOLR_EDIT_REPLACE, value);
 
+			// Adding fields to be updated
 			SolrInputDocument document = new SolrInputDocument();
 			document.setField(CommonConstants.USER_ID_SOLR, userId);
 			document.setField(key, editKeyValues);

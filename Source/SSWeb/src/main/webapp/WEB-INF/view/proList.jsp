@@ -91,8 +91,8 @@
 											<div class="float-left ctnt-list-item-img"></div>
 											<div class="float-left ctnt-list-item-txt-wrap">
 												<div class="ctnt-item-name">${user.displayName}</div>
-												<div class="ctnt-item-desig">Marketting Head at Ralecon</div>
-												<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>
+												<div class="ctnt-item-desig">${user.title}</div>
+												<div class="ctnt-item-comment">${user.aboutMe}</div>
 											</div>
 											<div class="float-left ctnt-list-item-btn-wrap">
 												<div class="ctnt-review-btn" user="${user.userId}"><spring:message code="label.reviewbutton.key" /></div>
