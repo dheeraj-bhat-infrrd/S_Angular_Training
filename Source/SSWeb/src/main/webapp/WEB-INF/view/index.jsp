@@ -42,7 +42,7 @@
 	                        </div>
 	                        <div class="h-inp-wrapper">
                                 <div class="m-inp-img m-inp-img-pwd"></div>
-	                            <input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password">
+	                            <input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password" value="raremile@">
 	                        </div>
 	                    </div>
 	                    <div class="float-left h-login-btn-wrapper">
