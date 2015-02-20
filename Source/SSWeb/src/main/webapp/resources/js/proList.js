@@ -11,7 +11,7 @@ function adjustTextContainerWidthOnResize() {
 	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
 }
 
-//Function to validate the first name pattern
+// Function to validate the first name pattern
 function validateProFirstNamePattern(elementId) {
 	if ($('#' + elementId).val() != "") {
 		if (firstNamePatternRegex.test($('#' + elementId).val()) == true) {
@@ -53,8 +53,8 @@ function validateFindProForm(id) {
 	return true;
 }
 
-$('#find-pro-submit').click(function() {
-	event.preventDefault();
+$('#find-pro-submit').click(function(e) {
+	e.preventDefault();
 	if(validateFindProForm('find-pro-form')){
 		console.log("Submitting Find a Profile form");
 		$('#find-pro-form').submit();
@@ -89,15 +89,15 @@ function infiniteScrollCallback(response) {
 			var evenOdd = (loopStatus % 2 == 0) ? '' : 'ctnt-list-item-even';
 			htmlData = htmlData + '<div class="ctnt-list-item clearfix ' + evenOdd + '">'
 				+ '<div class="float-left ctnt-list-item-img"></div>'
-					+ '<div class="float-left ctnt-list-item-txt-wrap">'
-						+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
-						+ '<div class="ctnt-item-desig">Marketting Head at Ralecon</div>'
-						+ '<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>'
-					+ '</div>'
-					+ '<div class="float-left ctnt-list-item-btn-wrap">'
-						+ '<div class="ctnt-review-btn user="'+user+'">Review</div>'
-					+ '</div>'
-				+ '</div>';
+				+ '<div class="float-left ctnt-list-item-txt-wrap">'
+					+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
+					+ '<div class="ctnt-item-desig">' + user.title + '</div>'
+					+ '<div class="ctnt-item-comment">' + user.aboutMe + '</div>'
+				+ '</div>'
+				+ '<div class="float-left ctnt-list-item-btn-wrap">'
+					+ '<div class="ctnt-review-btn user="' + user.userId + '">Review</div>'
+				+ '</div>'
+			+ '</div>';
 			loopStatus ++;
 		});
 		
@@ -108,8 +108,8 @@ function infiniteScrollCallback(response) {
 
 $('.ctnt-review-btn').click(function() {
 	var payload = {
-			"userId" : $(this).attr('user')
-		};
+		"userId" : $(this).attr('user')
+	};
 	$.ajax({
 		url : "./../rest/survey/redirecttodetailspage",
 		type : "GET",

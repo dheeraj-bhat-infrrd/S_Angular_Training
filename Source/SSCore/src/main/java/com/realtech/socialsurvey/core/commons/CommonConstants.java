@@ -243,11 +243,15 @@ public interface CommonConstants {
 	public static final String USER_IS_OWNER_SOLR = "isOwner";
 	public static final String BRANCHES_SOLR = "branches";
 	public static final String REGIONS_SOLR = "regions";
-	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
+	public static final String IS_AGENT_SOLR = "isAgent";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
+	public static final String ABOUT_ME_SOLR = "aboutMe";
+	public static final String PROFILE_URL_SOLR = "profileUrl";
+	public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
+	public static final String TITLE_SOLR = "title";
 
 	/*
 	 * Payment detail constants

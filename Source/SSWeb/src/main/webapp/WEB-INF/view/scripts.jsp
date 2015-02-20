@@ -13,13 +13,13 @@
 <script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
 <script>
-	$('#company-setting').click(function(e) {
+	$('#company-setting').click(function() {
 		showMainContent('./showcompanysettings.do');
 	});
-	$('#header-logo').click(function(e){
+	$('#header-logo').click(function(){
 		showMainContent('./dashboard.do');
 	});
-	$('#profile-setting').click(function(e) {
+	$('#profile-setting').click(function() {
 		showMainContent('./showprofilepage.do');
 	});
 </script>
