@@ -1,11 +1,8 @@
-/**
- * 
- */
 var companyProfileName = $("#company-profile-name").val();
 var currentProfileIden = "";
 var startIndex = 0;
 var numOfRows = 5;
-var minScore;
+var minScore=0;
 
 function fetchCompanyProfile() {
 	startIndex = 0;
@@ -381,14 +378,13 @@ function paintReviewsForCompany(data) {
 		var result = $.parseJSON(responseJson.entity);
 		var reviewsHtml = "";
 		if(result != undefined && result.length > 0) {
-			$.each(result,function(i, reviewItem) {
-				var d = Date.parse(reviewItem.updatedOn);
+			$.each(result, function(i, reviewItem) {
+				//var d = Date.parse(reviewItem.updatedOn);
 				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
 				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';
-				//reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">12<sup>th</sup>Sept 2014</div>';    
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+d.getDate() +" "+ d.getMonthName()+" "+d.getFullYear()+'</div>'; 
+				//reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+d.getDate() +" "+ d.getMonthName()+" "+d.getFullYear()+'</div>'; 
 				reviewsHtml=  reviewsHtml+'    </div>';
 				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
@@ -414,7 +410,6 @@ function paintReviewsForCompany(data) {
 				reviewsHtml=  reviewsHtml+'	</div>';
 				reviewsHtml=  reviewsHtml+'</div>';
 			});
-			
 			
 			if($("#profile-fetch-info").attr("fetch-all-reviews") == "true") {
 				$("#prof-review-item").html(reviewsHtml);
@@ -492,12 +487,13 @@ function paintHiddenReviewsCount(data) {
 		}
 		$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
 		$("#prof-hidden-review-count").click(function(){
+			$('#prof-review-item').html('');
 			$(this).hide();
 			startIndex = 0;
 			numOfRows = 5;
 			minScore = 0;
-			$("#profile-fetch-info").attr("fetch-all-reviews","true");
-			fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows);
+			$("#profile-fetch-info").attr("fetch-all-reviews", "true");
+			fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
 			$(window).scrollTop($('#reviews-container').offset().top);
 		});
 	}
