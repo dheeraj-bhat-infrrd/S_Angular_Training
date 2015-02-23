@@ -36,6 +36,28 @@
 
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
+	<div>
+		<c:choose>
+			<c:when test="${user.companyAdmin}">
+				<input type="hidden" id="prof-company-id" value="${profile.iden}">
+				<input type="hidden" id="company-profile-name" value="${profile.profileName}">
+			</c:when>
+			<c:when test="${user.regionAdmin}">
+				<input type="hidden" id="prof-region-id" value="${profile.iden}">
+				<input type="hidden" id="prof-region-name" value="${profile.profileName}">
+			</c:when>
+			<c:when test="${user.branchAdmin}">
+				<input type="hidden" id="prof-branch-id" value="${profile.iden}">
+				<input type="hidden" id="prof-branch-name" value="${profile.profileName}">
+			</c:when>
+			<c:when test="${user.agent}">
+				<input type="hidden" id="prof-agent-id" value="${profile.iden}">
+				<input type="hidden" id="prof-agent-name" value="${profile.profileName}">
+			</c:when>
+		</c:choose>
+		<input type="hidden" id="profile-min-post-score" value="${profile.survey_settings.show_survey_above_score}"/>
+		<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0"/>
+	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
@@ -61,7 +83,7 @@
 							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center;"></div>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer"	style="background-image:initial; background: no-repeat center;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
@@ -111,13 +133,14 @@
 						<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 					</div>
 					<div class="prof-rating clearfix">
-						<div class="st-rating-wrapper maring-0 clearfix float-left">
+						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-full-star"></div>
 							<div class="rating-star icn-half-star"></div>
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 						</div>
+						<div class="float-left review-count-left" id="prof-company-review-count"></div>
 					</div>
 				</div>
 			</div>
@@ -373,6 +396,25 @@
 					</c:otherwise>
 				</c:choose>
 				</div>
+				
+				<div id="prof-hierarchy-container">
+					<c:choose>
+						<c:when	test="${user.companyAdmin}">
+							<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                    			<div class="left-assoc-wrapper">
+                        			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+                        			<!-- hidden fields to capture which region/branch is expanded -->
+                        			<input type="hidden" id="regionid-hidden"/>
+                        			<input type="hidden" id="branchid-hidden"/>
+                        			<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+                            			<!--Company hierarchy is displayed here  -->
+                        			</div>
+                    			</div>
+                			</div>
+						</c:when>
+					</c:choose>
+				</div>
+				
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -468,50 +510,15 @@
 						</div>
 					</div>
 				</div>
-				<div class="people-say-wrapper rt-content-main bord-bot-dc">
-					<div class="main-con-header">
-						<span class="ppl-say-txt-st">What people say</span> about Anna Thomas
-					</div>
-					<div class="ppl-review-item">
-						<div class="ppl-header-wrapper clearfix">
-							<div class="float-left ppl-header-left">
-								<div class="ppl-head-1">Matt and Gina Conelly - Lehi, UT</div>
-								<div class="ppl-head-2">
-									12<sup>th</sup> Sept 2014
-								</div>
-							</div>
-							<div class="float-right ppl-header-right">
-								<div class="st-rating-wrapper maring-0 clearfix">
-									<div class="rating-star icn-full-star"></div>
-									<div class="rating-star icn-full-star"></div>
-									<div class="rating-star icn-half-star"></div>
-									<div class="rating-star icn-no-star"></div>
-									<div class="rating-star icn-no-star"></div>
-								</div>
-							</div>
-						</div>
-						<div class="ppl-content">Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at
-							Sntiner lorenm ipsim dore et ie las.</div>
-						<div class="ppl-share-wrapper clearfix">
-							<div class="float-left blue-text ppl-share-shr-txt">Share</div>
-							<div class="float-left icn-share icn-plus-open"></div>
-							<div class="float-left clearfix ppl-share-social hide">
-								<div class="float-left ppl-share-icns icn-fb"></div>
-								<div class="float-left ppl-share-icns icn-twit"></div>
-								<div class="float-left ppl-share-icns icn-lin"></div>
-								<div class="float-left ppl-share-icns icn-yelp"></div>
-							</div>
-							<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
-						</div>
-					</div>
-				</div>
+				<div id="reviews-container" class="people-say-wrapper rt-content-main">
+                    <div class="main-con-header" id="prof-reviews-header"></div>
+                    <div id="prof-review-item" class="prof-reviews">
+	                	<!--  reviews get populated here --> 
+                    </div>
+                    <div id="prof-hidden-review-count" class="prof-hidden-review-link">
+	                   	<!--  count of hidden reviews get populated here --> 
+                    </div>
+               	</div>
 			</div>
 		</div>
 	</div>
@@ -525,11 +532,14 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Profile Settings");
 		adjustImage();
 		$(window).resize(adjustImage);
+		
+		paintForProfile();
 		
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
 			$(this).hide();
