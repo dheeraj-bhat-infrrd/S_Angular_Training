@@ -544,6 +544,8 @@ public class ProfileManagementController {
 				
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
 			}
 			else {
@@ -668,6 +670,8 @@ public class ProfileManagementController {
 
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
 			}
