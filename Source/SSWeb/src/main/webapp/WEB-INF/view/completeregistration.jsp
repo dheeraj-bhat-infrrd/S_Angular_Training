@@ -69,7 +69,6 @@
 	                        <input type="password" class="float-left login-wrapper-txt" id="complete-reg-cnf-pwd" data-non-empty="true" name="confirmPassword" placeholder='<spring:message code="label.confirmpassword.key" />'>
 	                    </div>
 	                    <div id="complete-reg-page-cnf-pwd" class="input-error-2 margin-0-auto"></div>
-	                    <div style="padding-left: 50px; margin-bottom: 10px;"><input type="checkbox" name="connectWithLinkedIn" value="true" checked>Connect with your LinkedIn profile</div>
 	                    <div class="btn-submit margin-0-auto cursor-pointer font-18 text-center" id="reset-pwd-submit"><spring:message code="label.submit.key"/></div>
 	                </div>
 	                <input type="hidden" value="${param.q}" name="q">

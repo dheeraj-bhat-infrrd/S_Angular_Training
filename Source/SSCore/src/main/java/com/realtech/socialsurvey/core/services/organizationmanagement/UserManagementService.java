@@ -134,6 +134,15 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
+	
+	/**
+	 * Adds the LinkedIn access tokens to the agent's settings in mongo
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public void setLinkedInAccessTokenForUser(User user,String accessToken) throws InvalidInputException, NoRecordsFetchedException;
 
 }
 // JIRA SS-34 BY RM02 BOC

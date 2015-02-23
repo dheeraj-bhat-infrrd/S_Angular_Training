@@ -768,8 +768,7 @@ public class UserManagementController {
 	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
 	public String completeRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method completeRegistration() to complete registration of user started.");
-		LinkedInOAuthService oauthService;
-
+		
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
 			String lastName = request.getParameter(CommonConstants.LAST_NAME);
@@ -779,7 +778,6 @@ public class UserManagementController {
 			String encryptedUrlParameters = request.getParameter("q");
 			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
-			String connectWithLinkedIn = request.getParameter("connectWithLinkedIn");
 			User user = null;
 
 			// form parameters validation
@@ -886,17 +884,7 @@ public class UserManagementController {
 				// TODO: add logic for what happens when no user profile present
 			}
 			
-			if( connectWithLinkedIn != null && connectWithLinkedIn.equals("true") ){
-				LOG.info("Connecting to LinkedIn");
-				
-				oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
-		        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://4bac54a5.ngrok.com/linkedinauth.do");
-				
-		        String authUrl = requestToken.getAuthorizationUrl();
-		        session.setAttribute("requestToken", requestToken);
-		        LOG.info("Redirecting to url : " + authUrl );
-		        return "redirect:"+authUrl;
-			}
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
@@ -904,7 +892,7 @@ public class UserManagementController {
 			return JspResolver.COMPLETE_REGISTRATION;
 		}
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
-		return JspResolver.LANDING;
+		return JspResolver.LINKEDIN_ACCESS;
 	}
 
 	@RequestMapping(value = "/showchangepasswordpage")
@@ -981,21 +969,62 @@ public class UserManagementController {
 		LOG.debug("change password form parameters validated successfully");
 	}
 	
+	@ResponseBody
+	@RequestMapping(value="/linkedinauthpage", method = RequestMethod.GET)
+	public String getLinkedInAuthPage(Model model,HttpServletRequest request){
+		
+		HttpSession session = request.getSession(false);
+		if(session == null){
+			LOG.error("Session is null!");
+		}
+		
+		LOG.info("Connecting to LinkedIn");
+		LinkedInOAuthService oauthService;		
+		oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://6a723c3f.ngrok.com/linkedinauth.do");
+        
+        //We will keep the request token in session
+        session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
+        
+        LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
+        
+        session = request.getSession(false);
+		if(session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN) == null){
+			LOG.error("Request token is null!");
+		}
+		
+		return requestToken.getAuthorizationUrl();
+	}
+	
 	@RequestMapping(value="/linkedinauth", method = RequestMethod.GET)
 	public String authenticateLinkedInAccess(Model model,HttpServletRequest request){
 		
 		LOG.info("LinkedIn authentication url requested");
+		HttpSession session = request.getSession(false);
 		
-		LinkedInOAuthService oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
-		String oauthVerifier = request.getParameter("oauth_verifier");
-		LOG.info("LinkedIn oauth verfier : " + oauthVerifier);
-        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://4bac54a5.ngrok.com/linkedinauth.do");
-		LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
-        
-        LOG.info("Access Token : " + accessToken.getToken());
-        LOG.info("Access Token Secret : " + accessToken.getTokenSecret());		
-		
-		return JspResolver.LOGIN;
+		try {
+			if(session == null){
+				LOG.error("authenticateLinkedInAccess : Session object is null!");
+				throw new NoRecordsFetchedException("authenticateLinkedInAccess : Session object is null!");
+			}
+			
+			User user = sessionHelper.getCurrentUser();
+			LinkedInOAuthService oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+			String oauthVerifier = request.getParameter("oauth_verifier");
+			LOG.info("LinkedIn oauth verfier : " + oauthVerifier);
+	        LinkedInRequestToken requestToken= (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
+			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
+			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken());	        
+	        LOG.info("Access Token : " + accessToken.getToken());
+	        LOG.info("Access Token Secret : " + accessToken.getTokenSecret());
+		}
+		catch (Exception e) {
+			LOG.error(e.getMessage(),e);	
+			return JspResolver.LINKEDIN_MESSAGE;
+		}
+			
+        model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);		
+		return JspResolver.LINKEDIN_MESSAGE;
 	}
 }
 // JIRA SS-77 BY RM07 EOC
