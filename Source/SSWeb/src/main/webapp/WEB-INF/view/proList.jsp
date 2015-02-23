@@ -88,7 +88,7 @@
 								<c:when test="${not empty users}">
 									<c:forEach var="user" varStatus="loopStatus" items="${users}">
 										<div class="ctnt-list-item clearfix ${loopStatus.index % 2 == 0 ? '' : 'ctnt-list-item-even'}">
-											<div class="float-left ctnt-list-item-img"></div>
+											<div class="float-left ctnt-list-item-img" style="background: url(${user.profileImageUrl}) no-repeat center; background-size: contain;"></div>
 											<div class="float-left ctnt-list-item-txt-wrap">
 												<div class="ctnt-item-name">${user.displayName}</div>
 												<div class="ctnt-item-desig">${user.title}</div>
