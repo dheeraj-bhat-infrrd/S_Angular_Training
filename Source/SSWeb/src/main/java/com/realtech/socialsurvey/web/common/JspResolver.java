@@ -44,4 +44,6 @@ public interface JspResolver {
 	public static final String PROFILE_SOCIAL_LINKS = "profilesociallinks";
 	public static final String INDEX = "index";
 	public static final String PROFILE_LIST = "proList";
+	public static final String LINKEDIN_ACCESS="linkedinaccess";
+	public static final String LINKEDIN_MESSAGE="linkedinmessage";
 }

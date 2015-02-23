@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -110,6 +111,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	
+	@Value("${LINKED_IN_API_KEY}")
+	private String linkedInApiKey;
+	
+	@Value("${LINKED_IN_API_SECRET}")
+	private String linkedInApiSecret;
+	
+	@Value("${LINKED_IN_OAUTH_TOKEN}")
+	private String linkedInOauthToken;
+	
+	@Value("${LINKED_IN_OAUTH_SECRET}")
+	private String linkedInOauthSecret;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -1412,6 +1425,52 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.debug("Method isAssigningAllowed() finsihed.");
 		return false;
+	}
+	
+	/**
+	 * Adds the LinkedIn access tokens to the agent's settings in mongo
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	public void setLinkedInAccessTokenForUser(User user, String accessToken) throws InvalidInputException, NoRecordsFetchedException {
+		if ( user == null) {
+			LOG.error("setLinkedInAccessTokenForUser : user parameter is null!");
+			throw new InvalidInputException("setLinkedInAccessTokenForUser : user parameter is null!");			
+		}
+		if ( accessToken == null || accessToken.isEmpty()) {
+			LOG.error("setLinkedInAccessTokenForUser : accessToken parameter is null!");
+			throw new InvalidInputException("setLinkedInAccessTokenForUser : accessToken parameter is null!");	
+		}
+		
+		LOG.info("Adding the LinkedIn access tokens to agent settings in mongo for user id : " + user.getUserId());
+		AgentSettings currentAgentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(user.getUserId());
+		if ( currentAgentSettings == null) {
+			LOG.error("setLinkedInAccessTokenForUser : agent settings not found for user id : " + user.getUserId());
+			throw new NoRecordsFetchedException("setLinkedInAccessTokenForUser : agent settings not found for user id : " + user.getUserId());			
+		}
+		
+		LOG.debug("We fetch the current social media tokens for the agent");
+		SocialMediaTokens mediaTokens = currentAgentSettings.getSocialMediaTokens();
+		//Check if media tokens exist. If not, create them.
+		if( mediaTokens == null ){
+			LOG.debug("Updating the existing media tokens for LinkedIn");
+			mediaTokens = new SocialMediaTokens();
+			mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+			mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(new Timestamp(System.currentTimeMillis()));
+		}
+		else{
+			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+			mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+			mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(new Timestamp(System.currentTimeMillis()));
+		}
+		
+		LOG.debug("Updating the mongo collection with new LinkedIn access tokens");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens, currentAgentSettings, CommonConstants.AGENT_SETTINGS_COLLECTION);
+		LOG.info("Agent settings successfully updated with LinkedIn access token");
+		
 	}
 
 	/*
