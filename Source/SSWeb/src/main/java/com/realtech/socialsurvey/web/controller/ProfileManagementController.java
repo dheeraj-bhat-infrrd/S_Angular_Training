@@ -1,14 +1,11 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.codec.binary.Base64;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -548,9 +545,13 @@ public class ProfileManagementController {
 				
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
+				if (name.indexOf(" ") != -1) {
+					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+				} else {
+					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
+				}
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
@@ -674,10 +675,15 @@ public class ProfileManagementController {
 
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS, address1 + ", " + address2);
+				if (name.indexOf(" ") != -1) {
+					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+				} else {
+					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
+				}
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
