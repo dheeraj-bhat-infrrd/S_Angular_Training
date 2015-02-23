@@ -39,7 +39,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 });
 
 
-// TODO Lock Settings
+// Lock Settings
 $(document).on('click', '.lp-edit-locks', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
@@ -356,7 +356,7 @@ function callBackUpdateBasicDetails(data) {
 }
 
 
-// TODO Function to update profile image
+// Function to update profile image
 function callBackShowProfileImage(data) {
 	$('#prof-img-container').html(data);
 	var profileImageUrl = $('#prof-image-edit').css("background-image");
@@ -382,7 +382,7 @@ function callBackOnProfileImageUpload(data) {
 }
 
 
-//TODO Function to update profile logo image
+// Function to update profile logo image
 function callBackShowProfileLogo(data) {
 	$('#prof-logo-container').html(data);
 	var logoImageUrl = $('#prof-logo-edit').css("background-image");
@@ -806,4 +806,31 @@ function initializeGoogleMap() {
 	        });
 		}
 	});
+}
+
+
+// TODO Other Data
+function paintForProfile() {
+	var companyId = $('#prof-company-id').val();
+	var regionId = $('#prof-region-id').val();
+	var branchId = $('#prof-branch-id').val();
+	var agentId = $('#prof-agent-id').val();
+	minScore = $('#profile-min-post-score').val();
+	currentProfileIden = companyId;
+	
+	if (companyId != "") {
+		fetchAverageRatings(companyId);
+
+		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
+		if(minScore > 0){
+			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
+		}
+		
+		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
+		
+		fetchCompanyRegions();
+		fetchCompanyBranches();
+		fetchCompanyIndividuals();
+	}
 }

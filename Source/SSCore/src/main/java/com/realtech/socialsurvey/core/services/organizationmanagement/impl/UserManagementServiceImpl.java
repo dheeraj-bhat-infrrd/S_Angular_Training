@@ -1682,7 +1682,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		mail_ids.setWork(user.getEmailId());
 		
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
-		contactSettings.setName(user.getFirstName());
+		
+		if (user.getLastName() != null)
+			contactSettings.setName(user.getFirstName() + " " + user.getLastName());
+		else
+			contactSettings.setName(user.getFirstName());
+		
 		contactSettings.setMail_ids(mail_ids);
 		
 		agentSettings.setContact_details(contactSettings);
