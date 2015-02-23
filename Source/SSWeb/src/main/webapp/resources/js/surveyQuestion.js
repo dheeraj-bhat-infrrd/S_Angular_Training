@@ -4,7 +4,7 @@ var is_firefox = navigator.userAgent.indexOf('Firefox') > -1;
 var is_safari = navigator.userAgent.indexOf("Safari") > -1;
 var is_Opera = navigator.userAgent.indexOf("Presto") > -1;
 var qno = 0;
-var data;
+var questions;
 var questionDetails;
 var agentId;
 var agentName;
@@ -13,6 +13,8 @@ var customerEmail;
 var mood;
 var stage;
 var isSmileTypeQuestion;
+var swearWords = [];
+var isAbusive;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -65,7 +67,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 }
 
 function paintSurveyPage(jsonData) {
-	data = jsonData.responseJSON.survey;
+	questions = jsonData.responseJSON.survey;
 	stage = jsonData.responseJSON.stage;
 	if (stage != undefined)
 		qno = stage;
@@ -86,7 +88,7 @@ function paintSurveyPageFromJson() {
 		$('#content').html(
 				"You have already taken survey for " + agentName + "!");
 	}
-	questionDetails = data[qno];
+	questionDetails = questions[qno];
 	var question = questionDetails.question;
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
@@ -144,7 +146,7 @@ function paintSurveyPageFromJson() {
 		$("#prev-mcq").removeClass("btn-com-disabled");
 		$("#prev-textarea-smiley").removeClass("btn-com-disabled");
 	}
-	if (qno == data.length - 1) {
+	if (qno == questions.length - 1) {
 		$("#next-mcq").addClass("btn-com-disabled");
 		$("#next-smile").addClass("btn-com-disabled");
 		$("#next-star").addClass("btn-com-disabled");
@@ -180,21 +182,34 @@ function storeCustomerAnswer(customerResponse) {
 		},
 		complete : function(data) {
 			if (success) {
-				// paintSurveyPage(data);
+				if (qno == (questions.length - 1)) {
+					var parsed = data.responseJSON;
+					for ( var x in parsed) {
+						swearWords.push(parsed[x]);
+					}
+				}
 			}
 		},
 		error : function(e) {
-			console.error("error : " + e);
+			console.error("error : ");
 		}
 	});
 }
 
 function updateCustomeResponse(feedback) {
+	isAbusive = false;
+	var feedbackArr = feedback.split(" ");
+	for (var i = 0; i < feedbackArr.length; i++) {
+		if ($.inArray(feedbackArr[i], swearWords) != -1) {
+			isAbusive = true;
+		}
+	}
 	var payload = {
 		"mood" : mood,
 		"feedback" : feedback,
 		"agentId" : agentId,
-		"customerEmail" : customerEmail
+		"customerEmail" : customerEmail,
+		"isAbusive" : isAbusive
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
@@ -313,7 +328,7 @@ $('.sq-star').click(function() {
 			$(this).addClass('sq-full-star-click');
 		}
 	});
-	if (qno != data.length - 1) {
+	if (qno != questions.length - 1) {
 		$("#next-star").removeClass("btn-com-disabled");
 	}
 	storeCustomerAnswer(starVal);
@@ -492,7 +507,7 @@ $('.sq-smile').click(function() {
 			$(this).addClass('sq-full-smile-click');
 		}
 	});
-	if (qno != data.length - 1) {
+	if (qno != questions.length - 1) {
 		$("#next-smile").removeClass("btn-com-disabled");
 	}
 	storeCustomerAnswer(smileVal);
