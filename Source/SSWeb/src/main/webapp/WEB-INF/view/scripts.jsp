@@ -22,7 +22,8 @@
 	$('#header-logo').click(function(){
 		showMainContent('./dashboard.do');
 	});
-	$('#profile-setting').click(function() {
+	$('#profile-setting').click(function(e) {
 		showMainContent('./showprofilepage.do');
+		e.stopImmediatePropagation();
 	});
 </script>
