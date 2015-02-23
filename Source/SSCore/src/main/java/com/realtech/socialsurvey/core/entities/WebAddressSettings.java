@@ -6,6 +6,7 @@ public class WebAddressSettings {
 
 	private String work;
 	private String personal;
+	private String blogs;
 	private List<MiscValues> others;
 
 	public String getWork() {
@@ -23,6 +24,14 @@ public class WebAddressSettings {
 	public void setPersonal(String personal) {
 		this.personal = personal;
 	}
+	
+	public String getBlogs() {
+		return blogs;
+	}
+
+	public void setBlogs(String blogs) {
+		this.blogs = blogs;
+	}
 
 	public List<MiscValues> getOthers() {
 		return others;
@@ -34,7 +43,6 @@ public class WebAddressSettings {
 
 	@Override
 	public String toString() {
-		return "work: " + work + "\t personal: " + personal + "\t others: " + (others != null ? others.toString() : "null");
+		return "WebAddressSettings [work=" + work + ", personal=" + personal + ", blogs=" + blogs + ", others=" + others + "]";
 	}
-
 }
