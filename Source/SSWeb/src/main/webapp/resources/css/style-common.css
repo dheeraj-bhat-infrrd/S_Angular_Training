@@ -2363,6 +2363,7 @@ button.paypal.is-active {
     bottom: 50px;
     width: 100%;
     line-height: 32px;
+    display: none;
 }
 
 .sb-btns-add-rem-wrapper {
@@ -2949,6 +2950,7 @@ button.paypal.is-active {
 .profile-addl-links {
     margin-top: 10px;
     text-align: right;
+    margin-bottom: 10px;
 }
 
 .p-a-l-item {
@@ -3218,6 +3220,7 @@ button.paypal.is-active {
     right: 20px;
     background-color: #f9f9fb;
     border: 1px solid #dcdcdc;
+    z-index: 999;
 }
 
 .hr-dd-item {
@@ -3266,6 +3269,8 @@ button.paypal.is-active {
 }
 
 .dsh-btn-complete {
+/*    background-color: #26BDEF;*/
+/*    background-color: #5CC7EF;*/
     background-color: #009FE0;
     height: 50px;
     line-height: 50px;
@@ -3277,6 +3282,15 @@ button.paypal.is-active {
     font-size: 18px;
     font-family: 'opensanslight';
     text-transform: uppercase;
+    cursor: pointer;
+}
+
+.dsh-btn-complete:hover{
+    background-color: #7AB400 !important;
+}
+
+.dsh-btn-complete:active {
+    background-color: #70A501 !important;
 }
 
 .dsh-txt-2, .dsh-txt-3 {
@@ -3506,9 +3520,9 @@ button.paypal.is-active {
 }
 
 .dsh-graph-txt-4 {
-    top: 94px;
-    left: -190px;
-    width: 190px;
+    top: 146px;
+    left: -215px;
+    width: 220px;
 }
 
 .stat-icn-img-green {
@@ -3586,4 +3600,19 @@ button.paypal.is-active {
 
 .lgn-col-red {
     background-color: rgb(255,202,145);
+}
+
+.dash-main-left{
+    overflow: hidden;
+    margin-left: -20px;
+}
+
+.dash-main-right{
+    margin-left: -55px;
+}
+
+.rt-content-main-adj{
+    padding: 15px 15px 15px 30px;
+    margin-left: -15px;
+    margin-right: 0;
 }
