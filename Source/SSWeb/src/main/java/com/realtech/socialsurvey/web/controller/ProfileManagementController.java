@@ -90,6 +90,7 @@ public class ProfileManagementController {
 
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfilePage(Model model, HttpServletRequest request) {
+		LOG.info("ProfileEdit page called");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -544,6 +545,8 @@ public class ProfileManagementController {
 				
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
 			}
 			else {
@@ -668,6 +671,8 @@ public class ProfileManagementController {
 
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
 			}
@@ -716,7 +721,7 @@ public class ProfileManagementController {
 	public String updateLogo(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Method updateLogo() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
-		String logoName = "";
+		String logoUrl = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -731,8 +736,8 @@ public class ProfileManagementController {
 				if (logoFileName == null || logoFileName.isEmpty()) {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
-				logoName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
-				logoName = endpoint + "/" + bucket + "/" +logoName;
+				logoUrl = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
+				logoUrl = endpoint + "/" + bucket + "/" +logoUrl;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
@@ -745,8 +750,8 @@ public class ProfileManagementController {
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
-				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, logoName);
-				companySettings.setLogo(logoName);
+				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, logoUrl);
+				companySettings.setLogo(logoUrl);
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
@@ -755,8 +760,8 @@ public class ProfileManagementController {
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
-				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, logoName);
-				regionSettings.setLogo(logoName);
+				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, logoUrl);
+				regionSettings.setLogo(logoUrl);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
@@ -765,8 +770,8 @@ public class ProfileManagementController {
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
-				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, logoName);
-				branchSettings.setLogo(logoName);
+				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, logoUrl);
+				branchSettings.setLogo(logoUrl);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
@@ -775,15 +780,15 @@ public class ProfileManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, logoName);
-				agentSettings.setLogo(logoName);
+				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, logoUrl);
+				agentSettings.setLogo(logoUrl);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setLogo(logoName);
+			profile.setLogo(logoUrl);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setLogoInSession(session, userSettings);
@@ -811,7 +816,7 @@ public class ProfileManagementController {
 	public String updateProfileImage(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Method updateProfileImage() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
-		String imageName = "";
+		String profileImageUrl = "";
 
 		try {
 			HttpSession session = request.getSession(false);
@@ -821,13 +826,13 @@ public class ProfileManagementController {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
-			String profileImageUrl = request.getParameter("logoFileName");
+			String profileImageName = request.getParameter("logoFileName");
 			try {
-				if (profileImageUrl == null || profileImageUrl.isEmpty()) {
+				if (profileImageName == null || profileImageName.isEmpty()) {
 					throw new InvalidInputException("Profile Image passed is null or empty");
 				}
-				imageName = fileUploadService.fileUploadHandler(fileLocal, profileImageUrl);
-				imageName = endpoint + "/" + bucket + "/" +imageName;
+				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, profileImageName);
+				profileImageUrl = endpoint + "/" + bucket + "/" +profileImageUrl;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while uploading Profile Image. Reason :" + e.getMessage(), e);
@@ -840,8 +845,8 @@ public class ProfileManagementController {
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, imageName);
-				companySettings.setProfileImageUrl(imageName);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, profileImageUrl);
+				companySettings.setProfileImageUrl(profileImageUrl);
 				userSettings.setCompanySettings(companySettings);
 			}
 			else if (user.isRegionAdmin()) {
@@ -850,8 +855,8 @@ public class ProfileManagementController {
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, imageName);
-				regionSettings.setProfileImageUrl(imageName);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, profileImageUrl);
+				regionSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
 			else if (user.isBranchAdmin()) {
@@ -860,8 +865,8 @@ public class ProfileManagementController {
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, imageName);
-				branchSettings.setProfileImageUrl(imageName);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, profileImageUrl);
+				branchSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
@@ -870,8 +875,8 @@ public class ProfileManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, imageName);
-				agentSettings.setProfileImageUrl(imageName);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, profileImageUrl);
+				agentSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 
 				// Modify Agent details in Solr
@@ -881,7 +886,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setProfileImageUrl(imageName);
+			profile.setProfileImageUrl(profileImageUrl);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setProfileImageInSession(session, userSettings);
