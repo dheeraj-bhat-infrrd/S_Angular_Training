@@ -95,26 +95,35 @@
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
-						<div class="sq-star-wrapper sq-i-container clearfix">
+						<div class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
 							<div class="clearfix sq-info-wrapper">
 								<div class="sq-i-lbl float-left">First Name</div>
 								<div class="sq-i-txt float-left">
+									<div class="hide sq-img-adj icn-fname"></div>
 									<input id="firstName" class="sq-i-txt-fld">
 								</div>
 							</div>
 							<div class="clearfix sq-info-wrapper">
 								<div class="sq-i-lbl float-left">Last Name</div>
 								<div class="sq-i-txt float-left">
+									<div class="hide sq-img-adj icn-lname"></div>
 									<input id="lastName" class="sq-i-txt-fld">
 								</div>
 							</div>
 							<div class="clearfix sq-info-wrapper">
 								<div class="sq-i-lbl float-left">Email</div>
 								<div class="sq-i-txt float-left">
+									<div class="hide sq-img-adj icn-email"></div>
 									<input id="email" class="sq-i-txt-fld">
 								</div>
 							</div>
-
+							<div class="clearfix sq-info-wrapper">
+								<div class="sq-i-lbl float-left">I</div>
+								<div class="sq-i-txt float-left">
+									<select id="cust-agnt-rel" class="sq-i-txt-fld">
+									</select>
+								</div>
+							</div>
 							<div class="clearfix reg-captcha-wrapper reg-item reg-cap-nw-adj">
 								<div class="reg-cap-nw-adj-container">
 									<div class="reg-captcha-img"></div>
@@ -203,7 +212,7 @@
 							<div class="sq-pts-item-hover pts-hover-3 pts-arr-bot">Good</div>
 							<div class="sq-pts-item-hover pts-hover-4 pts-arr-bot">V
 								Good</div>
-							<div class="sq-pts-item-hover pts-hover-5 pts-arr-bot">Exccellent</div>
+							<div class="sq-pts-item-hover pts-hover-5 pts-arr-bot">Excellent</div>
 						</div>
 						<div class="sq-slider-wrapper clearfix">
 							<div value="1" class="sq-pts-item sq-pts-red">1</div>
@@ -274,6 +283,16 @@
 						<div id="next-mcq"
 							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
+				</div>
+				
+				<!-- Div for Error Messages -->
+				<div data-ques-type="error" class="sq-quest-item hide">
+					<div class="sq-top-img"></div>
+					<div id="content-head" class="sq-main-txt">Error</div>
+					<div class="sq-ques">
+						<i><span id="content" class="sq-ques-txt"></span></i>
+					</div>
+					<div class="sq-bord-bot-sm"></div>
 				</div>
 			</div>
 		</div>
@@ -409,7 +428,7 @@
 						console.log("Info button clicked");
 						$("#recaptcha_whatsthis").click();
 					});
-					//				initSurvey($('#prof-container').attr("data-agentId"));
+					$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
 				});
 	</script>
 
