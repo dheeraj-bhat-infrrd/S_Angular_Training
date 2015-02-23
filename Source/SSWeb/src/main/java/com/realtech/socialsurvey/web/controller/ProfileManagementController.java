@@ -90,6 +90,7 @@ public class ProfileManagementController {
 
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfilePage(Model model, HttpServletRequest request) {
+		LOG.info("ProfileEdit page called");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
