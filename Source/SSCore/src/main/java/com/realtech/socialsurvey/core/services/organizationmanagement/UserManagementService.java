@@ -28,7 +28,7 @@ public interface UserManagementService {
 
 	public User assignRegionAdmin(User user, long regionId, long userId) throws InvalidInputException;
 
-	public void updateUserStatus(long userId, int status) throws InvalidInputException;
+	public void updateUserStatus(long userId, int status) throws InvalidInputException, SolrException;
 
 	// JIRA SS-42 BY RM02 BOC
 
@@ -69,6 +69,27 @@ public interface UserManagementService {
 
 	// Method to assign a user to a particular branch.
 	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException, SolrException;
+	
+	/**
+	 * Assign a user directly under the company.
+	 * @param admin
+	 * @param userId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignUserToCompany(User admin, long userId) throws InvalidInputException, NoRecordsFetchedException, SolrException;
+	
+	/**
+	 * Assign a user directly to a region 
+	 * @param admin
+	 * @param userId
+	 * @param regionId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignUserToRegion(User admin, long userId, long regionId) throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 	// Method to unassign a user from branch.
 	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException;
@@ -99,7 +120,7 @@ public interface UserManagementService {
 
 	public void updateProfileCompletionStage(User user, int profilesMasterId, String profileCompletionStage) throws InvalidInputException;
 
-	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException;
+	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException, SolrException;
 	
 	//JIRA SS-42 by RM-06:BOC
 	
@@ -144,5 +165,12 @@ public interface UserManagementService {
 	 */
 	public void setLinkedInAccessTokenForUser(User user,String accessToken) throws InvalidInputException, NoRecordsFetchedException;
 
+	/**
+	 * Method to insert agent settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertAgentSettings(User user) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

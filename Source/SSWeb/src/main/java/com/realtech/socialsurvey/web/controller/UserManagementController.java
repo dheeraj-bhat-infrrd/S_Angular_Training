@@ -162,7 +162,15 @@ public class UserManagementController {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
+						
+						LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+						userManagementService.insertAgentSettings(user);
+						LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
+						LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 						solrSearchService.addUserToSolr(user);
+						LOG.debug("Added newly added user {} to solr", user.getFirstName());
+						
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
@@ -858,7 +866,11 @@ public class UserManagementController {
 			}
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
-			
+
+			LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+			userManagementService.insertAgentSettings(user);
+			LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
 			LOG.debug("Adding newly registered user to principal session");
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");

@@ -149,11 +149,13 @@ a, a:hover, a:visited{
 
 .hero-txt-wrapper {
     text-transform: capitalize;
-    font-size: 32px;
+    font-size: 30px;
     width: 705px;
     margin: 2px auto;
     padding: 20px;
     text-align: center;
+    line-height: 34px;
+    text-shadow: 2px 2px 46px rgba(255,255,255,0.5);
 }
 
 .index-body {
@@ -194,7 +196,7 @@ a, a:hover, a:visited{
 }
 
 .c-pic-top-2 {
-    background: url(../images/Person1.png) no-repeat center;
+    background: url(../images/homep1.png) no-repeat center;
     background-size: cover;
 }
 
@@ -206,20 +208,21 @@ a, a:hover, a:visited{
 }
 
 .c-pic-bot-2 {
-    background: url(../images/Person3.png) no-repeat center;
+    background: url(../images/homep3.png) no-repeat center;
     background-size: cover;
     margin-right: 5px;
 }
 
 .c-pic-bot-3 {
-    background: url(../images/Person4.png) no-repeat center;
+    background: url(../images/homep4.png) no-repeat center;
     background-size: cover;
 }
 
 .c-panel-txt-top {
     position: relative;
     z-index: 99;
-    font-size: 32px;
+    font-size: 30px;
+    margin-bottom: 5px;
 }
 
 .pic-bot-txt {
@@ -234,7 +237,7 @@ a, a:hover, a:visited{
 }
 
 .c-pic-bot-1 {
-    background: url(../images/Person2.png) no-repeat center;
+    background: url(../images/homep2.png) no-repeat center;
     background-size: cover;
     margin-right: 5px;
 }
@@ -274,6 +277,7 @@ a, a:hover, a:visited{
 }
 
 .reg-item {
+    position: relative;
     margin-bottom: 10px;
 }
 
@@ -282,7 +286,7 @@ a, a:hover, a:visited{
 }
 
 .reg-captcha-img {
-    height: 56px;
+    height: 58px;
     border-bottom: 1px solid #dcdcdc;
     background: #fff;
 }
@@ -313,7 +317,7 @@ a, a:hover, a:visited{
     width: 100%;
     color: #fff;
     background-color: #7fba00;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .reg-txt-top1 {
@@ -324,7 +328,8 @@ a, a:hover, a:visited{
 }
 
 .reg-txt-top2 {
-    margin-bottom: 7px;
+    margin-bottom: 10px;
+    text-transform: capitalize;
 }
 
 .pic-bot-txt-top {
@@ -337,30 +342,31 @@ a, a:hover, a:visited{
 
 .pro-left-wrapper {
     text-align: right;
-    font-size: 24px;
+    font-size: 18px;
     width: 475px;
-    line-height: 80px;
-    height: 80px;
+    line-height: 70px;
+    height: 70px;
     background-color: rgba(0, 159, 224, 0.8);
     color: #fff;
     margin-right: 5px;
     padding: 0 50px;
+    position: relative;
 }
 
 .pro-right-wrapper {
     position: relative;
     width: 660px;
-    height: 80px;
+    height: 70px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
-    padding: 20px;
+    padding: 15px;
 }
 
 .pro-inp {
     color: #3e3e3e;
     display: block;
     float: left;
-    width: 200px;
+    width: 202px;
     margin-right: 0;
     height: 40px;
     border: 0;
@@ -369,6 +375,8 @@ a, a:hover, a:visited{
     padding: 0 10px;
     margin-right: 10px;
     z-index: 99;
+    background-color: #fff !important;
+    background-position: -50px !important;
     position: relative;
 }
 
@@ -376,8 +384,8 @@ a, a:hover, a:visited{
     margin-right: 0;
     color: #fff !important;
     cursor: pointer;
-    background-color: #7fba00;
-    font-size: 18px !important;
+    background-color: #7fba00 !important;
+    font-size: 14px !important;
 }
 
 .pro-wrapper {
@@ -411,6 +419,7 @@ a, a:hover, a:visited{
 .footer-wrapper {
     margin: 20px 0;
     text-align: center;
+    font-size: 12px;
 }
 
 .hdr-log-reg-btn {
@@ -562,12 +571,13 @@ a, a:hover, a:visited{
 .c-panel-txt-bot {
     position: relative;
     z-index: 99;
+    font-size: 13px;
 }
 
 .blue-ext-right {
     position: absolute;
     width: 1500px;
-    height: 80px;
+    height: 70px;
     background-color: rgba(0, 159, 224, 0.8);
     top: 0;
     left: 0;
@@ -582,4 +592,67 @@ a, a:hover, a:visited{
     background: url('../images/temp_ad.png') no-repeat center;
     height: 1000px;
     background-size: 160px;
+}
+
+.fp-txt-1 {
+    position: relative;
+    z-index: 99999;
+}
+
+.m-inp-img-uname {
+    background: url(../images/userName.png) no-repeat center;
+}
+
+.m-inp-img-pwd {
+    background: url(../images/password.png) no-repeat;
+    background-position: 10px center;
+}
+
+.m-inp-img-fname {
+    background: url(../images/first-name.png) no-repeat center;
+}
+
+.m-inp-img-lname {
+    background: url(../images/last-name.png) no-repeat center;
+}
+
+.m-inp-img-email {
+    background: url(../images/email.png) no-repeat center;
+}
+
+.h-inp-wrapper {
+    position: relative;
+}
+
+.m-inp-img {
+    position: absolute;
+    left: 0;
+    width: 50px;
+    height: 44px;
+    top: 0;
+    display: none;
+    z-index: 999999;
+}
+
+.m-inp-img-adj {
+    top: 44px;
+}
+
+.header-row {
+    position: relative;
+}
+
+.header-search-icn {
+    height: 50px;
+    width: 50px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    background: url(../images/search_white.png) no-repeat center;
+    background-size: 28px;
+    display: none;
+}
+
+.pro-wrapper-top {
+    margin: 0 !important;
 }
