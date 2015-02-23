@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +13,8 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -63,11 +69,32 @@ public class SurveyManagementController {
 	@Autowired
 	private EmailServices emailServices;
 
+	private static String swearWords = "";
+
+	static {
+		Resource resource = new ClassPathResource("swear-words");
+		try {
+			BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+			String text;
+			List<String> swearWordsLst = new ArrayList<>();
+			text = br.readLine();
+			while (text != null) {
+				swearWordsLst.add(text.trim());
+				text = br.readLine();
+			}
+			swearWords = new Gson().toJson(swearWordsLst);
+		}
+		catch (IOException e) {
+			LOG.error("Error parsing list of swear words", e);
+		}
+	}
+
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/data/storeAnswer")
-	public void storeSurveyAnswer(HttpServletRequest request) {
+	public String storeSurveyAnswer(HttpServletRequest request) {
 		LOG.info("Method storeSurveyAnswer() started to store response of customer.");
 		// TODO store answer provided by customer in mongoDB.
 		String answer = request.getParameter("answer");
@@ -78,6 +105,7 @@ public class SurveyManagementController {
 		long agentId = Long.valueOf(request.getParameter("agentId"));
 		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
+		return swearWords;
 	}
 
 	/*
@@ -87,26 +115,27 @@ public class SurveyManagementController {
 	public void storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
 		// TODO store answer provided by customer in mongoDB.
-		try{
-			String feedback = request.getParameter("feedback");
-		String mood = request.getParameter("mood");
-		String customerEmail = request.getParameter("customerEmail");
-		long agentId = Long.valueOf(request.getParameter("agentId"));
-		surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
-		
-		//Sending email to the customer telling about successful completion of survey.
-		SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 		try {
-			emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+			String feedback = request.getParameter("feedback");
+			String mood = request.getParameter("mood");
+			String customerEmail = request.getParameter("customerEmail");
+			long agentId = Long.valueOf(request.getParameter("agentId"));
+			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
+
+			// Sending email to the customer telling about successful completion of survey.
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			try {
+				emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
+				throw e;
+			}
 		}
-		catch (InvalidInputException | UndeliveredEmailException e) {
-			LOG.error("Exception occurred while trying to send survey completion mail to : "+customerEmail);
-			throw e;
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
+			return;
 		}
-	}catch(NonFatalException e){
-		LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ",e);
-		return;
-	}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
 
@@ -149,7 +178,6 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-//		String survey = null;
 		Integer stage = null;
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		try {
@@ -174,18 +202,18 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw e;
 			}
-			if(!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)){
+			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				throw new InvalidInputException("Captcha Validation failed!",DisplayMessageConstants.INVALID_CAPTCHA);
+				throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
 				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent);
-				if(survey!=null){
+				if (survey != null) {
 					stage = survey.getStage();
-					for(SurveyQuestionDetails surveyDetails:surveyQuestionDetails){
-						for(SurveyResponse surveyResponse:survey.getSurveyResponse()){
-							if(surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())){
+					for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
+						for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
+							if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
 								surveyDetails.setCustomerResponse(surveyResponse.getAnswer());
 							}
 						}
@@ -215,13 +243,17 @@ public class SurveyManagementController {
 		return new Gson().toJson(surveyAndStage);
 	}
 
-	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent)
-			throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
+	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
+			String custRelationWithAgent) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
 		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent);
 	}
 
 	private String getApplicationBaseUrl() {
 		return surveyHandler.getApplicationBaseUrl();
+	}
+
+	public static String getSwearWords() {
+		return swearWords;
 	}
 }
 // JIRA SS-119 by RM-05 : EOC
