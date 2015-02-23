@@ -88,7 +88,7 @@ function infiniteScrollCallback(response) {
 		$.each(users, function(i, user) {
 			var evenOdd = (loopStatus % 2 == 0) ? '' : 'ctnt-list-item-even';
 			htmlData = htmlData + '<div class="ctnt-list-item clearfix ' + evenOdd + '">'
-				+ '<div class="float-left ctnt-list-item-img"></div>'
+				+ '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: contain;"></div>'
 				+ '<div class="float-left ctnt-list-item-txt-wrap">'
 					+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
 					+ '<div class="ctnt-item-desig">' + user.title + '</div>'
