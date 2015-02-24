@@ -91,6 +91,9 @@ public class UserManagementController {
 	
 	@Value("${LINKED_IN_OAUTH_SECRET}")
 	private String linkedInOauthSecret;
+	
+	@Value("${LINKED_IN_REDIRECT_URI}")
+	private String linkedinRedirectUri;
 
 	// JIRA SS-42 BY RM05 BOC
 	/*
@@ -894,25 +897,11 @@ public class UserManagementController {
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present
-			}
-			
-			LinkedInRequestToken requestToken = userManagementService.getLinkedInRequestToken();
-			
-			//We will keep the request token in session
-	        session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);       
-	        LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
-	        
-			//Now we set the model attribute with the authorization url
-	        model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());			
+			}	
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.COMPLETE_REGISTRATION;
-		}
-		catch (Exception e) {
-			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", e.getMessage());
 			return JspResolver.COMPLETE_REGISTRATION;
 		}
 		
@@ -994,7 +983,12 @@ public class UserManagementController {
 		LOG.debug("change password form parameters validated successfully");
 	}
 	
-	@ResponseBody
+	/**
+	 * Returns the linked in authorization page
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value="/linkedinauthpage", method = RequestMethod.GET)
 	public String getLinkedInAuthPage(Model model,HttpServletRequest request){
 		
@@ -1003,24 +997,33 @@ public class UserManagementController {
 			LOG.error("Session is null!");
 		}
 		
-		LOG.info("Connecting to LinkedIn");
-		LinkedInOAuthService oauthService;		
-		oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
-        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://5c7c2ee3.ngrok.com/linkedinauth.do");
+		LOG.info("getLinkedInAuthPage called");
+		LinkedInRequestToken requestToken;	
+		try{
+			requestToken = userManagementService.getLinkedInRequestToken();
+		}
+		catch(Exception e){
+			LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", e.getMessage());
+			return JspResolver.ERROR_PAGE;
+		}
         
         //We will keep the request token in session
         session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
         
         LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
         
-        session = request.getSession(false);
-		if(session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN) == null){
-			LOG.error("Request token is null!");
-		}
-		
-		return requestToken.getAuthorizationUrl();
+		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
+		model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());
+		return JspResolver.LINKEDIN_MESSAGE;
 	}
 	
+	/**
+	 * The url that LinkedIn send request to with the oauth verification code
+	 * @param model
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value="/linkedinauth", method = RequestMethod.GET)
 	public String authenticateLinkedInAccess(Model model,HttpServletRequest request){
 		

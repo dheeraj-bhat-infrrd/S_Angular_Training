@@ -38,6 +38,9 @@
 									<c:when test="${ success == 1 }">
 										<spring:message code="label.authorization.success" />
 									</c:when>
+									<c:when test="${ message == 1 }">
+										<spring:message code="label.waitmessage.key" />
+									</c:when>
 									<c:otherwise>
 										<spring:message code="label.authorization.failure" />
 									</c:otherwise>
@@ -46,7 +49,16 @@
 						</div>
 						<div
 							style="font-size: 11px; text-align: center;">
-							<spring:message code="label.timer.key" />
+							<c:choose>
+									<c:when test="${ success == 1 }">
+										<spring:message code="label.timer.key" />
+									</c:when>
+									<c:when test="${ message == 1 }"></c:when>
+									<c:otherwise>
+										<spring:message code="label.timer.key" />
+									</c:otherwise>
+							</c:choose>
+							
 						</div>
 					</div>
 
@@ -70,6 +82,18 @@
 
 	<script>
 		$(document).ready(function() {
+			
+			var waitMessage = "${ message }";
+			if( parseInt(waitMessage) == 1 ){
+				var authUrl = "${ authUrl }";
+				if( authUrl != null){
+					location.href = authUrl;
+				}
+				else{
+					console.log("authUrl not found!");
+				}
+			}			
+			
 			var parentWindow;
 			if (window.opener != null && !window.opener.closed) {
 				parentWindow = window.opener;
@@ -79,13 +103,12 @@
 			}
 			
 			var error = "${error}";
-			if(parseInt(error) == 1){
+			if( parseInt(error) == 1 ){
 				parentWindow.location.href = "./landing.do";
 	           	window.close();
 			}
 			
 			setTimeout(function() {
-				console.log("Unable to access parent window!");
 				parentWindow.location.href = "./landing.do";
 				window.close();
 			}, 3000);
