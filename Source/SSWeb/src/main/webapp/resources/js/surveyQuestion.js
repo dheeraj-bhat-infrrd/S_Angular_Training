@@ -380,8 +380,7 @@ $('.sq-np-item-next')
 					if (questionDetails.questionType == "sb-sel-mcq"
 							&& customerResponse != undefined) {
 						storeCustomerAnswer(customerResponse);
-					} else if (questionDetails.questionType == "sb-sel-desc"
-							&& customerResponse != undefined) {
+					} else if (questionDetails.questionType == "sb-sel-desc") {
 						customerResponse = $("#text-area").val();
 						if (customerResponse == undefined) {
 							customerResponse = "";
