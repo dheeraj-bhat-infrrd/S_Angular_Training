@@ -35,10 +35,12 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_LOCATION_ENABLED = "isLocationEnabled";
 	public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
+	public static final String KEY_LOCK_SETTINGS = "lockSettings";
 
 	public static final String KEY_PROFILE_NAME = "profileName";
 	public static final String KEY_PROFILE_URL = "profileUrl";
 	public static final String KEY_LOGO = "logo";
+	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
 	public static final String KEY_CONTACT_DETAILS = "contact_details";
 	public static final String KEY_ASSOCIATION = "associations";
 	public static final String KEY_ACHIEVEMENTS = "achievements";
@@ -62,35 +64,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Override
 	public void insertAgentSettings(AgentSettings agentSettings) {
-		LOG.info("Inseting agent settings. Agent id: " + agentSettings.getIden());
-		LOG.debug("Inserting agent settings: " + agentSettings.toString());
+		LOG.info("Inserting agent settings: " + agentSettings.toString());
 		mongoTemplate.insert(agentSettings, AGENT_SETTINGS_COLLECTION);
 		LOG.info("Inserted into agent settings");
-	}
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		LOG.info("Checking if collections are created in mongodb");
-		if (!mongoTemplate.collectionExists(COMPANY_SETTINGS_COLLECTION)) {
-			LOG.info("Creating " + COMPANY_SETTINGS_COLLECTION);
-			mongoTemplate.createCollection(COMPANY_SETTINGS_COLLECTION);
-			createIndexOnIden(COMPANY_SETTINGS_COLLECTION);
-		}
-		if (!mongoTemplate.collectionExists(REGION_SETTINGS_COLLECTION)) {
-			LOG.info("Creating " + REGION_SETTINGS_COLLECTION);
-			mongoTemplate.createCollection(REGION_SETTINGS_COLLECTION);
-			createIndexOnIden(REGION_SETTINGS_COLLECTION);
-		}
-		if (!mongoTemplate.collectionExists(BRANCH_SETTINGS_COLLECTION)) {
-			LOG.info("Creating " + BRANCH_SETTINGS_COLLECTION);
-			mongoTemplate.createCollection(BRANCH_SETTINGS_COLLECTION);
-			createIndexOnIden(BRANCH_SETTINGS_COLLECTION);
-		}
-		if (!mongoTemplate.collectionExists(AGENT_SETTINGS_COLLECTION)) {
-			LOG.info("Creating " + AGENT_SETTINGS_COLLECTION);
-			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
-			createIndexOnIden(AGENT_SETTINGS_COLLECTION);
-		}
 	}
 
 	@Override
@@ -122,6 +98,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Updated the unit setting");
 	}
 
+	@Override
+	public void updateParticularKeyAgentSettings(String keyToUpdate, Object updatedRecord, AgentSettings agentSettings) {
+		LOG.info("Updating unit setting in AGENT_SETTINGS with " + agentSettings + " for key: " + keyToUpdate + " wtih value: " + updatedRecord);
+		Query query = new Query();
+		query.addCriteria(Criteria.where("_id").is(agentSettings.getId()));
+		Update update = new Update().set(keyToUpdate, updatedRecord);
+		LOG.debug("Updating the unit settings");
+		mongoTemplate.updateFirst(query, update, OrganizationUnitSettings.class, AGENT_SETTINGS_COLLECTION);
+		LOG.info("Updated the unit setting");
+	}
+
 	/**
 	 * Fetchs the list of names of logos being used.
 	 * 
@@ -129,10 +116,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	 */
 	@Override
 	public List<String> fetchLogoList() {
-
 		LOG.info("Fetching the list of logos being used");
 		List<OrganizationUnitSettings> settingsList = mongoTemplate.findAll(OrganizationUnitSettings.class, COMPANY_SETTINGS_COLLECTION);
 		List<String> logoList = new ArrayList<>();
+
 		LOG.info("Preparing the list of logo names");
 		for (OrganizationUnitSettings settings : settingsList) {
 			String logoName = settings.getLogo();
@@ -140,7 +127,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 				logoList.add(logoName);
 			}
 		}
-
 		LOG.info("Returning the list prepared!");
 		return logoList;
 	}
@@ -161,13 +147,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Successfully completed updation of unit settings");
 	}
 
-	// creates index on field 'iden'
-	private void createIndexOnIden(String collectionName) {
-		LOG.debug("Creating unique index on 'iden' for " + collectionName);
-		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
-		LOG.debug("Index created");
-	}
-
 	/**
 	 * Method to fetch organization settings based on profile name
 	 */
@@ -185,7 +164,6 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	/**
 	 * Method to fetch organization settings based on profile url
 	 */
-
 	@Override
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName) {
 		LOG.info("Method fetchOrganizationUnitSettingsByProfileUrl called for profileUrl:" + profileUrl + " and collectionName:" + collectionName);
@@ -197,4 +175,35 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return organizationUnitSettings;
 	}
 
+	// creates index on field 'iden'
+	private void createIndexOnIden(String collectionName) {
+		LOG.debug("Creating unique index on 'iden' for " + collectionName);
+		mongoTemplate.indexOps(collectionName).ensureIndex(new Index().on(KEY_IDENTIFIER, Sort.Direction.ASC).unique());
+		LOG.debug("Index created");
+	}
+
+	@Override
+	public void afterPropertiesSet() throws Exception {
+		LOG.info("Checking if collections are created in mongodb");
+		if (!mongoTemplate.collectionExists(COMPANY_SETTINGS_COLLECTION)) {
+			LOG.info("Creating " + COMPANY_SETTINGS_COLLECTION);
+			mongoTemplate.createCollection(COMPANY_SETTINGS_COLLECTION);
+			createIndexOnIden(COMPANY_SETTINGS_COLLECTION);
+		}
+		if (!mongoTemplate.collectionExists(REGION_SETTINGS_COLLECTION)) {
+			LOG.info("Creating " + REGION_SETTINGS_COLLECTION);
+			mongoTemplate.createCollection(REGION_SETTINGS_COLLECTION);
+			createIndexOnIden(REGION_SETTINGS_COLLECTION);
+		}
+		if (!mongoTemplate.collectionExists(BRANCH_SETTINGS_COLLECTION)) {
+			LOG.info("Creating " + BRANCH_SETTINGS_COLLECTION);
+			mongoTemplate.createCollection(BRANCH_SETTINGS_COLLECTION);
+			createIndexOnIden(BRANCH_SETTINGS_COLLECTION);
+		}
+		if (!mongoTemplate.collectionExists(AGENT_SETTINGS_COLLECTION)) {
+			LOG.info("Creating " + AGENT_SETTINGS_COLLECTION);
+			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
+			createIndexOnIden(AGENT_SETTINGS_COLLECTION);
+		}
+	}
 }

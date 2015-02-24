@@ -1,16 +1,24 @@
 package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.MongoSurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -25,39 +33,68 @@ public class SurveyHandlerImpl implements SurveyHandler {
 	private SolrSearchService solrSearchService;
 
 	@Autowired
-	private MongoSurveyDetailsDao mongoSurveyDetailsDao;
+	private SurveyDetailsDao surveyDetailsDao;
+
+	@Autowired
+	private UserDao userDao;
+
+	@Autowired
+	private URLGenerator urlGenerator;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
 
 	/**
 	 * Method to store question and answer format into mongo.
 	 * 
 	 * @param agentId
+	 * @throws InvalidInputException
 	 * @throws Exception
 	 */
 	@Override
-	public void storeInitialSurveyDetails(long agentId, long companyId, long regionId, long branchId, String customerEmail, int reminderCount)
-			throws SolrException, NoRecordsFetchedException, SolrServerException {
-		String agentName;
+	@Transactional
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent)
+			throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException {
+
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() started.");
-		try {
-			agentName = solrSearchService.getUserDisplayNameById(agentId);
+
+		String agentName;
+		long branchId = 0;
+		long companyId = 0;
+		long regionId = 0;
+
+		User user = userDao.findById(User.class, agentId);
+		companyId = user.getCompany().getCompanyId();
+		agentName = user.getFirstName() + " " + user.getLastName();
+		for (UserProfile userProfile : user.getUserProfiles()) {
+			if (userProfile.getAgentId() == agentId) {
+				branchId = userProfile.getBranchId();
+				regionId = userProfile.getRegionId();
+			}
 		}
-		catch (SolrException | NoRecordsFetchedException | SolrServerException e) {
-			LOG.error("Exception caught in storeInitialSurveyAnswers () while fetching user's name from Solr.", e);
-			throw e;
-		}
+
 		SurveyDetails surveyDetails = new SurveyDetails();
 		surveyDetails.setAgentId(agentId);
 		surveyDetails.setAgentName(agentName);
 		surveyDetails.setBranchId(branchId);
+		surveyDetails.setCustomerName(firstName+" "+lastName);
 		surveyDetails.setCompanyId(companyId);
 		surveyDetails.setCustomerEmail(customerEmail);
 		surveyDetails.setRegionId(regionId);
 		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
 		surveyDetails.setReminderCount(reminderCount);
+		surveyDetails.setUpdatedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
-		mongoSurveyDetailsDao.updateEmailForExistingFeedback(agentId, customerEmail);
-		mongoSurveyDetailsDao.insertSurveyDetails(surveyDetails);
+		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
+		SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
+		if (survey == null) {
+			surveyDetailsDao.insertSurveyDetails(surveyDetails);
+			return null;
+		}
+		else {
+			return survey;
+		}
 	}
 
 	/*
@@ -76,19 +113,33 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		surveyResponse.setAnswer(answer);
 		surveyResponse.setQuestion(question);
 		surveyResponse.setQuestionType(questionType);
-		mongoSurveyDetailsDao.updateCustomerResponse(agentId, customerEmail, surveyResponse, stage);
+		surveyDetailsDao.updateCustomerResponse(agentId, customerEmail, surveyResponse, stage);
 		LOG.info("Method to update answers provided by customer in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
-	
+
 	/*
-	 * Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS.
+	 * Method to update customer review and final score on the basis of rating questions in
+	 * SURVEY_DETAILS.
 	 */
 	@Override
-	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review){
+	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review) {
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() started.");
-		mongoSurveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review);
-		mongoSurveyDetailsDao.updateFinalScore(agentId, customerEmail);
+		surveyDetailsDao.updateGatewayAnswer(agentId, customerEmail, mood, review);
+		surveyDetailsDao.updateFinalScore(agentId, customerEmail);
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
+	}
+	
+	public SurveyDetails getSurveyDetails(long agentId, String customerEmail){
+		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email started.");
+		SurveyDetails surveyDetails;
+		surveyDetails = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
+		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email finished.");
+		return surveyDetails;
+	}
+
+	@Override
+	public String getApplicationBaseUrl() {
+		return applicationBaseUrl;
 	}
 }
 // JIRA SS-119 by RM-05:EOC
