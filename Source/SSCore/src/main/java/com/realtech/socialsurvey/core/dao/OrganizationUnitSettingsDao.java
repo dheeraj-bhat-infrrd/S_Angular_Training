@@ -53,6 +53,15 @@ public interface OrganizationUnitSettingsDao {
 			String collectionName);
 
 	/**
+	 * Updates a particular element in the collection
+	 * 
+	 * @param keyToUpdate
+	 * @param updatedRecord
+	 * @param agentSettings
+	 */
+	public void updateParticularKeyAgentSettings(String keyToUpdate, Object updatedRecord, AgentSettings agentSettings);
+	
+	/**
 	 * Fetchs the list of names of logos being used.
 	 * 
 	 * @return

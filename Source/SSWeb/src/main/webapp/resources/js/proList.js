@@ -11,10 +11,10 @@ function adjustTextContainerWidthOnResize() {
 	$('.ctnt-list-item .ctnt-list-item-txt-wrap').width(textContainerWidth);
 }
 
-//Function to validate the first name pattern
+// Function to validate the first name pattern
 function validateProFirstNamePattern(elementId) {
 	if ($('#' + elementId).val() != "") {
-		if (nameRegex.test($('#' + elementId).val()) == true) {
+		if (firstNamePatternRegex.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			$('#overlay-toast').html('Please enter a first name pattern.');
@@ -31,7 +31,7 @@ function validateProFirstNamePattern(elementId) {
 // Function to validate the last name pattern
 function validateProLastNamePattern(elementId) {
 	if ($('#' + elementId).val() != "") {
-		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
+		if (lastNamePatternRegEx.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
 			$('#overlay-toast').html('Please enter a valid last name pattern.');
@@ -53,8 +53,8 @@ function validateFindProForm(id) {
 	return true;
 }
 
-$('#find-pro-submit').click(function() {
-	event.preventDefault();
+$('#find-pro-submit').click(function(e) {
+	e.preventDefault();
 	if(validateFindProForm('find-pro-form')){
 		console.log("Submitting Find a Profile form");
 		$('#find-pro-form').submit();
@@ -88,16 +88,16 @@ function infiniteScrollCallback(response) {
 		$.each(users, function(i, user) {
 			var evenOdd = (loopStatus % 2 == 0) ? '' : 'ctnt-list-item-even';
 			htmlData = htmlData + '<div class="ctnt-list-item clearfix ' + evenOdd + '">'
-				+ '<div class="float-left ctnt-list-item-img"></div>'
-					+ '<div class="float-left ctnt-list-item-txt-wrap">'
-						+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
-						+ '<div class="ctnt-item-desig">Marketting Head at Ralecon</div>'
-						+ '<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>'
-					+ '</div>'
-					+ '<div class="float-left ctnt-list-item-btn-wrap">'
-						+ '<div class="ctnt-review-btn">Review</div>'
-					+ '</div>'
-				+ '</div>';
+				+ '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: contain;"></div>'
+				+ '<div class="float-left ctnt-list-item-txt-wrap">'
+					+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
+					+ '<div class="ctnt-item-desig">' + user.title + '</div>'
+					+ '<div class="ctnt-item-comment">' + user.aboutMe + '</div>'
+				+ '</div>'
+				+ '<div class="float-left ctnt-list-item-btn-wrap">'
+					+ '<div class="ctnt-review-btn user="' + user.userId + '">Review</div>'
+				+ '</div>'
+			+ '</div>';
 			loopStatus ++;
 		});
 		
@@ -105,3 +105,24 @@ function infiniteScrollCallback(response) {
 		$('#fp-users-size').val(loopStatus);
 	}
 }
+
+$('.ctnt-review-btn').click(function() {
+	var payload = {
+		"userId" : $(this).attr('user')
+	};
+	$.ajax({
+		url : "./../rest/survey/redirecttodetailspage",
+		type : "GET",
+		data : payload,
+		datatype : "html",
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				window.open(data.responseText);
+			}
+		}
+	});
+});
