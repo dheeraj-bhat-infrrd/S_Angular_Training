@@ -198,18 +198,18 @@
                     <div class="initial-dd-wrapper hide blue-arrow-bot">
                         <c:if test="${highestrole == 1}">
                             <!-- show the company settings only of the user has company admin as a role -->
-                            <div class="initial-dd-item" id="company-setting">
+                            <div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do')">
                                 <spring:message code="label.settings.company.key" />
                             </div>
                         </c:if>
-                        <div class="initial-dd-item" id="profile-setting">
+                        <div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do')">
                             <spring:message code="label.profilesetting.key" />
                         </div>
                         <div class="initial-dd-item" id="account-setting">
                             <spring:message code="label.accountsetting.key" />
                         </div>
-                        <div class="initial-dd-item" id="change-password"onclick="showMainContent('./showchangepasswordpage.do')">
-                        <spring:message code="label.changepassword.key"/>
+                        <div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do')">
+                        	<spring:message code="label.changepassword.key"/>
                         </div>
                         <c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
                             <div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
