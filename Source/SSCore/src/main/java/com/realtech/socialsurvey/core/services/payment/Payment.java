@@ -155,8 +155,10 @@ public interface Payment {
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
 	 * @throws SolrException 
 	 * @throws UndeliveredEmailException 
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws CreditCardException 
 	 */
-	public void upgradePlanForSubscription(User user,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException;
+	public void upgradePlanForSubscription(User user,int newAccountsMasterId, String nonce) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException, SubscriptionUnsuccessfulException, CreditCardException;
 	
 	/**
 	 * Fetches the current card details for a particular subscription
