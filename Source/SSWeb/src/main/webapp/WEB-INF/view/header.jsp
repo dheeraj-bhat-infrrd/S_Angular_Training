@@ -55,7 +55,7 @@
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if test="">
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a>
 					</div>
@@ -98,7 +98,9 @@
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo"></div>
 			<div class="float-left hdr-links clearfix">
-				<div class="hdr-link-item hdr-link-active"><a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a></div>
+				<div class="hdr-link-item hdr-link-active">
+					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a>
@@ -109,7 +111,7 @@
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1 && highestrole != 4}">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
