@@ -3821,3 +3821,7 @@ button.paypal.is-active {
     margin-left: -15px;
     margin-right: 0;
 }
+
+.pe-whitespace {
+	white-space:pre-wrap;
+}
