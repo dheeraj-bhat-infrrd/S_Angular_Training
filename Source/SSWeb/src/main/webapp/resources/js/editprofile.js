@@ -812,22 +812,22 @@ function initializeGoogleMap() {
 // TODO Other Data
 function paintForProfile() {
 	var companyId = $('#prof-company-id').val();
-	var regionId = $('#prof-region-id').val();
-	var branchId = $('#prof-branch-id').val();
-	var agentId = $('#prof-agent-id').val();
+	// var regionId = $('#prof-region-id').val();
+	// var branchId = $('#prof-branch-id').val();
+	// var agentId = $('#prof-agent-id').val();
 	minScore = $('#profile-min-post-score').val();
-	currentProfileIden = companyId;
 	
-	if (companyId != "") {
-		fetchAverageRatings(companyId);
+	if (companyId != undefined) {
+		currentProfileIden = companyId;
+		companyProfileName = $("#company-profile-name").val();
 
+		fetchAverageRatings(companyId);
+		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
 		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
 		if(minScore > 0){
 			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
 		}
-		
-		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 		
 		fetchCompanyRegions();
 		fetchCompanyBranches();
