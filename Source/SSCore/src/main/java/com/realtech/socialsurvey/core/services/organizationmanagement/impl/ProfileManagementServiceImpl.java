@@ -766,7 +766,6 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		if (userProfiles != null && !userProfiles.isEmpty()) {
 			userProfiles.get(0);
-
 		}
 		// TODO fetch final agent settings based on the locks
 
