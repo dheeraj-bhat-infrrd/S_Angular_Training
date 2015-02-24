@@ -22,7 +22,7 @@
 									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</c:when>
 								<c:when	test="${not parentLock.isAboutMeLocked && lock.isAboutMeLocked && not user.agent}">
-									<div id="aboutme-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</c:when>
 								<c:when	test="${not parentLock.isAboutMeLocked && not lock.isAboutMeLocked && not user.agent}">
 									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
@@ -30,13 +30,16 @@
 							</c:choose>
 						</div>
 					</div>
-					<div class="intro-body" id="intro-body-text">
-						<c:choose>
-							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
-								${contactdetail.about_me}
-								<input type="hidden" id="aboutme-status" value="edited"/>
-							</c:when>
-							<c:otherwise><spring:message code="label.aboutcompany.empty.key" /></c:otherwise>
-						</c:choose>
-					</div>
-					<textarea class="sb-txtarea hide" id="intro-body-text-edit"></textarea>
+					<c:choose>
+						<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
+							<div class="pe-whitespace intro-body" id="intro-body-text">${fn:trim(contactdetail.about_me)}</div>
+							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit">${fn:trim(contactdetail.about_me)}</textarea>
+						</c:when>
+						<c:otherwise>
+							<div class="intro-body" id="intro-body-text">
+								<spring:message code="label.aboutcompany.empty.key" />
+							</div>
+							<input type="hidden" id="aboutme-status" value="new"/>
+							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit"></textarea>
+						</c:otherwise>
+					</c:choose>

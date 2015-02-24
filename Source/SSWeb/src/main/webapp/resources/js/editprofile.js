@@ -10,7 +10,7 @@ var delay = (function() {
 // Toggle text editor
 $(document).on('focus', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).addClass('prof-name-edit');
 		$('#prof-all-lock').val('modified');
 	}
@@ -18,14 +18,14 @@ $(document).on('focus', '.prof-edditable', function() {
 
 $(document).on('blur', '.prof-edditable', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
 
 $(document).on('focus', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).addClass('prof-name-edit');
 		$('#prof-all-lock').val('modified');
 	}
@@ -33,7 +33,7 @@ $(document).on('focus', '.prof-edditable-sin', function() {
 
 $(document).on('blur', '.prof-edditable-sin', function() {
 	var lockId = $(this).attr("id") + "-lock";
-	if ($('#' + lockId).attr('data-control') == 'user' && $('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]')) {
+	if ($('#' + lockId).attr('data-control') == 'user' || ($('#' + lockId).attr('data-state') == 'unlocked' && !$(this).is('[readonly]'))) {
 		$(this).removeClass('prof-name-edit');
 	}
 });
@@ -50,13 +50,13 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 			$(this).removeClass('lp-edit-locks-locked');
 			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-			$("#" + fieldId).attr("readonly", false);
+			//$("#" + fieldId).attr("readonly", false);
 			
 		} else {
 			$(this).addClass('lp-edit-locks-locked');
 			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
-			$("#" + fieldId).attr("readonly", true);
+			//$("#" + fieldId).attr("readonly", true);
 		}
 	} else {
 		$('#overlay-toast').html("Settings locked by Admin");
@@ -74,13 +74,13 @@ $(document).on('click', '.prof-img-lock-item', function(e) {
 			$(this).removeClass('prof-img-lock-locked');
 			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-			$("#" + fieldId).attr("disabled", false);
+			// $("#" + fieldId).attr("disabled", false);
 
 		} else {
 			$(this).addClass('prof-img-lock-locked');
 			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
-			$("#" + fieldId).attr("disabled", true);
+			// $("#" + fieldId).attr("disabled", true);
 		}
 	} else {
 		$('#overlay-toast').html("Settings locked by Admin");
@@ -123,6 +123,7 @@ $(document).on('click', '#intro-body-text', function() {
 		}
 		$('#intro-body-text-edit').val(textContent);
 		$('#intro-body-text-edit').show();
+		$('#intro-body-text-edit').focus();
 	}
 });
 

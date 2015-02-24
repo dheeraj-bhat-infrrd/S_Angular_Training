@@ -16,14 +16,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
 <script>
-	$('#company-setting').click(function() {
-		showMainContent('./showcompanysettings.do');
-	});
 	$('#header-logo').click(function(){
 		showMainContent('./dashboard.do');
-	});
-	$('#profile-setting').click(function(e) {
-		showMainContent('./showprofilepage.do');
-		e.stopImmediatePropagation();
 	});
 </script>
