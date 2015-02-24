@@ -123,6 +123,7 @@ $(document).on('click', '#intro-body-text', function() {
 		}
 		$('#intro-body-text-edit').val(textContent);
 		$('#intro-body-text-edit').show();
+		$('#intro-body-text-edit').focus();
 	}
 });
 
