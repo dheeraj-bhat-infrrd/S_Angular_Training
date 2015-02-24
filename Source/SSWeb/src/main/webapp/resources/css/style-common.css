@@ -3355,7 +3355,7 @@ button.paypal.is-active {
     height: 50px;
     width: 18px;
     margin-right: 1px;
-    background-size: 100% auto !important;
+    background-size: 80% auto !important;
 }
 
 .stat-icn-txt-rt {
@@ -3521,8 +3521,8 @@ button.paypal.is-active {
 
 .dsh-graph-txt-4 {
     top: 146px;
-    left: -215px;
-    width: 220px;
+    left: -165px;
+    width: 165px;
 }
 
 .stat-icn-img-green {
@@ -3605,10 +3605,6 @@ button.paypal.is-active {
 .dash-main-left{
     overflow: hidden;
     margin-left: -20px;
-}
-
-.dash-main-right{
-    margin-left: -55px;
 }
 
 .rt-content-main-adj{
