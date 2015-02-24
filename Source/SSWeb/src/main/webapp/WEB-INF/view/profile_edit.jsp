@@ -117,8 +117,8 @@
 								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 							</c:when>
 							<c:when	test="${not parentLock.isDisplayNameLocked && lock.isDisplayNameLocked && not user.agent}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-								<div id="prof-name-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
+								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 							</c:when>
 							<c:when	test="${not parentLock.isDisplayNameLocked && not lock.isDisplayNameLocked && not user.agent}">
 								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
@@ -169,9 +169,9 @@
 									</form>
 								</c:when>
 								<c:when	test="${not parentLock.isLogoLocked && lock.isLogoLocked && not user.agent}">
-									<div id="prof-logo-lock" data-state="locked" data-control="user" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
+										<input type="file" id="prof-logo" class="con_img_inp_file">
 									</form>
 								</c:when>
 								<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && not user.agent}">
@@ -232,8 +232,8 @@
 											<div id="web-address-work-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isWebAddressLocked && lock.isWebAddressLocked && not user.agent}">
-											<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>' readonly>
-											<div id="web-address-work-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+											<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
+											<div id="web-address-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isWebAddressLocked && not lock.isWebAddressLocked && not user.agent}">
 											<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
@@ -259,8 +259,8 @@
 											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && not user.agent}">
-											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
-											<div id="phone-number-work-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && not user.agent}">
 											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
@@ -286,8 +286,8 @@
 											<div id="phone-number-personal-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isPersonalPhoneLocked && lock.isPersonalPhoneLocked && not user.agent}">
-											<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>' readonly>
-											<div id="phone-number-personal-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+											<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>'>
+											<div id="phone-number-personal-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isPersonalPhoneLocked && not lock.isPersonalPhoneLocked && not user.agent}">
 											<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>'>
@@ -313,8 +313,8 @@
 											<div id="phone-number-fax-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isFaxPhoneLocked && lock.isFaxPhoneLocked && not user.agent}">
-											<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>' readonly>
-											<div id="phone-number-fax-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+											<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
+											<div id="phone-number-fax-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 										</c:when>
 										<c:when	test="${not parentLock.isFaxPhoneLocked && not lock.isFaxPhoneLocked && not user.agent}">
 											<input id="phone-number-fax" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="fax" value="${contactNumbers.fax}" placeholder='<spring:message code="label.fax.placeholder.key"/>'>
@@ -435,7 +435,7 @@
 									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</c:when>
 								<c:when	test="${not parentLock.isAboutMeLocked && lock.isAboutMeLocked && not user.agent}">
-									<div id="aboutme-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 								</c:when>
 								<c:when	test="${not parentLock.isAboutMeLocked && not lock.isAboutMeLocked && not user.agent}">
 									<div id="aboutme-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
