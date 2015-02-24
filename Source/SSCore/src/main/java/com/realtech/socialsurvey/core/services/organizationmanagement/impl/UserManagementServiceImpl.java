@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
@@ -15,6 +17,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
+import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -27,11 +32,13 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -112,6 +119,21 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+	
+	@Value("${LINKED_IN_API_KEY}")
+	private String linkedInApiKey;
+	
+	@Value("${LINKED_IN_API_SECRET}")
+	private String linkedInApiSecret;
+	
+	@Value("${LINKED_IN_OAUTH_TOKEN}")
+	private String linkedInOauthToken;
+	
+	@Value("${LINKED_IN_OAUTH_SECRET}")
+	private String linkedInOauthSecret;
+	
+	@Value("${LINKED_IN_REDIRECT_URI}")
+	private String linkedinRedirectUri;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -1421,6 +1443,59 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return false;
 	}
 	
+	
+	/**
+	 * Adds the LinkedIn access tokens to the agent's settings in mongo
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret,Collection<AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
+		if ( user == null) {
+			LOG.error("setLinkedInAccessTokenForUser : user parameter is null!");
+			throw new InvalidInputException("setLinkedInAccessTokenForUser : user parameter is null!");			
+		}
+		if ( accessToken == null || accessToken.isEmpty()) {
+			LOG.error("setLinkedInAccessTokenForUser : accessToken parameter is null!");
+			throw new InvalidInputException("setLinkedInAccessTokenForUser : accessToken parameter is null!");	
+		}
+		
+		LOG.info("Adding the LinkedIn access tokens to agent settings in mongo for user id : " + user.getUserId());
+		
+		Iterator<AgentSettings> settingsIterator = agentSettings.iterator();
+		
+		while (settingsIterator.hasNext()) {
+			
+			AgentSettings agentSetting = settingsIterator.next();			
+			LOG.debug("Setting the access token for settings with id : " + agentSetting.getId());
+			SocialMediaTokens mediaTokens = agentSetting.getSocialMediaTokens();
+			//Check if media tokens exist. If not, create them.
+			if( mediaTokens == null ){
+				LOG.debug("Updating the existing media tokens for LinkedIn");
+				mediaTokens = new SocialMediaTokens();
+				mediaTokens.setLinkedInToken(new LinkedInToken());
+				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
+			}
+			else{
+				LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+				if(mediaTokens.getLinkedInToken() == null){
+					mediaTokens.setLinkedInToken(new LinkedInToken());
+				}
+				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
+			}			
+			LOG.debug("Updating the mongo collection with new LinkedIn access tokens for settings with id : " + agentSetting.getId());
+			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens, agentSetting, CommonConstants.AGENT_SETTINGS_COLLECTION);			
+		}
+		
+		LOG.info("Agent settings successfully updated with LinkedIn access token");
+	}
+
 	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException{
 		
 		LOG.debug("Fetching the default region for company");
@@ -1695,4 +1770,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
 	}
+	
+	/**
+	 * Returns the LinkedIn request token for a particular URL
+	 * @return
+	 */
+	@Override
+	public LinkedInRequestToken getLinkedInRequestToken() {
+		LinkedInOAuthService oauthService;		
+		oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken(linkedinRedirectUri);
+        return requestToken;
+	}
+
 }
