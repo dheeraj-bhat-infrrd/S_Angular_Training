@@ -418,6 +418,7 @@
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
+				
 				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc">
 					<div class="main-con-header main-con-header-adj clearfix">
 						<div class="float-left">
@@ -457,60 +458,31 @@
 						</c:otherwise>
 					</c:choose>
 				</div>
-				<div class="rt-content-main bord-bot-dc clearfix">
-					<div class="float-left panel-tweet-wrapper">
-						<div class="main-con-header"><spring:message code="label.recenttweets.key"/></div>
-						<div class="tweet-panel tweet-panel-left">
-							<div class="tweet-panel-item bord-bot-dc clearfix">
-								<div class="tweet-icn icn-tweet float-left"></div>
-								<div class="tweet-txt float-left">
-									<div class="tweet-text-main">Lorem ipsunmm dore tit sre
-										leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit
-										sre leru Lorem ipsunmm dore tit</div>
-									<div class="tweet-text-link">
-										<em>http://abblk.com</em>
-									</div>
-									<div class="tweet-text-time">
-										<em>24 minutes ago</em>
-									</div>
-								</div>
-							</div>
-							<div class="tweet-panel-item bord-bot-dc clearfix">
-								<div class="tweet-icn icn-tweet float-left"></div>
-								<div class="tweet-txt float-left">
-									<div class="tweet-text-main">Lorem ipsunmm dore tit sre
-										leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit
-										sre leru Lorem ipsunmm dore tit</div>
-									<div class="tweet-text-link">
-										<em>http://abblk.com</em>
-									</div>
-									<div class="tweet-text-time">
-										<em>24 minutes ago</em>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="float-left panel-tweet-wrapper posts-wrapper">
-						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
-						<div class="posts-panel posts-panel-right">
-							<div class="posts-panel-item bord-bot-dc">
-								<div class="post-txt">Lorem ipsunmm dore tit sre leru
-									Lorem ipsunmm dore tit sre leru Lorem</div>
-								<div class="post-lnk blue-text">
-									<em>The about.me blog</em>
-								</div>
-							</div>
-							<div class="posts-panel-item bord-bot-dc">
-								<div class="post-txt">Lorem ipsunmm dore tit sre leru
-									Lorem ipsunmm dore tit sre leru Lorem</div>
-								<div class="post-lnk blue-text">
-									<em>The about.me blog</em>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
+				
+                <div class="rt-content-main bord-bot-dc clearfix">
+                    <div class="float-left panel-tweet-wrapper">
+                        <div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
+                        <div class="tweet-panel tweet-panel-left">
+                            <div class="tweet-panel-item bord-bot-dc clearfix">
+                                <div class="tweet-icn icn-tweet float-left"></div>
+                                <div class="tweet-txt float-left">
+                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
+                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
+                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
+                                </div>
+                            </div>
+                            <div class="tweet-panel-item bord-bot-dc clearfix">
+                                <div class="tweet-icn icn-tweet float-left"></div>
+                                <div class="tweet-txt float-left">
+                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
+                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
+                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
 				<div id="reviews-container" class="people-say-wrapper rt-content-main">
                     <div class="main-con-header" id="prof-reviews-header"></div>
                     <div id="prof-review-item" class="prof-reviews">
