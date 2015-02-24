@@ -161,6 +161,8 @@ public interface CommonConstants {
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
 	public static final String ERROR = "error";
+	public static final String MESSAGE = "message";
+	
 
 	/**
 	 * Batch Constants

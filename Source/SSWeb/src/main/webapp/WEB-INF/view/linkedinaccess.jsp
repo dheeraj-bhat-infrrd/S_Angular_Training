@@ -66,21 +66,12 @@
 		
 		
 		function redirectToAuthPage() {
-			var authUrl = "${authUrl}";
-			if (authUrl == null) {
-				console.log("Auth url not found!");
-			} else {
-				window.open(authUrl,"Authorization Page","width=600,height=600,scrollbars=yes");
-			}
+			window.open("./linkedinauthpage.do","Authorization Page","width=600,height=600,scrollbars=yes");
 		}
 
 		$("#skip-button").click(function() {
 			location.href = "./landing.do";
 		});
-		
-		function hideTheOverlayOnChildWindowClose(){
-		    $('.overlay-loader').show();
-		}
 	</script>
 </body>
 </html>
