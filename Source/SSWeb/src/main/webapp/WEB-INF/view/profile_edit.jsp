@@ -443,18 +443,19 @@
 							</c:choose>
 						</div>
 					</div>
-					<div class="intro-body" id="intro-body-text">
-						<c:choose>
-							<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
-								${contactdetail.about_me}
-							</c:when>
-							<c:otherwise>
+					<c:choose>
+						<c:when	test="${not empty contactdetail.about_me && not empty fn:trim(contactdetail.about_me)}">
+							<div class="pe-whitespace intro-body" id="intro-body-text">${fn:trim(contactdetail.about_me)}</div>
+							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit">${fn:trim(contactdetail.about_me)}</textarea>
+						</c:when>
+						<c:otherwise>
+							<div class="intro-body" id="intro-body-text">
 								<spring:message code="label.aboutcompany.empty.key" />
-								<input type="hidden" id="aboutme-status" value="new"/>
-							</c:otherwise>
-						</c:choose>
-					</div>
-					<textarea class="sb-txtarea hide" id="intro-body-text-edit"></textarea>
+							</div>
+							<input type="hidden" id="aboutme-status" value="new"/>
+							<textarea class="pe-whitespace sb-txtarea hide" id="intro-body-text-edit"></textarea>
+						</c:otherwise>
+					</c:choose>
 				</div>
 				<div class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
@@ -539,6 +540,9 @@
 		adjustImage();
 		$(window).resize(adjustImage);
 		
+		if ($('#aboutme-status').val() != 'new') {
+			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
+		}
 		paintForProfile();
 		
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
