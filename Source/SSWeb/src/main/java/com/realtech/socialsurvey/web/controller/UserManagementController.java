@@ -896,13 +896,26 @@ public class UserManagementController {
 				// TODO: add logic for what happens when no user profile present
 			}
 			
+			LinkedInRequestToken requestToken = userManagementService.getLinkedInRequestToken();
 			
+			//We will keep the request token in session
+	        session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);       
+	        LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
+	        
+			//Now we set the model attribute with the authorization url
+	        model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.COMPLETE_REGISTRATION;
 		}
+		catch (Exception e) {
+			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", e.getMessage());
+			return JspResolver.COMPLETE_REGISTRATION;
+		}
+		
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
 		return JspResolver.LINKEDIN_ACCESS;
 	}
@@ -993,7 +1006,7 @@ public class UserManagementController {
 		LOG.info("Connecting to LinkedIn");
 		LinkedInOAuthService oauthService;		
 		oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
-        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://6a723c3f.ngrok.com/linkedinauth.do");
+        LinkedInRequestToken requestToken= oauthService.getOAuthRequestToken("http://5c7c2ee3.ngrok.com/linkedinauth.do");
         
         //We will keep the request token in session
         session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
@@ -1013,28 +1026,33 @@ public class UserManagementController {
 		
 		LOG.info("LinkedIn authentication url requested");
 		HttpSession session = request.getSession(false);
+		String errorCode = request.getParameter("oauth_problem");
 		
 		try {
 			if(session == null){
 				LOG.error("authenticateLinkedInAccess : Session object is null!");
 				throw new NoRecordsFetchedException("authenticateLinkedInAccess : Session object is null!");
 			}
+			if( errorCode != null ){
+				LOG.error("Error code : " + errorCode);
+				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+				return JspResolver.LINKEDIN_MESSAGE;
+			}
 			
 			User user = sessionHelper.getCurrentUser();
 			LinkedInOAuthService oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
 			String oauthVerifier = request.getParameter("oauth_verifier");
-			LOG.info("LinkedIn oauth verfier : " + oauthVerifier);
+			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
 	        LinkedInRequestToken requestToken= (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
 			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
-			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken());	        
-	        LOG.info("Access Token : " + accessToken.getToken());
-	        LOG.info("Access Token Secret : " + accessToken.getTokenSecret());
+			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(),accessToken.getTokenSecret());	        
 		}
 		catch (Exception e) {
 			LOG.error(e.getMessage(),e);	
 			return JspResolver.LINKEDIN_MESSAGE;
 		}
-			
+		
+		LOG.info("Access tokens obtained and added to mongo successfully!");
         model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);		
 		return JspResolver.LINKEDIN_MESSAGE;
 	}

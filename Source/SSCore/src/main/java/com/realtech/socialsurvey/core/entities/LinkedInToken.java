@@ -1,19 +1,18 @@
 package com.realtech.socialsurvey.core.entities;
 
-import java.sql.Timestamp;
-
 public class LinkedInToken {
 
 	private String linkedInId;
 	private String linkedInPageLink;
 	private String linkedInAccessToken;
-	private Timestamp linkedInAccessTokenCreatedOn;
+	private String linkedInAccessTokenSecret;
+	private long linkedInAccessTokenCreatedOn;
 
-	public Timestamp getLinkedInAccessTokenCreatedOn() {
+	public long getLinkedInAccessTokenCreatedOn() {
 		return linkedInAccessTokenCreatedOn;
 	}
 
-	public void setLinkedInAccessTokenCreatedOn(Timestamp linkedInAccessTokenCreatedOn) {
+	public void setLinkedInAccessTokenCreatedOn(long linkedInAccessTokenCreatedOn) {
 		this.linkedInAccessTokenCreatedOn = linkedInAccessTokenCreatedOn;
 	}
 
@@ -39,6 +38,14 @@ public class LinkedInToken {
 
 	public void setLinkedInPageLink(String linkedInPageLink) {
 		this.linkedInPageLink = linkedInPageLink;
+	}
+	
+	public String getLinkedInAccessTokenSecret() {
+		return linkedInAccessTokenSecret;
+	}
+
+	public void setLinkedInAccessTokenSecret(String linkedInAccessTokenSecret) {
+		this.linkedInAccessTokenSecret = linkedInAccessTokenSecret;
 	}
 
 	@Override

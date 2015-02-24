@@ -160,6 +160,7 @@ public interface CommonConstants {
 	public static final String SUCCESS_ATTRIBUTE = "success";
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
+	public static final String ERROR = "error";
 
 	/**
 	 * Batch Constants
