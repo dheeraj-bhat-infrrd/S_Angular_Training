@@ -21,8 +21,8 @@
 								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
 							</c:when>
 							<c:when	test="${not parentLock.isDisplayNameLocked && lock.isDisplayNameLocked && not user.agent}">
-								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-								<div id="prof-name-lock" data-state="locked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
+								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
 							</c:when>
 							<c:when	test="${not parentLock.isDisplayNameLocked && not lock.isDisplayNameLocked && not user.agent}">
 								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
