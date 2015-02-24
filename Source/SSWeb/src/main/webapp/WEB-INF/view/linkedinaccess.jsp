@@ -21,7 +21,7 @@
 </head>
 <body>
 	<div id="overlay-toast" class="overlay-toast"></div>
-	<div class="overlay-loader hide"></div>
+	<div id="overlay-loader" class="overlay-loader hide"></div>
 	<div class="login-main-wrapper padding-001 login-wrapper-min-height">
 		<div class="container login-container">
 			<div class="row login-row">
@@ -34,11 +34,14 @@
 
 					<div style="padding: 0px 20px;" class="clearfix">
 						<div
-							style="margin-bottom: 30px; font-size: 15px; text-align: center; padding: 0px 20px;">It
-							would be great if you could give us permission to access your
-							LinkedIn profile.</div>
-						<input id="allow-access" type="button" onclick="redirectToAuthPage();" class="btn-payment float-left" value='<spring:message code="label.allowaccess.key"/>' /> 
-						<input id="skip-button"	type="button" class="btn-payment float-right" value='<spring:message code="label.skip.key"/>' />
+							style="margin-bottom: 30px; font-size: 15px; text-align: center; padding: 0px 20px;">
+							<spring:message code="label.allowaccess.message" />
+						</div>
+						<input id="allow-access" type="button"
+							onclick="redirectToAuthPage();" class="btn-payment float-left"
+							value='<spring:message code="label.allowaccess.key"/>' /> <input
+							id="skip-button" type="button" class="btn-payment float-right"
+							value='<spring:message code="label.skip.key"/>' />
 					</div>
 
 					<div class="footer-copyright text-center">
@@ -58,26 +61,26 @@
 	<script
 		src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-	
+
 	<script>
-	
-	function redirectToAuthPage(){		
-		showOverlay();
-		callAjaxGET("./linkedinauthpage.do",function (data){			
-			window.open(data,"Authorization Page", "width=600,height=600,scrollbars=yes");
-			setTimeout(function(){
+		
+		
+		function redirectToAuthPage() {
+			var authUrl = "${authUrl}";
+			if (authUrl == null) {
+				console.log("Auth url not found!");
+			} else {
+				window.open(authUrl,"Authorization Page","width=600,height=600,scrollbars=yes");
+			}
+		}
+
+		$("#skip-button").click(function() {
 			location.href = "./landing.do";
-			},2000);
 		});
-	};
-	
-	
-	$("#skip-button").click(function(){
-		location.href = "./landing.do";
-	});
-	
-	
-	
+		
+		function hideTheOverlayOnChildWindowClose(){
+		    $('.overlay-loader').show();
+		}
 	</script>
 </body>
 </html>

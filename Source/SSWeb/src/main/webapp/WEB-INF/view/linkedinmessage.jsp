@@ -70,9 +70,25 @@
 
 	<script>
 		$(document).ready(function() {
+			var parentWindow;
+			if (window.opener != null && !window.opener.closed) {
+				parentWindow = window.opener;
+            }
+			else{
+				console.log("Unable to access parent window!");
+			}
+			
+			var error = "${error}";
+			if(parseInt(error) == 1){
+				parentWindow.location.href = "./landing.do";
+	           	window.close();
+			}
+			
 			setTimeout(function() {
+				console.log("Unable to access parent window!");
+				parentWindow.location.href = "./landing.do";
 				window.close();
-			}, 5000);
+			}, 3000);
 		});
 	</script>
 </body>
