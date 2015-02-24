@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1030,11 +1031,22 @@ public class UserManagementController {
 		LOG.info("LinkedIn authentication url requested");
 		HttpSession session = request.getSession(false);
 		String errorCode = request.getParameter("oauth_problem");
-		
+		UserSettings currentUserSettings;
 		try {
 			if(session == null){
 				LOG.error("authenticateLinkedInAccess : Session object is null!");
-				throw new NoRecordsFetchedException("authenticateLinkedInAccess : Session object is null!");
+				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
+			}
+			if(session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null){
+				LOG.error("authenticateLinkedInAccess : user canonical settings not found in session!");
+				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");				
+			}
+			else{
+				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+				if(currentUserSettings.getAgentSettings() == null){
+					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
+					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
+				}
 			}
 			if( errorCode != null ){
 				LOG.error("Error code : " + errorCode);
@@ -1048,13 +1060,14 @@ public class UserManagementController {
 			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
 	        LinkedInRequestToken requestToken= (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
 			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
-			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(),accessToken.getTokenSecret());	        
+			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(),accessToken.getTokenSecret(),currentUserSettings.getAgentSettings().values());	        
 		}
 		catch (Exception e) {
+			session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
 			LOG.error(e.getMessage(),e);	
 			return JspResolver.LINKEDIN_MESSAGE;
 		}
-		
+		session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
 		LOG.info("Access tokens obtained and added to mongo successfully!");
         model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);		
 		return JspResolver.LINKEDIN_MESSAGE;

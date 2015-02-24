@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
@@ -1450,7 +1452,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @throws NoRecordsFetchedException
 	 */
 	@Override
-	public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret) throws InvalidInputException, NoRecordsFetchedException {
+	public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret,Collection<AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
 		if ( user == null) {
 			LOG.error("setLinkedInAccessTokenForUser : user parameter is null!");
 			throw new InvalidInputException("setLinkedInAccessTokenForUser : user parameter is null!");			
@@ -1461,35 +1463,36 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		
 		LOG.info("Adding the LinkedIn access tokens to agent settings in mongo for user id : " + user.getUserId());
-		AgentSettings currentAgentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(user.getUserId());
-		if ( currentAgentSettings == null) {
-			LOG.error("setLinkedInAccessTokenForUser : agent settings not found for user id : " + user.getUserId());
-			throw new NoRecordsFetchedException("setLinkedInAccessTokenForUser : agent settings not found for user id : " + user.getUserId());			
-		}
 		
-		LOG.debug("We fetch the current social media tokens for the agent");
-		SocialMediaTokens mediaTokens = currentAgentSettings.getSocialMediaTokens();
-		//Check if media tokens exist. If not, create them.
-		if( mediaTokens == null ){
-			LOG.debug("Updating the existing media tokens for LinkedIn");
-			mediaTokens = new SocialMediaTokens();
-			mediaTokens.setLinkedInToken(new LinkedInToken());
-			mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
-			mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
-			mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
-		}
-		else{
-			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
-			if(mediaTokens.getLinkedInToken() == null){
+		Iterator<AgentSettings> settingsIterator = agentSettings.iterator();
+		
+		while (settingsIterator.hasNext()) {
+			
+			AgentSettings agentSetting = settingsIterator.next();			
+			LOG.debug("Setting the access token for settings with id : " + agentSetting.getId());
+			SocialMediaTokens mediaTokens = agentSetting.getSocialMediaTokens();
+			//Check if media tokens exist. If not, create them.
+			if( mediaTokens == null ){
+				LOG.debug("Updating the existing media tokens for LinkedIn");
+				mediaTokens = new SocialMediaTokens();
 				mediaTokens.setLinkedInToken(new LinkedInToken());
+				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
 			}
-			mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
-			mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
-			mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
+			else{
+				LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+				if(mediaTokens.getLinkedInToken() == null){
+					mediaTokens.setLinkedInToken(new LinkedInToken());
+				}
+				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
+			}			
+			LOG.debug("Updating the mongo collection with new LinkedIn access tokens for settings with id : " + agentSetting.getId());
+			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens, agentSetting, CommonConstants.AGENT_SETTINGS_COLLECTION);			
 		}
 		
-		LOG.debug("Updating the mongo collection with new LinkedIn access tokens");
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens, currentAgentSettings, CommonConstants.AGENT_SETTINGS_COLLECTION);
 		LOG.info("Agent settings successfully updated with LinkedIn access token");
 	}
 

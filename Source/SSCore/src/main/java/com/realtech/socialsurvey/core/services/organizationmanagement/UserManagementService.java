@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
@@ -169,7 +170,7 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public void setLinkedInAccessTokenForUser(User user,String accessToken, String accessTokenSecret) throws InvalidInputException, NoRecordsFetchedException;
+	public void setLinkedInAccessTokenForUser(User user,String accessToken, String accessTokenSecret,Collection<AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException;
 	
 	/**
 	 * Method to insert agent settings into mongo
