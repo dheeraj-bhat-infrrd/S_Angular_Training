@@ -206,7 +206,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				parentLock.setDisplayNameLocked(true);
 			}
 			if (higherLock.getIsWebAddressLocked()) {
-				parentLock.setLogoLocked(true);
+				parentLock.setWebAddressLocked(true);
 			}
 			if (higherLock.getIsWorkPhoneLocked()) {
 				parentLock.setWorkPhoneLocked(true);
