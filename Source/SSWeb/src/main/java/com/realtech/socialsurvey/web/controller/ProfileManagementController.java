@@ -96,13 +96,13 @@ public class ProfileManagementController {
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
-		// Setting parentLock in session
-		LockSettings parentLock = fetchParentLockSettings(model, user, accountType, settings);
-		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
-
 		// Setting userProfile in session
 		OrganizationUnitSettings profile = fetchUserProfile(model, user, accountType, settings);
 		session.setAttribute(CommonConstants.USER_PROFILE, profile);
+
+		// Setting parentLock in session
+		LockSettings parentLock = fetchParentLockSettings(model, user, accountType, settings);
+		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
 
 		LOG.info("Starting the ProfileEdit page");
 		return JspResolver.PROFILE_EDIT;
