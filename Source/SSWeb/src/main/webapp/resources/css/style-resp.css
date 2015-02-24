@@ -1,5 +1,8 @@
 /* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
+    body{
+        font-size: 12px;
+    }
     .login-main-wrapper{
         background: #fff;
     }
@@ -537,7 +540,7 @@
         display: none;
     }
     .ppl-header-left, .ppl-header-right{
-        float: none;
+        float: none !important;
     }
     .ppl-share-wrapper{
         line-height: 30px;
@@ -818,7 +821,7 @@
     .dash-sub-head{
         padding: 0;
         text-align: center;
-        margin-bottom: 20px;
+        margin-bottom: 0px;
         font-size: 16px;
     }
     .stats-left {
@@ -843,32 +846,45 @@
     }
     .stats-right {
         margin-left: 0px;
+        margin: 0 auto;
+        width: 265px;
+        float: none !important;
+    }
+    .stats-right-adj {
+        margin-left: 0px;
         width: 100%;
     }
     .stat-icn-lbl {
-        width: 100%;
-        font-size: 14px;
+        font-size: 12px;
         padding-left: 10px;
+        line-height: 16px;
+        padding-top: 4px;
+        width: 100px;
     }
     .stat-icn-img{
         width: 12px;
+        height: 28px;
     }
     .stat-icn-txt-rt {
-        font-size: 18px;
+        font-size: 14px;
         margin-left: 10px;
+        line-height: 28px;
+    }
+    .stat-icns-wrapper{
+        line-height: 22px;
     }
     .dash-sel-lbl {
         width: 100%;
         text-align: left;
-        line-height: 36px;
+        line-height: 22px;
         padding-left: 22px;
     }
     .util-gph-item{
         margin-left: 0;
         width: 280px;
         overflow: hidden;
-        float: none;
-        margin: 0 auto;
+        float: none !important;
+        margin: 15px auto 0;
     }
     .util-gph-legend {
         position: static;
@@ -878,7 +894,7 @@
         font-size: 13px;
         width: 182px;
         text-align: right;
-        margin: 0 auto;
+        margin: 15px auto 0;;
     }
     .dash-ppl-say-lbl, .dash-btn-dl-sd{
         float: none !important;
@@ -887,7 +903,7 @@
         padding: 10px 0;
     }
     .dsh-name-wrapper {
-        font-size: 18px;
+        font-size: 16px;
     }
     .dsh-star-wrapper{
         width: 100%;
@@ -903,7 +919,7 @@
         margin: 0 auto;
         height: 40px;
         line-height: 40px;
-        font-size: 22px;
+        font-size: 18px;
         position: relative;
         top: 10px;
     }
@@ -926,6 +942,54 @@
     }
     .resp-adj{
         padding: 0;
+    }
+    .dash-sel-wrapper {
+        margin-bottom: 10px;
+    }
+    .dash-lp-item{
+        margin-bottom: 0;
+        line-height: 34px;
+    }
+    .dash-lp-header{
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .dash-panel-left{
+        padding: 15px 10px 0px 0px;
+        border-right: 0;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .dash-lp-rt-img{
+        height: 34px;
+    }
+    .dash-btn-sur-data{
+        margin: 10px auto;
+    }
+    .ppl-head-1{
+        font-size: 14px;
+    }
+    .ppl-head-2 {
+        font-size: 11px;
+    }
+    .row-dash-top-adj{
+        margin-top: -132px;
+    }
+    .dash-main-right{
+        height: 350px;
+    }
+    .dash-main-left{
+        height: 310px;
+    }
+    .dsh-graph-wrapper{
+        transform: scale(0.45);
+        -webkit-transform: scale(0.45);
+        -o-transform: scale(0.45);
+        -ms-transform: scale(0.45);
+        -moz-transform: scale(0.45);
+        position: relative;
+        left: -162px;
+        width: 594px;
+        background-position: 87px top;
     }
 }
 
@@ -1089,14 +1153,24 @@
         width: 91%;
     }
     .stats-left {
-        width: 280px;
+        width: 100%;
+        float: none;
     }
     .dash-sel-item{
-        width: 155px;
+        width: 250px;
         margin-left: 10px;
     }
     .stats-right {
-        margin-left: 0;
+        clear: both;
+        width: 53%;
+        margin: 0 auto;
+        float: none !important;
+    }
+    .stats-right-adj{
+        clear: both;
+        width: 100%;
+        margin: 0 auto;
+        float: none !important;
     }
     .stat-icn-lbl {
         width: 180px;
@@ -1110,7 +1184,43 @@
         margin-left: 10px;
     }
     .util-gph-item{
-        width: 430px;
+        width: 100%;
+    }
+    .dash-sel-wrapper{
+        width: 50%;
+        float: left;
+        margin-bottom: 15px;
+    }
+    .util-gph-legend-item {
+        float: left;
+        width: 50%;
+    }
+    .util-gph-legend{
+        position: static;
+        width: 54%;
+        margin: 25px auto 0;
+    }
+    .dash-left-txt-wrapper, .dsh-graph-wrapper{
+        transform: scale(0.7);
+        -webkit-transform: scale(0.7);
+        -o-transform: scale(0.7);
+        -ms-transform: scale(0.7);
+        -moz-transform: scale(0.7);
+    }
+    .dsh-graph-wrapper{
+        margin-left: -161px;
+        width: 600px;
+        background-position: 86px top;
+    }
+    .row-dash-top-adj{
+        margin-top: -72px;
+    }
+    .dash-main-left, .dash-main-right{
+        height: 410px;
+    }
+    .dash-main-right {
+        position: relative;
+        left: -10px;
     }
 }
 
@@ -1213,11 +1323,18 @@
     .stats-left {
         width: 330px;
     }
+    .dash-main-right{
+        position: relative;
+        left: -107px;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
 @media (min-width: 1200px) {
-    
+    .dash-main-right {
+        position: relative;
+        left: -84px;
+    }
 }
 
 
