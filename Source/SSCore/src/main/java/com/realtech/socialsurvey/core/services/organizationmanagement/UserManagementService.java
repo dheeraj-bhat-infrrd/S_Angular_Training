@@ -156,5 +156,12 @@ public interface UserManagementService {
 	 */
 	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
 
+	/**
+	 * Method to insert agent settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertAgentSettings(User user) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC

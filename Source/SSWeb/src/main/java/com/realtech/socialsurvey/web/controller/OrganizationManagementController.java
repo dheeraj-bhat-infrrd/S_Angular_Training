@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,6 +76,12 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
 
 	/**
 	 * Method to upload logo image for a company
@@ -95,6 +102,8 @@ public class OrganizationManagementController {
 
 		try {
 			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
+			//Setting the complete logo url in session
+			logoName = endpoint + "/" + bucket + "/" +logoName;
 			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
