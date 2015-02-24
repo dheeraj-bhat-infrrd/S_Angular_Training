@@ -166,16 +166,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param userId
 	 * @throws InvalidInputException
 	 */
-	private void insertIntoLicenseTable(int accountsMasterId, Company company, User user, String subscriptionId) throws InvalidInputException {
+	private void insertIntoLicenseTable(int accountsMasterId, User user, String subscriptionId) throws InvalidInputException {
 
 		if (accountsMasterId <= 0) {
 			LOG.error("updateLicenseTable : accountsMasterId parameter is invalid");
 			throw new InvalidInputException("updateLicenseTable : accountsMasterId parameter is invalid");
-		}
-
-		if (company == null) {
-			LOG.error("updateLicenseTable : company parameter is null or invalid");
-			throw new InvalidInputException("updateLicenseTable : company parameter is null or invalid");
 		}
 
 		if (user == null) {
@@ -187,6 +182,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("updateLicenseTable : subscriptionId parameter is null or invalid");
 			throw new InvalidInputException("updateLicenseTable : subscriptionId parameter is null or invalid");
 		}
+
+		Company company = user.getCompany();
 
 		AccountsMaster accountsMaster = accountsMasterDao.findById(AccountsMaster.class, accountsMasterId);
 		if (accountsMaster == null) {
@@ -250,7 +247,6 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("addCustomerWithPayment : company parameter is null!");
 			throw new InvalidInputException("addCustomerWithPayment : company parameter is null!");
 		}
-
 		if (nonce == null || nonce.isEmpty()) {
 			LOG.error("addCustomerWithPayment : nonce parameter is null or empty!");
 			throw new InvalidInputException("addCustomerWithPayment : nonce parameter is null or empty!");
@@ -379,7 +375,6 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		customer = containsCustomer(customerId);
 		if (customer != null) {
 			String paymentToken;
-
 			paymentToken = customer.getPaymentMethods().get(CommonConstants.INITIAL_INDEX).getToken();
 
 			// Make a subscription request
@@ -406,10 +401,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 		}
 		else {
-
 			LOG.error("Customer with id " + customerId + " not found in vault to make subscription!");
 			throw new NoRecordsFetchedException("Customer with id " + customerId + " not found in vault to make subscription!");
-
 		}
 		return subscriptionId;
 	}
@@ -438,21 +431,19 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("subscribe : user parameter is null!");
 			throw new InvalidInputException("subscribe : user parameter is null!");
 		}
-
-		// Getting the company from the user
-		Company company = user.getCompany();
-
 		// Checking for the range of allowed account type, which is 1 to 5
 		if (accountsMasterId < CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL || accountsMasterId > CommonConstants.ACCOUNTS_MASTER_FREE) {
 			LOG.error("subscribe : accountsMasterId parameter is invalid! parameter value : " + String.valueOf(accountsMasterId));
 			throw new InvalidInputException("subscribe : accountsMasterId parameter is invalid!parameter value : " + String.valueOf(accountsMasterId));
 		}
-
 		// Free account will not have a nonce
 		if (accountsMasterId != CommonConstants.ACCOUNTS_MASTER_FREE && (nonce == null || nonce.isEmpty())) {
 			LOG.error("subscribe : nonce parameter is null or empty!");
 			throw new InvalidInputException("subscribe : nonce parameter is null or empty!");
 		}
+
+		// Getting the company from the user
+		Company company = user.getCompany();
 
 		if (accountsMasterId != CommonConstants.ACCOUNTS_MASTER_FREE) {
 			LOG.info("Making a subscription!");
@@ -463,14 +454,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("Fetching the planId string using property file");
 			// Get the plan name used in Braintree
 
-			String braintreePlanName = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(accountsMasterId));
-			if (braintreePlanName == null) {
-				LOG.error("Invalid Plan ID provided for subscription.");
-				throw new InvalidInputException("Invalid Plan ID provided for subscription.");
-			}
+			String braintreePlanName = getBraintreePlanId(accountsMasterId);
 
 			// Check if the customer already exists in the vault.
-
 			Customer customer = containsCustomer(String.valueOf(company.getCompanyId()));
 
 			if (customer != null) {
@@ -488,7 +474,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		LOG.info("Subscription successful. Updating the license table.");
 		try {
-			insertIntoLicenseTable(accountsMasterId, company, user, subscriptionId);
+			insertIntoLicenseTable(accountsMasterId, user, subscriptionId);
 			LOG.info("LicenseDetail table update done!");
 		}
 		catch (DatabaseException e) {
@@ -499,44 +485,6 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 	}
 
-	@Override
-	@Transactional
-	/*
-	 * public void subscribeForFreeAccount(User user,int accountsMasterId) throws
-	 * InvalidInputException{ if (user == null) {
-	 * LOG.error("subscribeForFreeAccount : user parameter is null!"); throw new
-	 * InvalidInputException("subscribeForFreeAccount : user parameter is null!"); } if
-	 * (accountsMasterId != CommonConstants.ACCOUNTS_MASTER_FREE) {
-	 * LOG.error("subscribeForFreeAccount : accountsMasterId parameter is invalid! parameter value : "
-	 * + String.valueOf(accountsMasterId)); throw new InvalidInputException(
-	 * "subscribeForFreeAccount : accountsMasterId parameter is invalid!parameter value : " +
-	 * String.valueOf(accountsMasterId)); } LOG.info("Creating a free subscrpition");
-	 * LOG.debug("Updating the license table"); AccountsMaster accountsMaster =
-	 * accountsMasterDao.findById(AccountsMaster.class, accountsMasterId); if (accountsMaster ==
-	 * null) { LOG.error("updateLicenseTable : null returned by dao for accountsMaster"); throw new
-	 * InvalidInputException("updateLicenseTable : null returned by dao for accountsMaster"); }
-	 * LOG.debug("BrainTreePaymentImpl : updateLicenseTable() : Executing method.");
-	 * LOG.debug("Parameters provided : accountsMasterId : " + accountsMasterId + ", company : " +
-	 * user.getCompany().toString() + ", userId : " + user.getUserId());
-	 * LOG.debug("Updating LicenseDetail Table"); LicenseDetail licenseDetail = new LicenseDetail();
-	 * licenseDetail.setSubscriptionId(null); licenseDetail.setAccountsMaster(accountsMaster);
-	 * licenseDetail.setCompany(user.getCompany());
-	 * licenseDetail.setCreatedBy(String.valueOf(user.getUserId()));
-	 * licenseDetail.setModifiedBy(String.valueOf(user.getUserId())); licenseDetail.setCreatedOn(new
-	 * Timestamp(System.currentTimeMillis())); licenseDetail.setModifiedOn(new
-	 * Timestamp(System.currentTimeMillis()));
-	 * licenseDetail.setPaymentMode(CommonConstants.AUTO_PAYMENT_MODE);
-	 * licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
-	 * licenseDetail.setSubscriptionIdSource(CommonConstants.FREE_ACCOUNT);
-	 * licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE); licenseDetail.setLicenseStartDate(new
-	 * Timestamp(System.currentTimeMillis()));
-	 * licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
-	 * licenseDetailDao.save(licenseDetail);
-	 * LOG.debug("License detail table updated. Updating the company entity.");
-	 * user.getCompany().setLicenseDetails(Arrays.asList(licenseDetail));
-	 * LOG.debug("Company entity updated."); LOG.debug("LicenseDetail table updated");
-	 * LOG.info("Subscription successful!"); }
-	 */
 	/**
 	 * Returns a Braintree client token that is used by the frontend to setup the drop-in UI.
 	 * 
@@ -996,6 +944,105 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	}
 
 	/**
+	 * Fetches the braintree plan id from the property file
+	 * 
+	 * @param accountsMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String getBraintreePlanId(int accountsMasterId) throws InvalidInputException {
+		if (accountsMasterId < CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL && accountsMasterId > CommonConstants.ACCOUNTS_MASTER_FREE) {
+			LOG.error("getBraintreePlanId : accountsMAsterId parameter is invalid!");
+			throw new InvalidInputException("getBraintreePlanId : accountsMAsterId parameter is invalid!");
+		}
+		LOG.debug("getBraintreePlanId called");
+		// Getting the braintree id for the new plan
+		String braintreePlanId = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(accountsMasterId));
+		if (braintreePlanId == null) {
+			LOG.error("Invalid Plan ID provided for subscription.");
+			throw new InvalidInputException("Invalid Plan ID provided for subscription.");
+		}
+		LOG.debug("Returning the braintree plan name");
+		return braintreePlanId;
+	}
+
+	/**
+	 * Updates the license detail table on plan upgrade
+	 * 
+	 * @param licenseDetail
+	 * @param company
+	 * @param newAccountsMaster
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException 
+	 */
+	private void updateLicenseDetailsTableOnPlanUpgrade(User user,LicenseDetail licenseDetail, Company company, AccountsMaster newAccountsMaster,
+			String subscriptionId) throws InvalidInputException, NoRecordsFetchedException {
+
+		if (licenseDetail == null) {
+			LOG.error("updateLicenseDetailsTableOnPlanUpgrade : license detail parameter is null!");
+			throw new InvalidInputException("updateLicenseDetailsTableOnPlanUpgrade : license detail parameter is null!");
+		}
+		if (company == null) {
+			LOG.error("updateLicenseDetailsTableOnPlanUpgrade : company parameter is null!");
+			throw new InvalidInputException("updateLicenseDetailsTableOnPlanUpgrade : company parameter is null!");
+		}
+		if (newAccountsMaster == null) {
+			LOG.error("updateLicenseDetailsTableOnPlanUpgrade : newAccountsMaster parameter is null!");
+			throw new InvalidInputException("updateLicenseDetailsTableOnPlanUpgrade : newAccountsMaster parameter is null!");
+		}
+		if(subscriptionId == null && licenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE){
+			LOG.error("updateLicenseDetailsTableOnPlanUpgrade : subscriptionId parameter is null!");
+			throw new InvalidInputException("updateLicenseDetailsTableOnPlanUpgrade : subscriptionId parameter is null!");
+		}
+
+		// Updating license detail table.
+		LOG.info("Updating the License Detail table to show changes");
+		if(checkIfItIsAFreeAccount(user)){
+			licenseDetail.setSubscriptionId(subscriptionId);
+		}
+		licenseDetail.setAccountsMaster(newAccountsMaster);
+		licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		licenseDetail.setModifiedBy(String.valueOf(user.getUserId()));
+		licenseDetailDao.update(licenseDetail);
+		LOG.debug("License Detail Table updated.Updating the company object to reflect the change.");
+		company.setLicenseDetails(Arrays.asList(licenseDetail));
+		LOG.debug("Company entity updated");
+		LOG.info("updateLicenseDetailsTableOnPlanUpgrade execution complete!");
+
+	}
+
+	/**
+	 * Checks if particular user belongs to free account
+	 * 
+	 * @param user
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	private boolean checkIfItIsAFreeAccount(User user) throws InvalidInputException, NoRecordsFetchedException {
+		if (user == null) {
+			LOG.error("checkIfItIsAFreeAccount : user parameter null!");
+			throw new InvalidInputException("checkIfItIsAFreeAccount : user parameter null!");
+		}
+		LOG.debug("checkIfItIsAFreeAccount called!");
+		boolean status = false;
+		// We get the accountsmaster for the current user
+		List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
+		if (licenseDetails == null || licenseDetails.isEmpty()) {
+			LOG.error("checkIfItIsAFreeAccount : No License details record found for user id : " + user.getUserId());
+			throw new NoRecordsFetchedException("checkIfItIsAFreeAccount : No License details record found for user id : " + user.getUserId());
+		}
+		AccountsMaster currentAccountsMaster = licenseDetails.get(CommonConstants.INITIAL_INDEX).getAccountsMaster();
+
+		if (currentAccountsMaster.getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE) {
+			LOG.info(" The user is currently under free plan");
+			status = true;
+		}
+		LOG.debug("End of checkIfItIsAFreeAccount");
+		return status;
+	}
+
+	/**
 	 * Upgrades the plan for a particular subscription.
 	 * 
 	 * @param company
@@ -1007,23 +1054,31 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws SubscriptionUpgradeUnsuccessfulException
 	 * @throws SolrException
 	 * @throws UndeliveredEmailException
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws CreditCardException 
 	 */
 	@Transactional
 	@Override
-	public void upgradePlanForSubscription(User user, int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException,
-			SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException {
+	public void upgradePlanForSubscription(User user, int newAccountsMasterId, String nonce) throws InvalidInputException, NoRecordsFetchedException,
+			SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException, SubscriptionUnsuccessfulException, CreditCardException {
 
 		if (user == null) {
 			LOG.error("upgradePlanForSubscription : User parameter given is null.");
 			throw new InvalidInputException("upgradePlanForSubscription : User parameter given is null.");
 		}
-
 		if (newAccountsMasterId < 0) {
 			LOG.error("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
 			throw new InvalidInputException("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
 		}
+		if(checkIfItIsAFreeAccount(user) && nonce == null){
+			LOG.error("upgradePlanForSubscription : nonce parameter given is invalid");
+			throw new InvalidInputException("upgradePlanForSubscription : nonce parameter given is invalid");
+		}
 
 		Company company = user.getCompany();
+		// We need the subscription id in case of free account
+		String subscriptionId = null;
+		
 		// Fetching the new accounts master record
 		LOG.info("Fetching the new accounts master record from the database.");
 		AccountsMaster newAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, newAccountsMasterId);
@@ -1033,69 +1088,54 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		LOG.info("Accounts master record fetched.");
 
-		// Fetching the license detail record for the company as it holds all the current
-		// subscription details.
-		LOG.info("Fetching the License Detail record for the company with id : " + company.getCompanyId());
-
-		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.COMPANY_COLUMN, company);
-
-		if (licenseDetails == null || licenseDetails.isEmpty()) {
-			LOG.error("upgradePlanForSubscription : No records fetched for the company ");
-			throw new NoRecordsFetchedException("upgradePlanForSubscription : No records fetched for the company ");
+		LicenseDetail licenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+		if (licenseDetail.getIsSubscriptionDue() == CommonConstants.YES) {
+			LOG.error("Subscription is past due! So cannot upgrade it to new plan");
+			throw new SubscriptionPastDueException("Subscription is past due! So cannot upgrade it to new plan");
 		}
 
-		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
-		LOG.info("License Detail record fetched.");
+		String braintreePlanId = getBraintreePlanId(newAccountsMasterId);
 
-		// Checking if the subscription is passed due and throwing an exception if it is due.
-		LOG.info("Checking if subscription is due");
-		if (licenseDetail.getIsSubscriptionDue() == CommonConstants.STATUS_ACTIVE) {
-			LOG.error("upgradePlanForSubscription : Upgrade not possible as subscription is due.");
-			throw new SubscriptionPastDueException("upgradePlanForSubscription : Upgrade not possible as subscription is due.",
-					DisplayMessageConstants.SUBSCRIPTION_PAST_DUE);
+		if (checkIfItIsAFreeAccount(user)) {
+			// In case of free account we check if user is in braintree vault, if not we add him and
+			// make a fresh subscription.
+			Customer customer = containsCustomer(String.valueOf(company.getCompanyId()));
+
+			if (customer != null) {
+				LOG.debug("Customer found in vault. Making subscription.");
+				// If he does just subscribe the customer
+				subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanId);
+			}
+			else {
+				LOG.debug("Customer does not exist in the vault.Adding customer to vault.");
+				// If he doesnt add him to the vault and subscribe him
+				addCustomerWithPayment(company, nonce);
+				LOG.info("Customer Added. Making subscription.");
+				subscriptionId = subscribeCustomer(String.valueOf(company.getCompanyId()), braintreePlanId);
+			}
 		}
-
-		// Getting the braintree id for the new plan
-		String braintreePlanId = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, String.valueOf(newAccountsMasterId));
-		if (braintreePlanId == null) {
-			LOG.error("Invalid Plan ID provided for subscription.");
-			throw new InvalidInputException("Invalid Plan ID provided for subscription.");
+		else {
+			// Making API call to Braintree to update subscription.
+			LOG.info("Subscription isnt due. So upgrading the subscription");
+			upgradeSubscription(licenseDetail.getSubscriptionId(), newAccountsMaster.getAmount(), braintreePlanId);
+			LOG.info("Subscription upgraded at braintree");
 		}
-
-		// Making API call to Braintree to update subscription.
-		LOG.info("Subscription isnt due. So upgrading the subscription");
-		upgradeSubscription(licenseDetail.getSubscriptionId(), newAccountsMaster.getAmount(), braintreePlanId);
-		LOG.info("Subscription upgraded at braintree");
 
 		try {
 			// Update the branches and the regions and add settings to mongo
 			LOG.info("API call successful, updating the branch and region databases");
-			organizationManagementService.upgradeAccount(company, newAccountsMasterId);
-			// Updating license detail table.
-			LOG.info("Updating the License Detail table to show changes");
-			licenseDetail.setAccountsMaster(newAccountsMaster);
-			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			licenseDetailDao.update(licenseDetail);
-			LOG.info("License Detail Table updated.Updating the company object to reflect the change.");
-			company.setLicenseDetails(Arrays.asList(licenseDetail));
-			LOG.info("Company entity updated");
+			//organizationManagementService.upgradeAccount(company, newAccountsMasterId);
+			updateLicenseDetailsTableOnPlanUpgrade(user,licenseDetail, company, newAccountsMaster,subscriptionId);
+
 		}
 		catch (DatabaseException e) {
-
 			LOG.error("Database exception caught while performing the update.Reverting the upgrade!");
-
 			// Getting the braintree id for the old plan
-			String braintreeOldPlanId = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE,
-					String.valueOf(licenseDetail.getAccountsMaster().getAccountsMasterId()));
-			if (braintreeOldPlanId == null) {
-				LOG.error("Invalid Plan ID provided for subscription.");
-				throw new InvalidInputException("Invalid Plan ID provided for subscription.");
-			}
+			String braintreeOldPlanId = getBraintreePlanId(licenseDetail.getAccountsMaster().getAccountsMasterId());
 			// Reverting the account to the old plan
 			LOG.info("Reverting the subscription to the old plan");
 			upgradeSubscription(licenseDetail.getSubscriptionId(), licenseDetail.getAccountsMaster().getAmount(), braintreeOldPlanId);
 			throw e;
-
 		}
 
 		LOG.info("Sending mail to the customer about the upgrade");
