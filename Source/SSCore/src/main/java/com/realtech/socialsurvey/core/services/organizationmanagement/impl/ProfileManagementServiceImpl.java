@@ -23,6 +23,7 @@ import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -32,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -161,8 +163,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		// Fetching Company Lock settings
-		LockSettings parentLock = companySettings.getLockSettings();
-
+		LockSettings parentLock = new LockSettings();
+		parentLock = aggregateLockSettings(companySettings.getLockSettings(), parentLock);
+		
 		// Aggregate Region Lock settings if exists
 		if (regionSettings != null) {
 			parentLock = aggregateLockSettings(regionSettings.getLockSettings(), parentLock);
@@ -179,7 +182,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		// Fetching Company Lock settings
-		LockSettings parentLock = companySettings.getLockSettings();
+		LockSettings parentLock = new LockSettings();
+		parentLock = aggregateLockSettings(companySettings.getLockSettings(), parentLock);
 
 		// Aggregate Region Lock settings if exists
 		if (regionSettings != null) {
@@ -383,6 +387,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			LockSettings userLock) {
 		LOG.debug("Method aggregateProfileData() called from ProfileManagementService");
 
+		if (userProfile.getContact_details() == null) {
+			userProfile.setContact_details(new ContactDetailsSettings());
+		}
+		if (userProfile.getContact_details().getWeb_addresses() == null) {
+			userProfile.getContact_details().setWeb_addresses(new WebAddressSettings());
+		}
+		if (userProfile.getContact_details().getContact_numbers() == null) {
+			userProfile.getContact_details().setContact_numbers(new ContactNumberSettings());
+		}
+
 		// Aggregate parentProfile data with userProfile
 		LockSettings parentLock = parentProfile.getLockSettings();
 		if (parentLock != null) {
@@ -396,7 +410,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 			if (parentLock.getIsWebAddressLocked() && !userLock.getIsWebAddressLocked() && userProfile.getContact_details().getWeb_addresses() != null) {
 				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
-				userLock.setLogoLocked(true);
+				userLock.setWebAddressLocked(true);
 			}
 			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
 				userProfile.getContact_details().getContact_numbers().setWork(parentProfile.getContact_details().getContact_numbers().getWork());
