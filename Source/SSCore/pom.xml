@@ -32,7 +32,7 @@
 
 		<!-- PowerMock -->
 		<powermock.version>1.5.6</powermock.version>
-		
+
 		<!-- Google json -->
 		<gson.version>1.7.1</gson.version>
 
@@ -221,21 +221,28 @@
 			<artifactId>httpmime</artifactId>
 			<version>4.3.1</version>
 		</dependency>
-		
-		<!-- dependency for json  -->
+
+		<!-- dependency for json -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${gson.version}</version>
 		</dependency>
-		
+
+		<!-- kafka dependency -->
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.10</artifactId>
+			<version>0.8.1.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.4</version>
 		</dependency>
 
-		<!-- Spring Security Core-->
+		<!-- Spring Security Core -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
@@ -305,22 +312,22 @@
 	</build>
 
 	<profiles>
-	    <profile>
-	        <id>dev</id>
-	        <build>
-	            <filters>
-	                <filter>src/main/resources/filler.dev.properties</filter>
-	            </filters>
-	        </build>
-	    </profile>
-	    <profile>
-	        <id>test</id>
-	        <build>
-	            <filters>
-	                <filter>src/main/resources/filler.test.properties</filter>
-	            </filters>
-	        </build>
-	    </profile>
+		<profile>
+			<id>dev</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.dev.properties</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>test</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.test.properties</filter>
+				</filters>
+			</build>
+		</profile>
 	</profiles>
 
 	<pluginRepositories>
