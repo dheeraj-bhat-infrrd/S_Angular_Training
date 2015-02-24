@@ -155,8 +155,14 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
+	public static final String LINKEDIN_AUTH_URL = "authUrl";
+	public static final String LINKEDIN_REQUEST_TOKEN = "linkedinRequestToken";
+	public static final String SUCCESS_ATTRIBUTE = "success";
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
+	public static final String ERROR = "error";
+	public static final String MESSAGE = "message";
+	
 
 	/**
 	 * Batch Constants
@@ -301,6 +307,7 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE = 124;
 	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_FAILURE = 125;
 	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
+	
 	/**
 	 * Service codes
 	 */
@@ -308,7 +315,7 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_PROFILE = 101;
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
-	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
+	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;	
 	public static final int SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS = 105;
 	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
 	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
@@ -318,4 +325,11 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_REVIEWS = 111;
 	public static final int SERVICE_CODE_COMPANY_AVERAGE_RATINGS = 112;
 	public static final int SERVICE_CODE_COMPANY_REVIEWS_COUNT = 113;
+	
+	/*
+	 * Mongo column and collection constants
+	 */
+	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
+	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	
 }
