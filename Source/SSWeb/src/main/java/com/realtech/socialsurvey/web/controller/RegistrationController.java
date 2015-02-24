@@ -237,6 +237,11 @@ public class RegistrationController {
 						.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
+				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+				userManagementService.insertAgentSettings(user);
+				LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
+				LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Added newly added user {} to solr", user.getFirstName());
 
@@ -277,7 +282,6 @@ public class RegistrationController {
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
-
 	}
 
 	/**
