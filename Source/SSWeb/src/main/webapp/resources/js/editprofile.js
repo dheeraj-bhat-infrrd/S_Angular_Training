@@ -367,13 +367,6 @@ function callBackShowProfileImage(data) {
 	adjustImage();
 }
 
-$(document).on('change', '#prof-image', function() {
-	var formData = new FormData();
-	formData.append("logo", $(this).prop("files")[0]);
-	formData.append("logoFileName", $(this).prop("files")[0].name);
-	callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
-});
-
 function callBackOnProfileImageUpload(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
@@ -381,6 +374,10 @@ function callBackOnProfileImageUpload(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
+
+$(document).on('change', '#prof-image', function() {
+	initiateJcrop(this);
+});
 
 
 // Function to update profile logo image
@@ -407,19 +404,19 @@ function callBackShowProfileLogo(data) {
 	adjustImage();
 }
 
-$(document).on('change', '#prof-logo', function() {
-	var formData = new FormData();
-	formData.append("logo", $(this).prop("files")[0]);
-	formData.append("logoFileName", $(this).prop("files")[0].name);
-	callAjaxPOSTWithTextData("./updatelogo.do", callBackOnLogoUpload, false, formData);
-});
-
 function callBackOnLogoUpload(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
+
+$(document).on('change', '#prof-logo', function() {
+	var formData = new FormData();
+	formData.append("logo", $(this).prop("files")[0]);
+	formData.append("logoFileName", $(this).prop("files")[0].name);
+	callAjaxPOSTWithTextData("./updatelogo.do", callBackOnLogoUpload, false, formData);
+});
 
 
 // Function to populate associations container

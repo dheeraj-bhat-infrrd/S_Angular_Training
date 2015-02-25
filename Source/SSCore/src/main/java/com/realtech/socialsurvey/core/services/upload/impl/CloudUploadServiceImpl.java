@@ -58,6 +58,18 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	private String secretKey;
 
 	@Override
+	public String fileUploadHandler(File file, String logoName) throws InvalidInputException {
+		LOG.info("Method fileUploadHandler inside AmazonUploadServiceImpl called");
+		try {
+			return uploadImage(file, logoName);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
+			throw new FatalException("IOException occured while reading file. Reason : " + e.getMessage(), e);
+		}
+	}
+	
+	@Override
 	public String fileUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException {
 		LOG.info("Method fileUploadHandler inside AmazonUploadServiceImpl called");
 
@@ -65,23 +77,8 @@ public class CloudUploadServiceImpl implements FileUploadService {
 			try {
 				File convFile = new File(fileLocal.getOriginalFilename());
 				fileLocal.transferTo(convFile);
-				uploadUtils.validateFile(convFile);
 
-				StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.HYPHEN);
-				amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
-				amazonFileName.append(logoName.substring(logoName.lastIndexOf(".")));
-
-				PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, amazonFileName.toString(), convFile);
-				ObjectMetadata metadata = new ObjectMetadata();
-				metadata.setCacheControl(CACHE_PUBLIC);
-				putObjectRequest.setMetadata(metadata);
-				putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
-				AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
-
-				PutObjectResult result = s3Client.putObject(putObjectRequest);
-				LOG.info("Amazon Upload Etag: " + result.getETag());
-				LOG.info("Amazon file Name: " + amazonFileName.toString());
-				return amazonFileName.toString();
+				return uploadImage(convFile, logoName);
 			}
 			catch (IOException e) {
 				LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
@@ -92,6 +89,26 @@ public class CloudUploadServiceImpl implements FileUploadService {
 			LOG.error("Method fileUploadHandler inside AmazonUploadServiceImpl failed to upload");
 			throw new InvalidInputException("Upload failed: " + logoName + " because the file was empty", DisplayMessageConstants.INVALID_LOGO_FILE);
 		}
+	}
+
+	private String uploadImage(File convFile, String logoName) throws InvalidInputException {
+		uploadUtils.validateFile(convFile);
+
+		StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.HYPHEN);
+		amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
+		amazonFileName.append(logoName.substring(logoName.lastIndexOf(".")));
+
+		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, amazonFileName.toString(), convFile);
+		ObjectMetadata metadata = new ObjectMetadata();
+		metadata.setCacheControl(CACHE_PUBLIC);
+		putObjectRequest.setMetadata(metadata);
+		putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
+		AmazonS3 s3Client = createAmazonClient(endpoint, bucket);
+
+		PutObjectResult result = s3Client.putObject(putObjectRequest);
+		LOG.info("Amazon Upload Etag: " + result.getETag());
+		LOG.info("Amazon file Name: " + amazonFileName.toString());
+		return amazonFileName.toString();
 	}
 
 	/**
