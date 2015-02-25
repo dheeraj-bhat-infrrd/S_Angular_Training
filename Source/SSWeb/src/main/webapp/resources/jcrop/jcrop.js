@@ -12,7 +12,7 @@ $(function() {
 });
 
 function createPopupCanvas() {
-	var canvas = '<img src="" id="target" style="max-height:250px; max-width:470px; position:absoulte;"/>'
+	var canvas = '<img src="" id="target" style="max-width:500px; max-height:250px; position:absoulte;"/>'
 		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
 	$('#overlay-text').html(canvas).css('position','relative').css('align','center');
