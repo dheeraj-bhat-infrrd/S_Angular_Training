@@ -12,7 +12,7 @@
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
-						<input type="file" class="con_img_inp_file" id="prof-image">
+						<input type='file' id="prof-image" class="con_img_inp_file" />
 					</form>
 					<div class="prof-rating-mobile-wrapper hide">
 						<div class="st-rating-wrapper maring-0 clearfix">

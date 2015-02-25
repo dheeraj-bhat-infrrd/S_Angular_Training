@@ -28,9 +28,9 @@
 									</form>
 								</c:when>
 								<c:when	test="${not parentLock.isLogoLocked && lock.isLogoLocked && not user.agent}">
-									<div id="prof-logo-lock" data-state="locked" data-control="user" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
-										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
+										<input type="file" id="prof-logo" class="con_img_inp_file">
 									</form>
 								</c:when>
 								<c:when	test="${not parentLock.isLogoLocked && not lock.isLogoLocked && not user.agent}">
