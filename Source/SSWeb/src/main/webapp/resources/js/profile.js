@@ -51,7 +51,7 @@ function paintCompanyProfile(data) {
 	            
 	            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
 	            if(contactDetails.about_me != undefined) {
-	            	companyIntroHtml = companyIntroHtml + '<div class="intro-body">'+contactDetails.about_me+'</div>';
+	            	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
 	            }
 	            $("#prof-company-intro").html(companyIntroHtml);
 	            
