@@ -72,6 +72,10 @@
 	</div>
 </div>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
+<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
+
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
 	<div class="container">
@@ -87,7 +91,7 @@
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
-						<input type="file" class="con_img_inp_file" id="prof-image">
+						<input type='file' id="prof-image" class="con_img_inp_file" />
 					</form>
 					<div class="prof-rating-mobile-wrapper hide">
 						<div class="st-rating-wrapper maring-0 clearfix">
@@ -460,6 +464,11 @@
 				</div>
 				
                 <div class="rt-content-main bord-bot-dc clearfix">
+                	<div class="float-left panel-tweet-wrapper">
+                        <div class="main-con-header"><spring:message code="label.sspost.key"/></div>
+                        <textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
+                        <input type="button" class="float-right" value="Post">
+                    </div>
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
                         <div class="tweet-panel tweet-panel-left">

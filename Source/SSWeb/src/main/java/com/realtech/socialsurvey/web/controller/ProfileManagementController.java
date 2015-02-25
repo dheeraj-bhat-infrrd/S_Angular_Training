@@ -1,9 +1,13 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.apache.solr.common.SolrDocument;
@@ -20,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+import sun.misc.BASE64Decoder;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -815,8 +820,8 @@ public class ProfileManagementController {
 	}
 
 	// TODO
-	/*@RequestMapping(value = "/updateprofileimagecrop", method = RequestMethod.POST)
-	public String updateProfileImageCropped(Model model, HttpServletRequest request) {
+	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
+	public String updateProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileImage() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 		String profileImageUrl = "";
@@ -832,9 +837,6 @@ public class ProfileManagementController {
 			String imageBase64 = request.getParameter("imageBase64");
 			String imageFileName = request.getParameter("imageFileName");
 			
-			LOG.info(imageBase64);
-			LOG.info(imageFileName);
-			
 			try {
 				if (imageFileName == null || imageFileName.isEmpty()) {
 					throw new InvalidInputException("Logo passed is null or empty");
@@ -843,15 +845,18 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
 				
-				byte[] bImg64 = imageBase64.substring("data:image/png;base64,".length()).getBytes();
-				byte[] bImg = Base64.decodeBase64(bImg64);
+				BASE64Decoder decoder = new BASE64Decoder();
+				byte[] decodedBytes = decoder.decodeBuffer(imageBase64.substring("data:image/png;base64,".length()));
+				BufferedImage image = ImageIO.read(new ByteArrayInputStream(decodedBytes));
+				if (image == null) {
+					LOG.error("Buffered Image is null");
+				}
 				
-				FileOutputStream fos = new FileOutputStream("img.png");
-				fos.write(bImg);
-				fos.close();
-				
-				// imageName = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
-				// imageName = endpoint + "/" + bucket + "/" +imageName;
+				File fileLocal = new File(imageFileName);
+			    ImageIO.write(image, "png", fileLocal);
+			    
+				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, imageFileName);
+				profileImageUrl = endpoint + "/" + bucket + "/" + profileImageUrl;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while uploading Profile Image. Reason :" + e.getMessage(), e);
@@ -912,105 +917,7 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setProfileImageInSession(session, userSettings);
-
-			LOG.info("Profile Image uploaded successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
-		}
-
-		LOG.info("Method updateProfileImage() finished from ProfileManagementController");
-		return JspResolver.MESSAGE_HEADER;
-	}*/
-
-	/**
-	 * Method to add or update profile logo
-	 * 
-	 * @param model
-	 * @param request
-	 * @param fileLocal
-	 */
-	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
-	public String updateProfileImage(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
-		LOG.info("Method updateProfileImage() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
-		String profileImageUrl = "";
-
-		try {
-			HttpSession session = request.getSession(false);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
-				throw new InvalidInputException("No user settings found in session");
-			}
-
-			String profileImageName = request.getParameter("logoFileName");
-			try {
-				if (profileImageName == null || profileImageName.isEmpty()) {
-					throw new InvalidInputException("Profile Image passed is null or empty");
-				}
-				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, profileImageName);
-				profileImageUrl = endpoint + "/" + bucket + "/" +profileImageUrl;
-			}
-			catch (NonFatalException e) {
-				LOG.error("NonFatalException while uploading Profile Image. Reason :" + e.getMessage(), e);
-				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-				return JspResolver.MESSAGE_HEADER;
-			}
-
-			if (user.isCompanyAdmin()) {
-				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
-				if (companySettings == null) {
-					throw new InvalidInputException("No company settings found in current session");
-				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, profileImageUrl);
-				companySettings.setProfileImageUrl(profileImageUrl);
-				userSettings.setCompanySettings(companySettings);
-			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
-				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
-				if (regionSettings == null) {
-					throw new InvalidInputException("No Region settings found in current session");
-				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, profileImageUrl);
-				regionSettings.setProfileImageUrl(profileImageUrl);
-				userSettings.getRegionSettings().put(regionId, regionSettings);
-			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
-				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
-				if (branchSettings == null) {
-					throw new InvalidInputException("No Branch settings found in current session");
-				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, profileImageUrl);
-				branchSettings.setProfileImageUrl(profileImageUrl);
-				userSettings.getBranchSettings().put(branchId, branchSettings);
-			}
-			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
-				if (agentSettings == null) {
-					throw new InvalidInputException("No Agent settings found in current session");
-				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, profileImageUrl);
-				agentSettings.setProfileImageUrl(profileImageUrl);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
-
-				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
-			}
-			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
-			}
-
-			profile.setProfileImageUrl(profileImageUrl);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			sessionHelper.setProfileImageInSession(session, userSettings);
-
+			
 			LOG.info("Profile Image uploaded successfully");
 			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
@@ -2182,7 +2089,6 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/findapro", method = RequestMethod.POST)
 	public String findAProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method findAProfile called.");
-		List<SolrDocument> users = new ArrayList<SolrDocument>();
 		SolrDocumentList results = null;
 		String patternFirst;
 		String patternLast;
@@ -2202,9 +2108,6 @@ public class ProfileManagementController {
 
 			try {
 				results = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
-				for (SolrDocument solrDocument : results) {
-					users.add(solrDocument);
-				}
 			}
 			catch (MalformedURLException e) {
 				LOG.error("Error occured while searching in findAProfile(). Reason is ", e);
@@ -2218,8 +2121,7 @@ public class ProfileManagementController {
 			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
 			return new Gson().toJson(errorResponse);
 		}
-		model.addAttribute("users", users);
-		model.addAttribute("size", users.size());
+
 		model.addAttribute("numfound", results.getNumFound());
 		model.addAttribute("patternFirst", patternFirst);
 		model.addAttribute("patternLast", patternLast);

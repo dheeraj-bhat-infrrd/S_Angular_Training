@@ -103,4 +103,10 @@ public class FileUploadServiceImpl implements FileUploadService {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+	@Override
+	public String fileUploadHandler(File file, String logoName) throws InvalidInputException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
