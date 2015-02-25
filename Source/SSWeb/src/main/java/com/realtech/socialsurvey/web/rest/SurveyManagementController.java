@@ -1,25 +1,22 @@
 package com.realtech.socialsurvey.web.rest;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -69,26 +66,7 @@ public class SurveyManagementController {
 	@Autowired
 	private EmailServices emailServices;
 
-	private static String swearWords = "";
-
-	static {
-		Resource resource = new ClassPathResource("swear-words");
-		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
-			String text;
-			List<String> swearWordsLst = new ArrayList<>();
-			text = br.readLine();
-			while (text != null) {
-				swearWordsLst.add(text.trim());
-				text = br.readLine();
-			}
-			swearWords = new Gson().toJson(swearWordsLst);
-		}
-		catch (IOException e) {
-			LOG.error("Error parsing list of swear words", e);
-		}
-	}
-
+	
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
@@ -105,7 +83,7 @@ public class SurveyManagementController {
 		long agentId = Long.valueOf(request.getParameter("agentId"));
 		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
-		return swearWords;
+		return surveyHandler.getSwearWords();
 	}
 
 	/*
@@ -114,13 +92,14 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/data/storeFeedback")
 	public void storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
-		// TODO store answer provided by customer in mongoDB.
+		// To store final feedback provided by customer in mongoDB.
 		try {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
 			long agentId = Long.valueOf(request.getParameter("agentId"));
-			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
+			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
+			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
@@ -250,10 +229,6 @@ public class SurveyManagementController {
 
 	private String getApplicationBaseUrl() {
 		return surveyHandler.getApplicationBaseUrl();
-	}
-
-	public static String getSwearWords() {
-		return swearWords;
 	}
 }
 // JIRA SS-119 by RM-05 : EOC
