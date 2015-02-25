@@ -56,12 +56,12 @@ public class CloudUploadServiceImpl implements FileUploadService {
 
 	@Value("${AMAZON_SECRET_KEY}")
 	private String secretKey;
-
+	
 	@Override
-	public String fileUploadHandler(File file, String logoName) throws InvalidInputException {
+	public String fileUploadHandler(File file, String imageName) throws InvalidInputException {
 		LOG.info("Method fileUploadHandler inside AmazonUploadServiceImpl called");
 		try {
-			return uploadImage(file, logoName);
+			return uploadImage(file, imageName);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("IOException occured while reading file. Reason : " + e.getMessage(), e);
@@ -75,7 +75,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 
 		if (!fileLocal.isEmpty()) {
 			try {
-				File convFile = new File(fileLocal.getOriginalFilename());
+				File convFile = new File(CommonConstants.IMAGE_NAME);
 				fileLocal.transferTo(convFile);
 
 				return uploadImage(convFile, logoName);

@@ -17,7 +17,7 @@ public interface FileUploadService {
 	 * @throws InvalidInputException
 	 */
 	public String fileUploadHandler(MultipartFile fileLocal, String logoName) throws InvalidInputException;
-	public String fileUploadHandler(File file, String logoName) throws InvalidInputException;
+	public String fileUploadHandler(File file, String imageName) throws InvalidInputException;
 	
 	/**
 	 * Method that returns a list of all the keys in a bucket.
