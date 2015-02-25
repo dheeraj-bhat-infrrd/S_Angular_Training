@@ -810,9 +810,9 @@ function initializeGoogleMap() {
 // TODO Other Data
 function paintForProfile() {
 	var companyId = $('#prof-company-id').val();
-	// var regionId = $('#prof-region-id').val();
-	// var branchId = $('#prof-branch-id').val();
-	// var agentId = $('#prof-agent-id').val();
+	var regionId = $('#prof-region-id').val();
+	var branchId = $('#prof-branch-id').val();
+	var agentId = $('#prof-agent-id').val();
 	minScore = $('#profile-min-post-score').val();
 	
 	if (companyId != undefined) {
@@ -820,8 +820,9 @@ function paintForProfile() {
 		companyProfileName = $("#company-profile-name").val();
 
 		fetchAverageRatings(companyId);
-		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+
+		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
 		if(minScore > 0){
 			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
@@ -830,5 +831,14 @@ function paintForProfile() {
 		fetchCompanyRegions();
 		fetchCompanyBranches();
 		fetchCompanyIndividuals();
+	}
+	else if (regionId != undefined) {
+		
+	}
+	else if (branchId != undefined) {
+		
+	}
+	else if (agentId != undefined) {
+		
 	}
 }
