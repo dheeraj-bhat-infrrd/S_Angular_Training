@@ -175,6 +175,7 @@ public class LoginController {
 					}
 				}
 				else {
+					LOG.info("No User profile present");
 					//TODO: add logic for what happens when no user profile present
 				}
 			}
