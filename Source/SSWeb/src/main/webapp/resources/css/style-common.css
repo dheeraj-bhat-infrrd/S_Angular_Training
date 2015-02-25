@@ -1445,6 +1445,15 @@ button.paypal.is-active {
     height: 50px;
 }
 
+.prof-hidden-review-link {
+	line-height: 60px;
+	height: 50px;
+	font-size: 12px;
+	color:#DDD9D5;
+	cursor: pointer;
+	float: right;
+}
+
 .social-item-icon {
     height: 50px;
     width: 40px;
@@ -2363,6 +2372,7 @@ button.paypal.is-active {
     bottom: 50px;
     width: 100%;
     line-height: 32px;
+    display: none;
 }
 
 .sb-btns-add-rem-wrapper {
@@ -2906,6 +2916,13 @@ button.paypal.is-active {
     background: url(../images/rgn_blue.png) no-repeat center;
 }
 
+.lp-pers-img {
+	width:32px;
+	height:32px;
+	border-radius:50%;
+	background-size: 100% auto !important;
+}
+
 .icn-psn1 {
     background: url(../images/Person1.png) no-repeat center;
 }
@@ -2949,6 +2966,7 @@ button.paypal.is-active {
 .profile-addl-links {
     margin-top: 10px;
     text-align: right;
+    margin-bottom: 10px;
 }
 
 .p-a-l-item {
@@ -2960,6 +2978,7 @@ button.paypal.is-active {
 .ppl-review-item {
     border-bottom: 1px solid #dcdcdc;
     padding-bottom: 10px;
+    margin-top: 10px;
 }
 
 .survery-header-2 {
@@ -3077,6 +3096,54 @@ button.paypal.is-active {
     left: 80%;
 }
 
+.prog-img-container{
+	position: relative;
+}
+
+.form_contact_image{
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	opacity: 0;
+	z-index: 999;
+	background-color: #fff;
+	height: 100%;
+}
+
+.con_img_inp_file{
+	height: 50px;
+	height: 100%;
+	cursor: pointer;
+	width: 100%;
+	height: 100%;
+}
+
+.rp-edit-locks{
+	width: 46px;
+	height: 33px;
+	cursor: pointer;
+	background: url(../images/locks.png) no-repeat;
+	background-position: -118px center;
+}
+
+.lp-edit-locks{
+	cursor: pointer;
+	width: 46px;
+	height: 46px;
+	background: url(../images/locks.png) no-repeat;
+	background-position: -118px center;
+}
+
+.lp-ach-item-img{
+	cursor: pointer;
+	width: 46px;
+	height: 46px;
+	background: url(../images/icnRemove.png) no-repeat center;
+}
+
+.lp-ach-item-txt{
+	width: 78%;
+}
 .sq-i-container{
 	width: 400px;
 }
@@ -3098,6 +3165,130 @@ button.paypal.is-active {
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
     padding: 0 10px;
+}
+
+.lp-edit-locks-locked {
+	background-position: 10px center;
+}
+
+.prof-name-txt{
+	width: 79%;
+	float: left;
+}
+
+.prof-name-lock{
+	cursor: pointer;
+	width: 46px;
+	height: 33px;
+	background: url(../images/locks.png) no-repeat;
+	background-position: -118px center;
+}
+
+.prof-name-unlock{
+	background-position: 10px center;
+}
+
+.main-con-header-adj{
+	margin-bottom: 5px;
+	line-height: 33px;
+}
+
+.abt-locks-adj{
+	height: 33px;
+	width: 33px;
+	background: url(../images/locks.png) no-repeat;
+	background-position: -123px center;
+}
+.abt-locks-adj-locked{
+	background-position: 4px center;
+}
+
+.lp-prog-img-container{
+	position: relative;
+	height: 100px !important;;
+}
+
+.prof-image-rp{
+	height: 100px !important;
+}
+
+.prof-img-lock-wrapper{
+	position: relative;
+}
+
+.prof-img-lock-item{
+	position: absolute;
+	bottom: 20px;
+	right: 20px;
+	width: 46px;
+	height: 46px;
+	background-color: rgba(255,255,255,0.6);
+	border-radius: 50%;
+	z-index: 99999;
+}
+
+.prof-img-lock{
+	background: rgba(255,255,255,0.6) url(../images/locks.png) no-repeat;
+	background-position: -123px center;
+}
+.prof-img-lock-locked{
+	background-position: 4px center;
+}
+
+.prof-edit-social-link{
+	position: relative;
+}
+
+.social-token-text{
+	position: absolute;
+	z-index: 9999999999999;
+	top: 63px;
+	left: -30px;
+	height: 40px;
+	width: 260px;
+	padding: 0 10px;
+	border: 1px solid #e3e3e3;
+	border-radius: 3px;
+	box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
+
+.arrow_box_social {
+	position: relative;
+	background: #009fe0;
+}
+
+.arrow_box_social:after {
+	bottom: 100%;
+	left: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-color: rgba(0, 159, 224, 0);
+	border-bottom-color: #009fe0;
+	border-width: 8px;
+	margin-left: -8px;
+}
+
+.prof-addr-center {
+	text-align: center;
+}
+
+.prof-edit-icn{
+	position: relative;
+}
+
+.prf-edit-img{
+	position: absolute;
+	right: 0;
+	top: 0;
+	width: 32px;
+	border-radius: 50%;
+	cursor:pointer;
+	height: 32px;
+	background: rgba(215, 64, 64, 0.6);
 }
 
 .btn-com{
@@ -3135,6 +3326,21 @@ button.paypal.is-active {
 	display: block !important;
 }
 
+.pu-edit-fields{
+	width: 100%;
+	margin-bottom: 10px;
+	padding: 0 10px;
+	border: 1px solid #e3e3e3;
+	height: 40px;
+	border-radius: 3px;
+	box-shadow: 0px 2px 2px 0px #e3e3e3;
+	margin-bottom: 10px;
+	padding: 0 10px;
+	border: 1px solid #e3e3e3;
+	height: 40px;
+	border-radius: 3px;
+	box-shadow: 0px 2px 2px 0px #e3e3e3;
+}
 .err-nw-wrapper{
     display: none;
     background-color: #E57C66;
@@ -3195,6 +3401,7 @@ button.paypal.is-active {
 .bg-black-info{
     background-color: #666 !important;
 }
+
 .header-right {
     position: relative;
     height: 78px;
@@ -3218,6 +3425,7 @@ button.paypal.is-active {
     right: 20px;
     background-color: #f9f9fb;
     border: 1px solid #dcdcdc;
+    z-index: 999;
 }
 
 .hr-dd-item {
@@ -3266,6 +3474,8 @@ button.paypal.is-active {
 }
 
 .dsh-btn-complete {
+/*    background-color: #26BDEF;*/
+/*    background-color: #5CC7EF;*/
     background-color: #009FE0;
     height: 50px;
     line-height: 50px;
@@ -3277,6 +3487,15 @@ button.paypal.is-active {
     font-size: 18px;
     font-family: 'opensanslight';
     text-transform: uppercase;
+    cursor: pointer;
+}
+
+.dsh-btn-complete:hover{
+    background-color: #7AB400 !important;
+}
+
+.dsh-btn-complete:active {
+    background-color: #70A501 !important;
 }
 
 .dsh-txt-2, .dsh-txt-3 {
@@ -3341,7 +3560,7 @@ button.paypal.is-active {
     height: 50px;
     width: 18px;
     margin-right: 1px;
-    background-size: 100% auto !important;
+    background-size: 80% auto !important;
 }
 
 .stat-icn-txt-rt {
@@ -3506,9 +3725,9 @@ button.paypal.is-active {
 }
 
 .dsh-graph-txt-4 {
-    top: 94px;
-    left: -190px;
-    width: 190px;
+    top: 146px;
+    left: -165px;
+    width: 165px;
 }
 
 .stat-icn-img-green {
@@ -3586,4 +3805,19 @@ button.paypal.is-active {
 
 .lgn-col-red {
     background-color: rgb(255,202,145);
+}
+
+.dash-main-left{
+    overflow: hidden;
+    margin-left: -20px;
+}
+
+.rt-content-main-adj{
+    padding: 15px 15px 15px 30px;
+    margin-left: -15px;
+    margin-right: 0;
+}
+
+.pe-whitespace {
+	white-space:pre-wrap;
 }
