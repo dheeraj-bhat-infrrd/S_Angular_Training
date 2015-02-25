@@ -51,4 +51,9 @@ public interface JspResolver {
 	public static final String PROFILE_LOGO = "profile_profilelogo";
 	public static final String PROFILE_SOCIAL_LINKS = "profile_sociallinks";
 	public static final String PROFILE_COMPANY = "profile_new";
+
+	public static final String PROFILE_HIERARCHY_COMPANY = "profile_hierarchy_company";
+	public static final String PROFILE_HIERARCHY_REGION = "profile_hierarchy_region";
+	public static final String PROFILE_HIERARCHY_BRANCH = "profile_hierarchy_branch";
+	
 }
