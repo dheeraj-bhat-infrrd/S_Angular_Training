@@ -382,12 +382,12 @@ function paintReviewsForCompany(data) {
 		var reviewsHtml = "";
 		if(result != undefined && result.length > 0) {
 			$.each(result, function(i, reviewItem) {
-				//var d = Date.parse(reviewItem.updatedOn);
+				var date = Date.parse(reviewItem.updatedOn);
 				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
 				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';
-				//reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+d.getDate() +" "+ d.getMonthName()+" "+d.getFullYear()+'</div>'; 
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerName+'</div>';
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+date.getDate() +" "+ date.getMonthName()+" "+date.getFullYear()+'</div>'; 
 				reviewsHtml=  reviewsHtml+'    </div>';
 				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
