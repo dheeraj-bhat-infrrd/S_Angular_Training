@@ -41,6 +41,9 @@ function paintCompanyProfile(data) {
 	            
 	            var addressHtml = '<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
 	            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
+	            if(contactDetails.country != undefined) {
+	            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
+	            }
 	            $("#prof-company-address").html(addressHtml);
 	            if(result.logo != undefined) {
 	            	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
