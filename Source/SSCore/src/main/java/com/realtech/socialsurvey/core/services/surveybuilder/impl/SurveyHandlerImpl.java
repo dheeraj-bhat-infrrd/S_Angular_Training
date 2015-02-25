@@ -136,6 +136,15 @@ public class SurveyHandlerImpl implements SurveyHandler {
 		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email finished.");
 		return surveyDetails;
 	}
+	
+	/*
+	 * Method to update a survey as clicked when user triggers the survey and page of the first question starts loading. 
+	 */
+	public void updateSurveyAsClicked(long agentId, String customerEmail){
+		LOG.info("Method updateSurveyAsClicked() to mark the survey as clicked, started");
+		surveyDetailsDao.updateSurveyAsClicked(agentId, customerEmail);
+		LOG.info("Method updateSurveyAsClicked() to mark the survey as clicked, finished");
+	}
 
 	@Override
 	public String getApplicationBaseUrl() {
