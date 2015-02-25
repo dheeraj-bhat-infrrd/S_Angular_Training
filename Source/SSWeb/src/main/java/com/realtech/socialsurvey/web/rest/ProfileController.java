@@ -402,7 +402,7 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/branch/{branchId}/individuals")
 	public Response getIndividualsByBranchId(@PathVariable long branchId) {
-		LOG.info("Service to fetcg individuals for branch called for branchId:" + branchId);
+		LOG.info("Service to fetch individuals for branch called for branchId:" + branchId);
 		Response response = null;
 		try {
 			if (branchId <= 0l) {
