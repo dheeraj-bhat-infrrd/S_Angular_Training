@@ -436,7 +436,6 @@ function paintReviewsForCompany(data) {
 $(window).scroll(function(){
 	var totalReviews = $("#profile-fetch-info").attr("total-reviews");
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndex <= totalReviews){
-		console.log("yes"+" window.innerHeight:"+window.innerHeight+" window.pageYOffset:"+window.pageYOffset+" document.body.offsetHeight:"+document.body.offsetHeight);
 		startIndex = startIndex + numOfRows;
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
 		fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,minScore);
