@@ -51,7 +51,9 @@ public class KafkaProducerImpl implements ProducerForQueue, InitializingBean, Di
 			throw new InvalidInputException("Content is not to queue the mail");
 		}
 		// topics will be partitioned by header name
-		KeyedMessage<String, String> data = new KeyedMessage<String, String>(DEFAULT_EMAIL_TOPIC, header.getName(), content);
+		StringBuilder finalContent = new StringBuilder();
+		finalContent.append("HEADER^^").append(header.getName()).append("$$").append(content);
+		KeyedMessage<String, String> data = new KeyedMessage<String, String>(DEFAULT_EMAIL_TOPIC, header.getName(), finalContent.toString());
 		EMAIL_PRODUCER.send(data);
 		
 	}
@@ -63,7 +65,7 @@ public class KafkaProducerImpl implements ProducerForQueue, InitializingBean, Di
 		Properties props = new Properties();
 		props.put("metadata.broker.list", brokerList);
 		props.put("serializer.class", emailSerializerClass);
-		//props.put("partitioner.class", emailPartitionerClass);
+		props.put("partitioner.class", emailPartitionerClass);
 		props.put("request.required.acks", emailRequestRequiredAcks);
 		EMAIL_PRODUCER_CONFIG = new ProducerConfig(props);
 		EMAIL_PRODUCER = new Producer<String, String>(EMAIL_PRODUCER_CONFIG);
