@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import org.apache.solr.client.solrj.SolrServerException;
+
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -34,7 +35,7 @@ public interface SurveyHandler {
 	/*
 	 * Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS.
 	 */
-	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review);
+	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
 
 	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent) throws SolrException, NoRecordsFetchedException,
 			SolrServerException, InvalidInputException;
@@ -42,4 +43,9 @@ public interface SurveyHandler {
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
 	
 	public String getApplicationBaseUrl();
+
+	public String getSwearWords();
+	
+	public void updateSurveyAsClicked(long agentId, String customerEmail);
+
 }
