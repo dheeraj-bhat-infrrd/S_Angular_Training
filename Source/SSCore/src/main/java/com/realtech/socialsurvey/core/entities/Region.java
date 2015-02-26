@@ -56,6 +56,9 @@ public class Region implements Serializable {
 	
 	@Transient
 	private String address2;
+	
+	@Column(name="PROFILE_NAME")
+	private String profileName;
 
 	// bi-directional many-to-one association to Branch
 	@OneToMany(mappedBy = "region", fetch = FetchType.LAZY)
@@ -181,9 +184,9 @@ public class Region implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Region [regionId=" + regionId + ", isDefaultBySystem=" + isDefaultBySystem + ", region=" + region + ", status=" + status + "]";
+		return "Region [regionId=" + regionId + ", createdBy=" + createdBy + ", createdOn=" + createdOn + ", isDefaultBySystem=" + isDefaultBySystem
+				+ ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + ", region=" + region + ", status=" + status + ", address1="
+				+ address1 + ", address2=" + address2 + ", profileName=" + profileName + ", branches=" + branches + ", company=" + company + "]";
 	}
-	
-	
 
 }

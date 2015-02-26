@@ -19,6 +19,7 @@
 </head>
 <body>
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
+<input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
@@ -165,7 +166,19 @@
 <script>
     $(document).ready(function(){
         adjustImage();
-        fetchCompanyProfile();
+        /**
+        	If region profile name is mentioned, fetch the region profile 
+        	since this would be a call to fetch region profile page 
+        */
+        var regionProfileName = $("#region-profile-name").val();
+        if(regionProfileName.length > 0) {
+        	fetchRegionProfile(regionProfileName);
+        }
+        else {
+        	fetchCompanyProfile();
+        }
+        
+       
         $(window).resize(adjustImage);
         
         $('.icn-person').click(function(){
