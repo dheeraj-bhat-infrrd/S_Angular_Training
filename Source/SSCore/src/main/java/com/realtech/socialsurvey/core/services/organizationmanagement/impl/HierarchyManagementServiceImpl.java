@@ -626,6 +626,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(regionProfileName);
 			organizationSettings.setProfileUrl(regionProfileUrl);
+			
+			/**
+			 * Set the profile name in region object to update in sql later
+			 */
+			region.setProfileName(regionProfileName);
 		}
 		else {
 			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
