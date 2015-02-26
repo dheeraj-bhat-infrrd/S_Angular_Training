@@ -58,10 +58,10 @@ public class EmailServicesImpl implements EmailServices {
 		}
 		// format for the registration mail is RECIPIENT^^<comman separated recipients>$$URL^^<URL>$$FIRSTNAME^^<firstName>$$LASTNAME^^<lastName>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
 		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("FIRSTNAME").append(firstName);
-		contentBuilder.append("$$").append("LASTNAME").append(lastName);
+		contentBuilder.append("$$").append("FIRSTNAME^^").append(firstName);
+		contentBuilder.append("$$").append("LASTNAME^^").append(lastName);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.REGISTRATION, contentBuilder.toString());
 		LOG.info("Queued the registration mail");
@@ -137,9 +137,9 @@ public class EmailServicesImpl implements EmailServices {
 		}
 		// format for the reset password mail is RECIPIENT^^<comman separated recipients>$$URL^^<URL>$$NAME^^<name>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
 		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME").append(name);
+		contentBuilder.append("$$").append("NAME^^").append(name);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RESET_PASSWORD, contentBuilder.toString());
 		LOG.info("Queued the send reset password mail");
@@ -222,9 +222,9 @@ public class EmailServicesImpl implements EmailServices {
 		}
 		// format for the subscription charge unsuccessful mail is RECIPIENT^^<comman separated recipients>$$NAME^^<name>$$RETRYDAYS^^<retryDays>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME").append(name);
-		contentBuilder.append("$$").append("RETRYDAYS").append(retryDays);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(name);
+		contentBuilder.append("$$").append("RETRYDAYS^^").append(retryDays);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.SUBSCRIPTION_CHARGE_UNSUCESSFUL, contentBuilder.toString());
 		LOG.info("Queued the subscription charge unsuccessful mail");
@@ -291,9 +291,9 @@ public class EmailServicesImpl implements EmailServices {
 		
 		// format for the registration mail is RECIPIENT^^<comman separated recipients>$$URL^^<URL>$$NAME^^<recipientName>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
 		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME").append(recipientName);
+		contentBuilder.append("$$").append("NAME^^").append(recipientName);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.VERFICATION, contentBuilder.toString());
 		LOG.info("Queued the verification mail");
@@ -362,9 +362,9 @@ public class EmailServicesImpl implements EmailServices {
 		
 		// format for the registration mail is RECIPIENT^^<comman separated recipients>$$URL^^<URL>$$NAME^^<name>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
 		contentBuilder.append("$$").append("URL^^").append(url);
-		contentBuilder.append("$$").append("NAME").append(name);
+		contentBuilder.append("$$").append("NAME^^").append(name);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.REGISTRATION_COMPLETE, contentBuilder.toString());
 		LOG.info("Queued the registration complete mail");
@@ -530,9 +530,9 @@ public class EmailServicesImpl implements EmailServices {
 		
 		// format for the registration mail is RECIPIENT^^<comman separated recipients>$$NAME^^<displayName>$$RETRIES^^<retries>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME").append(displayName);
-		contentBuilder.append("$$").append("RETRIES").append(retries);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(displayName);
+		contentBuilder.append("$$").append("RETRIES^^").append(retries);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RETRY_CHARGE, contentBuilder.toString());
 		LOG.info("Queued the retry charged mail");
@@ -594,8 +594,8 @@ public class EmailServicesImpl implements EmailServices {
 		
 		// format for the retry exhausted mail is RECIPIENT^^<comman separated recipients>$$NAME^^<displayName>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME").append(displayName);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(displayName);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RETRY_EXHAUSTED, contentBuilder.toString());
 		LOG.info("Queued the retry charged mail");
@@ -650,8 +650,8 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Queueing account disabled email to : " + recipientMailId);
 		// format for the account disabled mail is RECIPIENT^^<comman separated recipients>$$NAME^^<displayName>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME").append(displayName);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(displayName);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_DISABLED, contentBuilder.toString());
 		LOG.info("Queued the account disabled mail");
@@ -706,8 +706,8 @@ public class EmailServicesImpl implements EmailServices {
 		
 		// format for the account upgrade mail is RECIPIENT^^<comman separated recipients>$$NAME^^<displayName>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME").append(displayName);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(displayName);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
 		LOG.info("Queued the account upgrade mail");
@@ -761,9 +761,9 @@ public class EmailServicesImpl implements EmailServices {
 		
 		// format for the survey complete mail is RECIPIENT^^<comman separated recipients>$$NAME^^<displayName>$$AGENTNAME^^<agentName>
 		StringBuilder contentBuilder =  new StringBuilder();
-		contentBuilder.append("RECIPIENT").append(recipientMailId);
-		contentBuilder.append("$$").append("NAME").append(displayName);
-		contentBuilder.append("$$").append("AGENTNAME").append(agentName);
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(displayName);
+		contentBuilder.append("$$").append("AGENTNAME^^").append(agentName);
 		LOG.debug("queueing content: "+contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
 		LOG.info("Queued the survey completion mail");
