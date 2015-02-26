@@ -2203,83 +2203,134 @@ public class ProfileManagementController {
 	}
 	
 	// TODO
-	@RequestMapping(value = "/getcompanyhierarchy", method = RequestMethod.GET)
-	public String getCompanyHierarchy(Model model, HttpServletRequest request) {
-		LOG.info("Method getRegionHierarchy() called from ProfileController");
-
-		String companyProfileName = request.getParameter("companyProfileName");
+	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
+	public String getAdminHierarchy(Model model, HttpServletRequest request) {
+		LOG.info("Method getAdminHierarchy() called from ProfileController");
+		User user = sessionHelper.getCurrentUser();
 		
-		List<Region> regions = null;
-		List<Branch> branches = null;
-		List<AgentSettings> individuals = null;
 		try {
-			regions = organizationManagementService.getRegionsForCompany(companyProfileName);
-			branches = organizationManagementService.getBranchesUnderCompany(companyProfileName);
-			individuals = profileManagementService.getIndividualsForCompany(companyProfileName);
+			if (user.isCompanyAdmin()) {
+				getCompanyHierarchy(model, request);
+			}
+			else if (user.isRegionAdmin()) {
+				model = getRegionHierarchy(model, request);
+			}
+			else if (user.isBranchAdmin()) {
+				model = getBranchHierarchy(model, request);
+			}
 		}
 		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while fetching company hierarchy. Reason: " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-		}
-		catch (NoRecordsFetchedException e) {
-			LOG.error("NoRecordsFetchedException while fetching company hierarchy. Reason: " + e.getMessage(), e);
+			LOG.error("InvalidInputException while fetching hierarchy. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 
+		LOG.info("Method getAdminHierarchy() finished from ProfileController");
+		return JspResolver.PROFILE_HIERARCHY;
+	}
+
+	private void getCompanyHierarchy(Model model, HttpServletRequest request) throws InvalidInputException {
+		List<Region> regions;
+		List<Branch> branches;
+		List<AgentSettings> individuals;
+		String companyProfileName = request.getParameter("companyProfileName");
+		if (companyProfileName == "") {
+			LOG.error("Invalid companyProfileName passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid companyProfileName passed in method getAdminHierarchy().");
+		}
+
+		// Fetching Regions under Company
+		regions = organizationManagementService.getRegionsForCompany(companyProfileName);
 		model.addAttribute("regions", regions);
-		model.addAttribute("branches", branches);
-		model.addAttribute("individuals", individuals);
 		
-		LOG.info("Method getRegionHierarchy() finished from ProfileController");
-		return JspResolver.PROFILE_HIERARCHY_COMPANY;
+		// Fetching Branches under Company
+		try {
+			branches = organizationManagementService.getBranchesUnderCompany(companyProfileName);
+			model.addAttribute("branches", branches);
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while fetching company hierarchy branches. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		// Fetching Individuals under Company
+		try {
+			individuals = profileManagementService.getIndividualsForCompany(companyProfileName);
+			model.addAttribute("individuals", individuals);
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while fetching company hierarchy individuals. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
 	}
 
 	@RequestMapping(value = "/getregionhierarchy", method = RequestMethod.GET)
-	public String getRegionHierarchy(Model model, HttpServletRequest request) {
-		LOG.info("Method getRegionHierarchy() called from ProfileController");
-
-		long regionId = Long.parseLong(request.getParameter("regionId"));
-		
-		List<Branch> branches = null;
-		List<AgentSettings> individuals = null;
+	public String getRegionHierarchyOnClick(Model model, HttpServletRequest request) {
+		LOG.info("Method getRegionHierarchyOnClick() called from ProfileController");
 		try {
-			branches = organizationManagementService.getBranchesByRegionId(regionId);
-			individuals = profileManagementService.getIndividualsByRegionId(regionId);
+			model = getRegionHierarchy(model, request);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while fetching region hierarchy. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
+
+		LOG.info("Method getRegionHierarchyOnClick() finished from ProfileController");
+		return JspResolver.PROFILE_HIERARCHY_CLICK_REGION;
+	}
+
+	private Model getRegionHierarchy(Model model, HttpServletRequest request) throws InvalidInputException {
+		List<Branch> branches;
+		List<AgentSettings> individuals;
+		
+		long regionId = Long.parseLong(request.getParameter("regionId"));
+		if (regionId == 0l) {
+			LOG.error("Invalid regionId passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid regionId passed in method getAdminHierarchy().");
+		}
+
+		// Fetching Branches under Region
+		branches = organizationManagementService.getBranchesByRegionId(regionId);
+		model.addAttribute("branches", branches);
+
+		// Fetching Individuals under Region
+		try {
+			individuals = profileManagementService.getIndividualsByRegionId(regionId);
+			model.addAttribute("individuals", individuals);
+		}
 		catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException while fetching region hierarchy. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-
-		model.addAttribute("branches", branches);
-		model.addAttribute("individuals", individuals);
-		
-		LOG.info("Method getRegionHierarchy() finished from ProfileController");
-		return JspResolver.PROFILE_HIERARCHY_REGION;
+		return model;
 	}
 	
 	@RequestMapping(value = "/getbranchhierarchy", method = RequestMethod.GET)
-	public String getBranchHierarchy(Model model, HttpServletRequest request) {
-		LOG.info("Method getRegionHierarchy() called from ProfileController");
-
-		long branchId = Long.parseLong(request.getParameter("branchId"));
-		
-		List<AgentSettings> individuals = null;
+	public String getBranchHierarchyOnClick(Model model, HttpServletRequest request) {
+		LOG.info("Method getBranchHierarchyOnClick() called from ProfileController");
 		try {
-			individuals = profileManagementService.getIndividualsByBranchId(branchId);
+			model = getBranchHierarchy(model, request);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while fetching branch hierarchy. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 
+		LOG.info("Method getBranchHierarchyOnClick() finished from ProfileController");
+		return JspResolver.PROFILE_HIERARCHY_CLICK_BRANCH;
+	}
+
+	private Model getBranchHierarchy(Model model, HttpServletRequest request) throws InvalidInputException {
+		List<AgentSettings> individuals;
+		long branchId = Long.parseLong(request.getParameter("branchId"));
+		if (branchId == 0l) {
+			LOG.error("Invalid branchId passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid branchId passed in method getAdminHierarchy().");
+		}
+
+		// Fetching Individuals under Branch
+		individuals = profileManagementService.getIndividualsByBranchId(branchId);
 		model.addAttribute("individuals", individuals);
-		
-		LOG.info("Method getRegionHierarchy() finished from ProfileController");
-		return JspResolver.PROFILE_HIERARCHY_BRANCH;
-	}	
+
+		return model;
+	}
 }
