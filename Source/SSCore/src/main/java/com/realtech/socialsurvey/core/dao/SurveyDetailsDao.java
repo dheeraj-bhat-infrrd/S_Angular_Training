@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 
@@ -15,7 +16,7 @@ public interface SurveyDetailsDao {
 
 	public void updateCustomerResponse(long agentId, String customerEmail, SurveyResponse surveyResponse, int stage);
 
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review);
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
 
 	public void updateFinalScore(long agentId, String customerEmail);
 
@@ -42,5 +43,7 @@ public interface SurveyDetailsDao {
 	public List<SurveyDetails> getFeedbacks(String columnName, long columNValue, int start, int rows, double startScore, double limitScore);
 
 	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore);
+
+	public void updateSurveyAsClicked(long agentId, String customerEmail);
 
 }
