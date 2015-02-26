@@ -7,105 +7,14 @@ var minScore=0;
 function fetchCompanyProfile() {
 	startIndex = 0;
 	var url = window.location.origin +'/rest/profile/'+companyProfileName;
-	callAjaxGET(url, paintCompanyProfile, true);
+	callAjaxGET(url, fetchCompanyProfileCallBack, true);
 }
 
-function paintCompanyProfile(data) {
+function fetchCompanyProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		var result = $.parseJSON(response.entity);
-		var headContentHtml = "";
-		if(result != undefined) {
-			currentProfileIden = result.iden;
-			var contactDetails = result.contact_details;
-			if(contactDetails != undefined){
-				headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
-	            headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
-	            if(contactDetails.title != undefined) {
-	            	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.title+'</div>';
-	            }
-	            headContentHtml = headContentHtml +' </div>';
-	            headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
-	            headContentHtml = headContentHtml + '	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">';
-	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
-	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
-	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
-	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
-	            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
-	            headContentHtml = headContentHtml +'	<div class="float-left review-count-left" id="prof-company-review-count"></div>';
-	            headContentHtml = headContentHtml +'	</div>';
-	            headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
-	            headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
-	            headContentHtml = headContentHtml +'	</div>';            
-	            $("#prof-company-head-content").html(headContentHtml);
-	            
-	            var addressHtml = '<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
-	            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
-	            if(contactDetails.country != undefined) {
-	            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
-	            }
-	            $("#prof-company-address").html(addressHtml);
-	            if(result.logo != undefined) {
-	            	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
-	            }
-	            if(result.profileImageUrl != undefined) {
-	            	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
-	            }
-	            
-	            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
-	            if(contactDetails.about_me != undefined) {
-	            	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
-	            }
-	            $("#prof-company-intro").html(companyIntroHtml);
-	            
-	            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
-	            $("#prof-reviews-header").html(reviewsHeaderHtml);
-	            
-	            var contactInfoHtml = "";
-	            var mailIds = contactDetails.mail_ids;
-	            
-	            if(mailIds != undefined) {
-	            	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
-	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
-	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
-	            }
-	            
-	            var webAddresses = contactDetails.web_addresses;
-	            if(webAddresses != undefined) {
-	            	if(webAddresses.work != undefined) {
-	            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-	                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
-	                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'">Our Website</a></div></div>';		            
-	            	}
-	            	if(webAddresses.blogs != undefined) {
-	                    contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-	                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-blog"></div>';		            
-	                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.blogs+'">Our Blogs</a></div></div>';	            
-	            	}
-	            }
-	            
-	            var contactNumbers	 = contactDetails.contact_numbers;
-	            if(contactNumbers != undefined) {
-	            	if(contactNumbers.personal != undefined) {
-	            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-		                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mbl"></div>';		            
-		                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.personal+'</div></div>';		            
-	            	}
-	            	if(contactNumbers.work != undefined) {
-	            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-	  	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-phone"></div>';		            
-	  	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.work+'</div></div>';		            
-	  	               
-	            	}
-	            	if(contactNumbers.fax != undefined) {
-	            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-	            		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-fax"></div>'	;	            
-	            		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.fax+'</div></div>';
-	            	}
-	            }
-	            $("#prof-contact-information").html(contactInfoHtml);
-			}         
-		}
+		paintProfilePage(result);
 		fetchAverageRatings(result.iden);
 		fetchCompanyRegions();
 		fetchCompanyBranches();
@@ -117,6 +26,103 @@ function paintCompanyProfile(data) {
 		fetchReviewsCountForCompany(result.iden, paintAllReviewsCount);
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
 		fetchReviewsForCompany(result.iden,startIndex,numOfRows,minScore);	
+	}
+}
+
+function paintProfilePage(result) {
+	if(result != undefined) {
+		currentProfileIden = result.iden;
+		var contactDetails = result.contact_details;
+		var headContentHtml = "";
+		if(contactDetails != undefined){
+			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
+			if(result.vertical != undefined) {
+				headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
+			}
+            if(contactDetails.title != undefined) {
+            	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.title+'</div>';
+            }
+            headContentHtml = headContentHtml +' </div>';
+            headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
+            headContentHtml = headContentHtml + '	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">';
+            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
+            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
+            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
+            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
+            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
+            headContentHtml = headContentHtml +'	<div class="float-left review-count-left" id="prof-company-review-count"></div>';
+            headContentHtml = headContentHtml +'	</div>';
+            headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
+            headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
+            headContentHtml = headContentHtml +'	</div>';            
+            $("#prof-company-head-content").html(headContentHtml);
+            
+            var addressHtml = '<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
+            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
+            if(contactDetails.country != undefined) {
+            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
+            }
+            $("#prof-company-address").html(addressHtml);
+            if(result.logo != undefined) {
+            	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
+            }
+            if(result.profileImageUrl != undefined) {
+            	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
+            }
+            
+            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
+            if(contactDetails.about_me != undefined) {
+            	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
+            }
+            $("#prof-company-intro").html(companyIntroHtml);
+            
+            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
+            $("#prof-reviews-header").html(reviewsHeaderHtml);
+            
+            var contactInfoHtml = "";
+            var mailIds = contactDetails.mail_ids;
+            
+            if(mailIds != undefined) {
+            	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
+                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
+                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
+            }
+            
+            var webAddresses = contactDetails.web_addresses;
+            if(webAddresses != undefined) {
+            	if(webAddresses.work != undefined) {
+            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
+                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'">Our Website</a></div></div>';		            
+            	}
+            	if(webAddresses.blogs != undefined) {
+                    contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
+                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-blog"></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.blogs+'">Our Blogs</a></div></div>';	            
+            	}
+            }
+            
+            var contactNumbers	 = contactDetails.contact_numbers;
+            if(contactNumbers != undefined) {
+            	if(contactNumbers.personal != undefined) {
+            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
+	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mbl"></div>';		            
+	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.personal+'</div></div>';		            
+            	}
+            	if(contactNumbers.work != undefined) {
+            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
+  	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-phone"></div>';		            
+  	                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.work+'</div></div>';		            
+  	               
+            	}
+            	if(contactNumbers.fax != undefined) {
+            		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
+            		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-fax"></div>'	;	            
+            		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.fax+'</div></div>';
+            	}
+            }
+            $("#prof-contact-information").html(contactInfoHtml);
+		}         
 	}
 }
 
@@ -168,13 +174,20 @@ function paintCompanyRegions(data) {
 			$.each(result,function(i, region) {
 				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-openstatus="closed" data-regionid = '+region.regionId+'>';
 				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
-				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company"></div>';
+				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company region-icon" data-profilename="'+region.profileName+'"></div>';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
 				regionsHtml = regionsHtml+'	   <div class="lpsub-2 hide" id="comp-region-branches-'+region.regionId+'"></div>';
 				regionsHtml = regionsHtml+'	</div>';
 				regionsHtml = regionsHtml+'</div>';
 			});
 			$("#comp-regions-content").html(regionsHtml);
+			
+			$(".region-icon").click(function(e) {
+				e.stopPropagation();
+				var regionProfileName = $(this).data("profilename");
+				var url = window.location.origin +"/regionprofile/"+companyProfileName+"/region/"+regionProfileName+".do";
+				window.open(url, "_blank");
+			});
 			
 			$(".comp-region").click(function(){
 				if($(this).data("openstatus") == "closed") {
@@ -498,4 +511,37 @@ function paintHiddenReviewsCount(data) {
 			fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
 		});
 	}
+}
+
+function fetchRegionProfile(regionProfileName) {
+	startIndex= 0;
+	var url = window.location.origin +"/rest/profile/"+companyProfileName+"/region/"+regionProfileName;
+	callAjaxGET(url, fetchRegionProfileCallBack, true);
+}
+
+function fetchRegionProfileCallBack(data) {
+	var response= $.parseJSON(data);
+	if(response != undefined) {
+		var result = $.parseJSON(response.entity);
+		paintProfilePage(result);
+		fetchAverageRatingsForRegion(result.iden);
+		fetchBranchesForRegion(result.iden);
+		fetchIndividualsForRegion(result.iden);
+		
+	}
+}
+
+function fetchAverageRatingsForRegion(regionId){
+	var url = window.location.origin +"/rest/profile/region/"+regionId+"/ratings";
+	callAjaxGET(url, paintAverageRatings, true);
+}
+function fetchReviewsForRegion(regionId,start,numRows,minScore) {
+	if(regionId == undefined || regionId == ""){
+		return;
+	}
+	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviews?start='+start+"&numRows="+numRows;
+	if(minScore != undefined) {
+		url = url +"&minScore="+minScore;
+	}
+	callAjaxGET(url, paintReviewsForCompany, false);
 }

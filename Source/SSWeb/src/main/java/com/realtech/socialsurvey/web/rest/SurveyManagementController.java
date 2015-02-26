@@ -3,7 +3,9 @@ package com.realtech.socialsurvey.web.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
+
 import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -14,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -63,11 +66,13 @@ public class SurveyManagementController {
 	@Autowired
 	private EmailServices emailServices;
 
+	
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/data/storeAnswer")
-	public void storeSurveyAnswer(HttpServletRequest request) {
+	public String storeSurveyAnswer(HttpServletRequest request) {
 		LOG.info("Method storeSurveyAnswer() started to store response of customer.");
 		// TODO store answer provided by customer in mongoDB.
 		String answer = request.getParameter("answer");
@@ -78,6 +83,7 @@ public class SurveyManagementController {
 		long agentId = Long.valueOf(request.getParameter("agentId"));
 		surveyHandler.updateCustomerAnswersInSurvey(agentId, customerEmail, question, questionType, answer, stage);
 		LOG.info("Method storeSurveyAnswer() finished to store response of customer.");
+		return surveyHandler.getSwearWords();
 	}
 
 	/*
@@ -86,27 +92,29 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/data/storeFeedback")
 	public void storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
-		// TODO store answer provided by customer in mongoDB.
-		try{
-			String feedback = request.getParameter("feedback");
-		String mood = request.getParameter("mood");
-		String customerEmail = request.getParameter("customerEmail");
-		long agentId = Long.valueOf(request.getParameter("agentId"));
-		surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback);
-		
-		//Sending email to the customer telling about successful completion of survey.
-		SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+		// To store final feedback provided by customer in mongoDB.
 		try {
-			emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+			String feedback = request.getParameter("feedback");
+			String mood = request.getParameter("mood");
+			String customerEmail = request.getParameter("customerEmail");
+			long agentId = Long.valueOf(request.getParameter("agentId"));
+			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
+			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
+
+			// Sending email to the customer telling about successful completion of survey.
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			try {
+				emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
+				throw e;
+			}
 		}
-		catch (InvalidInputException | UndeliveredEmailException e) {
-			LOG.error("Exception occurred while trying to send survey completion mail to : "+customerEmail);
-			throw e;
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
+			return;
 		}
-	}catch(NonFatalException e){
-		LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ",e);
-		return;
-	}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
 	}
 
@@ -149,7 +157,6 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-//		String survey = null;
 		Integer stage = null;
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		try {
@@ -174,18 +181,18 @@ public class SurveyManagementController {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
 				throw e;
 			}
-			if(!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)){
+			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				throw new InvalidInputException("Captcha Validation failed!",DisplayMessageConstants.INVALID_CAPTCHA);
+				throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
 				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent);
-				if(survey!=null){
+				if (survey != null) {
 					stage = survey.getStage();
-					for(SurveyQuestionDetails surveyDetails:surveyQuestionDetails){
-						for(SurveyResponse surveyResponse:survey.getSurveyResponse()){
-							if(surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())){
+					for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
+						for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
+							if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
 								surveyDetails.setCustomerResponse(surveyResponse.getAnswer());
 							}
 						}
@@ -215,8 +222,8 @@ public class SurveyManagementController {
 		return new Gson().toJson(surveyAndStage);
 	}
 
-	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent)
-			throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
+	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
+			String custRelationWithAgent) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
 		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent);
 	}
 
