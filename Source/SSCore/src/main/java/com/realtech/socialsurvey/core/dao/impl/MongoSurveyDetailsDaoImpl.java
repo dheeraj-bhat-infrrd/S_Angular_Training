@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,10 +17,10 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
 import org.springframework.data.mongodb.core.aggregation.TypedAggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.CriteriaDefinition;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -107,15 +108,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * collection.
 	 */
 	@Override
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review) {
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive) {
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer started.");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
-		update.set("stage", CommonConstants.SURVEY_STAGE_COMPLETE);
-		update.set("mood", mood);
+		update.set(CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE);
+		update.set(CommonConstants.MOOD_COLUMN, mood);
 		update.set("review", review);
+		update.set("isAbusive", isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
@@ -155,6 +157,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to calculate and update final score based upon rating questions finished.");
 	}
 
+	@Override
+	public void updateSurveyAsClicked(long agentId, String customerEmail) {
+		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.set(CommonConstants.SURVEY_CLICKED_COLUMN, true);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
+	}
+	
 	// JIRA SS-137 and 158 BY RM-05 : BOC
 
 	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----

@@ -127,6 +127,8 @@ public interface CommonConstants {
 	public static final String STAGE_COLUMN = "stage";
 	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
 	public static final String MOOD_COLUMN = "mood";
+	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
+
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
