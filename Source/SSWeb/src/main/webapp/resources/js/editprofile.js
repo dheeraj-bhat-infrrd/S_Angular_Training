@@ -260,6 +260,10 @@ $(document).on('click', '#prof-address-container', function() {
 function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
 	createPopupConfirm(header, data);
+	
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	$('body').css('overflow','hidden');
+	$('body').scrollTop('0');
 }
 
 $(document).on('click', '#overlay-continue', function() {
@@ -321,6 +325,9 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
+
+	$('body').css('overflow','auto');
+	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
 
 
@@ -807,38 +814,103 @@ function initializeGoogleMap() {
 }
 
 
-// TODO Other Data
+// TODO Data population for Admin
 function paintForProfile() {
+	var attrName;
 	var companyId = $('#prof-company-id').val();
 	var regionId = $('#prof-region-id').val();
 	var branchId = $('#prof-branch-id').val();
-	var agentId = $('#prof-agent-id').val();
-	minScore = $('#profile-min-post-score').val();
+	// var agentId = $('#prof-agent-id').val();
+	minScore = 0;
 	
 	if (companyId != undefined) {
+		attrName = "companyProfileName";
 		currentProfileIden = companyId;
 		companyProfileName = $("#company-profile-name").val();
 
 		fetchAverageRatings(companyId);
+		fetchHierarchy(attrName, companyProfileName);
 		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
-
-		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
-		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
-		if(minScore > 0){
-			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
-		}
-		
-		fetchCompanyRegions();
-		fetchCompanyBranches();
-		fetchCompanyIndividuals();
+		// fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 	}
 	else if (regionId != undefined) {
+		attrName = "regionId";
 		
+		fetchAverageRatingsForRegion(regionId);
+		fetchHierarchy(attrName, regionId);
+		// fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+		// fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 	}
 	else if (branchId != undefined) {
+		attrName = "branchId";
 		
+		// fetchAverageRatingsForRegion(regionId);
+		fetchHierarchy(attrName, branchId);
+		// fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+		// fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 	}
-	else if (agentId != undefined) {
-		
-	}
+}
+
+function fetchHierarchy(attrName, attrValue) {
+	var url = "./getadminhierarchy.do?" + attrName + "=" + attrValue;
+	callAjaxGET(url, paintHierarchy, true);
+}
+
+function paintHierarchy(data) {
+	$("#prof-hierarchy-container").html(data);
+	
+	// Click on region
+	$(document).on('click', '.comp-region', function(){
+		if($(this).data("openstatus") == "closed") {
+			fetchRegionHierarchyOnClick($(this).data('regionid'));
+			$(this).data("openstatus", "open");
+		} else {
+			$('#comp-region-branches-' + $(this).data('regionid')).slideUp(200);
+			$(this).data("openstatus", "closed");
+		}
+	});
+	
+	// Click on branch
+	bindClickBranchForIndividuals("comp-region-branch");
+	bindClickBranchForIndividuals("comp-branch");
+	
+	// Individuals
+	paintProfileImage("comp-individual-prof-image");
+}
+
+function fetchRegionHierarchyOnClick(regionId) {
+	var url = "./getregionhierarchy.do?regionId=" + regionId;
+	callAjaxGET(url, function(data) {
+		paintRegionHierarchyOnClick(data, regionId);
+	}, true);
+}
+
+function paintRegionHierarchyOnClick(data, regionId) {
+	$("#comp-region-branches-" + regionId).html(data).slideDown(200);
+	bindClickBranchForIndividuals("comp-region-branch");
+}
+
+function bindClickBranchForIndividuals(bindingClass) {
+	$("." + bindingClass).click(function(e){
+		e.stopPropagation();
+		if($(this).data("openstatus") == "closed") {
+			fetchBranchHierarchyOnClick($(this).data('branchid'));
+			$(this).data("openstatus","open");
+		} else {
+			$('#comp-branch-individuals-' + $(this).data('branchid')).slideUp(200);
+			$(this).data("openstatus","closed");
+		}
+	});
+}
+
+function fetchBranchHierarchyOnClick(branchId) {
+	var url = "./getbranchhierarchy.do?branchId=" + branchId;
+	callAjaxGET(url, function(data) {
+		paintBranchHierarchyOnClick(data, branchId);
+	}, true);
+}
+
+function paintBranchHierarchyOnClick(data, branchId) {
+	$("#comp-branch-individuals-" + branchId).html(data).slideDown(200);
+	paintProfileImage("comp-individual-prof-image");
 }

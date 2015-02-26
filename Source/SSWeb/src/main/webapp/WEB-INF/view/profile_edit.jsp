@@ -84,10 +84,10 @@
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
 						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center; background-size: cover;"></div>
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
@@ -152,7 +152,7 @@
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center; background-size: cover;"></div>
 							<c:choose>
 								<c:when	test="${parentLock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
@@ -187,7 +187,7 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
+							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center; background-size: cover;"></div>
 							<form class="form_contact_image" enctype="multipart/form-data">
 								<input type="file" id="prof-logo" class="con_img_inp_file">
 							</form>
@@ -198,10 +198,10 @@
 				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer">
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
 					<c:if test="${not empty contactdetail.address}">
-						<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.address}</div>
+						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.address}</div>
 					</c:if>
 					<c:if test="${not empty contactdetail.country && not empty contactdetail.zipcode}">
-						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
+						<div class="prof-user-addline3 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
 					</c:if>
 				</div>
 			</div>
@@ -402,21 +402,7 @@
 				</div>
 				
 				<div id="prof-hierarchy-container">
-					<c:choose>
-						<c:when	test="${user.companyAdmin}">
-							<div class="prof-left-row prof-left-assoc bord-bot-dc">
-                    			<div class="left-assoc-wrapper">
-                        			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-                        			<!-- hidden fields to capture which region/branch is expanded -->
-                        			<input type="hidden" id="regionid-hidden"/>
-                        			<input type="hidden" id="branchid-hidden"/>
-                        			<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-                            			<!--Company hierarchy is displayed here  -->
-                        			</div>
-                    			</div>
-                			</div>
-						</c:when>
-					</c:choose>
+					<!--Hierarchy is displayed here  -->
 				</div>
 				
 			</div>
