@@ -2858,8 +2858,8 @@ button.paypal.is-active {
 
 .prof-user-logo {
     height: 150px;
-    background: url(../images/userInfoLogo.png) no-repeat center;
     background-size: 130px auto;
+    background-color:#f1f1f1;
 }
 
 .prof-user-addline1 {
