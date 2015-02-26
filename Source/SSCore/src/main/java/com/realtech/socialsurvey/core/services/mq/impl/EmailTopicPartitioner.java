@@ -2,10 +2,10 @@ package com.realtech.socialsurvey.core.services.mq.impl;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import kafka.producer.Partitioner;
 import kafka.utils.VerifiableProperties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EmailTopicPartitioner implements Partitioner {
 
