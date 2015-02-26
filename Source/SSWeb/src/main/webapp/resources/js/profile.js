@@ -541,7 +541,7 @@ function fetchRegionProfileCallBack(data) {
 			minScore = result.survey_settings.show_survey_above_score;
 		}
 		startIndex = 0;
-		//fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
+		fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
 		
 	}
 }
