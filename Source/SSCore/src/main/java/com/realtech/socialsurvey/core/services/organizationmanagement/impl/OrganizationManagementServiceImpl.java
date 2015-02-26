@@ -1293,6 +1293,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			List<String> columnNames = new ArrayList<String>();
 			columnNames.add(CommonConstants.REGION_NAME_COLUMN);
 			columnNames.add(CommonConstants.REGION_ID_COLUMN);
+			columnNames.add(CommonConstants.PROFILE_NAME_COLUMN);
 
 			/**
 			 * Building criteria
