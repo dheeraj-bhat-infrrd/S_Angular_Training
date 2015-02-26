@@ -15,13 +15,17 @@ function createPopupCanvas() {
 	var canvas = '<img src="" id="target" width="470" style="position:absoulte;"/>'
 		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
-	$('#overlay-text').html(canvas).css('position','relative').css('align','center');
+	$('#overlay-text').html(canvas).css('position','relative');
 	$('#overlay-continue').html("Upload");
 	$('#overlay-cancel').html("Cancel");
 
 	$('#overlay-main').show();
 	
 	$('#overlay-continue').unbind('click');
+	
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	$('body').css('overflow','hidden');
+	$('body').scrollTop('0');
 }
 
 function initiateJcrop(input) {

@@ -301,6 +301,7 @@ $('#overlay-cancel').click(function(){
 	$('#overlay-continue').unbind('click');
 	overlayRevert();
 	$('#othercategory').val('');
+	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 });
 
 function createPopupConfirm(header, body) {
