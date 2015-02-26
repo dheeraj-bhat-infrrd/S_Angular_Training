@@ -933,7 +933,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE);
 
 		// Send reset password link to the user email ID
-		emailServices.sendRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
+		emailServices.queueRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
 	}
 
 	/*
@@ -1010,13 +1010,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
-			emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName());
+			emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName());
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
-		}
-		catch (UndeliveredEmailException e) {
-			throw new UndeliveredEmailException("Could not send mail for verification.Reason : " + e.getMessage(), e);
 		}
 
 		LOG.debug("Method sendVerificationLink of Registration service finished");
@@ -1049,7 +1046,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		storeCompanyAdminInvitation(queryParam, emailId);
 
 		LOG.debug("Calling email services to send registration invitation mail");
-		emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
+		//emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
+		emailServices.queueRegistrationInviteMail(url, emailId, firstName, lastName);
 
 		LOG.debug("Method inviteUser finished successfully");
 
