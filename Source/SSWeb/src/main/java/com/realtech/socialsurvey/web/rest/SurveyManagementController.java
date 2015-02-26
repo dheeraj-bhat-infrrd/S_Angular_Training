@@ -97,9 +97,9 @@ public class SurveyManagementController {
 		//Sending email to the customer telling about successful completion of survey.
 		SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 		try {
-			emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+			emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
 		}
-		catch (InvalidInputException | UndeliveredEmailException e) {
+		catch (InvalidInputException e) {
 			LOG.error("Exception occurred while trying to send survey completion mail to : "+customerEmail);
 			throw e;
 		}

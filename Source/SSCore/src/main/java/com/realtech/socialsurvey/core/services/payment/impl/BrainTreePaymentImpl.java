@@ -637,7 +637,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
-		emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
 
 		LOG.info("Email sent successfully!");
 
@@ -1037,7 +1037,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		
 		LOG.info("Sending mail to the customer about the upgrade");
-		emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
 		LOG.info("Mail successfully sent");		
 		
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");

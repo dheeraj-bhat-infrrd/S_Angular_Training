@@ -140,10 +140,10 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 		LOG.debug("Sending mail for retrying subscription charge.");
 
 		try {
-			emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+			emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
 					String.valueOf(licenseDetail.getPaymentRetries() + 1));
 		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
+		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
 
 			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
@@ -294,10 +294,10 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 				// Now a mail regarding the same is sent to the user
 				LOG.info("Sending a mail regarding the blocking of subscription to the user.");
 				try {
-					emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					emailServices.queueRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
 					LOG.info("Mail successfully sent.");
 				}
-				catch (InvalidInputException | UndeliveredEmailException e1) {
+				catch (InvalidInputException e1) {
 					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage(),e1);
 					coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
 
