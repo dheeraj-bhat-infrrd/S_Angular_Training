@@ -104,6 +104,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String REGION_ID_COLUMN = "regionId";
+	public static final String PROFILE_NAME_COLUMN = "profileName";
 	public static final String BRANCH_ID_COLUMN = "branchId";
 	public static final String BRANCH_NAME_COLUMN = "branch";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
@@ -193,6 +194,10 @@ public interface CommonConstants {
 	public static final int PAYMENT_INCREMENT = 1;
 	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
+	public static final String PROFILE_LEVEL_COMPANY = "COMPANY";
+	public static final String PROFILE_LEVEL_REGION = "REGION";
+	public static final String PROFILE_LEVEL_BRANCH = "BRANCH";
+	public static final String PROFILE_LEVEL_INDIVIDUAL = "INDIVIDUAL";
 
 	/**
 	 * Logo related config
@@ -309,8 +314,10 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE = 122;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE = 123;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE = 124;
-	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_FAILURE = 125;
-	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
+	public static final int ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE = 125;
+	public static final int ERROR_CODE_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
+	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_PRECONDITION_FAILURE = 127;
+	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE = 128;
 	
 	/**
 	 * Service codes
@@ -329,7 +336,8 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_REVIEWS = 111;
 	public static final int SERVICE_CODE_COMPANY_AVERAGE_RATINGS = 112;
 	public static final int SERVICE_CODE_COMPANY_REVIEWS_COUNT = 113;
-	
+	public static final int SERVICE_CODE_REGION_AVERAGE_RATINGS = 114;
+	public static final int SERVICE_CODE_REGION_REVIEWS = 115;
 	/*
 	 * Mongo column and collection constants
 	 */
