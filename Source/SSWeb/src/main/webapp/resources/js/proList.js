@@ -106,7 +106,7 @@ function infiniteScrollCallback(response) {
 	}
 }
 
-$('.ctnt-review-btn').click(function() {
+$(document).on('click', '.ctnt-review-btn', function(){
 	var payload = {
 		"userId" : $(this).attr('user')
 	};
