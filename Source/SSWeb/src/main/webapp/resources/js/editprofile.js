@@ -260,6 +260,10 @@ $(document).on('click', '#prof-address-container', function() {
 function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
 	createPopupConfirm(header, data);
+	
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	$('body').css('overflow','hidden');
+	$('body').scrollTop('0');
 }
 
 $(document).on('click', '#overlay-continue', function() {
@@ -301,7 +305,6 @@ $('#overlay-cancel').click(function(){
 	$('#overlay-continue').unbind('click');
 	overlayRevert();
 	$('#othercategory').val('');
-	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 });
 
 function createPopupConfirm(header, body) {
@@ -322,6 +325,9 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
+
+	$('body').css('overflow','auto');
+	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
 
 
@@ -811,7 +817,6 @@ function initializeGoogleMap() {
 // TODO Data population for Admin
 function paintForProfile() {
 	var attrName;
-	
 	var companyId = $('#prof-company-id').val();
 	var regionId = $('#prof-region-id').val();
 	var branchId = $('#prof-branch-id').val();
@@ -824,24 +829,25 @@ function paintForProfile() {
 		companyProfileName = $("#company-profile-name").val();
 
 		fetchAverageRatings(companyId);
-		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
 		fetchHierarchy(attrName, companyProfileName);
-		
-		/*fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
-		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
-		if(minScore > 0){
-			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
-		}*/
+		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+		// fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 	}
 	else if (regionId != undefined) {
 		attrName = "regionId";
 		
+		fetchAverageRatingsForRegion(regionId);
 		fetchHierarchy(attrName, regionId);
+		// fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+		// fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 	}
 	else if (branchId != undefined) {
 		attrName = "branchId";
 		
+		// fetchAverageRatingsForRegion(regionId);
 		fetchHierarchy(attrName, branchId);
+		// fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+		// fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 	}
 }
 
