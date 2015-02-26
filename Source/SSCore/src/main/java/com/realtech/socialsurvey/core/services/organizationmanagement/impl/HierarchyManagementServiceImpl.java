@@ -563,6 +563,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Calling method to insert region settings");
 		insertRegionSettings(region);
+		
+		regionDao.update(region);
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
