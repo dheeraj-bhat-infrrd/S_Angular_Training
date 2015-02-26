@@ -1,6 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<div class="main-con-header"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
+<c:if test="${not empty profile && not empty profile.contact_details}">
+	<c:set value="${profile.contact_details}" var="contactdetail"></c:set>
+</c:if>
+<div class="main-con-header">
+	<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
+</div>
 <c:choose>
 	<c:when test="${not empty reviewItems}">
 		<c:forEach var="reviewItem" items="${reviewItems}">
