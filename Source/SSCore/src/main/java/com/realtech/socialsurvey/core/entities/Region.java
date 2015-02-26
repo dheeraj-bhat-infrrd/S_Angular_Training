@@ -159,6 +159,14 @@ public class Region implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
+	
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
 
 	public Branch addBranch(Branch branch) {
 		getBranches().add(branch);
