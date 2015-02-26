@@ -618,6 +618,7 @@ public class ProfileController {
 	 * @param numRows
 	 * @return
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/region/{regionId}/reviews")
 	public Response getReviewsForRegion(@PathVariable long regionId, @QueryParam(value = "minScore") Double minScore,
 			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
