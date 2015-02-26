@@ -227,7 +227,12 @@ function paintBranchesForRegion(data) {
 				branchesHtml = branchesHtml +'</div>' ;
 			});
 			
-			$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
+			if($("#region-branches").length > 0) {
+				$("#region-branches").html(branchesHtml);
+			}
+			else {
+				$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
+			}
 			bindClickToFetchBranchIndividuals("comp-region-branch");
 		}
 	}
@@ -303,7 +308,12 @@ function paintIndividualsForRegion(data) {
 					}
 				});
 				
-				$("#comp-region-branches-"+regionId).append(individualsHtml).slideDown(200);
+				if($("#region-branches").length > 0) {
+					$("#region-branches").append(individualsHtml);
+				}
+				else {
+					$("#comp-region-branches-"+regionId).append(individualsHtml).slideDown(200);
+				}
 				paintProfileImage("individual-prof-image");
 		}
 	}
@@ -450,8 +460,9 @@ function paintReviewsForCompany(data) {
 	}
 }
 
-$(window).scroll(function(){
-	var totalReviews = $("#profile-fetch-info").attr("total-reviews");
+$(document).scroll(function(){
+	console.log("scroll function called------");
+	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndex <= totalReviews){
 		startIndex = startIndex + numOfRows;
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
@@ -514,7 +525,6 @@ function paintHiddenReviewsCount(data) {
 }
 
 function fetchRegionProfile(regionProfileName) {
-	startIndex= 0;
 	var url = window.location.origin +"/rest/profile/"+companyProfileName+"/region/"+regionProfileName;
 	callAjaxGET(url, fetchRegionProfileCallBack, true);
 }
@@ -527,6 +537,11 @@ function fetchRegionProfileCallBack(data) {
 		fetchAverageRatingsForRegion(result.iden);
 		fetchBranchesForRegion(result.iden);
 		fetchIndividualsForRegion(result.iden);
+		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+			minScore = result.survey_settings.show_survey_above_score;
+		}
+		startIndex = 0;
+		//fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
 		
 	}
 }
@@ -539,7 +554,8 @@ function fetchReviewsForRegion(regionId,start,numRows,minScore) {
 	if(regionId == undefined || regionId == ""){
 		return;
 	}
-	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviews?start='+start+"&numRows="+numRows;
+	var url = window.location.origin +"/rest/profile/region/"+regionId+"/reviews?start="+start+"&numRows="+numRows;
+	alert(url);
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
