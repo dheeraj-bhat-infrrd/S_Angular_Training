@@ -3822,3 +3822,77 @@ button.paypal.is-active {
 .pe-whitespace {
 	white-space:pre-wrap;
 }
+.reg_header {
+    text-align: center;
+    line-height: 70px;
+    font-weight: bold;
+    font-size: 32px;
+}
+
+.reg_form_wrapper_2 {
+    width: 730px;
+    margin:  25px auto 0;
+}
+
+.rfr_lbl {
+    line-height: 50px;
+    margin-right: 30px;
+    text-align: right;
+    width: 80px;
+    font-size: 16px;
+}
+
+.rfr_txt_fld {
+    width: 276px;
+    height: 50px;
+    padding: 0 10px;
+    border-radius: 3px;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #dcdcdc;
+    margin-right: 30px;
+}
+
+.rfr_txt {
+    position: relative;
+}
+
+.rfr_icn {
+    display: none;
+    position: absolute;
+    height: 50px;
+    width: 50px;
+}
+
+.reg_btn {
+    background-color: #009FE0;
+    height: 46px;
+    line-height: 50px;
+    width: 222px;
+    text-align: center;
+    color: #fff;
+    border-radius: 3px;
+    margin: 10px auto;
+    font-size: 18px;
+    font-family: 'opensanslight';
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.reg_btn:hover{
+    background-color: #7AB400 !important;
+}
+
+.reg_btn:active{
+    background-color: #70A501 !important;
+}
+
+.reg_form_row {
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.reg_form_wrapper_1 {
+    width: 425px;
+    margin:  25px auto 0;
+}
