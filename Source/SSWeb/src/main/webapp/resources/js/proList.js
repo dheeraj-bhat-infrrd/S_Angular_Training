@@ -65,22 +65,22 @@ $('#find-pro-submit').click(function(e) {
 $(window).scroll(function() {
 	var newIndex = startIndex + rowSize;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
-		console.log(newIndex);
-		console.log($('#srch-num').html());
-		var formData = new FormData();
-		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
-		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-		formData.append("find-pro-start-index", newIndex);
-		formData.append("find-pro-row-size", rowSize);
-
-		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+		fetchUsers(newIndex);
 		startIndex = newIndex;
 	}
 });
 
+function fetchUsers(newIndex) {
+	var formData = new FormData();
+	formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
+	formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
+	formData.append("find-pro-start-index", newIndex);
+	formData.append("find-pro-row-size", rowSize);
+
+	callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+}
+
 function infiniteScrollCallback(response) {
-	console.log(response);
-	
 	var users =  $.parseJSON(response);
 	var htmlData = "";
 	if (users != null) {

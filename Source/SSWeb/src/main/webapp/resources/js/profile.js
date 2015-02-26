@@ -1,7 +1,7 @@
 var companyProfileName = $("#company-profile-name").val();
 var currentProfileIden = "";
 var startIndex = 0;
-var numOfRows = 5;
+var numOfRows = 3;
 var minScore=0;
 
 function fetchCompanyProfile() {
@@ -41,6 +41,9 @@ function paintCompanyProfile(data) {
 	            
 	            var addressHtml = '<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
 	            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
+	            if(contactDetails.country != undefined) {
+	            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
+	            }
 	            $("#prof-company-address").html(addressHtml);
 	            if(result.logo != undefined) {
 	            	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
@@ -51,7 +54,7 @@ function paintCompanyProfile(data) {
 	            
 	            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
 	            if(contactDetails.about_me != undefined) {
-	            	companyIntroHtml = companyIntroHtml + '<div class="intro-body">'+contactDetails.about_me+'</div>';
+	            	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
 	            }
 	            $("#prof-company-intro").html(companyIntroHtml);
 	            
@@ -113,14 +116,7 @@ function paintCompanyProfile(data) {
 		}
 		fetchReviewsCountForCompany(result.iden, paintAllReviewsCount);
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
-		fetchReviewsForCompany(result.iden,startIndex,numOfRows,minScore);
-		
-		/**
-		 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
-		 */
-		if(minScore > 0){
-			fetchReviewsCountForCompany(result.iden,paintHiddenReviewsCount,minScore);
-		}		
+		fetchReviewsForCompany(result.iden,startIndex,numOfRows,minScore);	
 	}
 }
 
@@ -369,7 +365,7 @@ function fetchReviewsForCompany(companyId,start,numRows,minScore) {
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
-	callAjaxGET(url, paintReviewsForCompany, true);
+	callAjaxGET(url, paintReviewsForCompany, false);
 }
 
 function paintReviewsForCompany(data) {
@@ -379,12 +375,12 @@ function paintReviewsForCompany(data) {
 		var reviewsHtml = "";
 		if(result != undefined && result.length > 0) {
 			$.each(result, function(i, reviewItem) {
-				//var d = Date.parse(reviewItem.updatedOn);
+				var date = Date.parse(reviewItem.updatedOn);
 				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
 				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerEmail+'</div>';
-				//reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+d.getDate() +" "+ d.getMonthName()+" "+d.getFullYear()+'</div>'; 
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerName+'</div>';
+				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+date.getDate() +" "+ date.getMonthName()+" "+date.getFullYear()+'</div>'; 
 				reviewsHtml=  reviewsHtml+'    </div>';
 				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
@@ -411,7 +407,7 @@ function paintReviewsForCompany(data) {
 				reviewsHtml=  reviewsHtml+'</div>';
 			});
 			
-			if($("#profile-fetch-info").attr("fetch-all-reviews") == "true") {
+			if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 				$("#prof-review-item").html(reviewsHtml);
 			}else {
 				$("#prof-review-item").append(reviewsHtml);
@@ -430,17 +426,23 @@ function paintReviewsForCompany(data) {
 	            $(this).parent().find('.icn-plus-open').show();
 	        });
 		}
+		else {
+			/**
+			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
+			 */
+			if(minScore > 0){
+				fetchReviewsCountForCompany(currentProfileIden,paintHiddenReviewsCount,minScore);
+			}		
+		}
 	}
 }
 
 $(window).scroll(function(){
 	var totalReviews = $("#profile-fetch-info").attr("total-reviews");
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndex <= totalReviews){
-		console.log("yes"+" window.innerHeight:"+window.innerHeight+" window.pageYOffset:"+window.pageYOffset+" document.body.offsetHeight:"+document.body.offsetHeight);
 		startIndex = startIndex + numOfRows;
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
 		fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,minScore);
-		
 	}
 });
 
@@ -490,11 +492,10 @@ function paintHiddenReviewsCount(data) {
 			$('#prof-review-item').html('');
 			$(this).hide();
 			startIndex = 0;
-			numOfRows = 5;
 			minScore = 0;
 			$("#profile-fetch-info").attr("fetch-all-reviews", "true");
-			fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
 			$(window).scrollTop($('#reviews-container').offset().top);
+			fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
 		});
 	}
 }
