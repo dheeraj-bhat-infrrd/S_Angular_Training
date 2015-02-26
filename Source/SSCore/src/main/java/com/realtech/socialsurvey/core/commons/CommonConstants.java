@@ -127,6 +127,8 @@ public interface CommonConstants {
 	public static final String STAGE_COLUMN = "stage";
 	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
 	public static final String MOOD_COLUMN = "mood";
+	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
+
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -201,6 +203,8 @@ public interface CommonConstants {
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
+	public static final String IMAGE_NAME = "image.png";
+	public static final String IMAGE_FORMAT = "png";
 
 	/**
 	 * Amazon Details

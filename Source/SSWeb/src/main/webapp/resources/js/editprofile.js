@@ -367,13 +367,6 @@ function callBackShowProfileImage(data) {
 	adjustImage();
 }
 
-$(document).on('change', '#prof-image', function() {
-	var formData = new FormData();
-	formData.append("logo", $(this).prop("files")[0]);
-	formData.append("logoFileName", $(this).prop("files")[0].name);
-	callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
-});
-
 function callBackOnProfileImageUpload(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchprofileimage.do", callBackShowProfileImage);
@@ -381,6 +374,10 @@ function callBackOnProfileImageUpload(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
+
+$(document).on('change', '#prof-image', function() {
+	initiateJcrop(this);
+});
 
 
 // Function to update profile logo image
@@ -407,19 +404,19 @@ function callBackShowProfileLogo(data) {
 	adjustImage();
 }
 
-$(document).on('change', '#prof-logo', function() {
-	var formData = new FormData();
-	formData.append("logo", $(this).prop("files")[0]);
-	formData.append("logoFileName", $(this).prop("files")[0].name);
-	callAjaxPOSTWithTextData("./updatelogo.do", callBackOnLogoUpload, false, formData);
-});
-
 function callBackOnLogoUpload(data) {
 	$('#prof-message-header').html(data);
 	callAjaxGET("./fetchprofilelogo.do", callBackShowProfileLogo);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
+
+$(document).on('change', '#prof-logo', function() {
+	var formData = new FormData();
+	formData.append("logo", $(this).prop("files")[0]);
+	formData.append("logoFileName", $(this).prop("files")[0].name);
+	callAjaxPOSTWithTextData("./updatelogo.do", callBackOnLogoUpload, false, formData);
+});
 
 
 // Function to populate associations container
@@ -813,9 +810,9 @@ function initializeGoogleMap() {
 // TODO Other Data
 function paintForProfile() {
 	var companyId = $('#prof-company-id').val();
-	// var regionId = $('#prof-region-id').val();
-	// var branchId = $('#prof-branch-id').val();
-	// var agentId = $('#prof-agent-id').val();
+	var regionId = $('#prof-region-id').val();
+	var branchId = $('#prof-branch-id').val();
+	var agentId = $('#prof-agent-id').val();
 	minScore = $('#profile-min-post-score').val();
 	
 	if (companyId != undefined) {
@@ -823,8 +820,9 @@ function paintForProfile() {
 		companyProfileName = $("#company-profile-name").val();
 
 		fetchAverageRatings(companyId);
-		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
+
+		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
 		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
 		if(minScore > 0){
 			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
@@ -833,5 +831,14 @@ function paintForProfile() {
 		fetchCompanyRegions();
 		fetchCompanyBranches();
 		fetchCompanyIndividuals();
+	}
+	else if (regionId != undefined) {
+		
+	}
+	else if (branchId != undefined) {
+		
+	}
+	else if (agentId != undefined) {
+		
 	}
 }
