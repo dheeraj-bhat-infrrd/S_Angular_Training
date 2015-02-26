@@ -95,7 +95,7 @@ function infiniteScrollCallback(response) {
 					+ '<div class="ctnt-item-comment">' + user.aboutMe + '</div>'
 				+ '</div>'
 				+ '<div class="float-left ctnt-list-item-btn-wrap">'
-					+ '<div class="ctnt-review-btn user="' + user.userId + '">Review</div>'
+					+ '<div class="ctnt-review-btn" user="' + user.userId + '">Review</div>'
 				+ '</div>'
 			+ '</div>';
 			loopStatus ++;
@@ -107,6 +107,7 @@ function infiniteScrollCallback(response) {
 }
 
 $(document).on('click', '.ctnt-review-btn', function(){
+	console.log($(this).attr('user'));
 	var payload = {
 		"userId" : $(this).attr('user')
 	};
