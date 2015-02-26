@@ -12,10 +12,10 @@ $(function() {
 });
 
 function createPopupCanvas() {
-	var canvas = '<img src="" id="target" style="max-width:500px; max-height:250px; position:absoulte;"/>'
+	var canvas = '<img src="" id="target" width="470" style="position:absoulte;"/>'
 		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
-	$('#overlay-text').html(canvas).css('position','relative').css('align','center');
+	$('#overlay-text').html(canvas).css('position','relative');
 	$('#overlay-continue').html("Upload");
 	$('#overlay-cancel').html("Cancel");
 
@@ -32,8 +32,8 @@ function initiateJcrop(input) {
 		reader.onload = function(e) {
 			$('#target').attr('src', e.target.result);
 			$('#target').Jcrop({
-				boxWidth: 500,
-				boxHeight: 200,
+				//boxWidth: 500,
+				//boxHeight: 200,
 				setSelect: [ 100, 100, 50, 50 ],
 				onSelect: updatePreview,
 				onChange: updatePreview

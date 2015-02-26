@@ -991,6 +991,48 @@
         width: 594px;
         background-position: 87px top;
     }
+    .rfr_lbl{
+        display: none;
+    }
+    .reg_form_wrapper_2, .reg_form_wrapper_1{
+        width: 100%;
+        margin-top: 0;
+    }
+    .reg_panel_container{
+        padding: 0 !important;
+    }
+    .rfr_txt{
+        width: 100%;
+        float: none;
+    }
+    .reg_form_row{
+        margin-bottom: 0;
+    }
+    .rfr_txt_fld{
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+        border: 0;
+        border-bottom: 1px solid #dcdcdc;
+        border-top: 1px solid #dcdcdc;
+        padding-left: 50px;
+        margin-bottom: -1px;
+    }
+    .reg_header{
+        text-align: center;
+        line-height: 60px;
+        font-size: 22px;
+    }
+    .reg_btn{
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        height: 50px;
+        font-size: 16px;
+    }
+    .rfr_icn{
+        display: block;
+    }
 }
 
 
