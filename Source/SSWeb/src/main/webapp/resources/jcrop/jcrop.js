@@ -1,5 +1,8 @@
+var imageMaxWidth = 470;
+var ratio = 1;
+
 function createPopupCanvas() {
-	var canvas = '<img src="" id="target" width="470" style="position:absoulte;"/>'
+	var canvas = '<img src="" id="target" class="hide" style="position:absoulte;"/>'
 		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
 	$('#overlay-text').html(canvas).css('position', 'relative');
@@ -9,6 +12,9 @@ function createPopupCanvas() {
 	$('#overlay-main').show();
 }
 
+$(document).on('change', '#target', function() {
+});
+
 function initiateJcrop(input) {
 	if (input.files && input.files[0]) {
 		createPopupCanvas();
@@ -16,6 +22,10 @@ function initiateJcrop(input) {
 		var reader = new FileReader();
 		reader.onload = function(e) {
 			$('#target').attr('src', e.target.result);
+			ratio = $('#target').width() / imageMaxWidth;
+			$('#target').removeClass('hide');
+			$('#target').width(imageMaxWidth);
+			
 			$('#target').Jcrop({
 				setSelect: [ 100, 100, 50, 50 ],
 				onSelect: updatePreview,
@@ -44,6 +54,6 @@ function updatePreview(c) {
 		var imageObj = $("#target")[0];
 		var canvas = $("#canvas")[0];
 		var context = canvas.getContext("2d");
-		context.drawImage(imageObj, c.x, c.y, c.w, c.h, 0, 0, canvas.width, canvas.height);
+		context.drawImage(imageObj, (c.x)*ratio, (c.y)*ratio, (c.w)*ratio, (c.h)*ratio, 0, 0, canvas.width, canvas.height);
 	}
 }
