@@ -1,27 +1,12 @@
-$(function() {
-	$(document).on('click', '#overlay-continue', function() {
-		var dataurl = canvas.toDataURL("image/png");
-		$('#prof-image').attr('src', dataurl);
-		$('#overlay-main').hide();
-
-		var formData = new FormData();
-		formData.append("imageBase64", dataurl);
-		formData.append("imageFileName", $('#prof-image').prop("files")[0].name);
-		callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
-	});
-});
-
 function createPopupCanvas() {
 	var canvas = '<img src="" id="target" width="470" style="position:absoulte;"/>'
 		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
-	$('#overlay-text').html(canvas).css('position','relative');
+	$('#overlay-text').html(canvas).css('position', 'relative');
 	$('#overlay-continue').html("Upload");
 	$('#overlay-cancel').html("Cancel");
 
 	$('#overlay-main').show();
-	
-	$('#overlay-continue').unbind('click');
 }
 
 function initiateJcrop(input) {
@@ -32,14 +17,25 @@ function initiateJcrop(input) {
 		reader.onload = function(e) {
 			$('#target').attr('src', e.target.result);
 			$('#target').Jcrop({
-				//boxWidth: 500,
-				//boxHeight: 200,
 				setSelect: [ 100, 100, 50, 50 ],
 				onSelect: updatePreview,
 				onChange: updatePreview
 			});
 		};
 		reader.readAsDataURL(input.files[0]);
+
+		$(document).on('click', '#overlay-continue', function() {
+			var dataurl = canvas.toDataURL("image/png");
+			$('#prof-image').attr('src', dataurl);
+			$('#overlay-main').hide();
+
+			var formData = new FormData();
+			formData.append("imageBase64", dataurl);
+			formData.append("imageFileName", $('#prof-image').prop("files")[0].name);
+			callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
+			
+			$('#overlay-continue').unbind('click');
+		});
 	}
 }
 
