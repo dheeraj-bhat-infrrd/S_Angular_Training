@@ -3,6 +3,7 @@
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
 <div class="prof-left-row prof-left-assoc bord-bot-dc">
 	<div class="left-assoc-wrapper clearfix">
+		
 		<c:choose>
 			<c:when	test="${user.companyAdmin}">
 				<div class="left-panel-header lp-align-adj"><spring:message code="label.ourcompany.key"/></div>
@@ -14,6 +15,7 @@
 				<div class="left-panel-header lp-align-adj"><spring:message code="label.ourbranch.key"/></div>
 			</c:when>
 		</c:choose>
+		
 		<div class="left-panel-content left-panel-content-adj">
 
 			<!-- Regions -->
