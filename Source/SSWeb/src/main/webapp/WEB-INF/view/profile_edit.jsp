@@ -209,7 +209,7 @@
 
 		<div class="row">
 			<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
-				<div class="prof-left-row prof-left-info bord-bot-dc">
+				<div class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
 					<div class="left-contact-wrapper">
 						<div class="clearfix">
 							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key" /></div>
@@ -409,7 +409,7 @@
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				
-				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc">
+				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
 					<div class="main-con-header main-con-header-adj clearfix">
 						<div class="float-left">
 							<spring:message code="label.about.key" /> ${contactdetail.name}
