@@ -161,6 +161,10 @@ function callBackOnEditAdboutMeDetails(data) {
 		$('#intro-body-text').show();
 	}
 
+	if ($('#aboutme-status').val() == 'new') {
+		showMainContent('./showprofilepage.do');
+	}
+	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
