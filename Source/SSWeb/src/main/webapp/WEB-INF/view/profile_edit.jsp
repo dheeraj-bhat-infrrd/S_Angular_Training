@@ -138,8 +138,8 @@
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
 						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-full-star"></div>
+							<div class="rating-star icn-no-star"></div>
+							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
