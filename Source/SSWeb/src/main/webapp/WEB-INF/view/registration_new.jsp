@@ -32,7 +32,7 @@
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row hm-header-row-main clearfix">
-            <div class="float-left hm-header-row-left">Sign Up To Start Your Survey</div>
+            <div class="float-left hm-header-row-left text-center">Sign Up To Start Your Survey</div>
         </div>
     </div>
 </div>
