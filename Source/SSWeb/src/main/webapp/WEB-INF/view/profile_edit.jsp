@@ -209,7 +209,7 @@
 
 		<div class="row">
 			<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
-				<div class="prof-left-row prof-left-info bord-bot-dc">
+				<div class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
 					<div class="left-contact-wrapper">
 						<div class="clearfix">
 							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key" /></div>
@@ -409,7 +409,7 @@
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				
-				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc">
+				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
 					<div class="main-con-header main-con-header-adj clearfix">
 						<div class="float-left">
 							<spring:message code="label.about.key" /> ${contactdetail.name}
@@ -453,7 +453,7 @@
                 	<div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.sspost.key"/></div>
                         <textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
-                        <input type="button" class="float-right" value="Post">
+						<div class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
                     </div>
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
