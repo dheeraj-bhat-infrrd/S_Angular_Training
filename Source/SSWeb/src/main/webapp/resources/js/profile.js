@@ -220,7 +220,7 @@ function paintBranchesForRegion(data) {
 			$.each(result,function(i,branch) {
 				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				branchesHtml = branchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
-				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
+				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn branch-icon" data-profilename="'+branch.profileName+'"></div>';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
 				branchesHtml = branchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
 				branchesHtml = branchesHtml +'	</div>';
@@ -233,6 +233,13 @@ function paintBranchesForRegion(data) {
 			else {
 				$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
 			}
+			
+			$(".branch-icon").click(function(e){
+				e.stopPropagation();
+				var branchProfileName = $(this).data("profilename");
+				var url = window.location.origin +"/branchprofile/"+companyProfileName+"/branch/"+branchProfileName+".do";
+				window.open(url, "_blank");				
+			});
 			bindClickToFetchBranchIndividuals("comp-region-branch");
 		}
 	}
@@ -278,7 +285,12 @@ function paintIndividualForBranch(data) {
 					individualsHtml=  individualsHtml+'</div>';
 				}
 			});
-			$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
+			if($("#branch-individuals").length > 0) {
+				$("#branch-individuals").html(individualsHtml);
+			}
+			else {
+				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
+			}
 			paintProfileImage("individual-prof-image");
 		}
 	}
@@ -388,66 +400,15 @@ function fetchReviewsForCompany(companyId,start,numRows,minScore) {
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
-	callAjaxGET(url, paintReviewsForCompany, false);
+	callAjaxGET(url, fetchReviewsForCompanyCallBack, false);
 }
 
-function paintReviewsForCompany(data) {
+function fetchReviewsForCompanyCallBack(data) {
 	var responseJson = $.parseJSON(data);
 	if(responseJson != undefined) {
 		var result = $.parseJSON(responseJson.entity);
-		var reviewsHtml = "";
 		if(result != undefined && result.length > 0) {
-			$.each(result, function(i, reviewItem) {
-				var date = Date.parse(reviewItem.updatedOn);
-				reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
-				reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
-				reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerName+'</div>';
-				reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+date.getDate() +" "+ date.getMonthName()+" "+date.getFullYear()+'</div>'; 
-				reviewsHtml=  reviewsHtml+'    </div>';
-				reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
-				reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
-				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
-				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
-				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
-				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
-				reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
-				reviewsHtml=  reviewsHtml+'       </div>';
-				reviewsHtml=  reviewsHtml+'   </div>';
-				reviewsHtml=  reviewsHtml+'	</div>';
-				reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
-				reviewsHtml=  reviewsHtml+'		<div class="ppl-share-wrapper clearfix">';
-				reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
-				reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
-				reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
-				reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb"></div>';
-				reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit"></div>';
-				reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin"></div>';
-				reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp"></div>';
-				reviewsHtml=  reviewsHtml+'    	</div>';
-				reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
-				reviewsHtml=  reviewsHtml+'	</div>';
-				reviewsHtml=  reviewsHtml+'</div>';
-			});
-			
-			if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
-				$("#prof-review-item").html(reviewsHtml);
-			}else {
-				$("#prof-review-item").append(reviewsHtml);
-			}
-			$(".review-ratings").each(function() {
-				changeRatingPattern($(this).data("rating"), $(this));
-			});
-			$('.icn-plus-open').click(function(){
-	            $(this).hide();
-	            $(this).parent().find('.ppl-share-social,.icn-remove').show();
-	        });
-	        
-	        $('.icn-remove').click(function(){
-	            $(this).hide();
-	            $(this).parent().find('.ppl-share-social').hide();
-	            $(this).parent().find('.icn-plus-open').show();
-	        });
+			paintReviews(result);
 		}
 		else {
 			/**
@@ -460,12 +421,77 @@ function paintReviewsForCompany(data) {
 	}
 }
 
+function paintReviews(result){
+	var reviewsHtml = "";
+	$.each(result, function(i, reviewItem) {
+		var date = Date.parse(reviewItem.updatedOn);
+		reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
+		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
+		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
+		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerName+'</div>';
+		if(date != null){
+			reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+date.getDate() +" "+ date.getMonthName()+" "+date.getFullYear()+'</div>'; 
+		}
+		reviewsHtml=  reviewsHtml+'    </div>';
+		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
+		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
+		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
+		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
+		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
+		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
+		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
+		reviewsHtml=  reviewsHtml+'       </div>';
+		reviewsHtml=  reviewsHtml+'   </div>';
+		reviewsHtml=  reviewsHtml+'	</div>';
+		reviewsHtml=  reviewsHtml+'	<div class="ppl-content">'+reviewItem.review +'</div>';
+		reviewsHtml=  reviewsHtml+'		<div class="ppl-share-wrapper clearfix">';
+		reviewsHtml=  reviewsHtml+'    		<div class="float-left blue-text ppl-share-shr-txt">Share</div>';
+		reviewsHtml=  reviewsHtml+'    		<div class="float-left icn-share icn-plus-open"></div>';
+		reviewsHtml=  reviewsHtml+'    		<div class="float-left clearfix ppl-share-social hide">';
+		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-fb"></div>';
+		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-twit"></div>';
+		reviewsHtml=  reviewsHtml+'        	<div class="float-left ppl-share-icns icn-lin"></div>';
+		reviewsHtml=  reviewsHtml+'       	<div class="float-left ppl-share-icns icn-yelp"></div>';
+		reviewsHtml=  reviewsHtml+'    	</div>';
+		reviewsHtml=  reviewsHtml+'   <div class="float-left icn-share icn-remove icn-rem-size hide"></div>';
+		reviewsHtml=  reviewsHtml+'	</div>';
+		reviewsHtml=  reviewsHtml+'</div>';
+	});
+	
+	if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
+		$("#prof-review-item").html(reviewsHtml);
+	}else {
+		$("#prof-review-item").append(reviewsHtml);
+	}
+	$(".review-ratings").each(function() {
+		changeRatingPattern($(this).data("rating"), $(this));
+	});
+	$('.icn-plus-open').click(function(){
+        $(this).hide();
+        $(this).parent().find('.ppl-share-social,.icn-remove').show();
+    });
+    
+    $('.icn-remove').click(function(){
+        $(this).hide();
+        $(this).parent().find('.ppl-share-social').hide();
+        $(this).parent().find('.icn-plus-open').show();
+    });
+
+}
+
 $(document).scroll(function(){
 	var totalReviews = parseInt($("#profile-fetch-info").attr("total-reviews"));
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndex <= totalReviews){
 		startIndex = startIndex + numOfRows;
 		$("#profile-fetch-info").attr("fetch-all-reviews","false");
-		fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,minScore);
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
+		if(profileLevel == 'COMPANY'){
+			fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,minScore);
+		}
+		else if(profileLevel == 'REGION'){
+			fetchReviewsForRegion(currentProfileIden,startIndex,numOfRows,minScore);
+		}
+		
 	}
 });
 
@@ -541,7 +567,7 @@ function fetchRegionProfileCallBack(data) {
 		}
 		startIndex = 0;
 		fetchReviewsForRegion(result.iden,startIndex,numOfRows,minScore);
-		
+		fetchReviewsCountForRegion(result.iden, paintAllReviewsCount);
 	}
 }
 
@@ -549,14 +575,104 @@ function fetchAverageRatingsForRegion(regionId){
 	var url = window.location.origin +"/rest/profile/region/"+regionId+"/ratings";
 	callAjaxGET(url, paintAverageRatings, true);
 }
+
 function fetchReviewsForRegion(regionId,start,numRows,minScore) {
 	if(regionId == undefined || regionId == ""){
 		return;
 	}
 	var url = window.location.origin +"/rest/profile/region/"+regionId+"/reviews?start="+start+"&numRows="+numRows;
-	alert(url);
 	if(minScore != undefined) {
 		url = url +"&minScore="+minScore;
 	}
-	callAjaxGET(url, paintReviewsForCompany, false);
+	callAjaxGET(url, fetchReviewsForRegionCallBack, false);
 }
+
+function fetchReviewsForRegionCallBack(data) {
+	var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {
+		var result = $.parseJSON(responseJson.entity);
+		if(result != undefined && result.length > 0) {
+			paintReviews(result);
+		}
+		else {
+			/**
+			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
+			 */
+			if(minScore > 0){
+				fetchReviewsCountForRegion(currentProfileIden,paintHiddenReviewsCount,minScore);
+			}		
+		}
+	}
+}
+
+function fetchReviewsCountForRegion(regionId,callBackFunction,maxScore) {
+	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviewcount';
+	if(maxScore != undefined) {
+		url = url +"?maxScore="+maxScore;
+	}
+	callAjaxGET(url, callBackFunction, true);
+}
+
+function fetchAverageRatingsForBranch(branchId){
+	var url = window.location.origin +"/rest/profile/branch/"+branchId+"/ratings";
+	callAjaxGET(url, paintAverageRatings, true);
+}
+
+function fetchReviewsForBranch(branchId,start,numRows,minScore){
+	if(branchId == undefined || branchId == ""){
+		return;
+	}
+	var url = window.location.origin +"/rest/profile/branch/"+branchId+"/reviews?start="+start+"&numRows="+numRows;
+	if(minScore != undefined) {
+		url = url +"&minScore="+minScore;
+	}
+	callAjaxGET(url, fetchReviewsForBranchCallBack, false);
+}
+
+function fetchReviewsForBranchCallBack(data) {
+	var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {
+		var result = $.parseJSON(responseJson.entity);
+		if(result != undefined && result.length > 0) {
+			paintReviews(result);
+		}
+		else {
+			/**
+			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
+			 */
+			if(minScore > 0){
+				fetchReviewsCountForBranch(currentProfileIden,paintHiddenReviewsCount,minScore);
+			}		
+		}
+	}
+}
+
+function fetchReviewsCountForBranch(branchId,callBackFunction,maxScore) {
+	var url = window.location.origin +'/rest/profile/branch/'+branchId+'/reviewcount';
+	if(maxScore != undefined) {
+		url = url +"?maxScore="+maxScore;
+	}
+	callAjaxGET(url, callBackFunction, true);
+}
+
+function fetchBranchProfile(branchProfileName) {
+	var url = window.location.origin +"/rest/profile/"+companyProfileName+"/branch/"+branchProfileName;
+	callAjaxGET(url, fetchBranchProfileCallBack, true);
+}
+
+function fetchBranchProfileCallBack(data) {
+	var response= $.parseJSON(data);
+	if(response != undefined) {
+		var result = $.parseJSON(response.entity);
+		paintProfilePage(result);
+		fetchAverageRatingsForBranch(result.iden);
+		fetchIndividualsForBranch(result.iden);
+		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+			minScore = result.survey_settings.show_survey_above_score;
+		}
+		startIndex = 0;
+		fetchReviewsForBranch(result.iden,startIndex,numOfRows,minScore);
+		fetchReviewsCountForBranch(result.iden, paintAllReviewsCount);
+	}
+}
+
