@@ -266,34 +266,34 @@ function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
 	createPopupConfirm(header, data);
 	
+	$(document).on('click', '#overlay-continue', function() {
+		var profName = $('#prof-name').val();
+		var profAddress1 = $('#prof-address1').val();
+		var profAddress2 = $('#prof-address2').val();
+		var country = $('#prof-country').val();
+		var zipCode = $('#prof-zipcode').val();
+		if (!profName || !profAddress1 || !country || !zipCode) {
+			return;
+		}
+		
+		delay(function() {
+			var payload = {
+				"profName" : profName,
+				"address1" : profAddress1,
+				"address2" : profAddress2,
+				"country" : country,
+				"zipCode" : zipCode
+			};
+			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
+		}, 0);
+
+		$('#overlay-continue').unbind('click');
+	});
+
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	$('body').css('overflow','hidden');
 	$('body').scrollTop('0');
 }
-
-$(document).on('click', '#overlay-continue', function() {
-	var profName = $('#prof-name').val();
-	var profAddress1 = $('#prof-address1').val();
-	var profAddress2 = $('#prof-address2').val();
-	var country = $('#prof-country').val();
-	var zipCode = $('#prof-zipcode').val();
-	if (!profName || !profAddress1 || !country || !zipCode) {
-		return;
-	}
-	
-	delay(function() {
-		var payload = {
-			"profName" : profName,
-			"address1" : profAddress1,
-			"address2" : profAddress2,
-			"country" : country,
-			"zipCode" : zipCode
-		};
-		callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
-	}, 0);
-
-	$('#overlay-continue').unbind('click');
-});
 
 function callBackUpdateAddressDetails(data) {
 	$('#prof-message-header').html(data);
@@ -309,7 +309,6 @@ function callBackUpdateAddressDetails(data) {
 $('#overlay-cancel').click(function(){
 	$('#overlay-continue').unbind('click');
 	overlayRevert();
-	$('#othercategory').val('');
 });
 
 function createPopupConfirm(header, body) {
@@ -319,7 +318,6 @@ function createPopupConfirm(header, body) {
 	$('#overlay-cancel').html("Cancel");
 
 	$('#overlay-main').show();
-	$('#overlay-continue').unbind('click');
 }
 function overlayRevert() {
 	$('#overlay-main').hide();
