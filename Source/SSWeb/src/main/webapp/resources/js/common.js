@@ -140,3 +140,23 @@ function callAjaxPostWithPayloadData(url, callBackFunction, payload,isAsync){
 		}
 	});
 }
+
+function changeRatingPattern(rating, ratingParent) {
+	var counter = 0;
+	ratingParent.children().each(function() {
+		$(this).addClass("icn-no-star");
+		$(this).removeClass("icn-half-star");
+		$(this).removeClass("icn-full-star");
+
+		if (rating >= counter) {
+			if (rating - counter >= 1) {
+				$(this).removeClass("icn-no-star");
+				$(this).addClass("icn-full-star");
+			} else if (rating - counter == 0.5) {
+				$(this).removeClass("icn-no-star");
+				$(this).addClass("icn-half-star");
+			}
+		}
+		counter++;
+	});
+}
