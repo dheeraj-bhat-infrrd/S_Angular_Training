@@ -1,3 +1,9 @@
+// Varibles for processing
+var startIndex = 0;
+var numOfRows = 3;
+var minScore = 0;
+var attrName = null;
+var attrVal = null;
 var webAddressRegEx = /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
 var timer = 0;
 var delay = (function() {
@@ -43,7 +49,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 $(document).on('click', '.lp-edit-locks', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
-	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
+	// var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if ($(this).attr('data-control') == 'user') {
 		if($(this).hasClass('lp-edit-locks-locked')) {
@@ -67,7 +73,7 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 $(document).on('click', '.prof-img-lock-item', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
-	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
+	// var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if ($(this).attr('data-control') == 'user') {
 		if($(this).hasClass('prof-img-lock-locked')) {
@@ -334,6 +340,8 @@ function overlayRevert() {
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
+	fetchAvgRating(attrName, attrVal);
+	fetchReviewCount(attrName, attrVal, minScore);
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
@@ -813,13 +821,7 @@ function initializeGoogleMap() {
 }
 
 
-// TODO Data population for Admin
-var startIndex = 0;
-var numOfRows = 3;
-var minScore = 0;
-var attrName = null;
-var attrVal = null;
-
+// Data population for Admin
 function paintForProfile() {
 	var companyId = $('#prof-company-id').val();
 	var regionId = $('#prof-region-id').val();
@@ -923,7 +925,10 @@ function paintProfImage(imgDivClass) {
 // Fetch and paint Reviews
 $(window).scroll(function() {
 	var newIndex = startIndex + numOfRows;
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
+	var totalReviews = $("#prof-company-review-count").html();
+	totalReviews = totalReviews.substr(0, totalReviews.indexOf(' '));
+
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex <= totalReviews) {
 		fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
 		startIndex = newIndex;
 	}
@@ -933,12 +938,7 @@ function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
 			+ minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
 	callAjaxGET(url, function(data) {
-		if($(startIndex == 0)) {
-			$("#prof-review-item").html(data);
-		} else {
-			$("#prof-review-item").append(data);
-		}
-		
+		$("#prof-review-item").append(data);
 		$(".review-ratings").each(function() {
 			changeRatingPattern($(this).data("rating"), $(this));
 		});
@@ -977,7 +977,7 @@ function paintReviewCount(reviewCount) {
 	}
 }
 
-// TODO fetch avg rating
+// fetch avg rating
 function fetchAvgRating(attrName, attrVal) {
 	var url = "./fetchaveragerating.do?" + attrName + "=" + attrVal;
 	callAjaxGET(url, paintAvgRating, true);
