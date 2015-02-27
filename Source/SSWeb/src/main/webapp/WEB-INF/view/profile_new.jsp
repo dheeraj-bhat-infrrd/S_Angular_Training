@@ -20,7 +20,8 @@
 <body>
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
-<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0"/>
+<input type="hidden" value="${branchProfileName}" id="branch-profile-name">
+<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0" profile-level="${profileLevel}"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
@@ -171,12 +172,11 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resourbranchIdces/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
-
+<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script>
     $(document).ready(function(){
         adjustImage();
@@ -185,10 +185,14 @@
         	since this would be a call to fetch region profile page 
         */
         var regionProfileName = $("#region-profile-name").val();
+        var branchProfileName = $("#branch-profile-name").val();
         if(regionProfileName.length > 0) {
         	fetchRegionProfile(regionProfileName);
         }
-        else {
+        else if(branchProfileName.length > 0){
+        	fetchBranchProfile(branchProfileName);
+        }
+        else{
         	fetchCompanyProfile();
         }
         

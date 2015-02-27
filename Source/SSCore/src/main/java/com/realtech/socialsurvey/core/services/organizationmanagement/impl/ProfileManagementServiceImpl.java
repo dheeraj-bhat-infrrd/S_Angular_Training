@@ -722,6 +722,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to get the branch based on profile name
 	 */
 	@Override
+	@Transactional
 	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
 		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
 
