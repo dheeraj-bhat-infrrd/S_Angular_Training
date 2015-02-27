@@ -1492,7 +1492,7 @@ button.paypal.is-active {
     white-space: nowrap;
 }
 .main-con-header {
-    text-transform: uppercase;
+     /*text-transform: uppercase;*/
     font-size: 18px;
     margin-bottom: 15px;
 }
@@ -1844,7 +1844,8 @@ button.paypal.is-active {
 }
 
 .prof-name-edit {
-    background-color: #f1f1f1;
+	height: 44px;
+	background-color: #f1f1f1;
     border: 1px solid #dcdcdc;
 }
 
@@ -3899,6 +3900,20 @@ button.paypal.is-active {
     margin:  25px auto 0;
 }
 
+.main-rt-adj{
+	padding-top: 0;
+}
+
+.left-panel-content-adj{
+	clear: both;
+}
+
+.lp-align-adj{
+	text-align: left !important;
+	float: left;
+	clear: both;
+}
+
 .reg_lkin_wrapper {
     margin:  0 auto;
     width: 100%;
@@ -4023,4 +4038,27 @@ button.paypal.is-active {
 	border-left-color: #dcdcdc;
 	border-width: 9px;
 	margin-top: -9px;
+}
+
+.pe-btn-post {
+    background-color: #009FE0;
+    height: 40px;
+    line-height: 40px;
+    width: 200px;
+    text-align: center;
+    color: #fff;
+    border-radius: 3px;
+    margin: 10px auto;
+    font-size: 16px;
+    font-family: 'opensanslight';
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.pe-btn-post:hover{
+    background-color: #7AB400 !important;
+}
+
+.pe-btn-post:active {
+    background-color: #70A501 !important;
 }
