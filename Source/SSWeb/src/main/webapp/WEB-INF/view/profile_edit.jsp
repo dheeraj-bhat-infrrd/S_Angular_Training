@@ -44,15 +44,15 @@
 			</c:when>
 			<c:when test="${user.regionAdmin}">
 				<input type="hidden" id="prof-region-id" value="${profile.iden}">
-				<input type="hidden" id="prof-region-name" value="${profile.profileName}">
+				<%-- <input type="hidden" id="prof-region-name" value="${profile.profileName}"> --%>
 			</c:when>
 			<c:when test="${user.branchAdmin}">
 				<input type="hidden" id="prof-branch-id" value="${profile.iden}">
-				<input type="hidden" id="prof-branch-name" value="${profile.profileName}">
+				<%-- <input type="hidden" id="prof-branch-name" value="${profile.profileName}"> --%>
 			</c:when>
 			<c:when test="${user.agent}">
 				<input type="hidden" id="prof-agent-id" value="${profile.iden}">
-				<input type="hidden" id="prof-agent-name" value="${profile.profileName}">
+				<%-- <input type="hidden" id="prof-agent-name" value="${profile.profileName}"> --%>
 			</c:when>
 		</c:choose>
 		<input type="hidden" id="profile-min-post-score" value="${profile.survey_settings.show_survey_above_score}"/>
@@ -70,10 +70,6 @@
 		</div>
 	</div>
 </div>
-
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
-<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
@@ -133,7 +129,7 @@
 						<div class="prof-addline1 prof-edditable">${profile.vertical}</div>
 						
 						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
-						<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
+						<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 					</div>
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
@@ -498,6 +494,10 @@
 	<div class="float-left mob-icn inc-more"></div>
 </div>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
+
+<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script>
 	$(document).ready(function() {
