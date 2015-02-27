@@ -453,7 +453,7 @@
                 	<div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.sspost.key"/></div>
                         <textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
-                        <input type="button" class="float-right" value="Post">
+						<div class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
                     </div>
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
