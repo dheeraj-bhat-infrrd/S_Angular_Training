@@ -2241,6 +2241,7 @@ public class ProfileManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		model.addAttribute("companyProfileName", profileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
 	}
@@ -2270,11 +2271,42 @@ public class ProfileManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		model.addAttribute("companyProfileName", companyProfileName);
+		model.addAttribute("regionProfileName", regionProfileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_REGION);
 		LOG.info("Service to initiate region profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
 	}
+	/**
+	 * Method to return branch profile page
+	 * @param companyProfileName
+	 * @param branchProfileName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/branchprofile/{companyProfileName}/branch/{branchProfileName}")
+	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model) {
+		LOG.info("Service to initiate branch profile page called");
+		String message = null;
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		if (branchProfileName == null || branchProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("companyProfileName", companyProfileName);
+		model.addAttribute("branchProfileName", branchProfileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_BRANCH);
+		LOG.info("Service to initiate branch profile page executed successfully");
+		return JspResolver.PROFILE_PAGE;
+	}
 	
-	
+	// TODO
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {
 		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");

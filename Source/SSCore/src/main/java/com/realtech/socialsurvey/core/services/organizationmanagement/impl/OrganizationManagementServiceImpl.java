@@ -1362,6 +1362,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		List<String> columnNames = new ArrayList<String>();
 		columnNames.add(CommonConstants.BRANCH_ID_COLUMN);
 		columnNames.add(CommonConstants.BRANCH_NAME_COLUMN);
+		columnNames.add(CommonConstants.PROFILE_NAME_COLUMN);
 
 		Map<String, Object> queries = new HashMap<String, Object>();
 
@@ -1474,6 +1475,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		List<String> columnNames = new ArrayList<String>();
 		columnNames.add(CommonConstants.BRANCH_ID_COLUMN);
 		columnNames.add(CommonConstants.BRANCH_NAME_COLUMN);
+		columnNames.add(CommonConstants.PROFILE_NAME_COLUMN);
 
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, regionDao.findById(Region.class, regionId));
