@@ -1,11 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if test="${not empty profile && not empty profile.contact_details}">
-	<c:set value="${profile.contact_details}" var="contactdetail"></c:set>
-</c:if>
-<div class="main-con-header">
-	<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
-</div>
 <c:choose>
 	<c:when test="${not empty reviewItems}">
 		<c:forEach var="reviewItem" items="${reviewItems}">
@@ -13,7 +8,9 @@
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${reviewItem.customerName}</div>
-						<div class="ppl-head-2">${reviewItem.updatedOn}</div>
+						<div class="ppl-head-2">
+							<fmt:formatDate type="date" pattern="dd MMM, yyyy" value="${reviewItem.updatedOn}" />
+						</div>
 					</div>
 					<div class="float-right ppl-header-right">
 						<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="${reviewItem.score}">
@@ -40,4 +37,7 @@
 			</div>
 		</c:forEach>
 	</c:when>
+	<c:otherwise>
+		<spring:message code="label.noreviews.key"/>
+	</c:otherwise>
 </c:choose>

@@ -814,29 +814,28 @@ function initializeGoogleMap() {
 
 
 // TODO Data population for Admin
+var startIndex = 0;
+var numOfRows = 3;
+var minScore = 0;
+var attrName = null;
+var attrVal = null;
+
 function paintForProfile() {
-	var attrName;
-	var attrVal;
 	var companyId = $('#prof-company-id').val();
 	var regionId = $('#prof-region-id').val();
 	var branchId = $('#prof-branch-id').val();
-	// var agentId = $('#prof-agent-id').val();
-	minScore = 0;
+	var agentId = $('#prof-agent-id').val();
 	
 	if (companyId != undefined) {
 		attrName = "companyId";
 		attrVal = companyId;
 		
-		fetchAverageRatings(companyId);
 		fetchHierarchy("companyProfileName", $("#company-profile-name").val());
-		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
-		fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows);
 	}
 	else if (regionId != undefined) {
 		attrName = "regionId";
 		attrVal = regionId;
-		
-		fetchAverageRatingsForRegion(regionId);
+
 		fetchHierarchy(attrName, attrVal);
 	}
 	else if (branchId != undefined) {
@@ -845,6 +844,15 @@ function paintForProfile() {
 		
 		fetchHierarchy(attrName, attrVal);
 	}
+	else if (agentId != undefined) {
+		attrName = "agentId";
+		attrVal = agentId;
+	}
+	
+	// Common call for all cases
+	fetchAvgRating(attrName, attrVal);
+	fetchReviewCount(attrName, attrVal, minScore);
+	fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows);
 }
 
 // Hierarchy data population
@@ -875,16 +883,13 @@ function paintHierarchy(data) {
 	paintProfImage("comp-individual-prof-image");
 }
 
+// region hierarchy on click
 function fetchRegionHierarchyOnClick(regionId) {
 	var url = "./getregionhierarchy.do?regionId=" + regionId;
 	callAjaxGET(url, function(data) {
-		paintRegionHierarchyOnClick(data, regionId);
+		$("#comp-region-branches-" + regionId).html(data).slideDown(200);
+		bindClickBranchForIndividuals("comp-region-branch");
 	}, true);
-}
-
-function paintRegionHierarchyOnClick(data, regionId) {
-	$("#comp-region-branches-" + regionId).html(data).slideDown(200);
-	bindClickBranchForIndividuals("comp-region-branch");
 }
 
 function bindClickBranchForIndividuals(bindingClass) {
@@ -900,16 +905,13 @@ function bindClickBranchForIndividuals(bindingClass) {
 	});
 }
 
+// Branch hierarchy on click
 function fetchBranchHierarchyOnClick(branchId) {
 	var url = "./getbranchhierarchy.do?branchId=" + branchId;
 	callAjaxGET(url, function(data) {
-		paintBranchHierarchyOnClick(data, branchId);
+		$("#comp-branch-individuals-" + branchId).html(data).slideDown(200);
+		paintProfImage("comp-individual-prof-image");
 	}, true);
-}
-
-function paintBranchHierarchyOnClick(data, branchId) {
-	$("#comp-branch-individuals-" + branchId).html(data).slideDown(200);
-	paintProfImage("comp-individual-prof-image");
 }
 
 function paintProfImage(imgDivClass) {
@@ -918,7 +920,7 @@ function paintProfImage(imgDivClass) {
 	});
 }
 
-// TODO
+// Fetch and paint Reviews
 $(window).scroll(function() {
 	var newIndex = startIndex + numOfRows;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
@@ -927,32 +929,62 @@ $(window).scroll(function() {
 	}
 });
 
-function fetchReviews(attrName, attrValue, minScore, startIndex, numOfRows) {
-	var url = "./fetchreviews.do?" + attrName + "=" + attrValue + "&minScore="
+function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
+	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
 			+ minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
 	callAjaxGET(url, function(data) {
-		fetchReviewsCallBack(data, startIndex);
+		if($(startIndex == 0)) {
+			$("#prof-review-item").html(data);
+		} else {
+			$("#prof-review-item").append(data);
+		}
+		
+		$(".review-ratings").each(function() {
+			changeRatingPattern($(this).data("rating"), $(this));
+		});
+		$('.icn-plus-open').click(function(){
+	        $(this).hide();
+	        $(this).parent().find('.ppl-share-social,.icn-remove').show();
+	    });
+	    
+	    $('.icn-remove').click(function(){
+	        $(this).hide();
+	        $(this).parent().find('.ppl-share-social').hide();
+	        $(this).parent().find('.icn-plus-open').show();
+	    });
 	}, true);
 }
 
-function fetchReviewsCallBack(data, startIndex) {
-	if($(startIndex == 0)) {
-		$("#prof-review-item").html(data);
-	} else {
-		$("#prof-review-item").append(data);
+// fetch review count
+function fetchReviewCount(attrName, attrVal, minScore) {
+	var url = "./fetchreviewcount.do?" + attrName + "=" + attrVal
+			+ "&minScore=" + minScore;
+	callAjaxGET(url, paintReviewCount, true);
+}
+
+function paintReviewCount(reviewCount) {
+	if (reviewCount != undefined) {
+		if (reviewCount <= 1) {
+			reviewCount = reviewCount + ' Review';
+		} else {
+			reviewCount = reviewCount + ' Reviews';
+		}
+		
+		$("#prof-company-review-count").html(reviewCount);
+		$("#prof-company-review-count").click(function(){
+			$(window).scrollTop($('#reviews-container').offset().top);
+		});
 	}
-	
-	$(".review-ratings").each(function() {
-		changeRatingPattern($(this).data("rating"), $(this));
-	});
-	$('.icn-plus-open').click(function(){
-        $(this).hide();
-        $(this).parent().find('.ppl-share-social,.icn-remove').show();
-    });
-    
-    $('.icn-remove').click(function(){
-        $(this).hide();
-        $(this).parent().find('.ppl-share-social').hide();
-        $(this).parent().find('.icn-plus-open').show();
-    });
+}
+
+// TODO fetch avg rating
+function fetchAvgRating(attrName, attrVal) {
+	var url = "./fetchaveragerating.do?" + attrName + "=" + attrVal;
+	callAjaxGET(url, paintAvgRating, true);
+}
+
+function paintAvgRating(avgRating) {
+	if (avgRating != undefined) {
+		changeRatingPattern(avgRating, $("#rating-avg-comp"));
+	}
 }
