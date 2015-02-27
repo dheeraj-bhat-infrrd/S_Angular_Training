@@ -2274,7 +2274,7 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_PAGE;
 	}
 	
-	// TODO
+	
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {
 		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");
@@ -2415,7 +2415,6 @@ public class ProfileManagementController {
 		return model;
 	}
 	
-	// TODO
 	@RequestMapping(value = "/fetchreviews", method = RequestMethod.GET)
 	public String fetchReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
@@ -2423,26 +2422,53 @@ public class ProfileManagementController {
 
 		List<SurveyDetails> reviewItems = null;
 		try {
-			long companyId = Long.parseLong(request.getParameter("companyId"));
-			double minScore = Double.parseDouble(request.getParameter("minScore"));
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
+			double minScore = Double.parseDouble(request.getParameter("minScore"));
 			int startIndex = Integer.parseInt(request.getParameter("startIndex"));
 			int numRows = Integer.parseInt(request.getParameter("numOfRows"));
 
 			if (user.isCompanyAdmin()) {
+				long companyId = Long.parseLong(request.getParameter("companyId"));
+				if (companyId == 0l) {
+					LOG.error("Invalid companyId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
+				}
+
 				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_COMPANY);
-				model.addAttribute("reviewItems", reviewItems);
 			}
 			else if (user.isRegionAdmin()) {
+				long regionId = Long.parseLong(request.getParameter("regionId"));
+				if (regionId == 0l) {
+					LOG.error("Invalid regionId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
+				}
 
+				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_REGION);
 			}
 			else if (user.isBranchAdmin()) {
-
+				long branchId = Long.parseLong(request.getParameter("branchId"));
+				if (branchId == 0l) {
+					LOG.error("Invalid branchId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
+				}
+				
+				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_BRANCH);
 			}
 			else if (user.isAgent()) {
-
+				long agentId = Long.parseLong(request.getParameter("agentId"));
+				if (agentId == 0l) {
+					LOG.error("Invalid agentId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
+				}
+				
+				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 			}
+
+			model.addAttribute("reviewItems", reviewItems);
 		}
 		catch (InvalidInputException e) {
 			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
@@ -2451,5 +2477,116 @@ public class ProfileManagementController {
 
 		LOG.info("Method fetchReviews() finished from ProfileManagementController");
 		return JspResolver.PROFILE_REVIEWS;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/fetchreviewcount", method = RequestMethod.GET)
+	public String fetchReviewCount(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchReviewCount() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
+
+		long reviewCount = 0l;
+		try {
+			double maxScore = CommonConstants.MAX_RATING_SCORE;
+			double minScore = Double.parseDouble(request.getParameter("minScore"));
+
+			if (user.isCompanyAdmin()) {
+				long companyId = Long.parseLong(request.getParameter("companyId"));
+				if (companyId == 0l) {
+					LOG.error("Invalid companyId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
+				}
+
+				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Long.parseLong(request.getParameter("regionId"));
+				if (regionId == 0l) {
+					LOG.error("Invalid regionId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
+				}
+
+				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Long.parseLong(request.getParameter("branchId"));
+				if (branchId == 0l) {
+					LOG.error("Invalid branchId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
+				}
+				
+				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
+			}
+			else if (user.isAgent()) {
+				long agentId = Long.parseLong(request.getParameter("agentId"));
+				if (agentId == 0l) {
+					LOG.error("Invalid agentId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
+				}
+				
+				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+			}
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
+					CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews"), e.getMessage());
+		}
+
+		LOG.info("Method fetchReviewCount() finished from ProfileManagementController");
+		return reviewCount + "";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/fetchaveragerating", method = RequestMethod.GET)
+	public String fetchAverageRating(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchAverageRating() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
+
+		double averageRating = 0l;
+		try {
+			if (user.isCompanyAdmin()) {
+				long companyId = Long.parseLong(request.getParameter("companyId"));
+				if (companyId == 0l) {
+					LOG.error("Invalid companyId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
+				}
+
+				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Long.parseLong(request.getParameter("regionId"));
+				if (regionId == 0l) {
+					LOG.error("Invalid regionId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
+				}
+
+				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Long.parseLong(request.getParameter("branchId"));
+				if (branchId == 0l) {
+					LOG.error("Invalid branchId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
+				}
+				
+				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
+			}
+			else if (user.isAgent()) {
+				long agentId = Long.parseLong(request.getParameter("agentId"));
+				if (agentId == 0l) {
+					LOG.error("Invalid agentId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
+				}
+				
+				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+			}
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
+					CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching Average rating"), e.getMessage());
+		}
+
+		LOG.info("Method fetchAverageRating() finished from ProfileManagementController");
+		return averageRating + "";
 	}
 }
