@@ -131,6 +131,23 @@ public class PaymentController {
 			}
 			
 			LOG.info("Subscription Successful!");
+			//Now we update the stage after payment is done and before the setting up the account.
+			try {
+				/**
+				 * For each account type, only the company admin's profile completion stage is
+				 * updated, all the other profiles created by default need no action so their
+				 * profile completion stage is marked completed at the time of insert
+				 */
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			
 			try {
 				LOG.debug("Calling sevices for adding account type of company");
 				accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
