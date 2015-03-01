@@ -6,6 +6,7 @@ public class AgentSettings extends OrganizationUnitSettings {
 
 	private List<String> expertise;
 	private List<String> hobbies;
+	private String designation;
 
 	public List<String> getExpertise() {
 		return expertise;
@@ -21,6 +22,14 @@ public class AgentSettings extends OrganizationUnitSettings {
 
 	public void setHobbies(List<String> hobbies) {
 		this.hobbies = hobbies;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
 	}
 
 	@Override
