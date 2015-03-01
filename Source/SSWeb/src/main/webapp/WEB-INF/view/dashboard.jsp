@@ -3,8 +3,8 @@
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
     <div class="container">
         <div class="hm-header-row clearfix">
-            <div class="float-left hm-header-row-left">Dashboard</div>
-            <div class="float-right header-right clearfix">
+            <div class="float-left hm-header-row-left hr-dsh-adj-lft">Dashboard</div>
+            <div class="float-right header-right clearfix hr-dsh-adj-rt">
                 <div class="float-left hr-txt1">View As</div>
                 <div id="hr-txt2" class="float-left hr-txt2">Agent</div>
                 <div id="hr-dd-wrapper" class="hr-dd-wrapper hide">
@@ -23,26 +23,8 @@
         data-branchAdmin="${branchAdmin}" data-regionNames="${regionNames}" data-regionIds="${regionIds}" 
         data-branchNames="${branchNames}" data-branchIds="${branchIds}" data-agent="${agent}" data-accountType="${accountType}"
         class="dash-top-info">
-            <div class="row">
-                <div class="dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="dash-left-txt-wrapper">
-                        <div class="dsh-name-wrapper">
-                            <div id="name" class="dsh-txt-1">Anna Thomas</div>
-                            <div id="designation" class="dsh-txt-2">Managing Broker at</div>
-                            <div id="company-name" class="dsh-txt-3">Prudential Utah Elite Real Estate</div>
-                        </div>
-                        <div class="dsh-star-wrapper clearfix">
-                            <div class="float-left dsh-star-item sq-full-star"></div>
-                            <div class="float-left dsh-star-item sq-full-star"></div>
-                            <div class="float-left dsh-star-item sq-full-star"></div>
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div class="float-right dsh-rating-item">3/5</div>
-                        </div>
-                        <div class="dsh-btn-complete">Complete Your Profile</div>
-                    </div>
-                </div>
-                <div class="dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
+            <div class="row row-dash-top-adj">
+                <div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="dsh-graph-wrapper">
                         <div class="dsh-g-wrap dsh-g-wrap-1">
                             <div class="dsh-graph-item dsh-graph-item-1">
@@ -75,11 +57,29 @@
                         </div>
                     </div>
                 </div>
+                <div class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
+                    <div class="dash-left-txt-wrapper">
+                        <div class="dsh-name-wrapper">
+                            <div class="dsh-txt-1">Anna Thomas</div>
+                            <div class="dsh-txt-2">Managing Broker at</div>
+                            <div class="dsh-txt-3">Prudential Utah Elite Real Estate</div>
+                        </div>
+                        <div class="dsh-star-wrapper clearfix">
+                            <div class="float-left dsh-star-item sq-full-star"></div>
+                            <div class="float-left dsh-star-item sq-full-star"></div>
+                            <div class="float-left dsh-star-item sq-full-star"></div>
+                            <div class="float-left dsh-star-item no-star"></div>
+                            <div class="float-left dsh-star-item no-star"></div>
+                            <div class="float-right dsh-rating-item">3/5</div>
+                        </div>
+                        <div class="dsh-btn-complete">Complete Your Profile</div>
+                    </div>
+                </div>
             </div>
         </div>
         
         <div class="dash-stats-wrapper bord-bot-dc clearfix">
-            <div class="float-left stats-left">
+            <div class="float-left stats-left clearfix">
                 <div class="dash-sub-head">Survey Status</div>
                 <div id="region-div" class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Choose</div>
@@ -120,6 +120,11 @@
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div id="survey-sent" class="float-left stat-icn-txt-rt">1K</div>
                     </div>
                 </div>
@@ -133,8 +138,7 @@
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-blue"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-blue"></div>
+			            <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div id="survey-clicked" class="float-left stat-icn-txt-rt">70%</div>
                     </div>
                 </div>
@@ -147,13 +151,7 @@
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div id="survey-completed" class="float-left stat-icn-txt-rt">85%</div>
+                        <div id="survey-completed" class="float-left stat-icn-txt-rt">8.5%</div>
                     </div>
                 </div>
                 <div class="clearfix stat-icns-wrapper">
@@ -167,17 +165,27 @@
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-red"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-red"></div>
-                        <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div id="social-posts" class="float-left stat-icn-txt-rt">80%</div>
                     </div>
                 </div>
+<!--
+                <div class="clearfix stat-icns-wrapper">
+                    <div class="float-left stat-icn-lbl">No. of social posts</div>
+                    <div class="float-left stat-icns-item clearfix">
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                                <span class="sr-only">40% Complete (success)</span>
+                            </div>
+                        </div>
+                        <div class="float-left stat-icn-txt-rt">80%</div>
+                    </div>
+                </div>
+-->
             </div>
         </div>
         
         <div class="dash-stats-wrapper bord-bot-dc clearfix">
-            <div class="float-left stats-left">
+            <div class="float-left stats-left clearfix">
                 <div class="dash-sub-head">Utilization over time</div>
                 <div class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Choose</div>
@@ -198,11 +206,11 @@
                     </select>
                 </div>
             </div>
-            <div class="float-left stats-right">
+            <div class="float-left stats-right stats-right-adj">
                 <div class="util-graph-wrapper">
                     <div id="util-gph-item" class="util-gph-item">
                     </div>
-                    <div class="util-gph-legend">
+                    <div class="util-gph-legend clearfix">
                         <div class="util-gph-legend-item">No of surveys sent<span class="lgn-col-item lgn-col-grn"></span></div>
                         <div class="util-gph-legend-item">No of surveys clicked<span class="lgn-col-item lgn-col-blue"></span></div>
                         <div class="util-gph-legend-item">No of surveys completed<span class="lgn-col-item lgn-col-yel"></span></div>
@@ -238,9 +246,9 @@
                     </div>
                     <div class="dash-btn-sur-data">Incomplete Survery Data</div>
                 </div>
-                <div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                    <div class="people-say-wrapper rt-content-main">
-                        <div class="main-con-header clearfix">
+                <div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
+                    <div class="people-say-wrapper rt-content-main rt-content-main-adj">
+                        <div class="main-con-header clearfix pad-bot-10-resp">
                             <div class="float-left dash-ppl-say-lbl"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
                             <div class="float-right dash-btn-dl-sd">Download Survery Data</div>
                         </div>
@@ -379,8 +387,18 @@
             var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 
             chart.draw(data, options);
-            
+            console.log('draw chart mtd');
         }
+        
+        var oldConW = $('.container').width();
+        var newConW = $('.container').width();
+        $(window).resize(function(){
+            newConW = $('.container').width();
+            if(newConW != oldConW){
+                drawChart();
+                oldConW = $('.container').width();
+            }
+        });
         
     });
 </script>

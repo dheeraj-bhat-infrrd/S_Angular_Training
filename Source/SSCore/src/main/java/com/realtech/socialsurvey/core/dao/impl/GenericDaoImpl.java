@@ -14,6 +14,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -269,7 +270,7 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 			throw new DatabaseException("HibernateException caught in merge().", hibernateException);
 		}
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	@Transactional
@@ -305,22 +306,24 @@ public class GenericDaoImpl<T, ID extends Serializable> implements GenericDao<T,
 	@SuppressWarnings("unchecked")
 	@Override
 	public List<T> findProjectionsByKeyValue(Class<T> dataClass, List<String> columnNames, Map<String, Object> queries) {
+		Criteria crit = null;
 		try {
-			Criteria crit = getSession().createCriteria(dataClass);
+			crit = getSession().createCriteria(dataClass);
 			ProjectionList projections = Projections.projectionList();
 			for (String columnName : columnNames) {
-				projections.add(Projections.property(columnName));
+				projections.add(Projections.property(columnName).as(columnName));
 			}
 			crit.setProjection(projections);
+			System.out.println(projections.toString());
 			for (Entry<String, Object> query : queries.entrySet()) {
 				crit.add(Restrictions.eq(query.getKey(), query.getValue()));
 			}
-			return crit.list();
 		}
 		catch (HibernateException e) {
-			LOG.error("HibernateException caught in findProjectionsByKeyValue(). Reason: "+e.getMessage(), e);
+			LOG.error("HibernateException caught in findProjectionsByKeyValue(). Reason: " + e.getMessage(), e);
 			throw new DatabaseException("HibernateException caught in findProjectionsByKeyValue().", e);
 		}
+		return crit.setResultTransformer(Transformers.aliasToBean(dataClass)).list();
 	}
 }
 // JIRA: SS-8: By RM05: EOC

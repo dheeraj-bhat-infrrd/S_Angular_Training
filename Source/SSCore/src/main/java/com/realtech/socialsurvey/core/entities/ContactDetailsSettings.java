@@ -126,7 +126,7 @@ public class ContactDetailsSettings {
 	@Override
 	public String toString() {
 		return "ContactDetailsSettings [name=" + name + ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", country="
-				+ country + ", countryCode=" + countryCode + ", zipcode=" + zipcode + ", title=" + title + ", mail_ids=" + mail_ids
+				+ country + ", countryCode=" + countryCode + ", zipcode=" + zipcode + ", about_me=" + about_me + ", title=" + title + ", mail_ids=" + mail_ids
 				+ ", contact_numbers=" + contact_numbers + ", social_links=" + social_links + "]";
 	}
 

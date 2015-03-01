@@ -5,8 +5,8 @@ package com.realtech.socialsurvey.core.services.search;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import org.apache.solr.client.solrj.SolrServerException;
 import java.util.List;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Branch;
@@ -111,5 +111,6 @@ public interface SolrSearchService {
 	
 	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException;
 	
+	public void editUserInSolr(long userId, String key, String value) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
