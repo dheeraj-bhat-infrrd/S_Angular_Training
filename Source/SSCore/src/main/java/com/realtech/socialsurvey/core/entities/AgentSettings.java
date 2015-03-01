@@ -34,7 +34,7 @@ public class AgentSettings extends OrganizationUnitSettings {
 
 	@Override
 	public String toString() {
-		return super.toString() + "\t expertise: " + expertise.toString() + "\t hobbies: " + hobbies.toString();
+		return super.toString();
 	}
 
 }

@@ -15,6 +15,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * The persistent class for the region database table.
@@ -28,6 +29,7 @@ public class Region implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "REGION_ID")
+	@SerializedName("regionId")
 	private long regionId;
 
 	@Column(name = "CREATED_BY")
