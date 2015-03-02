@@ -21,11 +21,13 @@ import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
 import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
 import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
@@ -93,6 +95,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
+
+	@Autowired
+	private Utils utils;
 
 	@Resource
 	@Qualifier("user")
@@ -812,7 +817,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		long regionId = 0l;
 
 		/**
-		 * fetching region for the branch selected 
+		 * fetching region for the branch selected
 		 */
 		Branch branch = branchDao.findById(Branch.class, branchId);
 		regionId = branch.getRegion().getRegionId();
@@ -1740,25 +1745,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	}
 
-	/*
-	 * 
-	 */
-	/*
-	 * @Autowired public boolean isModifiableByCurrentUser(User admin, User user) throws
-	 * InvalidInputException {
-	 * LOG.info("Method isModifiableByCurrentUser() started to check if {} can modify {}",
-	 * admin.getFirstName(), user.getFirstName()); if(user==null || admin==null){ throw new
-	 * InvalidInputException("Null value found for user or admin in isModifiableByCurrentUser().");
-	 * } admin = userDao.findById(User.class, admin.getUserId()); user =
-	 * userDao.findById(User.class, user.getUserId()); for(UserProfile
-	 * adminProfile:admin.getUserProfiles()){ for(UserProfile userProfile:user.getUserProfiles()){
-	 * if(userProfile.getProfilesMaster().getp) } }
-	 * LOG.info("Method isModifiableByCurrentUser() finished to check if {} can modify {}",
-	 * admin.getFirstName(), user.getFirstName()); return false; }
-	 */
-
 	@Override
-	public void insertAgentSettings(User user) {
+	public void insertAgentSettings(User user) throws InvalidInputException {
 		LOG.info("Inserting agent settings. User id: " + user.getUserId());
 		AgentSettings agentSettings = new AgentSettings();
 		agentSettings.setIden(user.getUserId());
@@ -1772,17 +1760,52 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 
-		if (user.getLastName() != null)
+		if (user.getLastName() != null) {
 			contactSettings.setName(user.getFirstName() + " " + user.getLastName());
-		else
+		}
+		else {
 			contactSettings.setName(user.getFirstName());
+		}
 
 		contactSettings.setMail_ids(mail_ids);
-
 		agentSettings.setContact_details(contactSettings);
+
+		String profileName = generateIndividualProfileName(user.getUserId(), user.getEmailId());
+		agentSettings.setProfileName(profileName);
+		agentSettings.setProfileUrl(utils.generateAgentProfileUrl(profileName));
 
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
+	}
+
+	/**
+	 * Method to generate a unique profile name from emailid and userId of individual
+	 * 
+	 * @param userId
+	 * @param emailId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String generateIndividualProfileName(long userId, String emailId) throws InvalidInputException {
+		LOG.info("Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId);
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("emailId is null or empty while generating agent profile name");
+		}
+		String profileName = null;
+		profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+
+		LOG.debug("Checking uniqueness of profileName:" + profileName);
+		OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		/**
+		 * If a profile already exists for the profile name generated, append userId to make it
+		 * unique
+		 */
+		if (agentSettings != null) {
+			profileName = profileName + String.valueOf(userId);
+		}
+		LOG.info("Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName);
+		return profileName;
 	}
 
 	/**

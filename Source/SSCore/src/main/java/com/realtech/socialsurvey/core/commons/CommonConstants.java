@@ -319,6 +319,8 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE = 128;
 	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_PRECONDITION_FAILURE = 129;
 	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_FAILURE = 130;
+	public static final int ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE = 131;
+	public static final int ERROR_CODE_PRO_LIST_FETCH_FAILURE = 132;
 
 	/**
 	 * Service codes
@@ -343,6 +345,11 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_BRANCH_AVERAGE_RATINGS = 116;
 	public static final int SERVICE_CODE_BRANCH_REVIEWS = 117;
 	public static final int SERVICE_CODE_BRANCH_REVIEWS_COUNT = 118;
+	public static final int SERVICE_CODE_PRO_LIST_FETCH = 119;
+	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
+	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
+	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
+
 	/*
 	 * Mongo column and collection constants
 	 */
