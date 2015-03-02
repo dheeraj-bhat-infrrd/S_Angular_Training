@@ -590,7 +590,8 @@ public class ProfileController {
 				numRows = -1;
 			}
 			try {
-				List<SurveyDetails> reviews = profileManagementService.getReviewsForCompany(companyId, minScore, maxScore, start, numRows);
+				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, minScore, maxScore, start, numRows,
+						CommonConstants.PROFILE_LEVEL_COMPANY);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -605,6 +606,61 @@ public class ProfileController {
 		}
 
 		LOG.info("Service to fetch reviews of company completed successfully");
+		return response;
+	}
+
+	/**
+	 * Service to fetch reviews for a region
+	 * 
+	 * @param regionId
+	 * @param minScore
+	 * @param maxScore
+	 * @param start
+	 * @param numRows
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/region/{regionId}/reviews")
+	public Response getReviewsForRegion(@PathVariable long regionId, @QueryParam(value = "minScore") Double minScore,
+			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
+		LOG.info("Service to fetch reviews of region called for regionId:" + regionId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
+		Response response = null;
+		try {
+			if (regionId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_REVIEWS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_REVIEWS, "Region id for region is invalid"),
+						"region id is not valid while fetching all reviews for a region");
+			}
+			if (minScore == null) {
+				minScore = CommonConstants.MIN_RATING_SCORE;
+			}
+			if (maxScore == null) {
+				maxScore = CommonConstants.MAX_RATING_SCORE;
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+			try {
+				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, minScore, maxScore, start, numRows,
+						CommonConstants.PROFILE_LEVEL_REGION);
+				String json = new Gson().toJson(reviews);
+				LOG.debug("reviews json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_REVIEWS, "Something went wrong while fetching reviews for a region"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+
+		LOG.info("Service to fetch reviews of region completed successfully");
 		return response;
 	}
 
@@ -626,7 +682,7 @@ public class ProfileController {
 						"company id is not valid while fetching average ratings for a company");
 			}
 			try {
-				double averageRating = profileManagementService.getAverageRatingForCompany(companyId);
+				double averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY);
 				String json = new Gson().toJson(averageRating);
 				LOG.debug("averageRating json : " + json);
 				response = Response.ok(json).build();
@@ -654,14 +710,13 @@ public class ProfileController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/company/{companyId}/reviewcount")
-	public Response getReviewCount(@PathVariable long companyId, @QueryParam(value = "minScore") Double minScore,
+	public Response getReviewCountForCompany(@PathVariable long companyId, @QueryParam(value = "minScore") Double minScore,
 			@QueryParam(value = "maxScore") Double maxScore) {
 		LOG.info("Service to fetch the reviews count called for companyId :" + companyId + " ,minScore:" + minScore + " and maxScore:" + maxScore);
 		Response response = null;
 		try {
 			if (companyId <= 0l) {
-				throw new InputValidationException(new ProfileServiceErrorCode(
-						CommonConstants.ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE,
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE,
 						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS_COUNT, "Company id is invalid"),
 						"company id is not valid while fetching reviews count for a company");
 			}
@@ -671,11 +726,17 @@ public class ProfileController {
 			if (maxScore == null) {
 				maxScore = CommonConstants.MAX_RATING_SCORE;
 			}
-			long reviewsCount = profileManagementService.getReviewsCountForCompany(companyId, minScore, maxScore);
-			String json = new Gson().toJson(reviewsCount);
-			LOG.debug("reviews count json : " + json);
-			response = Response.ok(json).build();
-
+			long reviewsCount = 0;
+			try {
+				reviewsCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY);
+				String json = new Gson().toJson(reviewsCount);
+				LOG.debug("reviews count json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_REVIEWS_COUNT, "Error occured while getting reviews count"), e.getMessage());
+			}
 		}
 		catch (BaseRestException e) {
 			response = getErrorResponse(e);
@@ -683,6 +744,223 @@ public class ProfileController {
 		LOG.info("Service to fetch the reviews count executed successfully");
 		return response;
 
+	}
+
+	/**
+	 * Service to fetch average ratings for region
+	 * 
+	 * @param regionId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/region/{regionId}/ratings")
+	public Response getAverageRatingForRegion(@PathVariable long regionId) {
+		LOG.info("Service to get average rating of region called ");
+		Response response = null;
+		try {
+			if (regionId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_AVERAGE_RATINGS, "Region id for region is invalid"),
+						"region id is not valid while fetching average ratings for a region");
+			}
+			try {
+				double averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION);
+				String json = new Gson().toJson(averageRating);
+				LOG.debug("averageRating json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_AVERAGE_RATINGS, "Something went wrong while fetching average ratings for region"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get average rating of region executed successfully ");
+		return response;
+	}
+
+	/**
+	 * Service to fetch review count for a region
+	 * 
+	 * @param regionId
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/region/{regionId}/reviewcount")
+	public Response getReviewCountForRegion(@PathVariable long regionId, @QueryParam(value = "minScore") Double minScore,
+			@QueryParam(value = "maxScore") Double maxScore) {
+		LOG.info("Service to fetch the reviews count called for regionId :" + regionId + " ,minScore:" + minScore + " and maxScore:" + maxScore);
+		Response response = null;
+		try {
+			if (regionId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_REVIEWS_COUNT, "Region id is invalid"),
+						"region id is not valid while fetching reviews count for a region");
+			}
+			if (minScore == null) {
+				minScore = CommonConstants.MIN_RATING_SCORE;
+			}
+			if (maxScore == null) {
+				maxScore = CommonConstants.MAX_RATING_SCORE;
+			}
+			long reviewsCount = 0;
+			try {
+				reviewsCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION);
+				String json = new Gson().toJson(reviewsCount);
+				LOG.debug("reviews count json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_REVIEWS_COUNT, "Error occured while getting reviews count"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to fetch the reviews count executed successfully");
+		return response;
+	}
+
+	/**
+	 * Service to fetch average ratings for branch
+	 * 
+	 * @param branchId
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/branch/{branchId}/ratings")
+	public Response getAverageRatingForBranch(@PathVariable long branchId) {
+		LOG.info("Service to get average rating of branch called ");
+		Response response = null;
+		try {
+			if (branchId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_AVERAGE_RATINGS, "branch id for branch is invalid"),
+						"branch id is not valid while fetching average ratings for a branch");
+			}
+			try {
+				double averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
+				String json = new Gson().toJson(averageRating);
+				LOG.debug("averageRating json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_AVERAGE_RATINGS, "Something went wrong while fetching average ratings for region"),
+						e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get average rating of branch executed successfully ");
+		return response;
+	}
+
+	/**
+	 * Service to fetch review count for a branch
+	 * 
+	 * @param branchId
+	 * @param minScore
+	 * @param maxScore
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/branch/{branchId}/reviewcount")
+	public Response getReviewCountForBranch(@PathVariable long branchId, @QueryParam(value = "minScore") Double minScore,
+			@QueryParam(value = "maxScore") Double maxScore) {
+		LOG.info("Service to fetch the reviews count called for branchId :" + branchId + " ,minScore:" + minScore + " and maxScore:" + maxScore);
+		Response response = null;
+		try {
+			if (branchId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_REVIEWS_COUNT, "branch id is invalid"),
+						"branch id is not valid while fetching reviews count for a branch");
+			}
+			if (minScore == null) {
+				minScore = CommonConstants.MIN_RATING_SCORE;
+			}
+			if (maxScore == null) {
+				maxScore = CommonConstants.MAX_RATING_SCORE;
+			}
+			long reviewsCount = 0;
+			try {
+				reviewsCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
+				String json = new Gson().toJson(reviewsCount);
+				LOG.debug("reviews count json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_REVIEWS_COUNT, "Error occured while getting reviews count"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to fetch the reviews count of a branch executed successfully");
+		return response;
+	}
+	
+	/**
+	 * Service to fetch reviews for a branch
+	 * 
+	 * @param branchId
+	 * @param minScore
+	 * @param maxScore
+	 * @param start
+	 * @param numRows
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/branch/{branchId}/reviews")
+	public Response getReviewsForBranch(@PathVariable long branchId, @QueryParam(value = "minScore") Double minScore,
+			@QueryParam(value = "maxScore") Double maxScore, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
+		LOG.info("Service to fetch reviews of branch called for branchId:" + branchId + " ,minScore:" + minScore + " and maxscore:" + maxScore);
+		Response response = null;
+		try {
+			if (branchId <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_REVIEWS_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_REVIEWS, "branch id for branch is invalid"),
+						"branch id is not valid while fetching all reviews for a branch");
+			}
+			if (minScore == null) {
+				minScore = CommonConstants.MIN_RATING_SCORE;
+			}
+			if (maxScore == null) {
+				maxScore = CommonConstants.MAX_RATING_SCORE;
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+			try {
+				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, minScore, maxScore, start, numRows,
+						CommonConstants.PROFILE_LEVEL_BRANCH);
+				String json = new Gson().toJson(reviews);
+				LOG.debug("reviews json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_REVIEWS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_REVIEWS, "Something went wrong while fetching reviews for a branch"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+
+		LOG.info("Service to fetch reviews of branch completed successfully");
+		return response;
 	}
 
 	/**

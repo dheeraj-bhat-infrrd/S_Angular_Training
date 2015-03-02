@@ -19,7 +19,9 @@
 </head>
 <body>
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
-<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0"/>
+<input type="hidden" value="${regionProfileName}" id="region-profile-name">
+<input type="hidden" value="${branchProfileName}" id="branch-profile-name">
+<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0" profile-level="${profileLevel}"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
@@ -70,7 +72,7 @@
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
                 <div class="prof-name-container" id="prof-company-head-content">
-                    <!-- -->
+                    <!-- name comes here -->
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
@@ -88,28 +90,42 @@
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
-                            <!--  -->
+                            <!--contact info comes here  -->
                         </div>
                     </div>
                 </div>
                 <div class="prof-left-row prof-left-assoc bord-bot-dc">
                     <div class="left-assoc-wrapper">
-                        <div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-                        <!-- hidden fields to capture which region/branch is expanded -->
-                        <input type="hidden" id="regionid-hidden"/>
-                        <input type="hidden" id="branchid-hidden"/>
+                    	<c:choose>
+                    		<c:when test="${not empty branchProfileName}">
+                    			<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
+	                        	<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
+	                            	<!--branch hierarchy is displayed here  -->
+	                        	</div>
+                   		 	</c:when>
+                   		 	<c:when test="${not empty regionProfileName}">
+                   		 	<input type="hidden" id="branchid-hidden"/>
+                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
+	                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
+	                            	<!--region hierarchy is displayed here  -->
+	                        	</div>
+                   		 	</c:when>
+                   		 	<c:when test="${not empty companyProfileName}">
+                   		 		<input type="hidden" id="regionid-hidden"/>
+                   		 		<input type="hidden" id="branchid-hidden"/>
+                   		 		<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+	                        	<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+	                            	<!--company hierarchy is displayed here  -->
+	                        	</div>
+                   		 	</c:when>
+                    	</c:choose>
                         
-                        <div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-                            <!--Company hierarchy is displayed here  -->
-                        </div>
                     </div>
                 </div>
             </div>
             <div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
                 <div class="intro-wrapper rt-content-main bord-bot-dc" id="prof-company-intro">
-                    <!-- <div class="main-con-header">About Anna Thomas</div>
-                    <div class="intro-body">Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. </div>
-                	 -->
+                    <!-- about me comes here  -->
                 </div>
                 <div class="rt-content-main bord-bot-dc clearfix">
                     <div class="float-left panel-tweet-wrapper">
@@ -135,7 +151,7 @@
                     </div>
                 </div>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
-                    <div class="main-con-header" id="prof-reviews-header"><!-- <span class="ppl-say-txt-st">What people say</span> about Anna Thomas --></div>
+                    <div class="main-con-header" id="prof-reviews-header"></div>
                     <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here --> 
                     </div>
@@ -156,16 +172,31 @@
 </div>
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resourbranchIdces/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
-
+<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script>
     $(document).ready(function(){
         adjustImage();
-        fetchCompanyProfile();
+        /**
+        	If region profile name is mentioned, fetch the region profile 
+        	since this would be a call to fetch region profile page 
+        */
+        var regionProfileName = $("#region-profile-name").val();
+        var branchProfileName = $("#branch-profile-name").val();
+        if(regionProfileName.length > 0) {
+        	fetchRegionProfile(regionProfileName);
+        }
+        else if(branchProfileName.length > 0){
+        	fetchBranchProfile(branchProfileName);
+        }
+        else{
+        	fetchCompanyProfile();
+        }
+        
+       
         $(window).resize(adjustImage);
         
         $('.icn-person').click(function(){

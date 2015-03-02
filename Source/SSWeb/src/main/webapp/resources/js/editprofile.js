@@ -1,3 +1,9 @@
+// Varibles for processing
+var startIndex = 0;
+var numOfRows = 3;
+var minScore = 0;
+var attrName = null;
+var attrVal = null;
 var webAddressRegEx = /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
 var timer = 0;
 var delay = (function() {
@@ -43,7 +49,7 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 $(document).on('click', '.lp-edit-locks', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
-	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
+	// var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if ($(this).attr('data-control') == 'user') {
 		if($(this).hasClass('lp-edit-locks-locked')) {
@@ -67,7 +73,7 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 $(document).on('click', '.prof-img-lock-item', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
-	var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
+	// var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if ($(this).attr('data-control') == 'user') {
 		if($(this).hasClass('prof-img-lock-locked')) {
@@ -93,7 +99,6 @@ function updateLockSettings(id, state) {
 		return;
 	}
 	
-	console.log(id + state);
 	delay(function() {
 		var payload = {
 			"id" : id,
@@ -156,6 +161,10 @@ function callBackOnEditAdboutMeDetails(data) {
 		$('#intro-body-text').show();
 	}
 
+	if ($('#aboutme-status').val() == 'new') {
+		showMainContent('./showprofilepage.do');
+	}
+	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
@@ -260,31 +269,35 @@ $(document).on('click', '#prof-address-container', function() {
 function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
 	createPopupConfirm(header, data);
-}
-
-$(document).on('click', '#overlay-continue', function() {
-	var profName = $('#prof-name').val();
-	var profAddress1 = $('#prof-address1').val();
-	var profAddress2 = $('#prof-address2').val();
-	var country = $('#prof-country').val();
-	var zipCode = $('#prof-zipcode').val();
-	if (!profName || !profAddress1 || !country || !zipCode) {
-		return;
-	}
 	
-	delay(function() {
-		var payload = {
-			"profName" : profName,
-			"address1" : profAddress1,
-			"address2" : profAddress2,
-			"country" : country,
-			"zipCode" : zipCode
-		};
-		callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
-	}, 0);
+	$(document).on('click', '#overlay-continue', function() {
+		var profName = $('#prof-name').val();
+		var profAddress1 = $('#prof-address1').val();
+		var profAddress2 = $('#prof-address2').val();
+		var country = $('#prof-country').val();
+		var zipCode = $('#prof-zipcode').val();
+		if (!profName || !profAddress1 || !country || !zipCode) {
+			return;
+		}
+		
+		delay(function() {
+			var payload = {
+				"profName" : profName,
+				"address1" : profAddress1,
+				"address2" : profAddress2,
+				"country" : country,
+				"zipCode" : zipCode
+			};
+			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
+		}, 0);
 
-	$('#overlay-continue').unbind('click');
-});
+		$('#overlay-continue').unbind('click');
+	});
+
+	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
+	$('body').css('overflow','hidden');
+	$('body').scrollTop('0');
+}
 
 function callBackUpdateAddressDetails(data) {
 	$('#prof-message-header').html(data);
@@ -300,7 +313,6 @@ function callBackUpdateAddressDetails(data) {
 $('#overlay-cancel').click(function(){
 	$('#overlay-continue').unbind('click');
 	overlayRevert();
-	$('#othercategory').val('');
 });
 
 function createPopupConfirm(header, body) {
@@ -310,7 +322,6 @@ function createPopupConfirm(header, body) {
 	$('#overlay-cancel').html("Cancel");
 
 	$('#overlay-main').show();
-	$('#overlay-continue').unbind('click');
 }
 function overlayRevert() {
 	$('#overlay-main').hide();
@@ -321,6 +332,9 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
+
+	$('body').css('overflow','auto');
+	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
 }
 
 
@@ -328,6 +342,8 @@ function overlayRevert() {
 function callBackShowBasicDetails(response) {
 	$('#prof-basic-container').html(response);
 	adjustImage();
+	fetchAvgRating(attrName, attrVal);
+	fetchReviewCount(attrName, attrVal, minScore);
 }
 
 $(document).on('blur', '#prof-basic-container input', function() {
@@ -807,38 +823,170 @@ function initializeGoogleMap() {
 }
 
 
-// TODO Other Data
+// Data population for Admin
 function paintForProfile() {
 	var companyId = $('#prof-company-id').val();
 	var regionId = $('#prof-region-id').val();
 	var branchId = $('#prof-branch-id').val();
 	var agentId = $('#prof-agent-id').val();
-	minScore = $('#profile-min-post-score').val();
 	
 	if (companyId != undefined) {
-		currentProfileIden = companyId;
-		companyProfileName = $("#company-profile-name").val();
-
-		fetchAverageRatings(companyId);
-		fetchReviewsCountForCompany(companyId, paintAllReviewsCount);
-
-		fetchReviewsForCompany(companyId, startIndex, numOfRows, minScore);
-		$("#profile-fetch-info").attr("fetch-all-reviews", "false");
-		if(minScore > 0){
-			fetchReviewsCountForCompany(companyId, paintHiddenReviewsCount, minScore);
-		}
+		attrName = "companyId";
+		attrVal = companyId;
 		
-		fetchCompanyRegions();
-		fetchCompanyBranches();
-		fetchCompanyIndividuals();
+		fetchHierarchy("companyProfileName", $("#company-profile-name").val());
 	}
 	else if (regionId != undefined) {
-		
+		attrName = "regionId";
+		attrVal = regionId;
+
+		fetchHierarchy(attrName, attrVal);
 	}
 	else if (branchId != undefined) {
+		attrName = "branchId";
+		attrVal = branchId;
 		
+		fetchHierarchy(attrName, attrVal);
 	}
 	else if (agentId != undefined) {
+		attrName = "agentId";
+		attrVal = agentId;
+	}
+	
+	// Common call for all cases
+	fetchAvgRating(attrName, attrVal);
+	fetchReviewCount(attrName, attrVal, minScore);
+	fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows);
+}
+
+// Hierarchy data population
+function fetchHierarchy(attrName, attrValue) {
+	var url = "./getadminhierarchy.do?" + attrName + "=" + attrValue;
+	callAjaxGET(url, paintHierarchy, true);
+}
+
+function paintHierarchy(data) {
+	$("#prof-hierarchy-container").html(data);
+	
+	// Click on region
+	$(document).on('click', '.comp-region', function(){
+		if($(this).data("openstatus") == "closed") {
+			fetchRegionHierarchyOnClick($(this).data('regionid'));
+			$(this).data("openstatus", "open");
+		} else {
+			$('#comp-region-branches-' + $(this).data('regionid')).slideUp(200);
+			$(this).data("openstatus", "closed");
+		}
+	});
+	
+	// Click on branch
+	bindClickBranchForIndividuals("comp-region-branch");
+	bindClickBranchForIndividuals("comp-branch");
+	
+	// Individuals
+	paintProfImage("comp-individual-prof-image");
+}
+
+// region hierarchy on click
+function fetchRegionHierarchyOnClick(regionId) {
+	var url = "./getregionhierarchy.do?regionId=" + regionId;
+	callAjaxGET(url, function(data) {
+		$("#comp-region-branches-" + regionId).html(data).slideDown(200);
+		bindClickBranchForIndividuals("comp-region-branch");
+	}, true);
+}
+
+function bindClickBranchForIndividuals(bindingClass) {
+	$("." + bindingClass).click(function(e){
+		e.stopPropagation();
+		if($(this).data("openstatus") == "closed") {
+			fetchBranchHierarchyOnClick($(this).data('branchid'));
+			$(this).data("openstatus","open");
+		} else {
+			$('#comp-branch-individuals-' + $(this).data('branchid')).slideUp(200);
+			$(this).data("openstatus","closed");
+		}
+	});
+}
+
+// Branch hierarchy on click
+function fetchBranchHierarchyOnClick(branchId) {
+	var url = "./getbranchhierarchy.do?branchId=" + branchId;
+	callAjaxGET(url, function(data) {
+		$("#comp-branch-individuals-" + branchId).html(data).slideDown(200);
+		paintProfImage("comp-individual-prof-image");
+	}, true);
+}
+
+function paintProfImage(imgDivClass) {
+	$("." + imgDivClass).each(function(){
+		$(this).css("background", "url(" + $(this).data('imageurl') + ") no-repeat center");
+	});
+}
+
+// Fetch and paint Reviews
+$(window).scroll(function() {
+	var newIndex = startIndex + numOfRows;
+	var totalReviews = $("#prof-company-review-count").html();
+	totalReviews = totalReviews.substr(0, totalReviews.indexOf(' '));
+
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex <= totalReviews) {
+		fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
+		startIndex = newIndex;
+	}
+});
+
+function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
+	var url = "./fetchreviews.do?" + attrName + "=" + attrVal + "&minScore="
+			+ minScore + "&startIndex=" + startIndex + "&numOfRows=" + numOfRows;
+	callAjaxGET(url, function(data) {
+		$("#prof-review-item").append(data);
+		$(".review-ratings").each(function() {
+			changeRatingPattern($(this).data("rating"), $(this));
+		});
+		$('.icn-plus-open').click(function(){
+	        $(this).hide();
+	        $(this).parent().find('.ppl-share-social,.icn-remove').show();
+	    });
+	    
+	    $('.icn-remove').click(function(){
+	        $(this).hide();
+	        $(this).parent().find('.ppl-share-social').hide();
+	        $(this).parent().find('.icn-plus-open').show();
+	    });
+	}, true);
+}
+
+// fetch review count
+function fetchReviewCount(attrName, attrVal, minScore) {
+	var url = "./fetchreviewcount.do?" + attrName + "=" + attrVal
+			+ "&minScore=" + minScore;
+	callAjaxGET(url, paintReviewCount, true);
+}
+
+function paintReviewCount(reviewCount) {
+	if (reviewCount != undefined) {
+		if (reviewCount <= 1) {
+			reviewCount = reviewCount + ' Review';
+		} else {
+			reviewCount = reviewCount + ' Reviews';
+		}
 		
+		$("#prof-company-review-count").html(reviewCount);
+		$("#prof-company-review-count").click(function(){
+			$(window).scrollTop($('#reviews-container').offset().top);
+		});
+	}
+}
+
+// fetch avg rating
+function fetchAvgRating(attrName, attrVal) {
+	var url = "./fetchaveragerating.do?" + attrName + "=" + attrVal;
+	callAjaxGET(url, paintAvgRating, true);
+}
+
+function paintAvgRating(avgRating) {
+	if (avgRating != undefined) {
+		changeRatingPattern(avgRating, $("#rating-avg-comp"));
 	}
 }
