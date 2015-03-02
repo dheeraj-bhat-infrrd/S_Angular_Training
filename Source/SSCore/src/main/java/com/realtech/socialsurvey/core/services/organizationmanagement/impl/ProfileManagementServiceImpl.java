@@ -765,29 +765,59 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	/**
 	 * Method to get profile of an individual
+	 * 
+	 * @throws NoRecordsFetchedException
 	 */
 	@Override
-	public OrganizationUnitSettings getIndividualByProfileName(String companyProfileName, String agentProfileName) throws InvalidInputException {
-		LOG.info("Method getIndividualByProfileName called for companyProfileName:" + companyProfileName + " and agentProfileName:"
-				+ agentProfileName);
-		OrganizationUnitSettings agentSettings = null;
+	@Transactional
+	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getIndividualByProfileName called for agentProfileName:" + agentProfileName);
 
-		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			throw new InvalidInputException("company profile name is null or empty while getting agent settings");
-		}
+		OrganizationUnitSettings agentSettings = null;
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
 			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
 		}
+
 		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
 				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-		User user = userDao.findById(User.class, agentSettings.getIden());
-		List<UserProfile> userProfiles = user.getUserProfiles();
-
-		if (userProfiles != null && !userProfiles.isEmpty()) {
-			userProfiles.get(0);
+		if (agentSettings == null) {
+			throw new NoRecordsFetchedException("No settings found for agent while fetching agent profile");
 		}
-		// TODO fetch final agent settings based on the locks
 
+		User user = userDao.findById(User.class, agentSettings.getIden());
+
+		LOG.debug("Fetching user profiles for agentId: " + agentSettings.getIden());
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		UserProfile userProfile = null;
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			userProfile = userProfiles.get(0);
+		}
+		else {
+			throw new NoRecordsFetchedException("User profiles not found while fetching agent profile");
+		}
+
+		long companyId = userProfile.getCompany().getCompanyId();
+		LOG.debug("Fetching company settings for companyId: "+companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		long regionId = userProfile.getRegionId();
+		OrganizationUnitSettings regionSettings = null;
+		if (regionId > 0l) {
+			LOG.debug("Fetching region settings for regionId: " + regionId);
+			regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
+					MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		}
+
+		long branchId = userProfile.getBranchId();
+		OrganizationUnitSettings branchSettings = null;
+		if (branchId > 0l) {
+			LOG.debug("Fetching branch settings for regionId: " + branchId);
+			branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		}
+		
+		agentSettings = aggregateAgentProfile(companySettings, regionSettings, branchSettings, agentSettings);
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
 	}
@@ -940,9 +970,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		long reviewsCount = 0;
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
 		reviewsCount = surveyDetailsDao.getFeedBacksCount(idenColumnName, iden, minScore, maxScore);
-		
+
 		LOG.info("Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount);
 		return reviewsCount;
+	}
+
+	@Override
+	public String getProListByProfileLevel(long iden, String profileLevel) throws InvalidInputException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

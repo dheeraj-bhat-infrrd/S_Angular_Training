@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.lang.text.StrTokenizer;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -340,7 +341,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + usersResult);
 		return usersResult;
 	}
-	
+
 	@Override
 	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
 			MalformedURLException {
@@ -547,7 +548,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 		SolrQuery solrQuery = new SolrQuery();
-		solrQuery.setQuery(CommonConstants.USER_ID_SOLR +":"+ userId);
+		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + userId);
 		LOG.debug("Querying solr for searching users");
 		response = solrServer.query(solrQuery);
 		SolrDocumentList results = response.getResults();
@@ -555,11 +556,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("No record found in Solr for userid {}  in method getUserDisplayNameById()", userId);
 			throw new NoRecordsFetchedException("No record found in Solr for userid " + userId + " in method getUserDisplayNameById()");
 		}
-		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString(); 
+		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
 		return displayName;
 	}
-	
+
 	/**
 	 * Method to edit User in solr
 	 */
@@ -586,5 +587,42 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method to edit user in solr finished for user : " + userId);
+	}
+
+	@Override
+	public String searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+			MalformedURLException {
+		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex
+				+ " noOfrows:" + noOfRows);
+		if(iden <= 0l){
+			throw new InvalidInputException("iden is not set in searchUsersByIden");
+		}
+		if(idenFieldName == null || idenFieldName.isEmpty()) {
+			throw new InvalidInputException("idenFieldName is null or empty in searchUsersByIden");
+		}
+		
+		String usersResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			usersResult = JSONUtil.toJSON(results);
+			LOG.debug("User search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException in searchUsersByIden");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method searchUsersByIden finished for iden : " + iden);
+		return usersResult;
 	}
 }

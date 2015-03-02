@@ -57,8 +57,13 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +'	</div>';            
             $("#prof-company-head-content").html(headContentHtml);
             
-            var addressHtml = '<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
-            addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
+            var addressHtml ="";
+            if(contactDetails.address1 != undefined){
+            	addressHtml = addressHtml +'<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
+            }
+            if(contactDetails.address2 != undefined){
+            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
+            }
             if(contactDetails.country != undefined) {
             	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
             }
@@ -279,7 +284,7 @@ function paintIndividualForBranch(data) {
 				if(individual.contact_details != undefined){
 					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel">';
 					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-profilename="'+individual.profileName+'" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
 					individualsHtml=  individualsHtml+'		</div>';
 					individualsHtml=  individualsHtml+'</div>';
@@ -292,6 +297,13 @@ function paintIndividualForBranch(data) {
 				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
 			}
 			paintProfileImage("individual-prof-image");
+			
+			$(".individual-prof-image").click(function(e){
+				e.stopPropagation();
+				var agentProfileName = $(this).data("profilename");
+				var url = window.location.origin +"/individualprofile/"+agentProfileName+".do";
+				window.open(url, "_blank");				
+			});
 		}
 	}
 }
@@ -491,6 +503,11 @@ $(document).scroll(function(){
 		else if(profileLevel == 'REGION'){
 			fetchReviewsForRegion(currentProfileIden,startIndex,numOfRows,minScore);
 		}
+		else if(profileLevel == 'BRANCH') {
+			fetchReviewsForBranch(currentProfileIden, startIndex, numOfRows, minScore);
+		}else if(profileLevel == 'INDIVIDUAL'){
+			fetchReviewsForAgent(currentProfileIden,startIndex,numOfRows,minScore);
+		}
 		
 	}
 });
@@ -676,3 +693,116 @@ function fetchBranchProfileCallBack(data) {
 	}
 }
 
+function fetchAverageRatingsForAgent(agentId){
+	var url = window.location.origin+"/rest/profile/individual/"+agentId+"/ratings";
+	callAjaxGET(url, paintAverageRatings, true);
+}
+
+function fetchReviewsCountForAgent(agentId,callBackFunction,maxScore) {
+	var url = window.location.origin +'/rest/profile/individual/'+agentId+'/reviewcount';
+	if(maxScore != undefined) {
+		url = url +"?maxScore="+maxScore;
+	}
+	callAjaxGET(url, callBackFunction, true);
+}
+
+function fetchReviewsForAgent(agentId,start,numRows,minScore){
+	if(agentId == undefined || agentId == ""){
+		return;
+	}
+	var url = window.location.origin +"/rest/profile/individual/"+agentId+"/reviews?start="+start+"&numRows="+numRows;
+	if(minScore != undefined) {
+		url = url +"&minScore="+minScore;
+	}
+	callAjaxGET(url, fetchReviewsForAgentCallBack, false);
+}
+
+function fetchReviewsForAgentCallBack(data) {
+	var responseJson = $.parseJSON(data);
+	if(responseJson != undefined) {
+		var result = $.parseJSON(responseJson.entity);
+		if(result != undefined && result.length > 0) {
+			paintReviews(result);
+		}
+		else {
+			/**
+			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
+			 */
+			if(minScore > 0){
+				fetchReviewsCountForAgent(currentProfileIden,paintHiddenReviewsCount,minScore);
+			}		
+		}
+	}
+}
+
+function paintIndividualDetails(result){
+	var individualDetailsHtml = "";
+	if(result.associations != undefined && result.associations.length > 0){
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Association</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		$.each(result.associations,function(i,associations){
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+associations.name+'</div>';
+		});
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+	if(result.achievements != undefined && result.achievements.length > 0){
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Achievements</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		$.each(result.achievements,function(i,achievements){
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+achievements.achievement+'</div>';
+		});
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+	var licenses = result.licenses;
+	if(licenses != undefined){
+		if(licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
+			individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-auth bord-bot-dc">';
+			individualDetailsHtml = individualDetailsHtml + '	<div class="left-auth-wrapper">';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Authorised In</div>';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+			
+			$.each(licenses.authorized_in, function(i, authorizedIn) {
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-auth-row lp-row clearfix">'+authorizedIn+'</div>';
+			});
+			
+			individualDetailsHtml = individualDetailsHtml + '		</div>';
+			individualDetailsHtml = individualDetailsHtml + '	</div>';
+			individualDetailsHtml = individualDetailsHtml + '</div>';
+		}		
+	}
+	$("#individual-details").html(individualDetailsHtml);
+	$('.lph-dd').click(function(){
+        $(this).next('.lph-dd-content').slideToggle(200);
+    });	
+    
+            
+}
+
+function fetchAgentProfile(agentProfileName){
+	var url = window.location.origin+"/rest/profile/individual/"+agentProfileName;
+	callAjaxGET(url, fetchAgentProfileCallBack, true);
+}
+
+function fetchAgentProfileCallBack(data) {
+	var response= $.parseJSON(data);
+	if(response != undefined) {
+		var result = $.parseJSON(response.entity);
+		paintProfilePage(result);
+		paintIndividualDetails(result);
+		fetchAverageRatingsForAgent(result.iden);
+		if(result.survey_settings != undefined && result.survey_settings.show_survey_above_score != undefined) {
+			minScore = result.survey_settings.show_survey_above_score;
+		}
+		startIndex = 0;
+		fetchReviewsForAgent(result.iden,startIndex,numOfRows,minScore);
+		fetchReviewsCountForAgent(result.iden, paintAllReviewsCount);
+	}
+}

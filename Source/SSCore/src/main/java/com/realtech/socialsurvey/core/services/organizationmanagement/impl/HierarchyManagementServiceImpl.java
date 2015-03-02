@@ -467,8 +467,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("Branch name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		branchProfileName = branchName.replaceAll(" ", "-").toLowerCase();
-		LOG.debug("Checking if profileName:" + branchProfileName + " is already taken by a branch in the company :" + branch.getCompany());
+		branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getCompany().getCompanyId(),
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -476,6 +475,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			String companyProfileName = companySettings.getProfileName();
 			String branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 
+			LOG.debug("Checking if profileName:" + branchProfileName + " is already taken by a branch in the company :" + branch.getCompany());
 			/**
 			 * Uniqueness of profile name is checked by url since combination of company profile
 			 * name and branch profile name is unique
@@ -607,7 +607,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("Region name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		regionProfileName = regionName.replaceAll(" ", "-").toLowerCase();
+		regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
 		LOG.debug("Checking if profileName:" + regionProfileName + " is already taken by a region in the company :" + region.getCompany());
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getCompany().getCompanyId(),
