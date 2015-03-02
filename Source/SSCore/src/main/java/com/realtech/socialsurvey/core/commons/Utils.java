@@ -9,6 +9,7 @@ public class Utils {
 
 	private final String REGION_PROFILE_URL_PATTERN = "/%s/region/%s";
 	private final String BRANCH_PROFILE_URL_PATTERN = "/%s/branch/%s";
+	private final String AGENT_PROFILE_URL_PATTERN = "/individual/%s";
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
 	/**
@@ -41,6 +42,20 @@ public class Utils {
 		String profileUrl = null;
 		profileUrl = String.format(BRANCH_PROFILE_URL_PATTERN, companyProfileName, branchProfileName);
 		LOG.info("Method generateBranchProfileUrl excecuted. Returning profile url:" + profileUrl);
+		return profileUrl;
+	}
+
+	/**
+	 * Method to generate agent profile url
+	 * 
+	 * @param agentProfileName
+	 * @return
+	 */
+	public String generateAgentProfileUrl(String agentProfileName) {
+		LOG.info("Method generateAgentProfileUrl called for agentProfileName:" + agentProfileName);
+		String profileUrl = null;
+		profileUrl = String.format(AGENT_PROFILE_URL_PATTERN, agentProfileName);
+		LOG.info("Method generateAgentProfileUrl excecuted. Returning profile url:" + profileUrl);
 		return profileUrl;
 	}
 }
