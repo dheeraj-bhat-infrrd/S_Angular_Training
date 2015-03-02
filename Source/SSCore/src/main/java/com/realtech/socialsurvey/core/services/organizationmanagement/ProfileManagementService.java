@@ -210,12 +210,12 @@ public interface ProfileManagementService {
 	/**
 	 * Method to get profile of an individual
 	 * 
-	 * @param companyProfileName
 	 * @param profileName
 	 * @return
 	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
 	 */
-	public OrganizationUnitSettings getIndividualByProfileName(String companyProfileName, String profileName) throws InvalidInputException;
+	public OrganizationUnitSettings getIndividualByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to fetch reviews based on the profile level specified, iden is one of
@@ -264,8 +264,19 @@ public interface ProfileManagementService {
 	 * @param maxScore
 	 * @param profileLevel
 	 * @return
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel) throws InvalidInputException;
+
+	/**
+	 * Method to get the list of individuals for branch/region or company as specified ide in one of
+	 * branchId/regionId/companyId
+	 * 
+	 * @param iden
+	 * @param profileLevel
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public String getProListByProfileLevel(long iden, String profileLevel) throws InvalidInputException;
 
 }
