@@ -436,10 +436,13 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Adding new branch into mongo");
 		insertBranchSettings(branch);
+		
+		LOG.debug("Updating branch table with profile name");
+		branchDao.update(branch);
 
 		LOG.debug("Adding newly added branch to solr");
 		solrSearchService.addOrUpdateBranchToSolr(branch);
-
+		
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
@@ -490,6 +493,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(branchProfileName);
 			organizationSettings.setProfileUrl(branchProfileUrl);
+			/**
+			 * set profile name in branch for setting value in sql tables
+			 */
+			branch.setProfileName(branchProfileName);
 		}
 		else {
 			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
@@ -563,6 +570,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Calling method to insert region settings");
 		insertRegionSettings(region);
+		
+		regionDao.update(region);
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
@@ -624,6 +633,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(regionProfileName);
 			organizationSettings.setProfileUrl(regionProfileUrl);
+			
+			/**
+			 * Set the profile name in region object to update in sql later
+			 */
+			region.setProfileName(regionProfileName);
 		}
 		else {
 			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
