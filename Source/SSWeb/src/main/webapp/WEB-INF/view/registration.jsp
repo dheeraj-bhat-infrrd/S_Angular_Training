@@ -87,6 +87,7 @@
 					<div class="reg_btn" id="reg-submit"><spring:message code="label.submit.key" /></div>
 				</div>
 			</div>
+			<input type="hidden" value="${message}" name="message" id="message"/>
 			<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid"/>
 			<input type="hidden" value="${isDirectRegistration}" name="isDirectRegistration" id="isDirectRegistration"/>
 		</form>
@@ -98,23 +99,17 @@
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
-var isRegistrationFormValid;
 $(document).ready(function() {
-	isRegistrationFormValid=false;
-
-	function submitRegistrationForm() {
-		console.log("submitting registration form");
-		if(validateRegistrationForm('reg-form')){
-			$('#registration-form').submit();
-			showOverlay();
-		}
+	var isRegistrationFormValid = false;
+	
+	if ($('#message').val() != "") {
+		showError($('#message').val());
 	}
 	
 	$('#reg-submit').click(function(e) {
 		submitRegistrationForm();
 	});
 	
-	// detect enter
 	$('input').keypress(function(e){
     	if (e.which==13){
     		e.preventDefault();
@@ -122,33 +117,42 @@ $(document).ready(function() {
     	}
 	});
 
+	function submitRegistrationForm() {
+		console.log("submitting registration form");
+		if (validateRegistrationForm('reg-form')) {
+			$('#registration-form').submit();
+			showOverlay();
+		}
+	}
+	
+
 	// Functions to trigger form validation of various input elements
 	$('#reg-fname').blur(function() {
-		if(validateFirstName(this.id)) {
+		if (validateFirstName(this.id)) {
 			hideError();
 		}
 	});
 	
 	$('#reg-lname').blur(function() {
-		if(validateLastName(this.id)) {
+		if (validateLastName(this.id)) {
 			hideError();
 		}
 	});
 	
 	$('#reg-email').blur(function() {
-		if(validateEmailId(this.id)) {
+		if (validateEmailId(this.id)) {
 			hideError();
 		}
 	});
 	
 	$('#reg-pwd').blur(function() {
-		if(validatePassword(this.id)) {
+		if (validatePassword(this.id)) {
 			hideError();
 		}
 	});
 	
 	$('#reg-conf-pwd').blur(function(){
-		if(validateConfirmPassword('reg-pwd', this.id)) {
+		if (validateConfirmPassword('reg-pwd', this.id)) {
 			hideError();
 		}
 	});

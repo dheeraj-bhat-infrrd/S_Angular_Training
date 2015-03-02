@@ -233,8 +233,7 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				User user = userManagementService
-						.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
 				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
@@ -258,6 +257,7 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			List<VerticalsMaster> verticalsMasters = null;
 			try {
 				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
