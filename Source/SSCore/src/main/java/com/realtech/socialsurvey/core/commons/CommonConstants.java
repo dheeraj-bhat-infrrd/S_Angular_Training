@@ -79,8 +79,8 @@ public interface CommonConstants {
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
-	public static final int MAX_DEFAULT_REGIONS=1;
-	public static final int MAX_DEFAULT_BRANCHES=1;
+	public static final int MAX_DEFAULT_REGIONS = 1;
+	public static final int MAX_DEFAULT_BRANCHES = 1;
 	public static final double MIN_RATING_SCORE = 1;
 	public static final double MAX_RATING_SCORE = 5;
 
@@ -104,6 +104,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String REGION_ID_COLUMN = "regionId";
+	public static final String PROFILE_NAME_COLUMN = "profileName";
 	public static final String BRANCH_ID_COLUMN = "branchId";
 	public static final String BRANCH_NAME_COLUMN = "branch";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
@@ -164,7 +165,6 @@ public interface CommonConstants {
 	public static final String USER_PROFILE = "profile";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
-	
 
 	/**
 	 * Batch Constants
@@ -193,6 +193,10 @@ public interface CommonConstants {
 	public static final int PAYMENT_INCREMENT = 1;
 	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
+	public static final String PROFILE_LEVEL_COMPANY = "COMPANY";
+	public static final String PROFILE_LEVEL_REGION = "REGION";
+	public static final String PROFILE_LEVEL_BRANCH = "BRANCH";
+	public static final String PROFILE_LEVEL_INDIVIDUAL = "INDIVIDUAL";
 
 	/**
 	 * Logo related config
@@ -309,9 +313,13 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE = 122;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE = 123;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE = 124;
-	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_FAILURE = 125;
-	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
-	
+	public static final int ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE = 125;
+	public static final int ERROR_CODE_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
+	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_PRECONDITION_FAILURE = 127;
+	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE = 128;
+	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_PRECONDITION_FAILURE = 129;
+	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_FAILURE = 130;
+
 	/**
 	 * Service codes
 	 */
@@ -319,7 +327,7 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_PROFILE = 101;
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
-	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;	
+	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
 	public static final int SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS = 105;
 	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
 	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
@@ -329,11 +337,16 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_REVIEWS = 111;
 	public static final int SERVICE_CODE_COMPANY_AVERAGE_RATINGS = 112;
 	public static final int SERVICE_CODE_COMPANY_REVIEWS_COUNT = 113;
-	
+	public static final int SERVICE_CODE_REGION_AVERAGE_RATINGS = 114;
+	public static final int SERVICE_CODE_REGION_REVIEWS = 115;
+	public static final int SERVICE_CODE_REGION_REVIEWS_COUNT = 115;
+	public static final int SERVICE_CODE_BRANCH_AVERAGE_RATINGS = 116;
+	public static final int SERVICE_CODE_BRANCH_REVIEWS = 117;
+	public static final int SERVICE_CODE_BRANCH_REVIEWS_COUNT = 118;
 	/*
 	 * Mongo column and collection constants
 	 */
 	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
-	
+
 }
