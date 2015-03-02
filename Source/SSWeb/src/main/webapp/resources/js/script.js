@@ -415,33 +415,37 @@ function validateConfirmPassword(pwdId, confirmPwdId){
 
 //Function to validate company name
 function validateCompany(elementId){
-	if($(window).width()<768){
+	if($(window).width()<768) {
 		if ($('#'+elementId).val() != "") {
 			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
 				return true;
-			}else {
-				$('#overlay-toast').html('Please enter a valid company name.');
-				showToast();
+			} else {
+				// $('#overlay-toast').html('Please enter a valid company name.');
+				// showToast();
+				showError('Please enter a valid company name');
 				return false;
 			}
-		}else{
-			$('#overlay-toast').html('Please enter company name.');
-			showToast();
+		} else {
+			// $('#overlay-toast').html('Please enter company name.');
+			// showToast();
+			showError('Please enter company name');
 			return false;
 		}
-	}else{
+	} else {
     	if ($('#'+elementId).val() != "") {
 			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.login-reg-err').hide();
+				// $('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
-			}else {
-				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid company name.');
-				$('#'+elementId).parent().next('.login-reg-err').show();
+			} else {
+				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid company name.');
+				// $('#'+elementId).parent().next('.login-reg-err').show();
+				showError('Please enter a valid company name');
 				return false;
 			}
-		}else{
-			$('#'+elementId).parent().next('.login-reg-err').html('Please enter company name.');
-			$('#'+elementId).parent().next('.login-reg-err').show();
+		} else {
+			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter company name.');
+			// $('#'+elementId).parent().next('.login-reg-err').show();
+			showError('Please enter company name');
 			return false;
 		}
 	}
@@ -483,33 +487,37 @@ function validateZipcode(elementId){
 
 //Function to validate the phone number
 function validatePhoneNumber(elementId) {
-	if($(window).width()<768){
+	if ($(window).width()<768) {
 		if ($('#'+elementId).val() != "") {
 			if (phoneRegex.test($('#'+elementId).val()) == true) {
 				return true;
-			}else {
-				$('#overlay-toast').html('Please enter a valid phone number.');
-				showToast();
+			} else {
+				// $('#overlay-toast').html('Please enter a valid phone number.');
+				// showToast();
+				showError('Please enter a valid phone number');
 				return false;
 			}
-		}else{
-			$('#overlay-toast').html('Please enter phone number.');
-			showToast();
+		} else {
+			// $('#overlay-toast').html('Please enter phone number.');
+			// showToast();
+			showError('Please enter phone number');
 			return false;
 		}
-	}else{
+	} else {
     	if ($('#'+elementId).val() != "") {
 			if (phoneRegex.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).parent().next('.login-reg-err').hide();
+				// $('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
-			}else {
-				$('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid phone number.');
-				$('#'+elementId).parent().next('.login-reg-err').show();
+			} else {
+				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid phone number.');
+				// $('#'+elementId).parent().next('.login-reg-err').show();
+				showError('Please enter a valid phone number');
 				return false;
 			}
-		}else{
-			$('#'+elementId).parent().next('.login-reg-err').html('Please enter phone number.');
-			$('#'+elementId).parent().next('.login-reg-err').show();
+		} else {
+			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter phone number.');
+			// $('#'+elementId).parent().next('.login-reg-err').show();
+			showError('Please enter phone number');
 			return false;
 		}
 	}
@@ -517,21 +525,23 @@ function validatePhoneNumber(elementId) {
 
 //Function to validate Address 1
 function validateAddress1(elementId){
-	if($(window).width()<768){
+	if ($(window).width()<768) {
 		if ($('#'+elementId).val() != "") {
 				return true;
-		}else{
-			$('#overlay-toast').html('Please enter address.');
-			showToast();
+		} else {
+			// $('#overlay-toast').html('Please enter address.');
+			// showToast();
+			showError('Please enter address');
 			return false;
 		}
-	}else{
+	} else {
     	if ($('#'+elementId).val() != "") {
-				$('#'+elementId).parent().next('.login-reg-err').hide();
-				return true;
-		}else{
-			$('#'+elementId).parent().next('.login-reg-err').html('Please enter address.');
-			$('#'+elementId).parent().next('.login-reg-err').show();
+			// $('#'+elementId).parent().next('.login-reg-err').hide();
+			return true;
+		} else {
+			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter address.');
+			// $('#'+elementId).parent().next('.login-reg-err').show();
+			showError('Please enter address');
 			return false;
 		}
 	}
