@@ -2306,6 +2306,28 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_PAGE;
 	}
 	
+	/**
+	 * Method to return agent profile page
+	 * @param agentProfileName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/individualprofile/{agentProfileName}")
+	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model) {
+		LOG.info("Service to initiate agent profile page called");
+		String message = null;
+		if (agentProfileName == null || agentProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("agentProfileName", agentProfileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+		LOG.info("Service to initiate agent profile page executed successfully");
+		return JspResolver.PROFILE_PAGE;
+	}
+	
 	// TODO
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {

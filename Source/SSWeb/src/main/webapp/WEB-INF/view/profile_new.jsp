@@ -21,6 +21,7 @@
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" value="${branchProfileName}" id="branch-profile-name">
+<input type="hidden" value="${agentProfileName}" id="agent-profile-name">
 <input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0" profile-level="${profileLevel}"/>
 <div class="hdr-wrapper">
     <div class="container hdr-container clearfix">
@@ -94,34 +95,49 @@
                         </div>
                     </div>
                 </div>
-                <div class="prof-left-row prof-left-assoc bord-bot-dc">
-                    <div class="left-assoc-wrapper">
-                    	<c:choose>
-                    		<c:when test="${not empty branchProfileName}">
-                    			<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
-	                        	<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
-	                            	<!--branch hierarchy is displayed here  -->
-	                        	</div>
-                   		 	</c:when>
-                   		 	<c:when test="${not empty regionProfileName}">
-                   		 	<input type="hidden" id="branchid-hidden"/>
-                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
-	                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
-	                            	<!--region hierarchy is displayed here  -->
-	                        	</div>
-                   		 	</c:when>
-                   		 	<c:when test="${not empty companyProfileName}">
-                   		 		<input type="hidden" id="regionid-hidden"/>
-                   		 		<input type="hidden" id="branchid-hidden"/>
-                   		 		<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-	                        	<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-	                            	<!--company hierarchy is displayed here  -->
-	                        	</div>
-                   		 	</c:when>
-                    	</c:choose>
+                
+                 	<c:choose>
+                   		<c:when test="${not empty branchProfileName}">
+                   			<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                   				<div class="left-assoc-wrapper">
+                   					<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
+                        			<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
+                            			<!--branch hierarchy is displayed here  -->
+                        			</div>
+                        		</div>
+              					</div>
+                  		 	</c:when>
+                  		 	<c:when test="${not empty regionProfileName}">
+                   		 	<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                   				<div class="left-assoc-wrapper">
+		                   		 	<input type="hidden" id="branchid-hidden"/>
+		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
+			                        	<div class="left-panel-content left-panel-content-adj" id="region-branches">
+			                            	<!--region hierarchy is displayed here  -->
+			                        	</div>
+			                    </div>
+			               </div>
+                  		 	</c:when>
+                  		 	<c:when test="${not empty agentProfileName}">
+                  		 		<div id="individual-details">
+                  		 			<!-- individual details like associations/hobbies/achievements come here -->
+                  		 		</div>
+                  		 	</c:when>
+                  		 	<c:when test="${not empty companyProfileName}">
+                  		 		<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                  					<div class="left-assoc-wrapper">
+	                   		 			<input type="hidden" id="regionid-hidden"/>
+	                   		 			<input type="hidden" id="branchid-hidden"/>
+	                   		 			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
+		                        		<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
+		                            		<!--company hierarchy is displayed here  -->
+		                        		</div>
+	                        		</div>
+		               			</div>
+                  		 	</c:when>
+              		</c:choose>
                         
-                    </div>
-                </div>
+                    
             </div>
             <div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
                 <div class="intro-wrapper rt-content-main bord-bot-dc" id="prof-company-intro">
@@ -186,12 +202,15 @@
         */
         var regionProfileName = $("#region-profile-name").val();
         var branchProfileName = $("#branch-profile-name").val();
+        var agentProfileName = $("#agent-profile-name").val();
         if(regionProfileName.length > 0) {
         	fetchRegionProfile(regionProfileName);
         }
         else if(branchProfileName.length > 0){
         	fetchBranchProfile(branchProfileName);
-        }
+        }else if(agentProfileName.length > 0){
+        	fetchAgentProfile(agentProfileName);
+        } 
         else{
         	fetchCompanyProfile();
         }
