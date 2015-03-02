@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.springframework.stereotype.Component;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
@@ -15,6 +16,7 @@ import kafka.javaapi.consumer.ConsumerConnector;
  * High level consumer for Kafka topics
  *
  */
+@Component
 public class KafkaConsumerGroup {
 
 	private final ConsumerConnector consumerConnector;

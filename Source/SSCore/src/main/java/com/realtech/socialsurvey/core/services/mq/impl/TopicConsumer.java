@@ -9,7 +9,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mq.InvalidMessageFormatException;
 
 /**
- * Consumes from a Kaafka topic
+ * Consumes from a Kafka topic
  *
  */
 public class TopicConsumer implements Runnable {
@@ -23,26 +23,36 @@ public class TopicConsumer implements Runnable {
 	
 	private KafkaStream<byte[], byte[]> stream;
 	
+	public TopicConsumer(){}
+	
 	public TopicConsumer(KafkaStream<byte[], byte[]> stream){
+		this.stream = stream;
+	}
+	
+	public void setStream(KafkaStream<byte[], byte[]> stream){
 		this.stream = stream;
 	}
 
 	@Override
 	public void run() {
 		// iterate the stream
-		ConsumerIterator<byte[], byte[]> itrConsumer = stream.iterator();
-		String message = null;
-		while(itrConsumer.hasNext()){
-			message = new String(itrConsumer.next().message());
-			LOG.info("Consuming message:");
-			LOG.info(message);
-			try{
-				String header = fetchHeader(message);
-				message = message.substring(HEADER_MARKER.length()+header.length()+2); // 2 is for $$
-				delegateProcess(header, message);
-			}catch(NonFatalException nfe){
-				LOG.error("Could not process message: "+message, nfe);
+		if(stream != null){
+			ConsumerIterator<byte[], byte[]> itrConsumer = stream.iterator();
+			String message = null;
+			while(itrConsumer.hasNext()){
+				message = new String(itrConsumer.next().message());
+				LOG.info("Consuming message:");
+				LOG.info(message);
+				try{
+					String header = fetchHeader(message);
+					message = message.substring(HEADER_MARKER.length()+header.length()+2); // 2 is for $$
+					delegateProcess(header, message);
+				}catch(NonFatalException nfe){
+					LOG.error("Could not process message: "+message, nfe);
+				}
 			}
+		}else{
+			LOG.warn("No stream provided for the topic");
 		}
 
 	}
