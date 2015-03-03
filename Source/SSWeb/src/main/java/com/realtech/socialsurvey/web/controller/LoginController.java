@@ -440,6 +440,9 @@ public class LoginController {
 			case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
 				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
 				break;
+			case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
+				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE; 
+				break;
 			case CommonConstants.DASHBOARD_STAGE:
 				redirectTo = JspResolver.LANDING;
 				break;
