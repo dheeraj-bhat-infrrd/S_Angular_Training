@@ -744,7 +744,6 @@ public class UserManagementController {
 	 */
 	@RequestMapping(value = "/showcompleteregistrationpage", method = RequestMethod.GET)
 	public String showCompleteRegistrationPage(@RequestParam("q") String encryptedUrlParams, Model model) {
-
 		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
 		try {
@@ -780,6 +779,7 @@ public class UserManagementController {
 	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
 	public String completeRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method completeRegistration() to complete registration of user started.");
+		User user = null;
 		
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
@@ -790,7 +790,6 @@ public class UserManagementController {
 			String encryptedUrlParameters = request.getParameter("q");
 			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
-			User user = null;
 
 			// form parameters validation
 			if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
@@ -813,17 +812,16 @@ public class UserManagementController {
 				LOG.error("Company Id passed was null or empty");
 				throw new InvalidInputException("Company Id passed was null or empty", DisplayMessageConstants.INVALID_COMPANY_NAME);
 			}
-
 			if (confirmPassword == null || confirmPassword.isEmpty()) {
 				LOG.error("Confirm password passed was null or empty");
 				throw new InvalidInputException("Confirm password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
 			}
-
 			// check if password and confirm password field match
 			if (!password.equals(confirmPassword)) {
 				LOG.error("Password and confirm password fields do not match");
 				throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 			}
+			
 			// Decrypting URL parameters
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
@@ -838,6 +836,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
+			
 			long companyId = 0;
 			try {
 				companyId = Long.parseLong(companyIdStr);
@@ -860,6 +859,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
+			
 			try {
 				// change user's password
 				authenticationService.changePassword(user, password);
@@ -868,6 +868,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
 
@@ -889,6 +890,7 @@ public class UserManagementController {
 			else {
 				LOG.debug("License details not found for the user's company");
 			}
+			
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 
 				// get the user's canonical settings
