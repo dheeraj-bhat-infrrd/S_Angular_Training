@@ -28,7 +28,6 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
-import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
@@ -1100,7 +1099,7 @@ public class ProfileController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/users/{iden}")
+	@RequestMapping(value = "/individuals/{iden}")
 	public Response getProListByProfile(@PathVariable long iden, @QueryParam(value = "profileLevel") String profileLevel,
 			@QueryParam(value = "start") Integer start, @QueryParam(value = "numOfRows") Integer numRows) {
 		Response response = null;
@@ -1123,6 +1122,8 @@ public class ProfileController {
 			}
 			try {
 				String json = profileManagementService.getProListByProfileLevel(iden, profileLevel, start, numRows);
+				LOG.debug("Pro list json : " + json);
+				response = Response.ok(json).build();
 				
 			}
 			catch(SolrException e){
@@ -1139,8 +1140,7 @@ public class ProfileController {
 		}
 
 		LOG.info("Method getProListByProfile called for iden:" + iden + " and profileLevel:" + profileLevel);
-
-		return null;
+		return response;
 
 	}
 
