@@ -19,6 +19,7 @@ public class TopicConsumer implements Runnable {
 	private static final String HEADER_MARKER = "HEADER^^";
 	private static final String RECIPIENT_MARKER = "RECIPIENT^^";
 	private static final String URL_MARKER = "URL^^";
+	private static final String NAME_MARKER = "NAME^^";
 	private static final String ELEMENTS_DELIMITER = "$$";
 	
 	private KafkaStream<byte[], byte[]> stream;
@@ -73,6 +74,8 @@ public class TopicConsumer implements Runnable {
 		// delegate the mail according to the header
 		if(header.equals(EmailHeader.REGISTRATION.getName())){
 			parseRegistrationMailMessage(message);
+		}else if(header.equals(EmailHeader.VERFICATION.getName())){
+			parseVerificationMail(message);
 		}
 	}
 	
@@ -88,6 +91,21 @@ public class TopicConsumer implements Runnable {
 		messageParsedIndex+=URL_MARKER.length()+url.length()+ELEMENTS_DELIMITER.length();
 		
 		
+	}
+	
+	private void parseVerificationMail(String message) throws InvalidMessageFormatException{
+		if(message.indexOf(RECIPIENT_MARKER) == -1 || message.indexOf(URL_MARKER) == -1 || message.indexOf(NAME_MARKER) == -1){
+			throw new InvalidMessageFormatException("Invalid format for verification mail");
+		}
+		String recipient = message.substring(RECIPIENT_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER));
+		LOG.debug("Recipient: "+recipient);
+		int messageParsedIndex = RECIPIENT_MARKER.length()+recipient.length()+ELEMENTS_DELIMITER.length(); // holds the index till the message has been parsed.
+		String url = message.substring(messageParsedIndex+URL_MARKER.length(), message.indexOf(ELEMENTS_DELIMITER, messageParsedIndex));
+		LOG.debug("Url: "+url);
+		messageParsedIndex+=URL_MARKER.length()+url.length()+ELEMENTS_DELIMITER.length();
+		String name = message.substring(messageParsedIndex+NAME_MARKER.length());
+		LOG.debug("Name: "+name);
+		//TODO: Send to the email services
 	}
 
 }
