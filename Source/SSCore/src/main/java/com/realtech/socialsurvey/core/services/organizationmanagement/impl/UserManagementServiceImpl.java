@@ -1026,7 +1026,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
-			emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName());
+			emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " " + (user.getLastName()!=null?user.getLastName():""));
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
