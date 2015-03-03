@@ -56,6 +56,7 @@ public interface CommonConstants {
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
+	public static final String PRE_PROCESSING_BEFORE_LOGIN_STAGE = "defaultbrandandregioncreation.do";
 	public static final String START_SURVEY = "rest/survey/start";
 
 	/**
