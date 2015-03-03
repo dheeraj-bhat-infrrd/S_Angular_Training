@@ -129,7 +129,7 @@ function paintProfilePage(result) {
             $("#prof-contact-information").html(contactInfoHtml);
             $("#read-write-share-btn").click(function(e){
             	e.stopPropagation();
-            	findProList(result.iden);
+            	findProList(result.iden,result.contact_details.name);
             	
             });
 		}         
@@ -812,7 +812,7 @@ function fetchAgentProfileCallBack(data) {
 	}
 }
 
-function findProList(iden){
+function findProList(iden,searchcritrianame){
 	if(iden == undefined || iden == ""){
 		return;
 	}
@@ -821,7 +821,7 @@ function findProList(iden){
 	if(profileLevel == 'INDIVIDUAL'){
 		initSurveyReview(iden);
 	}else {
-		 url = window.location.origin +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden;
+		 url = window.location.origin +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden+"&searchCriteria="+searchcritrianame;
 		 window.open(url, "_blank");
 	}
 	

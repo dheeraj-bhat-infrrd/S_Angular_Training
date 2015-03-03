@@ -2234,8 +2234,8 @@ public class ProfileManagementController {
 	 */
 	@RequestMapping("/initfindapro")
 	public String initProListByProfileLevelPage(Model model, @QueryParam(value = "profileLevel") String profileLevel,
-			@QueryParam(value = "iden") Long iden) {
-		LOG.info("Method initProListByProfileLevelPage called for profileLevel:" + profileLevel + " and iden:" + iden);
+			@QueryParam(value = "iden") Long iden,@QueryParam(value="searchCriteria") String searchCriteria) {
+		LOG.info("Method initProListByProfileLevelPage called for profileLevel:" + profileLevel + " and iden:" + iden+" and searchCriteria:"+searchCriteria);
 		DisplayMessage message = null;
 		try {
 			if (profileLevel == null || profileLevel.isEmpty()) {
@@ -2247,6 +2247,7 @@ public class ProfileManagementController {
 			}
 			model.addAttribute("profileLevel", profileLevel);
 			model.addAttribute("iden", iden);
+			model.addAttribute("searchCriteria", searchCriteria);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException in initProListByProfileLevelPage.Reason:" + e.getMessage(), e);
