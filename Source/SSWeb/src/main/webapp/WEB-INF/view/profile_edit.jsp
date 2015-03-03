@@ -44,19 +44,18 @@
 			</c:when>
 			<c:when test="${user.regionAdmin}">
 				<input type="hidden" id="prof-region-id" value="${profile.iden}">
-				<input type="hidden" id="prof-region-name" value="${profile.profileName}">
+				<%-- <input type="hidden" id="prof-region-name" value="${profile.profileName}"> --%>
 			</c:when>
 			<c:when test="${user.branchAdmin}">
 				<input type="hidden" id="prof-branch-id" value="${profile.iden}">
-				<input type="hidden" id="prof-branch-name" value="${profile.profileName}">
+				<%-- <input type="hidden" id="prof-branch-name" value="${profile.profileName}"> --%>
 			</c:when>
 			<c:when test="${user.agent}">
 				<input type="hidden" id="prof-agent-id" value="${profile.iden}">
-				<input type="hidden" id="prof-agent-name" value="${profile.profileName}">
+				<%-- <input type="hidden" id="prof-agent-name" value="${profile.profileName}"> --%>
 			</c:when>
 		</c:choose>
 		<input type="hidden" id="profile-min-post-score" value="${profile.survey_settings.show_survey_above_score}"/>
-		<input type="hidden" id="profile-fetch-info" fetch-all-reviews="false" total-reviews="0"/>
 	</div>
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
@@ -72,10 +71,6 @@
 	</div>
 </div>
 
-<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
-<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
-
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
 	<div class="container">
@@ -84,10 +79,10 @@
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
 						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center; background-size: cover;"></div>
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
@@ -134,13 +129,14 @@
 						<div class="prof-addline1 prof-edditable">${profile.vertical}</div>
 						
 						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
-						<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
+						<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 					</div>
-					<div class="prof-rating clearfix">
+					
+					<div id="prof-rating-review-count" class="prof-rating clearfix">
 						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-full-star"></div>
-							<div class="rating-star icn-half-star"></div>
+							<div class="rating-star icn-no-star"></div>
+							<div class="rating-star icn-no-star"></div>
+							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 						</div>
@@ -152,7 +148,7 @@
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) center; 50% 50% no-repeat; background-size: cover;"></div>
 							<c:choose>
 								<c:when	test="${parentLock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
@@ -187,7 +183,7 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center;"></div>
+							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
 							<form class="form_contact_image" enctype="multipart/form-data">
 								<input type="file" id="prof-logo" class="con_img_inp_file">
 							</form>
@@ -198,10 +194,10 @@
 				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer">
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
 					<c:if test="${not empty contactdetail.address}">
-						<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.address}</div>
+						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.address}</div>
 					</c:if>
 					<c:if test="${not empty contactdetail.country && not empty contactdetail.zipcode}">
-						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
+						<div class="prof-user-addline3 prof-edditable prof-addr-center" >${contactdetail.country}, ${contactdetail.zipcode}</div>
 					</c:if>
 				</div>
 			</div>
@@ -209,7 +205,7 @@
 
 		<div class="row">
 			<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
-				<div class="prof-left-row prof-left-info bord-bot-dc">
+				<div class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
 					<div class="left-contact-wrapper">
 						<div class="clearfix">
 							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key" /></div>
@@ -402,28 +398,14 @@
 				</div>
 				
 				<div id="prof-hierarchy-container">
-					<c:choose>
-						<c:when	test="${user.companyAdmin}">
-							<div class="prof-left-row prof-left-assoc bord-bot-dc">
-                    			<div class="left-assoc-wrapper">
-                        			<div class="left-panel-header"><spring:message code="label.ourcompany.key"/></div>
-                        			<!-- hidden fields to capture which region/branch is expanded -->
-                        			<input type="hidden" id="regionid-hidden"/>
-                        			<input type="hidden" id="branchid-hidden"/>
-                        			<div class="left-panel-content left-panel-content-adj" id="comp-regions-content">
-                            			<!--Company hierarchy is displayed here  -->
-                        			</div>
-                    			</div>
-                			</div>
-						</c:when>
-					</c:choose>
+					<!-- Hierarchy is displayed here  -->
 				</div>
 				
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
 				
-				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc">
+				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
 					<div class="main-con-header main-con-header-adj clearfix">
 						<div class="float-left">
 							<spring:message code="label.about.key" /> ${contactdetail.name}
@@ -467,7 +449,7 @@
                 	<div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.sspost.key"/></div>
                         <textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
-                        <input type="button" class="float-right" value="Post">
+						<div class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
                     </div>
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
@@ -493,12 +475,11 @@
                 </div>
 
 				<div id="reviews-container" class="people-say-wrapper rt-content-main">
-                    <div class="main-con-header" id="prof-reviews-header"></div>
+					<div class="main-con-header">
+						<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
+					</div>
                     <div id="prof-review-item" class="prof-reviews">
 	                	<!--  reviews get populated here --> 
-                    </div>
-                    <div id="prof-hidden-review-count" class="prof-hidden-review-link">
-	                   	<!--  count of hidden reviews get populated here --> 
                     </div>
                	</div>
 			</div>
@@ -513,8 +494,11 @@
 	<div class="float-left mob-icn inc-more"></div>
 </div>
 
+<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
+
+<script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Profile Settings");

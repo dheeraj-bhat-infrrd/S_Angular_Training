@@ -976,6 +976,9 @@
     }
     .dash-main-right{
         height: 350px;
+        float: none !important;
+        margin: 0 auto;
+        width: 300px;
     }
     .dash-main-left{
         height: 310px;
@@ -1032,6 +1035,13 @@
     }
     .rfr_icn{
         display: block;
+    }
+    .acc-type-container{
+        width: 100%;
+        padding: 0 5px;
+    }
+    .acc-type-item{
+        margin-right: 0;
     }
 }
 
