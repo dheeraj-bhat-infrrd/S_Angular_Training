@@ -885,7 +885,7 @@ public class OrganizationManagementController {
 			}
 			
 			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
-			HttpSession session = request.getSession();
+			HttpSession session = request.getSession(false);
 			AccountType accountType = null;
 			
 			if( currentLicenseDetail == null ){
