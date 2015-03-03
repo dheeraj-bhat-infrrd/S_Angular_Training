@@ -3,7 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <div id="payment-section" class="payment-section">
-<div class="ol-header" ><spring:message code="label.upgrade.confirmation.header" /></div>
+	<div class="ol-header" ><spring:message code="label.upgrade.confirmation.header" /></div>
 	<div class="ol-content">
 		<div class="ol-txt"><spring:message code="label.upgrade.confirmation.content" /></div>
 		<div class="ol-txt"><spring:message code="label.upgrade.balance.header" />${balanceAmount}</div>
