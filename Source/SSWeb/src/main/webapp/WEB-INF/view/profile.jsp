@@ -228,8 +228,6 @@
     <div class="float-left mob-icn inc-more"></div>
 </div>
 
-<jsp:include page="scripts.jsp"/>
-
 <script>
     $(document).ready(function(){
         adjustImage();

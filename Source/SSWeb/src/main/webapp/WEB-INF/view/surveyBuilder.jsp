@@ -202,6 +202,7 @@
 		</div>
 	</div>
 </div>
+<script src="${pageContext.request.contextPath}/resources/js/surveyBuilder.js"></script>
 <script>
 $(document).ready(function(){
 	$(document).attr("title", "Build Survey");
