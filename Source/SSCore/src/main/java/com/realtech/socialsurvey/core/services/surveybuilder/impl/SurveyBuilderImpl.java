@@ -735,21 +735,33 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		LOG.info("Adding default survey to company for user id : " + user.getUserId());
 		
-		//We fetch the vertical for the particular company from company settings
-		LOG.debug("Feting the company settings");
-		
 		//Next we get the default survey for a particular vertical
 		LOG.debug("Fetching the default survey");
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
 		queries.put(CommonConstants.VERTICAL_COLUMN, user.getCompany().getVerticalsMaster());
-		Survey defaultSurvey = surveyDao.findByKeyValue(Survey.class, queries).get(CommonConstants.INITIAL_INDEX);
 		
-		//Now we add the survey to the company
-		LOG.debug("Adding aurvey to company");
-		addSurveyToCompany(user, defaultSurvey, user.getCompany());
+		List<Survey> defaultSurveys = new ArrayList<>();
+		Survey defaultSurvey = null;
+		defaultSurveys = surveyDao.findByKeyValue(Survey.class, queries);
 		
-		LOG.info("Default survey added to the company");		
+		//Check if default survey exists
+		if(defaultSurveys != null && defaultSurveys.size() >= CommonConstants.MINIMUM_SIZE_OF_ARRAY){
+			defaultSurvey = defaultSurveys.get(CommonConstants.INITIAL_INDEX);
+		}
+		
+		//If default survey exists we map it to the company. Otherwise we dont.
+		if(defaultSurvey != null){
+			//Now we add the survey to the company
+			LOG.debug("Adding aurvey to company");
+			addSurveyToCompany(user, defaultSurvey, user.getCompany());
+			LOG.info("Default survey added to the company");		
+		}
+		else{
+			LOG.info("Default survey not found, so no default survey has been mapped to the company");		
+		}
+		
+		LOG.info("addDefaultSurveyToCompany completed!");		
 	}
 	
 	/**
