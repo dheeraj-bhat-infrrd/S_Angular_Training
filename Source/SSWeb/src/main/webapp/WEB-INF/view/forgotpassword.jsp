@@ -97,7 +97,9 @@ $(document).ready(function() {
 	});
 
 	$('#login-user-id').blur(function() {
-		validateEmailId(this.id);
+		if (validateEmailId(this.id)) {
+			hideError();
+		}
 	});
 
 	function validateForgotPasswordForm(id) {
