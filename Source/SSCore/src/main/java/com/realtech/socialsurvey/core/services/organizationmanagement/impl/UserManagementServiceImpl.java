@@ -2,7 +2,9 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
@@ -15,21 +17,30 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
+import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LinkedInToken;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
+import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -71,7 +82,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private EncryptionHelper encryptionHelper;
-	
+
 	@Autowired
 	private SolrSearchService solrSearchService;
 
@@ -84,6 +95,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
+
+	@Autowired
+	private Utils utils;
 
 	@Resource
 	@Qualifier("user")
@@ -110,6 +124,21 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+
+	@Value("${LINKED_IN_API_KEY}")
+	private String linkedInApiKey;
+
+	@Value("${LINKED_IN_API_SECRET}")
+	private String linkedInApiSecret;
+
+	@Value("${LINKED_IN_OAUTH_TOKEN}")
+	private String linkedInOauthToken;
+
+	@Value("${LINKED_IN_OAUTH_SECRET}")
+	private String linkedInOauthSecret;
+
+	@Value("${LINKED_IN_REDIRECT_URI}")
+	private String linkedinRedirectUri;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -275,7 +304,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * 
 	 * @param encryptedUrlParams
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException, SolrException {
@@ -359,7 +388,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		User user = createUser(admin.getCompany(), null, emailId, firstName, lastName, CommonConstants.STATUS_INACTIVE,
 				CommonConstants.STATUS_NOT_VERIFIED, String.valueOf(admin.getUserId()));
 		user = userDao.save(user);
-		
+
 		LOG.info("Method to add a new user, inviteNewUser() finished for email id : " + emailId);
 		return user;
 	}
@@ -382,8 +411,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		User userToBeDeactivated = userDao.findById(User.class, userIdToRemove);
 
-		userToBeDeactivated.setLoginName(userToBeDeactivated.getLoginName()+"_"+System.currentTimeMillis());
-		
+		userToBeDeactivated.setLoginName(userToBeDeactivated.getLoginName() + "_" + System.currentTimeMillis());
+
 		userToBeDeactivated.setStatus(CommonConstants.STATUS_INACTIVE);
 		userToBeDeactivated.setModifiedBy(String.valueOf(admin.getUserId()));
 		userToBeDeactivated.setModifiedOn(new Timestamp(System.currentTimeMillis()));
@@ -420,11 +449,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("Email id is null or empty in getUsersByEmailId()");
 		}
 		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.LOGIN_NAME,loginName);
+		queries.put(CommonConstants.LOGIN_NAME, loginName);
 		queries.put(CommonConstants.COMPANY, admin.getCompany());
 		List<User> users = userDao.findByKeyValue(User.class, queries);
-		if(users == null || users.isEmpty()){
-			throw new NoRecordsFetchedException("No users found with the login name : {}",loginName);
+		if (users == null || users.isEmpty()) {
+			throw new NoRecordsFetchedException("No users found with the login name : {}", loginName);
 		}
 		LOG.info("Method to fetch list of users on the basis of email id is finished.");
 		return users.get(CommonConstants.INITIAL_INDEX);
@@ -744,7 +773,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	/**
 	 * Method to update a user's status
-	 * @throws SolrException 
+	 * 
+	 * @throws SolrException
 	 */
 	@Override
 	@Transactional
@@ -759,7 +789,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		userDao.update(user);
 
-		//Updating status of user into Solr.
+		// Updating status of user into Solr.
 		solrSearchService.addUserToSolr(user);
 		LOG.info("Successfully completed method to update user status");
 	}
@@ -780,18 +810,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (user == null) {
 			throw new InvalidInputException("No user present for the specified userId");
 		}
-		//Checking if admin can assign a user to the given branch.
-		if(!isAssigningAllowed(branchId, admin)){
+		// Checking if admin can assign a user to the given branch.
+		if (!isAssigningAllowed(branchId, admin)) {
 			throw new InvalidInputException("Not authorized to assign user to branch " + branchId);
 		}
+		long regionId = 0l;
+
+		/**
+		 * fetching region for the branch selected
+		 */
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		regionId = branch.getRegion().getRegionId();
+
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_COLUMN, user);
 		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.REGION_ID_COLUMN, regionId);
+
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 		UserProfile userProfile;
 		if (userProfiles == null || userProfiles.isEmpty()) {
 			// Create a new entry in UserProfile to map user to the branch.
-			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), userId, branchId, CommonConstants.DEFAULT_REGION_ID,
+			userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), userId, branchId, regionId,
 					CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_INACTIVE,
 					String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
 		}
@@ -941,7 +981,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.debug("Method setProfilesOfUser() to set properties of a user based upon active profiles available for the user finished.");
 	}
-	
+
 	/*
 	 * Method to fetch all the user profiles for the user
 	 */
@@ -1405,88 +1445,146 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	/*
 	 * Method to check if current user is authorized to assign a user to the given branch.
 	 */
-	private boolean isAssigningAllowed(long branchId, User admin){
+	private boolean isAssigningAllowed(long branchId, User admin) {
 		LOG.debug("Method isAssigningAllowed() started to check if current user is authorized to assign a user to the given branch");
 		Branch branch = branchDao.findById(Branch.class, branchId);
-		if(admin.isCompanyAdmin())
+		if (admin.isCompanyAdmin())
 			return true;
-		for(UserProfile adminProfile:admin.getUserProfiles()){
-			if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin() && branch.getRegion().getRegionId()==adminProfile.getRegionId())
+		for (UserProfile adminProfile : admin.getUserProfiles()) {
+			if (adminProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin()
+					&& branch.getRegion().getRegionId() == adminProfile.getRegionId())
 				return true;
-			else if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID && admin.isBranchAdmin() && branch.getBranchId()==adminProfile.getBranchId())
+			else if (adminProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID
+					&& admin.isBranchAdmin() && branch.getBranchId() == adminProfile.getBranchId())
 				return true;
 		}
 		LOG.debug("Method isAssigningAllowed() finsihed.");
 		return false;
 	}
-	
-	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException{
-		
-		LOG.debug("Fetching the default region for company");
-		if(company == null){
-			LOG.error("fetchDefaultRegion : Company parameter is null");
-			throw new InvalidInputException("fetchDefaultRegion : Company parameter is null");			
+
+	/**
+	 * Adds the LinkedIn access tokens to the agent's settings in mongo
+	 * 
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret, Collection<AgentSettings> agentSettings)
+			throws InvalidInputException, NoRecordsFetchedException {
+		if (user == null) {
+			LOG.error("setLinkedInAccessTokenForUser : user parameter is null!");
+			throw new InvalidInputException("setLinkedInAccessTokenForUser : user parameter is null!");
 		}
-		
+		if (accessToken == null || accessToken.isEmpty()) {
+			LOG.error("setLinkedInAccessTokenForUser : accessToken parameter is null!");
+			throw new InvalidInputException("setLinkedInAccessTokenForUser : accessToken parameter is null!");
+		}
+
+		LOG.info("Adding the LinkedIn access tokens to agent settings in mongo for user id : " + user.getUserId());
+
+		Iterator<AgentSettings> settingsIterator = agentSettings.iterator();
+
+		while (settingsIterator.hasNext()) {
+
+			AgentSettings agentSetting = settingsIterator.next();
+			LOG.debug("Setting the access token for settings with id : " + agentSetting.getId());
+			SocialMediaTokens mediaTokens = agentSetting.getSocialMediaTokens();
+			// Check if media tokens exist. If not, create them.
+			if (mediaTokens == null) {
+				LOG.debug("Updating the existing media tokens for LinkedIn");
+				mediaTokens = new SocialMediaTokens();
+				mediaTokens.setLinkedInToken(new LinkedInToken());
+				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
+			}
+			else {
+				LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+				if (mediaTokens.getLinkedInToken() == null) {
+					mediaTokens.setLinkedInToken(new LinkedInToken());
+				}
+				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
+				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
+			}
+			LOG.debug("Updating the mongo collection with new LinkedIn access tokens for settings with id : " + agentSetting.getId());
+			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens,
+					agentSetting, CommonConstants.AGENT_SETTINGS_COLLECTION);
+		}
+
+		LOG.info("Agent settings successfully updated with LinkedIn access token");
+	}
+
+	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException {
+
+		LOG.debug("Fetching the default region for company");
+		if (company == null) {
+			LOG.error("fetchDefaultRegion : Company parameter is null");
+			throw new InvalidInputException("fetchDefaultRegion : Company parameter is null");
+		}
+
 		Region defaultRegion = null;
-		
+
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_ACTIVE);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
+
 		LOG.debug("Making database call to fetch default region");
 		List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
-		
-		if( regions==null || regions.size() != CommonConstants.MAX_DEFAULT_REGIONS ){
+
+		if (regions == null || regions.size() != CommonConstants.MAX_DEFAULT_REGIONS) {
 			LOG.error("No default regions found for company with id : " + company.getCompanyId());
 			throw new NoRecordsFetchedException("No default regions found for company with id : " + company.getCompanyId());
-		}		
-		
+		}
+
 		LOG.debug("Default region exists.");
 		defaultRegion = regions.get(CommonConstants.INITIAL_INDEX);
-		
+
 		LOG.debug("Returning default region with id : " + defaultRegion.getRegionId());
 		return defaultRegion;
 	}
-	
-	private Branch fetchDefaultBranch(Region region,Company company) throws InvalidInputException, NoRecordsFetchedException{
-		
+
+	private Branch fetchDefaultBranch(Region region, Company company) throws InvalidInputException, NoRecordsFetchedException {
+
 		LOG.debug("Fetching the default branch for region");
-		if(region == null){
+		if (region == null) {
 			LOG.error("fetchDefaultBranch : Region parameter is null");
-			throw new InvalidInputException("fetchDefaultBranch : Region parameter is null");			
+			throw new InvalidInputException("fetchDefaultBranch : Region parameter is null");
 		}
-		if(company == null){
+		if (company == null) {
 			LOG.error("fetchDefaultBranch : Company parameter is null");
-			throw new InvalidInputException("fetchDefaultBranch : Company parameter is null");			
+			throw new InvalidInputException("fetchDefaultBranch : Company parameter is null");
 		}
-		
+
 		Branch defaultBranch = null;
-		
+
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.STATUS_ACTIVE);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
-		
+
 		LOG.debug("Making database call to fetch default branch");
 		List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
-		
-		if( branches==null || branches.size() != CommonConstants.MAX_DEFAULT_BRANCHES ){
+
+		if (branches == null || branches.size() != CommonConstants.MAX_DEFAULT_BRANCHES) {
 			LOG.error("No default branches found for region with id : " + region.getRegionId());
 			throw new NoRecordsFetchedException("No default branches found for region with id : " + region.getRegionId());
-		}		
-		
+		}
+
 		LOG.debug("Default branch exists.");
 		defaultBranch = branches.get(CommonConstants.INITIAL_INDEX);
-		
+
 		LOG.debug("Returning default branch with id : " + defaultBranch.getBranchId());
 		return defaultBranch;
 	}
-	
+
 	/**
 	 * Assign a user directly under the company.
+	 * 
 	 * @param admin
 	 * @param userId
 	 * @throws InvalidInputException
@@ -1506,30 +1604,31 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			LOG.error("No records fetched for user with id : " + userId);
 			throw new NoRecordsFetchedException("No records fetched for user with id : " + userId);
 		}
-		//Checking if admin can assign a user to the given branch.
-		if(!admin.isCompanyAdmin()){
+		// Checking if admin can assign a user to the given branch.
+		if (!admin.isCompanyAdmin()) {
 			LOG.error("User : " + admin.getUserId() + " is not authorized to assign users to company " + admin.getCompany().getCompanyId());
-			throw new InvalidInputException("User : " + admin.getUserId() + " is not authorized to assign users to company " + admin.getCompany().getCompanyId());
+			throw new InvalidInputException("User : " + admin.getUserId() + " is not authorized to assign users to company "
+					+ admin.getCompany().getCompanyId());
 		}
-		
-		//Fetch the default region for company
+
+		// Fetch the default region for company
 		LOG.debug("Fetching default region for company with id :" + admin.getCompany().getCompanyId());
 		Region defaultRegion = fetchDefaultRegion(admin.getCompany());
-		
-		//Fetch the default branch for the region
+
+		// Fetch the default branch for the region
 		LOG.debug("Fetching default branch for region with id : " + defaultRegion.getRegionId());
-		Branch defaultBranch = fetchDefaultBranch(defaultRegion, admin.getCompany());		
-		
+		Branch defaultBranch = fetchDefaultBranch(defaultRegion, admin.getCompany());
+
 		UserProfile userProfile;
 		// Create a new entry in UserProfile to map user to the branch.
 		LOG.debug("Updating the User Profile table");
 		userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, defaultBranch.getBranchId(),
-					defaultRegion.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
-					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
-		
+				defaultRegion.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
+				CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+
 		userProfileDao.saveOrUpdate(userProfile);
 		LOG.debug("UserProfile table updated");
-		
+
 		if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
 			LOG.debug("Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName());
 			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
@@ -1538,49 +1637,52 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		setProfilesOfUser(user);
 		LOG.debug("Adding user to solr");
 		solrSearchService.addUserToSolr(user);
-		LOG.info("Method to assign user to a company finished for user : " + admin.getUserId());		
+		LOG.info("Method to assign user to a company finished for user : " + admin.getUserId());
 	}
-	
+
 	/**
 	 * Checks if a user can add users to a particular region
+	 * 
 	 * @param admin
 	 * @param regionId
 	 * @return
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
-	private boolean canAddUsersToRegion(User admin, long regionId) throws InvalidInputException{
-		
+	private boolean canAddUsersToRegion(User admin, long regionId) throws InvalidInputException {
+
 		LOG.debug("Method canAddUsersToRegion() called to check if current user is authorized to assign a user to the given region");
 
 		if (admin == null) {
 			LOG.error("canAddUsersToRegion : admin parameter is null");
 			throw new InvalidInputException("canAddUsersToRegion : admin parameter is null");
 		}
-		if(regionId <= 0 ){
+		if (regionId <= 0) {
 			LOG.error("canAddUsersToRegion : regionId parameter is null");
 			throw new InvalidInputException("canAddUsersToRegion : regionId parameter is null");
 		}
-		
+
 		LOG.debug("Fetching the region from the database for region id : " + regionId);
 		Region region = regionDao.findById(Region.class, regionId);
-		if(admin.isCompanyAdmin()){
+		if (admin.isCompanyAdmin()) {
 			LOG.debug("User is a corporate admin. returning true");
 			return true;
 		}
 		LOG.debug("Checking the user profiles to see if he is a region admin");
-		for(UserProfile adminProfile:admin.getUserProfiles()){
-			if(adminProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin() && region.getRegionId()==adminProfile.getRegionId()){
+		for (UserProfile adminProfile : admin.getUserProfiles()) {
+			if (adminProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID && admin.isRegionAdmin()
+					&& region.getRegionId() == adminProfile.getRegionId()) {
 				LOG.debug("User is region admin. Returning true");
-				return true;			
+				return true;
 			}
 		}
 		LOG.debug("User not allowed to add users to region with id : " + regionId);
 		return false;
-		
+
 	}
-	
+
 	/**
-	 * Assign a user directly to a region 
+	 * Assign a user directly to a region
+	 * 
 	 * @param admin
 	 * @param userId
 	 * @param regionId
@@ -1590,7 +1692,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 */
 	@Override
 	public void assignUserToRegion(User admin, long userId, long regionId) throws InvalidInputException, NoRecordsFetchedException, SolrException {
-		
+
 		if (admin == null) {
 			LOG.error("assignUserToRegion : admin parameter is null");
 			throw new InvalidInputException("assignUserToRegion : admin parameter is null");
@@ -1602,38 +1704,38 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			LOG.error("No records fetched for user with id : " + userId);
 			throw new NoRecordsFetchedException("No records fetched for user with id : " + userId);
 		}
-		if(regionId <= 0 ){
+		if (regionId <= 0) {
 			LOG.error("assignUserToRegion : regionId parameter is null");
 			throw new InvalidInputException("assignUserToRegion : regionId parameter is null");
 		}
-		//Checking if admin can assign a user to the given region.
-		if(!canAddUsersToRegion(admin,regionId)){
+		// Checking if admin can assign a user to the given region.
+		if (!canAddUsersToRegion(admin, regionId)) {
 			LOG.error("User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId);
 			throw new InvalidInputException("User : " + admin.getUserId() + " is not authorized to assign users to region " + regionId);
 		}
-		
-		//Get the region from the database
+
+		// Get the region from the database
 		LOG.debug("Fetching the region from the database for region id : " + regionId);
 		Region region = regionDao.findById(Region.class, regionId);
 		if (region == null) {
 			LOG.error("No records fetched for region with id : " + regionId);
 			throw new NoRecordsFetchedException("No records fetched for region with id : " + regionId);
 		}
-		
-		//Fetch the default branch for the region
+
+		// Fetch the default branch for the region
 		LOG.debug("Fetching the default branch for region with id : " + regionId);
 		Branch defaultBranch = fetchDefaultBranch(region, admin.getCompany());
-		
+
 		UserProfile userProfile;
 		// Create a new entry in UserProfile to map user to the branch.
 		LOG.debug("Updating the User Profile table");
 		userProfile = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID, defaultBranch.getBranchId(),
-					region.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
-					CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
-		
+				region.getRegionId(), CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID, CommonConstants.DASHBOARD_STAGE,
+				CommonConstants.STATUS_INACTIVE, String.valueOf(admin.getUserId()), String.valueOf(admin.getUserId()));
+
 		userProfileDao.saveOrUpdate(userProfile);
 		LOG.debug("UserProfile table updated");
-		
+
 		if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
 			LOG.debug("Updating isAtleastOneProfileComplete as 1 for user : " + user.getFirstName());
 			user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
@@ -1643,26 +1745,83 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Adding user to solr");
 		solrSearchService.addUserToSolr(user);
 		LOG.info("Method to assign user to a company finished for user : " + admin.getUserId());
-		
+
 	}
 
-	/*
+	@Override
+	public void insertAgentSettings(User user) throws InvalidInputException {
+		LOG.info("Inserting agent settings. User id: " + user.getUserId());
+		AgentSettings agentSettings = new AgentSettings();
+		agentSettings.setIden(user.getUserId());
+		agentSettings.setCreatedBy(user.getCreatedBy());
+		agentSettings.setCreatedOn(System.currentTimeMillis());
+		agentSettings.setModifiedBy(user.getModifiedBy());
+		agentSettings.setModifiedOn(System.currentTimeMillis());
+
+		MailIdSettings mail_ids = new MailIdSettings();
+		mail_ids.setWork(user.getEmailId());
+
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+
+		if (user.getLastName() != null) {
+			contactSettings.setName(user.getFirstName() + " " + user.getLastName());
+		}
+		else {
+			contactSettings.setName(user.getFirstName());
+		}
+
+		contactSettings.setMail_ids(mail_ids);
+		agentSettings.setContact_details(contactSettings);
+
+		String profileName = generateIndividualProfileName(user.getUserId(), user.getEmailId());
+		agentSettings.setProfileName(profileName);
+		agentSettings.setProfileUrl(utils.generateAgentProfileUrl(profileName));
+
+		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
+		LOG.info("Inserted into agent settings");
+	}
+
+	/**
+	 * Method to generate a unique profile name from emailid and userId of individual
 	 * 
+	 * @param userId
+	 * @param emailId
+	 * @return
+	 * @throws InvalidInputException
 	 */
-	/*@Autowired
-	public boolean isModifiableByCurrentUser(User admin, User user) throws InvalidInputException {
-		LOG.info("Method isModifiableByCurrentUser() started to check if {} can modify {}", admin.getFirstName(), user.getFirstName());
-		if(user==null || admin==null){
-			throw new InvalidInputException("Null value found for user or admin in isModifiableByCurrentUser().");
+	private String generateIndividualProfileName(long userId, String emailId) throws InvalidInputException {
+		LOG.info("Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId);
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("emailId is null or empty while generating agent profile name");
 		}
-		admin = userDao.findById(User.class, admin.getUserId());
-		user = userDao.findById(User.class, user.getUserId());
-		for(UserProfile adminProfile:admin.getUserProfiles()){
-			for(UserProfile userProfile:user.getUserProfiles()){
-				if(userProfile.getProfilesMaster().getp)
-			}
+		String profileName = null;
+		profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+
+		LOG.debug("Checking uniqueness of profileName:" + profileName);
+		OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		/**
+		 * If a profile already exists for the profile name generated, append userId to make it
+		 * unique
+		 */
+		if (agentSettings != null) {
+			profileName = profileName + String.valueOf(userId);
 		}
-		LOG.info("Method isModifiableByCurrentUser() finished to check if {} can modify {}", admin.getFirstName(), user.getFirstName());
-		return false;
-	}*/
+		LOG.info("Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName);
+		return profileName;
+	}
+
+	/**
+	 * Returns the LinkedIn request token for a particular URL
+	 * 
+	 * @return
+	 */
+	@Override
+	public LinkedInRequestToken getLinkedInRequestToken() {
+		LinkedInOAuthService oauthService;
+		oauthService = LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey, linkedInApiSecret);
+		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken(linkedinRedirectUri);
+		return requestToken;
+	}
+
 }

@@ -17,7 +17,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 /**
@@ -313,7 +313,7 @@ public class User implements UserDetails, Serializable {
 
 		return removedUser;
 	}
-	
+
 	@Transient
 	private boolean accountNonExpired = true;
 	@Transient
@@ -326,7 +326,7 @@ public class User implements UserDetails, Serializable {
 	private GrantedAuthority[] authorities;
 
 	public User() {
-		this.authorities = new GrantedAuthority[] { new GrantedAuthorityImpl("ROLE_USER") };
+		this.authorities = new GrantedAuthority[] { new SimpleGrantedAuthority("ROLE_USER") };
 	}
 
 	public void setAuthorities(GrantedAuthority[] authorities) {

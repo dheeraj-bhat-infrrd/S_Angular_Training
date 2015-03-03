@@ -233,10 +233,14 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				User user = userManagementService
-						.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
+				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+				userManagementService.insertAgentSettings(user);
+				LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
+				LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Added newly added user {} to solr", user.getFirstName());
 
@@ -253,6 +257,7 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			List<VerticalsMaster> verticalsMasters = null;
 			try {
 				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
@@ -277,7 +282,6 @@ public class RegistrationController {
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
-
 	}
 
 	/**

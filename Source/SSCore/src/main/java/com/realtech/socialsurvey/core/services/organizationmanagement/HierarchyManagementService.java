@@ -204,6 +204,4 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void insertBranchSettings(Branch branch) throws InvalidInputException;
-
-
 }

@@ -11,21 +11,28 @@ import javax.imageio.ImageReader;
 import javax.imageio.stream.ImageInputStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
-import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 @Component
 public final class UploadUtils {
 	private static final Logger LOG = LoggerFactory.getLogger(MessageUtils.class);
 
-	@Autowired
-	private PropertyFileReader propertyFileReader;
+	@Value("${MAX_LOGO_WIDTH_PIXELS}")
+	double maxWidth;
+
+	@Value("${MAX_LOGO_HEIGHT_PIXELS}")
+	double maxHeight;
+
+	@Value("${MAX_LOGO_SIZE_BYTES}")
+	double maxBytes;
+
+	@Value("${LIST_LOGO_FORMATS}")
+	String imageFormats;
 
 	/**
 	 * Method to validate File
@@ -33,13 +40,16 @@ public final class UploadUtils {
 	public void validateFile(File convFile) throws InvalidInputException {
 		LOG.debug("Validating uploaded image");
 		if (!imageFormat(convFile)) {
-			throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT);
+			throw new InvalidInputException("Upload failed: Not valid Format", DisplayMessageConstants.INVALID_LOGO_FORMAT
+					+ "(" + imageFormats + ")");
 		}
 		if (!imageSize(convFile)) {
-			throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE);
+			throw new InvalidInputException("Upload Failed: MAX size exceeded", DisplayMessageConstants.INVALID_LOGO_SIZE
+					+ "(" + maxBytes + "bytes)");
 		}
 		if (!imageDimension(convFile)) {
-			throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS);
+			throw new InvalidInputException("Upload Failed: MAX dimensions exceeded", DisplayMessageConstants.INVALID_LOGO_DIMENSIONS
+					+ "(" + maxWidth + " x " + maxHeight + " pixels)");
 		}
 		LOG.debug("Validated uploaded image");
 	}
@@ -49,11 +59,7 @@ public final class UploadUtils {
 	 */
 	public boolean imageSize(File logo) {
 		LOG.debug("Validation imageSize method inside ImageUploadServiceImpl called");
-		double maxPixels = Double.parseDouble(propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE,
-				CommonConstants.MAX_LOGO_SIZE_BYTES));
-
-		LOG.debug("Validation imageSize method inside ImageUploadServiceImpl completed successfully");
-		return (logo.length() < maxPixels) ? true : false;
+		return (logo.length() < maxBytes) ? true : false;
 	}
 
 	/**
@@ -74,8 +80,7 @@ public final class UploadUtils {
 				// Find the format of the image and converting to upper to match with allowed extensions
 				String formatName = reader.getFormatName().toUpperCase();
 				LOG.debug("Format of the file: "+formatName);
-				String[] listFormats = propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.LIST_LOGO_FORMATS)
-						.split(",");
+				String[] listFormats = imageFormats.split(",");
 				Set<String> setFormats = new HashSet<String>(Arrays.asList(listFormats));
 
 				if (setFormats.contains(formatName)) {
@@ -123,10 +128,6 @@ public final class UploadUtils {
 				int width = reader.getWidth(0);
 				int height = reader.getHeight(0);
 
-				double maxWidth = Double.parseDouble(propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE,
-						CommonConstants.MAX_LOGO_WIDTH_PIXELS));
-				double maxHeight = Double.parseDouble(propertyFileReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE,
-						CommonConstants.MAX_LOGO_HEIGHT_PIXELS));
 				LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl completed successfully");
 				return ((width < maxWidth) && (height < maxHeight)) ? true : false;
 			}

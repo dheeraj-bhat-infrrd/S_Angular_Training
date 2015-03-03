@@ -15,6 +15,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * The persistent class for the region database table.
@@ -28,6 +29,7 @@ public class Region implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "REGION_ID")
+	@SerializedName("regionId")
 	private long regionId;
 
 	@Column(name = "CREATED_BY")
@@ -54,6 +56,9 @@ public class Region implements Serializable {
 	
 	@Transient
 	private String address2;
+	
+	@Column(name="PROFILE_NAME")
+	private String profileName;
 
 	// bi-directional many-to-one association to Branch
 	@OneToMany(mappedBy = "region", fetch = FetchType.LAZY)
@@ -154,6 +159,14 @@ public class Region implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
+	
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
 
 	public Branch addBranch(Branch branch) {
 		getBranches().add(branch);
@@ -179,9 +192,9 @@ public class Region implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Region [regionId=" + regionId + ", isDefaultBySystem=" + isDefaultBySystem + ", region=" + region + ", status=" + status + "]";
+		return "Region [regionId=" + regionId + ", createdBy=" + createdBy + ", createdOn=" + createdOn + ", isDefaultBySystem=" + isDefaultBySystem
+				+ ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + ", region=" + region + ", status=" + status + ", address1="
+				+ address1 + ", address2=" + address2 + ", profileName=" + profileName + ", branches=" + branches + ", company=" + company + "]";
 	}
-	
-	
 
 }
