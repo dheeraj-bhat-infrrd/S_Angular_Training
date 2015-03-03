@@ -20,6 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AccountsMaster;
 import com.realtech.socialsurvey.core.entities.EncompassCrmInfo;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailContentSettings;
@@ -864,6 +865,85 @@ public class OrganizationManagementController {
 
 		LOG.info("Returning the confirmation page");
 		return JspResolver.UPGRADE_CONFIRMATION;
+	}
+	
+	/**
+	 * This controller is called to initialize the default branches and regions in case they arent done after payment.
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value="/defaultbrandandregioncreation", method = RequestMethod.GET)
+	public String createDefaultBranchesAndRegions(HttpServletRequest request,Model model){
+		
+		LOG.info("createDefaultBranchesAndRegions called to do pre processing before log in");
+		
+		User user = sessionHelper.getCurrentUser();
+		
+		try {
+			if( user == null ){
+				LOG.error("createDefaultBranchesAndRegions : user not found in session!");
+				throw new InvalidInputException("createDefaultBranchesAndRegions : user not found in session!");
+			}
+			
+			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+			HttpSession session = request.getSession(false);
+			AccountType accountType = null;
+			
+			if( currentLicenseDetail == null ){
+				LOG.error("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
+			}
+			
+			AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
+			
+			if( currentAccountsMaster == null ){
+				LOG.error("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : " + currentLicenseDetail.getLicenseId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : " + currentLicenseDetail.getLicenseId());
+			}
+			
+			try {
+				LOG.debug("Calling sevices for adding account type of company");
+				accountType = organizationManagementService.addAccountTypeForCompany(user,String.valueOf(currentAccountsMaster.getAccountsMasterId()));
+				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
+
+				LOG.debug("Adding account type in session");
+				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				// get the settings
+				sessionHelper.getCanonicalSettings(session);
+				// set the session variable
+				sessionHelper.setSettingVariablesInSession(session);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			try {
+				/**
+				 * For each account type, only the company admin's profile completion stage is
+				 * updated, all the other profiles created by default need no action so their
+				 * profile completion stage is marked completed at the time of insert
+				 */
+				LOG.debug("Calling sevices for updating profile completion stage");
+				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
+						CommonConstants.DASHBOARD_STAGE);
+				LOG.debug("Successfully executed sevices for updating profile completion stage");
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.ERROR_PAGE;
+		}
+		
+		LOG.info("createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!");
+		
+		return JspResolver.LANDING;
+		
 	}
 }
 
