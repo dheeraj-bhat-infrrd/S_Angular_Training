@@ -924,16 +924,13 @@ public class UserManagementController {
 	@RequestMapping(value = "/changepassword", method = RequestMethod.POST)
 	public String changePassword(Model model, HttpServletRequest request) {
 		LOG.info("change the password");
-
-		String oldPassword = request.getParameter("oldpassword");
-		String newPassword = request.getParameter("newpassword");
-		String confirmNewPassword = request.getParameter("confirmnewpassword");
+		User user = sessionHelper.getCurrentUser();
 
 		try {
+			String oldPassword = request.getParameter("oldpassword");
+			String newPassword = request.getParameter("newpassword");
+			String confirmNewPassword = request.getParameter("confirmnewpassword");
 			validateChangePasswordFormParameters(oldPassword, newPassword, confirmNewPassword);
-
-			// get user in session
-			User user = sessionHelper.getCurrentUser();
 
 			// check if old password entered matches with the one in the encrypted
 			try {
@@ -944,20 +941,19 @@ public class UserManagementController {
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_PASSWORD, e);
-
 			}
+			
 			// change user's password
 			authenticationService.changePassword(user, newPassword);
-
 			LOG.info("change user password executed successfully");
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 
+			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while changing password. Reason : " + e.getMessage(), e);
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-
 		}
 		return JspResolver.CHANGE_PASSWORD;
 	}
