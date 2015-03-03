@@ -1002,10 +1002,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
 				break;
 			case CommonConstants.PROFILE_LEVEL_REGION:
-				idenFieldName = CommonConstants.REGION_ID_SOLR;
+				idenFieldName = CommonConstants.REGIONS_SOLR;
 				break;
 			case CommonConstants.PROFILE_LEVEL_BRANCH:
-				idenFieldName = CommonConstants.BRANCH_ID_SOLR;
+				idenFieldName = CommonConstants.BRANCHES_SOLR;
 				break;
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
