@@ -127,6 +127,11 @@ function paintProfilePage(result) {
             	}
             }
             $("#prof-contact-information").html(contactInfoHtml);
+            $("#read-write-share-btn").click(function(e){
+            	e.stopPropagation();
+            	findProList(result.iden);
+            	
+            });
 		}         
 	}
 }
@@ -805,4 +810,19 @@ function fetchAgentProfileCallBack(data) {
 		fetchReviewsForAgent(result.iden,startIndex,numOfRows,minScore);
 		fetchReviewsCountForAgent(result.iden, paintAllReviewsCount);
 	}
+}
+
+function findProList(iden){
+	if(iden == undefined || iden == ""){
+		return;
+	}
+	var url = "";
+	var profileLevel = $("#profile-fetch-info").attr("profile-level");
+	if(profileLevel == 'INDIVIDUAL'){
+		initSurveyReview(iden);
+	}else {
+		 url = window.location.origin +"/initfindapro.do?profileLevel="+profileLevel+"&iden="+iden;
+		 window.open(url, "_blank");
+	}
+	
 }

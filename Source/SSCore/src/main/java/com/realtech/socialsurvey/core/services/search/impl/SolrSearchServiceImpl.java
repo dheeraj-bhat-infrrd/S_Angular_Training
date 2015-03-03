@@ -618,8 +618,14 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
-			solrQuery.setStart(startIndex);
-			solrQuery.setRows(noOfRows);
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			if (startIndex > -1) {
+				solrQuery.setStart(startIndex);
+			}
+			if (noOfRows > -1) {
+				solrQuery.setRows(noOfRows);
+			}
+
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();

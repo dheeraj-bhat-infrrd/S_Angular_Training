@@ -10,6 +10,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.QueryParam;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -36,6 +37,7 @@ import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
+import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
@@ -2224,6 +2226,39 @@ public class ProfileManagementController {
 	}
 
 	/**
+	 * Method to initiate find a pro page based on profile level and iden
+	 * 
+	 * @param profileLevel
+	 * @param iden
+	 * @return
+	 */
+	@RequestMapping("/initfindapro")
+	public String initProListByProfileLevelPage(Model model, @QueryParam(value = "profileLevel") String profileLevel,
+			@QueryParam(value = "iden") Long iden) {
+		LOG.info("Method initProListByProfileLevelPage called for profileLevel:" + profileLevel + " and iden:" + iden);
+		DisplayMessage message = null;
+		try {
+			if (profileLevel == null || profileLevel.isEmpty()) {
+				throw new InvalidInputException("profile level is invalid in initProListByProfileLevelPage",
+						DisplayMessageConstants.INVALID_PROFILE_LEVEL);
+			}
+			if (iden == null || iden <= 0l) {
+				throw new InvalidInputException("iden is invalid in initProListByProfileLevelPage", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			model.addAttribute("profileLevel", profileLevel);
+			model.addAttribute("iden", iden);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException in initProListByProfileLevelPage.Reason:" + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE);
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Method initProListByProfileLevelPage executed successfully");
+		return JspResolver.PROFILE_LIST;
+	}
+
+	/**
 	 * Method to return company profile page
 	 * 
 	 * @param profileName
@@ -2241,7 +2276,7 @@ public class ProfileManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		model.addAttribute("companyProfileName", profileName);
-		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_COMPANY);
+		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
 	}
@@ -2272,12 +2307,14 @@ public class ProfileManagementController {
 		}
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("regionProfileName", regionProfileName);
-		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_REGION);
+		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
 		LOG.info("Service to initiate region profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
 	}
+
 	/**
 	 * Method to return branch profile page
+	 * 
 	 * @param companyProfileName
 	 * @param branchProfileName
 	 * @param model
@@ -2301,13 +2338,14 @@ public class ProfileManagementController {
 		}
 		model.addAttribute("companyProfileName", companyProfileName);
 		model.addAttribute("branchProfileName", branchProfileName);
-		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_BRANCH);
+		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
 		LOG.info("Service to initiate branch profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
 	}
-	
+
 	/**
 	 * Method to return agent profile page
+	 * 
 	 * @param agentProfileName
 	 * @param model
 	 * @return
@@ -2323,17 +2361,17 @@ public class ProfileManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		model.addAttribute("agentProfileName", agentProfileName);
-		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 		LOG.info("Service to initiate agent profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
 	}
-	
+
 	// TODO
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {
 		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
-		
+
 		try {
 			if (user.isCompanyAdmin()) {
 				model = getCompanyHierarchy(model, request);
@@ -2368,7 +2406,7 @@ public class ProfileManagementController {
 		// Fetching Regions under Company
 		regions = organizationManagementService.getRegionsForCompany(companyProfileName);
 		model.addAttribute("regions", regions);
-		
+
 		// Fetching Branches under Company
 		try {
 			branches = organizationManagementService.getBranchesUnderCompany(companyProfileName);
@@ -2412,7 +2450,7 @@ public class ProfileManagementController {
 		LOG.debug("Method getRegionHierarchy() called from ProfileManagementController");
 		List<Branch> branches;
 		List<AgentSettings> individuals;
-		
+
 		long regionId = Long.parseLong(request.getParameter("regionId"));
 		if (regionId == 0l) {
 			LOG.error("Invalid regionId passed in method getAdminHierarchy().");
@@ -2436,7 +2474,7 @@ public class ProfileManagementController {
 		LOG.debug("Method getRegionHierarchy() finished from ProfileManagementController");
 		return model;
 	}
-	
+
 	@RequestMapping(value = "/getbranchhierarchy", method = RequestMethod.GET)
 	public String getBranchHierarchyOnClick(Model model, HttpServletRequest request) {
 		LOG.info("Method getBranchHierarchyOnClick() called from ProfileManagementController");
@@ -2468,7 +2506,7 @@ public class ProfileManagementController {
 		LOG.debug("Method getBranchHierarchy() finished from ProfileManagementController");
 		return model;
 	}
-	
+
 	@RequestMapping(value = "/fetchreviews", method = RequestMethod.GET)
 	public String fetchReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
@@ -2507,7 +2545,7 @@ public class ProfileManagementController {
 					LOG.error("Invalid branchId passed in method fetchReviews().");
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
-				
+
 				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_BRANCH);
 			}
@@ -2517,7 +2555,7 @@ public class ProfileManagementController {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
-				
+
 				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 			}
@@ -2532,7 +2570,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchReviews() finished from ProfileManagementController");
 		return JspResolver.PROFILE_REVIEWS;
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/fetchreviewcount", method = RequestMethod.GET)
 	public String fetchReviewCount(Model model, HttpServletRequest request) {
@@ -2568,7 +2606,7 @@ public class ProfileManagementController {
 					LOG.error("Invalid branchId passed in method fetchReviews().");
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
-				
+
 				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
 			}
 			else if (user.isAgent()) {
@@ -2577,7 +2615,7 @@ public class ProfileManagementController {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
-				
+
 				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 			}
 		}
@@ -2622,7 +2660,7 @@ public class ProfileManagementController {
 					LOG.error("Invalid branchId passed in method fetchReviews().");
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
-				
+
 				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
 			}
 			else if (user.isAgent()) {
@@ -2631,7 +2669,7 @@ public class ProfileManagementController {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
-				
+
 				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 			}
 		}
