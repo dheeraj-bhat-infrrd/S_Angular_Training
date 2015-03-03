@@ -10,6 +10,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -82,6 +83,12 @@ public class OrganizationManagementController {
 	
 	@Autowired
 	private SurveyBuilder surveyBuilder;
+	
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
 
 	/**
 	 * Method to upload logo image for a company
@@ -90,9 +97,11 @@ public class OrganizationManagementController {
 	 * @return
 	 * @throws IOException
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/uploadcompanylogo", method = RequestMethod.POST)
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
+		String message = "";
 		String logoName = "";
 
 		LOG.debug("Overriding Logo image name in Session");
@@ -102,18 +111,20 @@ public class OrganizationManagementController {
 
 		try {
 			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
-			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
+			//Setting the complete logo url in session
+			logoName = endpoint + "/" + bucket + "/" +logoName;
+			
+			LOG.debug("Setting Logo image name to Session");
+			request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
+
+			LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
+			message = messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			message = e.getMessage();
 		}
-		LOG.debug("Setting Logo image name to Session");
-		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
-
-		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 
 	/**
