@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import org.springframework.stereotype.Component;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
@@ -16,7 +15,6 @@ import kafka.javaapi.consumer.ConsumerConnector;
  * High level consumer for Kafka topics
  *
  */
-@Component
 public class KafkaConsumerGroup {
 
 	private final ConsumerConnector consumerConnector;
@@ -27,7 +25,7 @@ public class KafkaConsumerGroup {
 		Properties properties = new Properties();
 		properties.put("zookeeper.connect", zookeeper);
 		properties.put("group.id", groupId);
-		properties.put("zookeeper.session.timeout.ms", "2000");
+		properties.put("zookeeper.session.timeout.ms", "4000");
 		properties.put("zookeeper.sync.time.ms", "200");
 		properties.put("auto.commit.interval.ms", "1000");
 		return new ConsumerConfig(properties);
