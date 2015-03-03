@@ -171,8 +171,7 @@
 		$(document).ready(function(){
 			var message = '<c:out value="${message}"/>';
 			console.log("Showing toast message : " + message);
-			$('#overlay-toast').html(message);
-			showToast(message);
+			showInfo(message);
 		});
 	</script>
 </c:if>  
@@ -245,6 +244,7 @@ function confirmUpgradation(accountType){
 			$('.overlay-payment').html(data);		
 			hideOverlay();
 			$('.overlay-payment').show();
+			$('body').css('overflow', 'hidden');
 		},
 		error : redirectErrorpage
 	});
@@ -258,6 +258,7 @@ function upgradeAccountType(accountType) {
 	// show the progress icon
 	$('.overlay-payment').hide();
 	showOverlay();
+	$('body').css('overflow', 'auto');
 	
 	$.ajax({
 		url : url,
@@ -290,10 +291,6 @@ function showMessage(data){
 	}
 }
 
-$("#ol-btn-cancel").click(function() {
-	$('.overlay-payment').hide();
-});
-
 $('.acc-type-item').hover(
 	function(){
 		if ($(this).attr('data-status') != 'disabled') {
@@ -308,13 +305,8 @@ $('.acc-type-item').hover(
 );
 
 function overlayRevert() {
-	$('#overlay-main').hide();
-	$("#overlay-header").html('');
-	$("#overlay-text").html('');
-	$('#overlay-continue').html('');
-	$('#overlay-cancel').html('');
-
-	$('body').css('overflow','auto');
+	$('.overlay-payment').hide();
+	$('body').css('overflow', 'auto');
 }
 </script>
 
