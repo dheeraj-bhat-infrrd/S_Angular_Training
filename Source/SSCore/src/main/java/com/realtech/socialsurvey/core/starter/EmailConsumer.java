@@ -13,7 +13,7 @@ public class EmailConsumer {
 	public static void main(String[] args){
 		LOG.info("Starting up the email consumer.");
 		LOG.debug("Loading the application context");
-		ApplicationContext context = new ClassPathXmlApplicationContext("resources/sscore-beans.xml");
+		ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
 		if(args.length != 4){
 			LOG.warn("Usage: java EmailConsumer <zookeeper broker list> <groupid> <topic> <number of threads>");
 			System.exit(1);
@@ -31,7 +31,7 @@ public class EmailConsumer {
 			System.exit(1);
 		}
 		LOG.info("Running the consumer group with zookeeper: "+zookeeper+" groupId: "+ groupId+" topic: "+topic+" num of threads: "+iNoOfThreads);
-		KafkaConsumerGroup consumerGroup = new KafkaConsumerGroup(zookeeper, groupId, topic);
+		KafkaConsumerGroup consumerGroup = new KafkaConsumerGroup(zookeeper, groupId, topic, context);
 		consumerGroup.run(iNoOfThreads);
 	}
 }

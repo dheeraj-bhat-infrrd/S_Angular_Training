@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.springframework.context.ApplicationContext;
 import kafka.consumer.Consumer;
 import kafka.consumer.ConsumerConfig;
 import kafka.consumer.KafkaStream;
@@ -20,6 +21,7 @@ public class KafkaConsumerGroup {
 	private final ConsumerConnector consumerConnector;
 	private final String topic;
 	private ExecutorService executorService;
+	private ApplicationContext ctx;
 	
 	private static ConsumerConfig createConsumerConfig(String zookeeper, String groupId){
 		Properties properties = new Properties();
@@ -31,9 +33,10 @@ public class KafkaConsumerGroup {
 		return new ConsumerConfig(properties);
 	}
 	
-	public KafkaConsumerGroup(String zookeeper, String groupId, String topic){
+	public KafkaConsumerGroup(String zookeeper, String groupId, String topic, ApplicationContext ctx){
 		consumerConnector = Consumer.createJavaConsumerConnector(createConsumerConfig(zookeeper, groupId));
 		this.topic = topic;
+		this.ctx = ctx;
 	}
 	
 	public void run(int numOfThreads){
@@ -43,7 +46,7 @@ public class KafkaConsumerGroup {
 		List<KafkaStream<byte[], byte[]>> streams = consumerMap.get(topic);
 		executorService = Executors.newFixedThreadPool(numOfThreads);
 		for(final KafkaStream<byte[], byte[]> stream :  streams){
-			executorService.submit(new TopicConsumer(stream));
+			executorService.submit(new TopicConsumer(stream, ctx));
 		}
 	}
 	
