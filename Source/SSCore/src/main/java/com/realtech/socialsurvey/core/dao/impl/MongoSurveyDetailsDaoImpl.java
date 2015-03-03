@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -49,12 +52,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
-		if(surveys==null || surveys.size()==0)
+		if (surveys == null || surveys.size() == 0)
 			return null;
 		LOG.info("Method insertSurveyDetails() to insert details of survey finished.");
 		return surveys.get(CommonConstants.INITIAL_INDEX);
 	}
-	
+
 	/*
 	 * Method to insert survey details into the SURVEY_DETAILS collection.
 	 */
@@ -105,15 +108,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * collection.
 	 */
 	@Override
-	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review) {
+	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive) {
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer started.");
 		Query query = new Query();
 		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
-		update.set("stage", CommonConstants.SURVEY_STAGE_COMPLETE);
-		update.set("mood", mood);
+		update.set(CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE);
+		update.set(CommonConstants.MOOD_COLUMN, mood);
 		update.set("review", review);
+		update.set("isAbusive", isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
@@ -153,6 +157,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to calculate and update final score based upon rating questions finished.");
 	}
 
+	@Override
+	public void updateSurveyAsClicked(long agentId, String customerEmail) {
+		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.set(CommonConstants.SURVEY_CLICKED_COLUMN, true);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
+	}
+	
 	// JIRA SS-137 and 158 BY RM-05 : BOC
 
 	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
@@ -308,10 +325,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return mongoTemplate.count(query, SurveyDetails.class);
 	}
 
-	// Method to get aggregated rating of an agent/branch/region/company for past number of days
-	// provided as parameter.
-
 	@Override
+	@SuppressWarnings("unchecked")
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
 		Calendar calendar = Calendar.getInstance();
@@ -327,16 +342,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				.is(columnValue)
 				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
 						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
-				CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
-				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group(columnName)
-				.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
+				SurveyDetails.class, //
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
+						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
+				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
+		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		long a = mongoTemplate.count(query, SurveyDetails.class);
+		long a = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		double rating = 0;
 		if (result != null && a > 0) {
-			rating = ((long) result.getRawResults().get("total_score")) / a;
+			List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get("result");
+			rating = (double) basicDBObject.get(0).get("total_score") / a;
 		}
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
@@ -363,8 +381,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
 				CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
-				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation
-				.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+				.gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.group(columnName)
+				.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		double rating = 0;
@@ -433,24 +451,49 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	/*
 	 * Returns a list of feedbacks provided by customers. First sorted on score then on date (both
 	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
-	 * value for respective column.
+	 * value for respective column. limitScore is the max score under which reviews have to be shown
 	 */
 
-	public Map<String, Double> getAllFeedbacks(String columnName, String columNValue) {
-		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() started.");
-		Map<String, Double> feedbackWithRating = new HashMap<>();
+	@Override
+	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
-			query.addCriteria(Criteria.where(columnName).is(columNValue));
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+		if (startScore > 0 && limitScore > 0) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		if (start > -1) {
+			query.skip(start);
+		}
+		if (rows > -1) {
+			query.limit(rows);
+		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
-		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
-		for (SurveyDetails survey : surveys) {
-			feedbackWithRating.put(survey.getReview(), survey.getScore());
+		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+
+		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished.");
+		return surveysWithReviews;
+	}
+
+	@Override
+	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore) {
+		LOG.info("Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue + " startScore:" + startScore
+				+ " limitScore:" + limitScore);
+		Query query = new Query();
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getAllFeedbacks() finished.");
-		return feedbackWithRating;
+		if (startScore > 0 && limitScore > 0) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method getFeedBacksCount executed successfully");
+		return feedBackCount;
 	}
 
 	// JIRA SS-137 and 158 : EOC

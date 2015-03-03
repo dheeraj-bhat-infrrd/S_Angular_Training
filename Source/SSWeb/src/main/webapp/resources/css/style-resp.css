@@ -1,5 +1,8 @@
 /* ============== SMARTPHONES ==============*/
 @media (max-width: 767px) {
+    body{
+        font-size: 12px;
+    }
     .login-main-wrapper{
         background: #fff;
     }
@@ -537,7 +540,7 @@
         display: none;
     }
     .ppl-header-left, .ppl-header-right{
-        float: none;
+        float: none !important;
     }
     .ppl-share-wrapper{
         line-height: 30px;
@@ -811,6 +814,235 @@
     .sq-img-adj{
         display: block !important;
     }
+    .dash-stats-wrapper {
+        padding: 20px 0;
+        margin: 0 -15px;
+    }
+    .dash-sub-head{
+        padding: 0;
+        text-align: center;
+        margin-bottom: 0px;
+        font-size: 16px;
+    }
+    .stats-left {
+        width: 280px;
+        margin: 0 auto;
+        float: none !important;
+    }
+    .stat-icns-item {
+        padding-left: 10px;
+    }
+    .hr-dsh-adj-lft{
+        text-align: left;
+        width: auto;
+        font-size: 14px;
+        padding-left: 10px;
+        border-bottom: 0;
+    }
+    .hr-dsh-adj-rt{
+        line-height: 48px;
+        font-size: 14px;
+        height: 48px;
+    }
+    .stats-right {
+        margin-left: 0px;
+        margin: 0 auto;
+        width: 265px;
+        float: none !important;
+    }
+    .stats-right-adj {
+        margin-left: 0px;
+        width: 100%;
+    }
+    .stat-icn-lbl {
+        font-size: 12px;
+        padding-left: 10px;
+        line-height: 16px;
+        padding-top: 4px;
+        width: 100px;
+    }
+    .stat-icn-img{
+        width: 12px;
+        height: 28px;
+    }
+    .stat-icn-txt-rt {
+        font-size: 14px;
+        margin-left: 10px;
+        line-height: 28px;
+    }
+    .stat-icns-wrapper{
+        line-height: 22px;
+    }
+    .dash-sel-lbl {
+        width: 100%;
+        text-align: left;
+        line-height: 22px;
+        padding-left: 22px;
+    }
+    .util-gph-item{
+        margin-left: 0;
+        width: 280px;
+        overflow: hidden;
+        float: none !important;
+        margin: 15px auto 0;
+    }
+    .util-gph-legend {
+        position: static;
+        top: 200px;
+        line-height: 30px;
+        left: -210px;
+        font-size: 13px;
+        width: 182px;
+        text-align: right;
+        margin: 15px auto 0;;
+    }
+    .dash-ppl-say-lbl, .dash-btn-dl-sd{
+        float: none !important;
+    }
+    .dash-left-txt-wrapper{
+        padding: 10px 0;
+    }
+    .dsh-name-wrapper {
+        font-size: 16px;
+    }
+    .dsh-star-wrapper{
+        width: 100%;
+        margin: 10px auto;
+    }
+    .dsh-star-item{
+        width: 20%;
+        background-size: 40px;
+    }
+    .dsh-rating-item{
+        float: none !important;
+        clear: both;
+        margin: 0 auto;
+        height: 40px;
+        line-height: 40px;
+        font-size: 18px;
+        position: relative;
+        top: 10px;
+    }
+    .dsh-btn-complete{
+        width: 100%;
+        margin-top: 25px;
+        height: 40px;
+        line-height: 40px;
+        font-size: 14px;
+    }
+    .dash-top-info{
+        border-bottom: 0;
+    }
+    .dash-main-left{
+        border-bottom: 1px solid #dcdcdc;
+        margin: 0;
+    }
+    .pad-bot-10-resp{
+        padding-bottom: 10px;
+    }
+    .resp-adj{
+        padding: 0;
+    }
+    .dash-sel-wrapper {
+        margin-bottom: 10px;
+    }
+    .dash-lp-item{
+        margin-bottom: 0;
+        line-height: 34px;
+    }
+    .dash-lp-header{
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .dash-panel-left{
+        padding: 15px 10px 0px 0px;
+        border-right: 0;
+        border-bottom: 1px solid #dcdcdc;
+    }
+    .dash-lp-rt-img{
+        height: 34px;
+    }
+    .dash-btn-sur-data{
+        margin: 10px auto;
+    }
+    .ppl-head-1{
+        font-size: 14px;
+    }
+    .ppl-head-2 {
+        font-size: 11px;
+    }
+    .row-dash-top-adj{
+        margin-top: -132px;
+    }
+    .dash-main-right{
+        height: 350px;
+        float: none !important;
+        margin: 0 auto;
+        width: 300px;
+    }
+    .dash-main-left{
+        height: 310px;
+    }
+    .dsh-graph-wrapper{
+        transform: scale(0.45);
+        -webkit-transform: scale(0.45);
+        -o-transform: scale(0.45);
+        -ms-transform: scale(0.45);
+        -moz-transform: scale(0.45);
+        position: relative;
+        left: -162px;
+        width: 594px;
+        background-position: 87px top;
+    }
+    .rfr_lbl{
+        display: none;
+    }
+    .reg_form_wrapper_2, .reg_form_wrapper_1{
+        width: 100%;
+        margin-top: 0;
+    }
+    .reg_panel_container{
+        padding: 0 !important;
+    }
+    .rfr_txt{
+        width: 100%;
+        float: none;
+    }
+    .reg_form_row{
+        margin-bottom: 0;
+    }
+    .rfr_txt_fld{
+        margin: 0;
+        width: 100%;
+        border-radius: 0;
+        border: 0;
+        border-bottom: 1px solid #dcdcdc;
+        border-top: 1px solid #dcdcdc;
+        padding-left: 50px;
+        margin-bottom: -1px;
+    }
+    .reg_header{
+        text-align: center;
+        line-height: 60px;
+        font-size: 22px;
+    }
+    .reg_btn{
+        width: 100%;
+        margin: 0;
+        border-radius: 0;
+        height: 50px;
+        font-size: 16px;
+    }
+    .rfr_icn{
+        display: block;
+    }
+    .acc-type-container{
+        width: 100%;
+        padding: 0 5px;
+    }
+    .acc-type-item{
+        margin-right: 0;
+    }
 }
 
 
@@ -972,6 +1204,76 @@
     .sb-q-item-txt-or {
         width: 91%;
     }
+    .stats-left {
+        width: 100%;
+        float: none;
+    }
+    .dash-sel-item{
+        width: 250px;
+        margin-left: 10px;
+    }
+    .stats-right {
+        clear: both;
+        width: 53%;
+        margin: 0 auto;
+        float: none !important;
+    }
+    .stats-right-adj{
+        clear: both;
+        width: 100%;
+        margin: 0 auto;
+        float: none !important;
+    }
+    .stat-icn-lbl {
+        width: 180px;
+        font-size: 14px;
+    }
+    .stat-icn-img{
+        width: 14px;
+    }
+    .stat-icn-txt-rt {
+        font-size: 18px;
+        margin-left: 10px;
+    }
+    .util-gph-item{
+        width: 100%;
+    }
+    .dash-sel-wrapper{
+        width: 50%;
+        float: left;
+        margin-bottom: 15px;
+    }
+    .util-gph-legend-item {
+        float: left;
+        width: 50%;
+    }
+    .util-gph-legend{
+        position: static;
+        width: 54%;
+        margin: 25px auto 0;
+    }
+    .dash-left-txt-wrapper, .dsh-graph-wrapper{
+        transform: scale(0.7);
+        -webkit-transform: scale(0.7);
+        -o-transform: scale(0.7);
+        -ms-transform: scale(0.7);
+        -moz-transform: scale(0.7);
+    }
+    .dsh-graph-wrapper{
+        margin-left: -161px;
+        width: 600px;
+        background-position: 86px top;
+    }
+    .row-dash-top-adj{
+        margin-top: -72px;
+    }
+    .dash-main-left, .dash-main-right{
+        height: 410px;
+    }
+    .dash-main-right {
+        position: relative;
+        left: -10px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1025,11 +1327,66 @@
     .cp-err{
         padding-left: 183px;
     }
+    .dsh-graph-wrapper{
+        width: 550px;
+        background-position: 30px top;
+    }
+    .dash-main-left {
+        margin-left: -45px;
+    }
+    .dsh-g-wrap-1{
+        left: 50px;
+    }
+    .dsh-g-wrap-2{
+        left: 280px;
+    }
+    .dsh-g-wrap-3{
+        left: 430px;
+    }
+    .dsh-g-wrap-4{
+        left: 130px;
+    }
+    .dsh-name-wrapper{
+        font-size: 22px;
+    }
+    .dsh-star-wrapper{
+        margin: 25px auto;
+    }
+    .dsh-graph-txt-1 {
+        left: -33px;
+        top: 125px;
+    }
+    .dsh-graph-txt{
+        font-size: 18px;
+    }
+    .dsh-graph-txt-4 {
+        left: -214px;
+        top: 146px;
+    }
+    .dsh-graph-txt-3{
+        left: -40px;
+    }
+    .stats-right {
+        margin-left: 10px;
+    }
+    .util-gph-item{
+        width: 600px;
+    }
+    .stats-left {
+        width: 330px;
+    }
+    .dash-main-right{
+        position: relative;
+        left: -107px;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
 @media (min-width: 1200px) {
-    
+    .dash-main-right {
+        position: relative;
+        left: -84px;
+    }
 }
 
 

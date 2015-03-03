@@ -221,15 +221,10 @@
                 loginUser();
             });
            
-            $('#reg-submit').click(function() {
-				event.preventDefault();
+            $('#reg-submit').click(function(e) {
+				e.preventDefault();
 				submitRegistrationForm();
 			});
-            
-            $('#find-pro-submit').click(function() {
-            	event.preventDefault();
-            	submitFindProForm();
-            });
             
             // Form validation for login page
             $('#login-user-id').blur(function() {
@@ -316,6 +311,11 @@
 				console.log("Info button clicked");
 				$("#recaptcha_whatsthis").click();
 			});
+            
+            $('#find-pro-submit').click(function(e) {
+            	e.preventDefault();
+            	submitFindProForm();
+            });
             
             function submitFindProForm() {
 				console.log("Submitting Find a Profile form");
