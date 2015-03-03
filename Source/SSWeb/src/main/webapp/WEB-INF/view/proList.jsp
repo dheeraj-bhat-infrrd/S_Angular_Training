@@ -132,16 +132,7 @@
 			$('#find-pro-start-index').val(startIndex);
 			$('#fp-users-size').val(0);
 			
-			var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
-			var iden = $("#fp-profile-level-fetch-info").data("iden");
-			
-			if(profileLevel != undefined && profileLevel != ""){
-				fetchUsersByProfileLevel(iden, profileLevel, startIndex);
-			}else {
-				fetchUsers(startIndex);
-			}
-			
-			
+			fetchUsers(startIndex);
 			adjustTextContainerWidthOnResize();
 			
 			$(window).resize(function() {

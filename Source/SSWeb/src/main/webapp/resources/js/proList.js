@@ -70,14 +70,27 @@ $(window).scroll(function() {
 	}
 });
 
+/**
+ * Method to fetch users list based on the criteria i.e if profile level is specified,
+ *  bring all users of that level else search based on first/last name
+ * @param newIndex
+ */
 function fetchUsers(newIndex) {
-	var formData = new FormData();
-	formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
-	formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
-	formData.append("find-pro-start-index", newIndex);
-	formData.append("find-pro-row-size", rowSize);
-
-	callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+	var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
+	var iden = $("#fp-profile-level-fetch-info").data("iden");
+	
+	if(profileLevel != undefined && profileLevel != ""){
+		fetchUsersByProfileLevel(iden, profileLevel, startIndex);
+	}
+	else {
+		var formData = new FormData();
+		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
+		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
+		formData.append("find-pro-start-index", newIndex);
+		formData.append("find-pro-row-size", rowSize);
+		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
+	}
+	
 }
 
 function infiniteScrollCallback(response) {
@@ -133,5 +146,4 @@ function fetchUsersByProfileLevelCallback(data) {
 
 $(document).on('click', '.ctnt-review-btn', function(){
 	initSurveyReview($(this).attr('user'));
-	
 });
