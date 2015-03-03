@@ -68,6 +68,7 @@
 								<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
 								<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
 								<input id="fp-users-size" type="hidden">
+								<input id="fp-profile-level-fetch-info" data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
 							<div class="ctnt-list-header-right float-right">
 								<c:choose>
@@ -123,13 +124,23 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
 		$(document).ready(function() {
 			$('#find-pro-row-size').val(rowSize);
 			$('#find-pro-start-index').val(startIndex);
 			$('#fp-users-size').val(0);
-			fetchUsers(startIndex);
+			
+			var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
+			var iden = $("#fp-profile-level-fetch-info").data("iden");
+			
+			if(profileLevel != undefined && profileLevel != ""){
+				fetchUsersByProfileLevel(iden, profileLevel, startIndex);
+			}else {
+				fetchUsers(startIndex);
+			}
+			
 			
 			adjustTextContainerWidthOnResize();
 			
