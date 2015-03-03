@@ -36,8 +36,8 @@ public interface JspResolver {
 	public static final String UPGRADE_CONFIRMATION = "upgradeconfirmation";
 	public static final String INDEX = "index";
 	public static final String PROFILE_LIST = "proList";
-	public static final String LINKEDIN_ACCESS="linkedinaccess";
-	public static final String LINKEDIN_MESSAGE="linkedinmessage";
+	public static final String LINKEDIN_ACCESS = "linkedinaccess";
+	public static final String LINKEDIN_MESSAGE = "linkedinmessage";
 	public static final String PROFILE_EDIT = "profile_edit";
 	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";
 	public static final String PROFILE_ABOUT_ME = "profile_aboutme";
@@ -50,5 +50,9 @@ public interface JspResolver {
 	public static final String PROFILE_IMAGE = "profile_profileimage";
 	public static final String PROFILE_LOGO = "profile_profilelogo";
 	public static final String PROFILE_SOCIAL_LINKS = "profile_sociallinks";
-	public static final String PROFILE_COMPANY = "profile_new";
+	public static final String PROFILE_REVIEWS = "profile_reviews";
+	public static final String PROFILE_HIERARCHY = "profile_hierarchy";
+	public static final String PROFILE_HIERARCHY_CLICK_REGION = "profile_hierarchy_region";
+	public static final String PROFILE_HIERARCHY_CLICK_BRANCH = "profile_hierarchy_branch";
+	public static final String PROFILE_PAGE = "profile_new";
 }

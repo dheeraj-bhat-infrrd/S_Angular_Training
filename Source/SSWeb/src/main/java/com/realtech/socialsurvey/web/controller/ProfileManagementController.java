@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
@@ -42,7 +43,9 @@ import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -50,8 +53,12 @@ import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.InternalServerException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
@@ -79,6 +86,9 @@ public class ProfileManagementController {
 	private UrlValidationHelper urlValidationHelper;
 
 	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
 	private ProfileManagementService profileManagementService;
 
 	@Autowired
@@ -86,7 +96,7 @@ public class ProfileManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
-	
+
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
 
@@ -126,7 +136,7 @@ public class ProfileManagementController {
 			if (settings.getRegionSettings().size() > 0) {
 				regionId = user.getUserProfiles().get(0).getRegionId();
 			}
-			
+
 			LOG.debug("branchId: " + branchId + ", regionId: " + regionId);
 			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, settings, branchId, regionId);
 		}
@@ -145,7 +155,7 @@ public class ProfileManagementController {
 			long agentId = 0;
 			long branchId = 0;
 			long regionId = 0;
-			
+
 			if (settings.getAgentSettings().size() > 0) {
 				agentId = user.getUserProfiles().get(0).getAgentId();
 			}
@@ -155,7 +165,7 @@ public class ProfileManagementController {
 			if (settings.getRegionSettings().size() > 0) {
 				regionId = user.getUserProfiles().get(0).getRegionId();
 			}
-			
+
 			LOG.debug("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
 			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, agentId, branchId, regionId);
 		}
@@ -166,7 +176,7 @@ public class ProfileManagementController {
 		LOG.debug("Method fetchUserProfile() finished from ProfileManagementService");
 		return profile;
 	}
-	
+
 	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
 	public String fetchProfileAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Fetching profile aboutme");
@@ -300,7 +310,7 @@ public class ProfileManagementController {
 				lockSettings = updateLockSettings(lockSettings, parentLock, fieldId, fieldState);
 				lockSettings = profileManagementService.updateLockSettings(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, lockSettings);
-				LOG.info(lockSettings.getIsDisplayNameLocked()+"");
+				LOG.info(lockSettings.getIsDisplayNameLocked() + "");
 				branchSettings.setLockSettings(lockSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -313,13 +323,15 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Lock Settings updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
-		
+
 		LOG.info("Method updateLockSettings() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
@@ -327,7 +339,7 @@ public class ProfileManagementController {
 	// Update lockSettings
 	private LockSettings updateLockSettings(LockSettings lockSettings, LockSettings parentLock, String fieldId, boolean status) {
 		LOG.debug("Method updateLockSettings() called from ProfileManagementController");
-		
+
 		// Checking if locked by parent, if not updating lock settings
 		switch (fieldId) {
 			case "prof-name-lock":
@@ -369,7 +381,7 @@ public class ProfileManagementController {
 		LOG.debug("Method updateLockSettings() finished from ProfileManagementController");
 		return lockSettings;
 	}
-	
+
 	/**
 	 * Method to update about profile details
 	 * 
@@ -456,15 +468,17 @@ public class ProfileManagementController {
 			profile.setContact_details(contactDetailsSettings);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			
+
 			LOG.info("About me details updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating about me details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ABOUT_ME_DETAILS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
-		
+
 		LOG.info("Method updateAboutMe() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
@@ -547,14 +561,15 @@ public class ProfileManagementController {
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
-				
+
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
 				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
 				if (name.indexOf(" ") != -1) {
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
-				} else {
+				}
+				else {
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
 			}
@@ -565,13 +580,15 @@ public class ProfileManagementController {
 			profile.setContact_details(contactDetailsSettings);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			
+
 			LOG.info("Basic Detail updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.BASIC_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.BASIC_DETAILS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating profile basic details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.BASIC_DETAILS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.BASIC_DETAILS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateBasicDetail() finished from ProfileManagementController");
@@ -686,7 +703,8 @@ public class ProfileManagementController {
 				if (name.indexOf(" ") != -1) {
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
-				} else {
+				}
+				else {
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
 			}
@@ -699,11 +717,13 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Profile addresses updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_ADDRESSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateProfileAddress() finished from ProfileManagementController");
@@ -711,8 +731,8 @@ public class ProfileManagementController {
 	}
 
 	// Update address details
-	private ContactDetailsSettings updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2, String country,
-			String zipcode) {
+	private ContactDetailsSettings updateAddressDetail(ContactDetailsSettings contactDetailsSettings, String name, String address1, String address2,
+			String country, String zipcode) {
 		LOG.debug("Method updateAddressDetail() called from ProfileManagementController");
 		contactDetailsSettings.setName(name);
 		contactDetailsSettings.setAddress(address1 + ", " + address2);
@@ -751,7 +771,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
 				logoUrl = fileUploadService.fileUploadHandler(fileLocal, logoFileName);
-				logoUrl = endpoint + "/" + bucket + "/" +logoUrl;
+				logoUrl = endpoint + "/" + bucket + "/" + logoUrl;
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
@@ -806,20 +826,21 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setLogoInSession(session, userSettings);
-			
+
 			LOG.info("Logo uploaded successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LOGO_UPLOAD_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateLogo() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	// TODO
 	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
 	public String updateProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileImage() called from ProfileManagementController");
@@ -836,7 +857,7 @@ public class ProfileManagementController {
 
 			String imageBase64 = request.getParameter("imageBase64");
 			String imageFileName = request.getParameter("imageFileName");
-			
+
 			try {
 				if (imageFileName == null || imageFileName.isEmpty()) {
 					throw new InvalidInputException("Logo passed is null or empty");
@@ -844,17 +865,17 @@ public class ProfileManagementController {
 				if (imageBase64 == null || imageBase64.isEmpty()) {
 					throw new InvalidInputException("Logo passed is null or empty");
 				}
-				
+
 				BASE64Decoder decoder = new BASE64Decoder();
 				byte[] decodedBytes = decoder.decodeBuffer(imageBase64.substring("data:image/png;base64,".length()));
 				BufferedImage image = ImageIO.read(new ByteArrayInputStream(decodedBytes));
 				if (image == null) {
 					LOG.error("Buffered Image is null");
 				}
-				
+
 				File fileLocal = new File(CommonConstants.IMAGE_NAME);
-			    ImageIO.write(image, CommonConstants.IMAGE_FORMAT, fileLocal);
-			    
+				ImageIO.write(image, CommonConstants.IMAGE_FORMAT, fileLocal);
+
 				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, imageFileName);
 				profileImageUrl = endpoint + "/" + bucket + "/" + profileImageUrl;
 			}
@@ -872,7 +893,8 @@ public class ProfileManagementController {
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, profileImageUrl);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						profileImageUrl);
 				companySettings.setProfileImageUrl(profileImageUrl);
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -882,7 +904,8 @@ public class ProfileManagementController {
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, profileImageUrl);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						profileImageUrl);
 				regionSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
@@ -892,7 +915,8 @@ public class ProfileManagementController {
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, profileImageUrl);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						profileImageUrl);
 				branchSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -902,7 +926,8 @@ public class ProfileManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, profileImageUrl);
+				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						profileImageUrl);
 				agentSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 
@@ -917,13 +942,15 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setProfileImageInSession(session, userSettings);
-			
+
 			LOG.info("Profile Image uploaded successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while uploading logo. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_IMAGE_UPLOAD_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateProfileImage() finished from ProfileManagementController");
@@ -1023,11 +1050,13 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Maild ids updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating Mail ids. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.MAIL_IDS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateEmailds() finished from ProfileManagementController");
@@ -1163,11 +1192,13 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Contact numbers updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating contact numbers. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_NUMBERS_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updatePhoneNumbers() finished from ProfileManagementController");
@@ -1306,11 +1337,13 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Web addresses updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating web addresses. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.WEB_ADDRESSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateWebAddresses() finished from ProfileManagementController");
@@ -1318,7 +1351,8 @@ public class ProfileManagementController {
 	}
 
 	// update web addresses
-	private ContactDetailsSettings updateWebAddresses(ContactDetailsSettings contactDetailsSettings, List<MiscValues> webAddresses) throws InvalidInputException {
+	private ContactDetailsSettings updateWebAddresses(ContactDetailsSettings contactDetailsSettings, List<MiscValues> webAddresses)
+			throws InvalidInputException {
 		LOG.debug("Method updateWebAddresses() called from ProfileManagementController");
 		if (contactDetailsSettings == null) {
 			throw new InvalidInputException("No contact details object found for user");
@@ -1363,7 +1397,7 @@ public class ProfileManagementController {
 		LOG.info("Method updateFacebookLink() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 		SocialMediaTokens socialMediaTokens = null;
-		
+
 		try {
 			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -1391,7 +1425,7 @@ public class ProfileManagementController {
 				socialMediaTokens = companySettings.getSocialMediaTokens();
 				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -1404,7 +1438,7 @@ public class ProfileManagementController {
 				socialMediaTokens = regionSettings.getSocialMediaTokens();
 				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
@@ -1417,7 +1451,7 @@ public class ProfileManagementController {
 				socialMediaTokens = branchSettings.getSocialMediaTokens();
 				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -1430,24 +1464,26 @@ public class ProfileManagementController {
 				socialMediaTokens = agentSettings.getSocialMediaTokens();
 				socialMediaTokens = updateFacebookToken(socialMediaTokens, fbLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating fb token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profile.setSocialMediaTokens(socialMediaTokens);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Facebook link updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.FACEBOOK_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.FACEBOOK_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating facebook link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.FACEBOOK_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.FACEBOOK_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateFacebookLink() finished from ProfileManagementController");
@@ -1500,7 +1536,7 @@ public class ProfileManagementController {
 				socialMediaTokens = companySettings.getSocialMediaTokens();
 				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -1513,7 +1549,7 @@ public class ProfileManagementController {
 				socialMediaTokens = regionSettings.getSocialMediaTokens();
 				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
@@ -1526,7 +1562,7 @@ public class ProfileManagementController {
 				socialMediaTokens = branchSettings.getSocialMediaTokens();
 				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -1539,24 +1575,26 @@ public class ProfileManagementController {
 				socialMediaTokens = agentSettings.getSocialMediaTokens();
 				socialMediaTokens = updateTwitterToken(socialMediaTokens, twitterLink);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating twitter token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profile.setSocialMediaTokens(socialMediaTokens);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Twitter link updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.TWITTER_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.TWITTER_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating twitter link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.TWITTER_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.TWITTER_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateTwitterLink() finished from ProfileManagementController");
@@ -1609,7 +1647,7 @@ public class ProfileManagementController {
 				socialMediaTokens = companySettings.getSocialMediaTokens();
 				socialMediaTokens = updateLinkedinToken(linkedinLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -1622,7 +1660,7 @@ public class ProfileManagementController {
 				socialMediaTokens = regionSettings.getSocialMediaTokens();
 				socialMediaTokens = updateLinkedinToken(linkedinLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
@@ -1635,7 +1673,7 @@ public class ProfileManagementController {
 				socialMediaTokens = branchSettings.getSocialMediaTokens();
 				socialMediaTokens = updateLinkedinToken(linkedinLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -1648,24 +1686,26 @@ public class ProfileManagementController {
 				socialMediaTokens = agentSettings.getSocialMediaTokens();
 				socialMediaTokens = updateLinkedinToken(linkedinLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in upadting linkedin token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profile.setSocialMediaTokens(socialMediaTokens);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("LinkedIn link updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LINKEDIN_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LINKEDIN_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating linkedIn link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LINKEDIN_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LINKEDIN_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateLinkedInLink() finished from ProfileManagementController");
@@ -1718,7 +1758,7 @@ public class ProfileManagementController {
 				socialMediaTokens = companySettings.getSocialMediaTokens();
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
@@ -1731,7 +1771,7 @@ public class ProfileManagementController {
 				socialMediaTokens = regionSettings.getSocialMediaTokens();
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
@@ -1744,7 +1784,7 @@ public class ProfileManagementController {
 				socialMediaTokens = branchSettings.getSocialMediaTokens();
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
@@ -1757,24 +1797,26 @@ public class ProfileManagementController {
 				socialMediaTokens = agentSettings.getSocialMediaTokens();
 				socialMediaTokens = updateYelpLink(yelpLink, socialMediaTokens);
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-							socialMediaTokens);
+						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating yelp token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profile.setSocialMediaTokens(socialMediaTokens);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("YelpLinked in link updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.YELP_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.YELP_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating yelp link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.YELP_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.YELP_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateYelpLink() finished from ProfileManagementController");
@@ -1879,11 +1921,13 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Achievements updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating achievement details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ACHIEVEMENT_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateAchievements() finished from ProfileManagementController");
@@ -1969,17 +2013,19 @@ public class ProfileManagementController {
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profile.setAssociations(associations);
 			session.setAttribute(CommonConstants.USER_PROFILE, profile);
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
-			
+
 			LOG.info("Associations updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.ASSOCIATION_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateAssociations() finished from ProfileManagementController");
@@ -2071,16 +2117,19 @@ public class ProfileManagementController {
 			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Licence details updated successfully");
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while updating licence details. Reason :" + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.LICENSES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
 		LOG.info("Method updateProfileLicenses() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
+
 	// JIRA SS-97 by RM-06 : EOC
 
 	/*
@@ -2173,7 +2222,7 @@ public class ProfileManagementController {
 		LOG.info("Method findAProfileScroll finished.");
 		return new Gson().toJson(users);
 	}
-	
+
 	/**
 	 * Method to return company profile page
 	 * 
@@ -2192,7 +2241,406 @@ public class ProfileManagementController {
 			return JspResolver.MESSAGE_HEADER;
 		}
 		model.addAttribute("companyProfileName", profileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
-		return JspResolver.PROFILE_COMPANY;
+		return JspResolver.PROFILE_PAGE;
+	}
+
+	/**
+	 * Method to return region profile page
+	 * 
+	 * @param companyProfileName
+	 * @param regionProfileName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/regionprofile/{companyProfileName}/region/{regionProfileName}")
+	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model) {
+		LOG.info("Service to initiate region profile page called");
+		String message = null;
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		if (regionProfileName == null || regionProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_REGION_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("companyProfileName", companyProfileName);
+		model.addAttribute("regionProfileName", regionProfileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_REGION);
+		LOG.info("Service to initiate region profile page executed successfully");
+		return JspResolver.PROFILE_PAGE;
+	}
+	/**
+	 * Method to return branch profile page
+	 * @param companyProfileName
+	 * @param branchProfileName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/branchprofile/{companyProfileName}/branch/{branchProfileName}")
+	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model) {
+		LOG.info("Service to initiate branch profile page called");
+		String message = null;
+		if (companyProfileName == null || companyProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_COMPANY_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		if (branchProfileName == null || branchProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_BRANCH_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("companyProfileName", companyProfileName);
+		model.addAttribute("branchProfileName", branchProfileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_BRANCH);
+		LOG.info("Service to initiate branch profile page executed successfully");
+		return JspResolver.PROFILE_PAGE;
+	}
+	
+	/**
+	 * Method to return agent profile page
+	 * @param agentProfileName
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/individualprofile/{agentProfileName}")
+	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model) {
+		LOG.info("Service to initiate agent profile page called");
+		String message = null;
+		if (agentProfileName == null || agentProfileName.isEmpty()) {
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_INDIVIDUAL_PROFILENAME, DisplayMessageType.ERROR_MESSAGE)
+					.getMessage();
+			model.addAttribute("message", message);
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("agentProfileName", agentProfileName);
+		model.addAttribute("profileLevel",CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+		LOG.info("Service to initiate agent profile page executed successfully");
+		return JspResolver.PROFILE_PAGE;
+	}
+	
+	// TODO
+	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
+	public String getAdminHierarchy(Model model, HttpServletRequest request) {
+		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
+		
+		try {
+			if (user.isCompanyAdmin()) {
+				model = getCompanyHierarchy(model, request);
+			}
+			else if (user.isRegionAdmin()) {
+				model = getRegionHierarchy(model, request);
+			}
+			else if (user.isBranchAdmin()) {
+				model = getBranchHierarchy(model, request);
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching hierarchy. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method getAdminHierarchy() finished from ProfileManagementController");
+		return JspResolver.PROFILE_HIERARCHY;
+	}
+
+	private Model getCompanyHierarchy(Model model, HttpServletRequest request) throws InvalidInputException {
+		LOG.debug("Method getCompanyHierarchy() called from ProfileManagementController");
+		List<Region> regions;
+		List<Branch> branches;
+		List<AgentSettings> individuals;
+		String companyProfileName = request.getParameter("companyProfileName");
+		if (companyProfileName == "") {
+			LOG.error("Invalid companyProfileName passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid companyProfileName passed in method getAdminHierarchy().");
+		}
+
+		// Fetching Regions under Company
+		regions = organizationManagementService.getRegionsForCompany(companyProfileName);
+		model.addAttribute("regions", regions);
+		
+		// Fetching Branches under Company
+		try {
+			branches = organizationManagementService.getBranchesUnderCompany(companyProfileName);
+			model.addAttribute("branches", branches);
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while fetching company hierarchy branches. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		// Fetching Individuals under Company
+		try {
+			individuals = profileManagementService.getIndividualsForCompany(companyProfileName);
+			model.addAttribute("individuals", individuals);
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while fetching company hierarchy individuals. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.debug("Method getCompanyHierarchy() finished from ProfileManagementController");
+		return model;
+	}
+
+	@RequestMapping(value = "/getregionhierarchy", method = RequestMethod.GET)
+	public String getRegionHierarchyOnClick(Model model, HttpServletRequest request) {
+		LOG.info("Method getRegionHierarchyOnClick() called from ProfileManagementController");
+		try {
+			model = getRegionHierarchy(model, request);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching region hierarchy. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method getRegionHierarchyOnClick() finished from ProfileManagementController");
+		return JspResolver.PROFILE_HIERARCHY_CLICK_REGION;
+	}
+
+	private Model getRegionHierarchy(Model model, HttpServletRequest request) throws InvalidInputException {
+		LOG.debug("Method getRegionHierarchy() called from ProfileManagementController");
+		List<Branch> branches;
+		List<AgentSettings> individuals;
+		
+		long regionId = Long.parseLong(request.getParameter("regionId"));
+		if (regionId == 0l) {
+			LOG.error("Invalid regionId passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid regionId passed in method getAdminHierarchy().");
+		}
+
+		// Fetching Branches under Region
+		branches = organizationManagementService.getBranchesByRegionId(regionId);
+		model.addAttribute("branches", branches);
+
+		// Fetching Individuals under Region
+		try {
+			individuals = profileManagementService.getIndividualsByRegionId(regionId);
+			model.addAttribute("individuals", individuals);
+		}
+		catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException while fetching region hierarchy. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.debug("Method getRegionHierarchy() finished from ProfileManagementController");
+		return model;
+	}
+	
+	@RequestMapping(value = "/getbranchhierarchy", method = RequestMethod.GET)
+	public String getBranchHierarchyOnClick(Model model, HttpServletRequest request) {
+		LOG.info("Method getBranchHierarchyOnClick() called from ProfileManagementController");
+		try {
+			model = getBranchHierarchy(model, request);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching branch hierarchy. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method getBranchHierarchyOnClick() finished from ProfileManagementController");
+		return JspResolver.PROFILE_HIERARCHY_CLICK_BRANCH;
+	}
+
+	private Model getBranchHierarchy(Model model, HttpServletRequest request) throws InvalidInputException {
+		LOG.debug("Method getBranchHierarchy() finished from ProfileManagementController");
+		List<AgentSettings> individuals;
+		long branchId = Long.parseLong(request.getParameter("branchId"));
+		if (branchId == 0l) {
+			LOG.error("Invalid branchId passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid branchId passed in method getAdminHierarchy().");
+		}
+
+		// Fetching Individuals under Branch
+		individuals = profileManagementService.getIndividualsByBranchId(branchId);
+		model.addAttribute("individuals", individuals);
+
+		LOG.debug("Method getBranchHierarchy() finished from ProfileManagementController");
+		return model;
+	}
+	
+	@RequestMapping(value = "/fetchreviews", method = RequestMethod.GET)
+	public String fetchReviews(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchReviews() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
+
+		List<SurveyDetails> reviewItems = null;
+		try {
+			double maxScore = CommonConstants.MAX_RATING_SCORE;
+			double minScore = Double.parseDouble(request.getParameter("minScore"));
+			int startIndex = Integer.parseInt(request.getParameter("startIndex"));
+			int numRows = Integer.parseInt(request.getParameter("numOfRows"));
+
+			if (user.isCompanyAdmin()) {
+				long companyId = Long.parseLong(request.getParameter("companyId"));
+				if (companyId == 0l) {
+					LOG.error("Invalid companyId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
+				}
+
+				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_COMPANY);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Long.parseLong(request.getParameter("regionId"));
+				if (regionId == 0l) {
+					LOG.error("Invalid regionId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
+				}
+
+				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_REGION);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Long.parseLong(request.getParameter("branchId"));
+				if (branchId == 0l) {
+					LOG.error("Invalid branchId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
+				}
+				
+				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_BRANCH);
+			}
+			else if (user.isAgent()) {
+				long agentId = Long.parseLong(request.getParameter("agentId"));
+				if (agentId == 0l) {
+					LOG.error("Invalid agentId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
+				}
+				
+				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+			}
+
+			model.addAttribute("reviewItems", reviewItems);
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE,
+					CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews"), e.getMessage());
+		}
+
+		LOG.info("Method fetchReviews() finished from ProfileManagementController");
+		return JspResolver.PROFILE_REVIEWS;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/fetchreviewcount", method = RequestMethod.GET)
+	public String fetchReviewCount(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchReviewCount() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
+
+		long reviewCount = 0l;
+		try {
+			double maxScore = CommonConstants.MAX_RATING_SCORE;
+			double minScore = Double.parseDouble(request.getParameter("minScore"));
+
+			if (user.isCompanyAdmin()) {
+				long companyId = Long.parseLong(request.getParameter("companyId"));
+				if (companyId == 0l) {
+					LOG.error("Invalid companyId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
+				}
+
+				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Long.parseLong(request.getParameter("regionId"));
+				if (regionId == 0l) {
+					LOG.error("Invalid regionId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
+				}
+
+				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Long.parseLong(request.getParameter("branchId"));
+				if (branchId == 0l) {
+					LOG.error("Invalid branchId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
+				}
+				
+				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
+			}
+			else if (user.isAgent()) {
+				long agentId = Long.parseLong(request.getParameter("agentId"));
+				if (agentId == 0l) {
+					LOG.error("Invalid agentId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
+				}
+				
+				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+			}
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE,
+					CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching reviews"), e.getMessage());
+		}
+
+		LOG.info("Method fetchReviewCount() finished from ProfileManagementController");
+		return reviewCount + "";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/fetchaveragerating", method = RequestMethod.GET)
+	public String fetchAverageRating(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchAverageRating() called from ProfileManagementController");
+		User user = sessionHelper.getCurrentUser();
+
+		double averageRating = 0l;
+		try {
+			if (user.isCompanyAdmin()) {
+				long companyId = Long.parseLong(request.getParameter("companyId"));
+				if (companyId == 0l) {
+					LOG.error("Invalid companyId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
+				}
+
+				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY);
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = Long.parseLong(request.getParameter("regionId"));
+				if (regionId == 0l) {
+					LOG.error("Invalid regionId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
+				}
+
+				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION);
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = Long.parseLong(request.getParameter("branchId"));
+				if (branchId == 0l) {
+					LOG.error("Invalid branchId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
+				}
+				
+				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
+			}
+			else if (user.isAgent()) {
+				long agentId = Long.parseLong(request.getParameter("agentId"));
+				if (agentId == 0l) {
+					LOG.error("Invalid agentId passed in method fetchReviews().");
+					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
+				}
+				
+				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+			}
+		}
+		catch (InvalidInputException e) {
+			throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE,
+					CommonConstants.SERVICE_CODE_COMPANY_REVIEWS, "Something went wrong while fetching Average rating"), e.getMessage());
+		}
+
+		LOG.info("Method fetchAverageRating() finished from ProfileManagementController");
+		return averageRating + "";
 	}
 }

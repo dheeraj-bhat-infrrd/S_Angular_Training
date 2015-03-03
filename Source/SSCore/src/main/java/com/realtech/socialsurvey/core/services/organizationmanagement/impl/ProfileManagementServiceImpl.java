@@ -142,8 +142,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Individual
 					else if (user.isAgent()) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Enterprise account type");
-						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-								.getBranchSettings().get(branchId));
+						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), settings.getRegionSettings().get(regionId),
+								settings.getBranchSettings().get(branchId));
 					}
 					break;
 
@@ -165,7 +165,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// Fetching Company Lock settings
 		LockSettings parentLock = new LockSettings();
 		parentLock = aggregateLockSettings(companySettings.getLockSettings(), parentLock);
-		
+
 		// Aggregate Region Lock settings if exists
 		if (regionSettings != null) {
 			parentLock = aggregateLockSettings(regionSettings.getLockSettings(), parentLock);
@@ -200,7 +200,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	private LockSettings aggregateLockSettings(LockSettings higherLock, LockSettings parentLock) {
 		LOG.debug("Method aggregateLockSettings() called from ProfileManagementService");
-		
+
 		// Aggregate parentLockSettings with higherLockSettings
 		if (higherLock != null) {
 			if (higherLock.getIsLogoLocked()) {
@@ -249,7 +249,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			LOG.debug("Setting Company Profile for Company Admin");
 			userProfile = settings.getCompanySettings();
 		}
-		
+
 		// If user is not Company Admin, Profile need to be aggregated
 		else {
 			switch (accountType) {
@@ -344,7 +344,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (regionSettings != null) {
 			branchSettings = aggregateProfileData(regionSettings, branchSettings, userLock);
 		}
-		
+
 		// Aggregate Branch Profile Settings
 		// to reflect lockSettings of Branch
 		branchSettings = aggregateProfileData(branchSettings, branchSettings, userLock);
@@ -378,7 +378,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// No Aggregation needed Agent Profile Settings
 		// manully setting since agent do not have lockSettings
 		agentSettings.setLockSettings(userLock);
-		
+
 		LOG.debug("Method aggregateAgentProfile() finished from ProfileManagementService");
 		return agentSettings;
 	}
@@ -408,16 +408,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				userProfile.getContact_details().setName(parentProfile.getContact_details().getName());
 				userLock.setDisplayNameLocked(true);
 			}
-			if (parentLock.getIsWebAddressLocked() && !userLock.getIsWebAddressLocked() && userProfile.getContact_details().getWeb_addresses() != null) {
+			if (parentLock.getIsWebAddressLocked() && !userLock.getIsWebAddressLocked()
+					&& userProfile.getContact_details().getWeb_addresses() != null) {
 				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
 				userLock.setWebAddressLocked(true);
 			}
-			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
+			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
+					&& userProfile.getContact_details().getContact_numbers() != null) {
 				userProfile.getContact_details().getContact_numbers().setWork(parentProfile.getContact_details().getContact_numbers().getWork());
 				userLock.setWorkPhoneLocked(true);
 			}
-			if (parentLock.getIsPersonalPhoneLocked() && !userLock.getIsPersonalPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
-				userProfile.getContact_details().getContact_numbers().setPersonal(parentProfile.getContact_details().getContact_numbers().getPersonal());
+			if (parentLock.getIsPersonalPhoneLocked() && !userLock.getIsPersonalPhoneLocked()
+					&& userProfile.getContact_details().getContact_numbers() != null) {
+				userProfile.getContact_details().getContact_numbers()
+						.setPersonal(parentProfile.getContact_details().getContact_numbers().getPersonal());
 				userLock.setPersonalPhoneLocked(true);
 			}
 			if (parentLock.getIsFaxPhoneLocked() && !userLock.getIsFaxPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
@@ -718,6 +722,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to get the branch based on profile name
 	 */
 	@Override
+	@Transactional
 	public OrganizationUnitSettings getBranchByProfileName(String companyProfileName, String branchProfileName) throws InvalidInputException {
 		LOG.info("Method getBranchByProfileName called for companyProfileName:" + companyProfileName + " and branchProfileName:" + branchProfileName);
 
@@ -760,58 +765,61 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	/**
 	 * Method to get profile of an individual
+	 * 
+	 * @throws NoRecordsFetchedException
 	 */
 	@Override
-	public OrganizationUnitSettings getIndividualByProfileName(String companyProfileName, String agentProfileName) throws InvalidInputException {
-		LOG.info("Method getIndividualByProfileName called for companyProfileName:" + companyProfileName + " and agentProfileName:"
-				+ agentProfileName);
-		OrganizationUnitSettings agentSettings = null;
+	@Transactional
+	public OrganizationUnitSettings getIndividualByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getIndividualByProfileName called for agentProfileName:" + agentProfileName);
 
-		if (companyProfileName == null || companyProfileName.isEmpty()) {
-			throw new InvalidInputException("company profile name is null or empty while getting agent settings");
-		}
+		OrganizationUnitSettings agentSettings = null;
 		if (agentProfileName == null || agentProfileName.isEmpty()) {
 			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
 		}
+
 		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
 				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-		User user = userDao.findById(User.class, agentSettings.getIden());
-		List<UserProfile> userProfiles = user.getUserProfiles();
-
-		if (userProfiles != null && !userProfiles.isEmpty()) {
-			userProfiles.get(0);
+		if (agentSettings == null) {
+			throw new NoRecordsFetchedException("No settings found for agent while fetching agent profile");
 		}
-		// TODO fetch final agent settings based on the locks
 
+		User user = userDao.findById(User.class, agentSettings.getIden());
+
+		LOG.debug("Fetching user profiles for agentId: " + agentSettings.getIden());
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		UserProfile userProfile = null;
+		if (userProfiles != null && !userProfiles.isEmpty()) {
+			userProfile = userProfiles.get(0);
+		}
+		else {
+			throw new NoRecordsFetchedException("User profiles not found while fetching agent profile");
+		}
+
+		long companyId = userProfile.getCompany().getCompanyId();
+		LOG.debug("Fetching company settings for companyId: "+companyId);
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		long regionId = userProfile.getRegionId();
+		OrganizationUnitSettings regionSettings = null;
+		if (regionId > 0l) {
+			LOG.debug("Fetching region settings for regionId: " + regionId);
+			regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
+					MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		}
+
+		long branchId = userProfile.getBranchId();
+		OrganizationUnitSettings branchSettings = null;
+		if (branchId > 0l) {
+			LOG.debug("Fetching branch settings for regionId: " + branchId);
+			branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
+					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		}
+		
+		agentSettings = aggregateAgentProfile(companySettings, regionSettings, branchSettings, agentSettings);
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
-	}
-
-	/**
-	 * Method to get aggregated reviews of all agents of a company
-	 */
-	@Override
-	public List<SurveyDetails> getReviewsForCompany(long companyId, double startScore, double limitScore, int startIndex, int numOfRows)
-			throws InvalidInputException {
-		LOG.info("Method getReviewsForCompany called for companyId:" + companyId + " and limitScore:" + limitScore);
-		List<SurveyDetails> surveyDetails = surveyDetailsDao.getFeedbacks(CommonConstants.COMPANY_ID_COLUMN, companyId,startIndex,numOfRows, startScore, limitScore);
-		LOG.info("Method getReviewsForCompany executed successfully");
-		return surveyDetails;
-	}
-
-	/**
-	 * Method to get average rating for individuals of a company
-	 */
-	@Override
-	public double getAverageRatingForCompany(long companyId) throws InvalidInputException {
-		LOG.info("Method getAverageRatingForCompany called for companyId:" + companyId);
-		if (companyId <= 0l) {
-			throw new InvalidInputException("Company id is invalid for getting average rating os a company");
-		}
-		double averageRating = surveyDetailsDao.getRatingForPastNdays(CommonConstants.COMPANY_ID_COLUMN, companyId, -1);
-
-		LOG.info("Method getAverageRatingForCompany executed successfully");
-		return averageRating;
 	}
 
 	@Override
@@ -877,6 +885,100 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsByRegionId executed successfully");
 		return users;
+	}
+
+	/**
+	 * Method to fetch reviews based on the profile level specified, iden is one of
+	 * agentId/branchId/regionId or companyId based on the profile level
+	 */
+	@Override
+	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
+			throws InvalidInputException {
+		LOG.info("Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
+				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
+		List<SurveyDetails> surveyDetails = null;
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is invalid while fetching reviews");
+		}
+		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
+		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore);
+		return surveyDetails;
+	}
+
+	/**
+	 * Method to get average ratings based on the profile level specified, iden is one of
+	 * agentId/branchId/regionId or companyId based on the profile level
+	 */
+	@Override
+	public double getAverageRatings(long iden, String profileLevel) throws InvalidInputException {
+		LOG.info("Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel);
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is invalid for getting average rating os a company");
+		}
+		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
+		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1);
+
+		LOG.info("Method getAverageRatings executed successfully.Returning: " + averageRating);
+		return averageRating;
+	}
+
+	/**
+	 * Method to get iden column name from profile level
+	 * 
+	 * @param profileLevel
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String getIdenColumnNameFromProfileLevel(String profileLevel) throws InvalidInputException {
+		LOG.debug("Getting iden column name for profile level:" + profileLevel);
+		String idenColumnName = null;
+		if (profileLevel == null || profileLevel.isEmpty()) {
+			throw new InvalidInputException("profile level is null or empty while getting iden column name");
+		}
+		switch (profileLevel) {
+			case CommonConstants.PROFILE_LEVEL_COMPANY:
+				idenColumnName = CommonConstants.COMPANY_ID_COLUMN;
+				break;
+			case CommonConstants.PROFILE_LEVEL_REGION:
+				idenColumnName = CommonConstants.REGION_ID_COLUMN;
+				break;
+			case CommonConstants.PROFILE_LEVEL_BRANCH:
+				idenColumnName = CommonConstants.BRANCH_ID_COLUMN;
+				break;
+			case CommonConstants.PROFILE_LEVEL_INDIVIDUAL:
+				idenColumnName = CommonConstants.AGENT_ID_COLUMN;
+				break;
+			default:
+				throw new InvalidInputException("Invalid profile level while getting iden column name");
+		}
+		LOG.debug("Returning column name:" + idenColumnName + " for profile level:" + profileLevel);
+		return idenColumnName;
+	}
+
+	/**
+	 * Method to get reviews count based on the profile level specified, iden is one of
+	 * agentId/branchId/regionId or companyId based on the profile level within limit of rating
+	 * score specified
+	 */
+	@Override
+	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel) throws InvalidInputException {
+		LOG.info("Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore + " profilelevel:"
+				+ profileLevel);
+		if (iden <= 0l) {
+			throw new InvalidInputException("Iden is invalid for getting reviews count");
+		}
+		long reviewsCount = 0;
+		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
+		reviewsCount = surveyDetailsDao.getFeedBacksCount(idenColumnName, iden, minScore, maxScore);
+
+		LOG.info("Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount);
+		return reviewsCount;
+	}
+
+	@Override
+	public String getProListByProfileLevel(long iden, String profileLevel) throws InvalidInputException {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
