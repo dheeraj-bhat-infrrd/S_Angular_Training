@@ -40,6 +40,8 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 @DependsOn("generic")
 @Component
@@ -73,6 +75,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private UserManagementService userManagementService;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -797,7 +802,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 
 		long companyId = userProfile.getCompany().getCompanyId();
-		LOG.debug("Fetching company settings for companyId: "+companyId);
+		LOG.debug("Fetching company settings for companyId: " + companyId);
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -816,7 +821,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
 					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		}
-		
+
 		agentSettings = aggregateAgentProfile(companySettings, regionSettings, branchSettings, agentSettings);
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
@@ -975,10 +980,40 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		return reviewsCount;
 	}
 
+	/**
+	 * Method to get the list of individuals for branch/region or company as specified ide in one of
+	 * branchId/regionId/companyId
+	 * @throws SolrException 
+	 */
 	@Override
-	public String getProListByProfileLevel(long iden, String profileLevel) throws InvalidInputException {
-		// TODO Auto-generated method stub
-		return null;
+	public String getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException {
+		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
+				+ numOfRows);
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is invalid in getProListByProfileLevel");
+		}
+		if (profileLevel == null || profileLevel.isEmpty()) {
+			throw new InvalidInputException("profile level is null in getProListByProfileLevel");
+		}
+		String idenFieldName = null;
+		String searchResult = null;
+		switch (profileLevel) {
+			case CommonConstants.PROFILE_LEVEL_COMPANY:
+				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
+				break;
+			case CommonConstants.PROFILE_LEVEL_REGION:
+				idenFieldName = CommonConstants.REGION_ID_SOLR;
+				break;
+			case CommonConstants.PROFILE_LEVEL_BRANCH:
+				idenFieldName = CommonConstants.BRANCH_ID_SOLR;
+				break;
+			default:
+				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
+		}
+			searchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
+		
+		LOG.info("Method getProListByProfileLevel finished successfully");
+		return searchResult;
 	}
 
 }
