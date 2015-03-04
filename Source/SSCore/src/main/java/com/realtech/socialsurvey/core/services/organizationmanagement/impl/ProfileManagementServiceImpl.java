@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -986,7 +987,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws SolrException 
 	 */
 	@Override
-	public String getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException {
+	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException {
 		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
 				+ numOfRows);
 		if (iden <= 0l) {
@@ -996,7 +997,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("profile level is null in getProListByProfileLevel");
 		}
 		String idenFieldName = null;
-		String searchResult = null;
+		SolrDocumentList solrSearchResult = null;
 		switch (profileLevel) {
 			case CommonConstants.PROFILE_LEVEL_COMPANY:
 				idenFieldName = CommonConstants.COMPANY_ID_SOLR;
@@ -1010,10 +1011,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 		}
-			searchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
+			solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
 		
 		LOG.info("Method getProListByProfileLevel finished successfully");
-		return searchResult;
+		return solrSearchResult;
 	}
 
 }
