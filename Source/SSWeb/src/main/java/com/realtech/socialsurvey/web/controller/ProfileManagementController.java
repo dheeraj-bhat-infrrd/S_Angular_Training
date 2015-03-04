@@ -317,7 +317,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in editing LockSettings.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setLockSettings(lockSettings);
@@ -329,7 +329,7 @@ public class ProfileManagementController {
 					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			LOG.error("NonFatalException while editing LockSettings. Reason :" + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
@@ -469,7 +469,7 @@ public class ProfileManagementController {
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ABOUT_ME_SOLR, aboutMe);
 			}
 			else {
-				throw new InvalidInputException("Error occurred while checking user details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Error occurred while updating About me.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -581,7 +581,7 @@ public class ProfileManagementController {
 				}
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -716,7 +716,7 @@ public class ProfileManagementController {
 				}
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in editing Address details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -826,7 +826,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in uploading logo.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setLogo(logoUrl);
@@ -942,7 +942,7 @@ public class ProfileManagementController {
 				solrSearchService.editUserInSolr(agentId, CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setProfileImageUrl(profileImageUrl);
@@ -970,6 +970,7 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
+	// TODO
 	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
 	public String updateEmailds(Model model, HttpServletRequest request) {
 		LOG.info("Method updateEmailds() called from ProfileManagementController");
@@ -1049,7 +1050,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating emailids.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -1088,9 +1089,11 @@ public class ProfileManagementController {
 			String value = mailId.getValue();
 			if (key.equalsIgnoreCase("work")) {
 				mailIdSettings.setWork(value);
+				mailIdSettings.setWorkEmailVerified(false);
 			}
 			else if (key.equalsIgnoreCase("personal")) {
 				mailIdSettings.setPersonal(value);
+				mailIdSettings.setPersonalEmailVerified(false);
 			}
 			else {
 				if (others == null) {
@@ -1191,7 +1194,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating phone numbers.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -1336,7 +1339,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating web addresses.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -2380,7 +2383,7 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_PAGE;
 	}
 
-	// TODO
+	// Fetch Admin hierarchy
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {
 		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");
