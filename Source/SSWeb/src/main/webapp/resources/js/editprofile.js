@@ -477,7 +477,13 @@ function callBackShowProfileSocialLinks(data) {
 	adjustImage();
 }
 
-// Function to append an association
+// Agent details
+$(document).on('click', '.lp-ach-item-img', function() {
+	$(this).prev().remove();
+	$(this).remove();
+});
+
+// TODO Function to update association/membership list
 function addAnAssociation() {
 	if ($('#association-container > input').length <= 0) {
 		$('#association-container').empty();
@@ -496,55 +502,12 @@ function addAnAssociation() {
 	newAssociation.focus();
 }
 
-// Function to append an achievement
-$(document).on('click', '.lp-ach-item-img', function() {
-	$(this).prev().remove();
-	$(this).remove();
-});
-
-function addAnAchievement() {
-	if ($('#achievement-container > input').length <= 0) {
-		$('#achievement-container').empty();
-	}
-	var newAchievement = $('<input>').attr({
-		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
-		"placeholder" : "New Achievement"
-	});
-	$('#achievement-container').append(newAchievement);
-
-	var newAchievementButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
-	});
-	$('#achievement-container').append(newAchievementButton);
-
-	newAchievement.focus();
-}
-
-function addAuthorisedIn() {
-	if ($('#authorised-in-container > input').length <= 0) {
-		$('#authorised-in-container').empty();
-	}
-	var newAuthorisation = $('<input>').attr({
-		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin",
-		"placeholder" : "Authorized in"
-	});
-	$('#authorised-in-container').append(newAuthorisation);
-
-	var newAuthorizationButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
-	});
-	$('#authorised-in-container').append(newAuthorizationButton);
-
-	newAuthorisation.focus();
-}
-
 $(document).on('blur', '#association-container input', function() {
 	delay(function() {
 		updateAssociations();
 	}, 0);
 });
 
-// Function to update association list
 function updateAssociations() {
 	var associationList = [];
 	$('#association-container').children('input').each(function() {
@@ -571,13 +534,31 @@ function callBackUpdateAssociations(data) {
 	showAssociationList();
 }
 
+// TODO Function to update achievement list
+function addAnAchievement() {
+	if ($('#achievement-container > input').length <= 0) {
+		$('#achievement-container').empty();
+	}
+	var newAchievement = $('<input>').attr({
+		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
+		"placeholder" : "New Achievement"
+	});
+	$('#achievement-container').append(newAchievement);
+
+	var newAchievementButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#achievement-container').append(newAchievementButton);
+
+	newAchievement.focus();
+}
+
 $(document).on('blur', '#achievement-container input', function() {
 	delay(function() {
 		updateAchievements();
 	}, 0);
 });
 
-// Function to update achievement list
 function updateAchievements() {
 	var achievementList = [];
 	$('#achievement-container').children('input').each(function() {
@@ -605,13 +586,31 @@ function callBackUpdateAchievements(data) {
 	showAchievementList();
 }
 
+// TODO Function to update License authorizations
+function addAuthorisedIn() {
+	if ($('#authorised-in-container > input').length <= 0) {
+		$('#authorised-in-container').empty();
+	}
+	var newAuthorisation = $('<input>').attr({
+		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin",
+		"placeholder" : "Authorized in"
+	});
+	$('#authorised-in-container').append(newAuthorisation);
+
+	var newAuthorizationButton = $('<div>').attr({
+		"class" : "float-left lp-ach-item-img",
+	});
+	$('#authorised-in-container').append(newAuthorizationButton);
+
+	newAuthorisation.focus();
+}
+
 $(document).on('blur', '#authorised-in-container input', function() {
 	delay(function() {
 		updateLicenseAuthorizations();
 	}, 0);
 });
 
-// Function to update License authorizations
 function updateLicenseAuthorizations() {
 	var licenceList = [];
 	$('#authorised-in-container').children('input').each(function() {
@@ -944,6 +943,7 @@ function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 		$(".review-ratings").each(function() {
 			changeRatingPattern($(this).data("rating"), $(this));
 		});
+		
 		$('.icn-plus-open').click(function(){
 	        $(this).hide();
 	        $(this).parent().find('.ppl-share-social,.icn-remove').show();

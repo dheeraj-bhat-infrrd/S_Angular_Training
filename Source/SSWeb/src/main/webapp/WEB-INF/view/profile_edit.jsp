@@ -334,7 +334,7 @@
 							<div class="left-assoc-wrapper">
 								<div class="clearfix">
 									<div class="float-left left-panel-header"><spring:message code="label.membership.key" /></div>
-									<div class="float-right icn-share icn-plus-open" onclick="addAnAssociation();"></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAnAssociation();"></div>
 								</div>
 								<div id="association-container" class="left-panel-content">
 									<c:choose>
@@ -354,7 +354,7 @@
 							<div class="left-ach-wrapper">
 								<div class="clearfix">
 									<div class="float-left left-panel-header"><spring:message code="label.achievement.key" /></div>
-									<div class="float-right icn-share icn-plus-open" onclick="addAnAchievement();"></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAnAchievement();"></div>
 								</div>
 								<div id="achievement-container" class="left-panel-content">
 									<c:choose>
@@ -374,7 +374,7 @@
 							<div class="left-auth-wrapper">
 								<div class="clearfix">
 									<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
-									<div class="float-right icn-share icn-plus-open" onclick="addAuthorisedIn();"></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAuthorisedIn();"></div>
 								</div>
 								<div id="authorised-in-container" class="left-panel-content">
 									<c:choose>
