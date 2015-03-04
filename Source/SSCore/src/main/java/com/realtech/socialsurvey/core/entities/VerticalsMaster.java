@@ -1,9 +1,14 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.List;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 
 /**
@@ -40,6 +45,30 @@ public class VerticalsMaster implements Serializable {
 	//bi-directional many-to-one association to VerticalCrmMapping
 	@OneToMany(mappedBy="verticalsMaster")
 	private List<VerticalCrmMapping> verticalCrmMappings;
+	
+	//bi-directional many-to-one association to Survey
+	@OneToMany(mappedBy="verticalsMaster")
+	private List<Survey> surveys;
+
+	//bi-directional many-to-one association to Survey
+	@OneToMany(mappedBy="verticalsMaster")
+	private List<Survey> companies;
+	
+	public List<Survey> getCompanies() {
+		return companies;
+	}
+
+	public void setCompanies(List<Survey> companies) {
+		this.companies = companies;
+	}
+
+	public List<Survey> getSurveys() {
+		return surveys;
+	}
+
+	public void setSurveys(List<Survey> surveys) {
+		this.surveys = surveys;
+	}
 
 	public VerticalsMaster() {
 	}

@@ -19,7 +19,6 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 
@@ -69,14 +68,7 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 			//Sending mail to the respective user. We fetch the corporate admin for the company
 			User user = commonServices.getCorporateAdmin(company);
 			LOG.info("Sending mail to the respective corporate admin with email id : " + user.getEmailId());
-			try {
-				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
-				throw new UndeliveredEmailException("Email not delivered.");
-			}
-			catch (UndeliveredEmailException e) {
-				LOG.error("UnsubscribeAccountsItemProcessor : Exception caught when sending account disabled mail. Message : " + e.getMessage());
-				coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e);
-			}
+			emailServices.queueAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
 			LOG.info("Email successfully sent!");
 			
 			//Updating the company record to reflect changes

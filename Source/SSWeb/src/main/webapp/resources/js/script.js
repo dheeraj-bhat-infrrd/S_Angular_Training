@@ -746,6 +746,25 @@ $(window).resize(function(){
    }
 });
 
+
+
+function upgradeToPaidPlan(){
+	 console.log("upgrade plan button clicked");
+	 var url = "./upgradetopaidplanpage.do";
+	    
+	    $.ajax({
+	    	url: url,
+	    	type: "GET",
+	    	success: function(data){
+	        	$('#outer-payment').html(data);
+	        	$('#outer-payment').show();
+	        	},
+	        error : function(e) {
+	    			console.log(e);
+	    		}
+	    	});
+}
+
 /*function upgradePlan(){
 	console.log("upgrade plan button clicked");
 	var url = "./upgradepage.do";
