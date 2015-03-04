@@ -5,7 +5,7 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title><spring:message code="label.completeregistration.title.key" /></title>
+	<title><spring:message code="label.linkedin.access.key" /></title>
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
@@ -40,9 +40,8 @@
 		<div class="reg_lkin_wrapper text-center">
 			<div class="reg_lin_lin2"><spring:message code="label.allowaccess.message" /></div>
 			<div class="reg_lin_btn_wrapper">
-				<!-- <div class="btn_reg_lin">Connect With LinkedIn</div> -->
-				<input id="allow-access" type="button" onclick="redirectToAuthPage();" class="btn-payment float-left" value='<spring:message code="label.allowaccess.key"/>' />
-				<input id="skip-button" type="button" class="btn-payment float-right" value='<spring:message code="label.skip.key"/>' />
+				<div id="allow-access" class="btn_reg_lin" onclick="redirectToAuthPage();"></div>
+				<div id="skip-button" class="btn-reg-lin-skip"><spring:message code="label.skip.key"/></div>
 			</div>
 		</div>
 	</div>
