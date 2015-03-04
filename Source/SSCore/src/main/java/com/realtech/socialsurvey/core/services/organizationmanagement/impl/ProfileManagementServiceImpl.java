@@ -217,6 +217,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			if (higherLock.getIsWebAddressLocked()) {
 				parentLock.setWebAddressLocked(true);
 			}
+			if (higherLock.getIsBlogAddressLocked()) {
+				parentLock.setBlogAddressLocked(true);
+			}
 			if (higherLock.getIsWorkPhoneLocked()) {
 				parentLock.setWorkPhoneLocked(true);
 			}
@@ -417,6 +420,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					&& userProfile.getContact_details().getWeb_addresses() != null) {
 				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
 				userLock.setWebAddressLocked(true);
+			}
+			if (parentLock.getIsBlogAddressLocked() && !userLock.getIsBlogAddressLocked()
+					&& userProfile.getContact_details().getWeb_addresses() != null) {
+				userProfile.getContact_details().getWeb_addresses().setBlogs(parentProfile.getContact_details().getWeb_addresses().getBlogs());
+				userLock.setBlogAddressLocked(true);
 			}
 			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
 					&& userProfile.getContact_details().getContact_numbers() != null) {

@@ -243,6 +243,33 @@
 	  							</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-web"></div>
+								<div>
+									<c:choose>
+										<c:when	test="${parentLock.isBlogAddressLocked && not user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>' readonly>
+											<div id="web-address-blogs-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${parentLock.isBlogAddressLocked && user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>' readonly>
+											<div id="web-address-blogs-lock" data-state="locked" data-control="parent" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isBlogAddressLocked && user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
+											<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isBlogAddressLocked && lock.isBlogAddressLocked && not user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
+											<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isBlogAddressLocked && not lock.isBlogAddressLocked && not user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
+											<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
+	  							</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-phone"></div>
 								<div class="float-left lp-edit-wrapper clearfix float-left">
 									<c:choose>

@@ -359,6 +359,11 @@ public class ProfileManagementController {
 					lockSettings.setWebAddressLocked(status);;
 				}
 				break;
+			case "web-address-blogs-lock":
+				if (!parentLock.getIsBlogAddressLocked()) {
+					lockSettings.setBlogAddressLocked(status);;
+				}
+				break;
 			case "phone-number-work-lock":
 				if (!parentLock.getIsWorkPhoneLocked()) {
 					lockSettings.setWorkPhoneLocked(status);
@@ -1381,6 +1386,9 @@ public class ProfileManagementController {
 			else if (key.equalsIgnoreCase("personal")) {
 				webAddressSettings.setPersonal(value);
 			}
+			else if (key.equalsIgnoreCase("blogs")) {
+				webAddressSettings.setBlogs(value);
+			}
 			else {
 				if (others == null) {
 					others = new ArrayList<>();
@@ -1860,7 +1868,6 @@ public class ProfileManagementController {
 			}
 
 			String payload = request.getParameter("achievementList");
-			LOG.info("Acheivements" + payload);
 			try {
 				if (payload == null) {
 					throw new InvalidInputException("Acheivements passed was null");
