@@ -1774,7 +1774,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		String profileName = generateIndividualProfileName(user.getUserId(), user.getEmailId());
 		agentSettings.setProfileName(profileName);
-		agentSettings.setProfileUrl(utils.generateAgentProfileUrl(profileName));
+		String profileUrl = utils.generateAgentProfileUrl(profileName);
+		agentSettings.setProfileUrl(profileUrl);
+
+		/**
+		 * setting profile url and name to user object for further operations
+		 */
+		user.setProfileName(profileName);
+		user.setProfileUrl(profileUrl);
 
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
