@@ -264,6 +264,7 @@ public interface CommonConstants {
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
 	public static final String ABOUT_ME_SOLR = "aboutMe";
+	public static final String PROFILE_NAME_SOLR = "profileName";
 	public static final String PROFILE_URL_SOLR = "profileUrl";
 	public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
 	public static final String TITLE_SOLR = "title";
