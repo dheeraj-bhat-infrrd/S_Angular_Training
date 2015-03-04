@@ -2234,8 +2234,9 @@ public class ProfileManagementController {
 	 */
 	@RequestMapping("/initfindapro")
 	public String initProListByProfileLevelPage(Model model, @QueryParam(value = "profileLevel") String profileLevel,
-			@QueryParam(value = "iden") Long iden,@QueryParam(value="searchCriteria") String searchCriteria) {
-		LOG.info("Method initProListByProfileLevelPage called for profileLevel:" + profileLevel + " and iden:" + iden+" and searchCriteria:"+searchCriteria);
+			@QueryParam(value = "iden") Long iden, @QueryParam(value = "searchCriteria") String searchCriteria) {
+		LOG.info("Method initProListByProfileLevelPage called for profileLevel:" + profileLevel + " and iden:" + iden + " and searchCriteria:"
+				+ searchCriteria);
 		DisplayMessage message = null;
 		try {
 			if (profileLevel == null || profileLevel.isEmpty()) {
@@ -2244,6 +2245,10 @@ public class ProfileManagementController {
 			}
 			if (iden == null || iden <= 0l) {
 				throw new InvalidInputException("iden is invalid in initProListByProfileLevelPage", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			SolrDocumentList solrResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, 0, 0);
+			if (solrResult != null) {
+				model.addAttribute("numfound", solrResult.getNumFound());
 			}
 			model.addAttribute("profileLevel", profileLevel);
 			model.addAttribute("iden", iden);
