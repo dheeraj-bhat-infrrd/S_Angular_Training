@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
@@ -280,6 +281,6 @@ public interface ProfileManagementService {
 	 * @throws MalformedURLException
 	 * @throws SolrException
 	 */
-	public String getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException;
+	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException;
 
 }
