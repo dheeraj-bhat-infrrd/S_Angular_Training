@@ -192,6 +192,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script>
     $(document).ready(function(){

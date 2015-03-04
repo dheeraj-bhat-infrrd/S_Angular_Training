@@ -746,22 +746,7 @@ $(window).resize(function(){
    }
 });
 
-function upgradePlan(){
-	 console.log("upgrade plan button clicked");
-	 var url = "./upgradepage.do";
-	    
-	    $.ajax({
-	    	url: url,
-	    	type: "GET",
-	    	success: function(data){
-	        	$('.overlay-payment').html(data);
-	        	$('.overlay-payment').show();
-	        	},
-	        error : function(e) {
-	    			console.log(e);
-	    		}
-	    	});
-}
+
 
 function upgradeToPaidPlan(){
 	 console.log("upgrade plan button clicked");
@@ -779,3 +764,20 @@ function upgradeToPaidPlan(){
 	    		}
 	    	});
 }
+
+/*function upgradePlan(){
+	console.log("upgrade plan button clicked");
+	var url = "./upgradepage.do";
+
+	$.ajax({
+		url: url,
+		type: "GET",
+		success: function(data){
+			$('.overlay-payment').html(data);
+			$('.overlay-payment').show();
+		},
+		error : function(e) {
+			console.log(e);
+		}
+	});
+}*/
