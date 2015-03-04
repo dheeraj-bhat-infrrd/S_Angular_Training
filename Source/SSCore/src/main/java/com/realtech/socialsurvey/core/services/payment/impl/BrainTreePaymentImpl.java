@@ -1074,19 +1074,19 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("upgradePlanForSubscription : nonce parameter given is invalid");
 			throw new InvalidInputException("upgradePlanForSubscription : nonce parameter given is invalid");
 		}
-
+		LOG.info("upgradePlanForSubscription called!");
 		Company company = user.getCompany();
 		// We need the subscription id in case of free account
 		String subscriptionId = null;
 		
 		// Fetching the new accounts master record
-		LOG.info("Fetching the new accounts master record from the database.");
+		LOG.debug("Fetching the new accounts master record from the database.");
 		AccountsMaster newAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, newAccountsMasterId);
 		if (newAccountsMaster == null) {
 			LOG.error("upgradePlanForSubscription : null returned by dao for accountsMaster");
 			throw new InvalidInputException("upgradePlanForSubscription : null returned by dao for accountsMaster");
 		}
-		LOG.info("Accounts master record fetched.");
+		LOG.debug("Accounts master record fetched.");
 
 		LicenseDetail licenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
 		if (licenseDetail.getIsSubscriptionDue() == CommonConstants.YES) {
