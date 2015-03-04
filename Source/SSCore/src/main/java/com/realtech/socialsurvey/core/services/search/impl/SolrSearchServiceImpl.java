@@ -600,7 +600,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public String searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException, SolrException {
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException, SolrException {
 		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
 				+ noOfRows);
 		if (iden <= 0l) {
@@ -610,8 +610,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new InvalidInputException("idenFieldName is null or empty in searchUsersByIden");
 		}
 
-		String usersResult = null;
 		QueryResponse response = null;
+		SolrDocumentList results = null;
 		try {
 			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 			SolrQuery solrQuery = new SolrQuery();
@@ -628,15 +628,14 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
-			SolrDocumentList results = response.getResults();
-			usersResult = JSONUtil.toJSON(results);
-			LOG.debug("User search result is : " + usersResult);
+			results = response.getResults();
+			LOG.debug("User search result is : " + results);
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException in searchUsersByIden.Reason:" + e.getMessage(), e);
 			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method searchUsersByIden finished for iden : " + iden);
-		return usersResult;
+		return results;
 	}
 }
