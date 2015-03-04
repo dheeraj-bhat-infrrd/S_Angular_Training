@@ -477,7 +477,7 @@ function callBackShowProfileSocialLinks(data) {
 	adjustImage();
 }
 
-// TODO Agent details
+// Agent details
 $(document).on('focus', '.prof-edditable-sin-agent', function() {
 	$(this).addClass('prof-name-edit');
 });
@@ -554,7 +554,7 @@ function callBackUpdateAssociations(data) {
 	showAssociationList();
 }
 
-// TODO Function to update achievement list
+// Function to update achievement list
 function addAnAchievement() {
 	if ($('#achievement-container > input').length <= 0) {
 		$('#achievement-container').empty();
@@ -607,7 +607,7 @@ function callBackUpdateAchievements(data) {
 	showAchievementList();
 }
 
-// TODO Function to update License authorizations
+// Function to update License authorizations
 function addAuthorisedIn() {
 	if ($('#authorised-in-container > input').length <= 0) {
 		$('#authorised-in-container').empty();
@@ -1011,4 +1011,32 @@ function paintAvgRating(avgRating) {
 	if (avgRating != undefined) {
 		changeRatingPattern(avgRating, $("#rating-avg-comp"));
 	}
+}
+
+// TODO Edit EmailIds
+$(document).on('blur', '#contant-info-container input[data-email]', function() {
+	delay(function() {
+		var mailIds = [];
+		$('#contant-info-container input[data-email]').each(function() {
+			if (this.value != "") {
+				var mailId = {};
+				mailId.key = $(this).attr("data-email");
+				mailId.value = this.value;
+				mailIds.push(mailId);
+			}
+		});
+		mailIds = JSON.stringify(mailIds);
+		var payload = {
+			"mailIds" : mailIds
+		};
+		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload);
+	}, 0);
+});
+
+function callBackOnUpdateMailIds(data) {
+	$('#prof-message-header').html(data);
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 }
