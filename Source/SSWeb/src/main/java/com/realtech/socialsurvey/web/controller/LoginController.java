@@ -59,16 +59,16 @@ public class LoginController {
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
-					model.addAttribute("message",
-							messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
 					break;
 				case SESSION_ERROR:
-					model.addAttribute("message",
-							messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
 					break;
 				case LOGOUT:
-					model.addAttribute("message",
-							messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 					break;
 			}
 		}
