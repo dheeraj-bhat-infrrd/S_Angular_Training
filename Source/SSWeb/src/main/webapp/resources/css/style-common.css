@@ -4104,3 +4104,23 @@ button.paypal.is-active {
 	color: #009FE0;
 	margin: 10px auto;
 }
+
+.icn-plus-open-agent {
+    background: url(../images/iconPlus.png) no-repeat center;
+    background-size: 26px;
+    cursor: pointer;
+}
+
+.rfr_lbl_long {
+	max-height: 50px;
+	display: table-cell;
+	line-height: 25px;
+}
+
+.prof-edditable-sin-agent {
+    border: 0;
+    width: 100%;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}

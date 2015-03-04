@@ -1860,9 +1860,10 @@ public class ProfileManagementController {
 			}
 
 			String payload = request.getParameter("achievementList");
+			LOG.info("Acheivements" + payload);
 			try {
-				if (payload == null || payload.isEmpty()) {
-					throw new InvalidInputException("Acheivements passed was null or empty");
+				if (payload == null) {
+					throw new InvalidInputException("Acheivements passed was null");
 				}
 				ObjectMapper mapper = new ObjectMapper();
 				achievements = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, Achievement.class));
@@ -1959,7 +1960,7 @@ public class ProfileManagementController {
 
 			String payload = request.getParameter("associationList");
 			try {
-				if (payload == null || payload.isEmpty()) {
+				if (payload == null) {
 					throw new InvalidInputException("Association passed was null or empty");
 				}
 				ObjectMapper mapper = new ObjectMapper();
@@ -2057,7 +2058,7 @@ public class ProfileManagementController {
 			String payload = request.getParameter("licenceList");
 			List<String> authorisedIn = null;
 			try {
-				if (payload == null || payload.isEmpty()) {
+				if (payload == null) {
 					throw new InvalidInputException("Licenses passed was null or empty");
 				}
 				ObjectMapper mapper = new ObjectMapper();
