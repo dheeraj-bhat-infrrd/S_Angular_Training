@@ -88,6 +88,12 @@ public class User implements UserDetails, Serializable {
 
 	@Transient
 	private boolean companyAdmin;
+	
+	@Transient
+	private String profileName;
+	
+	@Transient
+	private String profileUrl;
 
 	// bi-directional many-to-one association to UserProfile
 	@OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -228,6 +234,22 @@ public class User implements UserDetails, Serializable {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+	
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
+
+	public String getProfileUrl() {
+		return profileUrl;
+	}
+
+	public void setProfileUrl(String profileUrl) {
+		this.profileUrl = profileUrl;
 	}
 
 	public List<UserProfile> getUserProfiles() {

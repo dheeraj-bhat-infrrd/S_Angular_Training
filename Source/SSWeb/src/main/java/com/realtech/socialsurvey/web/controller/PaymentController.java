@@ -5,7 +5,6 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -110,12 +108,8 @@ public class PaymentController {
 			// Get the nonce from the request
 			String nonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 
-			// Extract the session
-			HttpSession session = request.getSession(false);
-
 			// Get the user object from the session and the company object from it
 			User user = sessionHelper.getCurrentUser();
-			AccountType accountType = null;
 
 			if (strAccountType == null || strAccountType.isEmpty()) {
 				throw new InvalidInputException("Account type parameter passed is null or empty", DisplayMessageConstants.GENERAL_ERROR);
@@ -150,22 +144,7 @@ public class PaymentController {
 			}
 			
 			LOG.info("Subscription Successful!");
-			try {
-				LOG.debug("Calling sevices for adding account type of company");
-				accountType = organizationManagementService.addAccountTypeForCompany(user, strAccountType);
-				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
-
-				LOG.debug("Adding account type in session");
-				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
-				// get the settings
-				sessionHelper.getCanonicalSettings(session);
-				// set the session variable
-				sessionHelper.setSettingVariablesInSession(session);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException in addAccountType. Reason :" + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
+			//Now we update the stage after payment is done and before the setting up the account.
 			try {
 				/**
 				 * For each account type, only the company admin's profile completion stage is
@@ -174,22 +153,21 @@ public class PaymentController {
 				 */
 				LOG.debug("Calling sevices for updating profile completion stage");
 				userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-						CommonConstants.DASHBOARD_STAGE);
+						CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE);
 				LOG.debug("Successfully executed sevices for updating profile completion stage");
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.SUBSCRIPTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.ACCOUNT_TYPE_SELECTION;
 		}
-		return JspResolver.LANDING;
+		return "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
 	}
 
 	@RequestMapping(value = "/paymentchange", method = RequestMethod.GET)
