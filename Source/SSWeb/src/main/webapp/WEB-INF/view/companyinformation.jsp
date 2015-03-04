@@ -54,8 +54,8 @@
 					<div class="float-left rfr_txt">
 						<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
 						<input type="text" class="rfr_txt_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.key"/>'>
-						<input type="file" class="rfr_txt_fld" id="com-logo" name="logo" placeholder='<spring:message code="label.logo.key"/>'>
-						<div class="float-right input-icon-internal icn-file file-pick-logo" id="icn-file"></div>
+						<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo" placeholder='<spring:message code="label.logo.key"/>'>
+						<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">

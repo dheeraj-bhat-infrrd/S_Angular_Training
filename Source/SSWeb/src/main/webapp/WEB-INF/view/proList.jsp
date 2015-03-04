@@ -64,10 +64,18 @@
 						<div class="ctnt-list-header clearfix">
 							<div class="ctnt-list-header-left float-left">
 								<spring:message code="label.profilefoundfor.key" />
-								<span class="srch-name">${patternFirst} ${patternLast}</span>
-								<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
-								<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
+									<c:choose>
+										<c:when test = "${not empty searchCriteria}">
+											<span class="srch-name">${searchCriteria}</span>
+										</c:when>
+										<c:otherwise>
+											<span class="srch-name">${patternFirst} ${patternLast}</span>
+											<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
+											<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
+										</c:otherwise>
+									</c:choose>
 								<input id="fp-users-size" type="hidden">
+								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}" data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
 							<div class="ctnt-list-header-right float-right">
 								<c:choose>
@@ -123,14 +131,15 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
 		$(document).ready(function() {
 			$('#find-pro-row-size').val(rowSize);
 			$('#find-pro-start-index').val(startIndex);
 			$('#fp-users-size').val(0);
-			fetchUsers(startIndex);
 			
+			fetchUsers(startIndex);
 			adjustTextContainerWidthOnResize();
 			
 			$(window).resize(function() {
