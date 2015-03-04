@@ -477,25 +477,45 @@ function callBackShowProfileSocialLinks(data) {
 	adjustImage();
 }
 
-// Agent details
-$(document).on('click', '.lp-ach-item-img', function() {
-	$(this).prev().remove();
-	$(this).remove();
+// TODO Agent details
+$(document).on('focus', '.prof-edditable-sin-agent', function() {
+	$(this).addClass('prof-name-edit');
 });
 
-// TODO Function to update association/membership list
+$(document).on('blur', '.prof-edditable-sin-agent', function() {
+	$(this).removeClass('prof-name-edit');
+});
+
+$(document).on('click', '.lp-ach-item-img', function() {
+	var type = $(this).attr('data-type');
+	$(this).prev().remove();
+	$(this).remove();
+	
+	if (type == 'association') {
+		updateAssociations();
+	}
+	else if (type == 'achievement') {
+		updateAchievements();
+	}
+	else if (type == 'license') {
+		updateLicenseAuthorizations();
+	}
+});
+
+// Function to update association/membership list
 function addAnAssociation() {
 	if ($('#association-container > input').length <= 0) {
 		$('#association-container').empty();
 	}
 	var newAssociation = $('<input>').attr({
-		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin",
+		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Associaion"
 	});
 	$('#association-container').append(newAssociation);
 
 	var newAssociationButton = $('<div>').attr({
 		"class" : "float-left lp-ach-item-img",
+		"data-type" : "association"
 	});
 	$('#association-container').append(newAssociationButton);
 
@@ -540,13 +560,14 @@ function addAnAchievement() {
 		$('#achievement-container').empty();
 	}
 	var newAchievement = $('<input>').attr({
-		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
+		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Achievement"
 	});
 	$('#achievement-container').append(newAchievement);
 
 	var newAchievementButton = $('<div>').attr({
 		"class" : "float-left lp-ach-item-img",
+		"data-type" : "achievement"
 	});
 	$('#achievement-container').append(newAchievementButton);
 
@@ -592,13 +613,14 @@ function addAuthorisedIn() {
 		$('#authorised-in-container').empty();
 	}
 	var newAuthorisation = $('<input>').attr({
-		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin",
+		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "Authorized in"
 	});
 	$('#authorised-in-container').append(newAuthorisation);
 
 	var newAuthorizationButton = $('<div>').attr({
 		"class" : "float-left lp-ach-item-img",
+		"data-type" : "license"
 	});
 	$('#authorised-in-container').append(newAuthorizationButton);
 

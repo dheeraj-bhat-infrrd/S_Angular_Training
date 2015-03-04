@@ -470,14 +470,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
 			throws InvalidInputException {
-		if (associations == null || associations.isEmpty()) {
+		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		for (Association association : associations) {
-			if (association.getName() == null || association.getName().isEmpty()) {
-				associations.remove(association);
-			}
-		}
+		
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
 				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -488,14 +484,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Association> addAgentAssociations(String collection, AgentSettings agentSettings, List<Association> associations)
 			throws InvalidInputException {
-		if (associations == null || associations.isEmpty()) {
+		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		for (Association association : associations) {
-			if (association.getName() == null || association.getName().isEmpty()) {
-				associations.remove(association);
-			}
-		}
+		
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao
 				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, agentSettings);
@@ -548,7 +540,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
 			throws InvalidInputException {
-		if (achievements == null || achievements.isEmpty()) {
+		if (achievements == null) {
 			throw new InvalidInputException("Achievements passed can not be null or empty");
 		}
 		LOG.info("Adding achievements");
@@ -561,7 +553,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Achievement> addAgentAchievements(String collection, AgentSettings agentSettings, List<Achievement> achievements)
 			throws InvalidInputException {
-		if (achievements == null || achievements.isEmpty()) {
+		if (achievements == null) {
 			throw new InvalidInputException("Achievements passed can not be null or empty");
 		}
 		LOG.info("Adding achievements");
