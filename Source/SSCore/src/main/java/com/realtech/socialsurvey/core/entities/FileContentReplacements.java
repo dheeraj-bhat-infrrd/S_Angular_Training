@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 
