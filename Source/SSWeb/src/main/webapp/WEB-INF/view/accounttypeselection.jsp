@@ -5,6 +5,14 @@
 
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
+	<c:when test="${ paidUpgrade == 1 }">
+		<body>
+			<div class="overlay-payment overlay-main hide">
+				<div id="payment-section" class="payment-section">
+					<!-- Payment page comes here through ajax  -->
+				</div>
+			</div>	
+	</c:when>	
 	<c:otherwise>
    		<!DOCTYPE">
 		<html>
@@ -52,9 +60,8 @@
 	</div>
 </div>
 
-<div id="payment-form" class="acc-type-main-wrapper margin-top-25 margin-bottom-25">
-	<div id="acc-type-sel-options" class="acc-type-container container">
-	
+<div id="payment-form" class="acc-type-main-wrapper margin-top-25 margin-bottom-25" id="account-selection-popup">
+	<div id="acc-type-sel-options" class="acc-type-container container">	
 		<form id="account-type-selection-form">
 			<c:choose>
 				<%-- Payment options for upgrade --%>
@@ -68,7 +75,6 @@
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
 					</div>
-					
 					<c:choose>
 						<c:when test="${currentplan < 2}"><div class="acc-type-item text-center" onclick="confirmUpgradation(2)"></c:when>
 						<c:otherwise><div class="acc-type-item text-center" data-status="disabled"></c:otherwise>
@@ -111,7 +117,22 @@
 				
 				<%-- Payment options for new user --%>
 				<c:otherwise>
-					<div class="acc-type-item text-center" onclick="selectAccountType(1, '$35')">
+					<c:if test="${ empty paidUpgrade }">
+                     <div class="acc-type-item text-center" onclick="selectAccountType(5, 'Free')">
+						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.freeaccount.key"/></div>
+						<div class="act-price">
+							<spring:message code="label.free.key"/>
+						</div>
+						<div class="act-txt-1"><strong>1</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
+						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
+						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
+					</div>
+	                </c:if>
+	                <c:choose>
+							<c:when test="${ paidUpgrade == 1 }">
+								<div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(1,'$35')"></c:when>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(1, '$35')"></c:otherwise>
+					</c:choose>
 						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.individual.key"/></div>
 						<div class="act-price">
 							$35<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
@@ -120,16 +141,22 @@
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
 					</div>
-					<div class="acc-type-item text-center" onclick="selectAccountType(2, '$45')">
+					<c:choose>
+							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(2,'$45')"></c:when>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(2, '$45')"></c:otherwise>
+					</c:choose>
 						<div class="act-header" id="account-type-2"><spring:message code="label.accounttype.team.key"/></div>
 						<div class="act-price">
 							$45<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
 						</div>
 						<div class="act-txt-1"><strong>30</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
+						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>				
 					</div>
-					<div class="acc-type-item text-center" onclick="selectAccountType(3, '$65')">
+					<c:choose>
+							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(3, '$65')"></c:when>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(3, '$65')"></c:otherwise>
+					</c:choose>
 						<div class="act-header" id="account-type-3"><spring:message code="label.accounttype.company.key"/></div>
 						<div class="act-price">
 							$65<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
@@ -138,25 +165,28 @@
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
 						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
 					</div>
-					<div class="acc-type-item text-center" onclick="selectAccountType(4, '$99')">
+					<c:choose>
+							<c:when test="${ paidUpgrade == 1 }"><div class="acc-type-item text-center" onclick="javascript:makePaidUpgrade(4, '$99')"></c:when>
+							<c:otherwise><div class="acc-type-item text-center" onclick="selectAccountType(4, '$99')"></c:otherwise>
+					</c:choose>
 						<div class="act-header" id="account-type-4"><spring:message code="label.accounttype.enterprise.key"/></div>
 						<div class="act-price">
 							$99<sup>99</sup><span><spring:message code="label.permonth.key"/></span>
 						</div>
 						<div class="act-txt-1"><strong>100</strong> <spring:message code="label.accounttype.useraccounts.key"/></div>
 						<div class="act-txt-2">Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds Lor em ip sum do ie aje lanjds</div>
-						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>
+						<div class="act-txt-3"><spring:message code="label.accounttype.select.key"/></div>					
 					</div>
 				</c:otherwise>	
 			</c:choose>
 			<input type="hidden" name="accounttype" id="account-type" />
-		</form>
-	
+		</form>	
 	</div>
 </div>
 
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
+	<c:when test="${ paidUpgrade == 1 }"></c:when>
 	<c:otherwise>
 		<script	src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 		<script	src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
@@ -176,9 +206,6 @@
 	</script>
 </c:if>  
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
 function selectAccountType(accountType, paymentAmount) {
 	if ($(this).attr('data-status') == 'disabled') {
@@ -207,19 +234,66 @@ function selectAccountType(accountType, paymentAmount) {
 	});
 }
 
+function makePaidUpgrade(accountType,paymentAmount){
+	console.log("upgrading to paid account");
+    $('#account-type').val(accountType);
+    
+    var url = "./paymentpage.do";
+
+    /* show the progress icon */
+    showOverlay();
+
+    var $form = $("#account-type-selection-form");
+    var payLoad = $form.serialize();
+    $.ajax({
+        url : url,
+        type : "POST",
+        data : payLoad,
+        success : function(data) {
+            selectAccountTypeCallBack(data,accountType,paymentAmount);
+        },
+        error : function(e) {
+            console.error("error : " + e);
+        }
+    });
+}
+
 function selectAccountTypeCallBack(data,accountType,paymentAmount) {
 	console.log("callback for selectAccountType called");
-	hideOverlay();
+	var paidUpgrade = '<c:out value="${paidUpgrade}"/>';
+    if(accountType == 5 && data == ""){
+    	console.log("Subscribing for a free account");
+    	var url = "./subscribe.do";
+        var $form = $("#account-type-selection-form");
+        var payLoad = $form.serialize();
+        $.ajax({
+            url : url,
+            type : "POST",
+            data : payLoad,
+            success : function(data) {
+            	location.href="./landing.do";
+            },
+            error : function(e) {
+    			redirectErrorpage();
+    		}
+        });
+    }
+    else{
+    	 /* hide the progress icon */
+        hideOverlay();
+    	 
+    	if(paidUpgrade == 1){
+    		$("#account-selection-popup").css("display","none");
+    	}
 
-	// Replace the contents of account selection with payment page with selected account type contents
-	$("#payment-section").html(data);		
-	showPayment();
-	$('body').css('overflow', 'hidden');
-	
-	var selectedAccountType = $("#account-type-" + accountType).html();
-	$("#pu-acc-type-val").html(selectedAccountType);
-	$("#pu-acc-amount-val").html(paymentAmount);
-	console.log("callback for selectAccountType finished");
+        /* Replace the contents of account selection with payment page with selected account type contents*/
+        $("#payment-section").html(data);		
+        showPayment();
+        var selectedAccountType = $("#account-type-"+accountType).html();
+        $("#pu-acc-type-val").html(selectedAccountType);
+        $("#pu-acc-amount-val").html(paymentAmount);
+    }
+    console.log("callback for selectAccountType finished");
 }
 
 function confirmUpgradation(accountType){
@@ -312,6 +386,7 @@ function overlayRevert() {
 
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
+	<c:when test="${ paidUpgrade == 1 }"></c:when>
 	<c:otherwise>
 		</body>
 		</html>

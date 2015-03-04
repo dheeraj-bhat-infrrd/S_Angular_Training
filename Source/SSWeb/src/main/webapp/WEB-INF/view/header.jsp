@@ -147,6 +147,11 @@
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
+						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId == 5}">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradetopaidplanpage.do')">
+								<spring:message	code="label.header.upgrade.key" />
+							</div>
+						</c:if>
 						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
 					</div>
 				</div>

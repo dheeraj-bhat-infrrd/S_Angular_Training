@@ -231,6 +231,8 @@
 	   }
 	   
 	   function makeAjaxCallToPlanUpgrade(nonce){
+		   hidePayment();
+		   showOverlay();
 		   console.log("making ajax call with nonce: " + nonce)
 		   var data = "payment_method_nonce=" + nonce+"&accounttype=" + $('#account-type').val();
 		   console.log(data);
