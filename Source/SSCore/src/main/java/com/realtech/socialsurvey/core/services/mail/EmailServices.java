@@ -81,6 +81,18 @@ public interface EmailServices {
 			UndeliveredEmailException;
 
 	/**
+	 * Queues the email verification mail
+	 * @param url
+	 * @param recipientMailId
+	 * @param recipientName
+	 * @throws InvalidInputException
+	 */
+	public void queueEmailVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException;
+
+	public void sendEmailVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
+	UndeliveredEmailException;
+	
+	/**
 	 * Queues the retry charge email
 	 * @param recipientMailId
 	 * @param displayName

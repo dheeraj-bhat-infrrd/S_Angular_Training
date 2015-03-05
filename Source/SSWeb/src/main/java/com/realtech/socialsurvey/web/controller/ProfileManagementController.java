@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -98,6 +100,9 @@ public class ProfileManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
 
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
@@ -970,7 +975,6 @@ public class ProfileManagementController {
 	 * @param model
 	 * @param request
 	 */
-	// TODO
 	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
 	public String updateEmailds(Model model, HttpServletRequest request) {
 		LOG.info("Method updateEmailds() called from ProfileManagementController");
@@ -1004,6 +1008,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
@@ -1017,6 +1024,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
@@ -1030,6 +1040,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
@@ -1043,6 +1056,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+						agentSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
@@ -1071,6 +1087,38 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	// TODO send verification links
+	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
+			OrganizationUnitSettings userSettings) throws InvalidInputException {
+		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
+		Map<String, String> urlParams = null;
+		
+		if (oldSettings == null) {
+			throw new InvalidInputException("No contact details object found for user");
+		}
+		MailIdSettings mailIdSettings = oldSettings.getMail_ids();
+		if (mailIdSettings == null) {
+			LOG.debug("No maild ids added, create new mail id object in contact details");
+			mailIdSettings = new MailIdSettings();
+		}
+		
+		for (MiscValues mailId : mailIds) {
+			String key = mailId.getKey();
+			String emailId = mailId.getValue();
+			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
+				urlParams = new HashMap<String, String>();
+				urlParams.put(CommonConstants.EMAIL_ID, emailId);
+				urlParams.put(CommonConstants.USER_PROFILE, profile);
+				urlParams.put(CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK);
+				urlParams.put(CommonConstants.USER_ID, userSettings.getIden() + "");
+
+				profileManagementService.generateVerificationUrl(urlParams, applicationBaseUrl
+						+ CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details().getName());
+			}
+		}
+		LOG.debug("Method sendVerificationLinks() finished from ProfileManagementController");
+	}
+
 	// Update mail ids
 	private ContactDetailsSettings updateMailSettings(ContactDetailsSettings contactDetailsSettings, List<MiscValues> mailIds)
 			throws InvalidInputException {
@@ -1087,11 +1135,11 @@ public class ProfileManagementController {
 		for (MiscValues mailId : mailIds) {
 			String key = mailId.getKey();
 			String value = mailId.getValue();
-			if (key.equalsIgnoreCase("work")) {
+			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
 				mailIdSettings.setWork(value);
 				mailIdSettings.setWorkEmailVerified(false);
 			}
-			else if (key.equalsIgnoreCase("personal")) {
+			else if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_PERSONAL)) {
 				mailIdSettings.setPersonal(value);
 				mailIdSettings.setPersonalEmailVerified(false);
 			}
@@ -2697,5 +2745,29 @@ public class ProfileManagementController {
 
 		LOG.info("Method fetchAverageRating() finished from ProfileManagementController");
 		return averageRating + "";
+	}
+	
+	/**
+	 * Method to verify a new emailId
+	 * 
+	 * @param encryptedUrlParams
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/emailverification")
+	public String verifyAccount(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
+		LOG.info("Method to verify email called");
+		
+		try {
+			profileManagementService.updateEmailVerificationStatus(encryptedUrlParams);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while verifying email. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to verify email finished");
+		return JspResolver.LOGIN;
 	}
 }

@@ -1015,6 +1015,10 @@ function paintAvgRating(avgRating) {
 
 // TODO Edit EmailIds
 $(document).on('blur', '#contant-info-container input[data-email]', function() {
+	if (!$(this).val() || !emailRegex.test(this.value) || ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+		return;
+	}
+	
 	delay(function() {
 		var mailIds = [];
 		$('#contant-info-container input[data-email]').each(function() {

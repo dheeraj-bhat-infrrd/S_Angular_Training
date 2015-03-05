@@ -57,13 +57,15 @@
 							name="j_password" placeholder='<spring:message code="label.password.key"/>'>
 					</div>
 				</div>
+				<div class="btn-forgot-passwd-link">
+					<a href="./forgotpassword.do"><spring:message code="label.forgotpassword.key"/></a>
+				</div>
 				<div class="reg_form_row clearfix">
 					<div class="reg_btn" id="login-submit"><spring:message code="label.login.button.key"/></div>
 				</div>
 			</div>
 			<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
 		</form>
-		<div id="skip-button" class="btn-reg-lin-skip"><spring:message code="label.forgotpassword.key"/></div>
 		
 	</div>
 </div>
@@ -77,10 +79,10 @@ $(document).ready(function(){
 	isLoginFormValid = false;
 
 	if ($('#message').val() != "") {
-		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
-			showInfo($('#message').val());
-		} else {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
 			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
 		}
 	}
 
