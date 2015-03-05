@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -38,6 +40,8 @@ import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -79,6 +83,15 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private EmailServices emailServices;
+
+	@Autowired
+	private URLGenerator urlGenerator;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -217,6 +230,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 			if (higherLock.getIsWebAddressLocked()) {
 				parentLock.setWebAddressLocked(true);
+			}
+			if (higherLock.getIsBlogAddressLocked()) {
+				parentLock.setBlogAddressLocked(true);
 			}
 			if (higherLock.getIsWorkPhoneLocked()) {
 				parentLock.setWorkPhoneLocked(true);
@@ -419,6 +435,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
 				userLock.setWebAddressLocked(true);
 			}
+			if (parentLock.getIsBlogAddressLocked() && !userLock.getIsBlogAddressLocked()
+					&& userProfile.getContact_details().getWeb_addresses() != null) {
+				userProfile.getContact_details().getWeb_addresses().setBlogs(parentProfile.getContact_details().getWeb_addresses().getBlogs());
+				userLock.setBlogAddressLocked(true);
+			}
 			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
 					&& userProfile.getContact_details().getContact_numbers() != null) {
 				userProfile.getContact_details().getContact_numbers().setWork(parentProfile.getContact_details().getContact_numbers().getWork());
@@ -471,14 +492,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
 			throws InvalidInputException {
-		if (associations == null || associations.isEmpty()) {
+		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		for (Association association : associations) {
-			if (association.getName() == null || association.getName().isEmpty()) {
-				associations.remove(association);
-			}
-		}
+		
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
 				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -489,14 +506,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Association> addAgentAssociations(String collection, AgentSettings agentSettings, List<Association> associations)
 			throws InvalidInputException {
-		if (associations == null || associations.isEmpty()) {
+		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		for (Association association : associations) {
-			if (association.getName() == null || association.getName().isEmpty()) {
-				associations.remove(association);
-			}
-		}
+		
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao
 				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, agentSettings);
@@ -549,7 +562,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
 			throws InvalidInputException {
-		if (achievements == null || achievements.isEmpty()) {
+		if (achievements == null) {
 			throw new InvalidInputException("Achievements passed can not be null or empty");
 		}
 		LOG.info("Adding achievements");
@@ -562,7 +575,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Achievement> addAgentAchievements(String collection, AgentSettings agentSettings, List<Achievement> achievements)
 			throws InvalidInputException {
-		if (achievements == null || achievements.isEmpty()) {
+		if (achievements == null) {
 			throw new InvalidInputException("Achievements passed can not be null or empty");
 		}
 		LOG.info("Adding achievements");
@@ -1016,5 +1029,54 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method getProListByProfileLevel finished successfully");
 		return solrSearchResult;
 	}
+	
+	@Override
+	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException {
+		String verficationUrl = urlGenerator.generateUrl(urlParams, applicationUrl);
+		emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+	}
+	
+	@Override
+	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException {
+		Map<String, String> urlParams = urlGenerator.decryptParameters(urlParamsStr);
+		if (urlParams == null || urlParams.isEmpty()) {
+			throw new InvalidInputException("Url params are invalid for email verification");
+		}
 
+		ContactDetailsSettings contact = null;
+		MailIdSettings mail = null;
+		String collection = urlParams.get(CommonConstants.USER_PROFILE);
+		String emailType = urlParams.get(CommonConstants.EMAIL_TYPE);
+		String emailAddress = urlParams.get(CommonConstants.EMAIL_ID);
+		long iden = Long.parseLong(urlParams.get(CommonConstants.USER_ID));
+
+		if (!collection.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+			OrganizationUnitSettings unitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(iden, collection);
+			contact = unitSettings.getContact_details();
+			mail = contact.getMail_ids();
+			if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK) && mail.getWork().equals(emailAddress)) {
+				mail.setWorkEmailVerified(true);
+			}
+			else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL) && mail.getPersonal().equals(emailAddress)) {
+				mail.setPersonalEmailVerified(true);
+			}
+			contact.setMail_ids(mail);
+			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+					contact, unitSettings, collection);
+		}
+		else {
+			AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(iden);
+			contact = agentSettings.getContact_details();
+			mail = contact.getMail_ids();
+			if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK) && mail.getWork().equals(emailAddress)) {
+				mail.setWorkEmailVerified(true);
+			}
+			else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL) && mail.getPersonal().equals(emailAddress)) {
+				mail.setPersonalEmailVerified(true);
+			}
+			contact.setMail_ids(mail);
+			organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contact,
+					agentSettings);
+		}
+	}
 }
