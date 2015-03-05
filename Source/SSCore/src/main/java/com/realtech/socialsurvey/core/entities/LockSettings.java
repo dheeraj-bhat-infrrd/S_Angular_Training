@@ -5,6 +5,7 @@ public class LockSettings {
 	private boolean isLogoLocked;
 	private boolean isDisplayNameLocked;
 	private boolean isWebAddressLocked;
+	private boolean isBlogAddressLocked;
 	private boolean isWorkPhoneLocked;
 	private boolean isPersonalPhoneLocked;
 	private boolean isFaxPhoneLocked;
@@ -33,6 +34,14 @@ public class LockSettings {
 
 	public void setWebAddressLocked(boolean isWebAddressLocked) {
 		this.isWebAddressLocked = isWebAddressLocked;
+	}
+
+	public boolean getIsBlogAddressLocked() {
+		return isBlogAddressLocked;
+	}
+
+	public void setBlogAddressLocked(boolean isBlogAddressLocked) {
+		this.isBlogAddressLocked = isBlogAddressLocked;
 	}
 
 	public boolean getIsWorkPhoneLocked() {
@@ -78,7 +87,7 @@ public class LockSettings {
 	@Override
 	public String toString() {
 		return "LockSettings [isLogoLocked=" + isLogoLocked + ", isDisplayNameLocked=" + isDisplayNameLocked + ", isWebAddressLocked="
-				+ isWebAddressLocked + ", isWorkPhoneLocked=" + isWorkPhoneLocked + ", isPersonalPhoneLocked=" + isPersonalPhoneLocked
+				+ isWebAddressLocked + ", isBlogAddressLocked=" + isBlogAddressLocked + ", isWorkPhoneLocked=" + isWorkPhoneLocked + ", isPersonalPhoneLocked=" + isPersonalPhoneLocked
 				+ ", isFaxPhoneLocked=" + isFaxPhoneLocked + ", isAboutMeLocked=" + isAboutMeLocked + ", isAddressLocked=" + isAddressLocked + "]";
 	}
 }

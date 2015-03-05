@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -283,4 +284,7 @@ public interface ProfileManagementService {
 	 */
 	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException;
 
+	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException;
+	
+	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException;
 }

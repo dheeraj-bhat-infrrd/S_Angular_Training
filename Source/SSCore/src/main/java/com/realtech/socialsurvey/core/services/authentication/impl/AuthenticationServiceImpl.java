@@ -156,7 +156,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
 
 		// Send reset password link to the user email ID
-		emailServices.sendResetPasswordEmail(url, emailId, name);
+		emailServices.queueResetPasswordEmail(url, emailId, name);
 	}
 
 	/**
