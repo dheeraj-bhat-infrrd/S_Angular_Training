@@ -76,7 +76,9 @@
 					</div>
 				</c:if>
 				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-					<div class="header-links-item" id="upgrade-plan" onclick="upgradePlan();"><spring:message code="label.header.upgrade.key" /></div>
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
+					</div>
 				</c:if>
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.profilesetting.key" /></a>
@@ -136,7 +138,7 @@
 							<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>

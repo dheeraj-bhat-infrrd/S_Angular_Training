@@ -1874,7 +1874,7 @@ button.paypal.is-active {
     top: 0;
     width: 100%;
     height: 100%;
-    overflow: hidden;
+    overflow: auto;
     z-index: 999999999;
     min-height: 480px;
     background-color: rgba(255,255,255,0.7);
@@ -3925,7 +3925,7 @@ button.paypal.is-active {
 }
 
 .acc-type-container {
-    width: 864px;
+    /*width: 864px;*/
     margin: 0 auto;
     text-align: center;
 }
@@ -4299,4 +4299,46 @@ button.paypal.is-active {
     background: url(../images/sb-dd-icn-pd.png) no-repeat;
     background-position: right center;
     padding-right: 25px;
+}
+
+.com-logo-comp-info{
+	position: absolute;
+	top: 0px;
+	opacity: 0;
+}
+
+.file-pick-logo-adj{
+	position: absolute;
+	top: 1px;
+	right: 30px;
+}
+
+.ui-widget-content{
+	width: 276px !important;
+	margin-top: -2px;
+	border: 1px solid #dcdcdc;
+	background-color: #fff;
+	border-radius: 0 0 3px 3px;
+	padding: 0;
+	padding-left: 10px;
+}
+
+.ui-autocomplete li {
+	line-height: 24px;
+	list-style: none;
+}
+
+.btn_reg_lin{
+	height: 48px;
+	cursor: pointer;
+	width: 198px;
+	margin: 0 auto;
+	background: url(../images/connect-with-linkedin.png) no-repeat center;
+}
+
+.btn-reg-lin-skip{
+	width: 70px;
+	cursor: pointer;
+	color: #009FE0;
+	margin: 10px auto;
 }
