@@ -7,7 +7,7 @@
 	<c:when test="${not empty authorisedInList}">
 		<c:forEach items="${authorisedInList}" var="authorisedIn">
 			<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}">
-			<div class="float-left lp-ach-item-img" data-type="license"></div>
+			<div class="float-right lp-ach-item-img" data-type="license"></div>
 		</c:forEach>
 	</c:when>
 	<c:otherwise>

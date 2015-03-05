@@ -514,7 +514,7 @@ function addAnAssociation() {
 	$('#association-container').append(newAssociation);
 
 	var newAssociationButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
+		"class" : "float-right lp-ach-item-img",
 		"data-type" : "association"
 	});
 	$('#association-container').append(newAssociationButton);
@@ -566,7 +566,7 @@ function addAnAchievement() {
 	$('#achievement-container').append(newAchievement);
 
 	var newAchievementButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
+		"class" : "float-right lp-ach-item-img",
 		"data-type" : "achievement"
 	});
 	$('#achievement-container').append(newAchievementButton);
@@ -619,7 +619,7 @@ function addAuthorisedIn() {
 	$('#authorised-in-container').append(newAuthorisation);
 
 	var newAuthorizationButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
+		"class" : "float-right lp-ach-item-img",
 		"data-type" : "license"
 	});
 	$('#authorised-in-container').append(newAuthorizationButton);
@@ -1013,7 +1013,7 @@ function paintAvgRating(avgRating) {
 	}
 }
 
-// TODO Edit EmailIds
+// Edit EmailIds
 $(document).on('blur', '#contant-info-container input[data-email]', function() {
 	if (!$(this).val() || !emailRegex.test(this.value) || ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
 		return;

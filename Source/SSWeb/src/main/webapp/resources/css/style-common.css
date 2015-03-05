@@ -3134,7 +3134,7 @@ button.paypal.is-active {
 	width: 46px;
 	height: 46px;
 	background: url(../images/locks.png) no-repeat;
-	background-position: -118px center;
+	background-position: -218px center;
 }
 
 .lp-ach-item-img{
@@ -4357,7 +4357,7 @@ button.paypal.is-active {
 
 .prof-edditable-sin-agent {
     border: 0;
-    width: 100%;
+    width: 300px;
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
