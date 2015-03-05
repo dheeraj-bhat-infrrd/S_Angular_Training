@@ -6,9 +6,11 @@ package com.realtech.socialsurvey.web.controller;
  * Registration Controller Sends an invitation to the corporate admin
  */
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -159,42 +161,41 @@ public class RegistrationController {
 	 * @param model
 	 * @param request
 	 * @return
+	 * @throws IOException 
 	 */
 	@RequestMapping(value = "/registration")
-	public String initDirectRegistration(Model model, HttpServletRequest request) {
+	public String initDirectRegistration(Model model, HttpServletRequest request) throws IOException {
 		LOG.info("Method called for showing up the direct registration page");
-		String firstName = request.getParameter("firstName");
-		String lastName = request.getParameter("lastName");
-		String emailId = request.getParameter("emailId");
-		
-		String captchaResponse = request.getParameter("captchaResponse");
-		String challengeField = request.getParameter("recaptcha_challenge_field");
-		String remoteAddress = request.getRemoteAddr();
 		
 		try {
-			
-			if(!captchaValidation.isCaptchaValid(remoteAddress, challengeField, captchaResponse)){
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			String emailId = request.getParameter("emailId");
+
+			String captchaResponse = request.getParameter("captchaResponse");
+			String challengeField = request.getParameter("recaptcha_challenge_field");
+			String remoteAddress = request.getRemoteAddr();
+			if (!captchaValidation.isCaptchaValid(remoteAddress, challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				throw new InvalidInputException("Captcha Validation failed!",DisplayMessageConstants.INVALID_CAPTCHA);
+				throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
 			}
 			LOG.debug("Captcha validation complete!");
+
 			LOG.debug("Validating form elements");
 			validateFormParameters(firstName, lastName, emailId);
-			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName : " + lastName + " and emailID : " + emailId);
+			LOG.debug("Form parameters validation passed for firstName: " + firstName + " lastName: " + lastName + " and emailID: " + emailId);
 
 			model.addAttribute("firstname", firstName);
 			model.addAttribute("lastname", lastName);
 			model.addAttribute("emailid", emailId);
 			model.addAttribute("isDirectRegistration", true);
 			return JspResolver.REGISTRATION;
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.LOGIN;
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.INDEX;
 		}
-
 	}
 
 	/**
@@ -363,13 +364,11 @@ public class RegistrationController {
 			}
 		}
 
-		// check if email Id isEmpty, null or whether it matches the regular
-		// expression or not
+		// check if email Id isEmpty, null or whether it matches the regular expression or not
 		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 			throw new InvalidInputException("Email address is invalid in registration", DisplayMessageConstants.INVALID_EMAILID);
 		}
 		LOG.debug("Invitation form parameters validated successfully");
-
 	}
 
 	/**
