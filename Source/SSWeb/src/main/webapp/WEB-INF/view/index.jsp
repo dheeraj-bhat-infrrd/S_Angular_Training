@@ -61,13 +61,14 @@
 					<div class="clearfix c-pic-panel-top">
 						<div class="float-left c-pic-top-1">
 							<div class="blue-ext-left"></div>
-							<div class="c-panel-txt-top txt-bold">Why do I love TENNIS?</div>
-							<div class="c-panel-txt-bot">Tennis is a racquet sport that
-								can be played individually against a single opponent (singles)
-								or between two teams of two players each (doubles). Each player
-								uses a racquet that is strung with cord to strike a hollow
-								rubber ball covered with felt over or around a net and into the
-								opponent's court.</div>
+							<div class="c-panel-txt-top txt-bold">What is Lorem Ipsum?</div>
+							<div class="c-panel-txt-bot">Lorem Ipsum is simply dummy
+								text of the printing and typesetting industry. Lorem Ipsum has
+								been the industry's standard dummy text ever since the 1500s,
+								when an unknown printer took a galley of type and scrambled it
+								to make a type specimen book. It has survived not only five
+								centuries, but also the leap into electronic typesetting,
+								remaining essentially unchanged.</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-top-2">
 							<div class="pic-bot-txt">
