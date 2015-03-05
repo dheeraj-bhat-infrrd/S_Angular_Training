@@ -1297,7 +1297,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Getting the company settings for the user");
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 		canonicalUserSettings.setCompanySettings(companySettings);
-
+		/**
+		 * fetching all settings for all account types
+		 */
 		/*switch (accountType) {
 			case FREE:
 			case INDIVIDUAL:
