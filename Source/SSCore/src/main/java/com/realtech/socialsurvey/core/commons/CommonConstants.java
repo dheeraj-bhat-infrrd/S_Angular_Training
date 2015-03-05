@@ -27,6 +27,7 @@ public interface CommonConstants {
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
+	public static final String DEFAULT_ADDRESS = "Default Address";
 
 	/**
 	 * Profile master constants

@@ -4,6 +4,7 @@ import java.util.List;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1121,12 +1122,13 @@ public class ProfileController {
 				numRows = -1;
 			}
 			try {
-				String json = profileManagementService.getProListByProfileLevel(iden, profileLevel, start, numRows);
+				SolrDocumentList solrSearchResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, start, numRows);
+				String json = new Gson().toJson(solrSearchResult);
 				LOG.debug("Pro list json : " + json);
 				response = Response.ok(json).build();
-				
+
 			}
-			catch(SolrException e){
+			catch (SolrException e) {
 				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
 						CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list."), e.getMessage());
 			}
