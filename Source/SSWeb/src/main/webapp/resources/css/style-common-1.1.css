@@ -248,6 +248,7 @@ a, a:hover, a:visited{
     background-color: rgba(0, 159, 224, 0.8);
     width: 410px;
     color: #fff;
+    position: relative;
 }
 
 .c-pic-panel-top {
@@ -655,4 +656,34 @@ a, a:hover, a:visited{
 
 .pro-wrapper-top {
     margin: 0 !important;
+}
+
+.reg-err-pu{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 65px;
+/*
+    background-color: #E57C66;
+    color: #fff;
+*/
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #E55757;
+    text-align: center;
+    line-height: 65px;
+}
+
+.reg-err-pu-msg{
+    font-weight: bold !important;
+}
+
+.reg-err-pu-close {
+   display: inline-block;
+    width: 24px;
+    background: url(../images/close-red.png) no-repeat center;
+    background-size: 22px;
+    margin-left: 10px;
+    color: rgba(255, 255, 255, 0.95);;
+    cursor: pointer;
 }

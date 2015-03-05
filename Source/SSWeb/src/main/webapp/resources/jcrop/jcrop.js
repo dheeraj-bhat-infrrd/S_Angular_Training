@@ -12,9 +12,6 @@ function createPopupCanvas() {
 	$('#overlay-main').show();
 }
 
-$(document).on('change', '#target', function() {
-});
-
 function initiateJcrop(input) {
 	if (input.files && input.files[0]) {
 		createPopupCanvas();
