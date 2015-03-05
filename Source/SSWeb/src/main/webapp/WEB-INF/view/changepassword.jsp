@@ -1,178 +1,153 @@
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <div class="hm-header-main-wrapper">
 	<div class="container">
-		<div class="hm-header-row clearfix">
-			<div class="float-left hm-header-row-left">
-				<spring:message code="label.changepassword.key" />
-			</div>
+		<div class="hm-header-row hm-header-row-main clearfix">
+			<div class="float-left hm-header-row-left text-center"><spring:message code="label.changepassword.key" /></div>
 		</div>
 	</div>
 </div>
 
-<div id="hm-main-content-wrapper"
-	class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
-	<div class="container">
-		<div class="hm-content clearfix padding-001">
-			<div class="hm-top-panel padding-001" id="company-branch">
-				<div class="hm-top-panel-header">
-					<!--Use this container to input all the messages from server-->
-					<jsp:include page="messageheader.jsp" />
+<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+	<div class="container reg_panel_container">
+		<div class="reg_header"><spring:message code="label.changepassword.key" /></div>
+		
+		<form id="change-password-form" method="POST" action="./changepassword.do">
+			<div class="reg_form_wrapper_2">
+				<div class="reg_form_row clearfix">
+					<div class="float-left rfr_lbl"><spring:message code="label.currentpassword.key" /></div>
+					<div class="float-left rfr_txt">
+						<div class="rfr_icn icn-password"></div>
+						<input type="password" class="rfr_txt_fld" id="current-pwd" data-non-empty="true"
+							name="oldpassword" placeholder="<spring:message code="label.currentpassword.key" />">
+					</div>
 				</div>
-				<div class="create-branch-dd cp-container">
-					<form id="change-password-form" method="POST"
-						action="./changepassword.do">
-						<div class="hm-top-panel-content border-bottom-0 clearfix">
-							<div class="clearfix">
-								<div
-									class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-top-panel-item">
-									<div class="hm-item-row cp-item-row clearfix">
-										<div class="hm-item-row-left cp-item-row-left text-right">
-											<spring:message code="label.currentpassword.key" />
-										</div>
-										<div class="hm-item-row-right">
-											<input type="password" name="oldpassword" id="current-pwd"
-												data-non-empty="true"
-												class="hm-item-row-txt cp-item-row-txt"
-												placeholder='Current Password'>
-											
-										</div>
-										<div id="" class="error-msg cp-err"></div>
-									</div>
-								</div>
-								<div class="clearfix">
-									<div
-										class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-top-panel-item">
-										<div class="hm-item-row cp-item-row clearfix">
-											<div class="hm-item-row-left cp-item-row-left text-right">
-												<spring:message code="label.newpassword.key" />
-											</div>
-											<div class="hm-item-row-right">
-												<input type="password" name="newpassword" id="new-pwd"
-													data-non-empty="true"
-													class="hm-item-row-txt cp-item-row-txt"
-													placeholder='New Password'>
-												
-											</div>
-											<div id="" class="error-msg cp-err"></div>
-										</div>
-									</div>
-									<div
-										class="col-lg-6 col-md-6 col-sm-6 col-xs-12 hm-top-panel-item">
-										<div class="hm-item-row cp-item-row clearfix">
-											<div class="hm-item-row-left cp-item-row-left text-right">
-												<spring:message code="label.confirmnewpassword.key" />
-											</div>
-											<div class="hm-item-row-right">
-												<input type="password" name="confirmnewpassword"
-													id="confnw-pwd" data-non-empty="true"
-													class="hm-item-row-txt cp-item-row-txt"
-													placeholder='Confirm New Password'>
-												
-											</div>
-											<div id="" class="error-msg cp-err"></div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div
-								class="hm-btn-outer margin-bottom-25 margin-top-5 cp-btn-save clearfix hm-item-row-right-btn-save">
-								<div
-									class="clearfix hm-btn-wrapper hm-btn-wrapper-fix margin-0-auto">
-									<div class="btn-payment-sel cp-btn-save" id="save-pwd">
-										<spring:message code="label.save.key" />
-									</div>
-								</div>
-							</div>
-						</div>
-					</form>
+				
+				<div class="reg_form_row clearfix">
+					<div class="float-left rfr_lbl"><spring:message code="label.newpassword.key" /></div>
+					<div class="float-left rfr_txt">
+						<div class="rfr_icn icn-password"></div>
+						<input type="password" class="rfr_txt_fld" id="new-pwd" data-non-empty="true"
+							name="newpassword" placeholder="<spring:message code="label.newpassword.key" />">
+					</div>
+					<div class="float-left rfr_txt">
+						<div class="rfr_icn icn-confirm-password"></div>
+						<input type="password" class="rfr_txt_fld" id="confnw-pwd" data-non-empty="true"
+							name="confirmnewpassword" placeholder="<spring:message code="label.confirmnewpassword.key" />">
+					</div>
+				</div>
+				<div class="reg_form_row clearfix">
+					<div class="reg_btn" id="save-pwd"><spring:message code="label.submit.key" /></div>
 				</div>
 			</div>
-		</div>
+			<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
+		</form>
+		
 	</div>
 </div>
+
+<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/changepassword.js"></script>
 <script>
-	var isChangePasswordFormValid;
-	$(document).ready(function() {
-		isChangePasswordFormValid = false;
-		function submitChangepassword() {
-			console.log("submitting change password");
-			$('#change-password-form').submit();
+var isChangePasswordFormValid;
+$(document).ready(function() {
+	isChangePasswordFormValid = false;
 
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'SUCCESS_MESSAGE') {
+			showInfo($('#message').val());
+		} else {
+			showError($('#message').val());
 		}
-		function updatechangepassword(formid) {
-			var url = "./changepassword.do";
-			callAjaxFormSubmit(url, updatechangepasswordCallBack, formid);
+	}
+
+	function updatechangepassword(formid) {
+		var url = "./changepassword.do";
+		callAjaxFormSubmit(url, updatechangepasswordCallBack, formid);
+	}
+	
+	function updatechangepasswordCallBack(response) {
+		$("#main-content").html(response);
+	}
+	
+	$('#save-pwd').click(function(e) {
+		if(validateChangePasswordForm()){
+			updatechangepassword('change-password-form');
 		}
-		function updatechangepasswordCallBack(response) {
-			$("#main-content").html(response);
-		}
-		$('#save-pwd').click(function(e) {
+	});
+	
+	$('input').keypress(function(e) {
+		// detect enter
+		if (e.which == 13) {
+			e.preventDefault();
 			if(validateChangePasswordForm()){
 				updatechangepassword('change-password-form');
 			}
-		});
-		$('input').keypress(function(e) {
-			// detect enter
-			if (e.which == 13) {
-				e.preventDefault();
-				if(validateChangePasswordForm()){
-					updatechangepassword('change-password-form');
-				}
-			}
-		});
-
-		$('#current-pwd').blur(function() {
-			validateCurrentPassword(this.id);
-		});
-
-		$('#new-pwd').blur(function() {
-			validateNewPassword(this.id);
-		});
-
-		$('#confnw-pwd').blur(function() {
-			validateConfirmNewPassword('new-pwd', this.id);
-		});
-		function validateChangePasswordForm(){
-			$("#serverSideerror").hide();
-			isChangePasswordFormValid=true;
-        	var isFocussed = false;
-        	var isSmallScreen = false;
-        	if($(window).width()<768){
-        		isSmallScreen = true;
-        	}
-			if (!validateCurrentPassword('current-pwd')) {
-				isChangePasswordFormValid = false;
-				if (!isFocussed) {
-					$('#current-pwd').focus();
-					isFocussed = true;
-				}
-				if (isSmallScreen) {
-					return isChangePasswordFormValid;
-				}
-			}
-			if (!validateNewPassword('new-pwd')) {
-				isChangePasswordFormValid = false;
-				if (!isFocussed) {
-					$('#new-pwd').focus();
-					isFocussed = true;
-				}
-				if (isSmallScreen) {
-					return isChangePasswordFormValid;
-				}
-			}
-			if (!validateConfirmNewPassword('new-pwd', 'confnw-pwd')) {
-				isChangePasswordFormValid = false;
-				if (!isFocussed) {
-					$('#confnw-pwd').focus();
-					isFocussed = true;
-				}
-				if (isSmallScreen) {
-					return isChangePasswordFormValid;
-				}
-			}
-			return isChangePasswordFormValid;
 		}
-
 	});
+
+	$('#current-pwd').blur(function() {
+		if (validateCurrentPassword(this.id)) {
+			hideError();
+		}
+	});
+
+	$('#new-pwd').blur(function() {
+		if (validateNewPassword(this.id)) {
+			hideError();
+		}
+	});
+
+	$('#confnw-pwd').blur(function() {
+		if (validateConfirmNewPassword('new-pwd', this.id)) {
+			hideError();
+		}
+	});
+	
+	function validateChangePasswordForm(){
+		$("#serverSideerror").hide();
+		isChangePasswordFormValid=true;
+    	var isFocussed = false;
+    	var isSmallScreen = false;
+    	if($(window).width()<768){
+    		isSmallScreen = true;
+    	}
+		if (!validateCurrentPassword('current-pwd')) {
+			isChangePasswordFormValid = false;
+			if (!isFocussed) {
+				$('#current-pwd').focus();
+				isFocussed = true;
+			}
+			if (isSmallScreen) {
+				return isChangePasswordFormValid;
+			}
+		}
+		if (!validateNewPassword('new-pwd')) {
+			isChangePasswordFormValid = false;
+			if (!isFocussed) {
+				$('#new-pwd').focus();
+				isFocussed = true;
+			}
+			if (isSmallScreen) {
+				return isChangePasswordFormValid;
+			}
+		}
+		if (!validateConfirmNewPassword('new-pwd', 'confnw-pwd')) {
+			isChangePasswordFormValid = false;
+			if (!isFocussed) {
+				$('#confnw-pwd').focus();
+				isFocussed = true;
+			}
+			if (isSmallScreen) {
+				return isChangePasswordFormValid;
+			}
+		}
+		return isChangePasswordFormValid;
+	}
+});
 </script>
+
+</body>
+</html>

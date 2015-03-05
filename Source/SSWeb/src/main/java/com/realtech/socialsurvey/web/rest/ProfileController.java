@@ -4,6 +4,7 @@ import java.util.List;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
  * JIRA:SS-117 by RM02 Class with rest services for fetching various profiles
@@ -957,7 +959,7 @@ public class ProfileController {
 		LOG.info("Service to fetch reviews of branch completed successfully");
 		return response;
 	}
-	
+
 	/**
 	 * Service to fetch average ratings for agent
 	 * 
@@ -967,7 +969,7 @@ public class ProfileController {
 	@ResponseBody
 	@RequestMapping(value = "/individual/{agentId}/ratings")
 	public Response getAverageRatingForAgent(@PathVariable long agentId) {
-		LOG.info("Service to get average rating of agent called for agentId:"+agentId);
+		LOG.info("Service to get average rating of agent called for agentId:" + agentId);
 		Response response = null;
 		try {
 			if (agentId <= 0l) {
@@ -993,7 +995,7 @@ public class ProfileController {
 		LOG.info("Service to get average rating of agent executed successfully ");
 		return response;
 	}
-	
+
 	/**
 	 * Service to fetch review count for an agent
 	 * 
@@ -1038,7 +1040,7 @@ public class ProfileController {
 		LOG.info("Service to fetch the reviews count of an agent executed successfully");
 		return response;
 	}
-	
+
 	/**
 	 * Service to fetch reviews for an agent
 	 * 
@@ -1098,22 +1100,49 @@ public class ProfileController {
 	 * @return
 	 */
 	@ResponseBody
-	@RequestMapping(value = "/users/{iden}")
-	public Response getProListByProfile(@PathVariable long iden, @QueryParam(value = "profileLevel") String profileLevel) {
-		if (iden <= 0l) {
-			throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE,
-					CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list. Iden is invalid"),
-					"iden is invalid while getting users list for profile");
+	@RequestMapping(value = "/individuals/{iden}")
+	public Response getProListByProfile(@PathVariable long iden, @QueryParam(value = "profileLevel") String profileLevel,
+			@QueryParam(value = "start") Integer start, @QueryParam(value = "numOfRows") Integer numRows) {
+		Response response = null;
+		try {
+			if (iden <= 0l) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list. Iden is invalid"),
+						"iden is invalid while getting users list for profile");
+			}
+			if (profileLevel == null) {
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE,
+						CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list. Iden is invalid"),
+						"iden is invalid while getting users list for profile");
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+			try {
+				SolrDocumentList solrSearchResult = profileManagementService.getProListByProfileLevel(iden, profileLevel, start, numRows);
+				String json = new Gson().toJson(solrSearchResult);
+				LOG.debug("Pro list json : " + json);
+				response = Response.ok(json).build();
+
+			}
+			catch (SolrException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list."), e.getMessage());
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list."), e.getMessage());
+			}
 		}
-		if (profileLevel == null) {
-			throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE,
-					CommonConstants.SERVICE_CODE_PRO_LIST_FETCH, "Could not fetch users list. Iden is invalid"),
-					"iden is invalid while getting users list for profile");
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
 		}
 
 		LOG.info("Method getProListByProfile called for iden:" + iden + " and profileLevel:" + profileLevel);
-
-		return null;
+		return response;
 
 	}
 

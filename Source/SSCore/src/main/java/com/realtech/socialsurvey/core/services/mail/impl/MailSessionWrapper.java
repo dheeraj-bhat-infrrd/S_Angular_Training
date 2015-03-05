@@ -1,9 +1,7 @@
 package com.realtech.socialsurvey.core.services.mail.impl;
 
 import java.util.Properties;
-
 import javax.mail.Session;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

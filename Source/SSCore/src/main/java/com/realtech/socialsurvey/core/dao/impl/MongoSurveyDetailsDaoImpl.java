@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -489,7 +487,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 		if (startScore > 0 && limitScore > 0) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+					Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
 		}
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method getFeedBacksCount executed successfully");
