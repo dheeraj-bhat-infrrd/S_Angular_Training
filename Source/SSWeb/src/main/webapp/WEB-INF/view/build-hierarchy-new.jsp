@@ -36,7 +36,7 @@
     </div>
 
     <div class="container bd-hr-container">
-        <div class="bd-hr-left-panel col-lg-3 col-md-4 col-sm-4">
+        <div class="bd-hr-left-panel col-lg-3 col-md-3 col-sm-3">
             <div class="bd-hr-lp-header">Our Company</div>
             <div class="bd-hr-lp-content-wrapper">
                 <div class="bd-hr-item-l1">
@@ -99,7 +99,7 @@
                 </div>
             </div>
         </div>
-        <div class="bd-hr-rt-panel col-lg-9 col-md-8 col-sm-8 col-xs-12">
+        <div class="bd-hr-rt-panel col-lg-9 col-md-9 col-sm-9 col-xs-12">
             <div class="bd-hr-rt-header"><i>Would you like to add <strong>New</strong></i></div>
             <div class="bd-hr-tabs-wrapper">
                 <div class="bd-hr-tabs-header clearfix">
