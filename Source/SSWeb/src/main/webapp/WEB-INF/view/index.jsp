@@ -118,12 +118,12 @@
 						<div class="clearfix reg-item reg-item-bord-top">
 							<div class="m-inp-img-fname m-inp-img"></div>
 							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
-							<input id="reg-fname" name="firstName" class="reg-inp reg-inp-1 reg-inp-1-adj" placeholder="First Name">
-							<input id="reg-lname" name="lastName" class="reg-inp reg-inp-2" placeholder="Last Name">
+							<input id="reg-fname" name="firstName" class="reg-inp reg-inp-1 reg-inp-1-adj" value="${firstname}" placeholder="First Name">
+							<input id="reg-lname" name="lastName" class="reg-inp reg-inp-2" value="${lastname}" placeholder="Last Name">
 						</div>
 						<div class="clearfix reg-item">
 							<div class="m-inp-img-email m-inp-img"></div>
-							<input type="text" name="emailId" id="reg-email" class="reg-inp reg-inp-3" placeholder="Email">
+							<input type="text" name="emailId" id="reg-email" class="reg-inp reg-inp-3" value="${emailid}" placeholder="Email">
 						</div>
 						<div class="clearfix reg-captcha-wrapper reg-item">
 							<div class="reg-captcha-img"></div>
