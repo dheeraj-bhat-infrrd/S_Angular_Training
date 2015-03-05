@@ -122,7 +122,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
-		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE, organizationalDetails.get(CommonConstants.VERTICAL));
+		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE,
+				organizationalDetails.get(CommonConstants.VERTICAL));
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
@@ -218,11 +219,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		company.setCompany(companyName);
 		company.setIsRegistrationComplete(isRegistrationComplete);
 		company.setStatus(CommonConstants.STATUS_ACTIVE);
-		
-		//We fetch the vertical and set it
-		VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN, vertical).get(CommonConstants.INITIAL_INDEX);
+
+		// We fetch the vertical and set it
+		VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN,
+				vertical).get(CommonConstants.INITIAL_INDEX);
 		company.setVerticalsMaster(verticalsMaster);
-		
+
 		company.setCreatedBy(String.valueOf(user.getUserId()));
 		company.setModifiedBy(String.valueOf(user.getUserId()));
 		company.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -357,14 +359,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	private void addIndividualAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.info("Method addIndividual started for user : " + user.getLoginName());
 
-		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
-		solrSearchService.addOrUpdateRegionToSolr(region);
+		LOG.debug("Adding the default region");
+		Region region = hierarchyManagementService.addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
+				CommonConstants.DEFAULT_ADDRESS, null);
+
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -375,22 +378,21 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
-		LOG.debug("Adding a new branch");
-		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
-		solrSearchService.addOrUpdateBranchToSolr(branch);
+		LOG.debug("Adding the default branch");
+		Branch branch = hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+				CommonConstants.DEFAULT_ADDRESS, null);
 
 		LOG.debug("Creating user profile for branch admin");
 		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				branch.getBranchId(), CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+				branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 		LOG.debug("Creating user profile for agent");
-		UserProfile userProfileAgent = createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(),
-				CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID, profilesMaster.getProfileId(),
-				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
-				String.valueOf(user.getUserId()));
+		UserProfile userProfileAgent = createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), branch.getBranchId(),
+				region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
+				String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileAgent);
 		/**
 		 * For an individual, only the company admin's profile completion stage is updated, all the
@@ -414,9 +416,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void addTeamAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.debug("Method addTeam started for user : " + user.getLoginName());
 
-		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
-		solrSearchService.addOrUpdateRegionToSolr(region);
+		LOG.debug("Adding the default region");
+		Region region = hierarchyManagementService.addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
+				CommonConstants.DEFAULT_ADDRESS, null);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -425,9 +427,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileRegionAdmin);
 
-		LOG.debug("Adding a new branch");
-		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
-		solrSearchService.addOrUpdateBranchToSolr(branch);
+		LOG.debug("Adding the default branch");
+		Branch branch = hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+				CommonConstants.DEFAULT_ADDRESS, null);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
@@ -448,14 +450,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	 * 
 	 * @param user
 	 * @throws InvalidInputException
-	 * @throws SolrException 
+	 * @throws SolrException
 	 */
 	private void addCompanyAccountType(User user) throws InvalidInputException, SolrException {
 		LOG.debug("Method addCompanyAccountType started for user : " + user.getLoginName());
 
-		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
-		solrSearchService.addOrUpdateRegionToSolr(region);
+		LOG.debug("Adding the default region");
+		Region region = hierarchyManagementService.addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
+				CommonConstants.DEFAULT_ADDRESS, null);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -463,20 +465,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfile);
-		
-		LOG.debug("Adding a new branch");
-		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
-		solrSearchService.addOrUpdateBranchToSolr(branch);
+
+		LOG.debug("Adding the default branch");
+		Branch branch = hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+				CommonConstants.DEFAULT_ADDRESS, null);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
-		
 		LOG.debug("Creating user profile for branch admin");
 		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 
-		
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
@@ -484,14 +484,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.debug("Method addCompanyAccountType finished.");
 
 	}
-	
-	private void addEnterpriseAccountType(User user) throws InvalidInputException, SolrException{
-		
+
+	private void addEnterpriseAccountType(User user) throws InvalidInputException, SolrException {
+
 		LOG.debug("Method addEnterpriseAccountType started for user : " + user.getLoginName());
 
-		LOG.debug("Adding a new region");
-		Region region = addRegion(user, CommonConstants.YES, CommonConstants.DEFAULT_REGION_NAME);
-		solrSearchService.addOrUpdateRegionToSolr(region);
+		LOG.debug("Adding the default region");
+		Region region = hierarchyManagementService.addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
+				CommonConstants.DEFAULT_ADDRESS, null);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
@@ -499,26 +499,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfile);
-		
-		LOG.debug("Adding a new branch");
-		Branch branch = addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
-		solrSearchService.addOrUpdateBranchToSolr(branch);
+
+		LOG.debug("Adding the default branch");
+		Branch branch = hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+				CommonConstants.DEFAULT_ADDRESS, null);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
-		
 		LOG.debug("Creating user profile for branch admin");
 		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
 				branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
 
-		
 		LOG.debug("Updating profile stage to payment stage for account type team");
 		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
 
 		LOG.debug("Method addCompanyAccountType finished.");
-		
+
 	}
 
 	/**
