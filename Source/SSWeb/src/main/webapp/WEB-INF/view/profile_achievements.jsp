@@ -7,7 +7,7 @@
 	<c:when test="${not empty achievements}">
 		<c:forEach items="${achievements}" var="achievement">
 			<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}">
-			<div class="float-left lp-ach-item-img" data-type="achievement"></div>
+			<div class="float-right lp-ach-item-img" data-type="achievement"></div>
 		</c:forEach>
 	</c:when>
 	<c:otherwise>

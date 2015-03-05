@@ -370,7 +370,7 @@
 										<c:when test="${not empty associations}">
 											<c:forEach items="${associations}" var="association">
 												<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}">
-												<div class="float-left lp-ach-item-img" data-type="association"></div>
+												<div class="float-right lp-ach-item-img" data-type="association"></div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
@@ -391,7 +391,7 @@
 										<c:when test="${not empty achievements}">
 											<c:forEach items="${achievements}" var="achievement">
 												<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}">
-												<div class="float-left lp-ach-item-img" data-type="achievement"></div>
+												<div class="float-right lp-ach-item-img" data-type="achievement"></div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
@@ -412,7 +412,7 @@
 										<c:when test="${not empty authorisedInList}">
 											<c:forEach items="${authorisedInList}" var="authorisedIn">
 												<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}">
-												<div class="float-left lp-ach-item-img" data-type="license"></div>
+												<div class="float-right lp-ach-item-img" data-type="license"></div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
