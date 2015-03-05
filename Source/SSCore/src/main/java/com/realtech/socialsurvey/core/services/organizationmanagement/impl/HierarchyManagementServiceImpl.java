@@ -393,7 +393,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public Branch addNewBranch(User user, long regionId, String branchName, String branchAddress1, String branchAddress2)
+	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1, String branchAddress2)
 			throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewBranch");
@@ -430,19 +430,19 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("No region is present in db for the company while adding branch");
 		}
 
-		Branch branch = organizationManagementService.addBranch(user, region, branchName, CommonConstants.NO);
+		Branch branch = organizationManagementService.addBranch(user, region, branchName, isDefaultBySystem);
 		branch.setAddress1(branchAddress1);
 		branch.setAddress2(branchAddress2);
 
 		LOG.debug("Adding new branch into mongo");
 		insertBranchSettings(branch);
-		
+
 		LOG.debug("Updating branch table with profile name");
 		branchDao.update(branch);
 
 		LOG.debug("Adding newly added branch to solr");
 		solrSearchService.addOrUpdateBranchToSolr(branch);
-		
+
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
@@ -552,7 +552,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegion(User user, String regionName, String address1, String address2) throws InvalidInputException, SolrException {
+	public Region addNewRegion(User user, String regionName,int isDefaultBySystem, String address1, String address2) throws InvalidInputException, SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewRegion");
 		}
@@ -564,22 +564,22 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		}
 		LOG.info("Method add new region called for regionName : " + regionName);
 
-		Region region = organizationManagementService.addRegion(user, CommonConstants.NO, regionName);
+		Region region = organizationManagementService.addRegion(user, isDefaultBySystem, regionName);
 		region.setAddress1(address1);
 		region.setAddress2(address2);
 
 		LOG.debug("Calling method to insert region settings");
 		insertRegionSettings(region);
-		
+
 		regionDao.update(region);
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
-		
+
 		LOG.debug("Adding a default branch under the newly created region");
 		Branch defaultBranch = organizationManagementService.addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
 		LOG.debug("Added default branch for region : " + region.getRegionId() + " with branch id : " + defaultBranch.getBranchId());
-		
+
 		LOG.debug("Updating Solr with newly inserted default branch");
 		solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
 		LOG.debug("Solr updated with new default branch");
@@ -633,7 +633,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(regionProfileName);
 			organizationSettings.setProfileUrl(regionProfileUrl);
-			
+
 			/**
 			 * Set the profile name in region object to update in sql later
 			 */
@@ -791,7 +791,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
+
 	/**
 	 * Method to insert region settings into mongo
 	 * 
