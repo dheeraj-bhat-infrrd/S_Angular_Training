@@ -458,27 +458,27 @@ a, a:hover, a:visited{
 
 .hr-txt {
     font-family: 'opensanssemibold';
-    font-size: 22px;
+    font-size: 18px;
     text-align: center;
-    line-height: 95px;
+    line-height: 70px;
 }
 
 .fp-container {
-    height: 80px;
+    height: 65px;
     background-color: #009FE0;
     color: #fff;
 }
 
 .fp-left-item {
     font-family: 'opensanssemibold';
-	font-size: 22px;
+	font-size: 18px;
 	text-align: right;
-	line-height: 80px;
+	line-height: 65px;
 	padding-left: 15px;
 }
 
 .fp-wrapper {
-    height: 80px;
+    height: 65px;
 }
 
 .fp-inp {
@@ -487,7 +487,7 @@ a, a:hover, a:visited{
     float: left;
     width: 200px;
     margin-right: 0;
-    height: 40px;
+    height: 32px;
     border: 0;
     border-radius: 3px;
     font-size: 12px;
@@ -497,7 +497,7 @@ a, a:hover, a:visited{
 
 .srch-name,.ctnt-item-desig {
    font-weight: bold;
-   font-size:14px;
+   font-size:12px;
 }
 
 .srch-num {
@@ -506,8 +506,9 @@ a, a:hover, a:visited{
 
 .ctnt-list-item {
     padding: 20px;
-    height: 135px;
+    height: 108px;
     border-bottom: 1px solid #EEEDE9;
+    padding: 15px 20px 20px 20px;
 }
 
 .ctnt-review-btn {
@@ -515,8 +516,8 @@ a, a:hover, a:visited{
     background-color: #009FE0;
     color: #fff;
     width: 160px;
-	line-height: 40px;
-	height: 40px;
+	line-height: 32px;
+	height: 32px;
 	text-align: center;
 	border-radius: 3px;
 	font-size: 14px;
@@ -528,7 +529,7 @@ a, a:hover, a:visited{
 
 .fp-right-item{
 	margin-left: 40px;
-	margin-top: 20px;
+	margin-top: 17px;
 }
 
 .fp-row-wrapper{
@@ -537,25 +538,33 @@ a, a:hover, a:visited{
 }
 
 .ctnt-list-item-img{
-	width : 80px;
-	height : 80px;
+	width : 70px;
+	height : 70px;
 	margin: auto 15px;
 	background: url(../images/Person1.png) no-repeat center;
 	border-radius: 3px;
+    margin-left: 0;
 }
 
 .ctnt-list-item-txt-wrap{
-	height: 100px;
+	height: 72px;
 	overflow: hidden;
+    margin-right: 25px;
 }
 
 .ctnt-list-header{
 	border-bottom: 1px solid #EEEDE9;
 	margin-top: 50px;
+    line-height: 30px;
+    font-size: 12px;
+    padding-right: 10px;
 }
 
 .ctnt-list-wrapper{
 	margin-bottom: 2px;
+    padding-top: 10px;
+    font-size: 12px;
+    padding-top: 10px;
 }
 
 .ctnt-list-item-even{
@@ -589,12 +598,14 @@ a, a:hover, a:visited{
 
 .ctnt-wrapper {
     margin-bottom: 50px;
+    margin-top: -15px;
 }
 
 .ads-container {
     background: url('../images/temp_ad.png') no-repeat center;
     height: 1000px;
-    background-size: 160px;
+    background-size: 100% auto;
+    background-position: center 70px;
 }
 
 .fp-txt-1 {
