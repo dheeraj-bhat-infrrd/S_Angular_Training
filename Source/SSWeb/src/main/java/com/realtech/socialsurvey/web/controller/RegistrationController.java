@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,12 +165,11 @@ public class RegistrationController {
 	@RequestMapping(value = "/registration")
 	public String initDirectRegistration(Model model, HttpServletRequest request) throws IOException {
 		LOG.info("Method called for showing up the direct registration page");
-		
-		try {
-			String firstName = request.getParameter("firstName");
-			String lastName = request.getParameter("lastName");
-			String emailId = request.getParameter("emailId");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
 
+		try {
 			String captchaResponse = request.getParameter("captchaResponse");
 			String challengeField = request.getParameter("recaptcha_challenge_field");
 			String remoteAddress = request.getRemoteAddr();
@@ -194,6 +192,9 @@ public class RegistrationController {
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("firstname", firstName);
+			model.addAttribute("lastname", lastName);
+			model.addAttribute("emailid", emailId);
 			return JspResolver.INDEX;
 		}
 	}
