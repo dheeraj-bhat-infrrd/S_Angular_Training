@@ -100,7 +100,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="float-left c-reg-panel">
+                <div class="float-left c-reg-panel pos-relative">
+                    <div id="reg-err-pu" class="reg-err-pu hide">
+                        <span id="reg-err-pu-msg" class="reg-err-pu-msg"></span>
+                        <span id="reg-err-pu-close" class="reg-err-pu-close">`</span>
+                    </div>
                		<form id="registration-form" class="registration-form-cls" method="POST" action="./registration.do">
 	                    <div class="reg-txt-top1">Get Started - It's Free</div>
 	                    <div class="reg-txt-top2">Sign Up to Start Your Survey</div>
@@ -327,6 +331,10 @@
             
             $('#header-search-icn').click(function(e) {
                 $('#pro-wrapper-top').slideToggle(200);
+            });
+            
+            $('#reg-err-pu-close').click(function(){
+                hideRegErr();
             });
             
         });

@@ -404,6 +404,10 @@
     .ctnt-list-item-txt-wrap{
     	width: 385px !important;
     }
+    .reg-err-pu{
+        height: 50px;
+        line-height: 50px;
+    }
 }
 
 
