@@ -64,6 +64,7 @@ public interface CommonConstants {
 	public static final String RESET_PASSWORD = "resetpassword.do";
 	public static final String DASHBOARD_STAGE = "dashboard.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
+	public static final String REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION = "emailverification.do";
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
@@ -182,6 +183,9 @@ public interface CommonConstants {
 	public static final String USER_PROFILE = "profile";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
+	public static final String EMAIL_TYPE = "emailtype";
+	public static final String EMAIL_TYPE_WORK = "work";
+	public static final String EMAIL_TYPE_PERSONAL = "personal";
 
 	/**
 	 * Batch Constants

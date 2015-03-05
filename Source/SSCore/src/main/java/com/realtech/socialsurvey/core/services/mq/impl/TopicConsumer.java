@@ -80,6 +80,8 @@ public class TopicConsumer implements Runnable {
 			parseRegistrationMailMessage(message);
 		}else if(header.equals(EmailHeader.VERFICATION.getName())){
 			parseMailMessage(message, EmailHeader.VERFICATION);
+		}else if(header.equals(EmailHeader.EMAIL_VERFICATION.getName())){
+			parseMailMessage(message, EmailHeader.EMAIL_VERFICATION);
 		}else if(header.equals(EmailHeader.RESET_PASSWORD.getName())){
 			parseMailMessage(message, EmailHeader.RESET_PASSWORD);
 		}else if(header.equals(EmailHeader.SUBSCRIPTION_CHARGE_UNSUCESSFUL)){
@@ -132,13 +134,19 @@ public class TopicConsumer implements Runnable {
 		messageParsedIndex+=URL_MARKER.length()+url.length()+ELEMENTS_DELIMITER.length();
 		String name = message.substring(messageParsedIndex+NAME_MARKER.length());
 		LOG.debug("Name: "+name);
-		if(header == EmailHeader.VERFICATION){
+		if (header == EmailHeader.VERFICATION) {
 			LOG.debug("Sending verification mail");
 			emailServices.sendVerificationMail(url, recipient, name);
-		}else if(header == EmailHeader.RESET_PASSWORD){
+		}
+		else if (header == EmailHeader.EMAIL_VERFICATION) {
+			LOG.debug("Sending verification mail");
+			emailServices.sendEmailVerificationMail(url, recipient, name);
+		}
+		else if (header == EmailHeader.RESET_PASSWORD) {
 			LOG.debug("Sending reset password mail");
 			emailServices.sendResetPasswordEmail(url, recipient, name);
-		}else if(header == EmailHeader.REGISTRATION_COMPLETE){
+		}
+		else if (header == EmailHeader.REGISTRATION_COMPLETE) {
 			LOG.debug("Sending registration complete mail");
 			emailServices.sendRegistrationCompletionEmail(url, recipient, name);
 		}
