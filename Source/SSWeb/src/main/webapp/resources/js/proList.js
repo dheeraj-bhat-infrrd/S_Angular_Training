@@ -114,6 +114,7 @@ function paintProList(usersList) {
 				if(user.title != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
+				usersHtml = usersHtml +'	<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
 				usersHtml = usersHtml + '</div>';
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap">'
 					+ '<div class="ctnt-review-btn" user="' + user.userId + '">Review</div>'
