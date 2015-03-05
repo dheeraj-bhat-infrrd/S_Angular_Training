@@ -1087,7 +1087,7 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
-	// TODO send verification links
+	// send verification links
 	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
 			OrganizationUnitSettings userSettings) throws InvalidInputException {
 		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
