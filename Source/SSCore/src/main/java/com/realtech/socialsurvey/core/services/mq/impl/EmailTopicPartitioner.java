@@ -20,6 +20,7 @@ public class EmailTopicPartitioner implements Partitioner {
 		HEADER_PARTITION_MAP.put("registration_complete", 1);
 		HEADER_PARTITION_MAP.put("subscription_charge_unsucessful", 3);
 		HEADER_PARTITION_MAP.put("verification", 1);
+		HEADER_PARTITION_MAP.put("emailverification", 1);
 		HEADER_PARTITION_MAP.put("retry_charge", 3);
 		HEADER_PARTITION_MAP.put("retry_exhausted", 3);
 		HEADER_PARTITION_MAP.put("account_disabled", 2);

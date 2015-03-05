@@ -8,9 +8,9 @@ import java.util.List;
 public class MailIdSettings {
 
 	private String work;
-	private boolean isWorkEmailVerified;
+	private boolean isWorkEmailVerified = true;
 	private String personal;
-	private boolean isPersonalEmailVerified;
+	private boolean isPersonalEmailVerified = true;
 	private List<MiscValues> others;
 
 	// Need to implement verification for others
