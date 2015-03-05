@@ -477,65 +477,49 @@ function callBackShowProfileSocialLinks(data) {
 	adjustImage();
 }
 
-// Function to append an association
+// Agent details
+$(document).on('focus', '.prof-edditable-sin-agent', function() {
+	$(this).addClass('prof-name-edit');
+});
+
+$(document).on('blur', '.prof-edditable-sin-agent', function() {
+	$(this).removeClass('prof-name-edit');
+});
+
+$(document).on('click', '.lp-ach-item-img', function() {
+	var type = $(this).attr('data-type');
+	$(this).prev().remove();
+	$(this).remove();
+	
+	if (type == 'association') {
+		updateAssociations();
+	}
+	else if (type == 'achievement') {
+		updateAchievements();
+	}
+	else if (type == 'license') {
+		updateLicenseAuthorizations();
+	}
+});
+
+// Function to update association/membership list
 function addAnAssociation() {
 	if ($('#association-container > input').length <= 0) {
 		$('#association-container').empty();
 	}
 	var newAssociation = $('<input>').attr({
-		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin",
+		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Associaion"
 	});
 	$('#association-container').append(newAssociation);
 
 	var newAssociationButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
+		"class" : "float-right lp-ach-item-img",
+		"data-type" : "association"
 	});
 	$('#association-container').append(newAssociationButton);
 
 	newAssociation.focus();
-}
-
-// Function to append an achievement
-$(document).on('click', '.lp-ach-item-img', function() {
-	$(this).prev().remove();
-	$(this).remove();
-});
-
-function addAnAchievement() {
-	if ($('#achievement-container > input').length <= 0) {
-		$('#achievement-container').empty();
-	}
-	var newAchievement = $('<input>').attr({
-		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin",
-		"placeholder" : "New Achievement"
-	});
-	$('#achievement-container').append(newAchievement);
-
-	var newAchievementButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
-	});
-	$('#achievement-container').append(newAchievementButton);
-
-	newAchievement.focus();
-}
-
-function addAuthorisedIn() {
-	if ($('#authorised-in-container > input').length <= 0) {
-		$('#authorised-in-container').empty();
-	}
-	var newAuthorisation = $('<input>').attr({
-		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin",
-		"placeholder" : "Authorized in"
-	});
-	$('#authorised-in-container').append(newAuthorisation);
-
-	var newAuthorizationButton = $('<div>').attr({
-		"class" : "float-left lp-ach-item-img",
-	});
-	$('#authorised-in-container').append(newAuthorizationButton);
-
-	newAuthorisation.focus();
 }
 
 $(document).on('blur', '#association-container input', function() {
@@ -544,7 +528,6 @@ $(document).on('blur', '#association-container input', function() {
 	}, 0);
 });
 
-// Function to update association list
 function updateAssociations() {
 	var associationList = [];
 	$('#association-container').children('input').each(function() {
@@ -571,13 +554,32 @@ function callBackUpdateAssociations(data) {
 	showAssociationList();
 }
 
+// Function to update achievement list
+function addAnAchievement() {
+	if ($('#achievement-container > input').length <= 0) {
+		$('#achievement-container').empty();
+	}
+	var newAchievement = $('<input>').attr({
+		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
+		"placeholder" : "New Achievement"
+	});
+	$('#achievement-container').append(newAchievement);
+
+	var newAchievementButton = $('<div>').attr({
+		"class" : "float-right lp-ach-item-img",
+		"data-type" : "achievement"
+	});
+	$('#achievement-container').append(newAchievementButton);
+
+	newAchievement.focus();
+}
+
 $(document).on('blur', '#achievement-container input', function() {
 	delay(function() {
 		updateAchievements();
 	}, 0);
 });
 
-// Function to update achievement list
 function updateAchievements() {
 	var achievementList = [];
 	$('#achievement-container').children('input').each(function() {
@@ -605,13 +607,32 @@ function callBackUpdateAchievements(data) {
 	showAchievementList();
 }
 
+// Function to update License authorizations
+function addAuthorisedIn() {
+	if ($('#authorised-in-container > input').length <= 0) {
+		$('#authorised-in-container').empty();
+	}
+	var newAuthorisation = $('<input>').attr({
+		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
+		"placeholder" : "Authorized in"
+	});
+	$('#authorised-in-container').append(newAuthorisation);
+
+	var newAuthorizationButton = $('<div>').attr({
+		"class" : "float-right lp-ach-item-img",
+		"data-type" : "license"
+	});
+	$('#authorised-in-container').append(newAuthorizationButton);
+
+	newAuthorisation.focus();
+}
+
 $(document).on('blur', '#authorised-in-container input', function() {
 	delay(function() {
 		updateLicenseAuthorizations();
 	}, 0);
 });
 
-// Function to update License authorizations
 function updateLicenseAuthorizations() {
 	var licenceList = [];
 	$('#authorised-in-container').children('input').each(function() {
@@ -944,6 +965,7 @@ function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 		$(".review-ratings").each(function() {
 			changeRatingPattern($(this).data("rating"), $(this));
 		});
+		
 		$('.icn-plus-open').click(function(){
 	        $(this).hide();
 	        $(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -989,4 +1011,36 @@ function paintAvgRating(avgRating) {
 	if (avgRating != undefined) {
 		changeRatingPattern(avgRating, $("#rating-avg-comp"));
 	}
+}
+
+// Edit EmailIds
+$(document).on('blur', '#contant-info-container input[data-email]', function() {
+	if (!$(this).val() || !emailRegex.test(this.value) || ($(this).val() == $('#' + $(this).attr("id") + '-old').val())) {
+		return;
+	}
+	
+	delay(function() {
+		var mailIds = [];
+		$('#contant-info-container input[data-email]').each(function() {
+			if (this.value != "") {
+				var mailId = {};
+				mailId.key = $(this).attr("data-email");
+				mailId.value = this.value;
+				mailIds.push(mailId);
+			}
+		});
+		mailIds = JSON.stringify(mailIds);
+		var payload = {
+			"mailIds" : mailIds
+		};
+		callAjaxPostWithPayloadData("./updateemailids.do", callBackOnUpdateMailIds, payload);
+	}, 0);
+});
+
+function callBackOnUpdateMailIds(data) {
+	$('#prof-message-header').html(data);
+	callAjaxGET("./fetchcontactdetails.do", callBackShowContactDetails);
+
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
 }
