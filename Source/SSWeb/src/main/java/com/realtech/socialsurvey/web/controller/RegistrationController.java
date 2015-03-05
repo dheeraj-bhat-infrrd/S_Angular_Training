@@ -163,7 +163,7 @@ public class RegistrationController {
 	 * @throws IOException 
 	 */
 	@RequestMapping(value = "/registration")
-	public String initDirectRegistration(Model model, HttpServletRequest request) throws IOException {
+	public String initDirectRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method called for showing up the direct registration page");
 		String firstName = request.getParameter("firstName");
 		String lastName = request.getParameter("lastName");
