@@ -50,6 +50,15 @@ function hideInfo(){
     },200);
 }
 
+function showRegErr(msg){
+    $('#reg-err-pu-msg').html(msg);
+    $('#reg-err-pu').fadeIn();
+}
+
+function hideRegErr(msg){
+    $('#reg-err-pu').fadeOut();
+}
+
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();
