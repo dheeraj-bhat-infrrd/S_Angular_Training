@@ -23,6 +23,7 @@ public interface CommonConstants {
 	public static final long DEFAULT_COMPANY_ID = 1;
 	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
 	public static final String DEFAULT_REGION_NAME = "Default Region";
+	public static final String DEFAULT_ADDRESS = "Default Address";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
