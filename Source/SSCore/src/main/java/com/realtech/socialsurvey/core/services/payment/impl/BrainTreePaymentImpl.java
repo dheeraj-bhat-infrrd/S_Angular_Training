@@ -99,6 +99,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 
@@ -637,7 +640,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
-		emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		}else{
+			emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		}
 
 		LOG.info("Email sent successfully!");
 
@@ -1037,7 +1044,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		
 		LOG.info("Sending mail to the customer about the upgrade");
-		emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}else{
+			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}
 		LOG.info("Mail successfully sent");		
 		
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");

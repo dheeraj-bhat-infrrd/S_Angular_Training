@@ -62,6 +62,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -1089,7 +1090,7 @@ public class ProfileManagementController {
 
 	// send verification links
 	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
-			OrganizationUnitSettings userSettings) throws InvalidInputException {
+			OrganizationUnitSettings userSettings) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
 		Map<String, String> urlParams = null;
 		

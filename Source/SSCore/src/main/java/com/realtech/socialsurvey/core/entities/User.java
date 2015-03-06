@@ -73,8 +73,10 @@ public class User implements UserDetails, Serializable {
 	@Column(name = "SOURCE_USER_ID")
 	private int sourceUserId;
 
+	@Column(name = "SOURCE")
 	private String source;
 
+	@Column(name = "STATUS")
 	private int status;
 
 	@Transient
