@@ -1197,6 +1197,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setIsAtleastOneUserprofileComplete(isAtleastOneProfileComplete);
 		user.setStatus(status);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		user.setLastLogin(currentTimestamp);
 		user.setCreatedOn(currentTimestamp);
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(createdBy);
