@@ -1298,7 +1298,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 		canonicalUserSettings.setCompanySettings(companySettings);
 
-		switch (accountType) {
+		/*switch (accountType) {
+			case FREE:
 			case INDIVIDUAL:
 			case TEAM:
 				LOG.debug("Individual/ Team account type");
@@ -1320,7 +1321,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				canonicalUserSettings.setBranchSettings(branchesSettings);
 				break;
 			case ENTERPRISE:
-				LOG.debug("Company account type");
+				LOG.debug("Company account type");*/
+				
 				// get the agent settings. If the user is not an agent then there would agent
 				// settings would be null
 				LOG.debug("Gettings agent settings");
@@ -1334,10 +1336,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				LOG.debug("Gettings region settings for user profiles");
 				regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);
 				canonicalUserSettings.setRegionSettings(regionsSettings);
-				break;
+				/*break;
 			default:
 				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
-		}
+		}*/
 		return canonicalUserSettings;
 	}
 
