@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import com.braintreegateway.exceptions.UnexpectedException;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -19,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 
@@ -50,6 +52,9 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 	
 	private Map<String, Object> writerObjectsMap = new HashMap<String, Object>();
 	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
+	
 	private static final Logger LOG = LoggerFactory.getLogger(UnsubscribeAccountsItemProcessor.class);
 	
 	@Override
@@ -68,7 +73,11 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 			//Sending mail to the respective user. We fetch the corporate admin for the company
 			User user = commonServices.getCorporateAdmin(company);
 			LOG.info("Sending mail to the respective corporate admin with email id : " + user.getEmailId());
-			emailServices.queueAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
+			if(enableKafka.equals(CommonConstants.YES)){
+				emailServices.queueAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
+			}else{
+				emailServices.sendAccountDisabledMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName());
+			}
 			LOG.info("Email successfully sent!");
 			
 			//Updating the company record to reflect changes
@@ -101,7 +110,7 @@ public class UnsubscribeAccountsItemProcessor implements ItemProcessor<DisabledA
 			LOG.info("Processing of the item with id : " + disabledAccount.getId() + " UNSUCCESSFUL!");
 			return null;
 		}
-		catch (InvalidInputException | NoRecordsFetchedException e) {
+		catch (InvalidInputException | NoRecordsFetchedException | UndeliveredEmailException e) {
 			
 			LOG.error("Invalid Input Exception caught : Message : " + e.getMessage(),e);
 			LOG.info("Processing of item : License detail object with id : " + disabledAccount.getId() + " UNSUCCESSFUL");
