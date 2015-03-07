@@ -211,7 +211,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
 		licenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
 		licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
-		licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+		licenseDetail.setLicenseStartDate(currentTime);
+		licenseDetail.setLicenseEndDate(currentTime);
 		licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
 		licenseDetailDao.save(licenseDetail);
 		LOG.debug("License detail table updated. Updating the company entity.");
