@@ -137,6 +137,8 @@ $(document).on('blur', '#intro-body-text-edit', function() {
 		
 		var aboutMe = $('#intro-body-text-edit').val().trim();
 		if (aboutMe == undefined || aboutMe == "") {
+			$('#overlay-toast').html("Please add a few words about you");
+			showToast();
 			return;
 		}
 		delay(function() {
@@ -178,7 +180,12 @@ function callBackShowContactDetails(data) {
 
 // Phone numbers in contact details
 $(document).on('blur', '#contant-info-container input[data-phone-number]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || !phoneRegex.test(this.value) || $(this).is('[readonly]')) {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+		return;
+	}
+	if (!phoneRegex.test(this.value)) {
+		$('#overlay-toast').html("Please add a valid phone number");
+		showToast();
 		return;
 	}
 
@@ -211,7 +218,12 @@ function callBackOnUpdatePhoneNumbers(data) {
 
 // Function to update web addresses in contact details
 $(document).on('blur', '#contant-info-container input[data-web-address]', function() {
-	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || !isValidUrl($(this).val().trim()) || $(this).is('[readonly]')) {
+	if ($('#prof-all-lock').val() != 'modified' || !$(this).val() || $(this).is('[readonly]')) {
+		return;
+	}
+	if (!isValidUrl($(this).val().trim())) {
+		$('#overlay-toast').html("Please add a valid web address");
+		showToast();
 		return;
 	}
 
