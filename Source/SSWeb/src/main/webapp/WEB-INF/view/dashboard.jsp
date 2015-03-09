@@ -29,21 +29,21 @@
                         <div class="dsh-g-wrap dsh-g-wrap-1">
                             <div class="dsh-graph-item dsh-graph-item-1">
                                 <div id="dg-img-1" class="dsh-graph-img"></div>
-                                <div id="" class="dsh-graph-num">400</div>
+                                <div id="socl-post" class="dsh-graph-num">400</div>
                                 <div id="" class="dsh-graph-txt dsh-graph-txt-1">Social Post In Last 30 Days</div>
                             </div>
                         </div>
                         <div class="dsh-g-wrap dsh-g-wrap-2">
                             <div class="dsh-graph-item dsh-graph-item-1">
                                 <div id="dg-img-2" class="dsh-graph-img"></div>
-                                <div id="" class="dsh-graph-num">3000</div>
+                                <div id="srv-snt-cnt" class="dsh-graph-num">3000</div>
                                 <div id="" class="dsh-graph-txt dsh-graph-txt-2">Total Surveys Sent</div>
                             </div>
                         </div>
                         <div class="dsh-g-wrap dsh-g-wrap-3">
                             <div class="dsh-graph-item dsh-graph-item-1">
                                 <div id="dg-img-3" class="dsh-graph-img"></div>
-                                <div id="" class="dsh-graph-num">4/5</div>
+                                <div id="srv-scr" class="dsh-graph-num">4/5</div>
                                 <div id="" class="dsh-graph-txt dsh-graph-txt-3">Survey Score Over Last 30 Days</div>
                             </div>
                         </div>
