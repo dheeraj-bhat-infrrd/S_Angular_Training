@@ -112,5 +112,7 @@ public interface SolrSearchService {
 	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException;
 	
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
+	
+	public SolrDocumentList searchUsersByIden(long iden,String idenFieldName,int startIndex,int noOfRows) throws InvalidInputException,SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

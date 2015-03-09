@@ -43,18 +43,18 @@ import com.realtech.socialsurvey.core.exception.DatabaseException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CardUpdateUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
+import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentRetryUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionCancellationUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
-import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
-import com.realtech.socialsurvey.core.services.payment.Payment;
-import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.PropertyFileReader;
@@ -99,6 +99,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 
@@ -208,7 +211,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
 		licenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
 		licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
-		licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+		licenseDetail.setLicenseStartDate(currentTime);
+		licenseDetail.setLicenseEndDate(currentTime);
 		licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
 		licenseDetailDao.save(licenseDetail);
 		LOG.debug("License detail table updated. Updating the company entity.");
@@ -637,7 +642,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
-		emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		}else{
+			emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		}
 
 		LOG.info("Email sent successfully!");
 
@@ -1037,7 +1046,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		
 		LOG.info("Sending mail to the customer about the upgrade");
-		emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}else{
+			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}
 		LOG.info("Mail successfully sent");		
 		
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
