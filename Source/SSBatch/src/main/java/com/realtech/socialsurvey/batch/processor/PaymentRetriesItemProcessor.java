@@ -5,6 +5,7 @@ package com.realtech.socialsurvey.batch.processor;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.exceptions.UnexpectedException;
 import com.realtech.socialsurvey.batch.commons.BatchCommon;
@@ -56,6 +56,9 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 	
 	@Autowired
 	private BatchCommon commonServices;
@@ -140,13 +143,23 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 		LOG.debug("Sending mail for retrying subscription charge.");
 
 		try {
-			emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+			if(enableKafka.equals(CommonConstants.YES)){
+				emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
 					String.valueOf(licenseDetail.getPaymentRetries() + 1));
+			}else{
+				emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+					String.valueOf(licenseDetail.getPaymentRetries() + 1));
+			}
 		}
-		catch (InvalidInputException | UndeliveredEmailException e1) {
+		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
 
 			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
+		}
+		catch (UndeliveredEmailException e) {
+			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e.getMessage());
+
+			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e);
 		}
 
 		LOG.info("Returning transaction");
@@ -294,13 +307,21 @@ public class PaymentRetriesItemProcessor implements ItemProcessor<LicenseDetail,
 				// Now a mail regarding the same is sent to the user
 				LOG.info("Sending a mail regarding the blocking of subscription to the user.");
 				try {
-					emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					if(enableKafka.equals(CommonConstants.YES)){
+						emailServices.queueRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					}else{
+						emailServices.sendRetryExhaustedEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+					}
 					LOG.info("Mail successfully sent.");
 				}
-				catch (InvalidInputException | UndeliveredEmailException e1) {
+				catch (InvalidInputException e1) {
 					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e1.getMessage(),e1);
 					coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
 
+				}
+				catch (UndeliveredEmailException e) {
+					LOG.error("Exception caught when sending Fatal Exception mail. Message : " + e.getMessage(),e);
+					coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e);
 				}
 
 				LOG.info("Mail sent. Preparing map to be sent to the writer.");

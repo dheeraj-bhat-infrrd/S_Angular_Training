@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.core.entities;
 
 // JIRA: SS-7: By RM02: BOC
 import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Table;
 

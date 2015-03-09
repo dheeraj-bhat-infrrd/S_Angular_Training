@@ -479,8 +479,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (rows > -1) {
 			query.limit(rows);
 		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished.");
@@ -497,7 +497,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 		if (startScore > 0 && limitScore > 0) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+					Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
 		}
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method getFeedBacksCount executed successfully");

@@ -64,10 +64,18 @@
 						<div class="ctnt-list-header clearfix">
 							<div class="ctnt-list-header-left float-left">
 								<spring:message code="label.profilefoundfor.key" />
-								<span class="srch-name">${patternFirst} ${patternLast}</span>
-								<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
-								<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
-								<input id="fp-users-size" type="hidden" value="${size}">
+									<c:choose>
+										<c:when test = "${not empty searchCriteria}">
+											<span class="srch-name">${searchCriteria}</span>
+										</c:when>
+										<c:otherwise>
+											<span class="srch-name">${patternFirst} ${patternLast}</span>
+											<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
+											<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
+										</c:otherwise>
+									</c:choose>
+								<input id="fp-users-size" type="hidden">
+								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}" data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
 							<div class="ctnt-list-header-right float-right">
 								<c:choose>
@@ -82,29 +90,6 @@
 							</div>
 						</div>
 						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper">
-							
-							<!-- Populating user search results -->
-							<c:choose>
-								<c:when test="${not empty users}">
-									<c:forEach var="user" varStatus="loopStatus" items="${users}">
-										<div class="ctnt-list-item clearfix ${loopStatus.index % 2 == 0 ? '' : 'ctnt-list-item-even'}">
-											<div class="float-left ctnt-list-item-img" style="background: url(${user.profileImageUrl}) no-repeat center; background-size: contain;"></div>
-											<div class="float-left ctnt-list-item-txt-wrap">
-												<div class="ctnt-item-name">${user.displayName}</div>
-												<div class="ctnt-item-desig">${user.title}</div>
-												<div class="ctnt-item-comment">${user.aboutMe}</div>
-											</div>
-											<div class="float-left ctnt-list-item-btn-wrap">
-												<div class="ctnt-review-btn" user="${user.userId}"><spring:message code="label.reviewbutton.key" /></div>
-											</div>
-										</div>
-									</c:forEach>
-								</c:when>
-								<c:otherwise>
-									<div class="ctnt-list-item clearfix"><spring:message code="label.noprofilesfound.key" /></div>
-								</c:otherwise>
-							</c:choose>
-							
 							<!-- Example user search results -->
 							<div class="ctnt-list-item clearfix hide">
 								<div class="float-left ctnt-list-item-img"></div>
@@ -132,6 +117,7 @@
 									</div>
 								</div>
 							</div>
+							
 						</div>
 					</div>
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
@@ -145,12 +131,15 @@
 	<script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
 		$(document).ready(function() {
 			$('#find-pro-row-size').val(rowSize);
 			$('#find-pro-start-index').val(startIndex);
+			$('#fp-users-size').val(0);
 			
+			fetchUsers(startIndex);
 			adjustTextContainerWidthOnResize();
 			
 			$(window).resize(function() {

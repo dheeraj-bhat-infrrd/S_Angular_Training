@@ -65,64 +65,86 @@ $('#find-pro-submit').click(function(e) {
 $(window).scroll(function() {
 	var newIndex = startIndex + rowSize;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex < $('#srch-num').html()) {
-		console.log(newIndex);
-		console.log($('#srch-num').html());
+		fetchUsers(newIndex);
+		startIndex = newIndex;
+	}
+});
+
+/**
+ * Method to fetch users list based on the criteria i.e if profile level is specified,
+ *  bring all users of that level else search based on first/last name
+ * @param newIndex
+ */
+function fetchUsers(newIndex) {
+	var profileLevel = $("#fp-profile-level-fetch-info").data("profile-level");
+	var iden = $("#fp-profile-level-fetch-info").data("iden");
+	
+	if(profileLevel != undefined && profileLevel != ""){
+		fetchUsersByProfileLevel(iden, profileLevel, startIndex);
+	}
+	else {
 		var formData = new FormData();
 		formData.append("find-pro-first-name", $('#fp-first-name-pattern').val());
 		formData.append("find-pro-last-name", $('#fp-last-name-pattern').val());
 		formData.append("find-pro-start-index", newIndex);
 		formData.append("find-pro-row-size", rowSize);
-
 		callAjaxPOSTWithTextData("./findaproscroll.do", infiniteScrollCallback, true, formData);
-		startIndex = newIndex;
 	}
-});
+	
+}
 
 function infiniteScrollCallback(response) {
-	console.log(response);
-	
 	var users =  $.parseJSON(response);
-	var htmlData = "";
-	if (users != null) {
-		var loopStatus = $('#fp-users-size').val();
-		$.each(users, function(i, user) {
-			var evenOdd = (loopStatus % 2 == 0) ? '' : 'ctnt-list-item-even';
-			htmlData = htmlData + '<div class="ctnt-list-item clearfix ' + evenOdd + '">'
-				+ '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: contain;"></div>'
-				+ '<div class="float-left ctnt-list-item-txt-wrap">'
-					+ '<div class="ctnt-item-name">' + user.displayName + '</div>'
-					+ '<div class="ctnt-item-desig">' + user.title + '</div>'
-					+ '<div class="ctnt-item-comment">' + user.aboutMe + '</div>'
-				+ '</div>'
-				+ '<div class="float-left ctnt-list-item-btn-wrap">'
-					+ '<div class="ctnt-review-btn user="' + user.userId + '">Review</div>'
-				+ '</div>'
-			+ '</div>';
-			loopStatus ++;
-		});
-		
-		$('#ctnt-list-wrapper').append(htmlData);
-		$('#fp-users-size').val(loopStatus);
+	if (users != undefined) {
+		paintProList(users);
 	}
 }
 
-$('.ctnt-review-btn').click(function() {
-	var payload = {
-		"userId" : $(this).attr('user')
-	};
-	$.ajax({
-		url : "./../rest/survey/redirecttodetailspage",
-		type : "GET",
-		data : payload,
-		datatype : "html",
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				window.open(data.responseText);
-			}
+function paintProList(usersList) {
+	if(usersList != undefined) {
+		var usersSize = usersList.length;
+		var usersHtml = "";
+		if(usersSize > 0){
+			$.each(usersList,function(i,user){
+				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
+				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '">';
+				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
+				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
+				usersHtml = usersHtml + '	<div class="ctnt-item-name">' + user.displayName + '</div>';
+				if(user.title != undefined){
+					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
+				}
+				usersHtml = usersHtml + '	<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
+				usersHtml = usersHtml + '</div>';
+				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap">'
+					+ '<div class="ctnt-review-btn" user="' + user.userId + '">Review</div>'
+				+ '</div>'
+			+ '</div>';
+			});
+			
+			$('#ctnt-list-wrapper').append(usersHtml);
+			$('#fp-users-size').val(usersSize);
 		}
-	});
+	}
+}
+
+function fetchUsersByProfileLevel(iden,profileLevel,startIndex){
+	if(iden == undefined){
+		console.log("iden is undefined for fetchUsersByProfileLevel");
+		return;
+	}
+	var url = window.location.origin +"/rest/profile/individuals/"+iden+"?profileLevel="+profileLevel+"&startIndex="+startIndex;
+	callAjaxGET(url, fetchUsersByProfileLevelCallback, false);
+}
+
+function fetchUsersByProfileLevelCallback(data) {
+	var response = $.parseJSON(data);
+	if(response != undefined) {
+		var usersList = $.parseJSON(response.entity);
+		paintProList(usersList);
+	}
+}
+
+$(document).on('click', '.ctnt-review-btn', function(){
+	initSurveyReview($(this).attr('user'));
 });

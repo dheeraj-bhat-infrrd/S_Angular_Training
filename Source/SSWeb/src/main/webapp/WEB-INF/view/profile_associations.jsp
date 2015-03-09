@@ -6,7 +6,8 @@
 <c:choose>
 	<c:when test="${not empty associations}">
 		<c:forEach items="${associations}" var="association">
-			<input class="lp-assoc-row lp-row clearfix prof-edditable-sin" value="${association.name}">
+			<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}">
+			<div class="float-right lp-ach-item-img" data-type="association"></div>
 		</c:forEach>
 	</c:when>
 	<c:otherwise>

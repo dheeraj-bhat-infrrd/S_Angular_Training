@@ -532,6 +532,17 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
 			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
+
+			/**
+			 * add/update profile url and profile name in solr only when they are not null
+			 */
+			if (user.getProfileName() != null && !user.getProfileName().isEmpty()) {
+				document.addField(CommonConstants.PROFILE_NAME_SOLR, user.getProfileName());
+			}
+			if (user.getProfileUrl() != null && !user.getProfileUrl().isEmpty()) {
+				document.addField(CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl());
+			}
+
 			if (user.getCompany() != null)
 				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
@@ -547,19 +558,19 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.BRANCHES_SOLR, branches);
 			document.addField(CommonConstants.REGIONS_SOLR, regions);
 			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
-			LOG.debug("response while adding region is {}." + response);
+			LOG.debug("response while adding user is {}." + response);
 			solrServer.add(document);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding user to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding user to solr. Reason : " + e.getMessage(), e);
 		}
 		catch (SolrServerException | IOException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding user to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding user to solr. Reason : " + e.getMessage(), e);
 		}
-		LOG.info("Method to add region to solr finshed for region : " + user);
+		LOG.info("Method to add user to solr finshed for user : " + user);
 	}
 
 	/*
@@ -601,7 +612,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
 		return displayName;
 	}
-	
+
 	/**
 	 * Method to edit User in solr
 	 */
@@ -628,5 +639,45 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method to edit user in solr finished for user : " + userId);
+	}
+
+	@Override
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException, SolrException {
+		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
+				+ noOfRows);
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is not set in searchUsersByIden");
+		}
+		if (idenFieldName == null || idenFieldName.isEmpty()) {
+			throw new InvalidInputException("idenFieldName is null or empty in searchUsersByIden");
+		}
+
+		QueryResponse response = null;
+		SolrDocumentList results = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			if (startIndex > -1) {
+				solrQuery.setStart(startIndex);
+			}
+			if (noOfRows > -1) {
+				solrQuery.setRows(noOfRows);
+			}
+
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			results = response.getResults();
+			LOG.debug("User search result is : " + results);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException in searchUsersByIden.Reason:" + e.getMessage(), e);
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByIden finished for iden : " + iden);
+		return results;
 	}
 }

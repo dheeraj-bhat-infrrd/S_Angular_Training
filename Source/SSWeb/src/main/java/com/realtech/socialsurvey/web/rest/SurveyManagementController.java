@@ -3,20 +3,18 @@ package com.realtech.socialsurvey.web.rest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.servlet.http.HttpServletRequest;
-
 import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
-
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -28,7 +26,6 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
-import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
@@ -65,6 +62,9 @@ public class SurveyManagementController {
 	
 	@Autowired
 	private EmailServices emailServices;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	
 	/*
@@ -104,9 +104,13 @@ public class SurveyManagementController {
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			try {
-				emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				if(enableKafka.equals(CommonConstants.YES)){
+					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				}else{
+					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				}
 			}
-			catch (InvalidInputException | UndeliveredEmailException e) {
+			catch (InvalidInputException e) {
 				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
 				throw e;
 			}

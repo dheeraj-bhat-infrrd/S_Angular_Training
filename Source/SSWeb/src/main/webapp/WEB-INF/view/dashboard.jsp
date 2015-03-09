@@ -381,7 +381,6 @@
                 chartArea:{width:'90%',height:'80%'},
                 colors:['rgb(28,242,0)','rgb(0,174,239)','rgb(255,242,0)','rgb(255,202,145)'],
                 legend: { position: 'none' }
-//                chartArea:{left:20,top:20,width:'100%',height:'100%'}
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
