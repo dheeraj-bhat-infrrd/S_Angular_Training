@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -169,7 +167,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
 	}
-	
+
 	// JIRA SS-137 and 158 BY RM-05 : BOC
 
 	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
@@ -183,7 +181,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() started.");
 		Date startDate = getNdaysBackDate(noOfDays);
-		
+
 		Query query = new Query();
 		if (columnName != null) {
 			query = new Query(Criteria.where(columnName).is(columnValue));
@@ -415,30 +413,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	// Method to get count of posts shared by customers on various social networking sites for
 	// "agent/branch/region/company/all".
-	// Returns a map of Social Networking Site and posts count on that site.
+	// Returns posts count on that site.
 
 	@Override
-	public Map<String, Long> getSocialPostsCount(String columnName, long columnValue) {
+	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
-		TypedAggregation<SurveyDetails> aggregation;
-		if (columnName == null) {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation
-					.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(numberOfDays);
+		Query query = new Query(Criteria.where("sharedOn").exists(true));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		else {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
-					Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
-		}
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() finished.");
-		return postCountSplit;
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// Method to get count of surveys initiated by customers and agents separately.
@@ -515,8 +503,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method getFeedBacksCount executed successfully");
 		return feedBackCount;
 	}
-	
-	private Date getNdaysBackDate(int noOfDays){
+
+	private Date getNdaysBackDate(int noOfDays) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(5, noOfDays * (-1));
 		Date startDate = calendar.getTime();
