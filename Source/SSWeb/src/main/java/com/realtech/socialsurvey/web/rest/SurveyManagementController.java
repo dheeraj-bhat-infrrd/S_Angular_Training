@@ -188,6 +188,7 @@ public class SurveyManagementController {
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
 				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent);
+				surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 				if (survey != null) {
 					stage = survey.getStage();
 					for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {

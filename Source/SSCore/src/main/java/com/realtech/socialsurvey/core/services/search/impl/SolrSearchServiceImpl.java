@@ -161,6 +161,47 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	/**
+	 * Method to perform search of branches from solr based on the region id.
+	 * 
+	 * @param regionId
+	 * @param start
+	 * @param rows
+	 * @return list of branches
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public String searchBranchesByRegion(long regionId, int start, int rows) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBranchesByRegion() to search branches in a region started");
+		String branchResult = null;
+		QueryResponse response = null;
+		try {
+
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery query = new SolrQuery();
+			query.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			query.setStart(start);
+
+			if (rows > 0) {
+				query.setRows(rows);
+			}
+
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(query);
+			SolrDocumentList documentList = response.getResults();
+			branchResult = JSONUtil.toJSON(documentList);
+
+			LOG.debug("Results obtained from solr :" + branchResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranchesByRegion() to search branches in a region finished");
+		return branchResult;
+	}
+
+	/**
 	 * Method to add region into solr
 	 */
 	@Override
@@ -340,7 +381,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByLoginNameOrName finished for pattern :" + pattern + " returning : " + usersResult);
 		return usersResult;
 	}
-	
+
 	@Override
 	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
 			MalformedURLException {
@@ -400,6 +441,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		try {
 			SolrQuery solrQuery = new SolrQuery();
+
 			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR, CommonConstants.TITLE_SOLR,
 					CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR, CommonConstants.PROFILE_URL_SOLR };
 			solrQuery.setFields(fields);
@@ -547,7 +589,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 		SolrQuery solrQuery = new SolrQuery();
-		solrQuery.setQuery(CommonConstants.USER_ID_SOLR +":"+ userId);
+		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + userId);
 		LOG.debug("Querying solr for searching users");
 		response = solrServer.query(solrQuery);
 		SolrDocumentList results = response.getResults();
@@ -555,7 +597,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("No record found in Solr for userid {}  in method getUserDisplayNameById()", userId);
 			throw new NoRecordsFetchedException("No record found in Solr for userid " + userId + " in method getUserDisplayNameById()");
 		}
-		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString(); 
+		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
 		return displayName;
 	}

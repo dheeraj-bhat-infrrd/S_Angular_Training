@@ -19,6 +19,8 @@ public interface SurveyDetailsDao {
 	public void updateGatewayAnswer(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
 
 	public void updateFinalScore(long agentId, String customerEmail);
+	
+	public void updateSurveyAsClicked(long agentId, String customerEmail);
 
 	public Map<String, Long> getCountOfCustomersByMood(String columnName, long columnValue);
 
@@ -34,16 +36,16 @@ public interface SurveyDetailsDao {
 
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays);
 
-	public long getIncompleteSurveyCount(String columnName, long columnValue);
+	public long getIncompleteSurveyCount(String columnName, long columnValue, int noOfDays);
 
-	public long getCompletedSurveyCount(String columnName, long columnValue);
+	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays);
 
-	public long getSentSurveyCount(String columnName, long columnValue);
+	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays);
+	
+	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays);
 
 	public List<SurveyDetails> getFeedbacks(String columnName, long columNValue, int start, int rows, double startScore, double limitScore);
 
 	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore);
-
-	public void updateSurveyAsClicked(long agentId, String customerEmail);
 
 }
