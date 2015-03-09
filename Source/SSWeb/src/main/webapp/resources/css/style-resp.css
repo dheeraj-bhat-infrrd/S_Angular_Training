@@ -145,7 +145,7 @@
         display: none;
     }
     .header-menu-icn{
-        display: block;
+        display: block !important;
     }
     .header-main-wrapper .container, .hm-header-main-wrapper .container, .hm-main-content-wrapper .container{
         padding: 0;
@@ -979,7 +979,7 @@
         float: none !important;
         margin: 0 auto;
         width: 300px;
-        top: -6px;
+        top: 0px;
     }
     .dash-main-left{
         height: 310px;
