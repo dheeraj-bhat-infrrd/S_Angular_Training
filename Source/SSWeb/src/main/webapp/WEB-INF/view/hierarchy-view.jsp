@@ -58,8 +58,8 @@
                     <td class="v-tbl-role"></td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer"></td>
@@ -73,8 +73,8 @@
                     <td class="v-tbl-role"></td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer v-tbl-no-bd"></td>
@@ -88,8 +88,8 @@
                     <td class="v-tbl-role">Admin</td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer v-tbl-no-bd"></td>
@@ -103,8 +103,8 @@
                     <td class="v-tbl-role">User</td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer v-tbl-no-bd"></td>
@@ -118,8 +118,8 @@
                     <td class="v-tbl-role">Admin, User</td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer v-tbl-no-bd"></td>
@@ -133,8 +133,8 @@
                     <td class="v-tbl-role"></td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer v-tbl-no-bd"></td>
@@ -148,8 +148,8 @@
                     <td class="v-tbl-role"></td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer"></td>
@@ -163,8 +163,8 @@
                     <td class="v-tbl-role"></td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer"></td>
@@ -178,8 +178,8 @@
                     <td class="v-tbl-role"></td>
                     <td class="v-tbl-btns">
                         <div class="clearfix v-tbl-icn-wraper">
-                            <div class="float-left v-tbl-icn">A</div>
-                            <div class="float-left v-tbl-icn">B</div>
+                            <div class="float-left v-tbl-icn v-icn-close"></div>
+                            <div class="float-left v-tbl-icn v-icn-edit"></div>
                         </div>
                     </td>
                     <td class="v-tbl-spacer"></td>
@@ -208,6 +208,10 @@
                 $(this).next('.v-tbl-add-frm').slideUp(200);   
                 $(this).attr('clicked','false').removeClass('v-tbl-row-edit');
             }
+        });
+        
+        $(document).on('click','.v-tbl-icn',function(e){
+            e.stopPropagation();
         });
         
     });
