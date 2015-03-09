@@ -201,6 +201,7 @@ function paintCompanyRegions(data) {
 			
 			$(".comp-region").click(function(){
 				if($(this).data("openstatus") == "closed") {
+					$('#comp-region-branches-'+$(this).data('regionid')).html("");
 					fetchBranchesForRegion($(this).data('regionid'));
 					fetchIndividualsForRegion($(this).data('regionid'));
 					$(this).data("openstatus","open");
