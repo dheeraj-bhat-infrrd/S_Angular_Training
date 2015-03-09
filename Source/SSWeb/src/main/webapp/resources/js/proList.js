@@ -127,12 +127,12 @@ function paintProList(usersList) {
 			$('#ctnt-list-wrapper').append(usersHtml);
 			$('#fp-users-size').val(usersSize);
 			
-			$(".user-display-name").click(function(e){
+			/*$(".user-display-name").click(function(e){
 				// e.stopPropagation();
 				var agentProfileName = $(this).attr("data-profilename");
 				var url = window.location.origin + "/individualprofile/" + agentProfileName + ".do";
 				window.open(url, "_blank");
-			});
+			});*/
 		}
 	}
 }
