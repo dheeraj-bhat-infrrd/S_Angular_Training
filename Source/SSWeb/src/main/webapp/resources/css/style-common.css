@@ -4376,6 +4376,8 @@ button.paypal.is-active {
 }
 
 .v-tbl-icn {
+    cursor: pointer;
+    height: 39px;
     width: 50%;
 }
 
@@ -4419,6 +4421,7 @@ tr.v-tbl-row {
 }
 .v-tbl-no-bd {
     border-bottom: 0px !important;
+    border-top: 0 !important;
 }
 
 .v-line-cmp {
@@ -4497,4 +4500,12 @@ td.v-tbl-spacer {
 
 .v-tbl-row-rgn {
     background-color: #FAFAFB;
+}
+
+.v-icn-close {
+    background: url('../images/close_hr.png') no-repeat center;
+}
+
+.v-icn-edit {
+    background: url('../images/edit_hr.png') no-repeat center;
 }
