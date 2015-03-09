@@ -773,7 +773,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .header-menu-icn {
-    height: 50px;
+    height: 60px;
     width: 50px;
 }
 
@@ -3790,7 +3790,7 @@ button.paypal.is-active {
 
 .util-gph-legend {
     position: absolute;
-    top: 200px;
+    top: 170px;
     line-height: 30px;
     left: -210px;
     font-size: 13px;
@@ -4364,4 +4364,137 @@ button.paypal.is-active {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.v-hr-header {
+    margin-top: 15px;
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 36px;
+    font-family: opensanslight;
+    font-weight: bold !important;
+    font-size: 16px;
+}
+
+.v-tbl-icn {
+    width: 50%;
+}
+
+.hm-header-right {
+    background-color: #009FE0;
+    color: #fff;
+    padding: 0 20px;
+    font-size: 15px;
+    line-height: 40px;
+    margin-top: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+tr.v-tbl-header {
+    height: 40px;
+    font-size: 13px;
+}
+
+.v-tbl-row{
+    cursor: pointer;
+}
+
+.v-hr-tbl tr.v-tbl-row td{
+    font-size: 14px;
+    border-bottom: 1px solid #dcdcdc;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-hr-tbl tr.v-tbl-header td{
+    font-weight: bold !important;
+}
+.v-hr-tbl {
+    width: 100%;
+    margin-top: 10px;
+}
+
+tr.v-tbl-row {
+    font-size: 14px;
+    height: 40px;
+}
+.v-tbl-no-bd {
+    border-bottom: 0px !important;
+}
+
+.v-line-cmp {
+    border-left: 3px solid #6296D9;
+    border-bottom: 1px solid #dcdcdc;
+    height: 41px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-line-rgn {
+    border-left: 3px solid #61A64B;
+    border-bottom: 1px solid #dcdcdc;
+    height: 41px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    left: 25%;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-line-ind{
+    border-left: 3px solid #D7D7D7;
+    border-bottom: 1px solid #dcdcdc;
+    height: 41px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    left: 50%;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-tbl-line {
+    border-bottom: 0px !important;
+    position: relative;
+    border-top: 0px !important;
+}
+
+td.v-tbl-line {
+    width: 9%;
+}
+
+td.v-tbl-name {
+    width: 26%;
+}
+
+td.v-tbl-add {
+    width: 35%;
+}
+
+tr.v-tbl-row-sel, .v-tbl-row-sel tr{
+    background-color: #FAFAFB;
+}
+
+td.v-tbl-role {
+    width: 20%;
+}
+
+td.v-tbl-btns {
+    width: 7.5%;
+}
+
+td.v-tbl-spacer {
+    width: 2.5%;
+}
+
+.v-tbl-row-ind {
+    background-color: #FAFAFB;
+}
+
+.v-tbl-row-edit, .v-tbl-add-frm {
+    background-color: #FAFAFB;
+}
+
+.v-tbl-row-rgn {
+    background-color: #FAFAFB;
 }
