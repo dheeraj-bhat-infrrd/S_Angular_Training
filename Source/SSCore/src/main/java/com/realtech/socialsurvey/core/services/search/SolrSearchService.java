@@ -49,6 +49,19 @@ public interface SolrSearchService {
 	public String searchBranches(String branchPattern, Company company, int start, int rows) throws InvalidInputException, SolrException;
 
 	/**
+	 * Method to perform search of branches from solr based on the region id.
+	 * 
+	 * @param regionId
+	 * @param start
+	 * @param rows
+	 * @return list of branches
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public String searchBranchesByRegion(long regionId, int start, int rows) throws InvalidInputException, SolrException;
+
+	
+	/**
 	 * Method to add a region to solr
 	 * 
 	 * @param region

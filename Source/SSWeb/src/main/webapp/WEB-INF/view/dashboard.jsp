@@ -8,9 +8,9 @@
                 <div class="float-left hr-txt1">View As</div>
                 <div id="hr-txt2" class="float-left hr-txt2">Agent</div>
                 <div id="hr-dd-wrapper" class="hr-dd-wrapper hide">
-                    <div class="hr-dd-item">Temp</div>
-                    <div class="hr-dd-item">Temp</div>
-                    <div class="hr-dd-item">Temp</div>
+                    <div class="hr-dd-item">Branch Admin</div>
+                    <div class="hr-dd-item">Region Admin</div>
+                    <div class="hr-dd-item">Company Admin</div>
                 </div>
             </div>
         </div>
@@ -19,8 +19,10 @@
 
 <div class="dash-wrapper-main">
     <div class="dash-container container">
-        
-        <div class="dash-top-info">
+        <div id="prof-container" data-companyAdmin="${companyAdmin}" data-regionAdmin="${regionAdmin}" 
+        data-branchAdmin="${branchAdmin}" data-regionNames="${regionNames}" data-regionIds="${regionIds}" 
+        data-branchNames="${branchNames}" data-branchIds="${branchIds}" data-agent="${agent}" data-accountType="${accountType}"
+        class="dash-top-info">
             <div class="row row-dash-top-adj">
                 <div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="dsh-graph-wrapper">
@@ -79,29 +81,30 @@
         <div class="dash-stats-wrapper bord-bot-dc clearfix">
             <div class="float-left stats-left clearfix">
                 <div class="dash-sub-head">Survey Status</div>
-                <div class="clearfix dash-sel-wrapper">
+                <div id="region-div" class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Choose</div>
-                    <select class="float-left dash-sel-item">
-                        <option value="volvo">Region</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
+                    <select id="regions-list" class="float-left dash-sel-item">
+                    </select>
+                </div>
+                <div id="branch-div" class="clearfix dash-sel-wrapper">
+                    <div class="float-left dash-sel-lbl">Choose</div>
+                    <select id="branch-list" class="float-left dash-sel-item">
                     </select>
                 </div>
                 <div class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Duration</div>
-                    <select class="float-left dash-sel-item">
-                        <option value="volvo">30 Days</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
+                    <select id="survey-count-days" class="float-left dash-sel-item">
+                        <option value="30">30 Days</option>
+                        <option value="60">60 Days</option>
+                        <option value="90">90 Days</option>
+                        <option value="365">1 Year</option>
                     </select>
                 </div>
             </div>
             <div class="float-left stats-right">
                 <div class="clearfix stat-icns-wrapper">
                     <div class="float-left stat-icn-lbl">No. of surveys sent</div>
-                    <div class="float-left stat-icns-item clearfix">
+                    <div id="all-surv-icn" class="float-left stat-icns-item clearfix">
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
@@ -110,12 +113,24 @@
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
                         <div class="float-left stat-icn-img stat-icn-img-green"></div>
-                        <div class="float-left stat-icn-txt-rt">1K</div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div class="float-left stat-icn-img stat-icn-img-green"></div>
+                        <div id="survey-sent" class="float-left stat-icn-txt-rt">1K</div>
                     </div>
                 </div>
                 <div class="clearfix stat-icns-wrapper">
-                    <div class="float-left stat-icn-lbl">No. of surveys clicked</div>
-                    <div class="float-left stat-icns-item clearfix">
+                    <div class="float-left stat-icn-lbl">Surveys clicked</div>
+                    <div id="clicked-surv-icn" class="float-left stat-icns-item clearfix">
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
@@ -123,24 +138,25 @@
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
                         <div class="float-left stat-icn-img stat-icn-img-blue"></div>
-                        <div class="float-left stat-icn-txt-rt">70%</div>
+			            <div class="float-left stat-icn-img stat-icn-img-blue"></div>
+                        <div id="survey-clicked" class="float-left stat-icn-txt-rt">70%</div>
                     </div>
                 </div>
                 <div class="clearfix stat-icns-wrapper">
-                    <div class="float-left stat-icn-lbl">No. of surveys completed</div>
-                    <div class="float-left stat-icns-item clearfix">
+                    <div class="float-left stat-icn-lbl">Surveys completed</div>
+                    <div id="completed-surv-icn" class="float-left stat-icns-item clearfix">
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
                         <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-                        <div class="float-left stat-icn-txt-rt">85%</div>
+                        <div id="survey-completed" class="float-left stat-icn-txt-rt">8.5%</div>
                     </div>
                 </div>
                 <div class="clearfix stat-icns-wrapper">
-                    <div class="float-left stat-icn-lbl">No. of social posts</div>
-                    <div class="float-left stat-icns-item clearfix">
+                    <div class="float-left stat-icn-lbl">Social posts</div>
+                    <div id="social-post-icn" class="float-left stat-icns-item clearfix">
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
@@ -149,7 +165,7 @@
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
                         <div class="float-left stat-icn-img stat-icn-img-red"></div>
-                        <div class="float-left stat-icn-txt-rt">80%</div>
+                        <div id="social-posts" class="float-left stat-icn-txt-rt">80%</div>
                     </div>
                 </div>
 <!--
@@ -276,43 +292,27 @@
     </div>
 </div>
 
-<!-- <jsp:include page="scripts.jsp"/> -->
+<%-- <jsp:include page="scripts.jsp"/> --%>
 
 <script>
     
     window.onload = function onLoad() {
-        
-        
-        
     };
     
     $(document).ready(function(){
     	$(document).attr("title", "Dashboard"); 
-        
-        $('.icn-plus-open').click(function(){
-            $(this).hide();
-            $(this).parent().find('.ppl-share-social,.icn-remove').show();
-        });
-        
-        $('.icn-remove').click(function(){
-            $(this).hide();
-            $(this).parent().find('.ppl-share-social').hide();
-            $(this).parent().find('.icn-plus-open').show();
-        });
-        
-        $('#hr-txt2').click(function(e){
-            e.stopPropagation();
-            $('#hr-dd-wrapper').slideToggle(200);
-        });
-        
-        $('.hr-dd-item').click(function(e){
-            e.stopPropagation();
-        });
-        
-        $('body').click(function(){
-            $('#hr-dd-wrapper').slideUp(200);
-        });
-        
+    	var companyAdmin = $('#prof-container').attr("data-companyAdmin");
+    	var regionAdmin = $('#prof-container').attr("data-regionAdmin");
+    	var branchAdmin = $('#prof-container').attr("data-branchAdmin");
+    	var regionNames = $('#prof-container').attr("data-regionNames");
+    	var regionIds = $('#prof-container').attr("data-regionIds");
+    	var branchNames = $('#prof-container').attr("data-branchNames");
+    	var branchIds = $('#prof-container').attr("data-branchIds");
+    	var agent = $('#prof-container').attr("data-agent");
+    	var accountType = $('#prof-container').attr("data-accountType");
+    	
+    	paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames, regionIds, branchNames, branchIds, agent, accountType);
+    	
         var circle1 = new ProgressBar.Circle('#dg-img-1', {
             color: '#7AB400',
             fill: "rgba(249,249,251, 1)",
