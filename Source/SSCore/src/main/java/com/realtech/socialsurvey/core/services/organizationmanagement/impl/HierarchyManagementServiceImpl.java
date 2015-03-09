@@ -552,7 +552,8 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 	 */
 	@Override
 	@Transactional
-	public Region addNewRegion(User user, String regionName,int isDefaultBySystem, String address1, String address2) throws InvalidInputException, SolrException {
+	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2) throws InvalidInputException,
+			SolrException {
 		if (user == null) {
 			throw new InvalidInputException("User is null in addNewRegion");
 		}
@@ -575,19 +576,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
-
-		LOG.debug("Adding a default branch under the newly created region");
-		Branch defaultBranch = organizationManagementService.addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
-		LOG.debug("Added default branch for region : " + region.getRegionId() + " with branch id : " + defaultBranch.getBranchId());
-
-		LOG.debug("Updating Solr with newly inserted default branch");
-		solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
-		LOG.debug("Solr updated with new default branch");
-
+		
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
 	}
-
 
 	/**
 	 * Method to generate profile name and profile url for a region and also set them in
@@ -634,7 +626,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(regionProfileName);
 			organizationSettings.setProfileUrl(regionProfileUrl);
-			
+
 			/**
 			 * Set the profile name in region object to update in sql later
 			 */
@@ -792,7 +784,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		// TODO Auto-generated method stub
 		return true;
 	}
-	
+
 	/**
 	 * Method to insert region settings into mongo
 	 * 
