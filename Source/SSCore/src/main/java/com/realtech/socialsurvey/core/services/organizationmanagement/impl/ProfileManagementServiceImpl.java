@@ -42,6 +42,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -92,6 +93,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -1031,9 +1035,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 	
 	@Override
-	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException {
+	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException, UndeliveredEmailException {
 		String verficationUrl = urlGenerator.generateUrl(urlParams, applicationUrl);
-		emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		}else{
+			emailServices.sendEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		}
 	}
 	
 	@Override

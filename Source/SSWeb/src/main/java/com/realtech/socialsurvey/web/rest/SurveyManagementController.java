@@ -9,6 +9,7 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -61,6 +62,9 @@ public class SurveyManagementController {
 	
 	@Autowired
 	private EmailServices emailServices;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	
 	/*
@@ -100,7 +104,11 @@ public class SurveyManagementController {
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			try {
-				emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				if(enableKafka.equals(CommonConstants.YES)){
+					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				}else{
+					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
