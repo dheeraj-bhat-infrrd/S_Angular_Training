@@ -28,7 +28,7 @@
 							<div class="h-lbl">email address</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-uname"></div>
-								<input type="text" class="h-inp" placeholder="Username" id="login-user-id" name="j_username" value="ss_enterprise@mailinator.com">
+								<input type="text" class="h-inp" placeholder="Username" id="login-user-id" name="j_username">
 							</div>
 						</div>
 						<div class="float-left h-pwd-wrapper">
@@ -38,7 +38,7 @@
 							</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-pwd"></div>
-								<input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password" value="raremile@">
+								<input type="password" class="h-inp" placeholder="Password" id="login-pwd" name="j_password">
 							</div>
 						</div>
 						<div class="float-left h-login-btn-wrapper">
