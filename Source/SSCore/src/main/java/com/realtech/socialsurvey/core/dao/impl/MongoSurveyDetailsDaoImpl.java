@@ -325,7 +325,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
+	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
 		Calendar calendar = Calendar.getInstance();
 		Date endDate = calendar.getTime();
@@ -335,11 +335,25 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			calendar.setTimeInMillis(0);
 			startDate = calendar.getTime();
 		}
-		Query query = new Query(Criteria
-				.where(columnName)
-				.is(columnValue)
-				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
+		
+		Query query = new Query();
+		if (aggregateAbusive) {
+			query.addCriteria(Criteria
+					.where(columnName)
+					.is(columnValue)
+					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
+		}
+		else {
+			query.addCriteria(Criteria
+					.where(columnName)
+					.is(columnValue)
+					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
+							Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)));
+		}
+		
+		
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
 				SurveyDetails.class, //
 				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
@@ -451,24 +465,34 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
 	 * value for respective column. limitScore is the max score under which reviews have to be shown
 	 */
-
 	@Override
-	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore,
+			boolean fetchAbusive) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+
 		if (startScore > 0 && limitScore > 0) {
-			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+			if (fetchAbusive) {
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+			}
+			else {
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore),
+						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
+			}
 		}
+
 		if (start > -1) {
 			query.skip(start);
 		}
 		if (rows > -1) {
 			query.limit(rows);
 		}
+
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
@@ -478,21 +502,29 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	}
 
 	@Override
-	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore) {
+	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive) {
 		LOG.info("Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue + " startScore:" + startScore
 				+ " limitScore:" + limitScore);
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+		
 		if (startScore > 0 && limitScore > 0) {
-			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-					Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
+			if (fetchAbusive) {
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
+			}
+			else {
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore),
+						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
+			}
 		}
+		
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method getFeedBacksCount executed successfully");
 		return feedBackCount;
 	}
-
 	// JIRA SS-137 and 158 : EOC
 }

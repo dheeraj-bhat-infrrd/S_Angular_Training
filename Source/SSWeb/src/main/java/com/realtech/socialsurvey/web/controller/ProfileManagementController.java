@@ -2578,6 +2578,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 
+		boolean fetchAbusive = true;
 		List<SurveyDetails> reviewItems = null;
 		try {
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
@@ -2593,7 +2594,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_COMPANY);
+						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2603,7 +2604,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_REGION);
+						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2613,7 +2614,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_BRANCH);
+						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2623,7 +2624,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive);
 			}
 
 			model.addAttribute("reviewItems", reviewItems);
@@ -2643,6 +2644,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchReviewCount() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 
+		boolean fetchAbusive = true;
 		long reviewCount = 0l;
 		try {
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
@@ -2655,7 +2657,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY);
+				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2664,7 +2666,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION);
+				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2673,7 +2675,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
+				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2682,7 +2684,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive);
 			}
 		}
 		catch (InvalidInputException e) {
@@ -2700,6 +2702,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchAverageRating() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 
+		boolean aggregateAbusive = true;
 		double averageRating = 0l;
 		try {
 			if (user.isCompanyAdmin()) {
@@ -2709,7 +2712,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY);
+				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, aggregateAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2718,7 +2721,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION);
+				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, aggregateAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2727,7 +2730,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
+				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, aggregateAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2736,7 +2739,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, aggregateAbusive);
 			}
 		}
 		catch (InvalidInputException e) {
