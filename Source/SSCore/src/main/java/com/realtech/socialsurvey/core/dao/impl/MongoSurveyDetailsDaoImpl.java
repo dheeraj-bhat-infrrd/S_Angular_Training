@@ -167,7 +167,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
 	}
-	
+
 	// JIRA SS-137 and 158 BY RM-05 : BOC
 
 	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
@@ -335,7 +335,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			calendar.setTimeInMillis(0);
 			startDate = calendar.getTime();
 		}
-		
+
 		Query query = new Query();
 		if (aggregateAbusive) {
 			query.addCriteria(Criteria
@@ -352,8 +352,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
 							Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)));
 		}
-		
-		
+
 		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
 				SurveyDetails.class, //
 				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
@@ -476,11 +475,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 		if (startScore > 0 && limitScore > 0) {
 			if (fetchAbusive) {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gt(startScore),
 						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 			}
 			else {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gt(startScore),
 						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore),
 						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
 			}
@@ -509,8 +508,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		
-		if (startScore > 0 && limitScore > 0) {
+
+		if (startScore > -1 && limitScore > -1) {
 			if (fetchAbusive) {
 				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
@@ -521,7 +520,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
 			}
 		}
-		
+
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method getFeedBacksCount executed successfully");
 		return feedBackCount;

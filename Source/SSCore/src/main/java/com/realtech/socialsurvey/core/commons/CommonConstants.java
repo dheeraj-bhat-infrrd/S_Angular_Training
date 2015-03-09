@@ -84,7 +84,7 @@ public interface CommonConstants {
 	public static final String IS_UNASSIGN_ADMIN = "NO";
 	public static final int MAX_DEFAULT_REGIONS = 1;
 	public static final int MAX_DEFAULT_BRANCHES = 1;
-	public static final double MIN_RATING_SCORE = 1;
+	public static final double MIN_RATING_SCORE = 0;
 	public static final double MAX_RATING_SCORE = 5;
 
 	/**
