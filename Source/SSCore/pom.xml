@@ -258,13 +258,18 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		
+
+		<!-- Social Plugins -->
 		<dependency>
 			<groupId>com.googlecode.linkedin-j</groupId>
 			<artifactId>linkedin-j-core</artifactId>
 			<version>1.0.416</version>
 		</dependency>
-
+		<dependency>
+			<groupId>org.twitter4j</groupId>
+			<artifactId>twitter4j-core</artifactId>
+			<version>[4.0,)</version>
+		</dependency>
 	</dependencies>
 
 	<build>
