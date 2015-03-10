@@ -17,6 +17,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.RequestToken;
+import twitter4j.conf.Configuration;
+import twitter4j.conf.ConfigurationBuilder;
 import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
 import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
 import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
@@ -42,6 +48,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -126,21 +133,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
+	// LinkedIn
 	@Value("${LINKED_IN_API_KEY}")
 	private String linkedInApiKey;
-
 	@Value("${LINKED_IN_API_SECRET}")
 	private String linkedInApiSecret;
-
 	@Value("${LINKED_IN_OAUTH_TOKEN}")
 	private String linkedInOauthToken;
-
 	@Value("${LINKED_IN_OAUTH_SECRET}")
 	private String linkedInOauthSecret;
-
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
 	
+	// Twitter
+	@Value("${TWITTER_CONSUMER_KEY}")
+	private String twitterConsumerKey;
+	@Value("${TWITTER_CONSUMER_SECRET}")
+	private String twitterConsumerSecret;
+	@Value("${TWITTER_REDIRECT_URI}")
+	private String twitterRedirectUri;
+
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
@@ -1578,6 +1590,54 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Agent settings successfully updated with Facebook access token");
 	}
 
+	/**
+	 * Adds the Twitter access tokens to the agent's settings in mongo
+	 * 
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	public void setTwitterAccessTokenForUser(User user, String accessToken, String accessTokenSecret, OrganizationUnitSettings companySettings)
+			throws InvalidInputException, NoRecordsFetchedException {
+		if (user == null) {
+			LOG.error("setTwitterAccessTokenForUser : user parameter is null!");
+			throw new InvalidInputException("setTwitterAccessTokenForUser : user parameter is null!");
+		}
+		if (accessToken == null || accessToken.isEmpty()) {
+			LOG.error("setTwitterAccessTokenForUser : accessToken parameter is null!");
+			throw new InvalidInputException("setTwitterAccessTokenForUser : accessToken parameter is null!");
+		}
+
+		LOG.info("Adding the twitter access tokens to agent settings in mongo for user id : " + user.getUserId());
+		SocialMediaTokens mediaTokens = companySettings.getSocialMediaTokens();
+
+		// Check if media tokens exist. If not, create them.
+		if (mediaTokens == null) {
+			LOG.debug("Media tokens do not exist. Creating them and adding the Twitter access token");
+			mediaTokens = new SocialMediaTokens();
+			mediaTokens.setTwitterToken(new TwitterToken());
+			mediaTokens.getTwitterToken().setTwitterAccessToken(accessToken);
+			mediaTokens.getTwitterToken().setTwitterAccessTokenSecret(accessTokenSecret);
+			mediaTokens.getTwitterToken().setTwitterAccessTokenCreatedOn(System.currentTimeMillis());
+		}
+		else {
+			LOG.debug("Updating the existing media tokens for Twitter");
+			if (mediaTokens.getTwitterToken() == null) {
+				mediaTokens.setTwitterToken(new TwitterToken());
+			}
+			mediaTokens.getTwitterToken().setTwitterAccessToken(accessToken);
+			mediaTokens.getTwitterToken().setTwitterAccessTokenSecret(accessTokenSecret);
+			mediaTokens.getTwitterToken().setTwitterAccessTokenCreatedOn(System.currentTimeMillis());
+		}
+		LOG.info("Updating the mongo collection with new Twitter access tokens for settings with id : " + companySettings.getId());
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens,
+				companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		LOG.info("Agent settings successfully updated with Facebook access token");
+	}
+
 	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException {
 
 		LOG.debug("Fetching the default region for company");
@@ -1891,5 +1951,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken(linkedinRedirectUri);
 		return requestToken;
 	}
+	
+	/**
+	 * Returns the Twitter request token for a particular URL
+	 * 
+	 * @return
+	 * @throws TwitterException 
+	 */
+	@Override
+	public RequestToken getTwitterRequestToken() throws TwitterException {
+		ConfigurationBuilder builder = new ConfigurationBuilder();
+		builder.setOAuthConsumerKey(twitterConsumerKey);
+		builder.setOAuthConsumerSecret(twitterConsumerSecret);
+		Configuration configuration = builder.build();
+		TwitterFactory factory = new TwitterFactory(configuration);
+		Twitter twitter = factory.getInstance();
 
+		RequestToken requestToken = twitter.getOAuthRequestToken(twitterRedirectUri);
+		return requestToken;
+	}
 }
