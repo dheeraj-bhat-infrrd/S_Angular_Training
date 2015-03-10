@@ -11,6 +11,12 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
+            <div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+				<div class="float-left social-item-icon icn-fb" data-link="facebook" onclick="openAuthPage();"></div>
+				<div class="float-left social-item-icon icn-twit" data-link="twitter"></div>
+				<div class="float-left social-item-icon icn-lin" data-link="linkedin"></div>
+				<div class="float-left social-item-icon icn-yelp" data-link="yelp"></div>
+			</div>
         </div>
     </div>
 </div>
@@ -248,6 +254,10 @@
 <script src="${pageContext.request.contextPath}/resources/ckeditor/ckeditor.js"></script>
 <script src="${pageContext.request.contextPath}/resources/ckeditor/adapters/jquery.js"></script>
 <script>
+function openAuthPage() {
+	window.open("./facebookauthpage.do", "Authorization Page", "width=600,height=600,scrollbars=yes");
+}
+
 $(document).ready(function(){
 	$(document).attr("title", "Settings");
 	
