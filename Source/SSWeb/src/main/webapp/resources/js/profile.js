@@ -313,6 +313,7 @@ function bindClickToFetchIndividualProfile(bindingClass) {
 		e.stopPropagation();
 		var agentProfileName = $(this).data("profilename");
 		var url = window.location.origin +"/individualprofile/"+agentProfileName+".do";
+		alert(url);
 		window.open(url, "_blank");				
 	});
 }
@@ -726,9 +727,6 @@ function fetchReviewsCountForAgent(agentId,callBackFunction,minScore,maxScore) {
 		maxScore = -1;
 	}
 	var url = window.location.origin +'/rest/profile/individual/'+agentId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
-	}
 	callAjaxGET(url, callBackFunction, true);
 }
 
