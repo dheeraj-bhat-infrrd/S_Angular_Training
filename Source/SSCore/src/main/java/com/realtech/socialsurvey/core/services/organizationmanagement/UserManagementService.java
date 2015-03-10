@@ -1,14 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import twitter4j.TwitterException;
-import twitter4j.auth.RequestToken;
-import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -161,30 +156,6 @@ public interface UserManagementService {
 	 */
 	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
 	
-	/**
-	 * Returns the LinkedIn request token for a particular URL
-	 * @return
-	 */
-	public LinkedInRequestToken getLinkedInRequestToken();
-	
-	public RequestToken getTwitterRequestToken() throws TwitterException;
-
-	/**
-	 * Adds the LinkedIn access tokens to the agent's settings in mongo
-	 * @param user
-	 * @param accessToken
-	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
-	 */
-	public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret, Collection<AgentSettings> agentSettings)
-			throws InvalidInputException, NoRecordsFetchedException;
-
-	public void setFacebookAccessTokenForUser(User user, String accessToken, long accessTokenExpiresOn, OrganizationUnitSettings companySettings)
-			throws InvalidInputException, NoRecordsFetchedException;
-	
-	public void setTwitterAccessTokenForUser(User user, String accessToken, String accessTokenSecret, OrganizationUnitSettings companySettings)
-			throws InvalidInputException, NoRecordsFetchedException;
-
 	/**
 	 * Method to insert agent settings into mongo
 	 * 

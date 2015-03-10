@@ -54,6 +54,5 @@ public interface JspResolver {
 	public static final String PROFILE_PAGE = "profile";
 
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
-	public static final String LINKEDIN_MESSAGE = "linkedinmessage";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
 }
