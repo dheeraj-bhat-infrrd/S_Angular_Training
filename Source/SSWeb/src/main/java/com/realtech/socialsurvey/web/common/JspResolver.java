@@ -51,10 +51,9 @@ public interface JspResolver {
 	public static final String PROFILE_HIERARCHY = "profile_hierarchy";
 	public static final String PROFILE_HIERARCHY_CLICK_REGION = "profile_hierarchy_region";
 	public static final String PROFILE_HIERARCHY_CLICK_BRANCH = "profile_hierarchy_branch";
-	public static final String PROFILE_PAGE = "profile_new";
+	public static final String PROFILE_PAGE = "profile";
 
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String LINKEDIN_MESSAGE = "linkedinmessage";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
-	
 }
