@@ -17,21 +17,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationBuilder;
-import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
 import com.google.code.linkedinapi.client.oauth.LinkedInAccessToken;
 import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
 import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 /**
@@ -43,25 +38,10 @@ public class SocialManagementController {
 	private static final Logger LOG = LoggerFactory.getLogger(SocialManagementController.class);
 
 	@Autowired
-	private UserManagementService userManagementService;
-
-	@Autowired
 	private SessionHelper sessionHelper;
 
 	@Autowired
-	private LinkedInApiClientFactory linkedInApiClientFactory;
-
-	// LinkedIn
-	@Value("${LINKED_IN_API_KEY}")
-	private String linkedInApiKey;
-	@Value("${LINKED_IN_API_SECRET}")
-	private String linkedInApiSecret;
-	@Value("${LINKED_IN_OAUTH_TOKEN}")
-	private String linkedInOauthToken;
-	@Value("${LINKED_IN_OAUTH_SECRET}")
-	private String linkedInOauthSecret;
-	@Value("${LINKED_IN_REDIRECT_URI}")
-	private String linkedinRedirectUri;
+	private SocialManagementService socialManagementService;
 
 	// Facebook
 	@Value("${FB_CLIENT_ID}")
@@ -79,12 +59,6 @@ public class SocialManagementController {
 	@Value("${FB_GRAPH_URI}")
 	private String facebookGraphApiUri;
 
-	// Twitter
-	@Value("${TWITTER_CONSUMER_KEY}")
-	private String twitterConsumerKey;
-	@Value("${TWITTER_CONSUMER_SECRET}")
-	private String twitterConsumerSecret;
-
 	/**
 	 * Returns the social authorization page
 	 * 
@@ -92,7 +66,6 @@ public class SocialManagementController {
 	 * @param request
 	 * @return
 	 */
-	// TODO
 	@RequestMapping(value = "/socialauth", method = RequestMethod.GET)
 	public String getSocialAuthPage(Model model, HttpServletRequest request) {
 		LOG.info("Method getSocialAuthPage() called from SocialManagementController");
@@ -105,14 +78,13 @@ public class SocialManagementController {
 		String socialNetwork = request.getParameter("social");
 		switch (socialNetwork) {
 
-		// Building facebook authUrl
+			// Building facebook authUrl
 			case "facebook":
 				StringBuilder facebookAuthUrl = new StringBuilder(facebookDialogOauth).append("?client_id=").append(facebookClientId);
 				facebookAuthUrl.append("&redirect_uri=").append(facebookRedirectUri);
 				facebookAuthUrl.append("&scope=").append(facebookScope);
 
 				// Setting authUrl in model
-				model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebookAuthUrl.toString());
 
 				LOG.info("Returning the facebook authUrl : " + facebookAuthUrl.toString());
@@ -122,7 +94,7 @@ public class SocialManagementController {
 			case "twitter":
 				RequestToken requestToken;
 				try {
-					requestToken = userManagementService.getTwitterRequestToken();
+					requestToken = socialManagementService.getTwitterRequestToken();
 				}
 				catch (Exception e) {
 					LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
@@ -132,116 +104,42 @@ public class SocialManagementController {
 
 				// We will keep the request token in session
 				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, requestToken);
-				model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, requestToken.getAuthorizationURL());
 
 				LOG.info("Returning the twitter authorizationurl : " + requestToken.getAuthorizationURL());
 				break;
 
-			// Building facebook authUrl
+			// Building linkedin authUrl
 			case "linkedin":
-				getLinkedInAuthPage(model, request);
+				LinkedInRequestToken linkedInRequestToken;
+				try {
+					linkedInRequestToken = socialManagementService.getLinkedInRequestToken();
+				}
+				catch (Exception e) {
+					LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
+					model.addAttribute("message", e.getMessage());
+					return JspResolver.ERROR_PAGE;
+				}
+
+				// We will keep the request token in session
+				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, linkedInRequestToken);
+				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInRequestToken.getAuthorizationUrl());
+
+				LOG.info("Returning the linkedin authorizationurl : " + linkedInRequestToken.getAuthorizationUrl());
+				break;
+
+			// Building yelp authUrl
+			case "yelp":
+				// TODO
+
 				break;
 
 			default:
 				LOG.error("Social Network Type invalid in getSocialAuthPage");
 		}
-		return JspResolver.SOCIAL_AUTH_MESSAGE;
-	}
 
-	/**
-	 * Returns the linked in authorization page
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/linkedinauthpage", method = RequestMethod.GET)
-	public String getLinkedInAuthPage(Model model, HttpServletRequest request) {
-		LOG.info("Method getLinkedInAuthPage() called from SocialManagementController");
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			LOG.error("Session is null!");
-		}
-
-		LinkedInRequestToken requestToken;
-		try {
-			requestToken = userManagementService.getLinkedInRequestToken();
-		}
-		catch (Exception e) {
-			LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", e.getMessage());
-			return JspResolver.ERROR_PAGE;
-		}
-
-		// We will keep the request token in session
-		session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
 		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
-		model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());
-
-		LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
-		return JspResolver.LINKEDIN_MESSAGE;
-	}
-
-	/**
-	 * The url that LinkedIn send request to with the oauth verification code
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/linkedinauth", method = RequestMethod.GET)
-	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
-		LOG.info("LinkedIn authentication url requested");
-		HttpSession session = request.getSession(false);
-		UserSettings currentUserSettings;
-
-		try {
-			if (session == null) {
-				LOG.error("authenticateLinkedInAccess : Session object is null!");
-				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
-			}
-
-			if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null) {
-				LOG.error("authenticateLinkedInAccess : user canonical settings not found in session!");
-				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");
-			}
-			else {
-				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-				if (currentUserSettings.getAgentSettings() == null) {
-					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
-					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
-				}
-			}
-
-			String errorCode = request.getParameter("oauth_problem");
-			if (errorCode != null) {
-				LOG.error("Error code : " + errorCode);
-				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
-				return JspResolver.LINKEDIN_MESSAGE;
-			}
-
-			User user = sessionHelper.getCurrentUser();
-			LinkedInOAuthService oauthService = LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,
-					linkedInApiSecret);
-			String oauthVerifier = request.getParameter("oauth_verifier");
-			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
-
-			LinkedInRequestToken requestToken = (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
-			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(), currentUserSettings
-					.getAgentSettings().values());
-		}
-		catch (Exception e) {
-			session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-			LOG.error(e.getMessage(), e);
-			return JspResolver.LINKEDIN_MESSAGE;
-		}
-		session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-
-		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-		LOG.info("Access tokens obtained and added to mongo successfully!");
-		return JspResolver.LINKEDIN_MESSAGE;
+		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
 	/**
@@ -298,7 +196,7 @@ public class SocialManagementController {
 			String accessToken = StringUtils.removeEnd(StringUtils.removeStart(responseBody, "access_token="), "&expires=");
 			long accessTokenExpiresOn = Long.parseLong(responseBody.substring(responseBody.lastIndexOf("&expires=") + 9));
 
-			userManagementService.setFacebookAccessTokenForUser(user, accessToken, accessTokenExpiresOn, currentUserSettings.getCompanySettings());
+			socialManagementService.setFacebookAccessTokenForUser(user, accessToken, accessTokenExpiresOn, currentUserSettings.getCompanySettings());
 			model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		}
 		catch (Exception e) {
@@ -310,7 +208,6 @@ public class SocialManagementController {
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	// TODO
 	/**
 	 * The url that twitter send request to with the oauth verification code
 	 * 
@@ -347,17 +244,12 @@ public class SocialManagementController {
 			if (errorCode != null) {
 				LOG.error("Error code : " + errorCode);
 				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
-				return JspResolver.LINKEDIN_MESSAGE;
+				return JspResolver.SOCIAL_AUTH_MESSAGE;
 			}
 
 			AccessToken accessToken = null;
 			while (null == accessToken) {
-				ConfigurationBuilder builder = new ConfigurationBuilder();
-				builder.setOAuthConsumerKey(twitterConsumerKey);
-				builder.setOAuthConsumerSecret(twitterConsumerSecret);
-				Configuration configuration = builder.build();
-				TwitterFactory factory = new TwitterFactory(configuration);
-				Twitter twitter = factory.getInstance();
+				Twitter twitter = socialManagementService.getTwitterInstance();
 
 				String oauthVerifier = request.getParameter("oauth_verifier");
 				RequestToken requestToken = (RequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -373,7 +265,7 @@ public class SocialManagementController {
 					}
 				}
 			}
-			userManagementService.setTwitterAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(),
+			socialManagementService.setTwitterAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(),
 					currentUserSettings.getCompanySettings());
 		}
 		catch (Exception e) {
@@ -385,6 +277,66 @@ public class SocialManagementController {
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 
+		LOG.info("Access tokens obtained and added to mongo successfully!");
+		return JspResolver.SOCIAL_AUTH_MESSAGE;
+	}
+	
+	/**
+	 * The url that LinkedIn send request to with the oauth verification code
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/linkedinauth", method = RequestMethod.GET)
+	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
+		LOG.info("LinkedIn authentication url requested");
+		HttpSession session = request.getSession(false);
+		UserSettings currentUserSettings;
+
+		try {
+			if (session == null) {
+				LOG.error("authenticateLinkedInAccess : Session object is null!");
+				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
+			}
+
+			if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null) {
+				LOG.error("authenticateLinkedInAccess : user canonical settings not found in session!");
+				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");
+			}
+			else {
+				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+				if (currentUserSettings.getAgentSettings() == null) {
+					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
+					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
+				}
+			}
+
+			String errorCode = request.getParameter("oauth_problem");
+			if (errorCode != null) {
+				LOG.error("Error code : " + errorCode);
+				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+				return JspResolver.SOCIAL_AUTH_MESSAGE;
+			}
+
+			User user = sessionHelper.getCurrentUser();
+			LinkedInOAuthService oauthService = socialManagementService.getLinkedInInstance();
+			String oauthVerifier = request.getParameter("oauth_verifier");
+			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
+
+			LinkedInRequestToken requestToken = (LinkedInRequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
+			socialManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(), currentUserSettings
+					.getAgentSettings().values());
+		}
+		catch (Exception e) {
+			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+			LOG.error(e.getMessage(), e);
+			return JspResolver.SOCIAL_AUTH_MESSAGE;
+		}
+		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+
+		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		LOG.info("Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}

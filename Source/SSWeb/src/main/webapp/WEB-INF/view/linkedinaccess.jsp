@@ -40,7 +40,7 @@
 		<div class="reg_lkin_wrapper text-center">
 			<div class="reg_lin_lin2"><spring:message code="label.allowaccess.message" /></div>
 			<div class="reg_lin_btn_wrapper">
-				<div id="allow-access" class="btn_reg_lin" onclick="redirectToAuthPage();"></div>
+				<div id="allow-access" class="btn_reg_lin" onclick="openAuthPage('linkedin');"></div>
 				<div id="skip-button" class="btn-reg-lin-skip"><spring:message code="label.skip.key"/></div>
 			</div>
 		</div>
@@ -51,10 +51,10 @@
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
-	function redirectToAuthPage() {
-		window.open("./linkedinauthpage.do", "Authorization Page", "width=600,height=600,scrollbars=yes");
+	function openAuthPage(socialNetwork) {
+		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=600,height=600,scrollbars=yes");
 	}
-
+	
 	$("#skip-button").click(function() {
 		location.href = "./landing.do";
 	});

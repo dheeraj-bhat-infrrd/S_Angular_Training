@@ -171,9 +171,6 @@ public interface CommonConstants {
 	public static final String EMAIL_TYPE_WORK = "work";
 	public static final String EMAIL_TYPE_PERSONAL = "personal";
 	
-	public static final String LINKEDIN_AUTH_URL = "authUrl";
-	public static final String LINKEDIN_REQUEST_TOKEN = "linkedinRequestToken";
-	
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
 
