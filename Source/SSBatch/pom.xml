@@ -28,6 +28,10 @@
 		<spring.framework.version>3.2.4.RELEASE</spring.framework.version>
 		<spring.batch.version>3.0.2.RELEASE</spring.batch.version>
 		
+		<!-- Logging -->
+		<logback.version>1.0.13</logback.version>
+		<slf4j.version>1.7.5</slf4j.version>
+		
 	</properties>
 
 	<dependencies>
@@ -103,10 +107,25 @@
 			<artifactId>aspectjweaver</artifactId>
 			<version>1.6.8</version>
 		</dependency>
+		<!-- Logging with SLF4J & LogBack -->
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.14</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+			<!-- <scope>runtime</scope> -->
+		</dependency>
+		
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-core</artifactId>
+		    <version>${logback.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.realtech.socialsurvey</groupId>
