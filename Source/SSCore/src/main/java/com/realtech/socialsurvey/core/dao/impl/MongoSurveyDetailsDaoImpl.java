@@ -338,30 +338,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 
 		Query query = new Query();
-		if (aggregateAbusive) {
-			query.addCriteria(Criteria
-					.where(columnName)
-					.is(columnValue)
-					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
-							Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
-		}
-		else {
-			query.addCriteria(Criteria
-					.where(columnName)
-					.is(columnValue)
-					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
-							Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE),
-							Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)));
+
+		/**
+		 * adding isabusive criteria
+		 */
+		if (!aggregateAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive));
 		}
 
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
-				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
-				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
-		);
+		query.addCriteria(Criteria
+				.where(columnName)
+				.is(columnValue)
+				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
+
+		TypedAggregation<SurveyDetails> aggregation = null;
+		if (!aggregateAbusive) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(
+					CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)), Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN)
+					.as("total_score"));
+		}
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.group(columnName)
+					.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+		}
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
 		long reviewsCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
@@ -485,7 +492,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		/**
 		 * adding isabusive criteria
 		 */
-		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		if (!fetchAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		}
 
 		if (startScore > -1 && limitScore > -1) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
@@ -523,7 +532,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		/**
 		 * adding isabusive criteria
 		 */
-		query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		if (!fetchAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		}
 
 		/**
 		 * adding limit for score if specified
