@@ -342,7 +342,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					.where(columnName)
 					.is(columnValue)
 					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
+							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
+							Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
 		}
 		else {
 			query.addCriteria(Criteria
@@ -350,6 +351,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					.is(columnValue)
 					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
 							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
+							Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE),
 							Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)));
 		}
 
@@ -473,14 +475,16 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
 
-		if (startScore > 0 && limitScore > 0) {
+		if (startScore > -1 && limitScore > -1) {
 			if (fetchAbusive) {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gt(startScore),
-						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
 			}
 			else {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gt(startScore),
+				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE),
 						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
 			}
 		}
@@ -512,11 +516,13 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (startScore > -1 && limitScore > -1) {
 			if (fetchAbusive) {
 				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
+						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
 			}
 			else {
 				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE),
 						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
 			}
 		}
