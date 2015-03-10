@@ -326,7 +326,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	@Override
 	@SuppressWarnings("unchecked")
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
-		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
+		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: "+columnName+" columnValue:"+columnValue+" noOfDays:"+noOfDays+" aggregateAbusive:"+aggregateAbusive);
 		Calendar calendar = Calendar.getInstance();
 		Date endDate = calendar.getTime();
 		calendar.add(5, noOfDays * (-1));
@@ -363,11 +363,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		long a = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		long reviewsCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		LOG.debug("Count of aggregated results :"+reviewsCount);
 		double rating = 0;
-		if (result != null && a > 0) {
+		if (result != null && reviewsCount > 0) {
 			List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get("result");
-			rating = (double) basicDBObject.get(0).get("total_score") / a;
+			rating = (double) basicDBObject.get(0).get("total_score") / reviewsCount;
 		}
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
@@ -507,7 +508,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	@Override
 	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive) {
 		LOG.info("Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue + " startScore:" + startScore
-				+ " limitScore:" + limitScore);
+				+ " limitScore:" + limitScore+" and fetchAbusive:"+fetchAbusive);
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
@@ -528,7 +529,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
-		LOG.info("Method getFeedBacksCount executed successfully");
+		LOG.info("Method getFeedBacksCount executed successfully.Returning feedBackCount:"+feedBackCount);
 		return feedBackCount;
 	}
 	// JIRA SS-137 and 158 : EOC
