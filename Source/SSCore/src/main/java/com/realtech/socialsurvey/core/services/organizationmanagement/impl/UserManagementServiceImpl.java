@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
@@ -1498,17 +1499,14 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.info("Adding the LinkedIn access tokens to agent settings in mongo for user id : " + user.getUserId());
-
 		Iterator<AgentSettings> settingsIterator = agentSettings.iterator();
-
 		while (settingsIterator.hasNext()) {
-
 			AgentSettings agentSetting = settingsIterator.next();
 			LOG.debug("Setting the access token for settings with id : " + agentSetting.getId());
 			SocialMediaTokens mediaTokens = agentSetting.getSocialMediaTokens();
 			// Check if media tokens exist. If not, create them.
 			if (mediaTokens == null) {
-				LOG.debug("Updating the existing media tokens for LinkedIn");
+				LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
 				mediaTokens = new SocialMediaTokens();
 				mediaTokens.setLinkedInToken(new LinkedInToken());
 				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
@@ -1516,7 +1514,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
 			}
 			else {
-				LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+				LOG.debug("Updating the existing media tokens for LinkedIn");
 				if (mediaTokens.getLinkedInToken() == null) {
 					mediaTokens.setLinkedInToken(new LinkedInToken());
 				}
@@ -1530,6 +1528,54 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		LOG.info("Agent settings successfully updated with LinkedIn access token");
+	}
+	
+	/**
+	 * Adds the Facebook access tokens to the agent's settings in mongo
+	 * 
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	public void setFacebookAccessTokenForUser(User user, String accessToken, long accessTokenExpiresOn, OrganizationUnitSettings companySettings)
+			throws InvalidInputException, NoRecordsFetchedException {
+		if (user == null) {
+			LOG.error("setFacebookAccessTokenForUser : user parameter is null!");
+			throw new InvalidInputException("setFacebookAccessTokenForUser : user parameter is null!");
+		}
+		if (accessToken == null || accessToken.isEmpty()) {
+			LOG.error("setFacebookAccessTokenForUser : accessToken parameter is null!");
+			throw new InvalidInputException("setFacebookAccessTokenForUser : accessToken parameter is null!");
+		}
+
+		LOG.info("Adding the facebook access tokens to agent settings in mongo for user id : " + user.getUserId());
+		SocialMediaTokens mediaTokens = companySettings.getSocialMediaTokens();
+
+		// Check if media tokens exist. If not, create them.
+		if (mediaTokens == null) {
+			LOG.debug("Media tokens do not exist. Creating them and adding the Facebook access token");
+			mediaTokens = new SocialMediaTokens();
+			mediaTokens.setFacebookToken(new FacebookToken());
+			mediaTokens.getFacebookToken().setFacebookAccessToken(accessToken);
+			mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn(System.currentTimeMillis());
+			mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessTokenExpiresOn);
+		}
+		else {
+			LOG.debug("Updating the existing media tokens for Facebook");
+			if (mediaTokens.getFacebookToken() == null) {
+				mediaTokens.setFacebookToken(new FacebookToken());
+			}
+			mediaTokens.getFacebookToken().setFacebookAccessToken(accessToken);
+			mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn(System.currentTimeMillis());
+			mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessTokenExpiresOn);
+		}
+		LOG.info("Updating the mongo collection with new Facebook access tokens for settings with id : " + companySettings.getId());
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens,
+				companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		LOG.info("Agent settings successfully updated with Facebook access token");
 	}
 
 	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException {

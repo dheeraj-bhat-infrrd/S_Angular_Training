@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -171,6 +172,9 @@ public interface UserManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public void setLinkedInAccessTokenForUser(User user,String accessToken, String accessTokenSecret,Collection<AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException;
+
+	public void setFacebookAccessTokenForUser(User user, String accessToken, long accessTokenExpiresOn, OrganizationUnitSettings companySettings)
+			throws InvalidInputException, NoRecordsFetchedException;
 	
 	/**
 	 * Method to insert agent settings into mongo
