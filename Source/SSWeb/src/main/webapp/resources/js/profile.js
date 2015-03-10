@@ -313,7 +313,6 @@ function bindClickToFetchIndividualProfile(bindingClass) {
 		e.stopPropagation();
 		var agentProfileName = $(this).data("profilename");
 		var url = window.location.origin +"/individualprofile/"+agentProfileName+".do";
-		alert(url);
 		window.open(url, "_blank");				
 	});
 }
