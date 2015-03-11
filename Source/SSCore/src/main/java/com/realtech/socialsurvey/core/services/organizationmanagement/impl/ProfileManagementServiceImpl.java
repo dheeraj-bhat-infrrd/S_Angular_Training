@@ -93,7 +93,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
-	
+
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
@@ -421,6 +421,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		if (userProfile.getContact_details().getContact_numbers() == null) {
 			userProfile.getContact_details().setContact_numbers(new ContactNumberSettings());
+		}
+		if (userProfile.getSurvey_settings() == null) {
+			userProfile.setSurvey_settings(parentProfile.getSurvey_settings());
 		}
 
 		// Aggregate parentProfile data with userProfile
@@ -1001,10 +1004,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	/**
 	 * Method to get the list of individuals for branch/region or company as specified ide in one of
 	 * branchId/regionId/companyId
-	 * @throws SolrException 
+	 * 
+	 * @throws SolrException
 	 */
 	@Override
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException {
+	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+			SolrException {
 		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
 				+ numOfRows);
 		if (iden <= 0l) {
@@ -1028,22 +1033,24 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 		}
-			solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
-		
+		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
+
 		LOG.info("Method getProListByProfileLevel finished successfully");
 		return solrSearchResult;
 	}
-	
+
 	@Override
-	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException, UndeliveredEmailException {
+	public void generateVerificationUrl(Map<String, String> urlParams, String applicationUrl, String recipientMailId, String recipientName)
+			throws InvalidInputException, UndeliveredEmailException {
 		String verficationUrl = urlGenerator.generateUrl(urlParams, applicationUrl);
-		if(enableKafka.equals(CommonConstants.YES)){
+		if (enableKafka.equals(CommonConstants.YES)) {
 			emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
-		}else{
+		}
+		else {
 			emailServices.sendEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
 		}
 	}
-	
+
 	@Override
 	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException {
 		Map<String, String> urlParams = urlGenerator.decryptParameters(urlParamsStr);
