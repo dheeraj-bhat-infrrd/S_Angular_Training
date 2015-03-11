@@ -115,7 +115,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set(CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE);
 		update.set(CommonConstants.MOOD_COLUMN, mood);
 		update.set("review", review);
-		update.set("isAbusive", isAbusive);
+		update.set(CommonConstants.IS_ABUSIVE_COLUMN, isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
@@ -340,7 +340,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query();
 
 		/**
-		 * adding isabusive criteria
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
 		 */
 		if (!aggregateAbusive) {
 			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive));
@@ -489,8 +490,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 
+
 		/**
-		 * adding isabusive criteria
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
 		 */
 		if (!fetchAbusive) {
 			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
@@ -529,8 +532,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 
+
 		/**
-		 * adding isabusive criteria
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
 		 */
 		if (!fetchAbusive) {
 			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
