@@ -509,7 +509,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     border-radius: 50%;
     text-align: center;
     line-height: 40px;
-    margin-top: 19px;
+    margin-top: 14px;
     position: relative;
     color: #fff;
     text-transform: uppercase;
@@ -531,13 +531,15 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .hm-header-row {
-    height: 78px;
+    height: 60px;
     color: #3e3e3e;
 }
 
 .hm-header-row-left {
-    font-size: 22px;
-    line-height: 78px;
+    font-size: 16px;
+    line-height: 60px;
+    font-family: opensanslight;
+    font-weight: bold !important;
 }
 
 .hm-header-row-right {
@@ -771,7 +773,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .header-menu-icn {
-    height: 50px;
+    height: 60px;
     width: 50px;
 }
 
@@ -1492,9 +1494,8 @@ button.paypal.is-active {
     white-space: nowrap;
 }
 .main-con-header {
-     /*text-transform: uppercase;*/
-    font-size: 18px;
-    margin-bottom: 15px;
+    font-size: 16px;
+/*    margin-bottom: 15px;*/
 }
 
 .rt-content-main {
@@ -1616,13 +1617,14 @@ button.paypal.is-active {
 }
 
 .ppl-head-1 {
-    font-size: 16px;
+    font-size: 14px;
     font-weight: bold !important;
 }
 
 .ppl-head-2 {
     font-size: 13px;
-    color: 3ccc;
+    color: #666;
+    font-family: opensanslight;
 }
 
 .ppl-header-left {
@@ -1630,15 +1632,16 @@ button.paypal.is-active {
 }
 
 .ppl-header-right .rating-star{
-    width: 26px;
-    background-size: 26px;
+    width: 23px;
+    background-size: 23px;
+    background-position: center 1px;
 }
 .ppl-content {
     line-height: 24px;
 }
 
 .ppl-share-wrapper {
-    margin-top: 25px;
+    margin-top: 10px;
     line-height: 36px;
 }
 
@@ -2948,7 +2951,7 @@ button.paypal.is-active {
 }
 
 .hdr-links {
-    line-height: 80px;
+    line-height: 70px;
     color: #fff;
 }
 
@@ -3408,9 +3411,9 @@ button.paypal.is-active {
 
 .header-right {
     position: relative;
-    height: 78px;
+    height: 60px;
     line-height: 78px;
-    font-size: 16px;
+    font-size: 14px;
 }
 
 .hr-txt2 {
@@ -3445,7 +3448,7 @@ button.paypal.is-active {
 }
 
 .dsh-name-wrapper {
-    font-size: 26px;
+    font-size: 22px;
     text-align: center;
 }
 
@@ -3455,40 +3458,39 @@ button.paypal.is-active {
 }
 
 .dsh-star-wrapper {
-    width: 350px;
-    margin: 35px auto;
+    width: 300px;
+    margin: 25px auto;
 }
 
 .dsh-star-item {
     height: 50px;
-    width: 53px;
-    width: 52px;
-    background-size: 49px;
+    width: 43px;
+    background-size: 40px;
 }
 
 .dsh-rating-item {
     background-color: #009FE0;
     color: #fff;
-    line-height: 50px;
+    line-height: 42px;
     text-align: center;
-    font-size: 26px;
-    height: 50px;
+    font-size: 20px;
+    height: 42px;
     width: 75px;
     border-radius: 5px;
+    margin-top: 5px;
+    font-weight: bold !important;
 }
 
 .dsh-btn-complete {
-/*    background-color: #26BDEF;*/
-/*    background-color: #5CC7EF;*/
     background-color: #009FE0;
-    height: 50px;
-    line-height: 50px;
-    width: 350px;
+    height: 42px;
+    line-height: 42px;
+    width: 300px;
     text-align: center;
     color: #fff;
     border-radius: 3px;
     margin: 10px auto;
-    font-size: 18px;
+    font-size: 14px;
     font-family: 'opensanslight';
     text-transform: uppercase;
     cursor: pointer;
@@ -3507,7 +3509,7 @@ button.paypal.is-active {
 }
 
 .dash-left-txt-wrapper {
-    padding: 77px 0;
+    padding: 75px 0;
 }
 
 .dash-top-info {
@@ -3526,18 +3528,18 @@ button.paypal.is-active {
 }
 
 .dash-stats-wrapper {
-    padding: 40px 0;
+    padding: 30px 0 15px;;
 }
 
 .dash-sub-head {
     line-height: 32px;
-    font-size: 18px;
-    margin-bottom: 20px;
+    font-size: 16px;
+    margin-bottom: 15px;
     padding-left: 10px;
 }
 
 .dash-sel-wrapper {
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
 .dash-sel-item {
@@ -3551,29 +3553,28 @@ button.paypal.is-active {
 }
 
 .stat-icn-lbl {
-    width: 230px;
-    font-size: 16px;
+    width: 200px;
+    font-size: 14px;
 }
 
 .stat-icns-wrapper {
-    line-height: 50px;
-    margin-bottom: 5px;
+    line-height: 37px;
 }
 
 .stat-icn-img {
-    height: 50px;
+    height: 32px;
     width: 18px;
     margin-right: 1px;
     background-size: 80% auto !important;
 }
 
 .stat-icn-txt-rt {
-    font-size: 22px;
+    font-size: 18px;
     margin-left: 20px;
 }
 
 .stats-right {
-    margin-left: 30px;
+    margin-left: 40px;
 }
 
 .dash-panel-left {
@@ -3583,14 +3584,13 @@ button.paypal.is-active {
 
 .dash-lp-rt-img {
     width: 44px;
-    height: 44px;
+    height: 36px;
     background: url(../images/fast_mail.png) no-repeat center;
 }
 
 .dash-lp-item {
-    margin-bottom: 10px;
     padding-left: 15px;
-    line-height: 44px;
+    line-height: 35px;
 }
 
 .dash-lp-txt span {
@@ -3600,18 +3600,19 @@ button.paypal.is-active {
 
 .dash-btn-sur-data {
     color: #009FE0;
-    margin: 30px auto;
+    margin: 20px auto;
     border-radius: 3px;
     text-align: center;
-    line-height: 40px;
+    line-height: 32px;
     width: 218px;
     border: 1px solid #009FE0;
     cursor: pointer;
 }
 
 .dash-lp-header {
-    font-size: 18px;
+    font-size: 16px;
     padding-left: 10px;
+    margin-bottom: 10px;
 }
 
 .dash-lp-txt {
@@ -3624,7 +3625,8 @@ button.paypal.is-active {
 .dash-btn-dl-sd {
     color: #009FE0;
     border-radius: 3px;
-    line-height: 40px;
+    line-height: 32px;
+    margin-top: 6px;
     border: 1px solid #009FE0;
     cursor: pointer;
     width: 180px;
@@ -3729,8 +3731,8 @@ button.paypal.is-active {
 }
 
 .dsh-graph-txt-4 {
-    top: 146px;
-    left: -165px;
+    top: 100px;
+    left: -172px;
     width: 165px;
 }
 
@@ -3757,9 +3759,10 @@ button.paypal.is-active {
 .dsg-g-rbn {
     position: absolute;
     background: url(../images/Ribbon.png) no-repeat center;
-    height: 50px;
+    background-size: 83%;
+    height: 72px;
     width: 240px;
-    top: 155px;
+    top: 142px;
     left: -8px;
 }
 
@@ -3769,7 +3772,7 @@ button.paypal.is-active {
 
 .util-gph-item {
     position: relative;
-    height: 350px;
+    height: 290px;
     width: 750px;
 }
 
@@ -3787,7 +3790,7 @@ button.paypal.is-active {
 
 .util-gph-legend {
     position: absolute;
-    top: 200px;
+    top: 170px;
     line-height: 30px;
     left: -210px;
     font-size: 13px;
@@ -4361,4 +4364,148 @@ button.paypal.is-active {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+}
+
+.v-hr-header {
+    margin-top: 15px;
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 36px;
+    font-family: opensanslight;
+    font-weight: bold !important;
+    font-size: 16px;
+}
+
+.v-tbl-icn {
+    cursor: pointer;
+    height: 39px;
+    width: 50%;
+}
+
+.hm-header-right {
+    background-color: #009FE0;
+    color: #fff;
+    padding: 0 20px;
+    font-size: 15px;
+    line-height: 40px;
+    margin-top: 11px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+tr.v-tbl-header {
+    height: 40px;
+    font-size: 13px;
+}
+
+.v-tbl-row{
+    cursor: pointer;
+}
+
+.v-hr-tbl tr.v-tbl-row td{
+    font-size: 14px;
+    border-bottom: 1px solid #dcdcdc;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-hr-tbl tr.v-tbl-header td{
+    font-weight: bold !important;
+}
+.v-hr-tbl {
+    width: 100%;
+    margin-top: 10px;
+}
+
+tr.v-tbl-row {
+    font-size: 14px;
+    height: 40px;
+}
+.v-tbl-no-bd {
+    border-bottom: 0px !important;
+    border-top: 0 !important;
+}
+
+.v-line-cmp {
+    border-left: 3px solid #6296D9;
+    border-bottom: 1px solid #dcdcdc;
+    height: 41px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-line-rgn {
+    border-left: 3px solid #61A64B;
+    border-bottom: 1px solid #dcdcdc;
+    height: 41px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    left: 25%;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-line-ind{
+    border-left: 3px solid #D7D7D7;
+    border-bottom: 1px solid #dcdcdc;
+    height: 41px;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    left: 50%;
+    border-top: 1px solid #dcdcdc;
+}
+
+.v-tbl-line {
+    border-bottom: 0px !important;
+    position: relative;
+    border-top: 0px !important;
+}
+
+td.v-tbl-line {
+    width: 9%;
+}
+
+td.v-tbl-name {
+    width: 26%;
+}
+
+td.v-tbl-add {
+    width: 35%;
+}
+
+tr.v-tbl-row-sel, .v-tbl-row-sel tr{
+    background-color: #FAFAFB;
+}
+
+td.v-tbl-role {
+    width: 20%;
+}
+
+td.v-tbl-btns {
+    width: 7.5%;
+}
+
+td.v-tbl-spacer {
+    width: 2.5%;
+}
+
+.v-tbl-row-ind {
+    background-color: #FAFAFB;
+}
+
+.v-tbl-row-edit, .v-tbl-add-frm {
+    background-color: #FAFAFB;
+}
+
+.v-tbl-row-rgn {
+    background-color: #FAFAFB;
+}
+
+.v-icn-close {
+    background: url('../images/close_hr.png') no-repeat center;
+}
+
+.v-icn-edit {
+    background: url('../images/edit_hr.png') no-repeat center;
 }

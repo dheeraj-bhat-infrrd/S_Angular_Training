@@ -114,6 +114,7 @@ public interface HierarchyManagementService {
 	 */
 	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException;
 
+
 	/**
 	 * Method to add a branch
 	 * @param user
@@ -141,7 +142,7 @@ public interface HierarchyManagementService {
 	 * @throws SolrException
 	 */
 	public Region addNewRegion(User user, String regionName,int isDefaultBySystem, String address1, String address2) throws InvalidInputException, SolrException;
-
+	
 	/**
 	 * Method to update a branch
 	 * 
