@@ -42,6 +42,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -92,6 +93,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -864,10 +868,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore) {
+	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore, boolean fetchAbusive) {
 		LOG.info("Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:" + maxScore);
 		long reviewsCount = 0;
-		reviewsCount = surveyDetailsDao.getFeedBacksCount(CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore);
+		reviewsCount = surveyDetailsDao.getFeedBacksCount(CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore, fetchAbusive);
 		LOG.info("Method getReviewsCountForCompany executed successfully");
 		return reviewsCount;
 	}
@@ -911,8 +915,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * agentId/branchId/regionId or companyId based on the profile level
 	 */
 	@Override
-	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
-			throws InvalidInputException {
+	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
+			boolean fetchAbusive) throws InvalidInputException {
 		LOG.info("Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		List<SurveyDetails> surveyDetails = null;
@@ -920,7 +924,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore);
+		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive);
 		return surveyDetails;
 	}
 
@@ -929,13 +933,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * agentId/branchId/regionId or companyId based on the profile level
 	 */
 	@Override
-	public double getAverageRatings(long iden, String profileLevel) throws InvalidInputException {
+	public double getAverageRatings(long iden, String profileLevel, boolean aggregateAbusive) throws InvalidInputException {
 		LOG.info("Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel);
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid for getting average rating os a company");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1);
+		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1, aggregateAbusive);
 
 		LOG.info("Method getAverageRatings executed successfully.Returning: " + averageRating);
 		return averageRating;
@@ -980,7 +984,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * score specified
 	 */
 	@Override
-	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel) throws InvalidInputException {
+	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive) throws InvalidInputException {
 		LOG.info("Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore + " profilelevel:"
 				+ profileLevel);
 		if (iden <= 0l) {
@@ -988,7 +992,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		long reviewsCount = 0;
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		reviewsCount = surveyDetailsDao.getFeedBacksCount(idenColumnName, iden, minScore, maxScore);
+		reviewsCount = surveyDetailsDao.getFeedBacksCount(idenColumnName, iden, minScore, maxScore, fetchAbusive);
 
 		LOG.info("Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount);
 		return reviewsCount;
@@ -1031,9 +1035,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 	
 	@Override
-	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException {
+	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName)throws InvalidInputException, UndeliveredEmailException {
 		String verficationUrl = urlGenerator.generateUrl(urlParams, applicationUrl);
-		emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		}else{
+			emailServices.sendEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		}
 	}
 	
 	@Override

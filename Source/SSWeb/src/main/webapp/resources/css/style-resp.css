@@ -145,7 +145,7 @@
         display: none;
     }
     .header-menu-icn{
-        display: block;
+        display: block !important;
     }
     .header-main-wrapper .container, .hm-header-main-wrapper .container, .hm-main-content-wrapper .container{
         padding: 0;
@@ -979,6 +979,7 @@
         float: none !important;
         margin: 0 auto;
         width: 300px;
+        top: 0px;
     }
     .dash-main-left{
         height: 310px;
@@ -1273,6 +1274,7 @@
     .dash-main-right {
         position: relative;
         left: -10px;
+        top: -21px;
     }
 }
 
@@ -1378,6 +1380,8 @@
     .dash-main-right{
         position: relative;
         left: -107px;
+        transform: scale(0.85);
+        top: -36px;
     }
 }
 
@@ -1386,7 +1390,10 @@
     .dash-main-right {
         position: relative;
         left: -84px;
+        top: -36px;
+        transform: scale(0.85);
     }
+    
 }
 
 
