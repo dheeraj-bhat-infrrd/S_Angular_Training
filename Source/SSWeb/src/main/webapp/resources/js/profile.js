@@ -70,9 +70,11 @@ function paintProfilePage(result) {
             $("#prof-company-address").html(addressHtml);
             if(result.logo != undefined) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
+            	$("#prof-company-logo").css("background-size","100% auto");
             }
             if(result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
+            	 $("#prof-image").css("background-size","cover");
             }
             
             var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
