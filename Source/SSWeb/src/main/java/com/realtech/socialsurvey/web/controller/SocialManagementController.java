@@ -2,11 +2,6 @@ package com.realtech.socialsurvey.web.controller;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.commons.lang.StringUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +23,8 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.web.common.JspResolver;
+import facebook4j.Facebook;
+import facebook4j.FacebookException;
 
 /**
  * Controller to manage social media oauth and pull/push posts
@@ -44,20 +41,8 @@ public class SocialManagementController {
 	private SocialManagementService socialManagementService;
 
 	// Facebook
-	@Value("${FB_CLIENT_ID}")
-	private String facebookClientId;
-	@Value("${FB_APP_SECRET}")
-	private String facebookAppSecret;
-	@Value("${FB_SCOPE}")
-	private String facebookScope;
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
-	@Value("${FB_DIALOG_OAUTH}")
-	private String facebookDialogOauth;
-	@Value("${FB_GRAPH_OAUTH}")
-	private String facebookGraphOauth;
-	@Value("${FB_GRAPH_URI}")
-	private String facebookGraphApiUri;
 
 	/**
 	 * Returns the social authorization page
@@ -80,14 +65,13 @@ public class SocialManagementController {
 
 			// Building facebook authUrl
 			case "facebook":
-				StringBuilder facebookAuthUrl = new StringBuilder(facebookDialogOauth).append("?client_id=").append(facebookClientId);
-				facebookAuthUrl.append("&redirect_uri=").append(facebookRedirectUri);
-				facebookAuthUrl.append("&scope=").append(facebookScope);
+				Facebook facebook = socialManagementService.getFacebookInstance();
 
 				// Setting authUrl in model
-				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebookAuthUrl.toString());
+				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, facebook);
+				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, facebook.getOAuthAuthorizationURL(facebookRedirectUri));
 
-				LOG.info("Returning the facebook authUrl : " + facebookAuthUrl.toString());
+				LOG.info("Returning the facebook authUrl : " + facebook.getOAuthAuthorizationURL(facebookRedirectUri));
 				break;
 
 			// Building twitter authUrl
@@ -153,10 +137,10 @@ public class SocialManagementController {
 	public String authenticateFacebookAccessCode(Model model, HttpServletRequest request) {
 		LOG.info("Facebook authentication url requested");
 		UserSettings currentUserSettings;
+		HttpSession session = request.getSession(false);
 
 		try {
 			User user = sessionHelper.getCurrentUser();
-			HttpSession session = request.getSession(false);
 			if (session == null) {
 				LOG.error("authenticateLinkedInAccess : Session object is null!");
 				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
@@ -184,26 +168,27 @@ public class SocialManagementController {
 
 			// Building facebook authUrl
 			String verificationCode = request.getParameter("code");
-			StringBuilder facebookAuthUrl = new StringBuilder(facebookGraphOauth).append("?client_id=").append(facebookClientId);
-			facebookAuthUrl.append("&redirect_uri=").append(facebookRedirectUri);
-			facebookAuthUrl.append("&code=").append(verificationCode);
-			facebookAuthUrl.append("&client_secret=").append(facebookAppSecret);
+			Facebook facebook = (Facebook) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 
-			// fetching access token
-			HttpClient httpclient = HttpClientBuilder.create().build();
-			HttpGet httpget = new HttpGet(facebookAuthUrl.toString());
-			String responseBody = httpclient.execute(httpget, new BasicResponseHandler());
-			String accessToken = StringUtils.removeEnd(StringUtils.removeStart(responseBody, "access_token="), "&expires=");
-			long accessTokenExpiresOn = Long.parseLong(responseBody.substring(responseBody.lastIndexOf("&expires=") + 9));
+			facebook4j.auth.AccessToken accessToken = null;
+			try {
+				accessToken = facebook.getOAuthAccessToken(verificationCode, facebookRedirectUri);
+			}
+			catch (FacebookException e) {
+				LOG.error("Error while creating access token " + e.getLocalizedMessage(), e);
+			}
 
-			socialManagementService.setFacebookAccessTokenForUser(user, accessToken, accessTokenExpiresOn, currentUserSettings.getCompanySettings());
+			socialManagementService.setFacebookAccessTokenForUser(user, accessToken.getToken(), accessToken.getExpires(),
+					currentUserSettings.getCompanySettings());
 			model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		}
 		catch (Exception e) {
+			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			LOG.error("Exception while getting access token. Reason : " + e.getMessage(), e);
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
 
+		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		LOG.info("Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
@@ -280,7 +265,7 @@ public class SocialManagementController {
 		LOG.info("Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
-	
+
 	/**
 	 * The url that LinkedIn send request to with the oauth verification code
 	 * 
