@@ -4794,3 +4794,17 @@ tr.u-tbl-header td {
 .v-edt-tbl-header td {
     font-weight: bold !important;
 }
+.v-edt-btn-sav {
+    background-color: #3E9DCB;
+    color: #fff;
+    margin: 10px auto;
+    width: 180px;
+    line-height: 40px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 13px;
+    clear: both;
+    border-radius: 3px;
+    position: relative;
+    top: 10px;
+}
