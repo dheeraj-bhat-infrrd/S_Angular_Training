@@ -11,6 +11,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import facebook4j.Facebook;
 
 /**
  * Interface with methods defined to manage social networks
@@ -28,6 +29,8 @@ public interface SocialManagementService {
 	public RequestToken getTwitterRequestToken() throws TwitterException;
 	
 	public Twitter getTwitterInstance();
+	
+	public Facebook getFacebookInstance();
 
 	/**
 	 * Adds the LinkedIn access tokens to the agent's settings in mongo

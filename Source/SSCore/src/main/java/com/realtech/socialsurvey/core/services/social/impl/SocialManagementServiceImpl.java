@@ -31,6 +31,8 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
+import facebook4j.Facebook;
+import facebook4j.FacebookFactory;
 
 /**
  * JIRA:SS-34 BY RM02 Implementation for User management services
@@ -55,7 +57,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	private String linkedInOauthSecret;
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
-	
+
+	// Facebook
+	@Value("${FB_CLIENT_ID}")
+	private String facebookClientId;
+	@Value("${FB_CLIENT_SECRET}")
+	private String facebookAppSecret;
+	@Value("${FB_SCOPE}")
+	private String facebookScope;
+	@Value("${FB_REDIRECT_URI}")
+	private String facebookRedirectUri;
+
 	// Twitter
 	@Value("${TWITTER_CONSUMER_KEY}")
 	private String twitterConsumerKey;
@@ -80,12 +92,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	public LinkedInOAuthService getLinkedInInstance() {
 		return LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey, linkedInApiSecret);
 	}
-	
+
 	/**
 	 * Returns the Twitter request token for a particular URL
 	 * 
 	 * @return
-	 * @throws TwitterException 
+	 * @throws TwitterException
 	 */
 	@Override
 	public RequestToken getTwitterRequestToken() throws TwitterException {
@@ -100,9 +112,20 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		builder.setOAuthConsumerKey(twitterConsumerKey);
 		builder.setOAuthConsumerSecret(twitterConsumerSecret);
 		Configuration configuration = builder.build();
-		TwitterFactory factory = new TwitterFactory(configuration);
-		Twitter twitter = factory.getInstance();
-		return twitter;
+
+		return new TwitterFactory(configuration).getInstance();
+	}
+
+	@Override
+	public Facebook getFacebookInstance() {
+		facebook4j.conf.ConfigurationBuilder confBuilder = new facebook4j.conf.ConfigurationBuilder();
+		confBuilder.setOAuthAppId(facebookClientId);
+		confBuilder.setOAuthAppSecret(facebookAppSecret);
+		confBuilder.setOAuthCallbackURL(facebookRedirectUri);
+		confBuilder.setOAuthPermissions(facebookScope);
+		facebook4j.conf.Configuration configuration = confBuilder.build();
+
+		return new FacebookFactory(configuration).getInstance();
 	}
 
 	/**
@@ -156,7 +179,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 		LOG.info("Agent settings successfully updated with LinkedIn access token");
 	}
-	
+
 	/**
 	 * Adds the Facebook access tokens to the agent's settings in mongo
 	 * 
@@ -252,7 +275,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 		LOG.info("Agent settings successfully updated with Facebook access token");
 	}
-	
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		// TODO Auto-generated method stub
