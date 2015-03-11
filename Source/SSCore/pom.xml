@@ -265,7 +265,7 @@
 			</exclusions>
 		</dependency>
 
-		<!-- Social Plugins -->
+		<!-- Social Network Connectors -->
 		<dependency>
 			<groupId>com.googlecode.linkedin-j</groupId>
 			<artifactId>linkedin-j-core</artifactId>

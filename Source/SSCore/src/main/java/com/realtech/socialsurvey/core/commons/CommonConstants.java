@@ -358,11 +358,4 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
-
-	/*
-	 * Mongo column and collection constants
-	 */
-	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
-	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
-
 }
