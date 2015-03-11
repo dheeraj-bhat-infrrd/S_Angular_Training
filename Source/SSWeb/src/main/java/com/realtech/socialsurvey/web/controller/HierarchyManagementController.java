@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.web.controller;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.omg.CORBA.COMM_FAILURE;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -410,8 +409,11 @@ public class HierarchyManagementController {
 
 			LOG.debug("Calling service to add a new region");
 			try {
-				hierarchyManagementService.addNewRegion(user, regionName, CommonConstants.NO, regionAddress1, regionAddress2);
-
+				Region region = hierarchyManagementService.addNewRegion(user, regionName, CommonConstants.NO, regionAddress1, regionAddress2);
+				
+				LOG.debug("Adding default branch for the region created");
+				hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+						CommonConstants.DEFAULT_ADDRESS, null);
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}

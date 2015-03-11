@@ -23,11 +23,11 @@ public interface CommonConstants {
 	public static final long DEFAULT_COMPANY_ID = 1;
 	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
 	public static final String DEFAULT_REGION_NAME = "Default Region";
+	public static final String DEFAULT_ADDRESS = "Default Address";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
 	public static final String DEFAULT_SOURCE_APPLICATION = "AP";
-	public static final String DEFAULT_ADDRESS = "Default Address";
 
 	/**
 	 * Profile master constants
@@ -93,9 +93,9 @@ public interface CommonConstants {
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
 	public static final int EMPTY_LIST = 0;
-	public static final int MAX_DEFAULT_REGIONS=1;
-	public static final int MAX_DEFAULT_BRANCHES=1;
-	public static final double MIN_RATING_SCORE = 1;
+	public static final int MAX_DEFAULT_REGIONS = 1;
+	public static final int MAX_DEFAULT_BRANCHES = 1;
+	public static final double MIN_RATING_SCORE = 0;
 	public static final double MAX_RATING_SCORE = 5;
 
 	/**
@@ -145,7 +145,8 @@ public interface CommonConstants {
 	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
 	public static final String MOOD_COLUMN = "mood";
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
-
+	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
+	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */

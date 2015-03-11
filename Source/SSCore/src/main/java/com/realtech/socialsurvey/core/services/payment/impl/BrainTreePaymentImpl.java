@@ -100,6 +100,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	@Value("${PAYMENT_RETRY_DAYS}")
 	private int retryDays;
 
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
+
 	private static final Logger LOG = LoggerFactory.getLogger(BrainTreePaymentImpl.class);
 
 	private BraintreeGateway gateway = null;
@@ -215,7 +218,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		licenseDetail.setNextRetryTime(new Timestamp(CommonConstants.EPOCH_TIME_IN_MILLIS));
 		licenseDetail.setSubscriptionIdSource(CommonConstants.PAYMENT_GATEWAY);
 		licenseDetail.setStatus(CommonConstants.STATUS_ACTIVE);
-		licenseDetail.setLicenseStartDate(new Timestamp(System.currentTimeMillis()));
+		Timestamp currentTime = new Timestamp(System.currentTimeMillis());
+		licenseDetail.setLicenseStartDate(currentTime);
+		licenseDetail.setLicenseEndDate(currentTime);
 		licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
 		licenseDetailDao.save(licenseDetail);
 		LOG.debug("License detail table updated. Updating the company entity.");
@@ -639,8 +644,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.info("License table updated!");
 
 		LOG.info("Sending email to the customer!");
-
-		emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), String.valueOf(retryDays));
+		if (enableKafka.equals(CommonConstants.YES)) {
+			emailServices.queueSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+					String.valueOf(retryDays));
+		}
+		else {
+			emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+					String.valueOf(retryDays));
+		}
 
 		LOG.info("Email sent successfully!");
 
@@ -973,9 +984,9 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @param company
 	 * @param newAccountsMaster
 	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException 
+	 * @throws NoRecordsFetchedException
 	 */
-	private void updateLicenseDetailsTableOnPlanUpgrade(User user,LicenseDetail licenseDetail, Company company, AccountsMaster newAccountsMaster,
+	private void updateLicenseDetailsTableOnPlanUpgrade(User user, LicenseDetail licenseDetail, Company company, AccountsMaster newAccountsMaster,
 			String subscriptionId) throws InvalidInputException, NoRecordsFetchedException {
 
 		if (licenseDetail == null) {
@@ -990,14 +1001,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("updateLicenseDetailsTableOnPlanUpgrade : newAccountsMaster parameter is null!");
 			throw new InvalidInputException("updateLicenseDetailsTableOnPlanUpgrade : newAccountsMaster parameter is null!");
 		}
-		if(subscriptionId == null && licenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE){
+		if (subscriptionId == null && licenseDetail.getAccountsMaster().getAccountsMasterId() == CommonConstants.ACCOUNTS_MASTER_FREE) {
 			LOG.error("updateLicenseDetailsTableOnPlanUpgrade : subscriptionId parameter is null!");
 			throw new InvalidInputException("updateLicenseDetailsTableOnPlanUpgrade : subscriptionId parameter is null!");
 		}
 
 		// Updating license detail table.
 		LOG.info("Updating the License Detail table to show changes");
-		if(checkIfItIsAFreeAccount(user)){
+		if (checkIfItIsAFreeAccount(user)) {
 			licenseDetail.setSubscriptionId(subscriptionId);
 		}
 		licenseDetail.setAccountsMaster(newAccountsMaster);
@@ -1054,13 +1065,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws SubscriptionUpgradeUnsuccessfulException
 	 * @throws SolrException
 	 * @throws UndeliveredEmailException
-	 * @throws SubscriptionUnsuccessfulException 
-	 * @throws CreditCardException 
+	 * @throws SubscriptionUnsuccessfulException
+	 * @throws CreditCardException
 	 */
 	@Transactional
 	@Override
 	public void upgradePlanForSubscription(User user, int newAccountsMasterId, String nonce) throws InvalidInputException, NoRecordsFetchedException,
-			SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException, SubscriptionUnsuccessfulException, CreditCardException {
+			SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException,
+			SubscriptionUnsuccessfulException, CreditCardException {
 
 		if (user == null) {
 			LOG.error("upgradePlanForSubscription : User parameter given is null.");
@@ -1070,7 +1082,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
 			throw new InvalidInputException("upgradePlanForSubscription : newAccountsMasterId parameter given is invalid");
 		}
-		if(checkIfItIsAFreeAccount(user) && nonce == null){
+		if (checkIfItIsAFreeAccount(user) && nonce == null) {
 			LOG.error("upgradePlanForSubscription : nonce parameter given is invalid");
 			throw new InvalidInputException("upgradePlanForSubscription : nonce parameter given is invalid");
 		}
@@ -1078,7 +1090,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		Company company = user.getCompany();
 		// We need the subscription id in case of free account
 		String subscriptionId = null;
-		
+
 		// Fetching the new accounts master record
 		LOG.debug("Fetching the new accounts master record from the database.");
 		AccountsMaster newAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, newAccountsMasterId);
@@ -1124,8 +1136,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		try {
 			// Update the branches and the regions and add settings to mongo
 			LOG.info("API call successful, updating the branch and region databases");
-			//organizationManagementService.upgradeAccount(company, newAccountsMasterId);
-			updateLicenseDetailsTableOnPlanUpgrade(user,licenseDetail, company, newAccountsMaster,subscriptionId);
+			// organizationManagementService.upgradeAccount(company, newAccountsMasterId);
+			updateLicenseDetailsTableOnPlanUpgrade(user, licenseDetail, company, newAccountsMaster, subscriptionId);
 
 		}
 		catch (DatabaseException e) {
@@ -1139,10 +1151,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 
 		LOG.info("Sending mail to the customer about the upgrade");
+		if (enableKafka.equals(CommonConstants.YES)) {
+			emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}
+		else {
+			emailServices.sendAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}
+		LOG.info("Mail successfully sent");
 
-		emailServices.queueAccountUpgradeMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
-		LOG.info("Mail successfully sent");		
-		
 		LOG.info("Subscription with id : " + licenseDetail.getSubscriptionId() + " successfully upgraded!");
 
 	}
