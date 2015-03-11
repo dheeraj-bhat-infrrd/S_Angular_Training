@@ -30,12 +30,12 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.logintodosurvey.key"/></div>
+			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.logintodosurvey.key"/></div>
 		</div>
 	</div>
 </div>
 
-<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+<div class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
 	<div class="container reg_panel_container">
 		<div class="reg_header"><spring:message code="label.logintodosurvey.key"/></div>
 		
