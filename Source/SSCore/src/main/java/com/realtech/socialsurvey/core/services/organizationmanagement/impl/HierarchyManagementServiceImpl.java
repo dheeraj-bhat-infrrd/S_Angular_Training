@@ -436,41 +436,16 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Adding new branch into mongo");
 		insertBranchSettings(branch);
+		
+		LOG.debug("Updating branch table with profile name");
+		branchDao.update(branch);
 
 		LOG.debug("Adding newly added branch to solr");
 		solrSearchService.addOrUpdateBranchToSolr(branch);
-
+		
 		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
 		return branch;
 
-	}
-
-	/**
-	 * Method to insert branch settings into mongo
-	 * 
-	 * @param branch
-	 * @throws InvalidInputException
-	 */
-	public void insertBranchSettings(Branch branch) throws InvalidInputException {
-		LOG.info("Method to insert branch settings called for branch : " + branch);
-		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
-		organizationSettings.setIden(branch.getBranchId());
-		organizationSettings.setCreatedBy(branch.getCreatedBy());
-		organizationSettings.setCreatedOn(System.currentTimeMillis());
-		organizationSettings.setModifiedBy(branch.getModifiedBy());
-		organizationSettings.setModifiedOn(System.currentTimeMillis());
-		/**
-		 * Calling method to generate and set profile name and profile url
-		 */
-		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
-		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
-
-		organizationSettings.setContact_details(contactSettings);
-		// TODO set lock settings
-		organizationSettings.setLockSettings(new LockSettings());
-		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
-				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-		LOG.info("Method to insert branch settings finished for branch : " + branch);
 	}
 
 	/**
@@ -492,8 +467,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("Branch name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		branchProfileName = branchName.replaceAll(" ", "-").toLowerCase();
-		LOG.debug("Checking if profileName:" + branchProfileName + " is already taken by a branch in the company :" + branch.getCompany());
+		branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getCompany().getCompanyId(),
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -501,6 +475,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			String companyProfileName = companySettings.getProfileName();
 			String branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 
+			LOG.debug("Checking if profileName:" + branchProfileName + " is already taken by a branch in the company :" + branch.getCompany());
 			/**
 			 * Uniqueness of profile name is checked by url since combination of company profile
 			 * name and branch profile name is unique
@@ -518,6 +493,10 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(branchProfileName);
 			organizationSettings.setProfileUrl(branchProfileUrl);
+			/**
+			 * set profile name in branch for setting value in sql tables
+			 */
+			branch.setProfileName(branchProfileName);
 		}
 		else {
 			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
@@ -591,43 +570,22 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Calling method to insert region settings");
 		insertRegionSettings(region);
+		
+		regionDao.update(region);
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
+		
+		LOG.debug("Adding a default branch under the newly created region");
+		Branch defaultBranch = organizationManagementService.addBranch(user, region, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.YES);
+		LOG.debug("Added default branch for region : " + region.getRegionId() + " with branch id : " + defaultBranch.getBranchId());
+		
+		LOG.debug("Updating Solr with newly inserted default branch");
+		solrSearchService.addOrUpdateBranchToSolr(defaultBranch);
+		LOG.debug("Solr updated with new default branch");
 
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
-	}
-
-	/**
-	 * Method to insert region settings into mongo
-	 * 
-	 * @param region
-	 * @throws InvalidInputException
-	 */
-	public void insertRegionSettings(Region region) throws InvalidInputException {
-		LOG.info("Method for inserting region settings called for region : " + region);
-		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
-		organizationSettings.setIden(region.getRegionId());
-		organizationSettings.setCreatedBy(region.getCreatedBy());
-		organizationSettings.setCreatedOn(System.currentTimeMillis());
-		organizationSettings.setModifiedBy(region.getModifiedBy());
-		organizationSettings.setModifiedOn(System.currentTimeMillis());
-
-		/**
-		 * Calling method to generate and set region profile name and url
-		 */
-		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
-
-		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
-
-		organizationSettings.setContact_details(contactSettings);
-		// TODO set lock settings
-		organizationSettings.setLockSettings(new LockSettings());
-		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
-				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-
-		LOG.info("Method for inserting region settings finished");
 	}
 
 	/**
@@ -649,7 +607,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			throw new InvalidInputException("Region name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		regionProfileName = regionName.replaceAll(" ", "-").toLowerCase();
+		regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
 		LOG.debug("Checking if profileName:" + regionProfileName + " is already taken by a region in the company :" + region.getCompany());
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getCompany().getCompanyId(),
@@ -675,6 +633,11 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 			}
 			organizationSettings.setProfileName(regionProfileName);
 			organizationSettings.setProfileUrl(regionProfileUrl);
+			
+			/**
+			 * Set the profile name in region object to update in sql later
+			 */
+			region.setProfileName(regionProfileName);
 		}
 		else {
 			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
@@ -828,6 +791,59 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		// TODO Auto-generated method stub
 		return true;
 	}
+	
+	/**
+	 * Method to insert region settings into mongo
+	 * 
+	 * @param region
+	 * @throws InvalidInputException
+	 */
+	public void insertRegionSettings(Region region) throws InvalidInputException {
+		LOG.info("Method for inserting region settings called for region : " + region);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(region.getRegionId());
+		organizationSettings.setCreatedBy(region.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(region.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
 
+		// Calling method to generate and set region profile name and url
+		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
+
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
+		organizationSettings.setContact_details(contactSettings);
+		organizationSettings.setLockSettings(new LockSettings());
+
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		LOG.info("Method for inserting region settings finished");
+	}
+
+	/**
+	 * Method to insert branch settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertBranchSettings(Branch branch) throws InvalidInputException {
+		LOG.info("Method to insert branch settings called for branch : " + branch);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(branch.getBranchId());
+		organizationSettings.setCreatedBy(branch.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(branch.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
+
+		// Calling method to generate and set profile name and profile url
+		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
+
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationSettings.setContact_details(contactSettings);
+		organizationSettings.setLockSettings(new LockSettings());
+
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		LOG.info("Method to insert branch settings finished for branch : " + branch);
+	}
 }
 // JIRA SS-37 BY RM02 EOC

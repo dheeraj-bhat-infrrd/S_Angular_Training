@@ -46,6 +46,8 @@
 								<div class="fp-wrapper clearfix">
 									<input id="find-pro-first-name" name="find-pro-first-name" class="fp-inp" placeholder="First Name">
 									<input id="find-pro-last-name" name="find-pro-last-name" class="fp-inp" placeholder="Last Name">
+									<input id="find-pro-start-index" name="find-pro-start-index" type="hidden">
+									<input id="find-pro-row-size" name="find-pro-row-size" type="hidden">
 									<input id="find-pro-submit" type="button" class="fp-inp pro-btn" value="Search">
 								</div>
 							</form>
@@ -63,43 +65,23 @@
 							<div class="ctnt-list-header-left float-left">
 								<spring:message code="label.profilefoundfor.key" />
 								<span class="srch-name">${patternFirst} ${patternLast}</span>
+								<input id="fp-first-name-pattern" type="hidden" value="${patternFirst}">
+								<input id="fp-last-name-pattern" type="hidden" value="${patternLast}">
+								<input id="fp-users-size" type="hidden">
 							</div>
 							<div class="ctnt-list-header-right float-right">
 								<c:choose>
-									<c:when test="${results >= '0'}">
-										<span class="srch-num">${results}</span>
+									<c:when test="${numfound >= '0'}">
+										<span id="srch-num" class="srch-num">${numfound}</span>
 									</c:when>
 									<c:otherwise>
-										<span class="srch-num">0</span>
+										<span id="srch-num" class="srch-num">0</span>
 									</c:otherwise>
 								</c:choose>
 								<spring:message code="label.profilelistfound.key" />
 							</div>
 						</div>
-						<div class="ctnt-list-wrapper">
-							
-							<!-- Populating user search results -->
-							<c:choose>
-								<c:when test="${not empty users}">
-									<c:forEach var="user" varStatus="loopStatus" items="${users}">
-										<div class="ctnt-list-item clearfix ${loopStatus.index % 2 == 0 ? '' : 'ctnt-list-item-even'}">
-											<div class="float-left ctnt-list-item-img"></div>
-											<div class="float-left ctnt-list-item-txt-wrap">
-												<div class="ctnt-item-name">${user.displayName}</div>
-												<div class="ctnt-item-desig">Marketting Head at Ralecon</div>
-												<div class="ctnt-item-comment">lorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir leralorem ipsum doe ir lera</div>
-											</div>
-											<div class="float-left ctnt-list-item-btn-wrap">
-												<div class="ctnt-review-btn"><spring:message code="label.reviewbutton.key" /></div>
-											</div>
-										</div>
-									</c:forEach>
-								</c:when>
-								<c:otherwise>
-									<div class="ctnt-list-item clearfix"><spring:message code="label.noprofilesfound.key" /></div>
-								</c:otherwise>
-							</c:choose>
-							
+						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper">
 							<!-- Example user search results -->
 							<div class="ctnt-list-item clearfix hide">
 								<div class="float-left ctnt-list-item-img"></div>
@@ -127,6 +109,7 @@
 									</div>
 								</div>
 							</div>
+							
 						</div>
 					</div>
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
@@ -139,9 +122,15 @@
 	<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/script-1.1.js"></script>
     <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
 		$(document).ready(function() {
+			$('#find-pro-row-size').val(rowSize);
+			$('#find-pro-start-index').val(startIndex);
+			$('#fp-users-size').val(0);
+			fetchUsers(startIndex);
+			
 			adjustTextContainerWidthOnResize();
 			
 			$(window).resize(function() {
@@ -149,15 +138,6 @@
 					adjustTextContainerWidthOnResize();
 				}
 			});
-			
-			$('#find-pro-submit').click(function() {
-            	event.preventDefault();
-            	console.log("Submitting Find a Profile form");
-				if(validateFindProForm('find-pro-form')){
-					$('#find-pro-form').submit();
-				}
-				showOverlay();
-            });
 		});
 	</script>
 </body>

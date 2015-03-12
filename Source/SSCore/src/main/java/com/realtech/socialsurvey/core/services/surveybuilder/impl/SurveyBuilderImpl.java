@@ -36,8 +36,6 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 public class SurveyBuilderImpl implements SurveyBuilder {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SurveyBuilderImpl.class);
-	private static final String REORDER_UP = "up";
-	private static final String REORDER_DOWN = "down";
 
 	@Autowired
 	private GenericDao<Survey, Long> surveyDao;
@@ -278,7 +276,15 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.info("Method to get survey for agent id {} called.", agentId);
 		User user = userDao.findById(User.class, agentId);
 		LOG.info("Method to get survey for agent id {} finished.", agentId);
-		return getAllActiveQuestionsOfMappedSurvey(user);
+		List<SurveyQuestionDetails> surveyQuestions = getAllActiveQuestionsOfMappedSurvey(user);
+		// TODO Add the default question which will be shown at the end of survey.
+		SurveyQuestionDetails surveyQuestionDetails = new SurveyQuestionDetails();
+		surveyQuestionDetails.setIsRatingQuestion(CommonConstants.STATUS_ACTIVE);
+		surveyQuestionDetails.setQuestion("How was your overall experience with our agent?");
+		surveyQuestionDetails.setIsRatingQuestion(CommonConstants.YES);
+		surveyQuestionDetails.setQuestionType("sb-master");
+		surveyQuestions.add(surveyQuestionDetails);
+		return surveyQuestions;
 	}
 
 	/**
@@ -389,6 +395,25 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			survey = createNewSurvey(user);
 		}
 		return fetchSurveyQuestions(survey);
+	}
+
+	@Override
+	@Transactional
+	public void changeSurveyStatus(User user, int status) throws InvalidInputException {
+		LOG.debug("Method changeSurveyStatus() started.");
+		if (user == null) {
+			LOG.error("Invalid argument passed. user cannot be null.");
+			throw new InvalidInputException("Invalid argument passed. User is null in method changeSurveyStatus.");
+		}
+		Survey survey = checkForExistingSurvey(user);
+		if (survey == null) {
+			survey = createNewSurvey(user);
+		}
+
+		survey.setStatus(status);
+		surveyDao.saveOrUpdate(survey);
+		surveyDao.flush();
+		LOG.debug("Method changeSurveyStatus() finished.");
 	}
 
 	@Override
@@ -591,6 +616,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			throw new InvalidInputException("Invalid argument passed. Either user or reordertype is null in method deactivateQuestionSurveyMapping.");
 		}
 
+		String REORDER_UP = "up";
+		String REORDER_DOWN = "down";
 		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, questionId);
 		int order = surveyQuestionsMapping.getQuestionOrder();
 

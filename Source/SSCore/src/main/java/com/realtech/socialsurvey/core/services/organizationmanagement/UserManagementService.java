@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
@@ -28,7 +30,7 @@ public interface UserManagementService {
 
 	public User assignRegionAdmin(User user, long regionId, long userId) throws InvalidInputException;
 
-	public void updateUserStatus(long userId, int status) throws InvalidInputException;
+	public void updateUserStatus(long userId, int status) throws InvalidInputException, SolrException;
 
 	// JIRA SS-42 BY RM02 BOC
 
@@ -69,6 +71,27 @@ public interface UserManagementService {
 
 	// Method to assign a user to a particular branch.
 	public void assignUserToBranch(User admin, long userId, long branchId) throws InvalidInputException, SolrException;
+	
+	/**
+	 * Assign a user directly under the company.
+	 * @param admin
+	 * @param userId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignUserToCompany(User admin, long userId) throws InvalidInputException, NoRecordsFetchedException, SolrException;
+	
+	/**
+	 * Assign a user directly to a region 
+	 * @param admin
+	 * @param userId
+	 * @param regionId
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignUserToRegion(User admin, long userId, long regionId) throws InvalidInputException, NoRecordsFetchedException, SolrException;
 
 	// Method to unassign a user from branch.
 	public void unassignUserFromBranch(User admin, long userId, long branchId) throws InvalidInputException;
@@ -99,7 +122,7 @@ public interface UserManagementService {
 
 	public void updateProfileCompletionStage(User user, int profilesMasterId, String profileCompletionStage) throws InvalidInputException;
 
-	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException;
+	public void verifyAccount(String encryptedUrlParams) throws InvalidInputException, SolrException;
 	
 	//JIRA SS-42 by RM-06:BOC
 	
@@ -134,6 +157,27 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
-
+	
+	/**
+	 * Returns the LinkedIn request token for a particular URL
+	 * @return
+	 */
+	public LinkedInRequestToken getLinkedInRequestToken();
+	/**
+	 * Adds the LinkedIn access tokens to the agent's settings in mongo
+	 * @param user
+	 * @param accessToken
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public void setLinkedInAccessTokenForUser(User user,String accessToken, String accessTokenSecret,Collection<AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException;
+	
+	/**
+	 * Method to insert agent settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertAgentSettings(User user) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
