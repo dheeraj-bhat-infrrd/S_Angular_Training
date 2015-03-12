@@ -115,7 +115,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set(CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE);
 		update.set(CommonConstants.MOOD_COLUMN, mood);
 		update.set("review", review);
-		update.set("isAbusive", isAbusive);
+		update.set(CommonConstants.IS_ABUSIVE_COLUMN, isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
@@ -167,7 +167,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
 	}
-	
+
 	// JIRA SS-137 and 158 BY RM-05 : BOC
 
 	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
@@ -326,7 +326,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	@Override
 	@SuppressWarnings("unchecked")
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
-		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
+		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
+				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
 		Calendar calendar = Calendar.getInstance();
 		Date endDate = calendar.getTime();
 		calendar.add(5, noOfDays * (-1));
@@ -335,38 +336,48 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			calendar.setTimeInMillis(0);
 			startDate = calendar.getTime();
 		}
-		
+
 		Query query = new Query();
-		if (aggregateAbusive) {
-			query.addCriteria(Criteria
-					.where(columnName)
-					.is(columnValue)
-					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
+
+		/**
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
+		 */
+		if (!aggregateAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive));
+		}
+
+		query.addCriteria(Criteria
+				.where(columnName)
+				.is(columnValue)
+				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
+						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
+
+		TypedAggregation<SurveyDetails> aggregation = null;
+		if (!aggregateAbusive) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(
+					CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)), Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN)
+					.as("total_score"));
 		}
 		else {
-			query.addCriteria(Criteria
-					.where(columnName)
-					.is(columnValue)
-					.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-							Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
-							Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)));
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.group(columnName)
+					.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
 		}
-		
-		
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
-				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
-				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
-		);
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		long a = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		long reviewsCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		LOG.debug("Count of aggregated results :" + reviewsCount);
 		double rating = 0;
-		if (result != null && a > 0) {
+		if (result != null && reviewsCount > 0) {
 			List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get("result");
-			rating = (double) basicDBObject.get(0).get("total_score") / a;
+			rating = (double) basicDBObject.get(0).get("total_score") / reviewsCount;
 		}
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
@@ -474,16 +485,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
 
-		if (startScore > 0 && limitScore > 0) {
-			if (fetchAbusive) {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
-			}
-			else {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-						Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore),
-						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
-			}
+		/**
+		 * fetching only completed surveys
+		 */
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+
+
+		/**
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
+		 */
+		if (!fetchAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		}
+
+		if (startScore > -1 && limitScore > -1) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 		}
 
 		if (start > -1) {
@@ -504,26 +522,35 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	@Override
 	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive) {
 		LOG.info("Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue + " startScore:" + startScore
-				+ " limitScore:" + limitScore);
+				+ " limitScore:" + limitScore + " and fetchAbusive:" + fetchAbusive);
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		
-		if (startScore > 0 && limitScore > 0) {
-			if (fetchAbusive) {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
-			}
-			else {
-				query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-						Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore),
-						Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive)));
-			}
+		/**
+		 * fetching only completed surveys
+		 */
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+
+
+		/**
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
+		 */
+		if (!fetchAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
 		}
-		
+
+		/**
+		 * adding limit for score if specified
+		 */
+		if (startScore > -1 && limitScore > -1) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
+		}
+
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
-		LOG.info("Method getFeedBacksCount executed successfully");
+		LOG.info("Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount);
 		return feedBackCount;
 	}
 	// JIRA SS-137 and 158 : EOC
