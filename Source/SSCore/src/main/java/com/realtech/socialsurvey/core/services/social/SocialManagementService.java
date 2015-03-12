@@ -3,9 +3,6 @@ package com.realtech.socialsurvey.core.services.social;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
-import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
-import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -23,9 +20,9 @@ public interface SocialManagementService {
 	 * 
 	 * @return
 	 */
-	public LinkedInRequestToken getLinkedInRequestToken();
+	/*public LinkedInRequestToken getLinkedInRequestToken();
 	public LinkedInOAuthService getLinkedInInstance();
-	public LinkedInApiClientFactory getLinkedInApiClientFactory();
+	public LinkedInApiClientFactory getLinkedInApiClientFactory();*/
 
 	public RequestToken getTwitterRequestToken() throws TwitterException;
 	public Twitter getTwitterInstance();
