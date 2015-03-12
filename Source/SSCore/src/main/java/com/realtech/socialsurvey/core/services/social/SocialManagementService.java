@@ -6,7 +6,6 @@ import twitter4j.auth.RequestToken;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import facebook4j.Facebook;
@@ -30,22 +29,13 @@ public interface SocialManagementService {
 	public Facebook getFacebookInstance();
 
 	/**
-	 * Adds the Facebook access tokens to the agent's settings in mongo
+	 * Adds the SocialMedia access tokens to mongo
 	 * 
 	 * @param user
 	 * @param accessToken
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 */
-	public void setFacebookAccessTokenForUser(User user, String accessToken, long accessTokenExpiresOn, OrganizationUnitSettings companySettings)
-			throws InvalidInputException, NoRecordsFetchedException;
-
-	public void setTwitterAccessTokenForUser(User user, String accessToken, String accessTokenSecret, OrganizationUnitSettings companySettings)
-			throws InvalidInputException, NoRecordsFetchedException;
-
-	/*public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret, Collection<AgentSettings> agentSettings)
-	throws InvalidInputException, NoRecordsFetchedException;*/
-
 	public SocialMediaTokens updateSocialMediaTokens(String collection, OrganizationUnitSettings unitSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
 

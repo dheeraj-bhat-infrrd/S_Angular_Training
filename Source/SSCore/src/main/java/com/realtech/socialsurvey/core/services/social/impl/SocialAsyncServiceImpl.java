@@ -37,13 +37,6 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 	public Future<OrganizationUnitSettings> linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken) {
 		LOG.info("Method linkedInDataUpdate() called from SocialAsyncServiceImpl");
 
-		try {
-			Thread.sleep(15000);
-		}
-		catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		StringBuilder linkedInFetch = new StringBuilder(linkedInRestApiUri).append("(id,summary,picture-url)");
 		linkedInFetch.append("?oauth2_access_token=").append(linkedInToken.getLinkedInAccessToken());
 		linkedInFetch.append("&format=json");
@@ -59,25 +52,29 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			LOG.error(e.getMessage(), e);
 		}
 
-		String summary = (String) mapProfile.get("summary");
-		if (summary != null && !summary.equals("")) {
-			try {
-				unitSettings.getContact_details().setAbout_me(summary);
-				profileManagementService.updateContactDetails(collection, unitSettings, unitSettings.getContact_details());
-			}
-			catch (InvalidInputException e) {
-				LOG.error(e.getMessage(), e);
+		if (mapProfile.containsKey("summary")) {
+			String summary = (String) mapProfile.get("summary");
+			if (summary != null && !summary.equals("")) {
+				try {
+					unitSettings.getContact_details().setAbout_me(summary);
+					profileManagementService.updateContactDetails(collection, unitSettings, unitSettings.getContact_details());
+				}
+				catch (InvalidInputException e) {
+					LOG.error(e.getMessage(), e);
+				}
 			}
 		}
 
-		String pictureUrl = (String) mapProfile.get("pictureUrl");
-		if (pictureUrl != null && !pictureUrl.equals("")) {
-			try {
-				unitSettings.setProfileImageUrl(pictureUrl);
-				profileManagementService.updateProfileImage(collection, unitSettings, pictureUrl);
-			}
-			catch (InvalidInputException e) {
-				LOG.error(e.getMessage(), e);
+		if (mapProfile.containsKey("pictureUrl")) {
+			String pictureUrl = (String) mapProfile.get("pictureUrl");
+			if (pictureUrl != null && !pictureUrl.equals("")) {
+				try {
+					unitSettings.setProfileImageUrl(pictureUrl);
+					profileManagementService.updateProfileImage(collection, unitSettings, pictureUrl);
+				}
+				catch (InvalidInputException e) {
+					LOG.error(e.getMessage(), e);
+				}
 			}
 		}
 
