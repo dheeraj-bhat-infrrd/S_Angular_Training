@@ -35,7 +35,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 	@Async
 	@Override
 	public Future<OrganizationUnitSettings> linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken) {
-		LOG.info("Method linkedInDataUpdate() called from SocialManagementController");
+		LOG.info("Method linkedInDataUpdate() called from SocialAsyncServiceImpl");
 
 		try {
 			Thread.sleep(15000);
@@ -81,7 +81,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			}
 		}
 
-		LOG.info("Method linkedInDataUpdate() finished from SocialManagementController");
+		LOG.info("Method linkedInDataUpdate() finished from SocialAsyncServiceImpl");
 		return new AsyncResult<OrganizationUnitSettings>(unitSettings);
 	}
 }
