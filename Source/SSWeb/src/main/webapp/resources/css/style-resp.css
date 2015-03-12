@@ -1099,51 +1099,6 @@
     .encompass-url-adj{
         padding-right: 100px;
     }
-}
-
-
-
-/* ============== ANTHING ABOVE SMARTPHONES ==============*/
-@media (min-width: 768px) {
-    .login-wrapper-resp{
-        width: 457px;
-        float: none;
-        box-shadow: 0px 1px 20px 2px #7C7C7C;
-    }
-    
-    .error-wrapper{
-        width: 365px;
-        margin: 0 auto 10px;
-    }
-    .login-footer-wrapper{
-        width: 457px;
-        float: none;
-        margin-top: -5px;
-        padding: 0;
-    }
-    .payment-form {
-        max-width: 960px;
-        width: auto;
-        padding-bottom: 30px;
-    }
-    .padding-left-25 {
-        padding-left: 25px;
-    }
-    .padding-right-25{
-        padding-right: 25px;
-    }
-    .header-links{
-        font-size: 16px;
-    }
-    .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
-        display: block !important;
-    }
-    .overlay-toast{
-       // display: none;
-    }
-    .header-slider-wrapper{
-        display: none;
-    }
     .soc-nw-wrapper {
         padding: 10px;
         margin: 0 auto;
@@ -1153,7 +1108,6 @@
         margin-right: 0;
     }
 }
-
 
 
 /* ============== ONLY TABLETS ==============*/
@@ -1534,3 +1488,45 @@
 
 
 
+/* ============== ANTHING ABOVE SMARTPHONES ==============*/
+@media (min-width: 768px) {
+    .login-wrapper-resp{
+        width: 457px;
+        float: none;
+        box-shadow: 0px 1px 20px 2px #7C7C7C;
+    }
+    
+    .error-wrapper{
+        width: 365px;
+        margin: 0 auto 10px;
+    }
+    .login-footer-wrapper{
+        width: 457px;
+        float: none;
+        margin-top: -5px;
+        padding: 0;
+    }
+    .payment-form {
+        max-width: 960px;
+        width: auto;
+        padding-bottom: 30px;
+    }
+    .padding-left-25 {
+        padding-left: 25px;
+    }
+    .padding-right-25{
+        padding-right: 25px;
+    }
+    .header-links{
+        font-size: 16px;
+    }
+    .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
+        display: block !important;
+    }
+    .overlay-toast{
+       // display: none;
+    }
+    .header-slider-wrapper{
+        display: none;
+    }
+}
