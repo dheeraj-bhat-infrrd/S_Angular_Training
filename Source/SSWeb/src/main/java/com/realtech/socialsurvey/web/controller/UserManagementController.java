@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.apache.solr.common.SolrDocument;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,10 +20,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
+import com.google.code.linkedinapi.client.oauth.LinkedInAccessToken;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
+import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
+import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -69,8 +75,26 @@ public class UserManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+	
+	@Autowired
+	private LinkedInApiClientFactory linkedInApiClientFactory;
 
 	private final static int SOLR_BATCH_SIZE = 20;
+	
+	@Value("${LINKED_IN_API_KEY}")
+	private String linkedInApiKey;
+	
+	@Value("${LINKED_IN_API_SECRET}")
+	private String linkedInApiSecret;
+	
+	@Value("${LINKED_IN_OAUTH_TOKEN}")
+	private String linkedInOauthToken;
+	
+	@Value("${LINKED_IN_OAUTH_SECRET}")
+	private String linkedInOauthSecret;
+	
+	@Value("${LINKED_IN_REDIRECT_URI}")
+	private String linkedinRedirectUri;
 
 	// JIRA SS-42 BY RM05 BOC
 	/*
@@ -142,7 +166,15 @@ public class UserManagementController {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
+						
+						LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+						userManagementService.insertAgentSettings(user);
+						LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
+						LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 						solrSearchService.addUserToSolr(user);
+						LOG.debug("Added newly added user {} to solr", user.getFirstName());
+						
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
@@ -748,7 +780,7 @@ public class UserManagementController {
 	@RequestMapping(value = "/completeregistration", method = RequestMethod.POST)
 	public String completeRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method completeRegistration() to complete registration of user started.");
-
+		
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
 			String lastName = request.getParameter(CommonConstants.LAST_NAME);
@@ -838,7 +870,11 @@ public class UserManagementController {
 			}
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
-			
+
+			LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+			userManagementService.insertAgentSettings(user);
+			LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
 			LOG.debug("Adding newly registered user to principal session");
 			sessionHelper.loginOnRegistration(emailId, password);
 			LOG.debug("Successfully added registered user to principal session");
@@ -862,15 +898,16 @@ public class UserManagementController {
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present
-			}
+			}	
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.COMPLETE_REGISTRATION;
 		}
+		
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
-		return JspResolver.LANDING;
+		return JspResolver.LINKEDIN_ACCESS;
 	}
 
 	@RequestMapping(value = "/showchangepasswordpage")
@@ -947,49 +984,93 @@ public class UserManagementController {
 		LOG.debug("change password form parameters validated successfully");
 	}
 	
-	/*
-	 * Method to find a user on the basis of email id provided.
+	/**
+	 * Returns the linked in authorization page
+	 * @param model
+	 * @param request
+	 * @return
 	 */
-	@RequestMapping(value = "/findapro", method = RequestMethod.POST)
-	public String findAProfile(Model model, HttpServletRequest request) {
-		LOG.info("Method findAProfile called.");
-		List<SolrDocument> users;
-		String patternFirst;
-		String patternLast;
+	@RequestMapping(value="/linkedinauthpage", method = RequestMethod.GET)
+	public String getLinkedInAuthPage(Model model,HttpServletRequest request){
 		
+		HttpSession session = request.getSession(false);
+		if(session == null){
+			LOG.error("Session is null!");
+		}
+		
+		LOG.info("getLinkedInAuthPage called");
+		LinkedInRequestToken requestToken;	
+		try{
+			requestToken = userManagementService.getLinkedInRequestToken();
+		}
+		catch(Exception e){
+			LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", e.getMessage());
+			return JspResolver.ERROR_PAGE;
+		}
+        
+        //We will keep the request token in session
+        session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
+        
+        LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
+        
+		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
+		model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());
+		return JspResolver.LINKEDIN_MESSAGE;
+	}
+	
+	/**
+	 * The url that LinkedIn send request to with the oauth verification code
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value="/linkedinauth", method = RequestMethod.GET)
+	public String authenticateLinkedInAccess(Model model,HttpServletRequest request){
+		
+		LOG.info("LinkedIn authentication url requested");
+		HttpSession session = request.getSession(false);
+		String errorCode = request.getParameter("oauth_problem");
+		UserSettings currentUserSettings;
 		try {
-			patternFirst = request.getParameter("find-pro-first-name");
-			patternLast = request.getParameter("find-pro-last-name");
-			if (patternFirst == null && patternLast == null) {
-				LOG.error("Invalid search key passed in method findAProfile().");
-				throw new InvalidInputException("Invalid searchKey passed in method findAProfile().");
+			if(session == null){
+				LOG.error("authenticateLinkedInAccess : Session object is null!");
+				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
 			}
-
-			try {
-				users = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast);
+			if(session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null){
+				LOG.error("authenticateLinkedInAccess : user canonical settings not found in session!");
+				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");				
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException(e.getMessage(), e);
+			else{
+				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+				if(currentUserSettings.getAgentSettings() == null){
+					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
+					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
+				}
 			}
-			catch (MalformedURLException e) {
-				LOG.error("Error occured while searching in findAProfile(). Reason is ", e);
-				throw new NonFatalException("Error occured while searching in findAProfile(). Reason is ", e);
+			if( errorCode != null ){
+				LOG.error("Error code : " + errorCode);
+				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
+				return JspResolver.LINKEDIN_MESSAGE;
 			}
+			
+			User user = sessionHelper.getCurrentUser();
+			LinkedInOAuthService oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+			String oauthVerifier = request.getParameter("oauth_verifier");
+			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
+	        LinkedInRequestToken requestToken= (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
+			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
+			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(),accessToken.getTokenSecret(),currentUserSettings.getAgentSettings().values());	        
 		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			return JSONUtil.toJSON(errorResponse);
+		catch (Exception e) {
+			session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
+			LOG.error(e.getMessage(),e);	
+			return JspResolver.LINKEDIN_MESSAGE;
 		}
-		model.addAttribute("users", users);
-		model.addAttribute("results", users.size());
-		model.addAttribute("patternFirst", patternFirst);
-		model.addAttribute("patternLast", patternLast);
-		
-		LOG.info("Method findAProfile finished.");
-		return JspResolver.PROFILE_LIST;
+		session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
+		LOG.info("Access tokens obtained and added to mongo successfully!");
+        model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);		
+		return JspResolver.LINKEDIN_MESSAGE;
 	}
 }
 // JIRA SS-77 BY RM07 EOC

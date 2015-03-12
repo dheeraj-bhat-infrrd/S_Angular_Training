@@ -20,10 +20,12 @@
 		<jsp.version>2.2</jsp.version>
 		<jstl.version>1.2</jstl.version>
 		<servlet.version>2.5</servlet.version>
-		<dev.deployment.path>/Users/nishit/work/apps/jboss/jboss-eap-6.3/standalone/deployments</dev.deployment.path>
+
+		<dev.deployment.path>/home/bhumika/servers/jboss-as-7.1.1.Final/standalone/deployments</dev.deployment.path>
+
 
 		<!-- Spring -->
-		<spring-framework.version>3.2.4.RELEASE</spring-framework.version>
+		<spring-framework.version>4.1.4.RELEASE</spring-framework.version>
 		<spring.security>3.2.3.RELEASE</spring.security>
 
 		<!-- Hibernate / JPA -->
@@ -187,6 +189,12 @@
 			<groupId>javax.ws.rs</groupId>
 			<artifactId>javax.ws.rs-api</artifactId>
 			<version>2.0-m01</version>
+		</dependency>
+
+		<dependency>
+			<groupId>net.java.openjfx.backport</groupId>
+			<artifactId>openjfx-78-backport-compat</artifactId>
+			<version>1.8.0.1</version>
 		</dependency>
 
 	</dependencies>

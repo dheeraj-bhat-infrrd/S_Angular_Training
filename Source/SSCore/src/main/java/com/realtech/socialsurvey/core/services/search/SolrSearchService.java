@@ -6,12 +6,15 @@ package com.realtech.socialsurvey.core.services.search;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 /**
@@ -78,9 +81,25 @@ public interface SolrSearchService {
 	 */
 	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException, MalformedURLException;
 
+	/**
+	 * Method to perform search of Users from solr based on the input pattern for firstname and last name
+	 * 
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws MalformedURLException
+	 * @throws UnsupportedEncodingException
+	 */
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
+
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
+	
+	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException;
+	
+	public void editUserInSolr(long userId, String key, String value) throws SolrException;
+	
+	public String searchUsersByIden(long regionId,String idenFieldName,int startIndex,int noOfRows) throws InvalidInputException,SolrException,MalformedURLException;
 }
 // JIRA:SS-62 BY RM 02 EOC

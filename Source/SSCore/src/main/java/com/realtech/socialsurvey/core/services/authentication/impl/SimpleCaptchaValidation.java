@@ -4,11 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.Captcha;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
-
 
 public class SimpleCaptchaValidation implements CaptchaValidation {
 

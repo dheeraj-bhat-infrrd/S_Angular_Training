@@ -9,6 +9,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,6 +76,12 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Value("${AMAZON_ENDPOINT}")
+	private String endpoint;
+
+	@Value("${AMAZON_BUCKET}")
+	private String bucket;
 
 	/**
 	 * Method to upload logo image for a company
@@ -83,9 +90,11 @@ public class OrganizationManagementController {
 	 * @return
 	 * @throws IOException
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/uploadcompanylogo", method = RequestMethod.POST)
 	public String imageUpload(Model model, @RequestParam("logo") MultipartFile fileLocal, HttpServletRequest request) {
 		LOG.info("Method imageUpload of OrganizationManagementController called");
+		String message = "";
 		String logoName = "";
 
 		LOG.debug("Overriding Logo image name in Session");
@@ -95,18 +104,20 @@ public class OrganizationManagementController {
 
 		try {
 			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
-			model.addAttribute("message", messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE));
+			//Setting the complete logo url in session
+			logoName = endpoint + "/" + bucket + "/" +logoName;
+			
+			LOG.debug("Setting Logo image name to Session");
+			request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
+
+			LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
+			message = messageUtils.getDisplayMessage("LOGO_UPLOAD_SUCCESSFUL", DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while uploading Logo. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
+			message = e.getMessage();
 		}
-		LOG.debug("Setting Logo image name to Session");
-		request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
-
-		LOG.info("Method imageUpload of OrganizationManagementController completed successfully");
-		return JspResolver.MESSAGE_HEADER;
+		return message;
 	}
 
 	/**
@@ -127,9 +138,23 @@ public class OrganizationManagementController {
 		String country = request.getParameter("country");
 		String countryCode = request.getParameter("countrycode");
 		String vertical = request.getParameter("vertical");
-		
+
 		try {
-			validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo,vertical);
+			try {
+				validateCompanyInfoParams(companyName, address1, country, countryCode, zipCode, companyContactNo, vertical);
+			}
+			catch (InvalidInputException e) {
+				List<VerticalsMaster> verticalsMasters = null;
+				try {
+					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
+					model.addAttribute("verticals", verticalsMasters);
+				}
+				catch (InvalidInputException e1) {
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
+							DisplayMessageConstants.GENERAL_ERROR, e1);
+				}
+				throw new InvalidInputException("Invalid input exception occured while validating form parameters",e.getErrorCode(),e);
+			}
 			String address = getCompleteAddress(address1, address2);
 
 			HttpSession session = request.getSession(false);
@@ -164,16 +189,6 @@ public class OrganizationManagementController {
 					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 
 			LOG.debug("Successfully executed service to add company details");
-			List<VerticalsMaster> verticalsMasters = null;
-			try {
-				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-			model.addAttribute("verticals",verticalsMasters);
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
@@ -195,7 +210,7 @@ public class OrganizationManagementController {
 	 * @throws InvalidInputException
 	 */
 	private void validateCompanyInfoParams(String companyName, String address, String country, String countryCode, String zipCode,
-			String companyContactNo,String vertical) throws InvalidInputException {
+			String companyContactNo, String vertical) throws InvalidInputException {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
@@ -224,8 +239,8 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 		}
-		if(vertical == null || vertical.isEmpty()){
-			throw new InvalidInputException("Vertical selected is not valid",DisplayMessageConstants.INVALID_VERTICAL);
+		if (vertical == null || vertical.isEmpty()) {
+			throw new InvalidInputException("Vertical selected is not valid", DisplayMessageConstants.INVALID_VERTICAL);
 		}
 		LOG.debug("Returning from validateCompanyInfoParams after validating parameters");
 	}
@@ -688,7 +703,7 @@ public class OrganizationManagementController {
 			jsonMessage.put("message", message);
 		}
 		catch (JSONException e) {
-			LOG.error("Exception occured while building json response : " + e.getMessage(),e);
+			LOG.error("Exception occured while building json response : " + e.getMessage(), e);
 		}
 
 		LOG.info("Returning json response : " + jsonMessage.toString());
@@ -851,5 +866,5 @@ public class OrganizationManagementController {
 		return JspResolver.UPGRADE_CONFIRMATION;
 	}
 }
-	
+
 // JIRA: SS-24 BY RM02 EOC

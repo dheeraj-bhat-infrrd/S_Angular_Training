@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -232,10 +233,14 @@ public class RegistrationController {
 			 */
 			try {
 				LOG.debug("Registering user with emailId : " + emailId);
-				User user = userManagementService
-						.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
+				User user = userManagementService.addCorporateAdminAndUpdateStage(firstName, lastName, emailId, confirmPassword, isDirectRegistration);
 				LOG.debug("Succesfully completed registration of user with emailId : " + emailId);
 
+				LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
+				userManagementService.insertAgentSettings(user);
+				LOG.debug("Added newly added user {} to mongo", user.getFirstName());
+
+				LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 				solrSearchService.addUserToSolr(user);
 				LOG.debug("Added newly added user {} to solr", user.getFirstName());
 
@@ -252,6 +257,7 @@ public class RegistrationController {
 			catch (UndeliveredEmailException e) {
 				throw new UndeliveredEmailException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			List<VerticalsMaster> verticalsMasters = null;
 			try {
 				verticalsMasters = organizationManagementService.getAllVerticalsMaster();
@@ -276,7 +282,6 @@ public class RegistrationController {
 		}
 		LOG.info("Method registerUser of Registration Controller finished");
 		return JspResolver.COMPANY_INFORMATION;
-
 	}
 
 	/**
@@ -299,6 +304,11 @@ public class RegistrationController {
 			LOG.error("InvalidInputException while verifying account. Reason : " + e.getMessage(), e);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		catch (SolrException e) {
+			LOG.error("SolrException while verifying account. Reason : " + e.getMessage(), e);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage("SolrException", DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify account finished");
 		return JspResolver.LOGIN;
