@@ -1078,11 +1078,14 @@
     tr.u-tbl-row td{
         font-size: 12px;
     }
-    .v-tbl-rgn-adm, .v-tbl-of-adm, .v-tbl-ln-of, .v-tbl-mail, .v-tbl-online, .v-tbl-rem, .v-tbl-edit{
+    .v-tbl-rgn-adm, .v-tbl-of-adm, .v-tbl-ln-of, .v-tbl-mail, .v-tbl-online{
         display: none;
     }
     .v-um-hdr-left, .v-um-hdr-right{
         font-size: 14px;
+    }
+    .v-tbl-edit,.v-tbl-rem{
+        width: 6%;
     }
 }
 
