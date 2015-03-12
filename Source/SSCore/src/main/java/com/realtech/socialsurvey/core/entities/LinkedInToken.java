@@ -39,7 +39,7 @@ public class LinkedInToken {
 	public void setLinkedInPageLink(String linkedInPageLink) {
 		this.linkedInPageLink = linkedInPageLink;
 	}
-	
+
 	public String getLinkedInAccessTokenSecret() {
 		return linkedInAccessTokenSecret;
 	}
@@ -52,5 +52,4 @@ public class LinkedInToken {
 	public String toString() {
 		return "LinkdenInToken [linkedInId=" + linkedInId + ", linkedInPageLink=" + linkedInPageLink + "]";
 	}
-
 }

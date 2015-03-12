@@ -70,9 +70,11 @@ function paintProfilePage(result) {
             $("#prof-company-address").html(addressHtml);
             if(result.logo != undefined) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
+            	$("#prof-company-logo").css("background-size","100% auto");
             }
             if(result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
+            	 $("#prof-image").css("background-size","cover");
             }
             
             var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
@@ -438,7 +440,7 @@ function fetchReviewsForCompanyCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForCompany(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForCompany(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
@@ -523,11 +525,14 @@ $(document).scroll(function(){
 	}
 });
 
-function fetchReviewsCountForCompany(companyId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+function fetchReviewsCountForCompany(companyId,callBackFunction,minScore,maxScore) {
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -627,17 +632,20 @@ function fetchReviewsForRegionCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForRegion(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForRegion(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
 }
 
-function fetchReviewsCountForRegion(regionId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+function fetchReviewsCountForRegion(regionId,callBackFunction,minScore,maxScore) {
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -669,17 +677,20 @@ function fetchReviewsForBranchCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForBranch(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForBranch(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
 }
 
 function fetchReviewsCountForBranch(branchId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/branch/'+branchId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/branch/'+branchId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -709,11 +720,14 @@ function fetchAverageRatingsForAgent(agentId){
 	callAjaxGET(url, paintAverageRatings, true);
 }
 
-function fetchReviewsCountForAgent(agentId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/individual/'+agentId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+function fetchReviewsCountForAgent(agentId,callBackFunction,minScore,maxScore) {
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/individual/'+agentId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -740,7 +754,7 @@ function fetchReviewsForAgentCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForAgent(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForAgent(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
