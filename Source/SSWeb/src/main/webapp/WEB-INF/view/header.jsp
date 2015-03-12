@@ -152,9 +152,11 @@
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
-						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
 					</div>
 				</div>
+                <div class="float-left user-info-sing-out">
+                    <a class="" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+                </div>
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo"
