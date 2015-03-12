@@ -1,6 +1,6 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div id="overlay-toast" class="overlay-toast"></div>
+<!--<div id="overlay-toast" class="overlay-toast"></div>-->
 <style>
 	.body-no-scroll{
 			overflow: hidden;
@@ -116,25 +116,22 @@
                             </div>
                         </div>
                     </div>
-                    <div class="float-left score-rt-post score-rt-post-OR score-rt-min">
-                        <div class="st-score-rt-top">Minimum score to post to profile</div>
-                        <div class="st-score-rt-line2 clearfix">
-                            <div class="st-rating-wrapper float-left clearfix" id="rating-min-post-parent">
-                                <div class="rating-star icn-full-star"></div>
-                                <div class="rating-star icn-full-star"></div>
-                                <div class="rating-star icn-half-star"></div>
-                                <div class="rating-star icn-no-star"></div>
-                                <div class="rating-star icn-no-star"></div>
-                            </div>
-                            <div class="st-rating-txt float-left">
-                            <!-- set the min rating -->
-		                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.show_survey_above_score != null}">
-		                          	<c:set var="minpostscore" value="${cannonicalusersettings.companySettings.survey_settings.show_survey_above_score}"/>
-								</c:if>
-				            	<input type="text" name="rating-min-post" id="rating-min-post" class="st-item-row-txt cursor-pointer" autocomplete="off" value="${minpostscore}">
-			                    <div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
-                            </div>
-                        </div>
+                </div>
+                </form>
+            </div>
+        </div>
+        <div class="um-top-container">
+            <div class="um-header margin-top-25">Score Post Settings</div>
+            <div class="clearfix st-score-wrapper">
+                <div class="float-left st-score-txt">Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle </div>
+            	<form id="rating-settings-form">
+            	<input type="hidden" name="ratingcategory" id="ratingcategory">
+                <div class="clearfix float-right st-score-rt">
+                    <div class="soc-nw-wrapper clearfix">
+                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-fb"></div>
+                        <div class="float-left soc-nw-icns icn-wide-gplus"></div>
+                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter"></div>
+                        <div class="float-left soc-nw-icns icn-wide-rss"></div>
                     </div>
                 </div>
                 </form>
