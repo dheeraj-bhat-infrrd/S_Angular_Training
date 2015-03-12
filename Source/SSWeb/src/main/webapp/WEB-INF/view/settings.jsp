@@ -121,7 +121,7 @@
 								<div class="rating-star icn-no-star"></div>
 							</div>
 							<div class="st-rating-txt float-left">
-							<!-- set the min rating -->
+								<!-- set the min rating -->
 								<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.show_survey_above_score != null}">
 									<c:set var="minpostscore" value="${cannonicalusersettings.companySettings.survey_settings.show_survey_above_score}"/>
 								</c:if>
@@ -139,7 +139,6 @@
 			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
 			<div class="clearfix st-score-wrapper">
 				<div class="float-left st-score-txt">Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle </div>
-				<form id="rating-settings-form">
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
 				<div class="clearfix float-right st-score-rt">
 					<div class="soc-nw-wrapper clearfix">
@@ -151,7 +150,6 @@
 						<div class="float-left soc-nw-icns icn-wide-rss" onclick="openAuthPage('yelp');"></div>
 					</div>
 				</div>
-				</form>
 			</div>
 		</div>
 		
@@ -275,7 +273,7 @@ function openAuthPage(socialNetwork) {
 }
 
 $(document).ready(function(){
-	$(document).attr("title", "Settings");
+	$(document).attr("title", "Account Settings");
 	
 	$('#survey-participation-mailcontent').ckeditor();
 	$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
@@ -283,11 +281,11 @@ $(document).ready(function(){
 	$('#survey-participation-reminder-mailcontent').ckeditor();
 	$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
 	
-	autoAppendRatingDropdown('#st-dd-wrapper-auto-post', "st-dd-item st-dd-item-auto-post");
+	/* autoAppendRatingDropdown('#st-dd-wrapper-auto-post', "st-dd-item st-dd-item-auto-post");
 	changeRatingPattern($('#rating-auto-post').val(), $('#rating-auto-post-parent'));
 	$('#rating-auto-post').click(function(){
 		$('#st-dd-wrapper-auto-post').slideToggle(200);
-	});
+	}); */
 	
 	autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
 	changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
