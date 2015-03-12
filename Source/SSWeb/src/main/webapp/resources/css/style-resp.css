@@ -298,7 +298,7 @@
         width: 260px;
         height: 110px;
         padding: 0 !important;
-        float: none;
+        float: none !important;
         border: 0;
         margin: 0 auto;
     }
@@ -1087,6 +1087,18 @@
     .v-tbl-edit,.v-tbl-rem{
         width: 6%;
     }
+    .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item {
+        margin-bottom: 1px;
+    }
+    .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item.overflow-hidden {
+        margin-bottom: -9px;
+    }
+     .encompass-testconnection-adj{
+        right: 40px;
+    }
+    .encompass-url-adj{
+        padding-right: 100px;
+    }
 }
 
 
@@ -1131,6 +1143,14 @@
     }
     .header-slider-wrapper{
         display: none;
+    }
+    .soc-nw-wrapper {
+        padding: 10px;
+        margin: 0 auto;
+        width: 200px;
+    }
+    .soc-nw-adj {
+        margin-right: 0;
     }
 }
 
@@ -1197,6 +1217,7 @@
     }
     .st-score-txt, .st-score-rt{
         width: 100%;
+        border-right: 0;
     }
     .score-rt-post-OR {
         padding-left: 55px;
@@ -1334,6 +1355,18 @@
         margin-left: 96px;
         margin-top: 15px;
     }
+    .soc-nw-wrapper {
+        padding: 0px 130px 0;
+    }
+    .soc-nw-adj {
+        margin-right: 100px;
+    }
+    .score-rt-post{
+        width: 290px;
+        padding: 0;
+        margin: 0 auto;
+        float: none !important;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1357,10 +1390,10 @@
         width: 50%;
     }
     .score-rt-post{
-        padding: 0px 0px 20px 0px;
+        padding: 0px 90px 0px;
     }
     .score-rt-post-OR {
-        padding-left: 15px;
+        padding: 0 90px;
     }
     .lp-con-row-item {
         width: 225px;
@@ -1450,6 +1483,9 @@
     }
     .soc-nw-wrapper{
         padding: 10px 35px 0px;
+    }
+    .soc-nw-adj {
+        margin-right: 40px;
     }
 }
 

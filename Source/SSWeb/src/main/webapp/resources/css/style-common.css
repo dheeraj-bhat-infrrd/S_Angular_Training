@@ -491,7 +491,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .user-info-logo {
-    height: 78px;
+    height: 60px;
     width: 145px;
   /*  background: url(../images/userInfoLogo.png) no-repeat center;
     background-size: 100% auto; */
@@ -1093,7 +1093,7 @@ button.paypal.is-active {
 }
 
 .score-rt-post-OR {
-    padding-left: 45px;
+    padding: 0 130px;
 }
 
 .st-header-txt-rt-icn {
@@ -1785,14 +1785,16 @@ button.paypal.is-active {
     position: absolute;
     width: 75px;
     background-color: #fff;
-    padding: 8px;
+    padding: 0;
+    border-radius: 0 0 3px 3px;
     border: 1px solid #dcdcdc;
 }
 
 .st-dd-item {
     border-bottom: 1px solid #dcdcdc;
-    line-height: 36px;
+    line-height: 28px;
     cursor: pointer;
+    padding: 0 10px;
 }
 
 .st-dd-item:last-child {
@@ -4898,4 +4900,8 @@ tr.u-tbl-header td {
 
 .icn-wide-rss {
     background: url(../images/rss_wide.png) no-repeat center;
+}
+
+.dd-arrow-dn {
+    background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }
