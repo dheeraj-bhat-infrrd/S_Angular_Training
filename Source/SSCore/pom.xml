@@ -264,7 +264,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
+		
 		<!-- Social Network Connectors -->
 		<!-- <dependency>
 			<groupId>com.googlecode.linkedin-j</groupId>
@@ -281,6 +281,7 @@
 			<artifactId>twitter4j-core</artifactId>
 			<version>[4.0,)</version>
 		</dependency>
+
 	</dependencies>
 
 	<build>
