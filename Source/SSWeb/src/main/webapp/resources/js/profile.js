@@ -70,9 +70,11 @@ function paintProfilePage(result) {
             $("#prof-company-address").html(addressHtml);
             if(result.logo != undefined) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
+            	$("#prof-company-logo").css("background-size","100% auto");
             }
             if(result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
+            	 $("#prof-image").css("background-size","cover");
             }
             
             var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
@@ -182,7 +184,7 @@ function paintCompanyRegions(data) {
 		if(result != undefined && result.length > 0) {
 			var regionsHtml = "";
 			$.each(result,function(i, region) {
-				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region" data-openstatus="closed" data-regionid = '+region.regionId+'>';
+				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region cursor-pointer" data-openstatus="closed" data-regionid = '+region.regionId+'>';
 				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company region-icon" data-profilename="'+region.profileName+'"></div>';
 				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
@@ -201,6 +203,7 @@ function paintCompanyRegions(data) {
 			
 			$(".comp-region").click(function(){
 				if($(this).data("openstatus") == "closed") {
+					$('#comp-region-branches-'+$(this).data('regionid')).html("");
 					fetchBranchesForRegion($(this).data('regionid'));
 					fetchIndividualsForRegion($(this).data('regionid'));
 					$(this).data("openstatus","open");
@@ -228,7 +231,7 @@ function paintBranchesForRegion(data) {
 		var result = $.parseJSON(responseJson.entity);
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,branch) {
-				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel cursor-pointer comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				branchesHtml = branchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn branch-icon" data-profilename="'+branch.profileName+'"></div>';
 				branchesHtml = branchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
@@ -287,9 +290,9 @@ function paintIndividualForBranch(data) {
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,individual) {
 				if(individual.contact_details != undefined){
-					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel">';
+					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel cursor-pointer branch-individual" data-profilename="'+individual.profileName+'">';
 					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-profilename="'+individual.profileName+'" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
 					individualsHtml=  individualsHtml+'		</div>';
 					individualsHtml=  individualsHtml+'</div>';
@@ -302,15 +305,18 @@ function paintIndividualForBranch(data) {
 				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
 			}
 			paintProfileImage("individual-prof-image");
-			
-			$(".individual-prof-image").click(function(e){
-				e.stopPropagation();
-				var agentProfileName = $(this).data("profilename");
-				var url = window.location.origin +"/individualprofile/"+agentProfileName+".do";
-				window.open(url, "_blank");				
-			});
+			bindClickToFetchIndividualProfile("branch-individual");
 		}
 	}
+}
+
+function bindClickToFetchIndividualProfile(bindingClass) {
+	$("."+bindingClass).click(function(e){
+		e.stopPropagation();
+		var agentProfileName = $(this).data("profilename");
+		var url = window.location.origin +"/individualprofile/"+agentProfileName+".do";
+		window.open(url, "_blank");				
+	});
 }
 
 function fetchIndividualsForRegion(regionId) {
@@ -328,7 +334,7 @@ function paintIndividualsForRegion(data) {
 			if(result != undefined && result.length > 0) {
 				$.each(result,function(i,individual) {
 					if(individual.contact_details != undefined){
-						individualsHtml = individualsHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel comp-region-branch" data-openstatus="closed" data-agentid="'+individual.branchId+'">';
+						individualsHtml = individualsHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel cursor-pointer region-individual" data-openstatus="closed" data-profilename="'+individual.profileName+'" data-agentid="'+individual.branchId+'">';
 						individualsHtml = individualsHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
 						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 						individualsHtml = individualsHtml +'		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
@@ -344,6 +350,7 @@ function paintIndividualsForRegion(data) {
 					$("#comp-region-branches-"+regionId).append(individualsHtml).slideDown(200);
 				}
 				paintProfileImage("individual-prof-image");
+				bindClickToFetchIndividualProfile("region-individual");
 		}
 	}
 }
@@ -368,7 +375,7 @@ function paintCompanyIndividuals(data) {
 			var compIndividualsHtml = "";
 			$.each(result,function(i, compIndividual) {
 				if(compIndividual.contact_details != undefined){
-					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-individual" data-agentid = '+compIndividual.iden+'>';
+					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 cursor-pointer comp-individual" data-profilename="'+compIndividual.profileName+'" data-agentid = '+compIndividual.iden+'>';
 					compIndividualsHtml = compIndividualsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
 					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
 					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-txt">'+compIndividual.contact_details.name+'</div>';
@@ -378,6 +385,7 @@ function paintCompanyIndividuals(data) {
 			});
 			$("#comp-regions-content").append(compIndividualsHtml);
 			paintProfileImage("comp-individual-prof-image");
+			bindClickToFetchIndividualProfile("comp-individual");
 		}
 	}
 }
@@ -394,7 +402,7 @@ function paintCompanyBranches(data) {
 		if(result != undefined && result.length > 0) {
 			var compBranchesHtml = "";
 			$.each(result,function(i,branch) {
-				compBranchesHtml = compBranchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				compBranchesHtml = compBranchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 cursor-pointer comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
 				compBranchesHtml = compBranchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
 				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
 				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
@@ -432,7 +440,7 @@ function fetchReviewsForCompanyCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForCompany(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForCompany(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
@@ -517,11 +525,14 @@ $(document).scroll(function(){
 	}
 });
 
-function fetchReviewsCountForCompany(companyId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+function fetchReviewsCountForCompany(companyId,callBackFunction,minScore,maxScore) {
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/company/'+companyId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -621,17 +632,20 @@ function fetchReviewsForRegionCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForRegion(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForRegion(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
 }
 
-function fetchReviewsCountForRegion(regionId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+function fetchReviewsCountForRegion(regionId,callBackFunction,minScore,maxScore) {
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/region/'+regionId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -663,17 +677,20 @@ function fetchReviewsForBranchCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForBranch(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForBranch(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}
 }
 
 function fetchReviewsCountForBranch(branchId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/branch/'+branchId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/branch/'+branchId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -703,11 +720,14 @@ function fetchAverageRatingsForAgent(agentId){
 	callAjaxGET(url, paintAverageRatings, true);
 }
 
-function fetchReviewsCountForAgent(agentId,callBackFunction,maxScore) {
-	var url = window.location.origin +'/rest/profile/individual/'+agentId+'/reviewcount';
-	if(maxScore != undefined) {
-		url = url +"?maxScore="+maxScore;
+function fetchReviewsCountForAgent(agentId,callBackFunction,minScore,maxScore) {
+	if(minScore == undefined){
+		minScore = -1;
 	}
+	if(maxScore == undefined){
+		maxScore = -1;
+	}
+	var url = window.location.origin +'/rest/profile/individual/'+agentId+'/reviewcount?minScore='+minScore+'&maxScore='+maxScore;
 	callAjaxGET(url, callBackFunction, true);
 }
 
@@ -734,7 +754,7 @@ function fetchReviewsForAgentCallBack(data) {
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
 			if(minScore > 0){
-				fetchReviewsCountForAgent(currentProfileIden,paintHiddenReviewsCount,minScore);
+				fetchReviewsCountForAgent(currentProfileIden,paintHiddenReviewsCount,0,minScore);
 			}		
 		}
 	}

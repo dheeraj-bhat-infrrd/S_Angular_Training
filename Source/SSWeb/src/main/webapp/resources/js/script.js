@@ -55,7 +55,7 @@ function showRegErr(msg){
     $('#reg-err-pu').fadeIn();
 }
 
-function hideRegErr(msg){
+function hideRegErr(){
     $('#reg-err-pu').fadeOut();
 }
 

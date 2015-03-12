@@ -145,7 +145,7 @@
         display: none;
     }
     .header-menu-icn{
-        display: block;
+        display: block !important;
     }
     .header-main-wrapper .container, .hm-header-main-wrapper .container, .hm-main-content-wrapper .container{
         padding: 0;
@@ -979,6 +979,7 @@
         float: none !important;
         margin: 0 auto;
         width: 300px;
+        top: 0px;
     }
     .dash-main-left{
         height: 310px;
@@ -1042,6 +1043,49 @@
     }
     .acc-type-item{
         margin-right: 0;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 96px;
+        margin-top: 15px;
+        float: none;
+        display: inline-block;
+    }
+    .v-um-hdr-right{
+        float: left !important;
+        clear: both;
+    }
+    .v-um-tbl-wrapper{
+        padding: 0;
+        margin: 0 -15px;
+    }
+    .v-edit-lft{
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .v-ed-lbl{
+        display: none;
+    }
+    .v-ed-txt-sm, .v-ed-txt{
+        width: 100%;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 0;
+    }
+    .v-edit-row {
+        margin-bottom: 10px;
+        padding: 0 10px;
+    }
+    tr.u-tbl-row td{
+        font-size: 12px;
+    }
+    .v-tbl-rgn-adm, .v-tbl-of-adm, .v-tbl-ln-of, .v-tbl-mail, .v-tbl-online{
+        display: none;
+    }
+    .v-um-hdr-left, .v-um-hdr-right{
+        font-size: 14px;
+    }
+    .v-tbl-edit,.v-tbl-rem{
+        width: 6%;
     }
 }
 
@@ -1273,6 +1317,22 @@
     .dash-main-right {
         position: relative;
         left: -10px;
+        top: -21px;
+    }
+    .v-ed-txt {
+        width: 224px;
+    }
+    .v-ed-lbl{
+        width: 86px;
+        margin-right: 10px;
+    }
+    .v-ed-txt-sm {
+        width: 224px;
+        margin-right: 0;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 96px;
+        margin-top: 15px;
     }
 }
 
@@ -1378,6 +1438,15 @@
     .dash-main-right{
         position: relative;
         left: -107px;
+        transform: scale(0.85);
+        top: -36px;
+    }
+    .v-ed-txt-sm{
+        width: 300px;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 125px;
+        margin-top: 15px;
     }
 }
 
@@ -1386,7 +1455,10 @@
     .dash-main-right {
         position: relative;
         left: -84px;
+        top: -36px;
+        transform: scale(0.85);
     }
+    
 }
 
 
