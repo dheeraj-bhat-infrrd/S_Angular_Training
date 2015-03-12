@@ -11,12 +11,12 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left"><spring:message code="label.title.settings.key" /></div>
-            <div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+            <!-- <div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 				<div class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');"></div>
 				<div class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');"></div>
 				<div class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');"></div>
 				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('yelp');"></div>
-			</div>
+			</div> -->
         </div>
     </div>
 </div>
@@ -128,10 +128,10 @@
             	<input type="hidden" name="ratingcategory" id="ratingcategory">
                 <div class="clearfix float-right st-score-rt">
                     <div class="soc-nw-wrapper clearfix">
-                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-fb"></div>
-                        <div class="float-left soc-nw-icns icn-wide-gplus"></div>
-                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter"></div>
-                        <div class="float-left soc-nw-icns icn-wide-rss"></div>
+                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-fb" onclick="openAuthPage('facebook');"></div>
+                        <div class="float-left soc-nw-icns icn-wide-gplus" ></div>
+                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter" onclick="openAuthPage('twitter');"></div>
+                        <div class="float-left soc-nw-icns icn-wide-rss" ></div>
                     </div>
                 </div>
                 </form>
