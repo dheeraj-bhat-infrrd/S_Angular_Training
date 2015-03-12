@@ -4,7 +4,7 @@ public enum EmailHeader {
 
 	REGISTRATION("registration"), RESET_PASSWORD("reset_password"), REGISTRATION_COMPLETE("registration_complete"), SUBSCRIPTION_CHARGE_UNSUCESSFUL("subscription_charge_unsucessful"),
 	VERFICATION("verification"), RETRY_CHARGE("retry_charge"), RETRY_EXHAUSTED("retry_exhausted"), ACCOUNT_DISABLED("account_disabled"), ACCOUNT_UPGRADE("account_upgrade"),
-	SURVEY_COMPLETION("survey_completion");
+	SURVEY_COMPLETION("survey_completion"),EMAIL_VERFICATION("emailverification");
 	
 	String name;
 	

@@ -9,6 +9,7 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,14 +56,16 @@ public class SurveyManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
-	
+
 	@Autowired
 	private CaptchaValidation captchaValidation;
-	
+
 	@Autowired
 	private EmailServices emailServices;
 
-	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
+
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
@@ -100,7 +103,12 @@ public class SurveyManagementController {
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			try {
-				emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				if (enableKafka.equals(CommonConstants.YES)) {
+					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				}
+				else {
+					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+				}
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Exception occurred while trying to send survey completion mail to : " + customerEmail);
@@ -135,7 +143,7 @@ public class SurveyManagementController {
 		try {
 			agentName = solrSearchService.getUserDisplayNameById(agentId);
 		}
-		catch (SolrException | NoRecordsFetchedException | SolrServerException e) {
+		catch (NoRecordsFetchedException | InvalidInputException | SolrServerException e) {
 			LOG.error("Error occured while fetching display name of agent. Error is : " + e);
 			return "errorpage500";
 		}

@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -38,6 +40,9 @@ import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -79,6 +84,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private EmailServices emailServices;
+
+	@Autowired
+	private URLGenerator urlGenerator;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	@Override
 	public void afterPropertiesSet() throws Exception {
@@ -217,6 +234,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			}
 			if (higherLock.getIsWebAddressLocked()) {
 				parentLock.setWebAddressLocked(true);
+			}
+			if (higherLock.getIsBlogAddressLocked()) {
+				parentLock.setBlogAddressLocked(true);
 			}
 			if (higherLock.getIsWorkPhoneLocked()) {
 				parentLock.setWorkPhoneLocked(true);
@@ -402,6 +422,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (userProfile.getContact_details().getContact_numbers() == null) {
 			userProfile.getContact_details().setContact_numbers(new ContactNumberSettings());
 		}
+		if (userProfile.getSurvey_settings() == null) {
+			userProfile.setSurvey_settings(parentProfile.getSurvey_settings());
+		}
 
 		// Aggregate parentProfile data with userProfile
 		LockSettings parentLock = parentProfile.getLockSettings();
@@ -418,6 +441,11 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					&& userProfile.getContact_details().getWeb_addresses() != null) {
 				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
 				userLock.setWebAddressLocked(true);
+			}
+			if (parentLock.getIsBlogAddressLocked() && !userLock.getIsBlogAddressLocked()
+					&& userProfile.getContact_details().getWeb_addresses() != null) {
+				userProfile.getContact_details().getWeb_addresses().setBlogs(parentProfile.getContact_details().getWeb_addresses().getBlogs());
+				userLock.setBlogAddressLocked(true);
 			}
 			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
 					&& userProfile.getContact_details().getContact_numbers() != null) {
@@ -471,14 +499,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Association> addAssociations(String collection, OrganizationUnitSettings unitSettings, List<Association> associations)
 			throws InvalidInputException {
-		if (associations == null || associations.isEmpty()) {
+		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		for (Association association : associations) {
-			if (association.getName() == null || association.getName().isEmpty()) {
-				associations.remove(association);
-			}
-		}
+		
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
 				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -489,14 +513,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Association> addAgentAssociations(String collection, AgentSettings agentSettings, List<Association> associations)
 			throws InvalidInputException {
-		if (associations == null || associations.isEmpty()) {
+		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		for (Association association : associations) {
-			if (association.getName() == null || association.getName().isEmpty()) {
-				associations.remove(association);
-			}
-		}
+		
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao
 				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, agentSettings);
@@ -549,7 +569,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Achievement> addAchievements(String collection, OrganizationUnitSettings unitSettings, List<Achievement> achievements)
 			throws InvalidInputException {
-		if (achievements == null || achievements.isEmpty()) {
+		if (achievements == null) {
 			throw new InvalidInputException("Achievements passed can not be null or empty");
 		}
 		LOG.info("Adding achievements");
@@ -562,7 +582,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public List<Achievement> addAgentAchievements(String collection, AgentSettings agentSettings, List<Achievement> achievements)
 			throws InvalidInputException {
-		if (achievements == null || achievements.isEmpty()) {
+		if (achievements == null) {
 			throw new InvalidInputException("Achievements passed can not be null or empty");
 		}
 		LOG.info("Adding achievements");
@@ -851,10 +871,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore) {
+	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore, boolean fetchAbusive) {
 		LOG.info("Method getReviewsCountForCompany called for companyId:" + companyId + " minscore:" + minScore + " maxscore:" + maxScore);
 		long reviewsCount = 0;
-		reviewsCount = surveyDetailsDao.getFeedBacksCount(CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore);
+		reviewsCount = surveyDetailsDao.getFeedBacksCount(CommonConstants.COMPANY_ID_COLUMN, companyId, minScore, maxScore, fetchAbusive);
 		LOG.info("Method getReviewsCountForCompany executed successfully");
 		return reviewsCount;
 	}
@@ -898,8 +918,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * agentId/branchId/regionId or companyId based on the profile level
 	 */
 	@Override
-	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
-			throws InvalidInputException {
+	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
+			boolean fetchAbusive) throws InvalidInputException {
 		LOG.info("Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		List<SurveyDetails> surveyDetails = null;
@@ -907,7 +927,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore);
+		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive);
 		return surveyDetails;
 	}
 
@@ -916,13 +936,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * agentId/branchId/regionId or companyId based on the profile level
 	 */
 	@Override
-	public double getAverageRatings(long iden, String profileLevel) throws InvalidInputException {
+	public double getAverageRatings(long iden, String profileLevel, boolean aggregateAbusive) throws InvalidInputException {
 		LOG.info("Method getAverageRatings called for iden :" + iden + " profilelevel:" + profileLevel);
 		if (iden <= 0l) {
 			throw new InvalidInputException("iden is invalid for getting average rating os a company");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1);
+		double averageRating = surveyDetailsDao.getRatingForPastNdays(idenColumnName, iden, -1, aggregateAbusive);
 
 		LOG.info("Method getAverageRatings executed successfully.Returning: " + averageRating);
 		return averageRating;
@@ -967,7 +987,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * score specified
 	 */
 	@Override
-	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel) throws InvalidInputException {
+	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive) throws InvalidInputException {
 		LOG.info("Method getReviewsCount called for iden:" + iden + " minscore:" + minScore + " maxscore:" + maxScore + " profilelevel:"
 				+ profileLevel);
 		if (iden <= 0l) {
@@ -975,7 +995,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		long reviewsCount = 0;
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		reviewsCount = surveyDetailsDao.getFeedBacksCount(idenColumnName, iden, minScore, maxScore);
+		reviewsCount = surveyDetailsDao.getFeedBacksCount(idenColumnName, iden, minScore, maxScore, fetchAbusive);
 
 		LOG.info("Method getReviewsCount executed successfully. Returning reviewsCount:" + reviewsCount);
 		return reviewsCount;
@@ -984,10 +1004,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	/**
 	 * Method to get the list of individuals for branch/region or company as specified ide in one of
 	 * branchId/regionId/companyId
-	 * @throws SolrException 
+	 * 
+	 * @throws SolrException
 	 */
 	@Override
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException {
+	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+			SolrException {
 		LOG.info("Method getProListByProfileLevel called for iden: " + iden + " profileLevel:" + profileLevel + " start:" + start + " numOfRows:"
 				+ numOfRows);
 		if (iden <= 0l) {
@@ -1011,10 +1033,65 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 		}
-			solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
-		
+		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
+
 		LOG.info("Method getProListByProfileLevel finished successfully");
 		return solrSearchResult;
 	}
 
+	@Override
+	public void generateVerificationUrl(Map<String, String> urlParams, String applicationUrl, String recipientMailId, String recipientName)
+			throws InvalidInputException, UndeliveredEmailException {
+		String verficationUrl = urlGenerator.generateUrl(urlParams, applicationUrl);
+		if (enableKafka.equals(CommonConstants.YES)) {
+			emailServices.queueEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		}
+		else {
+			emailServices.sendEmailVerificationMail(verficationUrl, recipientMailId, recipientName);
+		}
+	}
+
+	@Override
+	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException {
+		Map<String, String> urlParams = urlGenerator.decryptParameters(urlParamsStr);
+		if (urlParams == null || urlParams.isEmpty()) {
+			throw new InvalidInputException("Url params are invalid for email verification");
+		}
+
+		ContactDetailsSettings contact = null;
+		MailIdSettings mail = null;
+		String collection = urlParams.get(CommonConstants.USER_PROFILE);
+		String emailType = urlParams.get(CommonConstants.EMAIL_TYPE);
+		String emailAddress = urlParams.get(CommonConstants.EMAIL_ID);
+		long iden = Long.parseLong(urlParams.get(CommonConstants.USER_ID));
+
+		if (!collection.equals(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION)) {
+			OrganizationUnitSettings unitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(iden, collection);
+			contact = unitSettings.getContact_details();
+			mail = contact.getMail_ids();
+			if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK) && mail.getWork().equals(emailAddress)) {
+				mail.setWorkEmailVerified(true);
+			}
+			else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL) && mail.getPersonal().equals(emailAddress)) {
+				mail.setPersonalEmailVerified(true);
+			}
+			contact.setMail_ids(mail);
+			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+					contact, unitSettings, collection);
+		}
+		else {
+			AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(iden);
+			contact = agentSettings.getContact_details();
+			mail = contact.getMail_ids();
+			if (emailType.equals(CommonConstants.EMAIL_TYPE_WORK) && mail.getWork().equals(emailAddress)) {
+				mail.setWorkEmailVerified(true);
+			}
+			else if (emailType.equals(CommonConstants.EMAIL_TYPE_PERSONAL) && mail.getPersonal().equals(emailAddress)) {
+				mail.setPersonalEmailVerified(true);
+			}
+			contact.setMail_ids(mail);
+			organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS, contact,
+					agentSettings);
+		}
+	}
 }

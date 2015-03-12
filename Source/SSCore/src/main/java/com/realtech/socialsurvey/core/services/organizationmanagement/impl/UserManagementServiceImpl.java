@@ -139,6 +139,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -949,7 +952,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE);
 
 		// Send reset password link to the user email ID
-		emailServices.queueRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
+		}else{
+			emailServices.sendRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
+		}
 	}
 
 	/*
@@ -1026,7 +1033,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
-			emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " " + (user.getLastName()!=null?user.getLastName():""));
+			if(enableKafka.equals(CommonConstants.YES)){
+				emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " " + (user.getLastName()!=null?user.getLastName():""));
+			}else{
+				emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " " + (user.getLastName()!=null?user.getLastName():""));
+			}
+			
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
@@ -1062,8 +1074,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		storeCompanyAdminInvitation(queryParam, emailId);
 
 		LOG.debug("Calling email services to send registration invitation mail");
-		//emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
-		emailServices.queueRegistrationInviteMail(url, emailId, firstName, lastName);
+		if(enableKafka.equals(CommonConstants.YES)){
+			emailServices.queueRegistrationInviteMail(url, emailId, firstName, lastName);
+		}else{
+			emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
+		}
 
 		LOG.debug("Method inviteUser finished successfully");
 
@@ -1182,6 +1197,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setIsAtleastOneUserprofileComplete(isAtleastOneProfileComplete);
 		user.setStatus(status);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
+		user.setLastLogin(currentTimestamp);
 		user.setCreatedOn(currentTimestamp);
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(createdBy);
@@ -1298,7 +1314,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 		canonicalUserSettings.setCompanySettings(companySettings);
 
-		switch (accountType) {
+		/*switch (accountType) {
+			case FREE:
 			case INDIVIDUAL:
 			case TEAM:
 				LOG.debug("Individual/ Team account type");
@@ -1320,7 +1337,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				canonicalUserSettings.setBranchSettings(branchesSettings);
 				break;
 			case ENTERPRISE:
-				LOG.debug("Company account type");
+				LOG.debug("Company account type");*/
+				
 				// get the agent settings. If the user is not an agent then there would agent
 				// settings would be null
 				LOG.debug("Gettings agent settings");
@@ -1334,10 +1352,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				LOG.debug("Gettings region settings for user profiles");
 				regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);
 				canonicalUserSettings.setRegionSettings(regionsSettings);
-				break;
+				/*break;
 			default:
 				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
-		}
+		}*/
 		return canonicalUserSettings;
 	}
 

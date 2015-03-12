@@ -62,6 +62,7 @@ public class UserProfile implements Serializable {
 	@Column(name = "REGION_ID")
 	private long regionId;
 
+	@Column(name = "STATUS")
 	private int status;
 
 	@Column(name = "USER_PROFILE_TYPE")

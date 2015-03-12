@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -17,6 +18,7 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 
 public interface ProfileManagementService {
@@ -233,8 +235,8 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
-			throws InvalidInputException;
+	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
+			boolean fetchAbusive) throws InvalidInputException;
 
 	/**
 	 * Method to get average ratings based on the profile level specified, iden is one of
@@ -245,7 +247,7 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public double getAverageRatings(long companyId, String profileLevel) throws InvalidInputException;
+	public double getAverageRatings(long companyId, String profileLevel, boolean aggregateAbusive) throws InvalidInputException;
 
 	/**
 	 * Method to get the reviews count for a company within limit of rating score specified
@@ -255,7 +257,7 @@ public interface ProfileManagementService {
 	 * @param maxScore
 	 * @return
 	 */
-	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore);
+	public long getReviewsCountForCompany(long companyId, double minScore, double maxScore, boolean fetchAbusive);
 
 	/**
 	 * Method to get reviews count based on the profile level specified, iden is one of
@@ -269,7 +271,7 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel) throws InvalidInputException;
+	public long getReviewsCount(long iden, double minScore, double maxScore, String profileLevel, boolean fetchAbusive) throws InvalidInputException;
 
 	/**
 	 * Method to get the list of individuals for branch/region or company as specified ide in one of
@@ -281,6 +283,11 @@ public interface ProfileManagementService {
 	 * @throws MalformedURLException
 	 * @throws SolrException
 	 */
-	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException, SolrException;
+	public SolrDocumentList getProListByProfileLevel(long iden, String profileLevel, int start, int numOfRows) throws InvalidInputException,
+			SolrException;
 
+	public void generateVerificationUrl(Map<String, String> urlParams, String applicationUrl, String recipientMailId, String recipientName)
+			throws InvalidInputException, UndeliveredEmailException;
+
+	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException;
 }

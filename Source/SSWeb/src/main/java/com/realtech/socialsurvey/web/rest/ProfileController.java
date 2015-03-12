@@ -588,7 +588,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_COMPANY);
+						CommonConstants.PROFILE_LEVEL_COMPANY, false);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -643,7 +643,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_REGION);
+						CommonConstants.PROFILE_LEVEL_REGION, false);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -679,7 +679,7 @@ public class ProfileController {
 						"company id is not valid while fetching average ratings for a company");
 			}
 			try {
-				double averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY);
+				double averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, false);
 				String json = new Gson().toJson(averageRating);
 				LOG.debug("averageRating json : " + json);
 				response = Response.ok(json).build();
@@ -725,7 +725,7 @@ public class ProfileController {
 			}
 			long reviewsCount = 0;
 			try {
-				reviewsCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY);
+				reviewsCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY, false);
 				String json = new Gson().toJson(reviewsCount);
 				LOG.debug("reviews count json : " + json);
 				response = Response.ok(json).build();
@@ -761,7 +761,7 @@ public class ProfileController {
 						"region id is not valid while fetching average ratings for a region");
 			}
 			try {
-				double averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION);
+				double averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, false);
 				String json = new Gson().toJson(averageRating);
 				LOG.debug("averageRating json : " + json);
 				response = Response.ok(json).build();
@@ -807,7 +807,7 @@ public class ProfileController {
 			}
 			long reviewsCount = 0;
 			try {
-				reviewsCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION);
+				reviewsCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION, false);
 				String json = new Gson().toJson(reviewsCount);
 				LOG.debug("reviews count json : " + json);
 				response = Response.ok(json).build();
@@ -842,7 +842,7 @@ public class ProfileController {
 						"branch id is not valid while fetching average ratings for a branch");
 			}
 			try {
-				double averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
+				double averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, false);
 				String json = new Gson().toJson(averageRating);
 				LOG.debug("averageRating json : " + json);
 				response = Response.ok(json).build();
@@ -888,7 +888,7 @@ public class ProfileController {
 			}
 			long reviewsCount = 0;
 			try {
-				reviewsCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
+				reviewsCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH, false);
 				String json = new Gson().toJson(reviewsCount);
 				LOG.debug("reviews count json : " + json);
 				response = Response.ok(json).build();
@@ -942,7 +942,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_BRANCH);
+						CommonConstants.PROFILE_LEVEL_BRANCH, false);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -978,7 +978,7 @@ public class ProfileController {
 						"agent id is not valid while fetching average ratings for an agent");
 			}
 			try {
-				double averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+				double averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
 				String json = new Gson().toJson(averageRating);
 				LOG.debug("averageRating json : " + json);
 				response = Response.ok(json).build();
@@ -1024,7 +1024,7 @@ public class ProfileController {
 			}
 			long reviewsCount = 0;
 			try {
-				reviewsCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+				reviewsCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
 				String json = new Gson().toJson(reviewsCount);
 				LOG.debug("reviews count json : " + json);
 				response = Response.ok(json).build();
@@ -1078,7 +1078,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
