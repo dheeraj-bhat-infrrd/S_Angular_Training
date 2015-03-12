@@ -19,6 +19,7 @@ body {
     -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
     -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
     color: #666;
+    font-size: 14px;
 }
 
 input,textarea{
@@ -4557,7 +4558,7 @@ td.v-tbl-spacer {
     margin-top: 20px;
 }
 
-.v-um-hdr-left {
+.v-um-hdr-left, .v-um-hdr-right {
     font-size: 16px;
 }
 
@@ -4671,6 +4672,139 @@ tr.u-tbl-header td {
     background-color: #F9F9FB;
 }
 
-.v-um-edit-row {
+.v-um-edit-wrapper {
+    padding: 20px 0;
     background-color: #F9F9FB;
+}
+
+.v-ed-txt-item {
+    width: 100%;
+    height: 40px;
+    outline: none;
+    border: 1px solid #dcdcdc;
+    box-shadow: none;
+    border-radius: 3px;
+    padding: 0 10px;
+    font-size: 13px;
+}
+
+.v-ed-lbl {
+    line-height: 40px;
+    width: 110px;
+    text-align: right;
+    margin-right: 15px;
+    font-size: 13px;
+}
+
+.v-ed-txt-sm {
+    width: 190px;
+    margin-right: 5px;
+}
+
+.v-ed-txt {
+    width: 300px;
+}
+
+.v-edit-row{
+    margin-bottom: 15px;
+}
+.v-ed-dd-wrapper {
+    position: absolute;
+    top: 40px;
+    border: 1px solid #dcdcdc;
+    line-height: 32px;
+    width: 100%;
+    background-color: #fff;
+    font-size: 12px;
+}
+
+.v-ed-dd-item {
+    cursor: pointer;
+    padding: 0 10px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.v-ed-dd-item:last-child {
+    border-bottom: 0;
+}
+
+.v-ed-txt-dd {
+    background: url('../images/sb-dd-icn-pd.png') no-repeat right center;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.v-edt-tbl-icn {
+    min-height: 40px;
+}
+
+.v-edt-tbl-switch {
+    background: url(../images/switch.png) no-repeat;
+}
+
+.tbl-switch-on {
+    background-position: left center;
+}
+
+.tbl-switch-off {
+    background-position: -187px center;
+}
+
+.v-edt-tbl {
+    width: 100%;
+    font-size: 14px;
+}
+
+.v-edt-tbl-header {
+    font-size: 15px;
+}
+
+.v-edt-tbl-assign-to {
+    width: 50%;
+}
+
+.v-edt-tbl-role {
+    width: 25%;
+}
+
+.v-edt-tbl-status {
+    width: 15%;
+}
+
+.v-edt-tbl-rem {
+    width: 10%;
+}
+
+.v-edt-tbl td {
+    line-height: 40px;
+}
+
+.v-edt-tbl tr {
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.v-edt-tbl-row {
+    font-size: 14px;
+}
+
+.v-edt-tbl-assign-to {
+    padding-left: 5px;
+}
+
+.v-edt-tbl-header td {
+    font-weight: bold !important;
+}
+.v-edt-btn-sav {
+    background-color: #3E9DCB;
+    color: #fff;
+    margin: 10px auto;
+    width: 180px;
+    line-height: 40px;
+    cursor: pointer;
+    text-align: center;
+    font-size: 13px;
+    clear: both;
+    border-radius: 3px;
+    position: relative;
+    top: 10px;
 }
