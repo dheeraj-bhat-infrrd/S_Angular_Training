@@ -1351,10 +1351,10 @@
         width: 240px;
     }
     .st-score-txt{
-        width: 310px;
+        width: 50%;
     }
     .st-score-rt {
-        width: 600px;
+        width: 50%;
     }
     .score-rt-post{
         padding: 0px 0px 20px 0px;
@@ -1447,6 +1447,9 @@
     .v-ed-txt-sm-adj{
         margin-left: 125px;
         margin-top: 15px;
+    }
+    .soc-nw-wrapper{
+        padding: 10px 35px 0px;
     }
 }
 
