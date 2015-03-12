@@ -1,6 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<!--<div id="overlay-toast" class="overlay-toast"></div>-->
 <style>
 	.body-no-scroll{
 			overflow: hidden;
@@ -148,8 +147,8 @@
 						<div class="float-left soc-nw-icns icn-wide-gplus" ></div>
 						<div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter" onclick="openAuthPage('twitter');"></div>
 						<div class="float-left soc-nw-icns icn-wide-rss" ></div>
-						<!-- <div class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');"></div>
-						<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('yelp');"></div> -->
+						<div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter" onclick="openAuthPage('linkedin');"></div>
+						<div class="float-left soc-nw-icns icn-wide-rss" onclick="openAuthPage('yelp');"></div>
 					</div>
 				</div>
 				</form>
