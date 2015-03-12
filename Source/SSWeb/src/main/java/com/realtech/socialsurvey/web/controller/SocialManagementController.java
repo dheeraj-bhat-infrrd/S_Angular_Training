@@ -29,9 +29,11 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -128,12 +130,10 @@ public class SocialManagementController {
 
 			// Building linkedin authUrl
 			case "linkedin":
-				
 				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
 				linkedInAuth.append("&client_id=").append(linkedInApiKey);
 				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUri);
 				linkedInAuth.append("&state=").append("SOCIALSURVEY");
-				// linkedInAuth.append("&scope=").append(linkedInApiKey);
 				
 				/*LinkedInRequestToken linkedInRequestToken;
 				try {
@@ -145,8 +145,6 @@ public class SocialManagementController {
 					return JspResolver.ERROR_PAGE;
 				}*/
 
-				// We will keep the request token in session
-				// session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, linkedInRequestToken);
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString());
 
 				LOG.info("Returning the linkedin authorizationurl : " + linkedInAuth.toString());
@@ -176,8 +174,8 @@ public class SocialManagementController {
 	@RequestMapping(value = "/facebookauth", method = RequestMethod.GET)
 	public String authenticateFacebookAccessCode(Model model, HttpServletRequest request) {
 		LOG.info("Facebook authentication url requested");
-		UserSettings currentUserSettings;
 		HttpSession session = request.getSession(false);
+		UserSettings userSettings;
 
 		try {
 			User user = sessionHelper.getCurrentUser();
@@ -191,8 +189,8 @@ public class SocialManagementController {
 				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");
 			}
 			else {
-				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-				if (currentUserSettings.getCompanySettings() == null) {
+				userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+				if (userSettings.getCompanySettings() == null) {
 					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
 					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
 				}
@@ -218,9 +216,59 @@ public class SocialManagementController {
 				LOG.error("Error while creating access token " + e.getLocalizedMessage(), e);
 			}
 
-			socialManagementService.setFacebookAccessTokenForUser(user, accessToken.getToken(), accessToken.getExpires(),
-					currentUserSettings.getCompanySettings());
-			model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
+			SocialMediaTokens mediaTokens = null;
+			long userId = user.getUserId();
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+				if (unitSettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = unitSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						unitSettings, mediaTokens);
+				unitSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setCompanySettings(unitSettings);
+			}
+			else if (user.isRegionAdmin()) {
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(userId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				regionSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getRegionSettings().put(userId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(userId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				branchSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getBranchSettings().put(userId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(userId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				agentSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getAgentSettings().put(userId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while updating FacebookToken.",
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -228,9 +276,35 @@ public class SocialManagementController {
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
 
+		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
+		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
+
 		LOG.info("Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
+	}
+	
+	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens) {
+		LOG.debug("Method updateFacebookToken() called from SocialManagementController");
+		if (mediaTokens == null) {
+			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+			mediaTokens = new SocialMediaTokens();
+			mediaTokens.setFacebookToken(new FacebookToken());
+		}
+		else {
+			LOG.debug("Updating the existing media tokens for LinkedIn");
+			if (mediaTokens.getFacebookToken() == null) {
+				mediaTokens.setFacebookToken(new FacebookToken());
+			}
+		}
+
+		mediaTokens.getFacebookToken().setFacebookAccessToken(accessToken.getToken());
+		mediaTokens.getFacebookToken().setFacebookAccessTokenCreatedOn(System.currentTimeMillis());
+		mediaTokens.getFacebookToken().setFacebookAccessTokenExpiresOn(accessToken.getExpires());
+
+		LOG.debug("Method updateFacebookToken() finished from SocialManagementController");
+		return mediaTokens;
 	}
 
 	/**
@@ -244,7 +318,7 @@ public class SocialManagementController {
 	public String authenticateTwitterAccess(Model model, HttpServletRequest request) {
 		LOG.info("Twitter authentication url requested");
 		HttpSession session = request.getSession(false);
-		UserSettings currentUserSettings;
+		UserSettings userSettings;
 
 		try {
 			User user = sessionHelper.getCurrentUser();
@@ -258,8 +332,8 @@ public class SocialManagementController {
 				throw new NonFatalException("authenticateTwitterAccess : user canonical settings not found in session!");
 			}
 			else {
-				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-				if (currentUserSettings.getAgentSettings() == null) {
+				userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+				if (userSettings.getAgentSettings() == null) {
 					LOG.error("authenticateTwitterAccess : agent settings not found in session!");
 					throw new NonFatalException("authenticateTwitterAccess : agent settings not found in session!");
 				}
@@ -290,8 +364,60 @@ public class SocialManagementController {
 					}
 				}
 			}
-			socialManagementService.setTwitterAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(),
-					currentUserSettings.getCompanySettings());
+
+			SocialMediaTokens mediaTokens = null;
+			long userId = user.getUserId();
+			if (user.isCompanyAdmin()) {
+				OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
+				if (unitSettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = unitSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						unitSettings, mediaTokens);
+				unitSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setCompanySettings(unitSettings);
+			}
+			else if (user.isRegionAdmin()) {
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(userId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				regionSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getRegionSettings().put(userId, regionSettings);
+			}
+			else if (user.isBranchAdmin()) {
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(userId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				branchSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getBranchSettings().put(userId, branchSettings);
+			}
+			else if (user.isAgent()) {
+				AgentSettings agentSettings = userSettings.getAgentSettings().get(userId);
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				agentSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getAgentSettings().put(userId, agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while updating TwitterToken.",
+						DisplayMessageConstants.GENERAL_ERROR);
+			}
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -299,13 +425,37 @@ public class SocialManagementController {
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
 
+		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 
 		LOG.info("Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
+	private SocialMediaTokens updateTwitterToken(AccessToken accessToken, SocialMediaTokens mediaTokens) {
+		LOG.debug("Method updateTwitterToken() called from SocialManagementController");
+		if (mediaTokens == null) {
+			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+			mediaTokens = new SocialMediaTokens();
+			mediaTokens.setTwitterToken(new TwitterToken());
+		}
+		else {
+			LOG.debug("Updating the existing media tokens for LinkedIn");
+			if (mediaTokens.getTwitterToken() == null) {
+				mediaTokens.setTwitterToken(new TwitterToken());
+			}
+		}
+
+		mediaTokens.getTwitterToken().setTwitterAccessToken(accessToken.getToken());
+		mediaTokens.getTwitterToken().setTwitterAccessTokenSecret(accessToken.getTokenSecret());
+		mediaTokens.getTwitterToken().setTwitterAccessTokenCreatedOn(System.currentTimeMillis());
+
+		LOG.debug("Method updateTwitterToken() finished from SocialManagementController");
+		return mediaTokens;
+	}
+	
 	/**
 	 * The url that LinkedIn send request to with the oauth verification code
 	 * 
@@ -318,7 +468,7 @@ public class SocialManagementController {
 		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
 		UserSettings userSettings;
-		
+
 		try {
 			if (session == null) {
 				LOG.error("authenticateLinkedInAccess : Session object is null!");
@@ -340,7 +490,7 @@ public class SocialManagementController {
 			params.add(new BasicNameValuePair("redirect_uri", linkedinRedirectUri));
 			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
 			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
-			
+
 			HttpClient httpclient = HttpClientBuilder.create().build();
 			HttpPost httpPost = new HttpPost(linkedinAccessUri);
 			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
@@ -348,11 +498,14 @@ public class SocialManagementController {
 			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
-			
-			/*LinkedInOAuthService oauthService = socialManagementService.getLinkedInInstance();
-			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
-			LinkedInRequestToken requestToken = (LinkedInRequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);*/
+
+			/*
+			 * LinkedInOAuthService oauthService = socialManagementService.getLinkedInInstance();
+			 * LOG.debug("LinkedIn oauth verfier : " + oauthVerifier); LinkedInRequestToken
+			 * requestToken = (LinkedInRequestToken)
+			 * session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN); LinkedInAccessToken
+			 * accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
+			 */
 
 			User user = sessionHelper.getCurrentUser();
 			userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -372,8 +525,8 @@ public class SocialManagementController {
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						unitSettings, mediaTokens);
-				socialAsyncService.linkedInDataUpdate(
-						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings, mediaTokens.getLinkedInToken());
+				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings,
+						mediaTokens.getLinkedInToken());
 				unitSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setCompanySettings(unitSettings);
 			}
@@ -386,6 +539,8 @@ public class SocialManagementController {
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
 						regionSettings, mediaTokens);
+				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						mediaTokens.getLinkedInToken());
 				regionSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getRegionSettings().put(userId, regionSettings);
 			}
@@ -398,6 +553,8 @@ public class SocialManagementController {
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
 						branchSettings, mediaTokens);
+				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						mediaTokens.getLinkedInToken());
 				branchSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getBranchSettings().put(userId, branchSettings);
 			}
@@ -409,24 +566,25 @@ public class SocialManagementController {
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						mediaTokens.getLinkedInToken());
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.getAgentSettings().put(userId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in editing LockSettings.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating LinkedInToken.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
-			// session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			LOG.error(e.getMessage(), e);
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
-		
+
 		// Updating attributes
-		// session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-		
+
 		LOG.info("Method authenticateLinkedInAccess() finished from SocialManagementController");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
@@ -444,11 +602,10 @@ public class SocialManagementController {
 				mediaTokens.setLinkedInToken(new LinkedInToken());
 			}
 		}
-		
+
 		mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
-		// mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessToken.getTokenSecret());
 		mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
-		
+
 		LOG.debug("Method updateLinkedInToken() finished from SocialManagementController");
 		return mediaTokens;
 	}
