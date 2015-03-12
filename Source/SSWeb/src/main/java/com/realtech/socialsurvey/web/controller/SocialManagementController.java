@@ -1,12 +1,22 @@
 package com.realtech.socialsurvey.web.controller;
 
-import java.util.EnumSet;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicNameValuePair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,13 +25,8 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
-import com.google.code.linkedinapi.client.LinkedInApiClient;
-import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
-import com.google.code.linkedinapi.client.enumeration.ProfileField;
-import com.google.code.linkedinapi.client.oauth.LinkedInAccessToken;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
-import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
-import com.google.code.linkedinapi.schema.Person;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -32,7 +37,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -42,6 +47,7 @@ import facebook4j.FacebookException;
 /**
  * Controller to manage social media oauth and pull/push posts
  */
+@EnableAsync
 @Controller
 public class SocialManagementController {
 
@@ -49,16 +55,29 @@ public class SocialManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Autowired
+	private SocialAsyncService socialAsyncService;
 
 	@Autowired
 	private SocialManagementService socialManagementService;
 
-	@Autowired
-	private ProfileManagementService profileManagementService;
-
-	// Facebook
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
+
+	// LinkedIn
+	@Value("${LINKED_IN_REST_API_URI}")
+	private String linkedInRestApiUri;
+	@Value("${LINKED_IN_API_KEY}")
+	private String linkedInApiKey;
+	@Value("${LINKED_IN_API_SECRET}")
+	private String linkedInApiSecret;
+	@Value("${LINKED_IN_REDIRECT_URI}")
+	private String linkedinRedirectUri;
+	@Value("${LINKED_IN_AUTH_URI}")
+	private String linkedinAuthUri;
+	@Value("${LINKED_IN_ACCESS_URI}")
+	private String linkedinAccessUri;
 
 	/**
 	 * Returns the social authorization page
@@ -111,7 +130,14 @@ public class SocialManagementController {
 
 			// Building linkedin authUrl
 			case "linkedin":
-				LinkedInRequestToken linkedInRequestToken;
+				
+				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
+				linkedInAuth.append("&client_id=").append(linkedInApiKey);
+				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUri);
+				linkedInAuth.append("&state=").append("SOCIALSURVEY");
+				// linkedInAuth.append("&scope=").append(linkedInApiKey);
+				
+				/*LinkedInRequestToken linkedInRequestToken;
 				try {
 					linkedInRequestToken = socialManagementService.getLinkedInRequestToken();
 				}
@@ -119,13 +145,13 @@ public class SocialManagementController {
 					LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
 					model.addAttribute("message", e.getMessage());
 					return JspResolver.ERROR_PAGE;
-				}
+				}*/
 
 				// We will keep the request token in session
-				session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, linkedInRequestToken);
-				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInRequestToken.getAuthorizationUrl());
+				// session.setAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN, linkedInRequestToken);
+				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString());
 
-				LOG.info("Returning the linkedin authorizationurl : " + linkedInRequestToken.getAuthorizationUrl());
+				LOG.info("Returning the linkedin authorizationurl : " + linkedInAuth.toString());
 				break;
 
 			// Building yelp authUrl
@@ -301,7 +327,7 @@ public class SocialManagementController {
 				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
 			}
 
-			String errorCode = request.getParameter("oauth_problem");
+			String errorCode = request.getParameter("error");
 			if (errorCode != null) {
 				LOG.error("Error code : " + errorCode);
 				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
@@ -309,11 +335,26 @@ public class SocialManagementController {
 			}
 
 			// Getting Oauth accesstoken for Linkedin
-			LinkedInOAuthService oauthService = socialManagementService.getLinkedInInstance();
-			String oauthVerifier = request.getParameter("oauth_verifier");
+			String oauthCode = request.getParameter("code");
+			List<NameValuePair> params = new ArrayList<NameValuePair>(2);
+			params.add(new BasicNameValuePair("grant_type", "authorization_code"));
+			params.add(new BasicNameValuePair("code", oauthCode));
+			params.add(new BasicNameValuePair("redirect_uri", linkedinRedirectUri));
+			params.add(new BasicNameValuePair("client_id", linkedInApiKey));
+			params.add(new BasicNameValuePair("client_secret", linkedInApiSecret));
+			
+			HttpClient httpclient = HttpClientBuilder.create().build();
+			HttpPost httpPost = new HttpPost(linkedinAccessUri);
+			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+
+			String accessTokenStr = httpclient.execute(httpPost, new BasicResponseHandler());
+			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
+			String accessToken = (String) map.get("access_token");
+			
+			/*LinkedInOAuthService oauthService = socialManagementService.getLinkedInInstance();
 			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
 			LinkedInRequestToken requestToken = (LinkedInRequestToken) session.getAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
+			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);*/
 
 			User user = sessionHelper.getCurrentUser();
 			userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
@@ -333,6 +374,8 @@ public class SocialManagementController {
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
 						unitSettings, mediaTokens);
+				socialAsyncService.linkedInDataUpdate(
+						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, unitSettings, mediaTokens.getLinkedInToken());
 				unitSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setCompanySettings(unitSettings);
 			}
@@ -376,13 +419,13 @@ public class SocialManagementController {
 			}
 		}
 		catch (Exception e) {
-			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+			// session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 			LOG.error(e.getMessage(), e);
 			return JspResolver.SOCIAL_AUTH_MESSAGE;
 		}
 		
 		// Updating attributes
-		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
+		// session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
 		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		
@@ -390,7 +433,7 @@ public class SocialManagementController {
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
-	private SocialMediaTokens updateLinkedInToken(LinkedInAccessToken accessToken, SocialMediaTokens mediaTokens) {
+	private SocialMediaTokens updateLinkedInToken(String accessToken, SocialMediaTokens mediaTokens) {
 		LOG.debug("Method updateLinkedInToken() called from SocialManagementController");
 		if (mediaTokens == null) {
 			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
@@ -404,43 +447,11 @@ public class SocialManagementController {
 			}
 		}
 		
-		mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken.getToken());
-		mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessToken.getTokenSecret());
+		mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
+		// mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessToken.getTokenSecret());
 		mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
 		
 		LOG.debug("Method updateLinkedInToken() finished from SocialManagementController");
 		return mediaTokens;
-	}
-	
-	private OrganizationUnitSettings linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken) {
-		LOG.info("Method linkedInDataUpdate() called from SocialManagementController");
-		LinkedInApiClientFactory factory = socialManagementService.getLinkedInApiClientFactory();
-		LinkedInApiClient client = factory.createLinkedInApiClient(linkedInToken.getLinkedInAccessToken(),
-				linkedInToken.getLinkedInAccessTokenSecret());
-
-		Person profile = client.getProfileForCurrentUser(EnumSet.of(ProfileField.SUMMARY, ProfileField.PICTURE_URL));
-		LOG.info(profile.getSummary());
-		if (profile.getSummary() != null || !profile.getSummary().equals("")) {
-			try {
-				unitSettings.getContact_details().setAbout_me(profile.getSummary());
-				profileManagementService.updateContactDetails(collection, unitSettings, unitSettings.getContact_details());
-			}
-			catch (InvalidInputException e) {
-				LOG.error(e.getMessage(), e);
-			}
-		}
-		LOG.info(profile.getPictureUrl());
-		if (profile.getPictureUrl() != null || !profile.getPictureUrl().equals("")) {
-			try {
-				unitSettings.setProfileImageUrl(profile.getPictureUrl());
-				profileManagementService.updateProfileImage(collection, unitSettings, profile.getPictureUrl());
-			}
-			catch (InvalidInputException e) {
-				LOG.error(e.getMessage(), e);
-			}
-		}
-
-		LOG.info("Method linkedInDataUpdate() finished from SocialManagementController");
-		return unitSettings;
 	}
 }

@@ -48,12 +48,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	private String linkedInApiKey;
 	@Value("${LINKED_IN_API_SECRET}")
 	private String linkedInApiSecret;
-	@Value("${LINKED_IN_OAUTH_TOKEN}")
-	private String linkedInOauthToken;
-	@Value("${LINKED_IN_OAUTH_SECRET}")
-	private String linkedInOauthSecret;
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
+	@Value("${LINKED_IN_AUTH_URI}")
+	private String linkedinAuthUri;
+	@Value("${LINKED_IN_ACCESS_URI}")
+	private String linkedinAccessUri;
 
 	// Facebook
 	@Value("${FB_CLIENT_ID}")
