@@ -166,6 +166,8 @@
                         <div class="float-left soc-nw-icns icn-wide-gplus"></div>
                         <div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter"></div>
                         <div class="float-left soc-nw-icns icn-wide-rss"></div>
+                        <div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter"></div>
+                        <div class="float-left soc-nw-icns icn-wide-rss"></div>
                     </div>
                 </div>
                 </form>
