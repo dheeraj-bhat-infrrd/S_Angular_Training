@@ -72,34 +72,58 @@ public interface SolrSearchService {
 	public String searchUsersByLoginNameOrName(String pattern, long companyId) throws InvalidInputException, SolrException, MalformedURLException;
 
 	/**
-	 * Method to perform search of Users from solr based on the input pattern for firstname and last name
+	 * Method to perform search of Users from solr based on the input pattern for firstname and last
+	 * name
 	 * 
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws MalformedURLException
 	 * @throws UnsupportedEncodingException
 	 */
-	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException, MalformedURLException;
+	public List<SolrDocument> searchUsersByFirstOrLastName(String patternFirst, String patternLast) throws InvalidInputException, SolrException,
+			MalformedURLException;
 
 	/**
-	 * Method to perform search of Users from solr based on the input pattern for firstname and last name
+	 * Method to perform search of Users from solr based on the input pattern for firstname and last
+	 * name
 	 * 
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws MalformedURLException
 	 * @throws UnsupportedEncodingException
 	 */
-	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
+	public SolrDocumentList searchUsersByFirstOrLastName(String patternFirst, String patternLast, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException, MalformedURLException;
 
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
-	
-	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException;
-	
+
+	/**
+	 * Method to fetch display name of a user from solr based upon user id provided
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws SolrServerException
+	 * @throws NoRecordsFetchedException
+	 * @throws InvalidInputException
+	 */
+	public String getUserDisplayNameById(long userId) throws SolrServerException, NoRecordsFetchedException, InvalidInputException;
+
+	/**
+	 * Method to fetch user based on the userid provided
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrServerException
+	 */
+	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException;
+
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
-	
-	public SolrDocumentList searchUsersByIden(long iden,String idenFieldName,int startIndex,int noOfRows) throws InvalidInputException,SolrException;
+
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
+			SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

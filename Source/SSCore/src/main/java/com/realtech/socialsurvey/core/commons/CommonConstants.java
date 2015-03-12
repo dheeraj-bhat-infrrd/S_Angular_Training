@@ -23,6 +23,7 @@ public interface CommonConstants {
 	public static final long DEFAULT_COMPANY_ID = 1;
 	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
 	public static final String DEFAULT_REGION_NAME = "Default Region";
+	public static final String DEFAULT_ADDRESS = "Default Address";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
@@ -53,6 +54,7 @@ public interface CommonConstants {
 	public static final String RESET_PASSWORD = "resetpassword.do";
 	public static final String DASHBOARD_STAGE = "dashboard.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
+	public static final String REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION = "emailverification.do";
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
@@ -82,7 +84,7 @@ public interface CommonConstants {
 	public static final String IS_UNASSIGN_ADMIN = "NO";
 	public static final int MAX_DEFAULT_REGIONS = 1;
 	public static final int MAX_DEFAULT_BRANCHES = 1;
-	public static final double MIN_RATING_SCORE = 1;
+	public static final double MIN_RATING_SCORE = 0;
 	public static final double MAX_RATING_SCORE = 5;
 
 	/**
@@ -130,7 +132,8 @@ public interface CommonConstants {
 	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
 	public static final String MOOD_COLUMN = "mood";
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
-
+	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
+	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -166,6 +169,9 @@ public interface CommonConstants {
 	public static final String USER_PROFILE = "profile";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
+	public static final String EMAIL_TYPE = "emailtype";
+	public static final String EMAIL_TYPE_WORK = "work";
+	public static final String EMAIL_TYPE_PERSONAL = "personal";
 
 	/**
 	 * Batch Constants

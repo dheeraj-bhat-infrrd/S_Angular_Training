@@ -148,7 +148,7 @@
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) center; 50% 50% no-repeat; background-size: cover;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) center; 50% 50% no-repeat; background-size: 100% auto;"></div>
 							<c:choose>
 								<c:when	test="${parentLock.isLogoLocked && not user.agent}">
 									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
@@ -213,7 +213,9 @@
 						<div class="left-panel-content" id="contant-info-container">
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mail"></div>
-								<div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div>
+								<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}">
+								<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
+								<div id="email-id-work-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-web"></div>
@@ -238,6 +240,33 @@
 										<c:when	test="${not parentLock.isWebAddressLocked && not lock.isWebAddressLocked && not user.agent}">
 											<input id="web-address-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="work" value="${webAddresses.work}" placeholder='<spring:message code="label.webaddress.placeholder.key"/>'>
 											<div id="web-address-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
+	  							</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-web"></div>
+								<div>
+									<c:choose>
+										<c:when	test="${parentLock.isBlogAddressLocked && not user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>' readonly>
+											<div id="web-address-blogs-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${parentLock.isBlogAddressLocked && user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>' readonly>
+											<div id="web-address-blogs-lock" data-state="locked" data-control="parent" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isBlogAddressLocked && user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
+											<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isBlogAddressLocked && lock.isBlogAddressLocked && not user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
+											<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isBlogAddressLocked && not lock.isBlogAddressLocked && not user.agent}">
+											<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
+											<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 										</c:when>
 									</c:choose>
 	  							</div>
@@ -334,13 +363,14 @@
 							<div class="left-assoc-wrapper">
 								<div class="clearfix">
 									<div class="float-left left-panel-header"><spring:message code="label.membership.key" /></div>
-									<div class="float-right icn-share icn-plus-open" onclick="addAnAssociation();"></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAnAssociation();"></div>
 								</div>
 								<div id="association-container" class="left-panel-content">
 									<c:choose>
 										<c:when test="${not empty associations}">
 											<c:forEach items="${associations}" var="association">
-												<input class="lp-assoc-row lp-row clearfix prof-edditable-sin" value="${association.name}">
+												<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}">
+												<div class="float-right lp-ach-item-img" data-type="association"></div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
@@ -354,13 +384,14 @@
 							<div class="left-ach-wrapper">
 								<div class="clearfix">
 									<div class="float-left left-panel-header"><spring:message code="label.achievement.key" /></div>
-									<div class="float-right icn-share icn-plus-open" onclick="addAnAchievement();"></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAnAchievement();"></div>
 								</div>
 								<div id="achievement-container" class="left-panel-content">
 									<c:choose>
 										<c:when test="${not empty achievements}">
 											<c:forEach items="${achievements}" var="achievement">
-												<input class="float-left lp-ach-item-txt lp-ach-row lp-row clearfix prof-edditable-sin" value="${achievement.achievement}">
+												<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}">
+												<div class="float-right lp-ach-item-img" data-type="achievement"></div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
@@ -374,13 +405,14 @@
 							<div class="left-auth-wrapper">
 								<div class="clearfix">
 									<div class="float-left left-panel-header"><spring:message code="label.licenses.key" /></div>
-									<div class="float-right icn-share icn-plus-open" onclick="addAuthorisedIn();"></div>
+									<div class="float-right icn-share icn-plus-open-agent" onclick="addAuthorisedIn();"></div>
 								</div>
 								<div id="authorised-in-container" class="left-panel-content">
 									<c:choose>
 										<c:when test="${not empty authorisedInList}">
 											<c:forEach items="${authorisedInList}" var="authorisedIn">
-												<input class="lp-auth-row lp-row clearfix prof-edditable-sin" value="${authorisedIn}">
+												<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}">
+												<div class="float-right lp-ach-item-img" data-type="license"></div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>

@@ -5,8 +5,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -471,7 +473,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
 		return usersResult;
 	}
-
+	
 	/**
 	 * Method to add User into solr
 	 */
@@ -501,22 +503,25 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				document.addField(CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl());
 			}
 
-			if (user.getCompany() != null)
+			if (user.getCompany() != null) {
 				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
+			}
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
-			List<Long> branches = new ArrayList<>();
-			List<Long> regions = new ArrayList<>();
+			Set<Long> branches = new HashSet<Long>();
+			Set<Long> regions = new HashSet<Long>();
 			if (user.getUserProfiles() != null)
 				for (UserProfile userProfile : user.getUserProfiles()) {
-					if (userProfile.getRegionId() != 0)
+					if (userProfile.getRegionId() != 0) {
 						regions.add(userProfile.getRegionId());
-					if (userProfile.getBranchId() != 0)
+					}
+					if (userProfile.getBranchId() != 0) {
 						branches.add(userProfile.getBranchId());
+					}
 				}
 			document.addField(CommonConstants.BRANCHES_SOLR, branches);
 			document.addField(CommonConstants.REGIONS_SOLR, regions);
 			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
-			LOG.debug("response while adding user is {}." + response);
+			LOG.debug("response while adding user is: " + response);
 			solrServer.add(document);
 			solrServer.commit();
 		}
@@ -553,22 +558,45 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * Method to fetch display name of a user from solr based upon user id provided.
 	 */
 	@Override
-	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException {
+	public String getUserDisplayNameById(long userId) throws InvalidInputException, NoRecordsFetchedException, SolrServerException {
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() started.");
+		SolrDocument solrDocument = getUserByUniqueId(userId);
+		if (solrDocument == null || solrDocument.isEmpty()) {
+			throw new NoRecordsFetchedException("No document found in solr for userId:" + userId);
+		}
+		String displayName = solrDocument.get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
+		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
+		return displayName;
+	}
+
+	/**
+	 * Method to fetch user based on the userid provided
+	 */
+	@Override
+	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException {
+		LOG.info("Method getUserByUniqueId called for userId:" + userId);
+		if (userId <= 0l) {
+			throw new InvalidInputException("userId is invalid for getting user from solr");
+		}
+		SolrDocument solrDocument = null;
 		QueryResponse response = null;
 		SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + userId);
+
 		LOG.debug("Querying solr for searching users");
 		response = solrServer.query(solrQuery);
 		SolrDocumentList results = response.getResults();
-		if (results == null || results.size() == 0) {
-			LOG.error("No record found in Solr for userid {}  in method getUserDisplayNameById()", userId);
-			throw new NoRecordsFetchedException("No record found in Solr for userid " + userId + " in method getUserDisplayNameById()");
+
+		if (results != null && !results.isEmpty()) {
+			solrDocument = results.get(CommonConstants.INITIAL_INDEX);
 		}
-		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
-		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
-		return displayName;
+		else {
+			LOG.debug("No user present in solr for the userId:" + userId);
+		}
+		LOG.info("Method getUserByUniqueId executed succesfully. Returning :" + solrDocument);
+		return solrDocument;
+
 	}
 
 	/**
@@ -600,7 +628,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException, SolrException {
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
+			SolrException {
 		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
 				+ noOfRows);
 		if (iden <= 0l) {

@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -60,6 +62,7 @@ import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -98,6 +101,9 @@ public class ProfileManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
 
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
@@ -317,7 +323,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in editing LockSettings.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setLockSettings(lockSettings);
@@ -329,7 +335,7 @@ public class ProfileManagementController {
 					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException while updating profile address details. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			LOG.error("NonFatalException while editing LockSettings. Reason :" + nonFatalException.getMessage(), nonFatalException);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.LOCK_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
@@ -357,6 +363,11 @@ public class ProfileManagementController {
 			case "web-address-work-lock":
 				if (!parentLock.getIsWebAddressLocked()) {
 					lockSettings.setWebAddressLocked(status);;
+				}
+				break;
+			case "web-address-blogs-lock":
+				if (!parentLock.getIsBlogAddressLocked()) {
+					lockSettings.setBlogAddressLocked(status);;
 				}
 				break;
 			case "phone-number-work-lock":
@@ -464,7 +475,7 @@ public class ProfileManagementController {
 				solrSearchService.editUserInSolr(agentId, CommonConstants.ABOUT_ME_SOLR, aboutMe);
 			}
 			else {
-				throw new InvalidInputException("Error occurred while checking user details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Error occurred while updating About me.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -576,7 +587,7 @@ public class ProfileManagementController {
 				}
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -699,9 +710,9 @@ public class ProfileManagementController {
 
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS, address1 + ", " + address2);
+				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
+				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
+				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS, address1 + ", " + address2);
 				if (name.indexOf(" ") != -1) {
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
 					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
@@ -711,7 +722,7 @@ public class ProfileManagementController {
 				}
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding Contact details.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in editing Address details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -821,7 +832,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred in uploading logo.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setLogo(logoUrl);
@@ -937,7 +948,7 @@ public class ProfileManagementController {
 				solrSearchService.editUserInSolr(agentId, CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setProfileImageUrl(profileImageUrl);
@@ -998,6 +1009,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No company settings found in current session");
 				}
 				contactDetailsSettings = companySettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings, contactDetailsSettings);
@@ -1011,6 +1025,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Region settings found in current session");
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
@@ -1024,6 +1041,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Branch settings found in current session");
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
@@ -1037,6 +1057,9 @@ public class ProfileManagementController {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
+				// Send verification Links
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
+						agentSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
@@ -1044,7 +1067,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating emailids.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -1065,6 +1088,38 @@ public class ProfileManagementController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	// send verification links
+	private void sendVerificationLinks(ContactDetailsSettings oldSettings, List<MiscValues> mailIds, String profile,
+			OrganizationUnitSettings userSettings) throws InvalidInputException, UndeliveredEmailException {
+		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
+		Map<String, String> urlParams = null;
+		
+		if (oldSettings == null) {
+			throw new InvalidInputException("No contact details object found for user");
+		}
+		MailIdSettings mailIdSettings = oldSettings.getMail_ids();
+		if (mailIdSettings == null) {
+			LOG.debug("No maild ids added, create new mail id object in contact details");
+			mailIdSettings = new MailIdSettings();
+		}
+		
+		for (MiscValues mailId : mailIds) {
+			String key = mailId.getKey();
+			String emailId = mailId.getValue();
+			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
+				urlParams = new HashMap<String, String>();
+				urlParams.put(CommonConstants.EMAIL_ID, emailId);
+				urlParams.put(CommonConstants.USER_PROFILE, profile);
+				urlParams.put(CommonConstants.EMAIL_TYPE, CommonConstants.EMAIL_TYPE_WORK);
+				urlParams.put(CommonConstants.USER_ID, userSettings.getIden() + "");
+
+				profileManagementService.generateVerificationUrl(urlParams, applicationBaseUrl
+						+ CommonConstants.REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION, emailId, userSettings.getContact_details().getName());
+			}
+		}
+		LOG.debug("Method sendVerificationLinks() finished from ProfileManagementController");
+	}
+
 	// Update mail ids
 	private ContactDetailsSettings updateMailSettings(ContactDetailsSettings contactDetailsSettings, List<MiscValues> mailIds)
 			throws InvalidInputException {
@@ -1081,11 +1136,13 @@ public class ProfileManagementController {
 		for (MiscValues mailId : mailIds) {
 			String key = mailId.getKey();
 			String value = mailId.getValue();
-			if (key.equalsIgnoreCase("work")) {
+			if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_WORK)) {
 				mailIdSettings.setWork(value);
+				mailIdSettings.setWorkEmailVerified(false);
 			}
-			else if (key.equalsIgnoreCase("personal")) {
+			else if (key.equalsIgnoreCase(CommonConstants.EMAIL_TYPE_PERSONAL)) {
 				mailIdSettings.setPersonal(value);
+				mailIdSettings.setPersonalEmailVerified(false);
 			}
 			else {
 				if (others == null) {
@@ -1186,7 +1243,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating phone numbers.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -1331,7 +1388,7 @@ public class ProfileManagementController {
 				userSettings.getAgentSettings().put(agentId, agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating web addresses.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
@@ -1380,6 +1437,9 @@ public class ProfileManagementController {
 			}
 			else if (key.equalsIgnoreCase("personal")) {
 				webAddressSettings.setPersonal(value);
+			}
+			else if (key.equalsIgnoreCase("blogs")) {
+				webAddressSettings.setBlogs(value);
 			}
 			else {
 				if (others == null) {
@@ -1861,8 +1921,8 @@ public class ProfileManagementController {
 
 			String payload = request.getParameter("achievementList");
 			try {
-				if (payload == null || payload.isEmpty()) {
-					throw new InvalidInputException("Acheivements passed was null or empty");
+				if (payload == null) {
+					throw new InvalidInputException("Acheivements passed was null");
 				}
 				ObjectMapper mapper = new ObjectMapper();
 				achievements = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, Achievement.class));
@@ -1959,7 +2019,7 @@ public class ProfileManagementController {
 
 			String payload = request.getParameter("associationList");
 			try {
-				if (payload == null || payload.isEmpty()) {
+				if (payload == null) {
 					throw new InvalidInputException("Association passed was null or empty");
 				}
 				ObjectMapper mapper = new ObjectMapper();
@@ -2057,7 +2117,7 @@ public class ProfileManagementController {
 			String payload = request.getParameter("licenceList");
 			List<String> authorisedIn = null;
 			try {
-				if (payload == null || payload.isEmpty()) {
+				if (payload == null) {
 					throw new InvalidInputException("Licenses passed was null or empty");
 				}
 				ObjectMapper mapper = new ObjectMapper();
@@ -2372,7 +2432,7 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_PAGE;
 	}
 
-	// TODO
+	// Fetch Admin hierarchy
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {
 		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");
@@ -2518,6 +2578,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 
+		boolean fetchAbusive = true;
 		List<SurveyDetails> reviewItems = null;
 		try {
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
@@ -2533,7 +2594,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_COMPANY);
+						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2543,7 +2604,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_REGION);
+						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2553,7 +2614,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_BRANCH);
+						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2563,7 +2624,7 @@ public class ProfileManagementController {
 				}
 
 				reviewItems = profileManagementService.getReviews(agentId, minScore, maxScore, startIndex, numRows,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive);
 			}
 
 			model.addAttribute("reviewItems", reviewItems);
@@ -2583,6 +2644,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchReviewCount() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 
+		boolean fetchAbusive = true;
 		long reviewCount = 0l;
 		try {
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
@@ -2595,7 +2657,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY);
+				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2604,7 +2666,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION);
+				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2613,7 +2675,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH);
+				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2622,7 +2684,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive);
 			}
 		}
 		catch (InvalidInputException e) {
@@ -2640,6 +2702,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchAverageRating() called from ProfileManagementController");
 		User user = sessionHelper.getCurrentUser();
 
+		boolean aggregateAbusive = true;
 		double averageRating = 0l;
 		try {
 			if (user.isCompanyAdmin()) {
@@ -2649,7 +2712,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY);
+				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, aggregateAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2658,7 +2721,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION);
+				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, aggregateAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2667,7 +2730,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH);
+				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, aggregateAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2676,7 +2739,7 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
 
-				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
+				averageRating = profileManagementService.getAverageRatings(agentId, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, aggregateAbusive);
 			}
 		}
 		catch (InvalidInputException e) {
@@ -2686,5 +2749,29 @@ public class ProfileManagementController {
 
 		LOG.info("Method fetchAverageRating() finished from ProfileManagementController");
 		return averageRating + "";
+	}
+	
+	/**
+	 * Method to verify a new emailId
+	 * 
+	 * @param encryptedUrlParams
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/emailverification")
+	public String verifyAccount(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
+		LOG.info("Method to verify email called");
+		
+		try {
+			profileManagementService.updateEmailVerificationStatus(encryptedUrlParams);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while verifying email. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to verify email finished");
+		return JspResolver.LOGIN;
 	}
 }
