@@ -70,7 +70,7 @@
 	                                <div class="hm-item-row item-row-OR clearfix">
 	                                    <div class="um-item-row-left text-right"><spring:message code="label.encompass.url.key" /></div>
 	                                    <div class="clearfix float-right st-url-icons">
-	                                        <div id="encompass-testconnection" class="um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
+	                                        <div id="encompass-testconnection" class="encompass-testconnection-adj um-item-row-icon icn-spanner margin-left-0 cursor-pointer"></div>
 	                                        <div id="encompass-save" class="um-item-row-icon icn-blue-tick margin-left-0 cursor-pointer"></div>
 	                                    </div>
 	                                    <div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
@@ -78,7 +78,7 @@
 		                                    <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.url != null}">
 		                                    	<c:set var="encomapssurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
 		                                    </c:if>
-	                                        <input id="encompass-url" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
+	                                        <input id="encompass-url" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
 		                                    <div id="encompass-url-error" class="hm-item-err-2"></div>
 	                                    </div>
 	                                </div>
@@ -96,6 +96,7 @@
             	<form id="rating-settings-form">
             	<input type="hidden" name="ratingcategory" id="ratingcategory">
                 <div class="clearfix float-right st-score-rt">
+<!--
                     <div class="float-left score-rt-post score-rt-auto bord-rt-dc">
                         <div class="st-score-rt-top">Set auto post score</div>
                         <div class="st-score-rt-line2 clearfix">
@@ -107,7 +108,6 @@
                                 <div class="rating-star icn-no-star"></div>
                             </div>
                             <div class="st-rating-txt float-left">
-	                            <!-- set the auto rating -->
 		                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.auto_post_score != null}">
 		                          	<c:set var="autopostscore" value="${cannonicalusersettings.companySettings.survey_settings.auto_post_score}"/>
 								</c:if>
@@ -115,6 +115,46 @@
                                 <div class="st-dd-wrapper hide" id="st-dd-wrapper-auto-post"></div>
                             </div>
                         </div>
+                    </div>
+-->
+                    <div class="float-left score-rt-post score-rt-post-OR score-rt-min">
+
+                        <div class="st-score-rt-top">Minimum score to post to profile</div>
+
+                        <div class="st-score-rt-line2 clearfix">
+
+                            <div class="st-rating-wrapper float-left clearfix" id="rating-min-post-parent">
+
+                                <div class="rating-star icn-full-star"></div>
+
+                                <div class="rating-star icn-full-star"></div>
+
+                                <div class="rating-star icn-half-star"></div>
+
+                                <div class="rating-star icn-no-star"></div>
+
+                                <div class="rating-star icn-no-star"></div>
+
+                            </div>
+
+                            <div class="st-rating-txt float-left">
+
+                            <!-- set the min rating -->
+
+                        <c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.show_survey_above_score != null}">
+
+                          <c:set var="minpostscore" value="${cannonicalusersettings.companySettings.survey_settings.show_survey_above_score}"/>
+
+</c:if>
+
+            <input type="text" name="rating-min-post" id="rating-min-post" class="st-item-row-txt cursor-pointer dd-arrow-dn" autocomplete="off" value="${minpostscore}">
+
+                    <div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
+
+                            </div>
+
+                        </div>
+
                     </div>
                 </div>
                 </form>
