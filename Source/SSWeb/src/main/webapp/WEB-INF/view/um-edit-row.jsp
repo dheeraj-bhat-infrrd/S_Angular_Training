@@ -6,7 +6,7 @@
                 <div class="float-left v-ed-txt-sm">
                     <input class="v-ed-txt-item" placeholder="First Name">
                 </div>
-                <div class="float-left v-ed-txt-sm">
+                <div class="float-left v-ed-txt-sm v-ed-txt-sm-adj">
                     <input class="v-ed-txt-item" placeholder="Last Name">
                 </div>
             </div>
@@ -20,6 +20,28 @@
                 <div class="float-left v-ed-lbl">Assign To</div>
                 <div class="float-left v-ed-txt pos-relative">
                     <input class="v-ed-txt-item v-ed-txt-dd" placeholder="Email Address">
+                    <div class="clearfix hide v-ed-dd-wrapper">
+                        <div class="clearfix v-ed-dd-item">One</div>
+                        <div class="clearfix v-ed-dd-item">Two</div>
+                        <div class="clearfix v-ed-dd-item">Three</div>
+                    </div>
+                </div>
+            </div>
+            <div class="v-edit-row clearfix">
+                <div class="float-left v-ed-lbl">Select Office</div>
+                <div class="float-left v-ed-txt pos-relative">
+                    <input class="v-ed-txt-item v-ed-txt-dd" placeholder="">
+                    <div class="clearfix hide v-ed-dd-wrapper">
+                        <div class="clearfix v-ed-dd-item">One</div>
+                        <div class="clearfix v-ed-dd-item">Two</div>
+                        <div class="clearfix v-ed-dd-item">Three</div>
+                    </div>
+                </div>
+            </div>
+            <div class="v-edit-row clearfix">
+                <div class="float-left v-ed-lbl">Select Role</div>
+                <div class="float-left v-ed-txt pos-relative">
+                    <input class="v-ed-txt-item v-ed-txt-dd" placeholder="">
                     <div class="clearfix hide v-ed-dd-wrapper">
                         <div class="clearfix v-ed-dd-item">One</div>
                         <div class="clearfix v-ed-dd-item">Two</div>
@@ -52,5 +74,6 @@
                 </table>
             </div>
         </div>
+        <div class="v-edt-btn-sav">Save Changes</div>
     </div>
 </td>
