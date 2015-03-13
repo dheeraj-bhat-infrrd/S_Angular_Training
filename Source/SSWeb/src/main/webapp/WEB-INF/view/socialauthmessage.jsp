@@ -80,13 +80,13 @@
 		// close on error
 		var error = "${error}";
 		if (parseInt(error) == 1) {
-			// parentWindow.location.href = "./landing.do";
+			parentWindow.location.href = "./landing.do";
            	window.close();
 		}
 		
 		// close on success
 		setTimeout(function() {
-			// parentWindow.location.href = "./landing.do";
+			parentWindow.location.href = "./landing.do";
 			window.close();
 		}, 3000);
 	});
