@@ -838,6 +838,7 @@
         font-size: 14px;
         padding-left: 10px;
         border-bottom: 0;
+        margin-top: 0;
     }
     .hr-dsh-adj-rt{
         line-height: 48px;
@@ -978,8 +979,9 @@
         height: 350px;
         float: none !important;
         margin: 0 auto;
-        width: 300px;
+        width: auto;
         top: 0px;
+        padding: 0;
     }
     .dash-main-left{
         height: 310px;
@@ -1106,6 +1108,18 @@
     }
     .soc-nw-adj {
         margin-right: 0;
+    }
+    .float-right.header-right.clearfix.hr-dsh-adj-rt{
+        margin-top: 0;
+    }
+    .row.row-dash-top-adj {
+        margin-bottom: 0;
+    }
+    .bd-svry-container{
+        padding: 0;
+    }
+    .srv-tbl-txt {
+        font-size: 13px;
     }
 }
 
@@ -1321,6 +1335,13 @@
         margin: 0 auto;
         float: none !important;
     }
+    .srv-tbl-txt{
+        width: 468px !important;
+        font-size: 14px;
+    }
+    .srv-tbl-rem, .srv-tbl-edit{
+        font-size: 13px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1440,6 +1461,9 @@
     }
     .soc-nw-adj {
         margin-right: 40px;
+    }
+    .srv-tbl-txt{
+        width: 680px !important;
     }
 }
 
