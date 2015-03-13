@@ -491,7 +491,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .user-info-logo {
-    height: 78px;
+    height: 60px;
     width: 145px;
   /*  background: url(../images/userInfoLogo.png) no-repeat center;
     background-size: 100% auto; */
@@ -1049,13 +1049,14 @@ button.paypal.is-active {
 
 
 .st-score-rt {
-    width: 700px;
+    width: 50%;
 }
 
 .score-rt-post {
-    width: 50%;
-    height: 110px;
-    padding: 0px 20px 20px 20px;
+    width: 100%;
+    height: 100px;
+    padding: 0px 20px 0px 100px;
+    border-right: 0;
 }
 
 .rating-star {
@@ -1092,7 +1093,7 @@ button.paypal.is-active {
 }
 
 .score-rt-post-OR {
-    padding-left: 45px;
+    padding: 0 130px;
 }
 
 .st-header-txt-rt-icn {
@@ -1784,14 +1785,16 @@ button.paypal.is-active {
     position: absolute;
     width: 75px;
     background-color: #fff;
-    padding: 8px;
+    padding: 0;
+    border-radius: 0 0 3px 3px;
     border: 1px solid #dcdcdc;
 }
 
 .st-dd-item {
     border-bottom: 1px solid #dcdcdc;
-    line-height: 36px;
+    line-height: 28px;
     cursor: pointer;
+    padding: 0 10px;
 }
 
 .st-dd-item:last-child {
@@ -4807,4 +4810,98 @@ tr.u-tbl-header td {
     border-radius: 3px;
     position: relative;
     top: 10px;
+}
+
+.panel-dd {
+    padding: 0 20px 0 0;
+    background: url(../images/sb-dd-icn-pd.png) no-repeat right 17px;
+    position: relative;
+}
+
+.panel-dd-wrapper {
+    position: absolute;
+    top: 40px;
+    width: 100%;
+    border: 1px solid #dcdcdc;
+    overflow: hidden;
+    border-radius: 3px;
+    z-index: 999;
+    background-color: #fff;
+}
+
+.panel-dd-item {
+    line-height: 32px;
+    padding: 0 10px;
+    border-bottom: 1px solid #dcdcdc;
+    cursor: pointer;
+}
+
+.panel-dd-item:last-child {
+    border-bottom: 0;
+}
+
+.panel-header {
+    line-height: 40px;
+    font-size: 16px;
+    font-family: opensanslight;
+    font-weight: bold !important;
+}
+
+.sett-container {
+    padding-top: 20px;
+}
+
+.ph-txt {
+    margin-right: 15px;
+}
+
+.sett-content .hm-item-row{
+    width: 100%;
+}
+
+.sett-content .um-item-row-icon{
+    margin: 0;
+}
+.sett-content {
+    margin: 20px 0px;
+}
+
+.sett-tier-item {
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.soc-nw-icns {
+    margin-bottom: 10px;
+    width: 180px;
+    height: 30px;
+    background-color: #f1f1f1;    
+}
+
+.soc-nw-adj {
+    margin-right: 100px;
+}
+
+.soc-nw-wrapper {
+    padding: 0px 55px;
+}
+
+.icn-wide-fb {
+    background: url(../images/fb_wide.png) no-repeat center;
+}
+
+.icn-wide-gplus {
+    background: url(../images/gPlus_wide.png) no-repeat center;
+}
+
+.icn-wide-twitter {
+    background: url(../images/twiter_wide.png) no-repeat center;
+}
+
+.icn-wide-rss {
+    background: url(../images/rss_wide.png) no-repeat center;
+}
+
+.dd-arrow-dn {
+    background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }

@@ -298,7 +298,7 @@
         width: 260px;
         height: 110px;
         padding: 0 !important;
-        float: none;
+        float: none !important;
         border: 0;
         margin: 0 auto;
     }
@@ -1087,53 +1087,27 @@
     .v-tbl-edit,.v-tbl-rem{
         width: 6%;
     }
-}
-
-
-
-/* ============== ANTHING ABOVE SMARTPHONES ==============*/
-@media (min-width: 768px) {
-    .login-wrapper-resp{
-        width: 457px;
-        float: none;
-        box-shadow: 0px 1px 20px 2px #7C7C7C;
+    .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item {
+        margin-bottom: 1px;
     }
-    
-    .error-wrapper{
-        width: 365px;
-        margin: 0 auto 10px;
+    .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item.overflow-hidden {
+        margin-bottom: -9px;
     }
-    .login-footer-wrapper{
-        width: 457px;
-        float: none;
-        margin-top: -5px;
-        padding: 0;
+     .encompass-testconnection-adj{
+        right: 40px;
     }
-    .payment-form {
-        max-width: 960px;
-        width: auto;
-        padding-bottom: 30px;
+    .encompass-url-adj{
+        padding-right: 100px;
     }
-    .padding-left-25 {
-        padding-left: 25px;
+    .soc-nw-wrapper {
+        padding: 10px;
+        margin: 0 auto;
+        width: 200px;
     }
-    .padding-right-25{
-        padding-right: 25px;
-    }
-    .header-links{
-        font-size: 16px;
-    }
-    .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
-        display: block !important;
-    }
-    .overlay-toast{
-       // display: none;
-    }
-    .header-slider-wrapper{
-        display: none;
+    .soc-nw-adj {
+        margin-right: 0;
     }
 }
-
 
 
 /* ============== ONLY TABLETS ==============*/
@@ -1197,6 +1171,7 @@
     }
     .st-score-txt, .st-score-rt{
         width: 100%;
+        border-right: 0;
     }
     .score-rt-post-OR {
         padding-left: 55px;
@@ -1334,6 +1309,18 @@
         margin-left: 96px;
         margin-top: 15px;
     }
+    .soc-nw-wrapper {
+        padding: 0px 130px 0;
+    }
+    .soc-nw-adj {
+        margin-right: 100px;
+    }
+    .score-rt-post{
+        width: 290px;
+        padding: 0;
+        margin: 0 auto;
+        float: none !important;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1351,16 +1338,16 @@
         width: 240px;
     }
     .st-score-txt{
-        width: 310px;
+        width: 50%;
     }
     .st-score-rt {
-        width: 600px;
+        width: 50%;
     }
     .score-rt-post{
-        padding: 0px 0px 20px 0px;
+        padding: 0px 90px 0px;
     }
     .score-rt-post-OR {
-        padding-left: 15px;
+        padding: 0 90px;
     }
     .lp-con-row-item {
         width: 225px;
@@ -1448,6 +1435,12 @@
         margin-left: 125px;
         margin-top: 15px;
     }
+    .soc-nw-wrapper{
+        padding: 10px 35px 0px;
+    }
+    .soc-nw-adj {
+        margin-right: 40px;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -1495,3 +1488,45 @@
 
 
 
+/* ============== ANTHING ABOVE SMARTPHONES ==============*/
+@media (min-width: 768px) {
+    .login-wrapper-resp{
+        width: 457px;
+        float: none;
+        box-shadow: 0px 1px 20px 2px #7C7C7C;
+    }
+    
+    .error-wrapper{
+        width: 365px;
+        margin: 0 auto 10px;
+    }
+    .login-footer-wrapper{
+        width: 457px;
+        float: none;
+        margin-top: -5px;
+        padding: 0;
+    }
+    .payment-form {
+        max-width: 960px;
+        width: auto;
+        padding-bottom: 30px;
+    }
+    .padding-left-25 {
+        padding-left: 25px;
+    }
+    .padding-right-25{
+        padding-right: 25px;
+    }
+    .header-links{
+        font-size: 16px;
+    }
+    .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
+        display: block !important;
+    }
+    .overlay-toast{
+       // display: none;
+    }
+    .header-slider-wrapper{
+        display: none;
+    }
+}
