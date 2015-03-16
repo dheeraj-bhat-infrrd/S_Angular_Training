@@ -14,8 +14,8 @@
 			<div class="sb-tab-header clearfix">
 				<div class="sb-tab-wrapper float-left clearfix">
 					<div id="btn-new-survey" class="sb-tab-item sb-tab-active"><spring:message code="label.newsurvey.key" /></div>
-					<div id="btn-choose-template" class="sb-tab-item"><spring:message code="label.choosetemplate.key" /></div>
-				</div>
+<%-- 					<div id="btn-choose-template" class="sb-tab-item"><spring:message code="label.choosetemplate.key" /></div>
+ --%>				</div>
 			</div>
 			<div class="sb-content new-survery-content">
 				<div class="sb-con-txt"><spring:message code="label.choosequestiontype.key" /></div>

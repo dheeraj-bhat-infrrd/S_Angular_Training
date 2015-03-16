@@ -425,13 +425,11 @@ a, a:hover, a:visited{
 
 .hdr-log-reg-btn {
     font-size: 12px;
-    margin-top: 25px;
-    margin-left: 10px;
+    margin-top: 19px;
     padding: 0 25px;
     cursor: pointer;
     height: 28px;
     line-height: 28px;
-    text-transform: uppercase;
 }
 
 .hdr-btns-wrapper {
@@ -439,17 +437,17 @@ a, a:hover, a:visited{
 }
 
 .hdr-wrapper {
-    height: 70px;
+    height: 60px;
     background-color: #009FE0;
     z-index: 9999999;
     position: relative;
 }
 
 .hdr-logo {
-    height: 70px;
+    height: 60px;
     width: 180px;
     background: url(../images/ss-logo.png) no-repeat;
-    background-size: 75%;
+    background-size: 65%;
     background-position: left center;
 }
 

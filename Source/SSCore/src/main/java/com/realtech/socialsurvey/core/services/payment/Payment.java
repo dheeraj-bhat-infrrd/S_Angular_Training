@@ -62,8 +62,16 @@ public interface Payment {
 	 * @throws CreditCardException 
 	 * @throws NonFatalException
 	 */
-	public void subscribe(User user,Company company, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, CreditCardException, SubscriptionUnsuccessfulException;
+	public void subscribe(User user, int planId, String nonce) throws InvalidInputException, PaymentException, NoRecordsFetchedException, SubscriptionUnsuccessfulException, CreditCardException;
 	
+	/**
+	 * Method used to subscribe customer to a free account.
+	 * @param user
+	 * @param accountsMasterId
+	 * @throws InvalidInputException
+	 */
+	//public void subscribeForFreeAccount(User user,int accountsMasterId) throws InvalidInputException;
+
 	/**
 	 * Function to create a Braintree transaction with a particular payment method token and an amount
 	 * @param paymentMethodToken
@@ -147,8 +155,10 @@ public interface Payment {
 	 * @throws SubscriptionUpgradeUnsuccessfulException 
 	 * @throws SolrException 
 	 * @throws UndeliveredEmailException 
+	 * @throws SubscriptionUnsuccessfulException 
+	 * @throws CreditCardException 
 	 */
-	public void upgradePlanForSubscription(User user,int newAccountsMasterId) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException;
+	public void upgradePlanForSubscription(User user,int newAccountsMasterId, String nonce) throws InvalidInputException, NoRecordsFetchedException, SubscriptionPastDueException, PaymentException, SubscriptionUpgradeUnsuccessfulException, SolrException, UndeliveredEmailException, SubscriptionUnsuccessfulException, CreditCardException;
 	
 	/**
 	 * Fetches the current card details for a particular subscription
