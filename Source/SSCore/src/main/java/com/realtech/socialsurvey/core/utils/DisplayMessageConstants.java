@@ -13,6 +13,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_FIRSTNAME = "INVALID_FIRSTNAME";
 	public static final String INVALID_LASTNAME = "INVALID_LASTNAME";
 	public static final String INVALID_EMAILID = "INVALID_EMAILID";
+	public static final String INVALID_ACCOUNT = "INVALID_ACCOUNT";
 	public static final String INVALID_CAPTCHA = "INVALID_CAPTCHA";
 	public static final String REGISTRATION_INVITE_GENERAL_ERROR = "REGISTRATION_INVITE_GENERAL_ERROR";
 	public static final String GENERAL_ERROR = "GENERAL_ERROR";
