@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.authentication.impl;
 
 // JIRA : SS-21 by RM-06 : BOC
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,23 +30,15 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 /**
  * Contains the implementation for AuthenticationService
  */
-
 @Component
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
-
 	private static final String USER = "user";
 	private static final String NAME = "name";
 
 	@Autowired
 	private URLGenerator urlGenerator;
-
-	@Value("${APPLICATION_BASE_URL}")
-	private String applicationBaseUrl;
-	
-	@Value("${ENABLE_KAFKA}")
-	private String enableKafka;
 
 	@Autowired
 	private EmailServices emailServices;
@@ -67,6 +58,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Autowired
 	private UserManagementService userManagementService;
 
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
+
 	/**
 	 * Method to validate user
 	 * 
@@ -76,7 +73,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 */
 	@Override
 	public void validateUser(User user, String password) throws InvalidInputException {
-
 		LOG.info("Authenticating user, UserId + " + user.getLoginName());
 
 		// get the encrypted password using encryptSHA512 method
@@ -204,7 +200,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	@Transactional
 	public void changePassword(User user, String password) throws InvalidInputException {
-
 		LOG.info("Method to the change user password called");
 		// Encrypt password using encryptSHA512 method
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
@@ -215,7 +210,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		// update the user object in the database
 		userDao.saveOrUpdate(user);
 		LOG.info("Password successfully changed");
-
 	}
 
 	/**
@@ -227,7 +221,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	@Transactional
 	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException {
-
 		LOG.info("Fetching company Admin user profile for the current user");
 		Map<String, Object> columns = new HashMap<>();
 		columns.put(USER, user);
@@ -242,5 +235,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return userProfile.get(0);
 	}
 }
-
 // JIRA : SS-21 by RM-06 : EOC
