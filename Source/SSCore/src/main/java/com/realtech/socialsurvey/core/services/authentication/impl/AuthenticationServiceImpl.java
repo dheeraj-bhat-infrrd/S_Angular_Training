@@ -39,6 +39,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final String USER = "user";
 	private static final String NAME = "name";
+
 	@Autowired
 	private URLGenerator urlGenerator;
 
@@ -148,20 +149,21 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendResetPasswordLink(String emailId, String name) throws InvalidInputException, UndeliveredEmailException {
-
+	public void sendResetPasswordLink(String emailId, String name, long companyId) throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Send a reset password link to the user");
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
+		urlParams.put(CommonConstants.COMPANY, companyId + "");
 		urlParams.put(NAME, name);
 
 		LOG.info("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
 
 		// Send reset password link to the user email ID
-		if(enableKafka.equals(CommonConstants.YES)){
+		if (enableKafka.equals(CommonConstants.YES)) {
 			emailServices.queueResetPasswordEmail(url, emailId, name);
-		}else{
+		}
+		else {
 			emailServices.sendResetPasswordEmail(url, emailId, name);
 		}
 	}
@@ -177,12 +179,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User getUserWithLoginNameAndCompanyId(String loginName, long companyId) throws InvalidInputException {
 		LOG.info("Fetching user object with emailId : " + loginName);
+		
 		Map<String, Object> queries = new HashMap<>();
 		Company company = companyDao.findById(Company.class, companyId);
 		queries.put(CommonConstants.USER_LOGIN_NAME_COLUMN, loginName);
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		List<User> users = userDao.findByKeyValue(User.class, queries);
+		
 		// Check if user list returned is null or empty
+		List<User> users = userDao.findByKeyValue(User.class, queries);
 		if (users == null || users.isEmpty()) {
 			LOG.error("No Record found for the UserID : " + loginName);
 			throw new InvalidInputException("No Record found for the UserID : " + loginName);
