@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
-
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -249,7 +248,7 @@ public class LoginController {
 			
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName());
+				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName(), user.getCompany().getCompanyId());
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
@@ -303,17 +302,19 @@ public class LoginController {
 	public String resetPassword(Model model, HttpServletRequest request) {
 		LOG.info("Reset the user password");
 		Map<String, String> urlParams = null;
-		String encryptedUrlParameters;
+		String encryptedUrlParameters = "";
+		String emailId = "";
 		User user = null;
 
 		try {
-			// Checking if any of the form parameters are null or empty
-			String emailId = request.getParameter("emailId");
+			emailId = request.getParameter("emailId");
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirmPassword");
+
+			// Checking if any of the form parameters are null or empty
 			validateResetPasswordFormParameters(emailId, password, confirmPassword);
 
-			// Decrypte Url parameters
+			// Decrypt Url parameters
 			encryptedUrlParameters = request.getParameter("q");
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
@@ -334,13 +335,12 @@ public class LoginController {
 				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
 			}
 			catch (NumberFormatException | NullPointerException e) {
-				LOG.error("Invalid company id found in URL parameters. Reason " + e.getStackTrace(), e);
+				LOG.error("Invalid company id found in URL parameters. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			
-			// update user's password
+			// fetch user object with email Id
 			try {
-				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 			}
 			catch (InvalidInputException e) {
@@ -348,8 +348,13 @@ public class LoginController {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
 			
+			if (user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED || user.getStatus() == CommonConstants.STATUS_INACTIVE) {
+				LOG.error("Account with EmailId entered is either inactive or not verified");
+				throw new InvalidInputException("Your Account is either inactive or not verified", DisplayMessageConstants.INVALID_ACCOUNT);
+			}
+			
+			// change user's password
 			try {
-				// change user's password
 				authenticationService.changePassword(user, password);
 			}
 			catch (InvalidInputException e) {
@@ -358,14 +363,13 @@ public class LoginController {
 			}
 			
 			LOG.info("Reset user password executed successfully");
-			
 			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("emailId", emailId);
 			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.RESET_PASSWORD;
