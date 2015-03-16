@@ -36,9 +36,9 @@
 										<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 											<!-- check the encompass username -->
 											<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.crm_username != null}">
-												<c:set var="encomapssusername" value="${cannonicalusersettings.companySettings.crm_info.crm_username }"/>
+												<c:set var="encompassusername" value="${cannonicalusersettings.companySettings.crm_info.crm_username }"/>
 											</c:if>
-											<input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encomapssusername}">
+											<input id="encompass-username" type="text" class="um-item-row-txt um-item-row-txt-OR" placeholder="Username" name="encompass-username" value="${encompassusername}">
 											<div id="encompass-username-error" class="hm-item-err-2"></div>
 										</div>
 									</div>
@@ -53,9 +53,9 @@
 										<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 											<!-- check the encompass password -->
 											<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.crm_password != null}">
-												<c:set var="encomapsspassword" value="${cannonicalusersettings.companySettings.crm_info.crm_password }"/>
+												<c:set var="encompasspassword" value="${cannonicalusersettings.companySettings.crm_info.crm_password }"/>
 											</c:if>
-											<input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encomapsspassword}">
+											<input id="encompass-password" type="password" class="um-item-row-txt um-item-row-txt-OR" placeholder="Password" name="encompass-password"  value="${encompasspassword}">
 											<div id="encompass-password-error" class="hm-item-err-2"></div>
 										</div>
 									</div>
@@ -70,9 +70,9 @@
 										<div class="hm-item-row-right um-item-row-right margin-right-10 hm-item-height-adj">
 											<!-- check the encompass password -->
 											<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.crm_info!= null && cannonicalusersettings.companySettings.crm_info.url != null}">
-												<c:set var="encomapssurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
+												<c:set var="encompassurl" value="${cannonicalusersettings.companySettings.crm_info.url }"/>
 											</c:if>
-											<input id="encompass-url" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encomapssurl}">
+											<input id="encompass-url" type="text" class="encompass-url-adj um-item-row-txt um-item-row-txt-OR" placeholder="URL" name="encompass-url" value="${encompassurl}">
 											<div id="encompass-url-error" class="hm-item-err-2"></div>
 										</div>
 									</div>
