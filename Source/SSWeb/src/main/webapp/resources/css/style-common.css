@@ -3553,6 +3553,7 @@ button.paypal.is-active {
 }
 
 .dash-sel-item {
+    background-color: #fff;
     height: 36px;
     width: 215px;
     margin-left: 20px;
@@ -4232,7 +4233,7 @@ button.paypal.is-active {
 }
 
 .bd-frm-rt-dd-item {
-    line-height: 26px;
+    line-height: 34px;
     padding: 0 10px;
     cursor: pointer;
 }
@@ -5053,7 +5054,8 @@ tr.u-tbl-header td {
 }
 
 .bd-q-pu-header {
-    
+    margin-top: 15px;
+    margin-bottom: 15px;
 }
 
 .bd-q-pu-header-rt {
@@ -5077,7 +5079,8 @@ tr.u-tbl-header td {
     height: 40px;
     width: 40px;
     cursor: pointer;
-    background: url(../images/Plus_Big.png) no-repeat center;
+    background: url(../images/close_srv.png) no-repeat center;
+    background-size: 32px auto;
 }
 
 .bd-q-pu-txt-wrapper {
@@ -5087,7 +5090,7 @@ tr.u-tbl-header td {
 .bd-q-pu-done-wrapper {
     line-height: 40px;
     width: 215px;
-    margin: 20px auto;
+    margin: 20px auto 0;
 }
 
 .bd-q-btn-cancel {
@@ -5157,10 +5160,112 @@ tr.u-tbl-header td {
 .bd-ans-img {
     width: 180px;
     height: 180px;
-    margin: 50px auto;
-    background-color: #3E9DCB;
+    margin: 0 auto;
+    cursor: pointer;
 }
 
 .bd-ans-type {
+    
+}
+
+.bd-q-pu-header-adj {
+    margin: 0;
+}
+
+.bd-ans-type-rating {
+    
+}
+
+.view-prof-lnk{
+    float: left;
+    padding-left: 10px;
+    border-left: 1px solid blue;
+    margin-left: 10px;
+    cursor: pointer;
+}
+.bd-mcq-txt {
+    height: 40px;
+    width: 500px;
+    border: 1px solid #D7D7D7;
+    background-color: #FCFCFC;
+    border-radius: 3px;
+    padding: 0 10px;
+}
+
+.bd-mcq-close {
+    width: 40px;
+    height: 40px;
+    margin-left: 10px;
+    background: url(../images/close_srv.png) no-repeat center;
+    background-size: 38px auto;
+    cursor: pointer;
+}
+
+.bd-mcq-row {
+    width: 645px;
+    margin: 0 auto 20px;
+}
+
+.bd-mcq-lbl {
+    font-size: 14px;
+    font-weight: bold !important;
+    line-height: 40px;
+    width: 90px;
+}
+
+.bd-ans-type-rating-adj {
     padding: 0 60px;
+}
+
+.bd-ans-img-wrapper {
+    margin: 20px auto 35px;
+    width: 180px;
+    cursor: pointer;
+}
+
+.bd-ans-img-txt {
+    font-size: 13px; 
+    font-weight: bold !important;
+    text-align: center;
+    line-height: 40px;
+}
+
+.bd-com-chk {
+    width: 18px;
+    height: 40px;
+    cursor: pointer;
+    background: url(../images/checks.png) no-repeat;
+    background-position: 2px center;
+}
+
+.bd-com-wrapper {
+    padding: 20px 50px;
+}
+
+.bd-com-txt {
+    line-height: 40px;
+    padding-left: 10px;
+}
+
+.bd-com-unchk {
+    background-position: right center;
+}
+
+.bd-img-sel{
+    opacity: 0.6;
+}
+
+.bd-ans-smiley {
+    background: url(../images/smiley.png) no-repeat center;
+    background-size: 100% auto;
+}
+
+.bd-ans-star {
+    background: url(../images/stars.png) no-repeat center;
+    background-size: 100% auto;
+}
+
+.bd-ans-scale {
+    background: url(../images/scale.png) no-repeat center;
+    background-size: 100% auto;
 }
