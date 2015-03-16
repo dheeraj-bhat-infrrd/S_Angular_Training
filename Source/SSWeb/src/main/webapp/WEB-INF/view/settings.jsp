@@ -142,12 +142,12 @@
 				<input type="hidden" name="ratingcategory" id="ratingcategory">
 				<div class="clearfix float-right st-score-rt">
 					<div class="soc-nw-wrapper clearfix">
-						<div class="float-left soc-nw-icns soc-nw-adj icn-wide-fb" onclick="openAuthPage('facebook');"></div>
-						<div class="float-left soc-nw-icns icn-wide-gplus" ></div>
-						<div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter" onclick="openAuthPage('twitter');"></div>
-						<div class="float-left soc-nw-icns icn-wide-rss" ></div>
-						<div class="float-left soc-nw-icns soc-nw-adj icn-wide-twitter" onclick="openAuthPage('linkedin');"></div>
-						<div class="float-left soc-nw-icns icn-wide-rss" onclick="openAuthPage('yelp');"></div>
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-fb soc-nw-adj" onclick="openAuthPage('facebook');"></div>
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-gplus" onclick="openAuthPage('google');"></div>
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-twitter soc-nw-adj" onclick="openAuthPage('twitter');"></div>
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-rss" onclick="openAuthPage('rss');"></div>
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-linkedin soc-nw-adj" onclick="openAuthPage('linkedin');"></div>
+						<div class="float-left soc-nw-icns cursor-pointer icn-wide-yelp" onclick="openAuthPage('yelp');"></div>
 					</div>
 				</div>
 			</div>

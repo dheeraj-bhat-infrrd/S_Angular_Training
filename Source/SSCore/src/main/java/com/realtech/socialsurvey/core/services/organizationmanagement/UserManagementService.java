@@ -154,7 +154,7 @@ public interface UserManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException;
+	public AgentSettings getAgentSettingsForUserProfiles(long userId) throws InvalidInputException;
 	
 	/**
 	 * Method to insert agent settings into mongo
