@@ -13,21 +13,21 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
  * Contains the methods to be implemented for authentication
  */
 public interface AuthenticationService {
-	
+
 	public void validateUser(User user, String password) throws InvalidInputException;
 
 	public User getUserWithLoginName(String userId) throws NoRecordsFetchedException;
 
 	public List<UserProfile> getUserProfileForUser(User user) throws InvalidInputException;
-	
+
 	public User verifyRegisteredUser(String emailId) throws InvalidInputException;
-	
-	public void sendResetPasswordLink(String emailId, String name) throws InvalidInputException, UndeliveredEmailException;
-	
+
+	public void sendResetPasswordLink(String emailId, String name, long companyId) throws InvalidInputException, UndeliveredEmailException;
+
 	public void changePassword(User user, String password) throws InvalidInputException;
-	
+
 	public User getUserWithLoginNameAndCompanyId(String loginName, long companyId) throws InvalidInputException;
-	
+
 	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException;
 
 }
