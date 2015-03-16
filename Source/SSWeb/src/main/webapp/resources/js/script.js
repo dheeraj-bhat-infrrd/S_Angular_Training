@@ -68,6 +68,15 @@ function showErrorMobileAndWeb(msg) {
 		showError(msg);
 	}
 }
+function showInfoMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInfo(msg);
+	}
+}
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();

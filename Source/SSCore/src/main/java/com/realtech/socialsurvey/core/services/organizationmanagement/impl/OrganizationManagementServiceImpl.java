@@ -48,6 +48,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
@@ -1351,11 +1352,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/**
 	 * Method to add a new region and assign the user to the newly created region if userId or
 	 * emailId is provided
+	 * 
+	 * @throws UserAssignmentException
 	 */
 	@Override
 	@Transactional
 	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
-			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException {
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
 		LOG.info("Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:" + isDefaultBySystem
 				+ " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:" + isAdmin);
 
@@ -1375,7 +1378,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			if (assigneeUser == null) {
 				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
 			}
-			assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+			try {
+				assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
 		}
 		else if (emailIdsArray != null && emailIdsArray.length > 0) {
 			LOG.debug("Fetching users list to assign to the region");
@@ -1383,7 +1392,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
 				for (User assigneeUser : assigneeUsers) {
-					assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+					try {
+						assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
 				}
 			}
 		}
@@ -1483,10 +1498,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId());
 	}
 
+	/**
+	 * Method to add a new region and assign the user to the newly created branch if userId or
+	 * emailId is provided
+	 * 
+	 * @throws UserAssignmentException
+	 */
 	@Override
 	@Transactional
 	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
-			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException {
+			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+			UserAssignmentException {
 		LOG.info("Method addNewBranchWithUser called for user:" + user + " branchName:" + branchName + "regionId: " + regionId
 				+ " isDefaultBySystem:" + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
 				+ isAdmin);
@@ -1503,7 +1525,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			if (assigneeUser == null) {
 				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
 			}
-			assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+			try {
+				assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
 		}
 		else if (emailIdsArray != null && emailIdsArray.length > 0) {
 			LOG.debug("Fetching users list to assign to the branch");
@@ -1511,7 +1539,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
 				for (User assigneeUser : assigneeUsers) {
-					assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+					try {
+						assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
 				}
 			}
 		}
