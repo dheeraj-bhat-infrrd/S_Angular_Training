@@ -22,10 +22,12 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -97,7 +99,8 @@ public class HierarchyManagementController {
 		}
 
 		LOG.info("Successfully completed method to showBuildHierarchyPage");
-		return JspResolver.HIERARCHY_MANAGEMENT;
+		return JspResolver.BUILD_HIERARCHY;
+		// return JspResolver.HIERARCHY_MANAGEMENT;
 	}
 
 	/**
@@ -400,34 +403,53 @@ public class HierarchyManagementController {
 			String regionName = request.getParameter("regionName");
 			String regionAddress1 = request.getParameter("regionAddress1");
 			String regionAddress2 = request.getParameter("regionAddress2");
+			String selectedUserIdStr = request.getParameter("selectedUserId");
+			String selectedUserEmail = request.getParameter("selectedUserEmail");
 
-			validateRegionForm(regionName, regionAddress1);
+			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
+				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			}
 
-			User user = sessionHelper.getCurrentUser();
-			String address = getCompleteAddress(regionAddress1, regionAddress2);
-			LOG.info("Address " + address + " is yet to be stored");
+			String isAdminStr = request.getParameter("isAdmin");
 
-			LOG.debug("Calling service to add a new region");
+			long selectedUserId = 0l;
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatException while parsing selected userId in add region",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
+			boolean isAdmin = false;
+			if (isAdminStr != null && !isAdminStr.isEmpty()) {
+				isAdmin = Boolean.parseBoolean(isAdminStr);
+			}
+			validateRegionForm(regionName);
+			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
+
+			User loggedInUser = sessionHelper.getCurrentUser();
+
+			LOG.debug("Calling service to add a new region and assigning user to it if specified");
 			try {
-				Region region = hierarchyManagementService.addNewRegion(user, regionName, CommonConstants.NO, regionAddress1, regionAddress2);
-				
-				LOG.debug("Adding default branch for the region created");
-				hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
-						CommonConstants.DEFAULT_ADDRESS, null);
+
+				organizationManagementService.addNewRegionWithUser(loggedInUser, regionName, CommonConstants.NO, regionAddress1, regionAddress2,
+						selectedUserId, assigneeEmailIds, isAdmin);
+
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException occured while adding new region.REason : " + e.getMessage(),
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				throw new InvalidInputException("Exception occured while adding new region.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
 		}
 		catch (NonFatalException e) {
-			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
+			LOG.error("NonFatalException while adding a region. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.info("Successfully comppleted method to add a region in controller");
+		LOG.info("Successfully completed method to add a region in controller");
 		return JspResolver.MESSAGE_HEADER;
 	}
 
@@ -442,17 +464,42 @@ public class HierarchyManagementController {
 	public String addBranch(Model model, HttpServletRequest request) {
 		LOG.info("Method to add a branch called in controller");
 		try {
-			String branchName = request.getParameter("branchName");
-			String branchAddress1 = request.getParameter("branchAddress1");
-			String branchAddress2 = request.getParameter("branchAddress2");
+			String branchName = request.getParameter("officeName");
+			String branchAddress1 = request.getParameter("officeAddress1");
+			String branchAddress2 = request.getParameter("officeAddress2");
 			String strRegionId = request.getParameter("regionId");
+			String selectedUserIdStr = request.getParameter("selectedUserId");
+			String selectedUserEmail = request.getParameter("selectedUserEmail");
 
-			validateBranchForm(branchName, branchAddress1);
+			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
+				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			}
+
+			String isAdminStr = request.getParameter("isAdmin");
+
+			long selectedUserId = 0l;
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatException while parsing selected userId in add branch",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
+			boolean isAdmin = false;
+			if (isAdminStr != null && !isAdminStr.isEmpty()) {
+				isAdmin = Boolean.parseBoolean(isAdminStr);
+			}
+
+			validateBranchForm(branchName);
+			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
 			try {
 				/**
-				 * parse the regionId if a region is selected for the branch
+				 * parse the regionId if a region is selected for the branch in case company is
+				 * selected, regionId is null
 				 */
 				if (strRegionId != null && !strRegionId.isEmpty()) {
 					regionId = Long.parseLong(strRegionId);
@@ -463,19 +510,18 @@ public class HierarchyManagementController {
 			}
 
 			User user = sessionHelper.getCurrentUser();
-			String address = getCompleteAddress(branchAddress1, branchAddress2);
-			LOG.info("Address " + address + " is yet to be stored");
 
 			try {
 				LOG.debug("Calling service to add a new branch");
-				hierarchyManagementService.addNewBranch(user, regionId, CommonConstants.NO, branchName, branchAddress1, branchAddress2);
+				organizationManagementService.addNewBranchWithUser(user, branchName, regionId, CommonConstants.NO, branchAddress1, branchAddress2,
+						selectedUserId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add a new branch");
 
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException occured while adding new branch.REason : " + e.getMessage(),
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				throw new InvalidInputException("Exception occured while adding new branch.REason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
@@ -483,7 +529,7 @@ public class HierarchyManagementController {
 			LOG.error("NonFatalException while adding a branch. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.info("Successfully comppleted controller to add a branch");
+		LOG.info("Successfully completed controller to add a branch");
 		return JspResolver.MESSAGE_HEADER;
 
 	}
@@ -504,7 +550,7 @@ public class HierarchyManagementController {
 		String branchAddress1 = request.getParameter("branchAddress1");
 		String branchAddress2 = request.getParameter("branchAddress2");
 		try {
-			validateBranchForm(branchName, branchAddress1);
+			validateBranchForm(branchName);
 			long regionId = 0l;
 			try {
 				/**
@@ -567,8 +613,20 @@ public class HierarchyManagementController {
 		String strRegionId = request.getParameter("regionId");
 		String regionAddress1 = request.getParameter("regionAddress1");
 		String regionAddress2 = request.getParameter("regionAddress2");
+		String selectedUserIdStr = request.getParameter("selectedUserId");
+		String selectedUserEmail = request.getParameter("selectedUserEmail");
 		try {
-			validateRegionForm(regionName, regionAddress1);
+			long selectedUserId = 0l;
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatException while parsing selected userId in update region",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
+			validateRegionForm(regionName);
 			long regionId = 0l;
 			try {
 				regionId = Long.parseLong(strRegionId);
@@ -809,6 +867,44 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Method to get page containing form for editing region
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getregioneditpage", method = RequestMethod.GET)
+	public String getRegionEditPage(Model model) {
+		LOG.info("Method getRegionEditPage called");
+		return JspResolver.HIERARCHY_REGION_EDIT;
+
+	}
+
+	/**
+	 * Method to get page containing form for editing office
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getofficeeditpage", method = RequestMethod.GET)
+	public String getOfficeEditPage(Model model) {
+		LOG.info("Method getOfficeEditPage called");
+		return JspResolver.HIERARCHY_OFFICE_EDIT;
+
+	}
+
+	/**
+	 * Method to get page containing form for editing individual
+	 * 
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/getindividualeditpage", method = RequestMethod.GET)
+	public String getIndividualEditPage(Model model) {
+		LOG.info("Method getIndividualEditPage called");
+		return JspResolver.HIERARCHY_INDIVIDUAL_EDIT;
+	}
+
+	/**
 	 * Method to get complete address from address lines
 	 * 
 	 * @param address1
@@ -832,16 +928,12 @@ public class HierarchyManagementController {
 	 * Method to validate branch addition/updation form
 	 * 
 	 * @param branchName
-	 * @param branchAddress1
 	 * @throws InvalidInputException
 	 */
-	private void validateBranchForm(String branchName, String branchAddress1) throws InvalidInputException {
+	private void validateBranchForm(String branchName) throws InvalidInputException {
 		LOG.debug("Validating branch add/update form");
 		if (branchName == null || branchName.isEmpty()) {
 			throw new InvalidInputException("Branch name is invalid while updating branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
-		}
-		if (branchAddress1 == null || branchAddress1.isEmpty()) {
-			throw new InvalidInputException("Branch address is invalid while adding branch", DisplayMessageConstants.INVALID_BRANCH_ADDRESS);
 		}
 		LOG.debug("Successsfully validated branch add/update form");
 	}
@@ -850,18 +942,42 @@ public class HierarchyManagementController {
 	 * Method to validate add/update region form
 	 * 
 	 * @param regionName
-	 * @param regionAddress1
+	 * @param selectedUserIdStr
+	 * @param selectedUserEmail
 	 * @throws InvalidInputException
 	 */
-	private void validateRegionForm(String regionName, String regionAddress1) throws InvalidInputException {
-		LOG.debug("Validating region add/update form");
+	private void validateRegionForm(String regionName) throws InvalidInputException {
+		LOG.debug("Validating region add/update form called for regionName:" + regionName);
 		if (regionName == null || regionName.isEmpty()) {
 			throw new InvalidInputException("Region name is invalid while adding region", DisplayMessageConstants.INVALID_REGION_NAME);
 		}
-		if (regionAddress1 == null || regionAddress1.isEmpty()) {
-			throw new InvalidInputException("Region address is invalid while adding region", DisplayMessageConstants.INVALID_REGION_ADDRESS);
-		}
 		LOG.debug("Validating region add/update form");
+	}
+
+	/**
+	 * Method to validate single/multiple emailIds provided for assigning a user to a hierarchy
+	 * level
+	 * 
+	 * @param selectedUserId
+	 * @param selectedUserEmail
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private String[] validateAndParseEmailIds(long selectedUserId, String selectedUserEmail) throws InvalidInputException {
+		LOG.info("Method validateAndParseEmailIds called for selectedUserIdStr:" + selectedUserId + " selectedUserEmail:" + selectedUserEmail);
+		String[] emailIdsArray = null;
+		if (selectedUserId <= 0l && selectedUserEmail != null && !selectedUserEmail.isEmpty()) {
+			emailIdsArray = selectedUserEmail.split(",");
+			if (emailIdsArray != null && emailIdsArray.length > 0) {
+				for (String emailId : emailIdsArray) {
+					if (emailId == null || emailId.trim().isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+						throw new InvalidInputException("Email address" + emailId + " is invalid", DisplayMessageConstants.INVALID_EMAILID);
+					}
+				}
+			}
+		}
+		LOG.info("Method validateAndParseEmailIds finished.Returning emailIdsArray:" + emailIdsArray);
+		return emailIdsArray;
 	}
 }
 // JIRA SS-37 BY RM02 EOC

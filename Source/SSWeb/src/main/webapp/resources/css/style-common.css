@@ -4228,6 +4228,7 @@ button.paypal.is-active {
     top: 50px;
     border: 1px solid #dcdcdc;
     width: 275px;
+    z-index: 999;
 }
 
 .bd-frm-rt-dd-item {
@@ -4297,6 +4298,7 @@ button.paypal.is-active {
     width: 148px;
     text-align: center;
     color: #fff;
+    text-transform: uppercase;
 }
 
 .bd-frm-rt-txt-area {

@@ -39,8 +39,10 @@ import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
@@ -65,6 +67,9 @@ public class UserManagementController {
 	private UserManagementService userManagementService;
 
 	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
 	private AuthenticationService authenticationService;
 
 	@Autowired
@@ -75,24 +80,24 @@ public class UserManagementController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
-	
+
 	@Autowired
 	private LinkedInApiClientFactory linkedInApiClientFactory;
 
 	private final static int SOLR_BATCH_SIZE = 20;
-	
+
 	@Value("${LINKED_IN_API_KEY}")
 	private String linkedInApiKey;
-	
+
 	@Value("${LINKED_IN_API_SECRET}")
 	private String linkedInApiSecret;
-	
+
 	@Value("${LINKED_IN_OAUTH_TOKEN}")
 	private String linkedInOauthToken;
-	
+
 	@Value("${LINKED_IN_OAUTH_SECRET}")
 	private String linkedInOauthSecret;
-	
+
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
 
@@ -166,7 +171,7 @@ public class UserManagementController {
 						LOG.debug("No records exist with the email id passed, inviting the new user");
 						user = userManagementService.inviteNewUser(admin, firstName, lastName, emailId);
 						LOG.debug("Adding user {} to solr server.", user.getFirstName());
-						
+
 						LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
 						userManagementService.insertAgentSettings(user);
 						LOG.debug("Added newly added user {} to mongo", user.getFirstName());
@@ -174,12 +179,12 @@ public class UserManagementController {
 						LOG.debug("Adding newly added user {} to solr", user.getFirstName());
 						solrSearchService.addUserToSolr(user);
 						LOG.debug("Added newly added user {} to solr", user.getFirstName());
-						
+
 						userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
 
 						// If account type is team assign user to default branch
-						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {							
-							String branches = solrSearchService.searchBranches("", admin.getCompany(),0,0);
+						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {
+							String branches = solrSearchService.searchBranches("", admin.getCompany(), 0, 0);
 							branches = branches.substring(1, branches.length() - 1);
 							JSONObject defaultBranch = new JSONObject(branches);
 							// assign new user to default branch in case of team account type
@@ -605,17 +610,23 @@ public class UserManagementController {
 			try {
 				regionId = Long.parseLong(region);
 				userId = Long.parseLong(userToAssign);
-				// Assigns the given user as region admin
-				userManagementService.assignRegionAdmin(admin, regionId, userId);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception while parsing region Id or user id", e);
 				throw new NonFatalException("Number format execption while parsing region Id or user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			try {
+				User assigneeUser = userManagementService.getUserByUserId(userId);
+				organizationManagementService.assignRegionToUser(admin, regionId, assigneeUser, true);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning user as region admin.Reason:"+e.getMessage(), e);
+				throw new NonFatalException("Exception while assigning user as region admin.Reason:"+e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 		}
 		// TODO add success message.
 		catch (NonFatalException e) {
-			LOG.error("Exception occured while assigning branch admin. Reason : " + e.getMessage(), e);
+			LOG.error("Exception occured while assigning region admin. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Successfully completed method to assign region admin");
@@ -780,7 +791,7 @@ public class UserManagementController {
 	public String completeRegistration(Model model, HttpServletRequest request) {
 		LOG.info("Method completeRegistration() to complete registration of user started.");
 		User user = null;
-		
+
 		try {
 			String firstName = request.getParameter(CommonConstants.FIRST_NAME);
 			String lastName = request.getParameter(CommonConstants.LAST_NAME);
@@ -821,7 +832,7 @@ public class UserManagementController {
 				LOG.error("Password and confirm password fields do not match");
 				throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 			}
-			
+
 			// Decrypting URL parameters
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
@@ -836,7 +847,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
-			
+
 			long companyId = 0;
 			try {
 				companyId = Long.parseLong(companyIdStr);
@@ -859,7 +870,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
-			
+
 			try {
 				// change user's password
 				authenticationService.changePassword(user, password);
@@ -868,7 +879,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
 
@@ -890,7 +901,7 @@ public class UserManagementController {
 			else {
 				LOG.debug("License details not found for the user's company");
 			}
-			
+
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 
 				// get the user's canonical settings
@@ -900,14 +911,14 @@ public class UserManagementController {
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present
-			}	
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.COMPLETE_REGISTRATION;
 		}
-		
+
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
 		return JspResolver.LINKEDIN_ACCESS;
 	}
@@ -942,13 +953,14 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in validating User. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_PASSWORD, e);
 			}
-			
+
 			// change user's password
 			authenticationService.changePassword(user, newPassword);
 			LOG.info("change user password executed successfully");
 
 			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while changing password. Reason : " + e.getMessage(), e);
@@ -981,93 +993,97 @@ public class UserManagementController {
 		}
 		LOG.debug("change password form parameters validated successfully");
 	}
-	
+
 	/**
 	 * Returns the linked in authorization page
+	 * 
 	 * @param model
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value="/linkedinauthpage", method = RequestMethod.GET)
-	public String getLinkedInAuthPage(Model model,HttpServletRequest request){
-		
+	@RequestMapping(value = "/linkedinauthpage", method = RequestMethod.GET)
+	public String getLinkedInAuthPage(Model model, HttpServletRequest request) {
+
 		HttpSession session = request.getSession(false);
-		if(session == null){
+		if (session == null) {
 			LOG.error("Session is null!");
 		}
-		
+
 		LOG.info("getLinkedInAuthPage called");
-		LinkedInRequestToken requestToken;	
-		try{
+		LinkedInRequestToken requestToken;
+		try {
 			requestToken = userManagementService.getLinkedInRequestToken();
 		}
-		catch(Exception e){
+		catch (Exception e) {
 			LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", e.getMessage());
 			return JspResolver.ERROR_PAGE;
 		}
-        
-        //We will keep the request token in session
-        session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
-        
-        LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
-        
+
+		// We will keep the request token in session
+		session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
+
+		LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
+
 		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
 		model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());
 		return JspResolver.LINKEDIN_MESSAGE;
 	}
-	
+
 	/**
 	 * The url that LinkedIn send request to with the oauth verification code
+	 * 
 	 * @param model
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value="/linkedinauth", method = RequestMethod.GET)
-	public String authenticateLinkedInAccess(Model model,HttpServletRequest request){
-		
+	@RequestMapping(value = "/linkedinauth", method = RequestMethod.GET)
+	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
+
 		LOG.info("LinkedIn authentication url requested");
 		HttpSession session = request.getSession(false);
 		String errorCode = request.getParameter("oauth_problem");
 		UserSettings currentUserSettings;
 		try {
-			if(session == null){
+			if (session == null) {
 				LOG.error("authenticateLinkedInAccess : Session object is null!");
 				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
 			}
-			if(session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null){
+			if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null) {
 				LOG.error("authenticateLinkedInAccess : user canonical settings not found in session!");
-				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");				
+				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");
 			}
-			else{
+			else {
 				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-				if(currentUserSettings.getAgentSettings() == null){
+				if (currentUserSettings.getAgentSettings() == null) {
 					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
 					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
 				}
 			}
-			if( errorCode != null ){
+			if (errorCode != null) {
 				LOG.error("Error code : " + errorCode);
 				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
 				return JspResolver.LINKEDIN_MESSAGE;
 			}
-			
+
 			User user = sessionHelper.getCurrentUser();
-			LinkedInOAuthService oauthService= LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,linkedInApiSecret);
+			LinkedInOAuthService oauthService = LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,
+					linkedInApiSecret);
 			String oauthVerifier = request.getParameter("oauth_verifier");
 			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
-	        LinkedInRequestToken requestToken= (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
+			LinkedInRequestToken requestToken = (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
 			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
-			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(),accessToken.getTokenSecret(),currentUserSettings.getAgentSettings().values());	        
+			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(), currentUserSettings
+					.getAgentSettings().values());
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-			LOG.error(e.getMessage(),e);	
+			LOG.error(e.getMessage(), e);
 			return JspResolver.LINKEDIN_MESSAGE;
 		}
 		session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
 		LOG.info("Access tokens obtained and added to mongo successfully!");
-        model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);		
+		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 		return JspResolver.LINKEDIN_MESSAGE;
 	}
 }

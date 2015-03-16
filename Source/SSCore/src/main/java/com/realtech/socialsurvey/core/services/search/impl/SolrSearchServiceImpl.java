@@ -473,7 +473,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
 		return usersResult;
 	}
-	
+
 	/**
 	 * Method to add User into solr
 	 */
@@ -491,7 +491,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
-			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
+
+			String displayName = user.getFirstName();
+			if (user.getLastName() != null) {
+				displayName = displayName + " " + user.getLastName();
+			}
+			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, displayName);
 
 			/**
 			 * add/update profile url and profile name in solr only when they are not null
