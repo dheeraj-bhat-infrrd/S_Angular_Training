@@ -1283,7 +1283,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("Invalid account type.");
 		}
 		UserSettings canonicalUserSettings = new UserSettings();
-		Map<Long, AgentSettings> agentSettings = null;
+		AgentSettings agentSettings = null;
 		Map<Long, OrganizationUnitSettings> branchesSettings = null;
 		Map<Long, OrganizationUnitSettings> regionsSettings = null;
 		LOG.info("Getting the canonical settings for the user: " + user.toString());
@@ -1320,7 +1320,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				// get the agent settings. If the user is not an agent then there would agent
 				// settings would be null
 				LOG.debug("Gettings agent settings");
-				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+				agentSettings = getAgentSettingsForUserProfiles(user.getUserId());
 				canonicalUserSettings.setAgentSettings(agentSettings);
 				// get the branches profiles and then resolve the parent organization unit.
 				LOG.debug("Gettings branch settings for user profiles");
@@ -1366,12 +1366,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles,
-			Map<Long, AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
+			AgentSettings agentSettings) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Getting branches settings for the user profile list");
 		Map<Long, OrganizationUnitSettings> branchesSettings = organizationManagementService.getBranchSettingsForUserProfiles(userProfiles);
 		// if agent settings is not null, the resolve the settings of branch associated with the
 		// user's agent profiles
-		if (agentSettings != null && agentSettings.size() > 0) {
+		if (agentSettings != null) {
 			LOG.debug("Resolving branches settings for agent profiles");
 			for (UserProfile userProfile : userProfiles) {
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -1404,34 +1404,34 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
-		Map<Long, AgentSettings> agentSettings = null;
-		if (userProfiles != null && userProfiles.size() > 0) {
+	public AgentSettings getAgentSettingsForUserProfiles(long userId) throws InvalidInputException {
+		// check if user has atleast one user profile. If so, then get the user profile
+		AgentSettings agentSettings = getUserSettings(userId);
+		
+		/*if (userProfiles != null && userProfiles.size() > 0) {
 			LOG.info("Get agent settings for the user profiles: " + userProfiles.toString());
-			agentSettings = new HashMap<Long, AgentSettings>();
-			AgentSettings agentSetting = null;
+
 			// get the agent profiles and get the settings for each of them.
 			for (UserProfile userProfile : userProfiles) {
-				agentSetting = new AgentSettings();
+				agentSettings = new AgentSettings();
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 					LOG.debug("Getting settings for " + userProfile);
-					// get the agent id and get the profile
+
+					// get the agent id and get the profile. agent id is the user id in case of agent profile
 					if (userProfile.getAgentId() > 0l) {
-						agentSetting = getUserSettings(userProfile.getAgentId());
-						if (agentSetting != null) {
-							agentSettings.put(userProfile.getAgentId(), agentSetting);
-						}
+						agentSettings = getUserSettings(userProfile.getAgentId());
 					}
 					else {
 						LOG.warn("Not a valid agent id for user profile: " + userProfile + ". Skipping the record");
 					}
+					break;
 				}
 			}
 		}
 		else {
 			throw new InvalidInputException("User profiles are not set");
-		}
-
+		}*/
+		
 		return agentSettings;
 	}
 

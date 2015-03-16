@@ -38,7 +38,6 @@ import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
-import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -194,7 +193,6 @@ public class SocialManagementController {
 		UserSettings userSettings;
 
 		try {
-			User user = sessionHelper.getCurrentUser();
 			if (session == null) {
 				LOG.error("authenticateFacebookAccess : Session object is null!");
 				throw new NonFatalException("authenticateFacebookAccess : Session object is null!");
@@ -226,7 +224,7 @@ public class SocialManagementController {
 			}
 
 			// Storing token in agent settings
-			AgentSettings agentSettings = userSettings.getAgentSettings().get(user.getUserId());
+			AgentSettings agentSettings = userSettings.getAgentSettings();
 			if (agentSettings == null) {
 				throw new InvalidInputException("No Agent settings found in current session");
 			}
@@ -235,7 +233,7 @@ public class SocialManagementController {
 			mediaTokens = updateFacebookToken(accessToken, mediaTokens);
 			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.getAgentSettings().put(user.getUserId(), agentSettings);
+			userSettings.setAgentSettings(agentSettings);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -327,8 +325,7 @@ public class SocialManagementController {
 			}
 
 			// Storing token in agent settings
-			User user = sessionHelper.getCurrentUser();
-			AgentSettings agentSettings = userSettings.getAgentSettings().get(user.getUserId());
+			AgentSettings agentSettings = userSettings.getAgentSettings();
 			if (agentSettings == null) {
 				throw new InvalidInputException("No Agent settings found in current session");
 			}
@@ -337,7 +334,7 @@ public class SocialManagementController {
 			mediaTokens = updateTwitterToken(accessToken, mediaTokens);
 			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.getAgentSettings().put(user.getUserId(), agentSettings);
+			userSettings.setAgentSettings(agentSettings);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -427,8 +424,7 @@ public class SocialManagementController {
 			String accessToken = (String) map.get("access_token");
 
 			// Storing token in agent settings
-			User user = sessionHelper.getCurrentUser();
-			AgentSettings agentSettings = userSettings.getAgentSettings().get(user.getUserId());
+			AgentSettings agentSettings = userSettings.getAgentSettings();
 			if (agentSettings == null) {
 				throw new InvalidInputException("No Agent settings found in current session");
 			}
@@ -437,7 +433,7 @@ public class SocialManagementController {
 			mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.getAgentSettings().put(user.getUserId(), agentSettings);
+			userSettings.setAgentSettings(agentSettings);
 
 			// starting async service for data update from linkedin
 			socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
@@ -464,8 +460,8 @@ public class SocialManagementController {
 			mediaTokens.setLinkedInToken(new LinkedInToken());
 		}
 		else {
-			LOG.debug("Updating the existing media tokens for LinkedIn");
 			if (mediaTokens.getLinkedInToken() == null) {
+				LOG.debug("Updating the existing media tokens for LinkedIn");
 				mediaTokens.setLinkedInToken(new LinkedInToken());
 			}
 		}
@@ -517,9 +513,7 @@ public class SocialManagementController {
 			LOG.info("Token: " + accessToken.getToken());
 
 			// Storing token in agent settings
-			User user = sessionHelper.getCurrentUser();
-			LOG.info(userSettings.getAgentSettings().size()+"");
-			AgentSettings agentSettings = userSettings.getAgentSettings().get(CommonConstants.INITIAL_INDEX);
+			AgentSettings agentSettings = userSettings.getAgentSettings();
 			if (agentSettings == null) {
 				throw new InvalidInputException("No Agent settings found in current session");
 			}
@@ -528,7 +522,7 @@ public class SocialManagementController {
 			mediaTokens = updateGoogleToken(accessToken, mediaTokens);
 			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
 			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.getAgentSettings().put(user.getUserId(), agentSettings);
+			userSettings.setAgentSettings(agentSettings);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
