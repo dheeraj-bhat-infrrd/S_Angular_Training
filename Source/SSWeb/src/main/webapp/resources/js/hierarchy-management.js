@@ -12,9 +12,11 @@ function displayMessage(data) {
 	$("#temp-message").html(data);
 	var displayMessageDiv = $("#display-msg-div");
 	if($(displayMessageDiv).hasClass("success-message")) {
-		showInfo($(displayMessageDiv).html());
+		showInfoMobileAndWeb($(displayMessageDiv).html());
+	}
+	else if($(displayMessageDiv).hasClass("error-message")) {
+		showErrorMobileAndWeb($(displayMessageDiv).html());
 	}	
-	//TODO show toast in case of mobile
 	$("#temp-message").html("");
 }
 

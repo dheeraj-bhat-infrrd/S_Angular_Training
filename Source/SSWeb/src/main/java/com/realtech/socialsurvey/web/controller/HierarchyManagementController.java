@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -440,6 +441,9 @@ public class HierarchyManagementController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 			}
+			catch (UserAssignmentException e) {
+				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.REGION_USER_ASSIGNMENT_ERROR, e);
+			}
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
 				throw new InvalidInputException("Exception occured while adding new region.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
@@ -519,6 +523,9 @@ public class HierarchyManagementController {
 
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+			catch (UserAssignmentException e) {
+				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
 			}
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
 				throw new InvalidInputException("Exception occured while adding new branch.REason : " + e.getMessage(),

@@ -252,9 +252,10 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException 
 	 */
 	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
-			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException;
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
 	 * Method to assign a user to a region
@@ -286,9 +287,10 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException 
 	 */
 	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
-			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException;
+			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
 	 * Method to assign a user to a branch
