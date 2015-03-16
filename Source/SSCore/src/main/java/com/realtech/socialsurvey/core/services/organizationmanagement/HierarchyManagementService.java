@@ -114,9 +114,9 @@ public interface HierarchyManagementService {
 	 */
 	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException;
 
-
 	/**
 	 * Method to add a branch
+	 * 
 	 * @param user
 	 * @param regionId
 	 * @param isDefaultBySystem
@@ -127,8 +127,8 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public Branch addNewBranch(User user, long regionId,int isDefaultBySystem,String branchName, String address1, String address2) throws InvalidInputException,
-			SolrException;
+	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String address1, String address2)
+			throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to add a new region
@@ -141,8 +141,9 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public Region addNewRegion(User user, String regionName,int isDefaultBySystem, String address1, String address2) throws InvalidInputException, SolrException;
-	
+	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2) throws InvalidInputException,
+			SolrException;
+
 	/**
 	 * Method to update a branch
 	 * 
@@ -189,7 +190,7 @@ public interface HierarchyManagementService {
 	 * @return
 	 */
 	public boolean canEditCompany(User user, AccountType accountType);
-	
+
 	/**
 	 * Method to insert region settings into mongo
 	 * 
@@ -197,7 +198,7 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void insertRegionSettings(Region region) throws InvalidInputException;
-	
+
 	/**
 	 * Method to insert branch settings into mongo
 	 * 
@@ -205,4 +206,5 @@ public interface HierarchyManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void insertBranchSettings(Branch branch) throws InvalidInputException;
+
 }

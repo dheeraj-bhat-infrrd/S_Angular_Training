@@ -139,7 +139,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
-	
+
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
@@ -328,22 +328,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Successfully completed method to verify account");
 	}
 
-	// Moved code from RegistrationServiceImpl By RM-05: EOC
-
-	// JIRA SS-42 BY RM05 BOC
-
-	/*
+	/**
 	 * Method to add a new user into a company. Admin sends the invite to user for registering.
 	 */
 	@Transactional
 	@Override
-	public void inviteUserToRegister(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
+	public User inviteUserToRegister(User admin, String firstName, String lastName, String emailId) throws InvalidInputException,
 			UserAlreadyExistsException, UndeliveredEmailException {
 		if (firstName == null || firstName.isEmpty()) {
 			throw new InvalidInputException("First name is either null or empty in inviteUserToRegister().");
-		}
-		if (lastName == null || lastName.isEmpty()) {
-			throw new InvalidInputException("Last name is either null or empty in inviteUserToRegister().");
 		}
 		if (emailId == null || emailId.isEmpty()) {
 			throw new InvalidInputException("Email Id is either null or empty in inviteUserToRegister().");
@@ -358,15 +351,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				CommonConstants.STATUS_NOT_VERIFIED, CommonConstants.ADMIN_USER_NAME);
 		user = userDao.save(user);
 
-		LOG.debug("Creating user profile for :" + emailId + " with profile completion stage : " + CommonConstants.ADD_COMPANY_STAGE);
-		UserProfile userProfile = createUserProfile(user, user.getCompany(), emailId, CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, CommonConstants.DEFAULT_REGION_ID, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-				CommonConstants.ADD_COMPANY_STAGE, CommonConstants.STATUS_INACTIVE, String.valueOf(user.getUserId()),
-				String.valueOf(user.getUserId()));
-		userProfileDao.save(userProfile);
+		LOG.debug("Inserting agent settings for the user:" + user);
+		insertAgentSettings(user);
 
-		sendVerificationLink(user);
-		LOG.info("Method to add a new user, inviteUserToRegister() finished for email id : " + emailId);
+		sendRegistrationCompletionLink(emailId, firstName, lastName, admin.getCompany().getCompanyId());
+		LOG.info("Method to add a new user, inviteUserToRegister finished for email id : " + emailId);
+		return user;
 	}
 
 	/*
@@ -694,41 +684,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return user;
 	}
 
-	/**
-	 * Method to create profile for a region admin
-	 */
-	@Transactional
 	@Override
-	public User assignRegionAdmin(User assigneeUser, long regionId, long userId) throws InvalidInputException {
-		if (assigneeUser == null) {
-			throw new InvalidInputException("Company is null in createRegionAdmin");
-		}
-		if (regionId <= 0l) {
-			throw new InvalidInputException("Region id is invalid in createRegionAdmin");
-		}
-		if (userId <= 0l) {
-			throw new InvalidInputException("User id is invalid in createRegionAdmin");
-		}
-		LOG.info("Method to createRegionAdmin called for regionId : " + regionId + " and userId : " + userId);
-
-		LOG.debug("Selecting user for the userId provided for region admin : " + userId);
-		User user = userDao.findById(User.class, userId);
-		if (user == null) {
-			throw new InvalidInputException("No user found for userId specified in createRegionAdmin");
-		}
-		UserProfile userProfile = createUserProfile(user, assigneeUser.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, regionId, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID,
-				CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE, String.valueOf(assigneeUser.getUserId()),
-				String.valueOf(assigneeUser.getUserId()));
-		userProfileDao.save(userProfile);
-
-		LOG.info("Method to createRegionAdmin finished for regionId : " + regionId + " and userId : " + userId);
-
-		return user;
-	}
-
-	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId,
-			int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
+	@Transactional
+	public UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
+			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
 		LOG.debug("Method createUserProfile called for username : " + user.getLoginName());
 		UserProfile userProfile = new UserProfile();
 		userProfile.setAgentId(agentId);
@@ -950,12 +909,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.SHOW_COMPLETE_REGISTRATION_PAGE);
-
+		String name = firstName;
+		if (lastName != null && !lastName.isEmpty()) {
+			name = name + " " + lastName;
+		}
 		// Send reset password link to the user email ID
-		if(enableKafka.equals(CommonConstants.YES)){
-			emailServices.queueRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
-		}else{
-			emailServices.sendRegistrationCompletionEmail(url, emailId, firstName + " " + lastName);
+		if (enableKafka.equals(CommonConstants.YES)) {
+			emailServices.queueRegistrationCompletionEmail(url, emailId, name);
+		}
+		else {
+			emailServices.sendRegistrationCompletionEmail(url, emailId, name);
 		}
 	}
 
@@ -1033,12 +996,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		try {
 			LOG.debug("Calling email services to send verification mail for user " + user.getEmailId());
-			if(enableKafka.equals(CommonConstants.YES)){
-				emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " " + (user.getLastName()!=null?user.getLastName():""));
-			}else{
-				emailServices.sendVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " " + (user.getLastName()!=null?user.getLastName():""));
+			if (enableKafka.equals(CommonConstants.YES)) {
+				emailServices.queueVerificationMail(verificationUrl, user.getEmailId(), user.getFirstName() + " "
+						+ (user.getLastName() != null ? user.getLastName() : ""));
 			}
-			
+			else {
+				emailServices.sendVerificationMail(verificationUrl, user.getEmailId(),
+						user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+			}
+
 		}
 		catch (InvalidInputException e) {
 			throw new InvalidInputException("Could not send mail for verification.Reason : " + e.getMessage(), e);
@@ -1074,9 +1040,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		storeCompanyAdminInvitation(queryParam, emailId);
 
 		LOG.debug("Calling email services to send registration invitation mail");
-		if(enableKafka.equals(CommonConstants.YES)){
+		if (enableKafka.equals(CommonConstants.YES)) {
 			emailServices.queueRegistrationInviteMail(url, emailId, firstName, lastName);
-		}else{
+		}
+		else {
 			emailServices.sendRegistrationInviteMail(url, emailId, firstName, lastName);
 		}
 
@@ -1316,48 +1283,40 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * fetching all settings for all account types
 		 */
-		/*switch (accountType) {
-			case FREE:
-			case INDIVIDUAL:
-			case TEAM:
-				LOG.debug("Individual/ Team account type");
-				// get the agent profile as well
-				LOG.debug("Gettings agent settings");
-				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
-				canonicalUserSettings.setAgentSettings(agentSettings);
-				break;
-			case COMPANY:
-				LOG.debug("Company account type");
-				// get the agent settings. If the user is not an agent then there would agent
-				// settings would be null
-				LOG.debug("Gettings agent settings");
-				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
-				canonicalUserSettings.setAgentSettings(agentSettings);
-				// get the branches profiles and then resolve the parent organization unit.
-				LOG.debug("Gettings branch settings for user profiles");
-				branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
-				canonicalUserSettings.setBranchSettings(branchesSettings);
-				break;
-			case ENTERPRISE:
-				LOG.debug("Company account type");*/
-				
-				// get the agent settings. If the user is not an agent then there would agent
-				// settings would be null
-				LOG.debug("Gettings agent settings");
-				agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
-				canonicalUserSettings.setAgentSettings(agentSettings);
-				// get the branches profiles and then resolve the parent organization unit.
-				LOG.debug("Gettings branch settings for user profiles");
-				branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
-				canonicalUserSettings.setBranchSettings(branchesSettings);
-				// get the regions profiles and then resolve the parent organization unit.
-				LOG.debug("Gettings region settings for user profiles");
-				regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);
-				canonicalUserSettings.setRegionSettings(regionsSettings);
-				/*break;
-			default:
-				throw new InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded");
-		}*/
+		/*
+		 * switch (accountType) { case FREE: case INDIVIDUAL: case TEAM:
+		 * LOG.debug("Individual/ Team account type"); // get the agent profile as well
+		 * LOG.debug("Gettings agent settings"); agentSettings =
+		 * getAgentSettingsForUserProfiles(user.getUserProfiles());
+		 * canonicalUserSettings.setAgentSettings(agentSettings); break; case COMPANY:
+		 * LOG.debug("Company account type"); // get the agent settings. If the user is not an agent
+		 * then there would agent // settings would be null LOG.debug("Gettings agent settings");
+		 * agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+		 * canonicalUserSettings.setAgentSettings(agentSettings); // get the branches profiles and
+		 * then resolve the parent organization unit.
+		 * LOG.debug("Gettings branch settings for user profiles"); branchesSettings =
+		 * getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
+		 * canonicalUserSettings.setBranchSettings(branchesSettings); break; case ENTERPRISE:
+		 * LOG.debug("Company account type");
+		 */
+
+		// get the agent settings. If the user is not an agent then there would agent
+		// settings would be null
+		LOG.debug("Gettings agent settings");
+		agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+		canonicalUserSettings.setAgentSettings(agentSettings);
+		// get the branches profiles and then resolve the parent organization unit.
+		LOG.debug("Gettings branch settings for user profiles");
+		branchesSettings = getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
+		canonicalUserSettings.setBranchSettings(branchesSettings);
+		// get the regions profiles and then resolve the parent organization unit.
+		LOG.debug("Gettings region settings for user profiles");
+		regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);
+		canonicalUserSettings.setRegionSettings(regionsSettings);
+		/*
+		 * break; default: throw new
+		 * InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded"); }
+		 */
 		return canonicalUserSettings;
 	}
 
@@ -1765,6 +1724,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	}
 
+	/**
+	 * Method to insert basic settings for a user
+	 */
 	@Override
 	public void insertAgentSettings(User user) throws InvalidInputException {
 		LOG.info("Inserting agent settings. User id: " + user.getUserId());
@@ -1847,5 +1809,4 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken(linkedinRedirectUri);
 		return requestToken;
 	}
-
 }

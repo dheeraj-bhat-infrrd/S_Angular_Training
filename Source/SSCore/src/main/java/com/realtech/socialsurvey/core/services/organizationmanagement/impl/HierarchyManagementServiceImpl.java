@@ -576,7 +576,7 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 
 		LOG.debug("Updating solr with newly inserted region");
 		solrSearchService.addOrUpdateRegionToSolr(region);
-		
+
 		LOG.info("Successfully completed method add new region for regionName : " + regionName);
 		return region;
 	}
