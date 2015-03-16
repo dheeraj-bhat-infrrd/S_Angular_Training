@@ -333,7 +333,8 @@
 .st-score-txt {
     height: 110px;
     line-height: 26px;
-    width: 360px;
+    width: 50%;
+    border-right: 1px solid #dcdcdc;
 }
 
 .icn-spanner {

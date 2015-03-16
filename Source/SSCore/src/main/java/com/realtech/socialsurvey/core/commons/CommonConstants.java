@@ -41,10 +41,20 @@ public interface CommonConstants {
 	/**
 	 * Accounts master constants
 	 */
+	public static final int ACCOUNTS_MASTER_FREE = 5;
 	public static final int ACCOUNTS_MASTER_INDIVIDUAL = 1;
 	public static final int ACCOUNTS_MASTER_TEAM = 2;
 	public static final int ACCOUNTS_MASTER_COMPANY = 3;
 	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
+	
+	/**
+	 *  Verticals master constants 
+	 */
+	public static final int VERTICALS_MASTER_CUSTOM = -1;
+	public static final int VERTICALS_MASTER_BANKING = 1;
+	public static final int VERTICALS_MASTER_MORTGAGE = 2;
+	public static final int VERTICALS_MASTER_REALTOR = 3;
+	
 
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
@@ -82,6 +92,7 @@ public interface CommonConstants {
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
+	public static final int EMPTY_LIST = 0;
 	public static final int MAX_DEFAULT_REGIONS = 1;
 	public static final int MAX_DEFAULT_BRANCHES = 1;
 	public static final double MIN_RATING_SCORE = 0;
@@ -100,6 +111,7 @@ public interface CommonConstants {
 	public static final String AUTO_PAYMENT_MODE = "A";
 	public static final int INITIAL_PAYMENT_RETRIES = 0;
 	public static final String PAYMENT_GATEWAY = "Braintree";
+	public static final String FREE_ACCOUNT = "Free Account";
 	public static final String IS_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
 	public static final String COMPANY_COLUMN = "company";
 	public static final String COMPANY_ID_COLUMN = "companyId";
@@ -117,6 +129,7 @@ public interface CommonConstants {
 	public static final String SURVEY_COMPANY_COLUMN = "company";
 	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
+	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
 
 	/**
 	 * Mongo entities and column name constants
@@ -162,6 +175,8 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
+	public static final String VERTICAL_COLUMN = "verticalsMaster";
+	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade"; 
 	public static final String LINKEDIN_AUTH_URL = "authUrl";
 	public static final String LINKEDIN_REQUEST_TOKEN = "linkedinRequestToken";
 	public static final String SUCCESS_ATTRIBUTE = "success";
@@ -198,8 +213,9 @@ public interface CommonConstants {
 	public static final int MAX_REGION_LIMIT_COMPANY = 1;
 	public static final int INITIAL_INDEX = 0;
 	public static final int PAYMENT_INCREMENT = 1;
-	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
+	public static final int MAX_LICENSE_DETAILS_RECORDS_PER_COMPANY = 1;
+	public static final int MINIMUM_SIZE_OF_ARRAY = 1;
 	public static final String PROFILE_LEVEL_COMPANY = "COMPANY";
 	public static final String PROFILE_LEVEL_REGION = "REGION";
 	public static final String PROFILE_LEVEL_BRANCH = "BRANCH";
@@ -338,6 +354,11 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
 	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
+	
+	/*
+	 * Mongo constants
+	 */
+	public static final String COMPANY_SETTINGS_COLLECTION = "COMPANY_SETTINGS";
 	public static final int SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS = 105;
 	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
 	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;

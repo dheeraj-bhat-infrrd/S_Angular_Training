@@ -298,7 +298,7 @@
         width: 260px;
         height: 110px;
         padding: 0 !important;
-        float: none;
+        float: none !important;
         border: 0;
         margin: 0 auto;
     }
@@ -838,6 +838,7 @@
         font-size: 14px;
         padding-left: 10px;
         border-bottom: 0;
+        margin-top: 0;
     }
     .hr-dsh-adj-rt{
         line-height: 48px;
@@ -978,8 +979,9 @@
         height: 350px;
         float: none !important;
         margin: 0 auto;
-        width: 300px;
+        width: auto;
         top: 0px;
+        padding: 0;
     }
     .dash-main-left{
         height: 310px;
@@ -1044,53 +1046,82 @@
     .acc-type-item{
         margin-right: 0;
     }
-}
-
-
-
-/* ============== ANTHING ABOVE SMARTPHONES ==============*/
-@media (min-width: 768px) {
-    .login-wrapper-resp{
-        width: 457px;
+    .v-ed-txt-sm-adj{
+        margin-left: 96px;
+        margin-top: 15px;
         float: none;
-        box-shadow: 0px 1px 20px 2px #7C7C7C;
+        display: inline-block;
     }
-    
-    .error-wrapper{
-        width: 365px;
-        margin: 0 auto 10px;
+    .v-um-hdr-right{
+        float: left !important;
+        clear: both;
     }
-    .login-footer-wrapper{
-        width: 457px;
-        float: none;
-        margin-top: -5px;
+    .v-um-tbl-wrapper{
         padding: 0;
+        margin: 0 -15px;
     }
-    .payment-form {
-        max-width: 960px;
-        width: auto;
-        padding-bottom: 30px;
+    .v-edit-lft{
+        padding-left: 0;
+        padding-right: 0;
     }
-    .padding-left-25 {
-        padding-left: 25px;
-    }
-    .padding-right-25{
-        padding-right: 25px;
-    }
-    .header-links{
-        font-size: 16px;
-    }
-    .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
-        display: block !important;
-    }
-    .overlay-toast{
-       // display: none;
-    }
-    .header-slider-wrapper{
+    .v-ed-lbl{
         display: none;
     }
+    .v-ed-txt-sm, .v-ed-txt{
+        width: 100%;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 0;
+    }
+    .v-edit-row {
+        margin-bottom: 10px;
+        padding: 0 10px;
+    }
+    tr.u-tbl-row td{
+        font-size: 12px;
+    }
+    .v-tbl-rgn-adm, .v-tbl-of-adm, .v-tbl-ln-of, .v-tbl-mail, .v-tbl-online{
+        display: none;
+    }
+    .v-um-hdr-left, .v-um-hdr-right{
+        font-size: 14px;
+    }
+    .v-tbl-edit,.v-tbl-rem{
+        width: 6%;
+    }
+    .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item {
+        margin-bottom: 1px;
+    }
+    .col-lg-6.col-md-6.col-sm-6.col-xs-12.um-panel-item.overflow-hidden {
+        margin-bottom: -9px;
+    }
+     .encompass-testconnection-adj{
+        right: 40px;
+    }
+    .encompass-url-adj{
+        padding-right: 100px;
+    }
+    .soc-nw-wrapper {
+        padding: 10px;
+        margin: 0 auto;
+        width: 200px;
+    }
+    .soc-nw-adj {
+        margin-right: 0;
+    }
+    .float-right.header-right.clearfix.hr-dsh-adj-rt{
+        margin-top: 0;
+    }
+    .row.row-dash-top-adj {
+        margin-bottom: 0;
+    }
+    .bd-svry-container{
+        padding: 0;
+    }
+    .srv-tbl-txt {
+        font-size: 13px;
+    }
 }
-
 
 
 /* ============== ONLY TABLETS ==============*/
@@ -1154,6 +1185,7 @@
     }
     .st-score-txt, .st-score-rt{
         width: 100%;
+        border-right: 0;
     }
     .score-rt-post-OR {
         padding-left: 55px;
@@ -1276,6 +1308,40 @@
         left: -10px;
         top: -21px;
     }
+    .v-ed-txt {
+        width: 224px;
+    }
+    .v-ed-lbl{
+        width: 86px;
+        margin-right: 10px;
+    }
+    .v-ed-txt-sm {
+        width: 224px;
+        margin-right: 0;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 96px;
+        margin-top: 15px;
+    }
+    .soc-nw-wrapper {
+        padding: 0px 130px 0;
+    }
+    .soc-nw-adj {
+        margin-right: 100px;
+    }
+    .score-rt-post{
+        width: 290px;
+        padding: 0;
+        margin: 0 auto;
+        float: none !important;
+    }
+    .srv-tbl-txt{
+        width: 468px !important;
+        font-size: 14px;
+    }
+    .srv-tbl-rem, .srv-tbl-edit{
+        font-size: 13px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1293,16 +1359,16 @@
         width: 240px;
     }
     .st-score-txt{
-        width: 310px;
+        width: 50%;
     }
     .st-score-rt {
-        width: 600px;
+        width: 50%;
     }
     .score-rt-post{
-        padding: 0px 0px 20px 0px;
+        padding: 0px 90px 0px;
     }
     .score-rt-post-OR {
-        padding-left: 15px;
+        padding: 0 90px;
     }
     .lp-con-row-item {
         width: 225px;
@@ -1383,6 +1449,22 @@
         transform: scale(0.85);
         top: -36px;
     }
+    .v-ed-txt-sm{
+        width: 300px;
+    }
+    .v-ed-txt-sm-adj{
+        margin-left: 125px;
+        margin-top: 15px;
+    }
+    .soc-nw-wrapper{
+        padding: 10px 35px 0px;
+    }
+    .soc-nw-adj {
+        margin-right: 40px;
+    }
+    .srv-tbl-txt{
+        width: 680px !important;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -1430,3 +1512,45 @@
 
 
 
+/* ============== ANTHING ABOVE SMARTPHONES ==============*/
+@media (min-width: 768px) {
+    .login-wrapper-resp{
+        width: 457px;
+        float: none;
+        box-shadow: 0px 1px 20px 2px #7C7C7C;
+    }
+    
+    .error-wrapper{
+        width: 365px;
+        margin: 0 auto 10px;
+    }
+    .login-footer-wrapper{
+        width: 457px;
+        float: none;
+        margin-top: -5px;
+        padding: 0;
+    }
+    .payment-form {
+        max-width: 960px;
+        width: auto;
+        padding-bottom: 30px;
+    }
+    .padding-left-25 {
+        padding-left: 25px;
+    }
+    .padding-right-25{
+        padding-right: 25px;
+    }
+    .header-links{
+        font-size: 16px;
+    }
+    .create-branch-dd, .prof-left-panel-wrapper, .prof-right-panel-wrapper{
+        display: block !important;
+    }
+    .overlay-toast{
+       // display: none;
+    }
+    .header-slider-wrapper{
+        display: none;
+    }
+}

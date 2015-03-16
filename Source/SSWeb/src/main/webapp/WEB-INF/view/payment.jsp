@@ -36,6 +36,7 @@
     			}
     		</style>
 </c:when>
+<c:when test="${ paidUpgrade == 1 }"></c:when>
 <c:otherwise>
 	<!DOCTYPE">
 	<html>
@@ -96,6 +97,7 @@
 	          <div id="payment-details-form" class="payment-details-form">
 	          		<c:choose>
 	          		<c:when test="${ paymentChange == 1 }"><form id="checkout"></c:when>
+	          		<c:when test="${ paidUpgrade == 1 }"><form id="checkout"></c:when>
 	          		<c:otherwise>
 	          			<form id="checkout" method="POST" action="./subscribe.do">
 	          			<div id="dropin" class="payment-dropin"></div>	          			
@@ -118,6 +120,21 @@
 						        	<div id="exp-year-err" class="card-err-txt"></div>
 						        	<input type="button" onclick="updateCardDetails();" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
 						        </c:when>
+						        <c:when test="${ paidUpgrade == 1 }">
+						        	<div class="clearfix">
+						        		<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="16" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
+						        	</div>
+						        	<div id="card-num-err" class="card-err-txt"></div>
+						        	<div class="clearfix">
+						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-month" data-non-empty="true" placeholder='<spring:message code="label.expmonth.key"/>'>
+						        	</div>
+						        	<div id="exp-month-err" class="card-err-txt"></div>
+						        	<div class="clearfix">
+						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
+						        	</div>
+						        	<div id="exp-year-err" class="card-err-txt"></div>
+						        	<input type="button" onclick="makePaymentForUpgrade();" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
+						        </c:when>
 						        <c:otherwise>
 					            	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
 					            </c:otherwise>
@@ -125,6 +142,9 @@
 					            <input type="button" id="cancel-payment" class="btn-payment float-right" value='<spring:message code="label.cancel.key"/>'/>
 				            </div>
 				        <c:choose>
+				        <c:when test="${ paidUpgrade == 1 }">
+				        	<input type="hidden" value="${accounttype}" name="accounttype">
+				        </c:when>
 				        <c:when test="${ paymentChange == 1 }"></c:when>
 				        <c:otherwise>
 			            <input type="hidden" value="${accounttype}" name="accounttype"></c:otherwise>
@@ -133,7 +153,7 @@
 	      	</div>
         </div>
     </div>  
-    <c:if test="${ paymentChange == 1 }">
+    <c:if test="${ paymentChange == 1 || paidUpgrade == 1 }">
     		</div>
     	</div>
     </div>
@@ -143,7 +163,8 @@
 	   $(document).ready(function() {
 		   console.log("Loading braintree");
 		   var paymentChangeStatus = '<c:out value="${paymentChange}"/>';
-		   if(paymentChangeStatus != 1){
+           var paidUpgrade = '<c:out value="${paidUpgrade}"/>';
+		   if(paymentChangeStatus != 1 && paidUpgrade!=1 ){
 			   console.log("Setting up the payment form");
 				braintree.setup('${clienttoken}', 'dropin', {
 					container : 'dropin'
@@ -186,7 +207,69 @@
 				   }
 				 });			   
 		   }		   		   
-	   }  
+	   }
+	   
+	   function makePaymentForUpgrade(){
+		   console.log("checking if form is valid");
+		   if(validateCardForm()){
+			   console.log("Submitting the form");
+			   showOverlay();
+			   cardNumber = $("#card-number").val();
+			   expMonth = $("#exp-month").val();
+			   expYear = $("#exp-year").val();
+			   console.log("Fetched values");
+			   var client = new braintree.api.Client({clientToken: '${clienttoken}'});
+			   client.tokenizeCard({number: cardNumber, expirationDate: expMonth + "/" + expYear }, function (err, nonce) {
+				   if( err == null){
+					   makeAjaxCallToPlanUpgrade(nonce);
+				   }
+				   else{
+					   displayError(err);
+				   }
+				 });			   
+		   }	
+	   }
+	   
+	   function makeAjaxCallToPlanUpgrade(nonce){
+		   hidePayment();
+		   showOverlay();
+		   console.log("making ajax call with nonce: " + nonce)
+		   var data = "payment_method_nonce=" + nonce+"&accounttype=" + $('#account-type').val();
+		   console.log(data);
+
+		   var url = "./upgradeplan.do";
+		   $.ajax({
+			  url : url,
+			  type : "POST",
+			  data : data,
+			  success : showMessage,
+			  error : function(e) {
+					redirectErrorpage();
+				}
+		   });
+	   }
+	   
+	   function showMessage(data){
+       	var jsonData = JSON.parse(data);
+       	console.log("Data recieved : " + jsonData);
+       	if(jsonData["success"] == 1){
+       		console.log("Account upgrade successful. Redirecting to dashboard");
+           	$('#overlay-toast').html(jsonData["message"]);
+	    		console.log("Added toast message. Showing it now");
+	    		showToast();
+	    		console.log("Finished showing the toast");
+           	setTimeout(function (){location.href = "./landing.do";},4000);
+       	}
+       	else{
+       		console.error("Error occured while upgrading. ");
+	        	$('.overlay-payment').hide();
+	        	hideOverlay();
+               $('#overlay-toast').html(jsonData["message"]);
+	    		console.log("Added toast message. Showing it now");
+	    		showToast();
+	    		console.log("Finished showing the toast");
+       	}
+       }
 	   
 	   function makeAjaxCallToUpgrade(nonce){
 		   console.log("making ajax call with nonce: " + nonce)
@@ -385,6 +468,7 @@
    
    <c:choose>
    <c:when test="${ paymentChange == 1 }"></c:when>
+   <c:when test="${ paidUpgrade == 1 }"></c:when>
    <c:otherwise>
 	    <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 	    <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>

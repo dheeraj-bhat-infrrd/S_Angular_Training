@@ -235,4 +235,76 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<Branch> getBranchesByRegionId(long regionId) throws InvalidInputException;
+
+	/**
+	 * Method to add a new region and assign the user to the newly created region if userId or
+	 * emailId is provided
+	 * 
+	 * @param user
+	 * @param regionName
+	 * @param isDefaultBySystem
+	 * @param address1
+	 * @param address2
+	 * @param selectedUserId
+	 * @param emailIdsArray
+	 * @param isAdmin
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException 
+	 */
+	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+	/**
+	 * Method to assign a user to a region
+	 * 
+	 * @param adminUser
+	 * @param regionId
+	 * @param assigneeUser
+	 * @param isAdmin
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignRegionToUser(User adminUser, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException;
+
+	/**
+	 * Method to add a new branch and assign the user to the newly created branch if userId or
+	 * emailId is provided
+	 * 
+	 * @param user
+	 * @param branchName
+	 * @param isDefaultBySystem
+	 * @param address1
+	 * @param address2
+	 * @param selectedUserId
+	 * @param emailIdsArray
+	 * @param isAdmin
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException 
+	 */
+	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
+			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+	/**
+	 * Method to assign a user to a branch
+	 * 
+	 * @param adminUser
+	 * @param branchId
+	 * @param regionId
+	 * @param assigneeUser
+	 * @param isAdmin
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public void assignBranchToUser(User adminUser, long branchId, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException;
+
 }
