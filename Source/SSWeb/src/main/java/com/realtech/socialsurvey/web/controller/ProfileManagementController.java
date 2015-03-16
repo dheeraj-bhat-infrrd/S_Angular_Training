@@ -160,13 +160,9 @@ public class ProfileManagementController {
 		LOG.debug("Method fetchUserProfile() called from ProfileManagementService");
 		OrganizationUnitSettings profile = null;
 		try {
-			long agentId = 0;
 			long branchId = 0;
 			long regionId = 0;
 
-			if (settings.getAgentSettings().size() > 0) {
-				agentId = user.getUserProfiles().get(0).getAgentId();
-			}
 			if (settings.getBranchSettings().size() > 0) {
 				branchId = user.getUserProfiles().get(0).getBranchId();
 			}
@@ -174,8 +170,8 @@ public class ProfileManagementController {
 				regionId = user.getUserProfiles().get(0).getRegionId();
 			}
 
-			LOG.debug("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
-			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, agentId, branchId, regionId);
+			LOG.debug("branchId: " + branchId + ", regionId: " + regionId);
+			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, branchId, regionId);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
@@ -459,8 +455,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -469,10 +464,10 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getRegionSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.ABOUT_ME_SOLR, aboutMe);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, aboutMe);
 			}
 			else {
 				throw new InvalidInputException("Error occurred while updating About me.", DisplayMessageConstants.GENERAL_ERROR);
@@ -563,8 +558,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -573,17 +567,17 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				}
 				else {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
 			}
 			else {
@@ -696,8 +690,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -706,19 +699,16 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
-				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
-				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS, address1 + ", " + address2);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				}
 				else {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
 			}
 			else {
@@ -822,14 +812,13 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, logoUrl);
 				agentSettings.setLogo(logoUrl);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in uploading logo.", DisplayMessageConstants.GENERAL_ERROR);
@@ -934,18 +923,17 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						profileImageUrl);
 				agentSettings.setProfileImageUrl(profileImageUrl);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1051,8 +1039,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1064,7 +1051,7 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while updating emailids.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1230,8 +1217,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1240,7 +1226,7 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while updating phone numbers.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1375,8 +1361,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1385,7 +1370,7 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while updating web addresses.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1518,8 +1503,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1528,7 +1512,7 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating fb token.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1629,8 +1613,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1639,7 +1622,7 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating twitter token.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1740,8 +1723,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1750,7 +1732,7 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in upadting linkedin token.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1851,8 +1833,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1861,7 +1842,7 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating yelp token.", DisplayMessageConstants.GENERAL_ERROR);
@@ -1964,15 +1945,14 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				achievements = profileManagementService.addAgentAchievements(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
 						agentSettings, achievements);
 				agentSettings.setAchievements(achievements);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding achievements.", DisplayMessageConstants.GENERAL_ERROR);
@@ -2062,15 +2042,14 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				associations = profileManagementService.addAgentAssociations(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
 						agentSettings, associations);
 				agentSettings.setAssociations(associations);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
@@ -2160,15 +2139,14 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				licenses = profileManagementService.addAgentLicences(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						authorisedIn);
 				agentSettings.setLicenses(licenses);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
