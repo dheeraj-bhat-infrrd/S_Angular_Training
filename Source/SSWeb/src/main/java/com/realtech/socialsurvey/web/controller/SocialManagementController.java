@@ -144,7 +144,7 @@ public class SocialManagementController {
 
 			// Building linkedin authUrl
 			case "linkedin":
-				if (!socialFlow.isEmpty()) {
+				if (socialFlow != null && !socialFlow.isEmpty()) {
 					session.setAttribute(CommonConstants.SOCIAL_FLOW, socialFlow);
 				}
 				
