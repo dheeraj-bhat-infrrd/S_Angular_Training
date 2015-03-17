@@ -256,7 +256,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
+	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId,
 			long regionId) throws InvalidInputException {
 		LOG.info("Method aggregateUserProfile() called from ProfileManagementService");
 		if (user == null) {
@@ -284,7 +284,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Individual
 					if (user.isAgent()) {
 						LOG.debug("Aggregate Profile for Agent of Individual/Team account type");
-						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings().get(agentId));
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings());
 					}
 					break;
 
@@ -300,7 +300,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					else if (user.isAgent()) {
 						LOG.debug("Aggregate Profile for Agent of Company account type");
 						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId), settings
-								.getAgentSettings().get(agentId));
+								.getAgentSettings());
 					}
 					break;
 
@@ -323,7 +323,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					else if (user.isAgent()) {
 						LOG.debug("Aggregate Profile for Agent of Enterprise account type");
 						userProfile = aggregateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
-								.getBranchSettings().get(branchId), settings.getAgentSettings().get(agentId));
+								.getBranchSettings().get(branchId), settings.getAgentSettings());
 					}
 					break;
 
