@@ -826,6 +826,7 @@ public class UserManagementController {
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 				user.setFirstName(firstName);
 				user.setLastName(lastName);
+				user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 				user.setStatus(CommonConstants.STATUS_ACTIVE);
 				user.setModifiedBy(String.valueOf(user.getUserId()));
 				user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
@@ -866,8 +867,9 @@ public class UserManagementController {
 				LOG.debug("License details not found for the user's company");
 			}
 			
+			// updating the flags for user profiles
+			
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
 				sessionHelper.getCanonicalSettings(session);

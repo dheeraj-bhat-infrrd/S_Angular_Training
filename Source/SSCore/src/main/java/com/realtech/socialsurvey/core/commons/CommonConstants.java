@@ -173,6 +173,7 @@ public interface CommonConstants {
 	
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
+	public static final String SOCIAL_FLOW = "socialFlow";
 
 	/**
 	 * Batch Constants
