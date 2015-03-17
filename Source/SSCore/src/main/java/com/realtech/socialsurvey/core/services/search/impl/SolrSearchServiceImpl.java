@@ -87,7 +87,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.REGION_NAME_SOLR + ":" + regionPattern);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_COLUMN + ":"
-					+ CommonConstants.STATUS_ACTIVE);
+					+ CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
 			solrQuery.setStart(start);
 			if (rows > 0) {
 				solrQuery.setRows(rows);
@@ -140,7 +140,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery query = new SolrQuery();
 			query.setQuery(CommonConstants.BRANCH_NAME_SOLR + ":" + branchPattern);
 			query.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
-					+ CommonConstants.STATUS_ACTIVE);
+					+ CommonConstants.STATUS_ACTIVE,CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
 			query.setStart(start);
 
 			if (rows > 0) {
