@@ -232,14 +232,17 @@
         
         $('#btn-add-question').click(function(){
             $('#bd-srv-pu').show();
+            $('body').addClass('body-no-scroll');
         }); 
         
         $('.bd-q-btn-cancel').click(function(){
             $('#bd-srv-pu').hide();
+            $('body').removeClass('body-no-scroll');
         }); 
         
         $('.bd-q-btn-done').click(function(){
             $('#bd-srv-pu').hide();
+            $('body').removeClass('body-no-scroll');
         }); 
         
         $(document).on('click','.bd-tab-rat',function(){
