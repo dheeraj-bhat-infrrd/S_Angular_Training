@@ -141,7 +141,6 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					
 					/*UserProfile highestUserProfile = null;
 					UserProfile companyAdminProfile = null;
 					// fetch the highest user profile for user
@@ -153,8 +152,8 @@ public class LoginController {
 						LOG.error("No user profiles found for the user");
 						return JspResolver.ERROR_PAGE;
 					}*/
-					//Compute all conditions for user and if user is CA then check for profile completion stage.
 					
+					//Compute all conditions for user and if user is CA then check for profile completion stage.
 					if(user.isCompanyAdmin()){
 						UserProfile adminProfile=null;
 						for(UserProfile userProfile:user.getUserProfiles()){
@@ -163,8 +162,10 @@ public class LoginController {
 						}
 						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
 					}
-					else
+					else {
 						redirectTo = JspResolver.LANDING;
+					}
+					
 					if(redirectTo.equals(JspResolver.LANDING)){
 						// get the user's canonical settings
 						LOG.info("Fetching the user's canonical settings and setting it in session");
@@ -292,7 +293,6 @@ public class LoginController {
 		}
 		return JspResolver.RESET_PASSWORD;
 	}
-
 	// RM-06 : EOC
 
 	/**
@@ -386,7 +386,6 @@ public class LoginController {
 	 * @param response
 	 * @return
 	 */
-
 	@RequestMapping(value = "/logout")
 	public String initLogoutPage(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("logging out");
@@ -457,47 +456,5 @@ public class LoginController {
 		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
 	}
-
-	/*
-	 * private void setSettingVariablesInSession(HttpSession session) {
-	 * LOG.info("Settings related session values being set."); if
-	 * (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) { //
-	 * setting the logo name UserSettings userSettings = (UserSettings)
-	 * session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION); // check if company
-	 * has a logo if (userSettings.getCompanySettings().getLogo() != null) {
-	 * LOG.debug("Settings logo image from company settings");
-	 * session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION,
-	 * userSettings.getCompanySettings().getLogo()); } else {
-	 * LOG.debug("Could not find logo settings in company. Checking in lower heirarchy."); // TODO:
-	 * Check the lower level hierarchy for logo } // check for the mail content String body = null;
-	 * FileContentReplacements replacements = new FileContentReplacements();
-	 * replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER +
-	 * EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY); if
-	 * (userSettings.getCompanySettings().getMail_content() == null) {
-	 * LOG.debug("Setting default survey participation mail body."); // set the mail contents try {
-	 * body = fileOperations.replaceFileContents(replacements);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
-	 * body); } catch (InvalidInputException e) {
-	 * LOG.warn("Could not set mail content for survey participation"); } } else {
-	 * LOG.debug("Company already has mail body settings. Hence, setting the same"); if
-	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION,
-	 * userSettings.getCompanySettings() .getMail_content().getTake_survey_mail().getMail_body()); }
-	 * else { try { body = fileOperations.replaceFileContents(replacements);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body); }
-	 * catch (InvalidInputException e) {
-	 * LOG.warn("Could not set mail content for survey participation"); } } if
-	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null)
-	 * { session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
-	 * userSettings.getCompanySettings()
-	 * .getMail_content().getTake_survey_reminder_mail().getMail_body()); } else { try { body =
-	 * fileOperations.replaceFileContents(replacements);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
-	 * body); } catch (InvalidInputException e) {
-	 * LOG.warn("Could not set mail content for survey participation reminder"); } } } } }
-	 */
-
 }
-
 // JIRA SS-21 : by RM-06 : EOC

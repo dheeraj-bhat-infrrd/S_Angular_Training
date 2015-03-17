@@ -79,12 +79,19 @@ $(document).ready(function() {
 	
 	// close on error
 	var error = "${error}";
+	var flow = "${socialFlow}";
 	if (parseInt(error) == 1) {
+		if (flow == "registration") {
+			parentWindow.location.href = "./landing.do";
+		}
 		window.close();
 	}
 	
 	// close on success
 	setTimeout(function() {
+		if (flow == "registration") {
+			parentWindow.location.href = "./landing.do";
+		}
 		window.close();
 	}, 3000);
 });
