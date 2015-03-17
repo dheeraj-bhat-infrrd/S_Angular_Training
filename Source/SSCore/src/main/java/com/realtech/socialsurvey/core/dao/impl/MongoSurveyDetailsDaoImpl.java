@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +19,6 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
-
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -117,7 +115,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set(CommonConstants.STAGE_COLUMN, CommonConstants.SURVEY_STAGE_COMPLETE);
 		update.set(CommonConstants.MOOD_COLUMN, mood);
 		update.set("review", review);
-		update.set("isAbusive", isAbusive);
+		update.set(CommonConstants.IS_ABUSIVE_COLUMN, isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
@@ -169,7 +167,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
 	}
-	
+
 	// JIRA SS-137 and 158 BY RM-05 : BOC
 
 	// -----Methods to get aggregated data from SURVEY_DETAILS collection starting-----
@@ -183,7 +181,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() started.");
 		Date startDate = getNdaysBackDate(noOfDays);
-		
+
 		Query query = new Query();
 		if (columnName != null) {
 			query = new Query(Criteria.where(columnName).is(columnValue));
@@ -353,28 +351,53 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays) {
-		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started.");
+	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
+		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
+				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
 		Date startDate = getNdaysBackDate(noOfDays);
 		Date endDate = Calendar.getInstance().getTime();
-		Query query = new Query(Criteria
+
+		Query query = new Query();
+
+		/**
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
+		 */
+		if (!aggregateAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive));
+		}
+
+		query.addCriteria(Criteria
 				.where(columnName)
 				.is(columnValue)
 				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
-						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
-		TypedAggregation<SurveyDetails> aggregation = new TypedAggregation<SurveyDetails>(
-				SurveyDetails.class, //
-				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(
-						CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)),
-				Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN).as("total_score") //
-		);
+						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate),
+						Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)));
+
+		TypedAggregation<SurveyDetails> aggregation = null;
+		if (!aggregateAbusive) {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(
+					CommonConstants.IS_ABUSIVE_COLUMN).is(aggregateAbusive)), Aggregation.group(columnName).sum(CommonConstants.SCORE_COLUMN)
+					.as("total_score"));
+		}
+		else {
+			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(
+					CommonConstants.MODIFIED_ON_COLUMN).lte(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(
+					startDate)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+					CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.group(columnName)
+					.sum(CommonConstants.SCORE_COLUMN).as("total_score"));
+		}
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		long a = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		long reviewsCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		LOG.debug("Count of aggregated results :" + reviewsCount);
 		double rating = 0;
-		if (result != null && a > 0) {
+		if (result != null && reviewsCount > 0) {
 			List<DBObject> basicDBObject = (List<DBObject>) result.getRawResults().get("result");
-			rating = (double) basicDBObject.get(0).get("total_score") / a;
+			rating = (double) basicDBObject.get(0).get("total_score") / reviewsCount;
 		}
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent finished.");
 		return rating;
@@ -415,30 +438,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	// Method to get count of posts shared by customers on various social networking sites for
 	// "agent/branch/region/company/all".
-	// Returns a map of Social Networking Site and posts count on that site.
+	// Returns posts count on that site.
 
 	@Override
-	public Map<String, Long> getSocialPostsCount(String columnName, long columnValue) {
+	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
-		TypedAggregation<SurveyDetails> aggregation;
-		if (columnName == null) {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation
-					.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(numberOfDays);
+		Query query = new Query(Criteria.where("sharedOn").exists(true));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		else {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
-					Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
-		}
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() finished.");
-		return postCountSplit;
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// Method to get count of surveys initiated by customers and agents separately.
@@ -473,26 +486,42 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
 	 * value for respective column. limitScore is the max score under which reviews have to be shown
 	 */
-
 	@Override
-	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore,
+			boolean fetchAbusive) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		if (startScore > 0 && limitScore > 0) {
+
+		/**
+		 * fetching only completed surveys
+		 */
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+
+		/**
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
+		 */
+		if (!fetchAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		}
+
+		if (startScore > -1 && limitScore > -1) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 		}
+
 		if (start > -1) {
 			query.skip(start);
 		}
 		if (rows > -1) {
 			query.limit(rows);
 		}
+
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() finished.");
@@ -500,9 +529,48 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	}
 
 	@Override
-	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore) {
+	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive) {
 		LOG.info("Method getFeedBacksCount started for columnName:" + columnName + " columnValue:" + columnValue + " startScore:" + startScore
-				+ " limitScore:" + limitScore);
+				+ " limitScore:" + limitScore + " and fetchAbusive:" + fetchAbusive);
+		Query query = new Query();
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		/**
+		 * fetching only completed surveys
+		 */
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+
+		/**
+		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
+		 * are to be fetched else fetch all the records
+		 */
+		if (!fetchAbusive) {
+			query.addCriteria(Criteria.where(CommonConstants.IS_ABUSIVE_COLUMN).is(fetchAbusive));
+		}
+
+		/**
+		 * adding limit for score if specified
+		 */
+		if (startScore > -1 && limitScore > -1) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
+		}
+
+		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount);
+		return feedBackCount;
+	}
+
+	/*
+	 * Returns a list of survey which are not yet competed by customers.Sorted on date (
+	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
+	 * value for respective column. limitScore is the max score under which reviews have to be shown
+	 */
+
+	@Override
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+		LOG.info("Method to fetch all the incomplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() started.");
 		Query query = new Query();
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
@@ -511,12 +579,21 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
 					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 		}
-		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
-		LOG.info("Method getFeedBacksCount executed successfully");
-		return feedBackCount;
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		if (start > -1) {
+			query.skip(start);
+		}
+		if (rows > -1) {
+			query.limit(rows);
+		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
+		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+
+		LOG.info("Method to fetch all the incoplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() finished.");
+		return surveysWithReviews;
 	}
-	
-	private Date getNdaysBackDate(int noOfDays){
+
+	private Date getNdaysBackDate(int noOfDays) {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(5, noOfDays * (-1));
 		Date startDate = calendar.getTime();

@@ -13,6 +13,7 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_FIRSTNAME = "INVALID_FIRSTNAME";
 	public static final String INVALID_LASTNAME = "INVALID_LASTNAME";
 	public static final String INVALID_EMAILID = "INVALID_EMAILID";
+	public static final String INVALID_ACCOUNT = "INVALID_ACCOUNT";
 	public static final String INVALID_CAPTCHA = "INVALID_CAPTCHA";
 	public static final String REGISTRATION_INVITE_GENERAL_ERROR = "REGISTRATION_INVITE_GENERAL_ERROR";
 	public static final String GENERAL_ERROR = "GENERAL_ERROR";
@@ -52,6 +53,10 @@ public final class DisplayMessageConstants {
 	public static final String INVALID_COUNTRY = "INVALID_COUNTRY";
 	public static final String INVALID_VERTICAL = "INVALID_VERTICAL";
 	public static final String INVALID_COMPANY_PROFILENAME = "INVALID_COMPANY_PROFILENAME";
+	public static final String INVALID_REGION_PROFILENAME = "INVALID_REGION_PROFILENAME";
+	public static final String INVALID_BRANCH_PROFILENAME = "INVALID_BRANCH_PROFILENAME";
+	public static final String INVALID_INDIVIDUAL_PROFILENAME = "INVALID_INDIVIDUAL_PROFILENAME";
+	public static final String INVALID_PROFILE_LEVEL = "INVALID_PROFILE_LEVEL";
 
 	public static final String INVALID_REGION_SELECTED = "INVALID_REGION_SELECTED";
 	public static final String INVALID_SURVEY_REMINDER_INTERVAL = "INVALID_SURVEY_REMINDER_INTERVAL";

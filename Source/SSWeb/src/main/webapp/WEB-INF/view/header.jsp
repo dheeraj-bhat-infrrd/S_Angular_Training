@@ -16,6 +16,8 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
 	<div id="toast-container" class="toast-container">
@@ -76,7 +78,9 @@
 					</div>
 				</c:if>
 				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-					<div class="header-links-item" id="upgrade-plan" onclick="upgradePlan();"><spring:message code="label.header.upgrade.key" /></div>
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
+					</div>
 				</c:if>
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.profilesetting.key" /></a>
@@ -136,13 +140,16 @@
 							<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="upgradePlan();">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
-						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+<!--						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>-->
 					</div>
 				</div>
+                <div class="float-left user-info-sing-out">
+                    <a class="" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+                </div>
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
 					<div class="float-left user-info-logo"

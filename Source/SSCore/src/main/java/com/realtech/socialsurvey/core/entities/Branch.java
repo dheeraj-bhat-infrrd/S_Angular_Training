@@ -1,8 +1,18 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.io.Serializable;
-import javax.persistence.*;
 import java.sql.Timestamp;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.Table;
+import javax.persistence.Transient;
 
 
 /**
@@ -41,6 +51,9 @@ public class Branch implements Serializable {
 
 	@Column(name="IS_DEFAULT_BY_SYSTEM")
 	private int isDefaultBySystem;
+	
+	@Column(name="PROFILE_NAME")
+	private String profileName;
 
 	@Column(name="MODIFIED_BY")
 	private String modifiedBy;
@@ -164,11 +177,24 @@ public class Branch implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
+	
+	
+
+	public String getProfileName() {
+		return profileName;
+	}
+
+	public void setProfileName(String profileName) {
+		this.profileName = profileName;
+	}
 
 	@Override
 	public String toString() {
-		return "Branch [branchId=" + branchId + ", branch=" + branch + ", isDefaultBySystem=" + isDefaultBySystem + ", status=" + status
+		return "Branch [branchId=" + branchId + ", branch=" + branch + ", createdBy=" + createdBy + ", createdOn=" + createdOn
+				+ ", isDefaultBySystem=" + isDefaultBySystem + ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + ", status=" + status
 				+ ", address1=" + address1 + ", address2=" + address2 + "]";
 	}
 	
+	
+
 }

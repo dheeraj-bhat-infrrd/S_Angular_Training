@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
 import org.apache.solr.client.solrj.SolrServerException;
-
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;

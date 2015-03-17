@@ -25,10 +25,10 @@
 		</property>
 
 		<property name="username">
-			<value>root</value>
+			<value>${DATABASE_USER}</value>
 		</property>
 		<property name="password">
-			<value>raremile</value>
+			<value>${DATABASE_PASSWORD}</value>
 		</property>
 	</bean>
 </beans>

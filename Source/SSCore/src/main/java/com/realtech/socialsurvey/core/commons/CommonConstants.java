@@ -23,6 +23,7 @@ public interface CommonConstants {
 	public static final long DEFAULT_COMPANY_ID = 1;
 	public static final String DEFAULT_BRANCH_NAME = "Default Branch";
 	public static final String DEFAULT_REGION_NAME = "Default Region";
+	public static final String DEFAULT_ADDRESS = "Default Address";
 	public static final long DEFAULT_REGION_ID = 0;
 	public static final long DEFAULT_BRANCH_ID = 0;
 	public static final long DEFAULT_AGENT_ID = 0;
@@ -53,9 +54,11 @@ public interface CommonConstants {
 	public static final String RESET_PASSWORD = "resetpassword.do";
 	public static final String DASHBOARD_STAGE = "dashboard.do";
 	public static final String PROFILE_STAGES_COMPLETE = "complete";
+	public static final String REQUEST_MAPPING_EMAIL_EDIT_VERIFICATION = "emailverification.do";
 	public static final String REQUEST_MAPPING_SHOW_REGISTRATION = "showregistrationpage.do";
 	public static final String REQUEST_MAPPING_MAIL_VERIFICATION = "verification.do";
 	public static final String SHOW_COMPLETE_REGISTRATION_PAGE = "showcompleteregistrationpage.do";
+	public static final String PRE_PROCESSING_BEFORE_LOGIN_STAGE = "defaultbrandandregioncreation.do";
 	public static final String START_SURVEY = "rest/survey/start";
 
 	/**
@@ -79,9 +82,9 @@ public interface CommonConstants {
 	public static final int SUBSCRIPTION_NOT_DUE = 0;
 	public static final String IS_ASSIGN_ADMIN = "YES";
 	public static final String IS_UNASSIGN_ADMIN = "NO";
-	public static final int MAX_DEFAULT_REGIONS=1;
-	public static final int MAX_DEFAULT_BRANCHES=1;
-	public static final double MIN_RATING_SCORE = 1;
+	public static final int MAX_DEFAULT_REGIONS = 1;
+	public static final int MAX_DEFAULT_BRANCHES = 1;
+	public static final double MIN_RATING_SCORE = 0;
 	public static final double MAX_RATING_SCORE = 5;
 
 	/**
@@ -104,6 +107,7 @@ public interface CommonConstants {
 	public static final String LICENSE_DETAIL_COLUMN = "licenseDetail";
 	public static final String REGION_COLUMN = "region";
 	public static final String REGION_ID_COLUMN = "regionId";
+	public static final String PROFILE_NAME_COLUMN = "profileName";
 	public static final String BRANCH_ID_COLUMN = "branchId";
 	public static final String BRANCH_NAME_COLUMN = "branch";
 	public static final String SUBSCRIPTION_ID_COLUMN = "subscriptionId";
@@ -128,7 +132,8 @@ public interface CommonConstants {
 	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
 	public static final String MOOD_COLUMN = "mood";
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
-
+	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
+	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -164,7 +169,9 @@ public interface CommonConstants {
 	public static final String USER_PROFILE = "profile";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
-	
+	public static final String EMAIL_TYPE = "emailtype";
+	public static final String EMAIL_TYPE_WORK = "work";
+	public static final String EMAIL_TYPE_PERSONAL = "personal";
 
 	/**
 	 * Batch Constants
@@ -193,6 +200,10 @@ public interface CommonConstants {
 	public static final int PAYMENT_INCREMENT = 1;
 	public static final long ACCOUNT_TYPE_TEAM = 2;
 	public static final int DEFAULT_BRANCH_REGION_ROWS = 10;
+	public static final String PROFILE_LEVEL_COMPANY = "COMPANY";
+	public static final String PROFILE_LEVEL_REGION = "REGION";
+	public static final String PROFILE_LEVEL_BRANCH = "BRANCH";
+	public static final String PROFILE_LEVEL_INDIVIDUAL = "INDIVIDUAL";
 
 	/**
 	 * Logo related config
@@ -203,6 +214,8 @@ public interface CommonConstants {
 	public static final String LIST_LOGO_FORMATS = "LIST_LOGO_FORMATS";
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
+	public static final String IMAGE_NAME = "image.png";
+	public static final String IMAGE_FORMAT = "png";
 
 	/**
 	 * Amazon Details
@@ -257,6 +270,7 @@ public interface CommonConstants {
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
 	public static final String ABOUT_ME_SOLR = "aboutMe";
+	public static final String PROFILE_NAME_SOLR = "profileName";
 	public static final String PROFILE_URL_SOLR = "profileUrl";
 	public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
 	public static final String TITLE_SOLR = "title";
@@ -307,9 +321,15 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_COMPANY_REVIEWS_FETCH_FAILURE = 122;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_PRECONDITION_FAILURE = 123;
 	public static final int ERROR_CODE_AVERAGE_RATING_FETCH_FAILURE = 124;
-	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_FAILURE = 125;
-	public static final int ERROR_CODE_COMPANY_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
-	
+	public static final int ERROR_CODE_REVIEWS_COUNT_FETCH_FAILURE = 125;
+	public static final int ERROR_CODE_REVIEWS_COUNT_FETCH_PRECONDITION_FAILURE = 126;
+	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_PRECONDITION_FAILURE = 127;
+	public static final int ERROR_CODE_REGION_REVIEWS_FETCH_FAILURE = 128;
+	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_PRECONDITION_FAILURE = 129;
+	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_FAILURE = 130;
+	public static final int ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE = 131;
+	public static final int ERROR_CODE_PRO_LIST_FETCH_FAILURE = 132;
+
 	/**
 	 * Service codes
 	 */
@@ -317,7 +337,7 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_PROFILE = 101;
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
-	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;	
+	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
 	public static final int SERVICE_CODE_FETCH_COMPANY_INDIVIDUALS = 105;
 	public static final int SERVICE_CODE_FETCH_COMPANY_BRANCHES = 106;
 	public static final int SERVICE_CODE_FETCH_BRANCH_INDIVIDUALS = 107;
@@ -327,11 +347,27 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_COMPANY_REVIEWS = 111;
 	public static final int SERVICE_CODE_COMPANY_AVERAGE_RATINGS = 112;
 	public static final int SERVICE_CODE_COMPANY_REVIEWS_COUNT = 113;
-	
+	public static final int SERVICE_CODE_REGION_AVERAGE_RATINGS = 114;
+	public static final int SERVICE_CODE_REGION_REVIEWS = 115;
+	public static final int SERVICE_CODE_REGION_REVIEWS_COUNT = 115;
+	public static final int SERVICE_CODE_BRANCH_AVERAGE_RATINGS = 116;
+	public static final int SERVICE_CODE_BRANCH_REVIEWS = 117;
+	public static final int SERVICE_CODE_BRANCH_REVIEWS_COUNT = 118;
+	public static final int SERVICE_CODE_PRO_LIST_FETCH = 119;
+	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
+	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
+	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
+
 	/*
 	 * Mongo column and collection constants
 	 */
 	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	
+	/*
+	 * Constants related to Dash board profile.
+	 */
+	public static final int MAX_SURVEY_SCORE = 5;
+	public static final int MAX_SENT_SURVEY_COUNT = 10;
+	public static final int MAX_SOCIAL_POSTS = 10;
 }
