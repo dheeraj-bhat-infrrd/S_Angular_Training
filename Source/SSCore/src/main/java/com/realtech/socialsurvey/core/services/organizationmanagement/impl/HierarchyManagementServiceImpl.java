@@ -560,9 +560,6 @@ public class HierarchyManagementServiceImpl implements HierarchyManagementServic
 		if (regionName == null || regionName.isEmpty()) {
 			throw new InvalidInputException("Region name is null in addNewRegion");
 		}
-		if (address1 == null || address1.isEmpty()) {
-			throw new InvalidInputException("Address1 is null in addNewRegion");
-		}
 		LOG.info("Method add new region called for regionName : " + regionName);
 
 		Region region = organizationManagementService.addRegion(user, isDefaultBySystem, regionName);

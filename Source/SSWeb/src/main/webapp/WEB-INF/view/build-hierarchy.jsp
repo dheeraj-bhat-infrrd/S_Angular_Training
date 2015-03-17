@@ -7,6 +7,9 @@
         </div>
     </div>
 </div>
+<div id="server-message">
+	<jsp:include page="usermanagementmessageheader.jsp"></jsp:include>
+</div>
 <div class="container bd-hr-container">
         <div class="bd-hr-left-panel col-lg-3 col-md-3 col-sm-3">
             <div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
@@ -101,6 +104,7 @@
     </div>
 <!-- div to temporarily store message to be displayed  -->
 <div id="temp-message" class="hide"></div>
+<input type="hidden" name="isUserAuthorized" id="is-user-authorized" value="${isUserAuthorized}"/>
 <%-- <script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script> --%>
 <script>
 $(document).ready(function() {

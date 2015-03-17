@@ -70,10 +70,16 @@ public class HierarchyManagementController {
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		boolean isRegionAdditionAllowed = false;
 		boolean isBranchAdditionAllowed = false;
-
+		boolean isUserAuthorized = true;
 		try {
 			try {
 				LOG.debug("Calling service for checking the status of regions already added");
+				if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
+					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
+					isUserAuthorized = false;
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
+							DisplayMessageType.ERROR_MESSAGE));
+				}
 				isRegionAdditionAllowed = hierarchyManagementService.isRegionAdditionAllowed(user, accountType);
 			}
 			catch (InvalidInputException e) {
@@ -90,6 +96,7 @@ public class HierarchyManagementController {
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
+			model.addAttribute("isUserAuthorized", isUserAuthorized);
 			model.addAttribute("isRegionAdditionAllowed", isRegionAdditionAllowed);
 			model.addAttribute("isBranchAdditionAllowed", isBranchAdditionAllowed);
 		}
@@ -101,7 +108,6 @@ public class HierarchyManagementController {
 
 		LOG.info("Successfully completed method to showBuildHierarchyPage");
 		return JspResolver.BUILD_HIERARCHY;
-		// return JspResolver.HIERARCHY_MANAGEMENT;
 	}
 
 	/**
@@ -496,7 +502,7 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 
-			validateBranchForm(branchName);
+			validateBranchForm(branchName, branchAddress1);
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
@@ -538,6 +544,98 @@ public class HierarchyManagementController {
 		}
 		LOG.info("Successfully completed controller to add a branch");
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to add an individual under a branch/region or company
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/addindividual", method = RequestMethod.POST)
+	public String addIndividual(Model model, HttpServletRequest request) {
+		LOG.info("Method to add an individual called in controller");
+		try {
+			String strRegionId = request.getParameter("regionId");
+			String strBranchId = request.getParameter("officeId");
+			String selectedUserIdStr = request.getParameter("selectedUserId");
+			String selectedUserEmail = request.getParameter("selectedUserEmail");
+			String isAdminStr = request.getParameter("isAdmin");
+
+			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
+				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			}
+			long selectedUserId = 0l;
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatException while parsing selected userId in add individual",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
+
+			boolean isAdmin = false;
+			if (isAdminStr != null && !isAdminStr.isEmpty()) {
+				isAdmin = Boolean.parseBoolean(isAdminStr);
+			}
+
+			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
+
+			long regionId = 0l;
+			try {
+				/**
+				 * parse the regionId if a region is selected for the individual in case company is
+				 * selected, regionId is null
+				 */
+				if (strRegionId != null && !strRegionId.isEmpty()) {
+					regionId = Long.parseLong(strRegionId);
+				}
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormatException while parsing regionId", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			long branchId = 0l;
+			try {
+				/**
+				 * parse the branchId if a branch is selected for the individual in case company is
+				 * selected, branchId is null
+				 */
+				if (strBranchId != null && !strBranchId.isEmpty()) {
+					branchId = Long.parseLong(strBranchId);
+				}
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormatException while parsing branchId", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			User user = sessionHelper.getCurrentUser();
+
+			try {
+				LOG.debug("Calling service to add/assign invidual(s)");
+				organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds, isAdmin);
+				LOG.debug("Successfully executed service to add/assign an invidual(s)");
+
+				model.addAttribute("message",
+						messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			}
+			catch (UserAssignmentException e) {
+				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				throw new InvalidInputException("Exception occured while adding an individual.REason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while adding an individual. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Successfully completed controller to add an individual");
+		return JspResolver.MESSAGE_HEADER;
 
 	}
 
@@ -557,7 +655,7 @@ public class HierarchyManagementController {
 		String branchAddress1 = request.getParameter("branchAddress1");
 		String branchAddress2 = request.getParameter("branchAddress2");
 		try {
-			validateBranchForm(branchName);
+			validateBranchForm(branchName, branchAddress1);
 			long regionId = 0l;
 			try {
 				/**
@@ -621,7 +719,7 @@ public class HierarchyManagementController {
 		String regionAddress1 = request.getParameter("regionAddress1");
 		String regionAddress2 = request.getParameter("regionAddress2");
 		String selectedUserIdStr = request.getParameter("selectedUserId");
-		String selectedUserEmail = request.getParameter("selectedUserEmail");
+		// String selectedUserEmail = request.getParameter("selectedUserEmail");
 		try {
 			long selectedUserId = 0l;
 			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
@@ -935,12 +1033,16 @@ public class HierarchyManagementController {
 	 * Method to validate branch addition/updation form
 	 * 
 	 * @param branchName
+	 * @param branchAddress1
 	 * @throws InvalidInputException
 	 */
-	private void validateBranchForm(String branchName) throws InvalidInputException {
+	private void validateBranchForm(String branchName, String branchAddress1) throws InvalidInputException {
 		LOG.debug("Validating branch add/update form");
 		if (branchName == null || branchName.isEmpty()) {
-			throw new InvalidInputException("Branch name is invalid while updating branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
+			throw new InvalidInputException("Branch name is invalid while adding/updating branch", DisplayMessageConstants.INVALID_BRANCH_NAME);
+		}
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
+			throw new InvalidInputException("Branch address is invalid while adding/updating branch", DisplayMessageConstants.INVALID_BRANCH_ADDRESS);
 		}
 		LOG.debug("Successsfully validated branch add/update form");
 	}

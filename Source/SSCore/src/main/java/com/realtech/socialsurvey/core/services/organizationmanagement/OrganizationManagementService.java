@@ -27,10 +27,6 @@ public interface OrganizationManagementService {
 
 	public long fetchAccountTypeMasterIdForCompany(Company company) throws InvalidInputException;
 
-	public Branch addBranch(User user, Region region, String branchName, int isDefaultBySystem);
-
-	public Region addRegion(User user, int isDefaultBySystem, String regionName);
-
 	/**
 	 * Edits the company information of the user. The user should have privileges to edit the
 	 * company
@@ -237,6 +233,27 @@ public interface OrganizationManagementService {
 	public List<Branch> getBranchesByRegionId(long regionId) throws InvalidInputException;
 
 	/**
+	 * Method to add a branch
+	 * 
+	 * @param user
+	 * @param region
+	 * @param branchName
+	 * @param isDefaultBySystem
+	 * @return
+	 */
+	public Branch addBranch(User user, Region region, String branchName, int isDefaultBySystem);
+
+	/**
+	 * Method to add a region
+	 * 
+	 * @param user
+	 * @param isDefaultBySystem
+	 * @param regionName
+	 * @return
+	 */
+	public Region addRegion(User user, int isDefaultBySystem, String regionName);
+
+	/**
 	 * Method to add a new region and assign the user to the newly created region if userId or
 	 * emailId is provided
 	 * 
@@ -252,7 +269,7 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
-	 * @throws UserAssignmentException 
+	 * @throws UserAssignmentException
 	 */
 	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
@@ -287,10 +304,11 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 * @throws NoRecordsFetchedException
-	 * @throws UserAssignmentException 
+	 * @throws UserAssignmentException
 	 */
 	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
-			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+			UserAssignmentException;
 
 	/**
 	 * Method to assign a user to a branch
@@ -306,5 +324,22 @@ public interface OrganizationManagementService {
 	 */
 	public void assignBranchToUser(User adminUser, long branchId, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException;
+
+	/**
+	 * Method to add a new user or assign existing user under a company/region or branch
+	 * 
+	 * @param adminUser
+	 * @param selectedUserId
+	 * @param branchId
+	 * @param regionId
+	 * @param emailIdsArray
+	 * @param isAdmin
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 * @throws UserAssignmentException 
+	 */
+	public void addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
+			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
 
 }
