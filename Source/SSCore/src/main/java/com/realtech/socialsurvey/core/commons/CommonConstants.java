@@ -162,8 +162,6 @@ public interface CommonConstants {
 	public static final String COUNTRY = "country";
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
-	public static final String LINKEDIN_AUTH_URL = "authUrl";
-	public static final String LINKEDIN_REQUEST_TOKEN = "linkedinRequestToken";
 	public static final String SUCCESS_ATTRIBUTE = "success";
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
@@ -172,6 +170,10 @@ public interface CommonConstants {
 	public static final String EMAIL_TYPE = "emailtype";
 	public static final String EMAIL_TYPE_WORK = "work";
 	public static final String EMAIL_TYPE_PERSONAL = "personal";
+	
+	public static final String SOCIAL_AUTH_URL = "authUrl";
+	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
+	public static final String SOCIAL_FLOW = "socialFlow";
 
 	/**
 	 * Batch Constants
@@ -357,11 +359,4 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
-
-	/*
-	 * Mongo column and collection constants
-	 */
-	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
-	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
-
 }
