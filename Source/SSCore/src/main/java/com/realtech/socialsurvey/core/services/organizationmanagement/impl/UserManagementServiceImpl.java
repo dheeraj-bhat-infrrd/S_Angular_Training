@@ -118,21 +118,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 
-	@Value("${LINKED_IN_API_KEY}")
-	private String linkedInApiKey;
-
-	@Value("${LINKED_IN_API_SECRET}")
-	private String linkedInApiSecret;
-
-	@Value("${LINKED_IN_OAUTH_TOKEN}")
-	private String linkedInOauthToken;
-
-	@Value("${LINKED_IN_OAUTH_SECRET}")
-	private String linkedInOauthSecret;
-
-	@Value("${LINKED_IN_REDIRECT_URI}")
-	private String linkedinRedirectUri;
-
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 

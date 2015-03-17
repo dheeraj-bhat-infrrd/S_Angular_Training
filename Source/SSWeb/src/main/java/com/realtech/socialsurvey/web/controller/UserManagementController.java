@@ -75,22 +75,6 @@ public class UserManagementController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
-	@Value("${LINKED_IN_API_KEY}")
-	private String linkedInApiKey;
-
-	@Value("${LINKED_IN_API_SECRET}")
-	private String linkedInApiSecret;
-
-	@Value("${LINKED_IN_OAUTH_TOKEN}")
-	private String linkedInOauthToken;
-
-	@Value("${LINKED_IN_OAUTH_SECRET}")
-	private String linkedInOauthSecret;
-
-	@Value("${LINKED_IN_REDIRECT_URI}")
-	private String linkedinRedirectUri;
-
-	
 	private final static int SOLR_BATCH_SIZE = 20;
 	
 	// JIRA SS-42 BY RM05 BOC
