@@ -316,6 +316,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyQuestion surveyQuestion = new SurveyQuestion();
 		surveyQuestion.setSurveyQuestion(question);
 		surveyQuestion.setSurveyQuestionsCode(questionType);
+		surveyQuestion.setStatus(CommonConstants.STATUS_ACTIVE);
 		surveyQuestion.setCreatedBy(String.valueOf(user.getUserId()));
 		surveyQuestion.setModifiedBy(String.valueOf(user.getUserId()));
 		surveyQuestion.setCreatedOn(new Timestamp(System.currentTimeMillis()));
