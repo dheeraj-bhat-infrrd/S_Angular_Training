@@ -161,6 +161,15 @@ function paintEditSection(data) {
 		$("#assign-to-droplist").slideToggle(200);
 	});
 	
+	$("#selected-region-txt").keyup(function() {
+		var text = $("#selected-region-txt").val();
+		if (text.length > 1) {
+			delay(function() {
+				populateRegionsSelector(text);
+			}, 500);
+		}
+	});
+	
 	$("#region-selector").click(function(e){
 		e.stopPropagation();
 		if(!$('#selected-region-txt').is(':disabled')){
@@ -343,11 +352,12 @@ function paintUsersList(data) {
 			});
 		}
 	}
-	if(htmlData == "") {
-		$("#users-droplist").slideUp(200);
+	if(htmlData != "") {
+		$("#users-droplist").html(htmlData).slideDown(200);
 	}
 	else{	
-		$("#users-droplist").html(htmlData).slideToggle(200);
+		$("#users-droplist").slideUp(200);
+		
 	}
 	
 	// bind the click event of selector
@@ -479,7 +489,6 @@ function populateRegionsSelector(regionPattern) {
  * @param data
  */
 function populateRegionsSelectorCallBack(data) {
-	console.log("populateRegionsSelectorCallBack : "+data);
 	var searchResult = $.parseJSON(data);
 	if(searchResult != null) {
 		var len = searchResult.length;
@@ -489,8 +498,13 @@ function populateRegionsSelectorCallBack(data) {
 			$.each(searchResult,function(i,region) {
 					htmlData = htmlData +'<div data-regionId="'+region.regionId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-region-option">'+region.regionName+'</div>';
 			});
+			if(htmlData != ""){
+				$("#regions-droplist").html(htmlData).slideDown(200);	
+			}
+			else {
+				$("#regions-droplist").html(htmlData).slideUp(200);	
+			}
 			
-			$("#regions-droplist").html(htmlData).slideToggle(200);
 			
 			// bind the click event of selector
 			$('.hm-region-option').click(function(e) {
