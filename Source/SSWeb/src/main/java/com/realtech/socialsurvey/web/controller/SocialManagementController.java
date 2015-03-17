@@ -320,7 +320,7 @@ public class SocialManagementController {
 					accessToken = twitter.getOAuthAccessToken(requestToken, oauthVerifier);
 				}
 				catch (TwitterException te) {
-					if (401 == te.getStatusCode()) {
+					if (TwitterException.UNAUTHORIZED == te.getStatusCode()) {
 						LOG.info("Unable to get the access token. Reason: UNAUTHORISED");
 					}
 					else {
