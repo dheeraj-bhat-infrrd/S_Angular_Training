@@ -1,4 +1,46 @@
 // Existing Survey Questions 
+function loadActiveSurveyQuestions() {
+	var url = "./getactivesurveyquestions.do";
+	callAjaxGET(url, populateActiveSurveyQuestions, true);
+}
+
+function populateActiveSurveyQuestions(response) {
+	var surveyDetail = $.parseJSON(response);
+	var surveyQuestions = surveyDetail.questions;
+	var htmlData = "";
+
+	if (surveyQuestions != null) {
+		var countQues = 1;
+		
+		// For Each Question
+		$.each(surveyQuestions, function(i, surveyQuestion) {
+			// Question start
+			htmlData = htmlData + '<div class="bd-srv-tbl-row clearfix" data-questionid="' + surveyQuestion.questionId + '">';
+
+			// Question order
+			htmlData = htmlData + '<div class="float-left srv-tbl-num"><span>' + surveyQuestion.questionOrder + '</span></div>';
+			
+			// Question Text
+			var questionTypeCode = surveyQuestion.questionType.trim();
+			htmlData = htmlData + '<div class="float-left srv-tbl-txt" q-type="' + questionTypeCode + '">' + surveyQuestion.question + '</div>';
+
+			// Buttons
+			htmlData = htmlData
+				+ '<div class="float-right srv-tbl-rem">Remove</div>'
+				+ '<div class="float-right srv-tbl-edit">Edit</div>';
+			
+			// Question End
+			htmlData = htmlData + '</div>';
+			
+			countQues++;
+		});
+		
+		$('#bs-ques-wrapper').html(htmlData);
+	} else {
+		$('#bs-ques-wrapper').html('');
+	}
+}
+
 $(document).on('mouseover', '.bd-srv-tbl-row', function() {
 	$(this).addClass('bd-srv-tbl-row-hover');
 	$(this).find('.srv-tbl-rem').show();

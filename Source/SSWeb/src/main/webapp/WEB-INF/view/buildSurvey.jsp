@@ -108,56 +108,45 @@
 	
 	<div class="bd-srv-q-tbl">
 		<div class="bd-srv-tbl-header"><spring:message code="label.build.customerfeedback.key" /></div>
-		<div class="bd-srv-rows">
+		
+		<div id="bs-ques-wrapper" class="bd-srv-rows">
 			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num">
-					<span>1</span>
-				</div>
+				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
 				<div class="float-right srv-tbl-rem">Remove</div>
 				<div class="float-right srv-tbl-edit">Edit</div>
 			</div>
 			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num">
-					<span>1</span>
-				</div>
+				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
 				<div class="float-right srv-tbl-rem">Remove</div>
 				<div class="float-right srv-tbl-edit">Edit</div>
 			</div>
 			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num">
-					<span>1</span>
-				</div>
+				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
 				<div class="float-right srv-tbl-rem">Remove</div>
 				<div class="float-right srv-tbl-edit">Edit</div>
 			</div>
 			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num">
-					<span>1</span>
-				</div>
+				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
 				<div class="float-right srv-tbl-rem">Remove</div>
 				<div class="float-right srv-tbl-edit">Edit</div>
 			</div>
 			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num">
-					<span>1</span>
-				</div>
+				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
 				<div class="float-right srv-tbl-rem">Remove</div>
 				<div class="float-right srv-tbl-edit">Edit</div>
 			</div>
 			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num">
-					<span>1</span>
-				</div>
+				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
 				<div class="float-right srv-tbl-rem">Remove</div>
@@ -167,15 +156,15 @@
 	</div>
 </div>
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/buildSurvey.js"></script>
 <script>
 $(document).ready(function() {
+	$(document).attr("title", "Build Survey");
+	
+	loadActiveSurveyQuestions();
+	
 	resizeAdj();
 	$(window).resize(resizeAdj);
-	
 	function resizeAdj(){
 		var winW = $(window).width();
 		if (winW < 768) {
