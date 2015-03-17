@@ -323,8 +323,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setLockSettings(lockSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Lock Settings updated successfully");
 			model.addAttribute("message",
@@ -474,8 +472,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("About me details updated successfully");
 			model.addAttribute("message",
@@ -585,8 +581,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Basic Detail updated successfully");
 			model.addAttribute("message",
@@ -716,8 +710,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Profile addresses updated successfully");
 			model.addAttribute("message",
@@ -825,8 +817,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setLogo(logoUrl);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setLogoInSession(session, userSettings);
 
 			LOG.info("Logo uploaded successfully");
@@ -940,8 +930,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setProfileImageUrl(profileImageUrl);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setProfileImageInSession(session, userSettings);
 
 			LOG.info("Profile Image uploaded successfully");
@@ -1058,8 +1046,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Maild ids updated successfully");
 			model.addAttribute("message",
@@ -1233,8 +1219,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Contact numbers updated successfully");
 			model.addAttribute("message",
@@ -1377,8 +1361,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Web addresses updated successfully");
 			model.addAttribute("message",
@@ -1519,8 +1501,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Facebook link updated successfully");
 			model.addAttribute("message",
@@ -1629,8 +1609,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Twitter link updated successfully");
 			model.addAttribute("message",
@@ -1739,8 +1717,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("LinkedIn link updated successfully");
 			model.addAttribute("message",
@@ -1849,8 +1825,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("YelpLinked in link updated successfully");
 			model.addAttribute("message",
@@ -1959,8 +1933,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setAchievements(achievements);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Achievements updated successfully");
 			model.addAttribute("message",
@@ -2056,8 +2028,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setAssociations(associations);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Associations updated successfully");
 			model.addAttribute("message",
@@ -2153,8 +2123,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setLicenses(licenses);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Licence details updated successfully");
 			model.addAttribute("message",
