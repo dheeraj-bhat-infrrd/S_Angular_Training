@@ -2,9 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
@@ -17,9 +15,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
-import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -34,13 +29,11 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
-import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -1272,7 +1265,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("Invalid account type.");
 		}
 		UserSettings canonicalUserSettings = new UserSettings();
-		Map<Long, AgentSettings> agentSettings = null;
+		AgentSettings agentSettings = null;
 		Map<Long, OrganizationUnitSettings> branchesSettings = null;
 		Map<Long, OrganizationUnitSettings> regionsSettings = null;
 		LOG.info("Getting the canonical settings for the user: " + user.toString());
@@ -1283,27 +1276,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		/**
 		 * fetching all settings for all account types
 		 */
-		/*
-		 * switch (accountType) { case FREE: case INDIVIDUAL: case TEAM:
-		 * LOG.debug("Individual/ Team account type"); // get the agent profile as well
-		 * LOG.debug("Gettings agent settings"); agentSettings =
-		 * getAgentSettingsForUserProfiles(user.getUserProfiles());
-		 * canonicalUserSettings.setAgentSettings(agentSettings); break; case COMPANY:
-		 * LOG.debug("Company account type"); // get the agent settings. If the user is not an agent
-		 * then there would agent // settings would be null LOG.debug("Gettings agent settings");
-		 * agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
-		 * canonicalUserSettings.setAgentSettings(agentSettings); // get the branches profiles and
-		 * then resolve the parent organization unit.
-		 * LOG.debug("Gettings branch settings for user profiles"); branchesSettings =
-		 * getBranchesSettingsForUserProfile(user.getUserProfiles(), agentSettings);
-		 * canonicalUserSettings.setBranchSettings(branchesSettings); break; case ENTERPRISE:
-		 * LOG.debug("Company account type");
-		 */
 
 		// get the agent settings. If the user is not an agent then there would agent
 		// settings would be null
 		LOG.debug("Gettings agent settings");
-		agentSettings = getAgentSettingsForUserProfiles(user.getUserProfiles());
+		agentSettings = getAgentSettingsForUserProfiles(user.getUserId());
 		canonicalUserSettings.setAgentSettings(agentSettings);
 		// get the branches profiles and then resolve the parent organization unit.
 		LOG.debug("Gettings branch settings for user profiles");
@@ -1313,10 +1290,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Gettings region settings for user profiles");
 		regionsSettings = getRegionSettingsForUserProfile(user.getUserProfiles(), branchesSettings);
 		canonicalUserSettings.setRegionSettings(regionsSettings);
-		/*
-		 * break; default: throw new
-		 * InvalidInputException("Account type is invalid in isMaxBranchAdditionExceeded"); }
-		 */
 		return canonicalUserSettings;
 	}
 
@@ -1348,13 +1321,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return regionsSettings;
 	}
 
-	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles,
-			Map<Long, AgentSettings> agentSettings) throws InvalidInputException, NoRecordsFetchedException {
+	private Map<Long, OrganizationUnitSettings> getBranchesSettingsForUserProfile(List<UserProfile> userProfiles, AgentSettings agentSettings)
+			throws InvalidInputException, NoRecordsFetchedException {
 		LOG.debug("Getting branches settings for the user profile list");
 		Map<Long, OrganizationUnitSettings> branchesSettings = organizationManagementService.getBranchSettingsForUserProfiles(userProfiles);
 		// if agent settings is not null, the resolve the settings of branch associated with the
 		// user's agent profiles
-		if (agentSettings != null && agentSettings.size() > 0) {
+		if (agentSettings != null) {
 			LOG.debug("Resolving branches settings for agent profiles");
 			for (UserProfile userProfile : userProfiles) {
 				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
@@ -1387,34 +1360,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	public Map<Long, AgentSettings> getAgentSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
-		Map<Long, AgentSettings> agentSettings = null;
-		if (userProfiles != null && userProfiles.size() > 0) {
-			LOG.info("Get agent settings for the user profiles: " + userProfiles.toString());
-			agentSettings = new HashMap<Long, AgentSettings>();
-			AgentSettings agentSetting = null;
-			// get the agent profiles and get the settings for each of them.
-			for (UserProfile userProfile : userProfiles) {
-				agentSetting = new AgentSettings();
-				if (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-					LOG.debug("Getting settings for " + userProfile);
-					// get the agent id and get the profile
-					if (userProfile.getAgentId() > 0l) {
-						agentSetting = getUserSettings(userProfile.getAgentId());
-						if (agentSetting != null) {
-							agentSettings.put(userProfile.getAgentId(), agentSetting);
-						}
-					}
-					else {
-						LOG.warn("Not a valid agent id for user profile: " + userProfile + ". Skipping the record");
-					}
-				}
-			}
-		}
-		else {
-			throw new InvalidInputException("User profiles are not set");
-		}
-
+	public AgentSettings getAgentSettingsForUserProfiles(long userId) throws InvalidInputException {
+		LOG.info("Getting agent settings for user id: "+userId);
+		AgentSettings agentSettings = getUserSettings(userId);
 		return agentSettings;
 	}
 
@@ -1436,61 +1384,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.debug("Method isAssigningAllowed() finsihed.");
 		return false;
-	}
-
-	/**
-	 * Adds the LinkedIn access tokens to the agent's settings in mongo
-	 * 
-	 * @param user
-	 * @param accessToken
-	 * @throws InvalidInputException
-	 * @throws NoRecordsFetchedException
-	 */
-	@Override
-	public void setLinkedInAccessTokenForUser(User user, String accessToken, String accessTokenSecret, Collection<AgentSettings> agentSettings)
-			throws InvalidInputException, NoRecordsFetchedException {
-		if (user == null) {
-			LOG.error("setLinkedInAccessTokenForUser : user parameter is null!");
-			throw new InvalidInputException("setLinkedInAccessTokenForUser : user parameter is null!");
-		}
-		if (accessToken == null || accessToken.isEmpty()) {
-			LOG.error("setLinkedInAccessTokenForUser : accessToken parameter is null!");
-			throw new InvalidInputException("setLinkedInAccessTokenForUser : accessToken parameter is null!");
-		}
-
-		LOG.info("Adding the LinkedIn access tokens to agent settings in mongo for user id : " + user.getUserId());
-
-		Iterator<AgentSettings> settingsIterator = agentSettings.iterator();
-
-		while (settingsIterator.hasNext()) {
-
-			AgentSettings agentSetting = settingsIterator.next();
-			LOG.debug("Setting the access token for settings with id : " + agentSetting.getId());
-			SocialMediaTokens mediaTokens = agentSetting.getSocialMediaTokens();
-			// Check if media tokens exist. If not, create them.
-			if (mediaTokens == null) {
-				LOG.debug("Updating the existing media tokens for LinkedIn");
-				mediaTokens = new SocialMediaTokens();
-				mediaTokens.setLinkedInToken(new LinkedInToken());
-				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
-				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
-				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
-			}
-			else {
-				LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
-				if (mediaTokens.getLinkedInToken() == null) {
-					mediaTokens.setLinkedInToken(new LinkedInToken());
-				}
-				mediaTokens.getLinkedInToken().setLinkedInAccessToken(accessToken);
-				mediaTokens.getLinkedInToken().setLinkedInAccessTokenSecret(accessTokenSecret);
-				mediaTokens.getLinkedInToken().setLinkedInAccessTokenCreatedOn(System.currentTimeMillis());
-			}
-			LOG.debug("Updating the mongo collection with new LinkedIn access tokens for settings with id : " + agentSetting.getId());
-			organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(CommonConstants.SOCIAL_MEDIA_TOKEN_MONGO_KEY, mediaTokens,
-					agentSetting, CommonConstants.AGENT_SETTINGS_COLLECTION);
-		}
-
-		LOG.info("Agent settings successfully updated with LinkedIn access token");
 	}
 
 	private Region fetchDefaultRegion(Company company) throws InvalidInputException, NoRecordsFetchedException {
@@ -1795,18 +1688,5 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.info("Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName);
 		return profileName;
-	}
-
-	/**
-	 * Returns the LinkedIn request token for a particular URL
-	 * 
-	 * @return
-	 */
-	@Override
-	public LinkedInRequestToken getLinkedInRequestToken() {
-		LinkedInOAuthService oauthService;
-		oauthService = LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey, linkedInApiSecret);
-		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken(linkedinRedirectUri);
-		return requestToken;
 	}
 }

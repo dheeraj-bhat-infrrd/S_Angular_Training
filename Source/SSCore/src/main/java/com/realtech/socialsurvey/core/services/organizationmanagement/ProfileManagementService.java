@@ -42,8 +42,8 @@ public interface ProfileManagementService {
 	 * @param settings
 	 * @throws InvalidInputException
 	 */
-	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long agentId, long branchId,
-			long regionId) throws InvalidInputException;
+	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
+			throws InvalidInputException;
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**
