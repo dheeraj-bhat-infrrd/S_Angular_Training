@@ -52,7 +52,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
 	function openAuthPage(socialNetwork) {
-		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=600,height=600,scrollbars=yes");
+		window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 	}
 	
 	$("#skip-button").click(function() {

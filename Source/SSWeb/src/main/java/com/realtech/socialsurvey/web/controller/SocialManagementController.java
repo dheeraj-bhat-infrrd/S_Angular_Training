@@ -109,6 +109,7 @@ public class SocialManagementController {
 
 		// AuthUrl for diff social networks
 		String socialNetwork = request.getParameter("social");
+		String socialFlow = request.getParameter("flow");
 		switch (socialNetwork) {
 
 			// Building facebook authUrl
@@ -143,6 +144,10 @@ public class SocialManagementController {
 
 			// Building linkedin authUrl
 			case "linkedin":
+				if (!socialFlow.isEmpty()) {
+					session.setAttribute(CommonConstants.SOCIAL_FLOW, socialFlow);
+				}
+				
 				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
 				linkedInAuth.append("&client_id=").append(linkedInApiKey);
 				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUri);
@@ -244,7 +249,6 @@ public class SocialManagementController {
 
 		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 
 		LOG.info("Facebook Access tokens obtained and added to mongo successfully!");
@@ -345,7 +349,6 @@ public class SocialManagementController {
 
 		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 
 		LOG.info("Twitter Access tokens obtained and added to mongo successfully!");
@@ -446,7 +449,6 @@ public class SocialManagementController {
 		}
 
 		// Updating attributes
-		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 
 		LOG.info("Method authenticateLinkedInAccess() finished from SocialManagementController");
@@ -533,7 +535,6 @@ public class SocialManagementController {
 
 		// Updating attributes
 		session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
-		session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
 
 		LOG.info("Method authenticateGoogleAccess() finished from SocialManagementController");
