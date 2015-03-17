@@ -503,6 +503,38 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method getFeedBacksCount executed successfully");
 		return feedBackCount;
 	}
+	
+	/*
+	 * Returns a list of survey which are not yet competed by customers.Sorted on date (
+	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
+	 * value for respective column. limitScore is the max score under which reviews have to be shown
+	 */
+
+	@Override
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+		LOG.info("Method to fetch all the incomplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() started.");
+		Query query = new Query();
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		if (startScore > 0 && limitScore > 0) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		if (start > -1) {
+			query.skip(start);
+		}
+		if (rows > -1) {
+			query.limit(rows);
+		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
+		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+
+		LOG.info("Method to fetch all the incoplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() finished.");
+		return surveysWithReviews;
+	}
+
 
 	private Date getNdaysBackDate(int noOfDays) {
 		Calendar calendar = Calendar.getInstance();

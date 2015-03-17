@@ -1087,4 +1087,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					agentSettings);
 		}
 	}
+	
+	/**
+	 * Method to fetch reviews based on the profile level specified, iden is one of
+	 * agentId/branchId/regionId or companyId based on the profile level
+	 */
+	@Override
+	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
+			throws InvalidInputException {
+		LOG.info("Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
+				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
+		List<SurveyDetails> surveyDetails = null;
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is invalid while fetching incomplete reviews");
+		}
+		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
+		surveyDetails = surveyDetailsDao.getIncompleteSurvey(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore);
+		return surveyDetails;
+	}
 }

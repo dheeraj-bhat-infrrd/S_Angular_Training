@@ -65,6 +65,9 @@ public class LoginController {
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Information aa gayi");
+		LOG.debug("DEBUG aa gaya");
+		LOG.error("Error aa gaya");
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
@@ -485,6 +488,8 @@ public class LoginController {
 		model.addAttribute("userId", user.getUserId());
 		model.addAttribute("emailId", user.getEmailId());
 		model.addAttribute("accountType", accountType);
+		List<Long> regionIds = new ArrayList<>();
+		List<Long> branchIds = new ArrayList<>();
 		for (UserProfile userProfile : user.getUserProfiles()) {
 			switch (userProfile.getProfilesMaster().getProfileId()) {
 				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
@@ -492,7 +497,6 @@ public class LoginController {
 					if (accountType == AccountType.ENTERPRISE) {
 						String regionsJson = solrSearchService.searchRegions("", user.getCompany(), 0, -1);
 						List<Region> regions = new ArrayList<>();
-						List<Long> regionIds = new ArrayList<>();
 						List<String> regionNames = new ArrayList<>();
 						regions.addAll((List<Region>) new Gson().fromJson(regionsJson, new TypeToken<List<Region>>() {}.getType()));
 						for (Region region : regions) {
@@ -505,7 +509,6 @@ public class LoginController {
 					else if (accountType == AccountType.COMPANY) {
 						String branchesJson = solrSearchService.searchBranches("", user.getCompany(), 0, -1);
 						List<Branch> branches = new ArrayList<>();
-						List<Long> branchIds = new ArrayList<>();
 						List<String> branchNames = new ArrayList<>();
 						branches.addAll((List<Branch>) new Gson().fromJson(branchesJson, new TypeToken<List<Branch>>() {}.getType()));
 						for (Branch branch : branches) {
@@ -518,11 +521,16 @@ public class LoginController {
 					return model;
 				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
 					model.addAttribute("regionAdmin", true);
-
+					// Add list of region Ids, user is admin of. Currently adding only 1st region id.
+					regionIds.add(userProfile.getRegionId());
+					model.addAttribute("regionIds", regionIds);
 					break;
 
 				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
 					model.addAttribute("branchAdmin", true);
+					// Add list of branch Ids, user is admin of.  Currently adding only 1st branch id.
+					branchIds.add(userProfile.getBranchId());
+					model.addAttribute("branchIds", branchIds);
 					break;
 
 				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
