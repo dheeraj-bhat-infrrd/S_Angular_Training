@@ -65,19 +65,22 @@ public class LoginController {
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Information aa gayi");
+		LOG.debug("DEBUG aa gaya");
+		LOG.error("Error aa gaya");
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
-					model.addAttribute("message",
-							messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
 					break;
 				case SESSION_ERROR:
-					model.addAttribute("message",
-							messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
+					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
 					break;
 				case LOGOUT:
-					model.addAttribute("message",
-							messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 					break;
 			}
 		}
@@ -90,7 +93,7 @@ public class LoginController {
 		return JspResolver.LANDING;
 	}
 
-	@RequestMapping(value = "/forgotPassword")
+	@RequestMapping(value = "/forgotpassword")
 	public String initForgotPassword() {
 		LOG.info("Forgot Password Page started");
 		return JspResolver.FORGOT_PASSWORD;
@@ -255,15 +258,15 @@ public class LoginController {
 	@RequestMapping(value = "/sendresetpasswordlink", method = RequestMethod.POST)
 	public String sendResetPasswordLink(Model model, HttpServletRequest request) {
 		LOG.info("Send password reset link to User");
-		String emailId = request.getParameter("emailId");
 
 		User user = null;
-		// check if form parameters passed are null
 		try {
+			String emailId = request.getParameter("emailId");
 			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 				LOG.error("Invalid email id passed");
 				throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 			}
+
 			try {
 				// verify if the user exists with the registered emailId
 				user = authenticationService.verifyRegisteredUser(emailId);
@@ -272,22 +275,24 @@ public class LoginController {
 				LOG.error("Invalid Input exception in verifying registered user. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
+			
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName());
+				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName(), user.getCompany().getCompanyId());
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
+			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while sending the reset password link. Reason : " + e.getStackTrace(), e);
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.FORGOT_PASSWORD;
 		}
 
 		return JspResolver.FORGOT_PASSWORD;
@@ -326,23 +331,21 @@ public class LoginController {
 	@RequestMapping(value = "/setnewpassword", method = RequestMethod.POST)
 	public String resetPassword(Model model, HttpServletRequest request) {
 		LOG.info("Reset the user password");
-
-		String emailId = request.getParameter("emailId");
-		String password = request.getParameter("password");
-		String confirmPassword = request.getParameter("confirmPassword");
-
 		Map<String, String> urlParams = null;
-		String encryptedUrlParameters;
-		encryptedUrlParameters = request.getParameter("q");
-
+		String encryptedUrlParameters = "";
+		String emailId = "";
 		User user = null;
 
 		try {
+			emailId = request.getParameter("emailId");
+			String password = request.getParameter("password");
+			String confirmPassword = request.getParameter("confirmPassword");
 
 			// Checking if any of the form parameters are null or empty
 			validateResetPasswordFormParameters(emailId, password, confirmPassword);
 
-			// Decrypte Url parameters
+			// Decrypt Url parameters
+			encryptedUrlParameters = request.getParameter("q");
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
 			}
@@ -356,38 +359,48 @@ public class LoginController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
+			
 			long companyId = 0;
 			try {
 				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
 			}
 			catch (NumberFormatException | NullPointerException e) {
-				LOG.error("Invalid company id found in URL parameters. Reason " + e.getStackTrace(), e);
+				LOG.error("Invalid company id found in URL parameters. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			// update user's password
+			
+			// fetch user object with email Id
 			try {
-				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
+			
+			if (user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED || user.getStatus() == CommonConstants.STATUS_INACTIVE) {
+				LOG.error("Account with EmailId entered is either inactive or not verified");
+				throw new InvalidInputException("Your Account is either inactive or not verified", DisplayMessageConstants.INVALID_ACCOUNT);
+			}
+			
+			// change user's password
 			try {
-				// change user's password
 				authenticationService.changePassword(user, password);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			LOG.info("Reset user password executed successfully");
+			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_CHANGE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
+			model.addAttribute("emailId", emailId);
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.RESET_PASSWORD;
 		}
@@ -461,6 +474,9 @@ public class LoginController {
 			case CommonConstants.ADD_ACCOUNT_TYPE_STAGE:
 				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
 				break;
+			case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
+				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE; 
+				break;
 			case CommonConstants.DASHBOARD_STAGE:
 				redirectTo = JspResolver.LANDING;
 				break;
@@ -477,6 +493,8 @@ public class LoginController {
 		model.addAttribute("userId", user.getUserId());
 		model.addAttribute("emailId", user.getEmailId());
 		model.addAttribute("accountType", accountType);
+		List<Long> regionIds = new ArrayList<>();
+		List<Long> branchIds = new ArrayList<>();
 		for (UserProfile userProfile : user.getUserProfiles()) {
 			switch (userProfile.getProfilesMaster().getProfileId()) {
 				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
@@ -484,7 +502,6 @@ public class LoginController {
 					if (accountType == AccountType.ENTERPRISE) {
 						String regionsJson = solrSearchService.searchRegions("", user.getCompany(), 0, -1);
 						List<Region> regions = new ArrayList<>();
-						List<Long> regionIds = new ArrayList<>();
 						List<String> regionNames = new ArrayList<>();
 						regions.addAll((List<Region>) new Gson().fromJson(regionsJson, new TypeToken<List<Region>>() {}.getType()));
 						for (Region region : regions) {
@@ -497,7 +514,6 @@ public class LoginController {
 					else if (accountType == AccountType.COMPANY) {
 						String branchesJson = solrSearchService.searchBranches("", user.getCompany(), 0, -1);
 						List<Branch> branches = new ArrayList<>();
-						List<Long> branchIds = new ArrayList<>();
 						List<String> branchNames = new ArrayList<>();
 						branches.addAll((List<Branch>) new Gson().fromJson(branchesJson, new TypeToken<List<Branch>>() {}.getType()));
 						for (Branch branch : branches) {
@@ -510,11 +526,16 @@ public class LoginController {
 					return model;
 				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
 					model.addAttribute("regionAdmin", true);
-
+					// Add list of region Ids, user is admin of. Currently adding only 1st region id.
+					regionIds.add(userProfile.getRegionId());
+					model.addAttribute("regionIds", regionIds);
 					break;
 
 				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
 					model.addAttribute("branchAdmin", true);
+					// Add list of branch Ids, user is admin of.  Currently adding only 1st branch id.
+					branchIds.add(userProfile.getBranchId());
+					model.addAttribute("branchIds", branchIds);
 					break;
 
 				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:

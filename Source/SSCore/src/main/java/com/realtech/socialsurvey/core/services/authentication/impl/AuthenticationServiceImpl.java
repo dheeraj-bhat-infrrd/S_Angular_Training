@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.authentication.impl;
 
 // JIRA : SS-21 by RM-06 : BOC
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,19 +30,15 @@ import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 /**
  * Contains the implementation for AuthenticationService
  */
-
 @Component
 public class AuthenticationServiceImpl implements AuthenticationService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
-
 	private static final String USER = "user";
 	private static final String NAME = "name";
+
 	@Autowired
 	private URLGenerator urlGenerator;
-
-	@Value("${APPLICATION_BASE_URL}")
-	private String applicationBaseUrl;
 
 	@Autowired
 	private EmailServices emailServices;
@@ -63,6 +58,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Autowired
 	private UserManagementService userManagementService;
 
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+	
+	@Value("${ENABLE_KAFKA}")
+	private String enableKafka;
+
 	/**
 	 * Method to validate user
 	 * 
@@ -72,7 +73,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 */
 	@Override
 	public void validateUser(User user, String password) throws InvalidInputException {
-
 		LOG.info("Authenticating user, UserId + " + user.getLoginName());
 
 		// get the encrypted password using encryptSHA512 method
@@ -145,18 +145,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws InvalidInputException
 	 */
 	@Override
-	public void sendResetPasswordLink(String emailId, String name) throws InvalidInputException, UndeliveredEmailException {
-
+	public void sendResetPasswordLink(String emailId, String name, long companyId) throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Send a reset password link to the user");
 		Map<String, String> urlParams = new HashMap<String, String>();
 		urlParams.put(CommonConstants.EMAIL_ID, emailId);
+		urlParams.put(CommonConstants.COMPANY, companyId + "");
 		urlParams.put(NAME, name);
 
 		LOG.info("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.RESET_PASSWORD);
 
 		// Send reset password link to the user email ID
-		emailServices.sendResetPasswordEmail(url, emailId, name);
+		if (enableKafka.equals(CommonConstants.YES)) {
+			emailServices.queueResetPasswordEmail(url, emailId, name);
+		}
+		else {
+			emailServices.sendResetPasswordEmail(url, emailId, name);
+		}
 	}
 
 	/**
@@ -170,12 +175,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Transactional
 	public User getUserWithLoginNameAndCompanyId(String loginName, long companyId) throws InvalidInputException {
 		LOG.info("Fetching user object with emailId : " + loginName);
+		
 		Map<String, Object> queries = new HashMap<>();
 		Company company = companyDao.findById(Company.class, companyId);
 		queries.put(CommonConstants.USER_LOGIN_NAME_COLUMN, loginName);
 		queries.put(CommonConstants.COMPANY_COLUMN, company);
-		List<User> users = userDao.findByKeyValue(User.class, queries);
+		
 		// Check if user list returned is null or empty
+		List<User> users = userDao.findByKeyValue(User.class, queries);
 		if (users == null || users.isEmpty()) {
 			LOG.error("No Record found for the UserID : " + loginName);
 			throw new InvalidInputException("No Record found for the UserID : " + loginName);
@@ -193,7 +200,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	@Transactional
 	public void changePassword(User user, String password) throws InvalidInputException {
-
 		LOG.info("Method to the change user password called");
 		// Encrypt password using encryptSHA512 method
 		String encryptedPassword = encryptionHelper.encryptSHA512(password);
@@ -204,7 +210,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		// update the user object in the database
 		userDao.saveOrUpdate(user);
 		LOG.info("Password successfully changed");
-
 	}
 
 	/**
@@ -216,7 +221,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	@Override
 	@Transactional
 	public UserProfile getCompanyAdminProfileForUser(User user) throws InvalidInputException {
-
 		LOG.info("Fetching company Admin user profile for the current user");
 		Map<String, Object> columns = new HashMap<>();
 		columns.put(USER, user);
@@ -231,5 +235,4 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return userProfile.get(0);
 	}
 }
-
 // JIRA : SS-21 by RM-06 : EOC

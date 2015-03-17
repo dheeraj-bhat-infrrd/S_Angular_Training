@@ -88,7 +88,6 @@ function validatePreRegistrationForm(id) {
 	if (!validateRegEmailId('reg-email')) {
 		$('#reg-email').focus();
 		return false;
-
 	}
 	return true;
 }
@@ -99,13 +98,15 @@ function validateRegEmailId(elementId) {
 		if (emailRegex.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
-			$('#overlay-toast').html('Please enter a valid email id.');
-			showToast();
+			// $('#overlay-toast').html('Please enter a valid email id.');
+			// showToast();
+			showRegErr('Please enter a valid email id');
 			return false;
 		}
 	} else {
-		$('#overlay-toast').html('Please enter email id.');
-		showToast();
+		// $('#overlay-toast').html('Please enter email id.');
+		// showToast();
+		showRegErr('Please enter email id');
 		return false;
 	}
 }
@@ -116,13 +117,15 @@ function validateRegFirstName(elementId) {
 		if (nameRegex.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
-			$('#overlay-toast').html('Please enter a valid first name.');
-			showToast();
+			// $('#overlay-toast').html('Please enter a valid first name.');
+			// showToast();
+			showRegErr('Please enter a valid first name');
 			return false;
 		}
 	} else {
-		$('#overlay-toast').html('Please enter first name.');
-		showToast();
+		// $('#overlay-toast').html('Please enter first name.');
+		// showToast();
+		showRegErr('Please enter first name');
 		return false;
 	}
 }
@@ -133,8 +136,9 @@ function validateRegLastName(elementId) {
 		if (lastNameRegEx.test($('#' + elementId).val()) == true) {
 			return true;
 		} else {
-			$('#overlay-toast').html('Please enter a valid last name.');
-			showToast();
+			// $('#overlay-toast').html('Please enter a valid last name.');
+			// showToast();
+			showRegErr('Please enter a valid last name.');
 			return false;
 		}
 	} else {
@@ -148,8 +152,7 @@ function validateRegPassword(elementId) {
 	if (password != "") {
 		// check if password length is proper
 		if (password.length < minPwdLength || password.length > maxPwdLength) {
-			$('#overlay-toast').html(
-					'Password must be between 6-15 characters.');
+			$('#overlay-toast').html('Password must be between 6-15 characters.');
 			showToast();
 			return false;
 		} else if (passwordRegex.test(password) == true) {
@@ -165,7 +168,6 @@ function validateRegPassword(elementId) {
 		showToast();
 		return false;
 	}
-
 }
 
 // Function to match password and confirm password

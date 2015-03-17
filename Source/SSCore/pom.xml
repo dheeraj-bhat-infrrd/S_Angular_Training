@@ -32,7 +32,7 @@
 
 		<!-- PowerMock -->
 		<powermock.version>1.5.6</powermock.version>
-		
+
 		<!-- Google json -->
 		<gson.version>1.7.1</gson.version>
 
@@ -72,7 +72,13 @@
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${logback.version}</version>
-			<scope>runtime</scope>
+			<!-- <scope>runtime</scope> -->
+		</dependency>
+		
+		<dependency>
+		    <groupId>ch.qos.logback</groupId>
+		    <artifactId>logback-core</artifactId>
+		    <version>${logback.version}</version>
 		</dependency>
 
 		<!-- Hibernate -->
@@ -211,31 +217,38 @@
 			<artifactId>httpclient</artifactId>
 			<version>4.3.6</version>
 		</dependency>
-		<dependency>
+		<!-- <dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-simple</artifactId>
 			<version>1.5.6</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
 			<version>4.3.1</version>
 		</dependency>
-		
-		<!-- dependency for json  -->
+
+		<!-- dependency for json -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
 			<version>${gson.version}</version>
 		</dependency>
-		
+
+		<!-- kafka dependency -->
+		<dependency>
+			<groupId>org.apache.kafka</groupId>
+			<artifactId>kafka_2.10</artifactId>
+			<version>0.8.1.1</version>
+		</dependency>
+
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
 			<version>2.4</version>
 		</dependency>
 
-		<!-- Spring Security Core-->
+		<!-- Spring Security Core -->
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-core</artifactId>
@@ -311,22 +324,22 @@
 	</build>
 
 	<profiles>
-	    <profile>
-	        <id>dev</id>
-	        <build>
-	            <filters>
-	                <filter>src/main/resources/filler.dev.properties</filter>
-	            </filters>
-	        </build>
-	    </profile>
-	    <profile>
-	        <id>test</id>
-	        <build>
-	            <filters>
-	                <filter>src/main/resources/filler.test.properties</filter>
-	            </filters>
-	        </build>
-	    </profile>
+		<profile>
+			<id>dev</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.dev.properties</filter>
+				</filters>
+			</build>
+		</profile>
+		<profile>
+			<id>test</id>
+			<build>
+				<filters>
+					<filter>src/main/resources/filler.test.properties</filter>
+				</filters>
+			</build>
+		</profile>
 	</profiles>
 
 	<pluginRepositories>

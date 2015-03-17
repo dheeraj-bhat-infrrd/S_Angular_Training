@@ -5,8 +5,10 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -513,7 +515,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
 		return usersResult;
 	}
-
+	
 	/**
 	 * Method to add User into solr
 	 */
@@ -532,34 +534,48 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
 			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
-			if (user.getCompany() != null)
+
+			/**
+			 * add/update profile url and profile name in solr only when they are not null
+			 */
+			if (user.getProfileName() != null && !user.getProfileName().isEmpty()) {
+				document.addField(CommonConstants.PROFILE_NAME_SOLR, user.getProfileName());
+			}
+			if (user.getProfileUrl() != null && !user.getProfileUrl().isEmpty()) {
+				document.addField(CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl());
+			}
+
+			if (user.getCompany() != null) {
 				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
+			}
 			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
-			List<Long> branches = new ArrayList<>();
-			List<Long> regions = new ArrayList<>();
+			Set<Long> branches = new HashSet<Long>();
+			Set<Long> regions = new HashSet<Long>();
 			if (user.getUserProfiles() != null)
 				for (UserProfile userProfile : user.getUserProfiles()) {
-					if (userProfile.getRegionId() != 0)
+					if (userProfile.getRegionId() != 0) {
 						regions.add(userProfile.getRegionId());
-					if (userProfile.getBranchId() != 0)
+					}
+					if (userProfile.getBranchId() != 0) {
 						branches.add(userProfile.getBranchId());
+					}
 				}
 			document.addField(CommonConstants.BRANCHES_SOLR, branches);
 			document.addField(CommonConstants.REGIONS_SOLR, regions);
 			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
-			LOG.debug("response while adding region is {}." + response);
+			LOG.debug("response while adding user is: " + response);
 			solrServer.add(document);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding user to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding user to solr. Reason : " + e.getMessage(), e);
 		}
 		catch (SolrServerException | IOException e) {
-			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
-			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			LOG.error("Exception while adding user to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding user to solr. Reason : " + e.getMessage(), e);
 		}
-		LOG.info("Method to add region to solr finshed for region : " + user);
+		LOG.info("Method to add user to solr finshed for user : " + user);
 	}
 
 	/*
@@ -584,24 +600,47 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * Method to fetch display name of a user from solr based upon user id provided.
 	 */
 	@Override
-	public String getUserDisplayNameById(long userId) throws SolrException, SolrServerException, NoRecordsFetchedException {
+	public String getUserDisplayNameById(long userId) throws InvalidInputException, NoRecordsFetchedException, SolrServerException {
 		LOG.info("Method to fetch user from solr based upon user id, searchUserById() started.");
+		SolrDocument solrDocument = getUserByUniqueId(userId);
+		if (solrDocument == null || solrDocument.isEmpty()) {
+			throw new NoRecordsFetchedException("No document found in solr for userId:" + userId);
+		}
+		String displayName = solrDocument.get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
+		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
+		return displayName;
+	}
+
+	/**
+	 * Method to fetch user based on the userid provided
+	 */
+	@Override
+	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException {
+		LOG.info("Method getUserByUniqueId called for userId:" + userId);
+		if (userId <= 0l) {
+			throw new InvalidInputException("userId is invalid for getting user from solr");
+		}
+		SolrDocument solrDocument = null;
 		QueryResponse response = null;
 		SolrServer solrServer = new HttpSolrServer(solrUserUrl);
 		SolrQuery solrQuery = new SolrQuery();
 		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + userId);
+
 		LOG.debug("Querying solr for searching users");
 		response = solrServer.query(solrQuery);
 		SolrDocumentList results = response.getResults();
-		if (results == null || results.size() == 0) {
-			LOG.error("No record found in Solr for userid {}  in method getUserDisplayNameById()", userId);
-			throw new NoRecordsFetchedException("No record found in Solr for userid " + userId + " in method getUserDisplayNameById()");
+
+		if (results != null && !results.isEmpty()) {
+			solrDocument = results.get(CommonConstants.INITIAL_INDEX);
 		}
-		String displayName = results.get(CommonConstants.INITIAL_INDEX).get(CommonConstants.USER_DISPLAY_NAME_SOLR).toString();
-		LOG.info("Method to fetch user from solr based upon user id, searchUserById() finished.");
-		return displayName;
+		else {
+			LOG.debug("No user present in solr for the userId:" + userId);
+		}
+		LOG.info("Method getUserByUniqueId executed succesfully. Returning :" + solrDocument);
+		return solrDocument;
+
 	}
-	
+
 	/**
 	 * Method to edit User in solr
 	 */
@@ -628,5 +667,169 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method to edit user in solr finished for user : " + userId);
+	}
+
+	@Override
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
+			SolrException {
+		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
+				+ noOfRows);
+		if (iden <= 0l) {
+			throw new InvalidInputException("iden is not set in searchUsersByIden");
+		}
+		if (idenFieldName == null || idenFieldName.isEmpty()) {
+			throw new InvalidInputException("idenFieldName is null or empty in searchUsersByIden");
+		}
+
+		QueryResponse response = null;
+		SolrDocumentList results = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
+			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			if (startIndex > -1) {
+				solrQuery.setStart(startIndex);
+			}
+			if (noOfRows > -1) {
+				solrQuery.setRows(noOfRows);
+			}
+
+			LOG.debug("Querying solr for searching users");
+			response = solrServer.query(solrQuery);
+			results = response.getResults();
+			LOG.debug("User search result is : " + results);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException in searchUsersByIden.Reason:" + e.getMessage(), e);
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByIden finished for iden : " + iden);
+		return results;
+	}
+	
+	/**
+	 * Method to perform search of region from solr based on the input Region id
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchRegionById(long regionId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchRegionById called for regionId :" + regionId);
+		if (regionId < 0) {
+			throw new InvalidInputException("Region id is null while searching for region");
+		}
+		String regionName = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":"+ CommonConstants.STATUS_ACTIVE);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if(results.size()!=0)
+				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_COLUMN);
+		}catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing region search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.debug("Region search result is : " + regionName);
+		return regionName;
+	}
+	
+	/**
+	 * Method to perform search of branch name from solr based on the input branch id
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBrancNameById called for branchId :" + branchId);
+		if (branchId < 0) {
+			throw new InvalidInputException("Branch id is null while searching for Branch");
+		}
+		String branchName = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.BRANCH_ID_SOLR + ":" + branchId);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":"+ CommonConstants.STATUS_ACTIVE);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if(results.size()!=0)
+				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_COLUMN);
+		}catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.debug("Branch search result is : " + branchName);
+		return branchName;
+	}
+	
+	/**
+	 * Method to perform search of region, branch or Agent name from solr based on the input pattern for a specific company
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException, SolrException{
+		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company started");
+		String result = null;
+		QueryResponse response = null;
+		searchKey = searchKey+"*";
+		try {
+			SolrServer solrServer;
+			switch(searchColumn){
+				case CommonConstants.REGION_NAME_SOLR : 
+					solrServer = new HttpSolrServer(solrRegionUrl);
+					break;
+				case CommonConstants.BRANCH_NAME_SOLR : 
+					solrServer = new HttpSolrServer(solrBranchUrl);
+					break;
+				case CommonConstants.USER_DISPLAY_NAME_SOLR : 
+					solrServer = new HttpSolrServer(solrUserUrl);
+					if(columnName.equals(CommonConstants.REGION_ID_COLUMN)){
+						columnName = "regions";
+					}
+					else if(columnName.equals(CommonConstants.BRANCH_ID_COLUMN)){
+						columnName = "branches";
+					}
+					break;
+				default :
+					solrServer = new HttpSolrServer(solrRegionUrl);
+			}
+			SolrQuery query = new SolrQuery();
+			query.setQuery(columnName + ":" + id);
+			
+			query.addFilterQuery(searchColumn + ":" + searchKey);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+
+			LOG.debug("Querying solr for searching "+searchColumn);
+			response = solrServer.query(query);
+			SolrDocumentList documentList = response.getResults();
+			result = JSONUtil.toJSON(documentList);
+
+			LOG.debug("Results obtained from solr :" + result);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing region, branch or agent search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
+		return result;
+
 	}
 }
