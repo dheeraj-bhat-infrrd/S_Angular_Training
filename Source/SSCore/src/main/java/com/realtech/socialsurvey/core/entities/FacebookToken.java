@@ -4,6 +4,9 @@ public class FacebookToken {
 
 	private String facebookId;
 	private String facebookPageLink;
+	private String facebookAccessToken;
+	private long facebookAccessTokenCreatedOn;
+	private long facebookAccessTokenExpiresOn;
 
 	public String getFacebookId() {
 		return facebookId;
@@ -21,9 +24,32 @@ public class FacebookToken {
 		this.facebookPageLink = facebookPageLink;
 	}
 
+	public String getFacebookAccessToken() {
+		return facebookAccessToken;
+	}
+
+	public void setFacebookAccessToken(String facebookAccessToken) {
+		this.facebookAccessToken = facebookAccessToken;
+	}
+
+	public long getFacebookAccessTokenCreatedOn() {
+		return facebookAccessTokenCreatedOn;
+	}
+
+	public void setFacebookAccessTokenCreatedOn(long facebookAccessTokenCreatedOn) {
+		this.facebookAccessTokenCreatedOn = facebookAccessTokenCreatedOn;
+	}
+
+	public long getFacebookAccessTokenExpiresOn() {
+		return facebookAccessTokenExpiresOn;
+	}
+
+	public void setFacebookAccessTokenExpiresOn(long facebookAccessTokenExpiresOn) {
+		this.facebookAccessTokenExpiresOn = facebookAccessTokenExpiresOn;
+	}
+
 	@Override
 	public String toString() {
 		return "FacebookToken [facebookId=" + facebookId + ", facebookPageLink=" + facebookPageLink + "]";
 	}
-
 }
