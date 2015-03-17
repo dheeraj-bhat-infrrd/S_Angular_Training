@@ -110,11 +110,13 @@ function paintProList(usersList) {
 				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '">';
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
-				usersHtml = usersHtml + '	<div class="ctnt-item-name">' + user.displayName + '</div>';
+				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name" data-profilename="' + user.profileName + '">' + user.displayName + '</div>';
 				if(user.title != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
-				usersHtml = usersHtml + '	<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
+				if(user.aboutMe != undefined){
+					usersHtml = usersHtml + '<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
+				}
 				usersHtml = usersHtml + '</div>';
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap">'
 					+ '<div class="ctnt-review-btn" user="' + user.userId + '">Review</div>'
@@ -124,6 +126,13 @@ function paintProList(usersList) {
 			
 			$('#ctnt-list-wrapper').append(usersHtml);
 			$('#fp-users-size').val(usersSize);
+			
+			/*$(".user-display-name").click(function(e){
+				// e.stopPropagation();
+				var agentProfileName = $(this).attr("data-profilename");
+				var url = window.location.origin + "/individualprofile/" + agentProfileName + ".do";
+				window.open(url, "_blank");
+			});*/
 		}
 	}
 }

@@ -409,7 +409,11 @@ public class HierarchyManagementController {
 
 			LOG.debug("Calling service to add a new region");
 			try {
-				hierarchyManagementService.addNewRegion(user, regionName, CommonConstants.NO, regionAddress1, regionAddress2);
+				Region region = hierarchyManagementService.addNewRegion(user, regionName, CommonConstants.NO, regionAddress1, regionAddress2);
+				
+				LOG.debug("Adding default branch for the region created");
+				hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+						CommonConstants.DEFAULT_ADDRESS, null);
 
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));

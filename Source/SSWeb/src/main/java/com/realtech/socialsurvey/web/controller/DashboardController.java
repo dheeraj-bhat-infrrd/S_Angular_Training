@@ -196,7 +196,7 @@ public class DashboardController {
 				}
 			}
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, 0, 0, startIndex, batchSize, profileLevel);
+				surveyDetails = profileManagementService.getReviews(iden, 0, 0, startIndex, batchSize, profileLevel, true);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
@@ -248,7 +248,7 @@ public class DashboardController {
 
 			}
 			// Calling service method to count number of reviews stored in database.
-			reviewCount = profileManagementService.getReviewsCount(iden, -1, -1, profileLevel);
+			reviewCount = profileManagementService.getReviewsCount(iden, -1, -1, profileLevel, true);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ", e);
