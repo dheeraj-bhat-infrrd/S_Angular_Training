@@ -1608,5 +1608,67 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method assignBranchToUser executed successfully");
 
 	}
+
+	/**
+	 * Method to add a new user or assign existing user under a company/region or branch
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public void addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
+			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException {
+		LOG.info("Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId + " isAdmin:" + isAdmin);
+		List<User> assigneeUsers = null;
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId);
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			assigneeUsers = new ArrayList<User>();
+			assigneeUsers.add(assigneeUser);
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list for the email addresses provided");
+			assigneeUsers = getUsersFromEmailIds(emailIdsArray, adminUser);
+		}
+		if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+			/**
+			 * if branchId is provided, add the individual to specified branch
+			 */
+			if (branchId > 0l) {
+				LOG.debug("assigning individual(s) to branch :" + branchId + " in addIndividual");
+				for (User assigneeUser : assigneeUsers) {
+					assignBranchToUser(adminUser, branchId, regionId, assigneeUser, isAdmin);
+				}
+			}
+			/**
+			 * else if regionId is provided, add the individual to specified region
+			 */
+			else if (regionId > 0l) {
+				LOG.debug("assigning individual(s) to region :" + regionId + " in addIndividual");
+				for (User assigneeUser : assigneeUsers) {
+					assignRegionToUser(adminUser, regionId, assigneeUser, isAdmin);
+				}
+			}
+			/**
+			 * else assign the individual to company (i.e under default region)
+			 */
+			else {
+				LOG.debug("assigning individual(s) to company in addIndividual");
+				Region region = getDefaultRegionForCompany(adminUser.getCompany());
+				if (region == null) {
+					throw new NoRecordsFetchedException("No default region found for company while adding individual");
+				}
+				for (User assigneeUser : assigneeUsers) {
+					assignRegionToUser(adminUser, region.getRegionId(), assigneeUser, isAdmin);
+				}
+			}
+
+		}
+
+		LOG.info("Method addNewIndividual executed successfully");
+	}
 }
 // JIRA: SS-27: By RM05: EOC
