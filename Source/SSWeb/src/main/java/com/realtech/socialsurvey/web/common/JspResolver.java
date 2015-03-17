@@ -4,7 +4,6 @@ package com.realtech.socialsurvey.web.common;
  * Holds the jsp name as constants
  */
 public interface JspResolver {
-
 	public static final String CORPORATE_INVITATION = "corporateinvitation";
 	public static final String INVITATION = "invitation";
 	public static final String ERROR_PAGE = "errorpage500";
@@ -18,8 +17,6 @@ public interface JspResolver {
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String UPGRADE_CONFIRMATION = "upgradeconfirmation";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
-	public static final String LINKEDIN_ACCESS = "linkedinaccess";
-	public static final String LINKEDIN_MESSAGE = "linkedinmessage";
 	public static final String PAYMENT = "payment";
 	public static final String LANDING = "landing";
 	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
@@ -59,4 +56,6 @@ public interface JspResolver {
 	public static final String HIERARCHY_REGION_EDIT = "hierarchy-region-edit";
 	public static final String HIERARCHY_OFFICE_EDIT = "hierarchy-office-edit";
 	public static final String HIERARCHY_INDIVIDUAL_EDIT = "hierarchy-individual-edit";
+	public static final String LINKEDIN_ACCESS = "linkedinaccess";
+	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
 }

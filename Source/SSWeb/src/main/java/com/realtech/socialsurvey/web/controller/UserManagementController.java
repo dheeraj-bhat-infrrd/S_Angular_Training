@@ -20,16 +20,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
-import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
-import com.google.code.linkedinapi.client.oauth.LinkedInAccessToken;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
-import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -81,11 +75,6 @@ public class UserManagementController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
-	@Autowired
-	private LinkedInApiClientFactory linkedInApiClientFactory;
-
-	private final static int SOLR_BATCH_SIZE = 20;
-
 	@Value("${LINKED_IN_API_KEY}")
 	private String linkedInApiKey;
 
@@ -101,6 +90,9 @@ public class UserManagementController {
 	@Value("${LINKED_IN_REDIRECT_URI}")
 	private String linkedinRedirectUri;
 
+	
+	private final static int SOLR_BATCH_SIZE = 20;
+	
 	// JIRA SS-42 BY RM05 BOC
 	/*
 	 * Method to show the User Management Page to a user on clicking UserManagement link.
@@ -862,6 +854,7 @@ public class UserManagementController {
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 				user.setFirstName(firstName);
 				user.setLastName(lastName);
+				user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
 				user.setStatus(CommonConstants.STATUS_ACTIVE);
 				user.setModifiedBy(String.valueOf(user.getUserId()));
 				user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
@@ -901,9 +894,10 @@ public class UserManagementController {
 			else {
 				LOG.debug("License details not found for the user's company");
 			}
-
+			
+			// updating the flags for user profiles
+			
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
 				sessionHelper.getCanonicalSettings(session);
@@ -992,99 +986,6 @@ public class UserManagementController {
 			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
 		}
 		LOG.debug("change password form parameters validated successfully");
-	}
-
-	/**
-	 * Returns the linked in authorization page
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/linkedinauthpage", method = RequestMethod.GET)
-	public String getLinkedInAuthPage(Model model, HttpServletRequest request) {
-
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			LOG.error("Session is null!");
-		}
-
-		LOG.info("getLinkedInAuthPage called");
-		LinkedInRequestToken requestToken;
-		try {
-			requestToken = userManagementService.getLinkedInRequestToken();
-		}
-		catch (Exception e) {
-			LOG.error("Exception while getting request token. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", e.getMessage());
-			return JspResolver.ERROR_PAGE;
-		}
-
-		// We will keep the request token in session
-		session.setAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN, requestToken);
-
-		LOG.info("Returning the authorizationurl : " + requestToken.getAuthorizationUrl());
-
-		model.addAttribute(CommonConstants.MESSAGE, CommonConstants.YES);
-		model.addAttribute(CommonConstants.LINKEDIN_AUTH_URL, requestToken.getAuthorizationUrl());
-		return JspResolver.LINKEDIN_MESSAGE;
-	}
-
-	/**
-	 * The url that LinkedIn send request to with the oauth verification code
-	 * 
-	 * @param model
-	 * @param request
-	 * @return
-	 */
-	@RequestMapping(value = "/linkedinauth", method = RequestMethod.GET)
-	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
-
-		LOG.info("LinkedIn authentication url requested");
-		HttpSession session = request.getSession(false);
-		String errorCode = request.getParameter("oauth_problem");
-		UserSettings currentUserSettings;
-		try {
-			if (session == null) {
-				LOG.error("authenticateLinkedInAccess : Session object is null!");
-				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
-			}
-			if (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) == null) {
-				LOG.error("authenticateLinkedInAccess : user canonical settings not found in session!");
-				throw new NonFatalException("authenticateLinkedInAccess : user canonical settings not found in session!");
-			}
-			else {
-				currentUserSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-				if (currentUserSettings.getAgentSettings() == null) {
-					LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
-					throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
-				}
-			}
-			if (errorCode != null) {
-				LOG.error("Error code : " + errorCode);
-				model.addAttribute(CommonConstants.ERROR, CommonConstants.YES);
-				return JspResolver.LINKEDIN_MESSAGE;
-			}
-
-			User user = sessionHelper.getCurrentUser();
-			LinkedInOAuthService oauthService = LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,
-					linkedInApiSecret);
-			String oauthVerifier = request.getParameter("oauth_verifier");
-			LOG.debug("LinkedIn oauth verfier : " + oauthVerifier);
-			LinkedInRequestToken requestToken = (LinkedInRequestToken) session.getAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-			LinkedInAccessToken accessToken = oauthService.getOAuthAccessToken(requestToken, oauthVerifier);
-			userManagementService.setLinkedInAccessTokenForUser(user, accessToken.getToken(), accessToken.getTokenSecret(), currentUserSettings
-					.getAgentSettings().values());
-		}
-		catch (Exception e) {
-			session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-			LOG.error(e.getMessage(), e);
-			return JspResolver.LINKEDIN_MESSAGE;
-		}
-		session.removeAttribute(CommonConstants.LINKEDIN_REQUEST_TOKEN);
-		LOG.info("Access tokens obtained and added to mongo successfully!");
-		model.addAttribute(CommonConstants.SUCCESS_ATTRIBUTE, CommonConstants.YES);
-		return JspResolver.LINKEDIN_MESSAGE;
 	}
 }
 // JIRA SS-77 BY RM07 EOC
