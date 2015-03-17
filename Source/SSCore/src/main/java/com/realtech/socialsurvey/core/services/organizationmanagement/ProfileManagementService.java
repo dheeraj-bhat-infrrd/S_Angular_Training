@@ -288,4 +288,21 @@ public interface ProfileManagementService {
 	public void generateVerificationUrl(Map<String,String> urlParams, String applicationUrl, String recipientMailId, String recipientName) throws InvalidInputException, UndeliveredEmailException;
 	
 	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException;
+	
+	/**
+	 * Method to fetch reviews based on the profile level specified, iden is one of
+	 * agentId/branchId/regionId or companyId based on the profile level
+	 * 
+	 * @param iden
+	 * @param startScore
+	 * @param limitScore
+	 * @param startIndex
+	 * @param numOfRows
+	 * @param profileLevel
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
+			throws InvalidInputException;
+
 }

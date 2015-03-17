@@ -114,5 +114,12 @@ public interface SolrSearchService {
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
 	
 	public SolrDocumentList searchUsersByIden(long iden,String idenFieldName,int startIndex,int noOfRows) throws InvalidInputException,SolrException;
+
+	public String searchRegionById(long regionId) throws InvalidInputException, SolrException;
+
+	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException;
+	
+	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
+			SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

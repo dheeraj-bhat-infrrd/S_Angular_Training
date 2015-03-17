@@ -15,6 +15,11 @@
 <script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
 <script>
 	$('#header-logo').click(function(){
 		showMainContent('./dashboard.do');
