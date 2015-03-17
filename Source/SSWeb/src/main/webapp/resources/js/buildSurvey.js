@@ -1,4 +1,10 @@
 // Existing Survey Questions 
+function commonActiveSurveyCallback(response){
+	showInfo(response);
+	$('#bs-ques-wrapper').html('');
+	loadActiveSurveyQuestions();
+}
+
 function loadActiveSurveyQuestions() {
 	var url = "./getactivesurveyquestions.do";
 	callAjaxGET(url, populateActiveSurveyQuestions, true);
@@ -67,6 +73,20 @@ $('.bd-q-btn-cancel').click(function() {
 $('.bd-q-btn-done').click(function() {
 	$('#bd-srv-pu').hide();
 	$('body').removeClass('body-no-scroll');
+});
+
+// Remove question from survey
+$('body').on('click', '.srv-tbl-rem', function(){
+	var questionId = $(this).parent().data('questionid');
+	var url = "./removequestionfromsurvey.do?questionId=" + questionId;
+	
+	createPopupConfirm("Delete Question");
+	$('body').on('click', '#overlay-continue', function(){
+		callAjaxPOST(url, commonActiveSurveyCallback, true);
+		
+		overlayRevert();
+		$('#overlay-continue').unbind('click');
+	});
 });
 
 // Select question type
@@ -190,4 +210,24 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 
 $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
+});
+
+// Overlay Popup
+function createPopupConfirm(header) {
+	$('#overlay-header').html(header);
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
+
+	$('#overlay-main').show();
+}
+function overlayRevert() {
+	$('#overlay-main').hide();
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
+}
+$('body').on('click', '#overlay-cancel', function(){
+	$('#overlay-continue').unbind('click');
+	overlayRevert();
 });
