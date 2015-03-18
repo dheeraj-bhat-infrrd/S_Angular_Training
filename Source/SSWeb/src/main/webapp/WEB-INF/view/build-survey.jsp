@@ -205,16 +205,35 @@
 <script>
     $(document).ready(function() {
         
+        $(document).on('click','.bd-srv-tbl-row',function(){
+            if($(window).width() < 768){
+                if($(this).find('.srv-tbl-rem').css('display') == 'none'){
+                    $(this).find('.srv-tbl-rem').show();
+                    $(this).find('.srv-tbl-edit').show();
+                }else{
+                    $(this).find('.srv-tbl-rem').hide();
+                    $(this).find('.srv-tbl-edit').hide();
+                }
+            }else{
+                $(this).find('.srv-tbl-rem').hide();
+                $(this).find('.srv-tbl-edit').hide();
+            }
+        });
+        
         $(document).on('mouseover','.bd-srv-tbl-row',function(){
-            $(this).addClass('bd-srv-tbl-row-hover');
-            $(this).find('.srv-tbl-rem').show();
-            $(this).find('.srv-tbl-edit').show();
+            if($(window).width() > 768){
+                $(this).addClass('bd-srv-tbl-row-hover');
+                $(this).find('.srv-tbl-rem').show();
+                $(this).find('.srv-tbl-edit').show();
+            }
         });
         
         $(document).on('mouseout','.bd-srv-tbl-row',function(){
-            $(this).removeClass('bd-srv-tbl-row-hover');
-            $(this).find('.srv-tbl-rem').hide();
-            $(this).find('.srv-tbl-edit').hide();
+            if($(window).width() > 768){
+                $(this).removeClass('bd-srv-tbl-row-hover');
+                $(this).find('.srv-tbl-rem').hide();
+                $(this).find('.srv-tbl-edit').hide();
+            }
         });
         
         resizeAdj();
