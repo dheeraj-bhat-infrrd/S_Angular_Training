@@ -14,7 +14,7 @@
 	<div id="bd-region-selector" class="bd-hr-form-item clearfix hide">
 	    <div class="float-left bd-frm-left"><spring:message code="label.selectregion.key"/></div>
 	    <div class="float-left bd-frm-right pos-relative" id="region-selector">
-	        <input id="selected-region-txt" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img cleara">
+	        <input id="selected-region-txt" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img clear" placeholder='<spring:message code="label.regionselector.placeholder.key"/>'/>
 	        <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
 	        <div id="regions-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	            <!-- regions list get populated here -->
@@ -24,7 +24,7 @@
 	<div id="bd-office-selector" class="bd-hr-form-item clearfix">
 	    <div class="float-left bd-frm-left"><spring:message code="label.selectoffice.key"/></div>
 	    <div class="float-left bd-frm-right pos-relative" id="office-selector">
-	        <input id="selected-office-txt" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img">
+	        <input id="selected-office-txt" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.officeselector.placeholder.key"/>'/>
 	        <input type="hidden" name="officeId" id="selected-office-id-hidden"/>
 	        <div id="offices-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	            <!-- offices list get populated here  -->
@@ -56,7 +56,7 @@
 	<div id="bd-single" class="bd-hr-form-item clearfix">
 	    <div class="float-left bd-frm-left"><spring:message code="label.adduser.key"/></div>
 	    <div class="float-left bd-frm-right pos-relative">
-	        <input id="selected-user-txt" name="selectedUserEmail" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img">
+	        <input id="selected-user-txt" name="selectedUserEmail" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.userselector.placeholder.key"/>'/>
 	        <input type="hidden" name="selectedUserId" id="selected-userid-hidden">
 	        <div id="users-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	            <!-- list of users from solr gets displayed here   -->

@@ -739,7 +739,12 @@ public class UserManagementController {
 				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
 				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
-				model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+				String lastName = urlParams.get(CommonConstants.LAST_NAME);
+				
+				if(lastName != null && !lastName.isEmpty()) {
+					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+				}
+				
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
