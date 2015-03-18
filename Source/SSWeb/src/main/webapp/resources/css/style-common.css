@@ -4299,6 +4299,7 @@ button.paypal.is-active {
     width: 148px;
     text-align: center;
     color: #fff;
+    text-transform: uppercase;
 }
 
 .bd-frm-rt-txt-area {

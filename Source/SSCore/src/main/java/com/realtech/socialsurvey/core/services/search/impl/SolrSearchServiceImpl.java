@@ -87,7 +87,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.REGION_NAME_SOLR + ":" + regionPattern);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_COLUMN + ":"
-					+ CommonConstants.STATUS_ACTIVE);
+					+ CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
 			solrQuery.setStart(start);
 			if (rows > 0) {
 				solrQuery.setRows(rows);
@@ -140,7 +140,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery query = new SolrQuery();
 			query.setQuery(CommonConstants.BRANCH_NAME_SOLR + ":" + branchPattern);
 			query.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
-					+ CommonConstants.STATUS_ACTIVE);
+					+ CommonConstants.STATUS_ACTIVE,CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
 			query.setStart(start);
 
 			if (rows > 0) {
@@ -473,7 +473,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
 		return usersResult;
 	}
-	
+
 	/**
 	 * Method to add User into solr
 	 */
@@ -491,7 +491,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
-			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
+
+			String displayName = user.getFirstName();
+			if (user.getLastName() != null) {
+				displayName = displayName + " " + user.getLastName();
+			}
+			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, displayName);
 
 			/**
 			 * add/update profile url and profile name in solr only when they are not null

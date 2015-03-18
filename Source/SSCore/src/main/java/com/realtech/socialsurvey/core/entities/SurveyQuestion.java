@@ -25,7 +25,7 @@ public class SurveyQuestion implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "SURVEY_QUESTIONS_ID")
-	private int surveyQuestionsId;
+	private long surveyQuestionsId;
 
 	@Column(name = "CREATED_BY")
 	private String createdBy;
@@ -58,11 +58,11 @@ public class SurveyQuestion implements Serializable {
 
 	public SurveyQuestion() {}
 
-	public int getSurveyQuestionsId() {
+	public long getSurveyQuestionsId() {
 		return this.surveyQuestionsId;
 	}
 
-	public void setSurveyQuestionsId(int surveyQuestionsId) {
+	public void setSurveyQuestionsId(long surveyQuestionsId) {
 		this.surveyQuestionsId = surveyQuestionsId;
 	}
 
