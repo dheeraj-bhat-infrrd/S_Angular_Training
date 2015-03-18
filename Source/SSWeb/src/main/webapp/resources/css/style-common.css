@@ -3371,8 +3371,8 @@ button.paypal.is-active {
     height: 36px;
     margin-bottom: -13px;
     width: 32px;
-    background: url(../images/close.png) no-repeat center;
-    background-size: 22px;
+    background: url(../images/close_check.png) no-repeat left center;
+    background-size: auto 22px;
 }
 
 .reg-cap-nw-adj{
@@ -3417,6 +3417,15 @@ button.paypal.is-active {
 
 .bg-black-info{
     background-color: #666 !important;
+}
+
+.bg-black-success{
+    background-color: #95E566 !important;
+}
+
+.bg-black-success .err-new-close{
+    background-position: right center;
+    background-size: auto 22px;
 }
 
 .header-right {
