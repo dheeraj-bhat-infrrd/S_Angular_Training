@@ -166,6 +166,10 @@ a, a:hover, a:visited{
     line-height: 33px;
 }
 
+.txt-header-small{
+    font-size: 18px;
+}
+
 .index-body {
     background: url(../images/bg-main.png) no-repeat center;
     background-size: cover;

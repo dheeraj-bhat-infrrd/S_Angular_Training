@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.surveybuilder.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.Survey;
@@ -23,6 +25,7 @@ import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionsMapping;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
@@ -54,6 +57,13 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Autowired
 	private UserDao userDao;
+	
+	@Autowired
+	private GenericDao<VerticalsMaster, Integer> verticalsMasterDao;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
 
 	@Override
 	@Transactional
@@ -105,7 +115,8 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.info("Method checkForExistingSurvey() finished.");
 		if (!surveyCompanyMappingList.isEmpty()) {
 			SurveyCompanyMapping surveyCompanyMapping = surveyCompanyMappingList.get(CommonConstants.INITIAL_INDEX);
-			return surveyCompanyMapping.getSurvey();
+			Survey survey = surveyCompanyMapping.getSurvey();
+			return survey;
 		}
 		return null;
 	}
@@ -119,10 +130,14 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			throw new InvalidInputException("Invalid argument. Null value is passed for user.", DisplayMessageConstants.GENERAL_ERROR);
 		}
 		String surveyName = " Survey";
+		//Fetch the vertical masters from the table for the vertical
+		VerticalsMaster verticalsMaster = verticalsMasterDao.findById(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_CUSTOM);
+		
 
 		// creating new survey and mapping to company
 		Survey survey = new Survey();
 		survey.setSurveyName(user.getCompany().getCompany() + surveyName);
+		survey.setVerticalsMaster(verticalsMaster);
 		survey.setStatus(CommonConstants.STATUS_ACTIVE);
 		survey.setCreatedBy(String.valueOf(user.getUserId()));
 		survey.setModifiedBy(String.valueOf(user.getUserId()));
@@ -168,6 +183,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		mapping.setCreatedOn(new Timestamp(System.currentTimeMillis()));
 		mapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		mapping = surveyCompanyMappingDao.saveOrUpdate(mapping);
+		survey.setSurveyCompanyMappings(Arrays.asList(mapping));
 	}
 
 	@Override
@@ -196,6 +212,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		LOG.debug("Disabling the SurveyCompanyMapping record with id : " + surveyCompanyMapping.getSurveyCompanyMappingId() + "from the database.");
 
 		surveyCompanyMappingDao.update(surveyCompanyMapping);
+		surveyCompanyMapping.getSurvey().setSurveyCompanyMappings(Arrays.asList(surveyCompanyMapping));
 		LOG.info("Method deactivateSurveyCompanyMapping() finished.");
 	}
 
@@ -371,7 +388,16 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		surveyQuestionsMapping.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 
 		LOG.debug("Saving mapping of survey to question.");
-		surveyQuestionsMappingDao.save(surveyQuestionsMapping);
+		if(survey.getSurveyQuestionsMappings() == null){
+			survey.setSurveyQuestionsMappings(Arrays.asList(surveyQuestionsMappingDao.save(surveyQuestionsMapping)));
+		}
+		else{
+			SurveyQuestionsMapping newSurveyQuestionsMapping = surveyQuestionsMappingDao.save(surveyQuestionsMapping);
+			List<SurveyQuestionsMapping> surveyQuestionsMappings = new ArrayList<SurveyQuestionsMapping>();
+			surveyQuestionsMappings.addAll(survey.getSurveyQuestionsMappings());
+			surveyQuestionsMappings.add(newSurveyQuestionsMapping);
+			survey.setSurveyQuestionsMappings(surveyQuestionsMappings);
+		}
 		surveyQuestionsMappingDao.flush();
 
 		LOG.debug("Method mapQuestionToSurvey() finished.");
@@ -397,7 +423,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		}
 		return fetchSurveyQuestions(survey);
 	}
-
+	
 	@Override
 	@Transactional
 	public void changeSurveyStatus(User user, int status) throws InvalidInputException {
@@ -411,30 +437,42 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			survey = createNewSurvey(user);
 		}
 
-		survey.setStatus(status);
+		survey.setIsSurveyBuildingComplete(status);
 		surveyDao.saveOrUpdate(survey);
 		surveyDao.flush();
 		LOG.debug("Method changeSurveyStatus() finished.");
 	}
-
+	
 	@Override
 	@Transactional
-	public List<SurveyTemplate> getSurveyTemplates() throws InvalidInputException {
-		HashMap<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_SURVEY_TEMPLATE);
-
-		List<Survey> surveys = surveyDao.findByKeyValue(Survey.class, queries);
-		List<SurveyTemplate> templates = new ArrayList<SurveyTemplate>();
-		SurveyTemplate template = null;
-
-		for (Survey survey : surveys) {
-			template = new SurveyTemplate();
-			template.setSurveyId(survey.getSurveyId());
-			template.setSurveyName(survey.getSurveyName());
-			template.setQuestions(fetchSurveyQuestions(survey));
-
-			templates.add(template);
+	public List<SurveyTemplate> getSurveyTemplates(User user) throws InvalidInputException {
+		
+		if( user == null ){
+			LOG.error("InvalidInputException : user parameter is null or invalid ");
+			throw new InvalidInputException("InvalidInputException : user parameter is null or invalid ");
 		}
+
+		LOG.debug("Fetching the verticals master record");
+		VerticalsMaster verticalsMaster = user.getCompany().getVerticalsMaster();
+		SurveyTemplate template = null;
+		List<SurveyTemplate> templates = new ArrayList<SurveyTemplate>();
+		
+		if(verticalsMaster.getVerticalsMasterId() > CommonConstants.VERTICALS_MASTER_CUSTOM){
+			HashMap<String, Object> queries = new HashMap<>();
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			queries.put(CommonConstants.VERTICAL_COLUMN, verticalsMaster);
+
+			List<Survey> surveys = surveyDao.findByKeyValue(Survey.class, queries);
+			for (Survey survey : surveys) {
+				template = new SurveyTemplate();
+				template.setSurveyId(survey.getSurveyId());
+				template.setSurveyName(survey.getSurveyName());
+				template.setQuestions(fetchSurveyQuestions(survey));
+
+				templates.add(template);
+			}
+		}		
+	
 		return templates;
 	}
 
@@ -659,26 +697,138 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public void cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException {
+	public Survey cloneSurveyFromTemplate(User user, long templateId) throws InvalidInputException, NoRecordsFetchedException {
 		LOG.info("Method cloneSurveyFromTemplate() started.");
 		if (user == null) {
 			LOG.error("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
 			throw new InvalidInputException("Invalid argument passed. User is null in method deactivateSurveyCompanyMapping.");
 		}
+
 		Survey survey = checkForExistingSurvey(user);
 		if (survey != null) {
 			deactivateSurveyCompanyMapping(user);
 		}
-		survey = createNewSurvey(user);
+		Survey newSurvey = createNewSurvey(user);
 
 		// fetching template
 		Survey surveyTemplate = surveyDao.findById(Survey.class, templateId);
 		List<SurveyQuestionDetails> surveyQuestionDetails = fetchSurveyQuestions(surveyTemplate);
 
 		for (SurveyQuestionDetails questionDetails : surveyQuestionDetails) {
-			addQuestionToExistingSurvey(user, survey, questionDetails);
+			addQuestionToExistingSurvey(user, newSurvey, questionDetails);
 		}
+		
 		LOG.info("Method cloneSurveyFromTemplate() finished.");
+		return newSurvey;
+	}
+	
+	/**
+	 * Adds a default survey to the company based on the vertical of the company.
+	 * @param user
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public void addDefaultSurveyToCompany(User user) throws InvalidInputException {
+		if (user == null) {
+			LOG.error("addDefaultSurveyToCompany : Invalid company parameter passed.");
+			throw new InvalidInputException("addDefaultSurveyToCompany : Invalid company parameter passed.");
+		}
+		LOG.info("Adding default survey to company for user id : " + user.getUserId());
+		
+		//Next we get the default survey for a particular vertical
+		LOG.debug("Fetching the default survey");
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.VERTICAL_COLUMN, user.getCompany().getVerticalsMaster());
+		
+		List<Survey> defaultSurveys = new ArrayList<>();
+		Survey defaultSurvey = null;
+		defaultSurveys = surveyDao.findByKeyValue(Survey.class, queries);
+		
+		//Check if default survey exists
+		if(defaultSurveys != null && defaultSurveys.size() >= CommonConstants.MINIMUM_SIZE_OF_ARRAY){
+			defaultSurvey = defaultSurveys.get(CommonConstants.INITIAL_INDEX);
+		}
+		
+		//If default survey exists we map it to the company. Otherwise we dont.
+		if(defaultSurvey != null){
+			//Now we add the survey to the company
+			LOG.debug("Adding aurvey to company");
+			addSurveyToCompany(user, defaultSurvey, user.getCompany());
+			LOG.info("Default survey added to the company");		
+		}
+		else{
+			LOG.info("Default survey not found, so no default survey has been mapped to the company");		
+		}
+		
+		LOG.info("addDefaultSurveyToCompany completed!");		
+	}
+	
+	/**
+	 * Checks if the survey is default and clones it. If not leaves it as it is.
+	 * @param user
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Transactional
+	@Override
+	public Map<Long, Long> checkIfSurveyIsDefaultAndClone(User user) throws InvalidInputException, NoRecordsFetchedException {
+		
+		if(user == null ){
+			LOG.error("checkIfSurveyIsDefaultAndClone : user parameter is null or invalid");
+			throw new InvalidInputException("checkIfSurveyIsDefaultAndClone : user parameter is null or invalid");
+		}
+		
+		//Map for the question mapping from old questions to new questions.
+		Map<Long, Long> oldToNewMapping = null;
+
+		LOG.info(" checkIfSurveyIsDefaultAndClone called");
+		//We fetch the current survey of the company
+		LOG.debug("Fetching the current survey mapping for the user with id : " + user.getUserId());
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, user.getCompany());
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		SurveyCompanyMapping currentSurveyMapping = surveyCompanyMappingDao.findByKeyValue(SurveyCompanyMapping.class, queries).get(CommonConstants.INITIAL_INDEX);
+		
+		//Now we check if it is a default survey
+		if( currentSurveyMapping.getSurvey().getVerticalsMaster().getVerticalsMasterId() != CommonConstants.VERTICALS_MASTER_CUSTOM ){
+			
+			//So it is a default survey
+			LOG.debug("A default survey is currently mapped to the company with id : " + user.getCompany().getCompanyId());
+			
+			//We clone the survey for the user
+			LOG.debug("Cloning the survey to template with id : " + currentSurveyMapping.getSurvey().getSurveyId());
+			Survey newSurvey = cloneSurveyFromTemplate(user, currentSurveyMapping.getSurvey().getSurveyId());
+			
+			//Check if the number of questions are the same in the default and the cloned survey
+			if( currentSurveyMapping.getSurvey().getSurveyQuestionsMappings().size() != newSurvey.getSurveyQuestionsMappings().size()){
+				LOG.error("checkIfSurveyIsDefaultAndClone : The default survey and the cloned survey are of different sizes!");
+				throw new InvalidInputException("checkIfSurveyIsDefaultAndClone : The default survey and the cloned survey are of different sizes!");
+			}
+						
+			oldToNewMapping = new HashMap<>();
+			
+			LOG.debug("Building map of old question ids to new question ids ");
+			for( int counter = 0; counter < currentSurveyMapping.getSurvey().getSurveyQuestionsMappings().size();counter++){
+				
+				long oldQuestionMappingId = currentSurveyMapping.getSurvey().getSurveyQuestionsMappings().get(counter).getSurveyQuestionsMappingId();
+				long newQuestionMappingId = newSurvey.getSurveyQuestionsMappings().get(counter).getSurveyQuestionsMappingId();
+				
+				LOG.debug(" Question mapping : " + oldQuestionMappingId + "  -- >  " + newQuestionMappingId);				
+				oldToNewMapping.put(oldQuestionMappingId,newQuestionMappingId);
+			}	
+			
+			LOG.debug("returning mapping of old to new questions");
+						
+			LOG.info("Survey cloned. Now all changes will be added to the users survey");
+		}
+		else{
+			LOG.info("Default survey not found, so no cloning required");
+		}
+		LOG.debug(" Method checkIfSurveyIsDefaultAndClone completed!");	
+		return oldToNewMapping;
 	}
 }
+
 // JIRA: SS-32: By RM05: EOC

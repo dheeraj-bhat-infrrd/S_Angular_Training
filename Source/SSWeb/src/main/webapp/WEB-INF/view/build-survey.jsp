@@ -143,55 +143,27 @@
                     <div class="float-left srv-tbl-num">
                         <span>1</span>
                     </div>
-                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
+<!--                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>-->
                     <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-                    <div class="float-right srv-tbl-rem">Remove</div>
-                    <div class="float-right srv-tbl-edit">Edit</div>
+                    <div class="srv-tbl-btns clearfix float-right">
+                        <div class="float-left srv-tbl-move-dn"></div>
+                        <div class="float-left srv-tbl-move-up"></div>
+                        <div class="float-left srv-tbl-edit">Edit</div>
+                        <div class="float-left srv-tbl-rem">Remove</div>
+                    </div>
                 </div>
                 <div class="bd-srv-tbl-row clearfix">
                     <div class="float-left srv-tbl-num">
-                        <span>1</span>
+                        <span>2</span>
                     </div>
-                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
+<!--                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>-->
                     <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-                    <div class="float-right srv-tbl-rem">Remove</div>
-                    <div class="float-right srv-tbl-edit">Edit</div>
-                </div>
-                <div class="bd-srv-tbl-row clearfix">
-                    <div class="float-left srv-tbl-num">
-                        <span>1</span>
+                    <div class="srv-tbl-btns clearfix float-right">
+                        <div class="float-left srv-tbl-move-dn"></div>
+                        <div class="float-left srv-tbl-move-up"></div>
+                        <div class="float-left srv-tbl-edit">Edit</div>
+                        <div class="float-left srv-tbl-rem">Remove</div>
                     </div>
-                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-                    <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-                    <div class="float-right srv-tbl-rem">Remove</div>
-                    <div class="float-right srv-tbl-edit">Edit</div>
-                </div>
-                <div class="bd-srv-tbl-row clearfix">
-                    <div class="float-left srv-tbl-num">
-                        <span>1</span>
-                    </div>
-                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-                    <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-                    <div class="float-right srv-tbl-rem">Remove</div>
-                    <div class="float-right srv-tbl-edit">Edit</div>
-                </div>
-                <div class="bd-srv-tbl-row clearfix">
-                    <div class="float-left srv-tbl-num">
-                        <span>1</span>
-                    </div>
-                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-                    <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-                    <div class="float-right srv-tbl-rem">Remove</div>
-                    <div class="float-right srv-tbl-edit">Edit</div>
-                </div>
-                <div class="bd-srv-tbl-row clearfix">
-                    <div class="float-left srv-tbl-num">
-                        <span>1</span>
-                    </div>
-                    <div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-                    <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-                    <div class="float-right srv-tbl-rem">Remove</div>
-                    <div class="float-right srv-tbl-edit">Edit</div>
                 </div>
             </div>
         </div>
@@ -210,9 +182,13 @@
                 if($(this).find('.srv-tbl-rem').css('display') == 'none'){
                     $(this).find('.srv-tbl-rem').show();
                     $(this).find('.srv-tbl-edit').show();
+                    $(this).find('.srv-tbl-move-up').show();
+                    $(this).find('.srv-tbl-move-dn').show();
                 }else{
                     $(this).find('.srv-tbl-rem').hide();
                     $(this).find('.srv-tbl-edit').hide();
+                    $(this).find('.srv-tbl-move-up').hide();
+                    $(this).find('.srv-tbl-move-dn').hide();
                 }
             }else{
                 $(this).find('.srv-tbl-rem').hide();
@@ -225,6 +201,8 @@
                 $(this).addClass('bd-srv-tbl-row-hover');
                 $(this).find('.srv-tbl-rem').show();
                 $(this).find('.srv-tbl-edit').show();
+                $(this).find('.srv-tbl-move-up').show();
+                $(this).find('.srv-tbl-move-dn').show();
             }
         });
         
@@ -233,6 +211,8 @@
                 $(this).removeClass('bd-srv-tbl-row-hover');
                 $(this).find('.srv-tbl-rem').hide();
                 $(this).find('.srv-tbl-edit').hide();
+                $(this).find('.srv-tbl-move-up').hide();
+                $(this).find('.srv-tbl-move-dn').hide();
             }
         });
         
@@ -251,12 +231,12 @@
         
         $('#btn-add-question').click(function(){
             $('#bd-srv-pu').show();
-            $('body').addClass('body-no-scroll');
+            $('body').addClass('body-no-scroll-y');
         }); 
         
         $('.bd-q-btn-cancel').click(function(){
             $('#bd-srv-pu').hide();
-            $('body').removeClass('body-no-scroll');
+            $('body').removeClass('body-no-scroll-y');
         }); 
         
         $('.bd-q-btn-done').click(function(){
