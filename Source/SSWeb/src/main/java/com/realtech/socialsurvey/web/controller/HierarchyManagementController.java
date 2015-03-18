@@ -19,6 +19,7 @@ import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -71,31 +72,34 @@ public class HierarchyManagementController {
 		boolean isRegionAdditionAllowed = false;
 		boolean isBranchAdditionAllowed = false;
 		boolean isUserAuthorized = true;
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		String profileName = null;
 		try {
 			try {
-				LOG.debug("Calling service for checking the status of regions already added");
 				if (user.getStatus() != CommonConstants.STATUS_ACTIVE) {
 					LOG.error("Inactive or unauthorized users can not access build hierarchy page");
 					isUserAuthorized = false;
 					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
 							DisplayMessageType.ERROR_MESSAGE));
 				}
+				LOG.debug("Calling service for checking the status of regions already added");
 				isRegionAdditionAllowed = hierarchyManagementService.isRegionAdditionAllowed(user, accountType);
-			}
-			catch (InvalidInputException e) {
-				throw new InvalidInputException("InvalidInputException while checking for max region addition. Reason : " + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
-			}
 
-			try {
 				LOG.debug("Calling service for checking the status of branches already added");
 				isBranchAdditionAllowed = hierarchyManagementService.isBranchAdditionAllowed(user, accountType);
+
+				LOG.debug("Obtaining profile name from settings present in session");
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				profileName = companySettings.getProfileName();
+				LOG.debug("Profile name obtained is : " + profileName);
+
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException("InvalidInputException while checking for max region addition. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
+			model.addAttribute("profileName", profileName);
 			model.addAttribute("isUserAuthorized", isUserAuthorized);
 			model.addAttribute("isRegionAdditionAllowed", isRegionAdditionAllowed);
 			model.addAttribute("isBranchAdditionAllowed", isBranchAdditionAllowed);
@@ -441,8 +445,8 @@ public class HierarchyManagementController {
 			LOG.debug("Calling service to add a new region and assigning user to it if specified");
 			try {
 
-				organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO, regionAddress1, regionAddress2,
-						selectedUserId, assigneeEmailIds, isAdmin);
+				organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO, regionAddress1,
+						regionAddress2, selectedUserId, assigneeEmailIds, isAdmin);
 
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -523,8 +527,8 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to add a new branch");
-				organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO, branchAddress1, branchAddress2,
-						selectedUserId, assigneeEmailIds, isAdmin);
+				organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO, branchAddress1,
+						branchAddress2, selectedUserId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add a new branch");
 
 				model.addAttribute("message",
