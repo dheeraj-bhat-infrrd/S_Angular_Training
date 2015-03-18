@@ -2411,8 +2411,8 @@ public class ProfileManagementController {
 		List<AgentSettings> individuals;
 		String companyProfileName = request.getParameter("companyProfileName");
 		if (companyProfileName == "") {
-			LOG.error("Invalid companyProfileName passed in method getAdminHierarchy().");
-			throw new InvalidInputException("Invalid companyProfileName passed in method getAdminHierarchy().");
+			LOG.error("Invalid companyProfileName passed in method getCompanyHierarchy().");
+			throw new InvalidInputException("Invalid companyProfileName passed in method getCompanyHierarchy().");
 		}
 
 		// Fetching Regions under Company
@@ -2465,8 +2465,8 @@ public class ProfileManagementController {
 
 		long regionId = Long.parseLong(request.getParameter("regionId"));
 		if (regionId == 0l) {
-			LOG.error("Invalid regionId passed in method getAdminHierarchy().");
-			throw new InvalidInputException("Invalid regionId passed in method getAdminHierarchy().");
+			LOG.error("Invalid regionId passed in method getRegionHierarchy().");
+			throw new InvalidInputException("Invalid regionId passed in method getRegionHierarchy().");
 		}
 
 		// Fetching Branches under Region
@@ -2507,8 +2507,8 @@ public class ProfileManagementController {
 		List<AgentSettings> individuals;
 		long branchId = Long.parseLong(request.getParameter("branchId"));
 		if (branchId == 0l) {
-			LOG.error("Invalid branchId passed in method getAdminHierarchy().");
-			throw new InvalidInputException("Invalid branchId passed in method getAdminHierarchy().");
+			LOG.error("Invalid branchId passed in method getBranchHierarchy().");
+			throw new InvalidInputException("Invalid branchId passed in method getBranchHierarchy().");
 		}
 
 		// Fetching Individuals under Branch
