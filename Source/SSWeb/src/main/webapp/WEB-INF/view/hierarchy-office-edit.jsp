@@ -9,7 +9,7 @@
 <div id="bd-assign-to" class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
     <div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
-        <input id="assign-to-txt" data-assignto="region" value='<spring:message code="label.region.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img"/>
+        <input id="assign-to-txt" data-assignto="region" value='<spring:message code="label.region.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
         <div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
             <div data-assign-to-option="region" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
             <div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
@@ -70,7 +70,7 @@
         </div>
     </div>
 </div>
-<div class="bd-hr-form-item clearfix">
+<div class="bd-hr-form-item clearfix" id="admin-privilege-div">
     <div class="float-left bd-frm-left"></div>
     <div class="float-left bd-frm-right">
         <div class="bd-frm-check-wrapper clearfix">
