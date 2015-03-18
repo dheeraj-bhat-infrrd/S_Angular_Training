@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -50,6 +52,10 @@ public class Company implements Serializable {
 
 	@Column(name = "STATUS")
 	private int status;
+	
+	@ManyToOne
+	@JoinColumn(name="VERTICAL_ID")
+	private VerticalsMaster verticalsMaster;
 
 	// bi-directional many-to-one association to Branch
 	@OneToMany(mappedBy = "company", fetch = FetchType.LAZY)
@@ -237,6 +243,22 @@ public class Company implements Serializable {
 
 	public void setRegions(List<Region> regions) {
 		this.regions = regions;
+	}
+	
+	public VerticalsMaster getVerticalsMaster() {
+		return verticalsMaster;
+	}
+
+	public List<DisabledAccount> getDisabledAccounts() {
+		return disabledAccounts;
+	}
+
+	public void setVerticalsMaster(VerticalsMaster verticalsMaster) {
+		this.verticalsMaster = verticalsMaster;
+	}
+
+	public void setDisabledAccounts(List<DisabledAccount> disabledAccounts) {
+		this.disabledAccounts = disabledAccounts;
 	}
 
 	public Region addRegion(Region region) {
