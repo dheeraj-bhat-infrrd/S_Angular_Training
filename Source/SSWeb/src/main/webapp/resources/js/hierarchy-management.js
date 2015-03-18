@@ -337,13 +337,6 @@ function validateRegionForm() {
 	isRegionValid = true;
 	var isFocussed = false;
 	
-	if(!validateRegionName('region-name-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-name-txt').focus();
-			isFocussed=true;
-		}
-	}
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
 		if(!validateUserSelection('selected-user-txt','selected-userid-hidden')){
@@ -363,6 +356,13 @@ function validateRegionForm() {
 			}
 		}
 		
+	}
+	if(!validateRegionName('region-name-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-name-txt').focus();
+			isFocussed=true;
+		}
 	}
 	
 	if(isRegionValid){
@@ -491,10 +491,10 @@ function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
 	
-	if(!validateOfficeName('office-name-txt')){
+	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isOfficeValid = false;
 		if(!isFocussed){
-			$('#office-name-txt').focus();
+			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
 	}
@@ -502,13 +502,6 @@ function validateOfficeForm() {
 		isOfficeValid = false;
 		if(!isFocussed){
 			$('#office-address-txt').focus();
-			isFocussed=true;
-		}
-	}
-	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
-		isOfficeValid = false;
-		if(!isFocussed){
-			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
 	}
@@ -531,6 +524,13 @@ function validateOfficeForm() {
 				isFocussed=true;
 			}
 		}		
+	}
+	if(!validateOfficeName('office-name-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-name-txt').focus();
+			isFocussed=true;
+		}
 	}
 	
 	if(isOfficeValid){
