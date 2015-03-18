@@ -100,7 +100,9 @@
 							<select name="vertical" id="select-vertical" class="rfr_txt_fld">
 								<option disabled selected><spring:message code="label.vertical.key"/></option>
 								<c:forEach items="${verticals }" var="vertical">
-									<option id="vertical-${vertical.verticalsMasterId}">${vertical.verticalName}</option>
+										<c:if test="${vertical.verticalsMasterId > 0 }">
+											<option id="vertical-${vertical.verticalsMasterId }">${vertical.verticalName}</option>
+										</c:if>								
 								</c:forEach>
 							</select>
 						</c:if>

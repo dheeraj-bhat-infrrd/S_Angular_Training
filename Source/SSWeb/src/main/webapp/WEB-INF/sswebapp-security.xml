@@ -19,6 +19,8 @@
 		<intercept-url pattern="/companyprofile.do" access="permitAll" />
 		<intercept-url pattern="/initfindapro.do" access="permitAll" />
 		
+		<intercept-url pattern="/testpage.do" access="permitAll" />
+		
 		<intercept-url pattern="/verification.do" access="permitAll" />
 		<intercept-url pattern="/emailverification.do" access="permitAll" />
 
