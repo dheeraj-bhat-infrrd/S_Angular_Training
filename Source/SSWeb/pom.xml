@@ -196,6 +196,13 @@
 			<version>2.0-m01</version>
 		</dependency>
 
+		<!-- Dependency for writing data into excel file -->
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.9</version>
+		</dependency>
+
 		<dependency>
 			<groupId>net.java.openjfx.backport</groupId>
 			<artifactId>openjfx-78-backport-compat</artifactId>

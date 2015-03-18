@@ -1,6 +1,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<div class="hm-header-main-wrapper">
+<div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left text-center"><spring:message code="label.changepassword.key" /></div>
