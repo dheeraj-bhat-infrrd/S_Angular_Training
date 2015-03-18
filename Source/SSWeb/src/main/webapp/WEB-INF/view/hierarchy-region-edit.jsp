@@ -50,7 +50,7 @@
 	         </div>
 	     </div>
 	 </div>
-	 <div class="bd-hr-form-item clearfix">
+	 <div class="bd-hr-form-item clearfix" id="admin-privilege-div">
 	     <div class="float-left bd-frm-left"></div>
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-check-wrapper clearfix">

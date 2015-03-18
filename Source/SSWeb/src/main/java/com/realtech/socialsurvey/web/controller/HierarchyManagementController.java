@@ -441,7 +441,7 @@ public class HierarchyManagementController {
 			LOG.debug("Calling service to add a new region and assigning user to it if specified");
 			try {
 
-				organizationManagementService.addNewRegionWithUser(loggedInUser, regionName, CommonConstants.NO, regionAddress1, regionAddress2,
+				organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO, regionAddress1, regionAddress2,
 						selectedUserId, assigneeEmailIds, isAdmin);
 
 				model.addAttribute("message",
@@ -523,7 +523,7 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to add a new branch");
-				organizationManagementService.addNewBranchWithUser(user, branchName, regionId, CommonConstants.NO, branchAddress1, branchAddress2,
+				organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO, branchAddress1, branchAddress2,
 						selectedUserId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add a new branch");
 
@@ -1082,6 +1082,7 @@ public class HierarchyManagementController {
 					if (emailId == null || emailId.trim().isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
 						throw new InvalidInputException("Email address" + emailId + " is invalid", DisplayMessageConstants.INVALID_EMAILID);
 					}
+					emailId = emailId.trim();
 				}
 			}
 		}
