@@ -48,8 +48,6 @@
 <div id="temp-message" class="hide"></div>
 <input class="ignore-clear" type="hidden" name="isUserAuthorized" id="is-user-authorized" value="${isUserAuthorized}"/>
 <input class="ignore-clear" type="hidden" id="profile-name" value="${profileName}"/>
-<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Build Hierarchy");

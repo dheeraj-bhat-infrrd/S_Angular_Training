@@ -613,6 +613,9 @@ function populateRegionsSelectorCallBack(data) {
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-region-option").removeClass("hm-dd-item-keys-selected");
 			});
+			/*$("#selected-region-txt").keydown(function(e){
+				bindArrowKeysWithSelector(e, "selected-region-txt", "regions-droplist", populateRegionsSelector, "selected-region-id-hidden", "data-regionid");
+			});	*/		
 		}
 		else {
 			$("#regions-droplist").html(htmlData).slideUp(200);	
@@ -780,7 +783,7 @@ function populateOfficesSelectorCallBack(data) {
 	}	
 }
 
-function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,dataAttr) {
+function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,attrName) {
 	if(e.which == 40) {
 		var text = $("#"+textBoxId).val();
 		if(text == undefined) {
@@ -817,7 +820,7 @@ function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hidd
 			selectedItem = $("#"+dropListId+" :first-child");
 		}
 		$('#'+textBoxId).val($(selectedItem).html());
-		$('#'+hiddenFieldId).val($(selectedItem).data(dataAttr));
+		$('#'+hiddenFieldId).val($(selectedItem).attr(attrName));
 		$('#'+dropListId).slideToggle(200);	
 	}
 }
