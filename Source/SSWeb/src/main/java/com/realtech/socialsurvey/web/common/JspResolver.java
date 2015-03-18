@@ -52,6 +52,10 @@ public interface JspResolver {
 	public static final String PROFILE_HIERARCHY_CLICK_REGION = "profile_hierarchy_region";
 	public static final String PROFILE_HIERARCHY_CLICK_BRANCH = "profile_hierarchy_branch";
 	public static final String PROFILE_PAGE = "profile";
+	public static final String BUILD_HIERARCHY = "build-hierarchy";
+	public static final String HIERARCHY_REGION_EDIT = "hierarchy-region-edit";
+	public static final String HIERARCHY_OFFICE_EDIT = "hierarchy-office-edit";
+	public static final String HIERARCHY_INDIVIDUAL_EDIT = "hierarchy-individual-edit";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
 }

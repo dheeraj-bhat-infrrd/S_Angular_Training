@@ -87,7 +87,7 @@ function showBranchesCallBack(data) {
 
 /**
  * function to search for more branches called on clicking view more
- */
+ */updateBranch
 function viewMoreBranches(obj) {
 	var branchPattern = $("#search-branch-txt").val();
 	if(branchPattern == undefined) {
@@ -665,12 +665,40 @@ var isRegionValid;
 $('#region-name-txt').blur(function() {
 	validateRegionName(this.id);
 });
-$('#region-address1-txt').blur(function() {
-	validateCompanyEnterpriseAddress1(this.id);
-});
-$('#region-address2-txt').blur(function() {
-	validateAddress2(this.id);
-});
+
+/**
+ * Function to validate Region name
+ */
+function validateRegionName(elementId){
+	if($(window).width()<768){
+		if ($('#'+elementId).val() != "") {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+				return true;
+			}else {
+				$('#overlay-toast').html('Please enter a valid region name.');
+				showToast();
+				return false;
+			}
+		}else{
+			$('#overlay-toast').html('Please enter region name.');
+			showToast();
+			return false;
+		}
+	}else{
+    	if ($('#'+elementId).val() != "") {
+			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+				hideError();
+				return true;
+			}else {
+				showError('Please enter a valid region name.');
+				return false;
+			}
+		}else{
+			showError("Please enter region name.");
+			return false;
+		}
+	}
+}
 
 function validateRegionInformation(elementId) {
 	isRegionValid = true;
@@ -680,20 +708,6 @@ function validateRegionInformation(elementId) {
 		isRegionValid = false;
 		if(!isFocussed){
 			$('#region-name-txt').focus();
-			isFocussed=true;
-		}
-	}
-	if(!validateCompanyEnterpriseAddress1('region-address1-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-address1-txt').focus();
-			isFocussed=true;
-		}
-	}
-	if(!validateAddress2('region-address2-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-address2-txt').focus();
 			isFocussed=true;
 		}
 	}
@@ -815,7 +829,7 @@ function searchRegionsCallBack(data) {
 	}
 }
 
-$("#region-save-icon").click(function(e) {
+$("#btn-region-save").click(function(e) {
 	if(validateRegionInformation('enterprise-branch-region')){
 		addOrUpdateRegion("add-region-form");
 		

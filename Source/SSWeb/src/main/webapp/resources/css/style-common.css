@@ -2805,9 +2805,14 @@ button.paypal.is-active {
     box-shadow: 0px 0px 13px 4px #CCC;
 }
 
+.body-no-scroll-y{
+    overflow: hidden;
+}
+
 .body-no-scroll{
     overflow: hidden;
 }
+
 .sb-quests-error {
     text-align: center;
     color: rgb(240, 75, 75);
@@ -3416,8 +3421,8 @@ button.paypal.is-active {
 
 .header-right {
     position: relative;
-    height: 65px;
-    line-height: 78px;
+    height: 55px;
+    line-height: 66px;
     font-size: 14px;
     margin-top: -10px;
 }
@@ -4299,6 +4304,7 @@ button.paypal.is-active {
     width: 148px;
     text-align: center;
     color: #fff;
+    text-transform: uppercase;
 }
 
 .bd-frm-rt-txt-area {
@@ -5019,15 +5025,15 @@ tr.u-tbl-header td {
 .srv-tbl-edit {
     display: none;
     cursor: pointer;
-    margin-left: 20px;
+    margin-left: 15px;
     color: #145C7F;
 }
 
 .srv-tbl-rem {
     display: none;
     cursor: pointer;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 15px;
+    margin-right: 10px;
     color: #145C7F;
 }
 
@@ -5270,4 +5276,29 @@ tr.u-tbl-header td {
 .bd-ans-scale {
     background: url(../images/scale.png) no-repeat center;
     background-size: 100% auto;
+}
+
+.srv-tbl-move-up, .srv-tbl-move-dn {
+    cursor: pointer;
+    display: none;
+    width: 20px;
+    height: 55px;
+}
+
+.srv-tbl-move-up {
+    background: url(../images/sb-reorder-up.png) no-repeat center;
+    margin-left: 10px;
+}
+
+.srv-tbl-move-dn {
+    background: url(../images/sb-reorder-down.png) no-repeat center;
+}
+
+.srv-tbl-btns {
+    margin-right: 10px;
+}
+
+.disclaimer {
+    color: #fff;
+    font-size: 12px;
 }

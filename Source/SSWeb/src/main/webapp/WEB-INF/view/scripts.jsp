@@ -14,6 +14,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
 <script>
 	$('#header-logo').click(function(){
 		showMainContent('./dashboard.do');
