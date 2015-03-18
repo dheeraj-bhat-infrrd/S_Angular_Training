@@ -97,13 +97,16 @@ public class SurveyBuilderController {
 			if (survey == null) {
 				survey = surveyBuilder.createNewSurvey(user);
 			}
+			
+			// Order of question 
+			String order = request.getParameter("order");
 
 			// Creating new SurveyQuestionDetails from form
-			String questionType = request.getParameter("sb-question-type");
+			String questionType = request.getParameter("sb-question-type-" + order);
 			int activeQuestionsInSurvey = (int) surveyBuilder.countActiveQuestionsInSurvey(survey);
 
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
-			questionDetails.setQuestion(request.getParameter("sb-question-txt"));
+			questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setQuestionOrder(activeQuestionsInSurvey + 1);
 
@@ -116,7 +119,7 @@ public class SurveyBuilderController {
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
-				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers[]"));
+				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
 
 				SurveyAnswerOptions surveyAnswerOptions;
 				int answerOrder = 1;
