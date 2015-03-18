@@ -154,31 +154,32 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-
-					/*
-					 * UserProfile highestUserProfile = null; UserProfile companyAdminProfile =
-					 * null; // fetch the highest user profile for user try { highestUserProfile =
-					 * userManagementService.getHighestUserProfileForUser(user); companyAdminProfile
-					 * = authenticationService.getCompanyAdminProfileForUser(user); } catch
-					 * (NoRecordsFetchedException e) {
-					 * LOG.error("No user profiles found for the user"); return
-					 * JspResolver.ERROR_PAGE; }
-					 */
-					// Compute all conditions for user and if user is CA then check for profile
-					// completion stage.
-
-					if (user.isCompanyAdmin()) {
-						UserProfile adminProfile = null;
-						for (UserProfile userProfile : user.getUserProfiles()) {
-							if ((userProfile.getCompany().getCompanyId() == user.getCompany().getCompanyId())
-									&& (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
+					/*UserProfile highestUserProfile = null;
+					UserProfile companyAdminProfile = null;
+					// fetch the highest user profile for user
+					try {
+						highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
+						companyAdminProfile = authenticationService.getCompanyAdminProfileForUser(user);
+					}
+					catch (NoRecordsFetchedException e) {
+						LOG.error("No user profiles found for the user");
+						return JspResolver.ERROR_PAGE;
+					}*/
+					
+					//Compute all conditions for user and if user is CA then check for profile completion stage.
+					if(user.isCompanyAdmin()){
+						UserProfile adminProfile=null;
+						for(UserProfile userProfile:user.getUserProfiles()){
+							if((userProfile.getCompany().getCompanyId()==user.getCompany().getCompanyId())&&(userProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
 								adminProfile = userProfile;
 						}
 						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
 					}
-					else
+					else {
 						redirectTo = JspResolver.LANDING;
-					if (redirectTo.equals(JspResolver.LANDING)) {
+					}
+					
+					if(redirectTo.equals(JspResolver.LANDING)){
 						// get the user's canonical settings
 						LOG.info("Fetching the user's canonical settings and setting it in session");
 						sessionHelper.getCanonicalSettings(session);
@@ -322,7 +323,6 @@ public class LoginController {
 		}
 		return JspResolver.RESET_PASSWORD;
 	}
-
 	// RM-06 : EOC
 
 	/**
@@ -416,7 +416,6 @@ public class LoginController {
 	 * @param response
 	 * @return
 	 */
-
 	@RequestMapping(value = "/logout")
 	public String initLogoutPage(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("logging out");
@@ -588,7 +587,5 @@ public class LoginController {
 	 * body); } catch (InvalidInputException e) {
 	 * LOG.warn("Could not set mail content for survey participation reminder"); } } } } }
 	 */
-
 }
-
 // JIRA SS-21 : by RM-06 : EOC

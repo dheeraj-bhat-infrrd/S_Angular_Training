@@ -43,9 +43,12 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
@@ -122,7 +125,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
-		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
+		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE,
+				organizationalDetails.get(CommonConstants.VERTICAL));
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
@@ -157,26 +161,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("account type is not valid while adding account type fro company");
 		}
 		AccountType accountType = AccountType.getAccountType(accountTypeValue);
-		
-		LOG.debug("Creating default hierarchy and user profiles for the selected account type :"+accountType.getName());
-		createDefaultHierarchy(user,accountType);
+
+		LOG.debug("Creating default hierarchy and user profiles for the selected account type :" + accountType.getName());
+		createDefaultHierarchy(user, accountType);
 		LOG.debug("Successfully created default hierarchy and user profiles");
-		
+
 		user = userDao.findById(User.class, user.getUserId());
 		userManagementService.setProfilesOfUser(user);
 		solrSearchService.addUserToSolr(user);
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
-	
+
 	/**
 	 * Method to add default branch/region/user profiles for a user and account type
+	 * 
 	 * @param user
 	 * @param accountType
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	private void createDefaultHierarchy(User user,AccountType accountType) throws InvalidInputException, SolrException {
+	private void createDefaultHierarchy(User user, AccountType accountType) throws InvalidInputException, SolrException {
 		LOG.debug("Method createDefaultHierarchy started for user : " + user.getLoginName());
 
 		LOG.debug("Adding the default region");
@@ -185,9 +190,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
-		UserProfile userProfileRegionAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfileRegionAdmin = userManagementService.createUserProfile(user, user.getCompany(), user.getEmailId(),
+				CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(),
+				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
+				String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileRegionAdmin);
 
 		LOG.debug("Adding the default branch");
@@ -196,26 +202,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
-		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfileBranchAdmin = userManagementService.createUserProfile(user, user.getCompany(), user.getEmailId(),
+				CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
+				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
+				String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
-		
+
 		/**
 		 * For an individual, a default agent profile is created
 		 */
-		if(accountType == AccountType.INDIVIDUAL) {
+		if (accountType == AccountType.INDIVIDUAL) {
 			profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 			LOG.debug("Creating user profile for agent");
-			UserProfile userProfileAgent = createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), branch.getBranchId(),
-					region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-					String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+			UserProfile userProfileAgent = userManagementService.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(),
+					branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+					CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 			userProfileDao.save(userProfileAgent);
-			
+
 		}
 
-		LOG.debug("Updating profile stage to payment stage for account type :"+accountType.getName());
+		LOG.debug("Updating profile stage to payment stage for account type :" + accountType.getName());
 		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
 
@@ -251,12 +258,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * This method adds a new company into the COMPANY table.
 	 */
-	private Company addCompany(User user, String companyName, int isRegistrationComplete) {
+	private Company addCompany(User user, String companyName, int isRegistrationComplete, String vertical) {
 		LOG.debug("Method addCompany started for user " + user.getLoginName());
 		Company company = new Company();
 		company.setCompany(companyName);
 		company.setIsRegistrationComplete(isRegistrationComplete);
 		company.setStatus(CommonConstants.STATUS_ACTIVE);
+
+		// We fetch the vertical and set it
+		VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN,
+				vertical).get(CommonConstants.INITIAL_INDEX);
+		company.setVerticalsMaster(verticalsMaster);
+
 		company.setCreatedBy(String.valueOf(user.getUserId()));
 		company.setModifiedBy(String.valueOf(user.getUserId()));
 		company.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -344,7 +357,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
-		// TODO set lock settings
 		companySettings.setLockSettings(new LockSettings());
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -437,29 +449,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branch = branchDao.save(branch);
 		LOG.debug("Method addBranch finished.");
 		return branch;
-	}
-
-	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId,
-			int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
-		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
-		UserProfile userProfile = new UserProfile();
-		userProfile.setAgentId(agentId);
-		userProfile.setBranchId(branchId);
-		userProfile.setCompany(company);
-		userProfile.setEmailId(emailId);
-		userProfile.setIsProfileComplete(isProfileComplete);
-		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
-		userProfile.setProfileCompletionStage(profileCompletionStage);
-		userProfile.setRegionId(regionId);
-		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
-		userProfile.setUser(user);
-		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-		userProfile.setCreatedOn(currentTimestamp);
-		userProfile.setModifiedOn(currentTimestamp);
-		userProfile.setCreatedBy(createdBy);
-		userProfile.setModifiedBy(modifiedBy);
-		LOG.debug("Method createUserProfile() finished");
-		return userProfile;
 	}
 
 	@Override
@@ -1358,6 +1347,328 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branches = branchDao.findProjectionsByKeyValue(Branch.class, columnNames, queries);
 		LOG.info("Method getBranchesByRegionId completed successfully");
 		return branches;
+	}
+
+	/**
+	 * Method to add a new region and assign the user to the newly created region if userId or
+	 * emailId is provided
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+		LOG.info("Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:" + isDefaultBySystem
+				+ " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:" + isAdmin);
+
+		Region region = hierarchyManagementService.addNewRegion(user, regionName, isDefaultBySystem, address1, address2);
+
+		LOG.debug("Adding default branch for the new region created");
+		hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+				CommonConstants.DEFAULT_ADDRESS, null);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * newly created region
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the region");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the region");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method addNewRegionWithUser completed successfully");
+		return region;
+	}
+
+	/**
+	 * Method to get the list of users for emailIds specified, and if the user doesn't exist for
+	 * that company invite the user
+	 * 
+	 * @param emailIdsArray
+	 * @param adminUser
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private List<User> getUsersFromEmailIds(String[] emailIdsArray, User adminUser) throws InvalidInputException {
+		LOG.info("Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray);
+		List<User> users = new ArrayList<User>();
+		for (String emailId : emailIdsArray) {
+			User user = null;
+			try {
+				user = userManagementService.getUserByLoginName(adminUser, emailId);
+			}
+			catch (NoRecordsFetchedException e) {
+				/**
+				 * if no user is present with the specified emailId, send an invite to register
+				 */
+				String firstName = emailId.substring(0, emailId.indexOf("@"));
+				try {
+					user = userManagementService.inviteUserToRegister(adminUser, firstName, null, emailId);
+				}
+				catch (UserAlreadyExistsException | UndeliveredEmailException e1) {
+					LOG.debug("Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1);
+				}
+			}
+			if (user != null) {
+				users.add(user);
+			}
+		}
+		LOG.info("Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size());
+		return users;
+	}
+
+	/**
+	 * Method to assign a region to a user
+	 * 
+	 * @throws SolrException
+	 */
+	@Transactional
+	@Override
+	public void assignRegionToUser(User adminUser, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (adminUser == null) {
+			throw new InvalidInputException("Admin user is null in assignRegionToUser");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in assignRegionToUser");
+		}
+		if (assigneeUser == null) {
+			throw new InvalidInputException("assignee user is null in assignRegionToUser");
+		}
+		LOG.info("Method to assignRegionToUser called for regionId : " + regionId + " and assigneeUser : " + assigneeUser.getUserId() + " isAdmin:"
+				+ isAdmin);
+		int profileMasterId = 0;
+		if (isAdmin) {
+			profileMasterId = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+		}
+		else {
+			profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		}
+		LOG.debug("Fetching default branch for region : " + regionId);
+		Branch defaultBranch = getDefaultBranchForRegion(regionId);
+
+		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
+				assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE,
+				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		userProfileDao.save(userProfile);
+
+		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.debug("Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId());
+			assigneeUser.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(assigneeUser);
+		}
+		/**
+		 * add newly created user profile to the list of user profiles in user object
+		 */
+		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = new ArrayList<UserProfile>();
+		}
+		userProfiles.add(userProfile);
+		assigneeUser.setUserProfiles(userProfiles);
+
+		userManagementService.setProfilesOfUser(assigneeUser);
+		solrSearchService.addUserToSolr(assigneeUser);
+		LOG.info("Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId());
+	}
+
+	/**
+	 * Method to add a new region and assign the user to the newly created branch if userId or
+	 * emailId is provided
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
+			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+			UserAssignmentException {
+		LOG.info("Method addNewBranchWithUser called for user:" + user + " branchName:" + branchName + "regionId: " + regionId
+				+ " isDefaultBySystem:" + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
+				+ isAdmin);
+
+		Branch branch = hierarchyManagementService.addNewBranch(user, regionId, isDefaultBySystem, branchName, address1, address2);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * newly created branch
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the branch");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the branch");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method addNewBranchWithUser completed successfully");
+		return branch;
+	}
+
+	/**
+	 * Method to assign a branch to a user
+	 */
+	@Override
+	@Transactional
+	public void assignBranchToUser(User adminUser, long branchId, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (adminUser == null) {
+			throw new InvalidInputException("Admin user is null in assignBranchToUser");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in assignBranchToUser");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in assignBranchToUser");
+		}
+		if (assigneeUser == null) {
+			throw new InvalidInputException("assignee user is null in assignBranchToUser");
+		}
+		LOG.info("Method assignBranchToUser called for adminUser:" + adminUser + " branchId:" + branchId + " regionId" + regionId + "assigneeUser:"
+				+ assigneeUser + " isAdmin:" + isAdmin);
+		int profileMasterId = 0;
+		if (isAdmin) {
+			profileMasterId = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+		}
+		else {
+			profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		}
+
+		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
+				assigneeUser.getUserId(), branchId, regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		userProfileDao.save(userProfile);
+
+		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.debug("Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId());
+			assigneeUser.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(assigneeUser);
+		}
+		/**
+		 * add newly created user profile to the list of user profiles in user object
+		 */
+		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = new ArrayList<UserProfile>();
+		}
+		userProfiles.add(userProfile);
+		assigneeUser.setUserProfiles(userProfiles);
+
+		userManagementService.setProfilesOfUser(assigneeUser);
+		solrSearchService.addUserToSolr(assigneeUser);
+
+		LOG.info("Method assignBranchToUser executed successfully");
+
+	}
+
+	/**
+	 * Method to add a new user or assign existing user under a company/region or branch
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public void addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
+			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException {
+		LOG.info("Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId + " isAdmin:" + isAdmin);
+		List<User> assigneeUsers = null;
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId);
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			assigneeUsers = new ArrayList<User>();
+			assigneeUsers.add(assigneeUser);
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list for the email addresses provided");
+			assigneeUsers = getUsersFromEmailIds(emailIdsArray, adminUser);
+		}
+		if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+			/**
+			 * if branchId is provided, add the individual to specified branch
+			 */
+			if (branchId > 0l) {
+				LOG.debug("assigning individual(s) to branch :" + branchId + " in addIndividual");
+				for (User assigneeUser : assigneeUsers) {
+					assignBranchToUser(adminUser, branchId, regionId, assigneeUser, isAdmin);
+				}
+			}
+			/**
+			 * else if regionId is provided, add the individual to specified region
+			 */
+			else if (regionId > 0l) {
+				LOG.debug("assigning individual(s) to region :" + regionId + " in addIndividual");
+				for (User assigneeUser : assigneeUsers) {
+					assignRegionToUser(adminUser, regionId, assigneeUser, isAdmin);
+				}
+			}
+			/**
+			 * else assign the individual to company (i.e under default region)
+			 */
+			else {
+				LOG.debug("assigning individual(s) to company in addIndividual");
+				Region region = getDefaultRegionForCompany(adminUser.getCompany());
+				if (region == null) {
+					throw new NoRecordsFetchedException("No default region found for company while adding individual");
+				}
+				for (User assigneeUser : assigneeUsers) {
+					assignRegionToUser(adminUser, region.getRegionId(), assigneeUser, isAdmin);
+				}
+			}
+
+		}
+
+		LOG.info("Method addNewIndividual executed successfully");
 	}
 }
 // JIRA: SS-27: By RM05: EOC

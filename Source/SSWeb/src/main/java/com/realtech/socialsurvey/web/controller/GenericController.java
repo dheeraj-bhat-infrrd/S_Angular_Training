@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -9,6 +10,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 /**
  * Controller for generic jsp pages
  */
+@EnableAsync
 @Controller
 public class GenericController {
 	
