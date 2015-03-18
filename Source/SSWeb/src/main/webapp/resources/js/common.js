@@ -160,3 +160,14 @@ function changeRatingPattern(rating, ratingParent) {
 		counter++;
 	});
 }
+
+/**
+ * function for adding delay to a function call
+ */
+var delay = (function() {
+	var timer = 0;
+	return function(callback, ms) {
+		clearTimeout(timer);
+		timer = setTimeout(callback, ms);
+	};
+})();
