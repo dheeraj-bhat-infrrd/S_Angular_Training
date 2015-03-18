@@ -7,13 +7,13 @@
         </div>
     </div>
 </div>
-<div id="server-message">
-	<jsp:include page="usermanagementmessageheader.jsp"></jsp:include>
+<div id="server-message" class="hide">
+	<jsp:include page="messageheader.jsp"></jsp:include>
 </div>
 <div class="container bd-hr-container">
         <div class="bd-hr-left-panel col-lg-3 col-md-3 col-sm-3">
             <div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
-            <div class="bd-hr-lp-content-wrapper">
+            <div class="bd-hr-lp-content-wrapper" id ="prof-hierarchy-container">
                 <div class="bd-hr-item-l1">
                     <div class="bd-hr-item bd-lt-l1 clearfix">
                         <div class="bd-hr-txt">Sample test</div>
@@ -104,16 +104,17 @@
     </div>
 <!-- div to temporarily store message to be displayed  -->
 <div id="temp-message" class="hide"></div>
-<input type="hidden" name="isUserAuthorized" id="is-user-authorized" value="${isUserAuthorized}"/>
+<input class="ignore-clear" type="hidden" name="isUserAuthorized" id="is-user-authorized" value="${isUserAuthorized}"/>
 <%-- <script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script> --%>
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Build Hierarchy");
+	checkUserAuthorization();
 	/**
 	*	Region form is displayed by default
 	*/
     getEditSectionForm('region');
-    
+	
     $(document).on('click', 'body', function() {
     	console.log("body clicked");
         $('.dd-com-list').slideUp(200);

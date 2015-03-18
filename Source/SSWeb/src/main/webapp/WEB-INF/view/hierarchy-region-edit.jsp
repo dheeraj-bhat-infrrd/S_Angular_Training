@@ -37,7 +37,7 @@
 	 <div id="bd-multiple" class="bd-hr-form-item clearfix hide">
 	     <div class="float-left bd-frm-left"><spring:message code="label.addmultipleusers.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <textarea class="bd-frm-rt-txt-area" id="selected-user-txt-area" name="selectedUserEmailArray"></textarea>
+	         <textarea class="bd-frm-rt-txt-area" id="selected-user-txt-area" name="selectedUserEmailArray" placeholder='<spring:message code="label.addmultipleemailids.key"/>'></textarea>
 	     </div>
 	 </div>
 	 <div id="bd-single" class="bd-hr-form-item clearfix">
@@ -50,7 +50,7 @@
 	         </div>
 	     </div>
 	 </div>
-	 <div class="bd-hr-form-item clearfix">
+	 <div class="bd-hr-form-item clearfix" id="admin-privilege-div">
 	     <div class="float-left bd-frm-left"></div>
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-check-wrapper clearfix">

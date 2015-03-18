@@ -21,6 +21,17 @@ function displayMessage(data) {
 }
 
 /**
+ * checks whether is authorized to build hierarchy and displays message to the user
+ */
+function checkUserAuthorization(){
+	var data = $("#server-message").html();
+	var isUserAuthorized = $("#is-user-authorized").val();
+	if(isUserAuthorized == "false") {
+		displayMessage(data);
+	}
+}
+
+/**
  * function to get the edit form based on tab value 
  */
 function getEditSectionForm(tabValue) {
@@ -134,10 +145,12 @@ function paintEditSection(data) {
         if($(this).data('type') == "single"){
             $('#bd-single').show();
             $('#bd-multiple').hide();
+            showAdminPrivilegesChk();
         }else if($(this).data('type') == "multiple"){
             $('#bd-single').hide();
             $('#bd-multiple').show();
             $('#selected-userid-hidden').val("");
+            hideAdminPrivilegesChk();
         }
         $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
     });
@@ -149,7 +162,7 @@ function paintEditSection(data) {
 	
 	$('.hm-assignto-options').click(function(e) {
 		e.stopPropagation();
-		var assignToOption = $(this).data('assign-to-option');
+		var assignToOption = $(this).attr('data-assign-to-option');
 		$("#assign-to-txt").val($(this).html());
 		$("#assign-to-txt").attr("data-assignto",assignToOption);
 		
@@ -234,6 +247,20 @@ function paintEditSection(data) {
 	});
 }
 
+function showAdminPrivilegesChk(){
+	$("#admin-privilege-div").show();
+	if($('.bd-check-img').hasClass('bd-check-img-checked') ){
+		$('.bd-check-img').next("#is-admin-chk").val("true");
+		$('.bd-check-img').removeClass('bd-check-img-checked');
+	}
+}
+
+function hideAdminPrivilegesChk(){
+	$("#admin-privilege-div").hide();
+	$('.bd-check-img').next("#is-admin-chk").val("false");
+	$('.bd-check-img').addClass('bd-check-img-checked');
+}
+
 function disableRegionSelector(){
 	$("#selected-region-txt").prop("disabled",true);
 	$("#selected-region-txt").val("");
@@ -310,13 +337,6 @@ function validateRegionForm() {
 	isRegionValid = true;
 	var isFocussed = false;
 	
-	if(!validateRegionName('region-name-txt')){
-		isRegionValid = false;
-		if(!isFocussed){
-			$('#region-name-txt').focus();
-			isFocussed=true;
-		}
-	}
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
 		if(!validateUserSelection('selected-user-txt','selected-userid-hidden')){
@@ -337,6 +357,13 @@ function validateRegionForm() {
 		}
 		
 	}
+	if(!validateRegionName('region-name-txt')){
+		isRegionValid = false;
+		if(!isFocussed){
+			$('#region-name-txt').focus();
+			isFocussed=true;
+		}
+	}
 	
 	if(isRegionValid){
 		hideError();
@@ -348,7 +375,7 @@ function validateRegionForm() {
  * clear input fields within specified form/div
  */
 function resetInputFields(elementId) {
-	$("#"+elementId+" :input").val("");
+	$("#"+elementId+" :input:not('.ignore-clear')").val("");
 }
 
 /**
@@ -356,6 +383,7 @@ function resetInputFields(elementId) {
  */
 function addRegion(formId) {
 	var url = "./addregion.do";
+	showOverlay();
 	callAjaxFormSubmit(url, addRegionCallBack, formId);
 }
 
@@ -365,6 +393,7 @@ function addRegion(formId) {
  * @param data
  */
 function addRegionCallBack(data) {
+	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-region-form");
 }
@@ -390,6 +419,7 @@ function paintUsersList(data) {
 	if(usersList != null) {
 		var len = usersList.length;
 		if(len > 0) {
+			$('#selected-userid-hidden').val("");
 			$.each(usersList,function(i,user) {
 				var displayName = user.firstName;
 				if(user.lastName != undefined) {
@@ -442,7 +472,7 @@ function validateOfficeName(elementId){
  * @returns {Boolean}
  */
 function validateRegionSelector(hiddenElementId,textElementId) {
-	var assignToType = $("#assign-to-txt").data("assignto");
+	var assignToType = $("#assign-to-txt").attr("data-assignto");
 	if(assignToType == 'region'){
 		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
 			showErrorMobileAndWeb('Please select a region');
@@ -461,10 +491,10 @@ function validateOfficeForm() {
 	isOfficeValid = true;
 	var isFocussed = false;
 	
-	if(!validateOfficeName('office-name-txt')){
+	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
 		isOfficeValid = false;
 		if(!isFocussed){
-			$('#office-name-txt').focus();
+			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
 	}
@@ -472,13 +502,6 @@ function validateOfficeForm() {
 		isOfficeValid = false;
 		if(!isFocussed){
 			$('#office-address-txt').focus();
-			isFocussed=true;
-		}
-	}
-	if(!validateRegionSelector('selected-region-txt', 'selected-region-id-hidden')) {
-		isOfficeValid = false;
-		if(!isFocussed){
-			$('#selected-region-txt').focus();
 			isFocussed=true;
 		}
 	}
@@ -502,6 +525,13 @@ function validateOfficeForm() {
 			}
 		}		
 	}
+	if(!validateOfficeName('office-name-txt')){
+		isOfficeValid = false;
+		if(!isFocussed){
+			$('#office-name-txt').focus();
+			isFocussed=true;
+		}
+	}
 	
 	if(isOfficeValid){
 		hideError();
@@ -514,6 +544,7 @@ function validateOfficeForm() {
  */
 function addOffice(formId) {
 	var url = "./addbranch.do";
+	showOverlay();
 	callAjaxFormSubmit(url, addOfficeCallBack, formId);
 }
 
@@ -523,6 +554,7 @@ function addOffice(formId) {
  * @param data
  */
 function addOfficeCallBack(data) {
+	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-office-form");
 }
@@ -580,25 +612,6 @@ function populateRegionsSelectorCallBack(data) {
 var isIndividualValid;
 
 /**
- * Method to validate name of individual
- * @param elementId
- * @returns {Boolean}
- */
-function validateIndividualName(elementId) {
-	if ($('#'+elementId).val() != "") {
-		if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-			return true;
-		}else {
-			showErrorMobileAndWeb('Please enter a valid name.');
-			return false;
-		}
-	}else{
-		showErrorMobileAndWeb('Please enter the name of individual');
-		return false;
-	}
-}
-
-/**
  * function to validate the office selector
  * 
  * @param hiddenElementId
@@ -606,13 +619,26 @@ function validateIndividualName(elementId) {
  * @returns {Boolean}
  */
 function validateOfficeSelector(hiddenElementId,textElementId) {
-	var assignToType = $("#assign-to-txt").data("assignto");
+	var assignToType = $("#assign-to-txt").attr("data-assignto");
 	if(assignToType == 'office'){
 		if ($('#'+hiddenElementId).val() == "" || $('#'+textElementId).val() == "") {
 			showErrorMobileAndWeb('Please select an office');
 			return false;
 		}
 		return true;
+	}
+	return true;
+}
+
+/**
+ * function to validate user selection in case of individual addition
+ * @param elementId
+ * @returns {Boolean}
+ */
+function validateIndividualSelection(elementId) {
+	if ($('#'+elementId).val() == "") {
+		showErrorMobileAndWeb('Please select a user or enter atleast one email address');
+		return false;
 	}
 	return true;
 }
@@ -643,6 +669,13 @@ function validateIndividualForm() {
 	
 	var userSelectionType = $('#user-selection-info').data('user-selection-type');
 	if(userSelectionType =="single"){
+		if(!validateIndividualSelection('selected-user-txt')) {
+			isIndividualValid = false;
+			if(!isFocussed){
+				$('#selected-user-txt').focus();
+				isFocussed=true;
+			}
+		}
 		if(!validateUserSelection('selected-user-txt','selected-userid-hidden')){
 			isOfficeValid = false;
 			if(!isFocussed){
@@ -652,6 +685,13 @@ function validateIndividualForm() {
 		}
 	}
 	else {
+		if(!validateIndividualSelection('selected-user-txt-area')) {
+			isIndividualValid = false;
+			if(!isFocussed){
+				$('#selected-user-txt-area').focus();
+				isFocussed=true;
+			}
+		}
 		if(!validateUserEmailTextArea('selected-user-txt-area')){
 			isOfficeValid = false;
 			if(!isFocussed){
@@ -669,10 +709,12 @@ function validateIndividualForm() {
 
 function addIndividual(formId) {
 	var url = "./addindividual.do";
+	showOverlay();
 	callAjaxFormSubmit(url, addIndividualCallBack, formId);
 }
 
 function addIndividualCallBack(data) {
+	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-individual-form");
 }
@@ -765,7 +807,6 @@ function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hidd
 		}
 		$('#'+textBoxId).val($(selectedItem).html());
 		$('#'+hiddenFieldId).val($(selectedItem).data(dataAttr));
-		$('#'+dropListId).slideToggle(200);
-		
+		$('#'+dropListId).slideToggle(200);	
 	}
 }
