@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -90,11 +91,12 @@ public class SurveyBuilderController {
 	public String addQuestionToExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
+		Map<String, String> statusMap = new HashMap<String, String>();
 		String message = "";
+		String statusJson = "";
 
 		try {
-			
-			//Check if survey is default one and clone it
+			// Check if survey is default one and clone it
 			surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			
 			// Getting the survey for user
@@ -144,21 +146,30 @@ public class SurveyBuilderController {
 			}
 
 			// Adding the question to survey
-			surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
-
+			long surveyQuestionMappingId = surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
+
+			statusMap.put("questionId", surveyQuestionMappingId + "");
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
+			statusJson = new Gson().toJson(statusMap);;
+			
 			LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_ANSWER, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
 		catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
-		return message;
+		
+		statusMap.put("message", message);
+		statusJson = new Gson().toJson(statusMap);
+		return statusJson;
 	}
 
 	/**
@@ -175,21 +186,20 @@ public class SurveyBuilderController {
 		User user = sessionHelper.getCurrentUser();
 		String message = "";
 
-		try {			
-			//Check if survey is default one and clone it
+		try {
+			// Check if survey is default one and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+
 			long surveyQuestionId;
-			
-			if(oldToNewQuestionMap != null){
+			if (oldToNewQuestionMap != null) {
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
 				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
-			else{
+			else {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-
 			}
-			String questionType = request.getParameter("sb-question-edit-type");
 
+			String questionType = request.getParameter("sb-question-edit-type");
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
 			questionDetails.setQuestion(request.getParameter("sb-question-edit-txt"));
 			questionDetails.setQuestionType(questionType);
@@ -254,18 +264,16 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			
-			//Check if default survey is mapped and clone it
+			// Check if default survey is mapped and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+
 			long surveyQuestionId;
-			
-			if(oldToNewQuestionMap != null){
+			if (oldToNewQuestionMap != null) {
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
 				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
-			else{
+			else {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-
 			}
 
 			surveyBuilder.deactivateQuestionSurveyMapping(user, surveyQuestionId);
@@ -303,21 +311,19 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			//Check if default survey is mapped and clone it
+			// Check if default survey is mapped and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
-			
+
 			String questionIdsStr = request.getParameter("questionIds");
 			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
 
-			LOG.info(questionIdsStr);
 			for (String questionIdStr : surveyQuestionIdStrs) {
-				if(oldToNewQuestionMap != null){
+				if (oldToNewQuestionMap != null) {
 					LOG.info(" Mapping question id : " + questionIdStr + " to : " + oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
 					surveyBuilder.deactivateQuestionSurveyMapping(user, oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
 				}
-				else{
+				else {
 					surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
-
 				}
 			}
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
@@ -350,20 +356,19 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			//Check if default survey is mapped and clone it
+			// Check if default survey is mapped and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
-			long surveyQuestionId;
 			
-			if(oldToNewQuestionMap != null){
+			long surveyQuestionId;
+			if (oldToNewQuestionMap != null) {
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
 				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
-			else{
+			else {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-
 			}
-			String reorderType = request.getParameter("reorderType");
 
+			String reorderType = request.getParameter("reorderType");
 			surveyBuilder.reorderQuestion(user, surveyQuestionId, reorderType);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
