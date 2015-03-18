@@ -408,7 +408,7 @@ function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-region-form");
-	fetchHierarchy(attrName, attrValue)
+	fetchCompanyHierarchy();
 }
 
 /**
