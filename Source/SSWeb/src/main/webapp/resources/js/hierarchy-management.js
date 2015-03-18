@@ -32,6 +32,14 @@ function checkUserAuthorization(){
 }
 
 /**
+ * Method to fetch the company hierarchy
+ */
+function fetchCompanyHierarchy() {
+	var profileName = $("#profile-name").val();
+    fetchHierarchy("companyProfileName", profileName);
+}
+
+/**
  * function to get the edit form based on tab value 
  */
 function getEditSectionForm(tabValue) {
@@ -400,6 +408,7 @@ function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-region-form");
+	fetchHierarchy(attrName, attrValue)
 }
 
 /**
@@ -561,6 +570,7 @@ function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-office-form");
+	fetchCompanyHierarchy();
 }
 
 /**
@@ -718,6 +728,7 @@ function addIndividualCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-individual-form");
+	fetchCompanyHierarchy();
 }
 
 /**
