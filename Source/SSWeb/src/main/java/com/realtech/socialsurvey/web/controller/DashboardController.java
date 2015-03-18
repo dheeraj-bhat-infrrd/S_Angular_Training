@@ -2,11 +2,16 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-137 : by RM-05 : BOC
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +34,7 @@ import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
 @Controller
 public class DashboardController {
@@ -46,12 +52,22 @@ public class DashboardController {
 
 	@Autowired
 	private SolrSearchService solrSearchService;
-	
+
 	@Autowired
 	private EmailServices emailServices;
-	
+
+	@Autowired
+	private SurveyHandler surveyHandler;
+
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
+
+	@Value("${TEMP_FILE_LOCATION}")
+	private String tempFileLocation;
+
+	private final String EXCEL_FORMAT = "application/vnd.ms-excel";
+	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
+	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
 	@ResponseBody
 	@RequestMapping(value = "/surveycount")
@@ -196,7 +212,7 @@ public class DashboardController {
 				}
 			}
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, 0, 0, startIndex, batchSize, profileLevel, true);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, startIndex, batchSize, profileLevel, true);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
@@ -384,7 +400,7 @@ public class DashboardController {
 			}
 
 			User user = sessionHelper.getCurrentUser();
-			if(columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)){
+			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				try {
 					result = solrSearchService.searchBranchRegionOrAgentByName(searchColumn, searchKey, columnName, user.getCompany().getCompanyId());
 				}
@@ -393,12 +409,12 @@ public class DashboardController {
 					throw e;
 				}
 			}
-			else if(columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)){
+			else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
 				try {
 					regionOrBranchId = Long.parseLong(columnValueStr);
 					result = solrSearchService.searchBranchRegionOrAgentByName(searchColumn, searchKey, columnName, regionOrBranchId);
 				}
-				catch(NumberFormatException e){
+				catch (NumberFormatException e) {
 					LOG.error("NumberFormatException caught in getRegionBranchOrAgent() while fetching details. Nested exception is ", e);
 					throw e;
 				}
@@ -407,7 +423,7 @@ public class DashboardController {
 					throw e;
 				}
 			}
-			else if(columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)){
+			else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
 				try {
 					result = solrSearchService.searchBranchRegionOrAgentByName(searchColumn, searchKey, columnName, regionOrBranchId);
 				}
@@ -424,7 +440,10 @@ public class DashboardController {
 		LOG.info("Method to get list of regions, branches, agents getRegionBranchOrAgent() finished.");
 		return result;
 	}
-	
+
+	/*
+	 * Method to send a reminder email to the customer if not completed survey already.
+	 */
 	@RequestMapping(value = "/sendsurveyremindermail")
 	public void sendReminderMailForSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() started.");
@@ -432,6 +451,8 @@ public class DashboardController {
 			String customerName = request.getParameter("customerName");
 			String customerEmail = request.getParameter("customerEmail");
 			String agentName = request.getParameter("agentName");
+			String agentIdStr = request.getParameter("agentId");
+			long agentId = 0;
 			if (customerName == null || customerName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for customerName.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for customerName.");
@@ -440,10 +461,22 @@ public class DashboardController {
 				LOG.error("Invalid value (null/empty) passed for customerEmail.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for customerEmail.");
 			}
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				LOG.error("Invalid value (null/empty) passed for agentIdStr.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for agentIdStr.");
+			}
 			try {
-				if(enableKafka.equals(CommonConstants.YES)){
+				agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ", e);
+				throw e;
+			}
+			try {
+				if (enableKafka.equals(CommonConstants.YES)) {
 					emailServices.queueSurveyReminderMail(customerEmail, customerName, agentName);
-				}else{
+				}
+				else {
 					emailServices.sendSurveyReminderMail(customerEmail, customerName, agentName);
 				}
 			}
@@ -451,12 +484,137 @@ public class DashboardController {
 				LOG.error("Exception occurred while trying to send survey reminder mail to : " + customerEmail);
 				throw e;
 			}
-		}catch(Exception e){
-			LOG.error("Exception caught in sendReminderMailForSurvey() while sending mail. Nested exception is ",e);
+			// Increasing value of reminder count by 1.
+			surveyHandler.updateReminderCount(agentId, customerEmail);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e);
 		}
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
 	}
-	
+
+	/*
+	 * Method to download file containing completed surveys
+	 */
+	@RequestMapping(value = "/downloaddashboardcompletesurvey")
+	public void getCompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() started.");
+		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		try {
+			String columnName = request.getParameter("columnName");
+			if (columnName == null || columnName.isEmpty()) {
+				LOG.error("Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
+			}
+			String profileLevel = getProfileLevel(columnName);
+			long iden = 0;
+
+			User user = sessionHelper.getCurrentUser();
+			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+				iden = user.getCompany().getCompanyId();
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+				iden = user.getUserId();
+			}
+			else {
+				String columnValue = request.getParameter("columnValue");
+				if (columnValue != null && !columnValue.isEmpty()) {
+					try {
+						iden = Long.parseLong(columnValue);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatException caught while parsing columnValue in getCompleteSurveyFile(). Nested exception is ", e);
+						throw e;
+					}
+				}
+			}
+			try {
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true);
+				String fileLocation = tempFileLocation + "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+				dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
+				response.setContentType(EXCEL_FORMAT);
+				String headerKey = CONTENT_DISPOSITION_HEADER;
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
+				response.setHeader(headerKey, headerValue);
+				InputStream is = new FileInputStream(new File(fileLocation));
+				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+				response.flushBuffer();
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getCompleteSurveyFile() while fetching completed surveys file. Nested exception is ", e);
+		}
+		LOG.info("Method to get file containg completed surveys list getCompleteSurveyFile() finished.");
+	}
+
+	/*
+	 * Method to download file containing incomplete surveys
+	 */
+	@RequestMapping(value = "/downloaddashboardincompletesurvey")
+	public void getIncompleteSurveyFile(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() started.");
+		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		try {
+			String columnName = request.getParameter("columnName");
+			if (columnName == null || columnName.isEmpty()) {
+				LOG.error("Invalid value (null/empty) passed for profile level.");
+				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
+			}
+			String profileLevel = getProfileLevel(columnName);
+			long iden = 0;
+
+			User user = sessionHelper.getCurrentUser();
+			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+				iden = user.getCompany().getCompanyId();
+			}
+			else if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
+				iden = user.getUserId();
+			}
+			else {
+				String columnValue = request.getParameter("columnValue");
+				if (columnValue != null && !columnValue.isEmpty()) {
+					try {
+						iden = Long.parseLong(columnValue);
+					}
+					catch (NumberFormatException e) {
+						LOG.error("NumberFormatException caught while parsing columnValue in getIncompleteSurveyFile(). Nested exception is ", e);
+						throw e;
+					}
+				}
+			}
+			try {
+				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel);
+				String fileLocation = tempFileLocation + "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
+				dashboardService.downloadIncompleteSurveyData(surveyDetails, fileLocation);
+				response.setContentType(EXCEL_FORMAT);
+				String headerKey = CONTENT_DISPOSITION_HEADER;
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
+				response.setHeader(headerKey, headerValue);
+				InputStream is = new FileInputStream(new File(fileLocation));
+				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+				response.flushBuffer();
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ", e);
+				throw e;
+			}
+			catch (IOException e) {
+				LOG.error("IOException caught in getIncompleteSurveyFile() while fetching incomplete reviews file. Nested exception is ", e);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in getReviews() while fetching incomplete reviews file. Nested exception is ", e);
+		}
+		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() finished.");
+	}
+
 	// Method to return title for logged in user.
 	// It returns title for various fields e.g. company, region, branch and agent.
 	private String getTitle(HttpServletRequest request, String field, long value, User user) {

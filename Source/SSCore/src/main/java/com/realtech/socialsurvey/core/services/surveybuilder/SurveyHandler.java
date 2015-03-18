@@ -47,4 +47,6 @@ public interface SurveyHandler {
 	
 	public String getSwearWords();
 
+	public void updateReminderCount(long agentId, String customerEmail);
+
 }

@@ -104,6 +104,15 @@ function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 	} else if (agent) {
 		showAgentFlow();
 	}
+	
+	$('#dsh-inc-dwnld').click(function() {
+		window.location.href = "./downloaddashboardincompletesurvey.do?columnName="+colName+"&columnValue="+colValue;
+	});
+
+	$('#dsh-cmp-dwnld').click(function() {
+		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="+colName+"&columnValue="+colValue;
+	});
+
 }
 
 function showCompanyAdminFlow(accountType) {
@@ -443,7 +452,7 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 				totalReviews = data.responseJSON;
 				paintName(columnName, columnValue);
 				if (parseInt(totalReviews) > 0) {
-					showReviews("companyId", 0);
+					showReviews(columnName, columnValue);
 				}
 			}
 		},
