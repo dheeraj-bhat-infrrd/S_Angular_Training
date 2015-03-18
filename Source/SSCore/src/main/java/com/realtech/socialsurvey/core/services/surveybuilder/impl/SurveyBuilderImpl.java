@@ -257,7 +257,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public void addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
+	public long addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
 		LOG.info("Method addQuestionToExistingSurvey() started.");
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
@@ -279,8 +279,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 		SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
 				surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
-		mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
+		long surveyQuestionMappingId = mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
 		LOG.info("Method addQuestionToExistingSurvey() finished.");
+		
+		return surveyQuestionMappingId;
 	}
 
 	// JIRA SS-119 by RM-05
@@ -374,7 +376,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	/**
 	 * Creates a new entry for new survey question mapping into database.
 	 */
-	private void mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey, int status) {
+	private long mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey, int status) {
 		LOG.debug("Method mapQuestionToSurvey() started to map questions with survey.");
 		SurveyQuestionsMapping surveyQuestionsMapping = new SurveyQuestionsMapping();
 		surveyQuestionsMapping.setIsRatingQuestion(surveyQuestionDetails.getIsRatingQuestion());
@@ -401,6 +403,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		surveyQuestionsMappingDao.flush();
 
 		LOG.debug("Method mapQuestionToSurvey() finished.");
+		return surveyQuestionsMapping.getSurveyQuestionsMappingId();
 	}
 
 	@Override
