@@ -592,6 +592,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method to fetch all the incoplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() finished.");
 		return surveysWithReviews;
 	}
+	
+	/*
+	 *  Method to increase reminder count by 1.
+	 */
+	@Override
+	public void updateReminderCount(long agentId, String customerEmail){
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.inc(CommonConstants.REMINDER_COUNT_COLUMN, 1);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
+	}
 
 	private Date getNdaysBackDate(int noOfDays) {
 		Calendar calendar = Calendar.getInstance();
