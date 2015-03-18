@@ -336,7 +336,7 @@
     }
     .hdr-logo{
         width: 150px;
-        background: url(../images/ss-logo.png) no-repeat center;
+        background: url(../images/ss-logo.png) no-repeat left center;
         background-size: 80%;
     }
     .hdr-link-item{
