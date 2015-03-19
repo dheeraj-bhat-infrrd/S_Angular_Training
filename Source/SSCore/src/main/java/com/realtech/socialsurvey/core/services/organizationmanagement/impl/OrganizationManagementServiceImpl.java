@@ -280,8 +280,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		user = userDao.findById(User.class, user.getUserId());
-		// List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user",
-		// user);
+
 		List<UserProfile> userProfiles = user.getUserProfiles();
 		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {

@@ -43,6 +43,7 @@ function showInfo(msg){
     $('#err-nw-txt').html(msg);
     $('#err-nw-wrapper').slideDown(200);
     $('#err-nw-wrapper').addClass('bg-black-info');
+    $(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
 
 function hideInfo(){
