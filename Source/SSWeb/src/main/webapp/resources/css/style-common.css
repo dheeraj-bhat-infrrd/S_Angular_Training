@@ -5089,6 +5089,16 @@ tr.u-tbl-header td {
     margin-top: 10px;
 }
 
+.bd-q-pu-txt-edit {
+    padding: 0 40px 0 10px; 
+    border: 1px solid #3E9DCB;
+    height: 40px;
+    border-radius: 2px;
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+}
+
 .bd-q-pu-close {
     right: 0;
     top: 0;
@@ -5106,7 +5116,7 @@ tr.u-tbl-header td {
 
 .bd-q-pu-done-wrapper {
     line-height: 40px;
-    width: 215px;
+    width: 120px;
     margin: 20px auto 0;
 }
 
@@ -5310,4 +5320,15 @@ tr.u-tbl-header td {
 .disclaimer {
     color: #fff;
     font-size: 12px;
+}
+
+.sb-edit-q-wrapper{
+    background-color: #fff;
+    border: 1px solid #D2DEDF;
+    border-radius: 3px;
+    padding: 20px;
+    margin: 0 auto;
+}
+.bd-srv-q-tbl {
+    margin-bottom: 50px;
 }
