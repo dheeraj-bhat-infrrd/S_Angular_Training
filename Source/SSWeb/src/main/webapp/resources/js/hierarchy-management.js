@@ -443,7 +443,7 @@ function paintUsersList(data) {
 			$.each(usersList,function(i,user) {
 				var displayName = user.firstName;
 				if(user.lastName != undefined) {
-					displayName = displayName + user.lastName;
+					displayName = displayName +" "+ user.lastName;
 				}
 				htmlData = htmlData +'<div class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-user-options" data-userid="'+user.userId+'">'+displayName+'</div>';
 			});
