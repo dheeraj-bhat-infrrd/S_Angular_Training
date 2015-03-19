@@ -55,7 +55,7 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
-            headContentHtml = headContentHtml +'	<div class="float-left review-count-left" id="prof-company-review-count"></div>';
+            headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
             headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
             headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
