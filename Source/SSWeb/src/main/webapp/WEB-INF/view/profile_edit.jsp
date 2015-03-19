@@ -429,11 +429,11 @@
 					</c:otherwise>
 				</c:choose>
 				</div>
-				
-				<div id="prof-hierarchy-container">
-					<!-- Hierarchy is displayed here  -->
-				</div>
-				
+				<div class="bd-hr-left-panel">
+        			<div id ="prof-hierarchy-container" class="hide">
+        				<!-- hierarchy structure comes here  -->
+        			</div>
+   				</div>
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -531,7 +531,6 @@
 
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Profile Settings");

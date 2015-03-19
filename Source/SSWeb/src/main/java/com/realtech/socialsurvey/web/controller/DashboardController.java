@@ -637,7 +637,7 @@ public class DashboardController {
 				case CommonConstants.AGENT_ID_COLUMN:
 					for (UserProfile userProfile : user.getUserProfiles()) {
 						if (userProfile.getBranchId() == value) {
-							AgentSettings agentSettings = userSettings.getAgentSettings().get(user.getUserId());
+							AgentSettings agentSettings = userSettings.getAgentSettings();
 							if (agentSettings != null)
 								title = agentSettings.getContact_details().getTitle();
 						}

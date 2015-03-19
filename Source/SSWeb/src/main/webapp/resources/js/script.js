@@ -41,13 +41,13 @@ function showInfo(msg){
 	buildMessageDiv();
     $('#err-nw-txt').html(msg);
     $('#err-nw-wrapper').slideDown(200);
-    $('#err-nw-wrapper').addClass('bg-black-info');
+    $('#err-nw-wrapper').addClass('bg-black-success');
 }
 
 function hideInfo(){
     $('#err-nw-wrapper').slideUp(200);
     setTimeout(function(){
-        $('#err-nw-wrapper').removeClass('bg-black-info');
+        $('#err-nw-wrapper').removeClass('bg-black-success');
     },200);
 }
 

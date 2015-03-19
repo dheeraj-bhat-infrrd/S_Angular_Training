@@ -38,6 +38,9 @@
         font-size: 24px;
         margin: 0;
     }
+    .txt-header-small{
+        font-size: 18px;
+    }
     .content-wrapper{
         margin: 0 -15px;
     }
