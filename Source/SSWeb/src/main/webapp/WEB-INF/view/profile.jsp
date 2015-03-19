@@ -27,11 +27,6 @@
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
         <div class="float-left hdr-links clearfix">
-            <!-- <div class="hdr-link-item hdr-link-active">Dashboard</div>
-            <div class="hdr-link-item">Build Hierarchy</div>
-            <div class="hdr-link-item">Build Survey</div>
-            <div class="hdr-link-item">User Management</div> -->
-        </div>
         <div class="float-right clearfix hdr-btns-wrapper">
             <div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key"/></div>
             <div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key"/></div>
@@ -54,7 +49,7 @@
     </div>
 </div>
 
-<div id="" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
     <div class="container">
         <div class="row prof-pic-name-wrapper">
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
