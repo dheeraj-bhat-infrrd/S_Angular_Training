@@ -14,7 +14,7 @@
 		<div class="bd-q-wrapper">
 			
 			<div class="bd-quest-item">
-			<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new">
+			<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new" data-status="new">
 				<div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
 					<div class="float-left bd-q-pu-header-lft"><spring:message code="label.create.surveyquestions.key" /></div>
 					<div class="float-right bd-q-pu-header-rt cursor-pointer"><spring:message code="label.needhelp.key" /></div>
@@ -84,7 +84,6 @@
 			</div>
 			
 			<div class="bd-q-pu-done-wrapper clearfix">
-				<div class="bd-q-btn-cancel float-left"><spring:message code="label.cancel.key" /></div>
 				<div class="bd-q-btn-done float-left"><spring:message code="label.done.key" /></div>
 			</div>
 		</div>
@@ -105,43 +104,23 @@
 				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-				<div class="float-right srv-tbl-rem">Remove</div>
-				<div class="float-right srv-tbl-edit">Edit</div>
+				<div class="srv-tbl-btns clearfix float-right">
+					<div class="float-left srv-tbl-move-dn"></div>
+					<div class="float-left srv-tbl-move-up"></div>
+					<div class="float-left srv-tbl-edit">Edit</div>
+					<div class="float-left srv-tbl-rem">Remove</div>
+				</div>
 			</div>
 			<div class="bd-srv-tbl-row clearfix">
 				<div class="float-left srv-tbl-num"><span>1</span></div>
 				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
 				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-				<div class="float-right srv-tbl-rem">Remove</div>
-				<div class="float-right srv-tbl-edit">Edit</div>
-			</div>
-			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num"><span>1</span></div>
-				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-				<div class="float-right srv-tbl-rem">Remove</div>
-				<div class="float-right srv-tbl-edit">Edit</div>
-			</div>
-			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num"><span>1</span></div>
-				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-				<div class="float-right srv-tbl-rem">Remove</div>
-				<div class="float-right srv-tbl-edit">Edit</div>
-			</div>
-			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num"><span>1</span></div>
-				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-				<div class="float-right srv-tbl-rem">Remove</div>
-				<div class="float-right srv-tbl-edit">Edit</div>
-			</div>
-			<div class="bd-srv-tbl-row clearfix">
-				<div class="float-left srv-tbl-num"><span>1</span></div>
-				<div class="float-left srv-tbl-chk srv-tbl-chk-on srv-tbl-chk-off"></div>
-				<div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
-				<div class="float-right srv-tbl-rem">Remove</div>
-				<div class="float-right srv-tbl-edit">Edit</div>
+				<div class="srv-tbl-btns clearfix float-right">
+					<div class="float-left srv-tbl-move-dn"></div>
+					<div class="float-left srv-tbl-move-up"></div>
+					<div class="float-left srv-tbl-edit">Edit</div>
+					<div class="float-left srv-tbl-rem">Remove</div>
+				</div>
 			</div>
 		</div>
 	</div>
