@@ -1,5 +1,5 @@
 // Populate Existing Survey Questions 
-var bdQuestItemRevert = '<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new" data-status="new"><div class="bd-q-pu-header bd-q-pu-header-adj clearfix"><div class="float-left bd-q-pu-header-lft"><spring:message code="label.create.surveyquestions.key"/></div><div class="float-right bd-q-pu-header-rt cursor-pointer"><spring:message code="label.needhelp.key"/></div></div><div class="bd-q-pu-txt-wrapper pos-relative"><input type="hidden" id="sb-question-type-1" name="sb-question-type-1" data-state="new"/><input id="sb-question-txt-1" name="sb-question-txt-1" class="bd-q-pu-txt" data-nextquest="false" data-qno="1"><div class="bd-q-pu-close hide"></div></div><div class="bs-ans-wrapper hide"><div class="bd-and-header-txt"><spring:message code="label.customer.reply.key"/></div><div class="bd-ans-options-wrapper"><div class="bd-ans-header clearfix"><div class="bd-ans-hd-container clearfix float-left"><div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel"><spring:message code="label.rating.key"/></div><div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item"><spring:message code="label.comment.key"/></div><div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item"><spring:message code="label.multiplechoice.key"/></div></div></div><div id="" class="bd-ans-type-rating bd-ans-type-item"><div class="bd-and-tier2"><spring:message code="label.customer.answer.key"/></div><div class="row clearfix bd-ans-type bd-ans-type-rating-adj"><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-smiles" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-smiley"></div><div class="bd-ans-img-txt"><spring:message code="label.smiles.key"/></div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-star" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-star"></div><div class="bd-ans-img-txt"><spring:message code="label.star.key"/></div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-scale" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-scale"></div><div class="bd-ans-img-txt"><spring:message code="label.scale.key"/></div></div></div></div></div><div id="" class="bd-ans-type-mcq bd-ans-type-item hide"><div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key"/></div><div class="clearfix bd-ans-type bd-ans-type-mcq-adj"><div class="bd-mcq-row clearfix"><div class="float-left bd-mcq-lbl"><spring:message code="label.option.key"/></div><input name="sb-answers-1[]" class="float-left bd-mcq-txt"><div class="float-left bd-mcq-close hide"></div></div><div class="bd-mcq-row clearfix"><div class="float-left bd-mcq-lbl"><spring:message code="label.option.key"/></div><input name="sb-answers-1[]" class="float-left bd-mcq-txt"><div class="float-left bd-mcq-close hide"></div></div></div></div><div id="" class="bd-ans-type-com bd-ans-type-item hide"><div class="clearfix bd-com-wrapper"><div class="float-left bd-com-chk"></div><div class="float-left bd-com-txt"><spring:message code="label.textarea.key"/></div></div></div></div><div class="bd-q-status-wrapper text-center hide"><span class="bd-spinner">`</span><span class="bd-q-status-txt">Saving</span></div></div></form>';
+var bdQuestItemRevert = '<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new" data-status="new"><div class="bd-q-pu-header bd-q-pu-header-adj clearfix"><div class="float-left bd-q-pu-header-lft">Create Your Survey Questions Here</div><div class="float-right bd-q-pu-header-rt cursor-pointer">Need Help?</div></div><div class="bd-q-pu-txt-wrapper pos-relative"><input type="hidden" id="sb-question-type-1" name="sb-question-type-1" data-state="new"/><input id="sb-question-txt-1" name="sb-question-txt-1" class="bd-q-pu-txt" data-nextquest="false" data-qno="1"><div class="bd-q-pu-close hide"></div></div><div class="bs-ans-wrapper hide"><div class="bd-and-header-txt">I want my customer reply using</div><div class="bd-ans-options-wrapper"><div class="bd-ans-header clearfix"><div class="bd-ans-hd-container clearfix float-left"><div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel">Range</div><div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item">Comment</div><div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item">Multiple Choice</div></div></div><div id="" class="bd-ans-type-rating bd-ans-type-item"><div class="bd-and-tier2">My Customers can answer using</div><div class="row clearfix bd-ans-type bd-ans-type-rating-adj"><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-smiles" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-smiley"></div><div class="bd-ans-img-txt">Smiley</div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-star" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-star"></div><div class="bd-ans-img-txt">Stars</div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-scale" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-scale"></div><div class="bd-ans-img-txt">Scale</div></div></div></div></div><div id="" class="bd-ans-type-mcq bd-ans-type-item hide"><div class="bd-and-tier2">My Customers can answer from</div><div class="clearfix bd-ans-type bd-ans-type-mcq-adj"><div class="bd-mcq-row clearfix"><div class="float-left bd-mcq-lbl">Option</div><input name="sb-answers-1[]" class="float-left bd-mcq-txt"><div class="float-left bd-mcq-close hide"></div></div><div class="bd-mcq-row clearfix"><div class="float-left bd-mcq-lbl">Option</div><input name="sb-answers-1[]" class="float-left bd-mcq-txt"><div class="float-left bd-mcq-close hide"></div></div></div></div><div id="" class="bd-ans-type-com bd-ans-type-item hide"><div class="clearfix bd-com-wrapper"><div class="float-left bd-com-chk"></div><div class="float-left bd-com-txt">Textarea</div></div></div></div><div class="bd-q-status-wrapper text-center hide"><span class="bd-spinner">`</span><span class="bd-q-status-txt">Saving</span></div></div></form>';
 function commonActiveSurveyCallback(response){
 	showInfo(response);
 	loadActiveSurveyQuestions();
@@ -110,8 +110,9 @@ $('#btn-add-question').click(function() {
 function revertQuestionOverlay() {
 	$('#bd-quest-item').html(bdQuestItemRevert);
 	$('#bd-srv-pu').hide();
-	$('body').removeClass('body-no-scroll-y');
+	$('body').removeClass('body-no-scroll');
 	loadActiveSurveyQuestions();
+	currentQues = 1;
 }
 
 $('.bd-q-btn-done').click(function() {
@@ -123,21 +124,24 @@ $('.bd-q-btn-done').click(function() {
 		if (lastQuestion > 0 && $('#bs-question-' + lastQuestion).attr('data-state') == 'new'
 			&& $('#bs-question-' + lastQuestion).attr('data-status') == 'edited') {
 			
-			if ($('#sb-question-txt-' + lastQuestion).val() == '') {
+			if ($('#sb-question-txt-' + lastQuestion).val() == '' || $('#sb-question-type-' + lastQuestion).val() == '') {
 				$("#overlay-toast").html('Please finish adding the Question');
 				showToast();
 			} else {
 				var url = "./addquestiontosurvey.do?order=" + lastQuestion;
+				$('#bs-question-' + lastQuestion).attr('data-state', 'editable');
+				$('#bs-question-' + quesOrder).attr('data-status', 'new');
 				callAjaxFormSubmit(url, function(data) {
 					var map =  $.parseJSON(data);
 					$("#overlay-toast").html(map.message);
 					showToast();
 					
 					if (map.status == "success") {
-						$('#bs-question-' + lastQuestion).attr('data-state', 'editable');
 						$('#bs-question-' + lastQuestion).attr('data-quesref', map.questionId);
-
 						revertQuestionOverlay();
+					} else {
+						$('#bs-question-' + quesOrder).attr('data-state', 'new');
+						$('#bs-question-' + quesOrder).attr('data-status', 'edited');
 					}
 					$('#overlay-continue').unbind('click');
 					overlayRevert();
@@ -149,7 +153,7 @@ $('.bd-q-btn-done').click(function() {
 		else if (lastQuestion > 0 && $('#bs-question-' + lastQuestion).attr('data-state') == 'editable'
 			&& $('#bs-question-' + lastQuestion).attr('data-status') == 'edited') {
 			
-			if ($('#sb-question-txt-' + lastQuestion).val() == '') {
+			if ($('#sb-question-txt-' + lastQuestion).val() == '' || $('#sb-question-type-' + lastQuestion).val() == '') {
 				$("#overlay-toast").html('Please finish editing the Question');
 				showToast();
 			} else {
@@ -177,7 +181,7 @@ $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
 });
 
-// TODO Question edit
+// Question edit
 $(document).on('click', '.srv-tbl-edit', function() {
 	var questionId = $(this).parent().parent().data('questionid');
 	
@@ -321,7 +325,7 @@ $(document).on('click', '.srv-tbl-edit', function() {
 $(document).on('click', '.bd-q-btn-done-edit', function() {
 	var questionId = $(this).data('quesnum');
 
-	if ($('#sb-question-txt-' + questionId).val() == '') {
+	if ($('#sb-question-txt-' + questionId).val() == '' || $('#sb-question-type-' + questionId).val() == '') {
 		$("#overlay-toast").html('Please finish editing the Question');
 		showToast();
 	} else {
@@ -390,25 +394,33 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 	var quesOrder = form.data('quesnum') - 1;
 	
 	// Settings status
+	showStatus('#bs-question-' + form.data('quesnum'), 'Edited');
 	$('#bs-question-' + form.data('quesnum')).attr('data-status', 'edited');
 	
 	// submit for adding new question
 	if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'new'
 			&& $('#bs-question-' + quesOrder).attr('data-status') == 'edited') {
 		
-		if ($('#sb-question-txt-' + quesOrder).val() == '') {
+		if ($('#sb-question-txt-' + quesOrder).val() == '' || $('#sb-question-type-' + quesOrder).val() == '') {
 			$("#overlay-toast").html('Please finish adding the Question');
 			showToast('error');
 		} else {
 			var url = "./addquestiontosurvey.do?order=" + quesOrder;
+			showProgress('#bs-question-' + quesOrder);
+			$('#bs-question-' + quesOrder).attr('data-state', 'editable');
+			$('#bs-question-' + quesOrder).attr('data-status', 'new');
 			callAjaxFormSubmit(url, function(data) {
 				var map =  $.parseJSON(data);
 				$("#overlay-toast").html(map.message);
 				showToast();
 				
 				if (map.status == "success") {
-					$('#bs-question-' + quesOrder).attr('data-state', 'editable');
 					$('#bs-question-' + quesOrder).attr('data-quesref', map.questionId);
+					showStatus('#bs-question-' + quesOrder, 'Saved');
+				} else {
+					$('#bs-question-' + quesOrder).attr('data-state', 'new');
+					$('#bs-question-' + quesOrder).attr('data-status', 'edited');
+					showStatus('#bs-question-' + quesOrder, 'Retry Saving');
 				}
 			}, 'bs-question-' + quesOrder);
 		}
@@ -417,19 +429,22 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 	else if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'editable'
 		&& $('#bs-question-' + quesOrder).attr('data-status') == 'edited') {
 		
-		if ($('#sb-question-txt-' + quesOrder).val() == '') {
+		if ($('#sb-question-txt-' + quesOrder).val() == '' || $('#sb-question-type-' + quesOrder).val() == '') {
 			$("#overlay-toast").html('Please finish editing the Question');
 			showToast();
 		} else {
 			var questionId = $('#bs-question-' + quesOrder).attr('data-quesref');
 			var url = "./updatequestionfromsurvey.do?order=" + quesOrder + "&questionId=" + questionId;
+			showProgress('#bs-question-' + quesOrder);
 			callAjaxFormSubmit(url, function(data) {
 				var map =  $.parseJSON(data);
 				$("#overlay-toast").html(map.message);
 				showToast();
 				
 				if (map.status == "success") {
-					
+					showStatus('#bs-question-' + quesOrder, 'Saved');
+				} else {
+					showStatus('#bs-question-' + quesOrder, 'Retry Saving');
 				}
 			}, 'bs-question-' + quesOrder);
 		}
@@ -528,6 +543,7 @@ $('body').on('blur', '.bd-mcq-txt', function(){
 		var addMcqTextOption = $(this).attr('name')[$(this).attr('name').length - 3];
 
 		// Settings status
+		showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 		$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
 		
 		var htmlData = '<div class="bd-mcq-row clearfix">'
@@ -595,3 +611,19 @@ $('body').on('click', '#overlay-cancel', function(){
 	
 	revertQuestionOverlay();
 });
+
+// Progress Bar
+function hideProgress(formId) {
+	$(formId).find('.bd-q-status-wrapper').hide();
+	$(formId).find('.bd-q-status-wrapper').find('.bd-q-status-txt').html('');
+}
+function showProgress(formId) {
+	$(formId).find('.bd-q-status-wrapper').show();
+	$(formId).find('.bd-q-status-wrapper').find('.bd-spinner').show();
+	$(formId).find('.bd-q-status-wrapper').find('.bd-q-status-txt').html('Saving');
+}
+function showStatus(formId, text) {
+	$(formId).find('.bd-q-status-wrapper').show();
+	$(formId).find('.bd-q-status-wrapper').find('.bd-spinner').hide();
+	$(formId).find('.bd-q-status-wrapper').find('.bd-q-status-txt').html(text);
+}
