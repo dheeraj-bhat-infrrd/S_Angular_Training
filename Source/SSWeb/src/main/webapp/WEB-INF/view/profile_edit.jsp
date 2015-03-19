@@ -82,7 +82,20 @@
 							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center; background-size: cover;"></div>
+							<c:choose>
+								<c:when test="${user.companyAdmin}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit comp-default-img  pos-relative cursor-pointer"></div>
+								</c:when>
+								<c:when test="${user.regionAdmin}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit region-default-img pos-relative cursor-pointer"></div>
+								</c:when>
+								<c:when test="${user.branchAdmin}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit office-default-img pos-relative cursor-pointer"></div>
+								</c:when>
+								<c:when test="${user.agent}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit pers-default-img-big pos-relative cursor-pointer"></div>
+								</c:when>
+							</c:choose>							
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
