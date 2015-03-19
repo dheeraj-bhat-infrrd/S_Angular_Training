@@ -169,6 +169,8 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 	// submitting prev form
 	var form = $(this).closest('form');
 	var quesOrder = form.data('quesnum') - 1;
+	
+	// submit for adding new question
 	if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'new') {
 		if ($('#sb-question-txt-' + quesOrder).val() == '') {
 			$("#overlay-toast").html('Please finish adding the Question');
@@ -176,10 +178,29 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 		} else {
 			var url = "./addquestiontosurvey.do?order=" + quesOrder;
 			callAjaxFormSubmit(url, function(data) {
-				addQuestionCallback(data);
+				var map =  $.parseJSON(data);
+				$("#overlay-toast").html(map.message);
+				showToast();
+				
+				if (map.status == "success") {
+					$('#bs-question-' + quesOrder).attr('data-state', 'editable');
+					$('#bs-question-' + quesOrder).attr('data-quesref', map.questionId);
+				}
 			}, 'bs-question-' + quesOrder);
-
-			$('#bs-question-' + quesOrder).attr('data-state', 'editable');
+		}
+	}
+	// submit for modifying question
+	else if (quesOrder > 0 && $('#bs-question-' + quesOrder).attr('data-state') == 'editable') {
+		if ($('#sb-question-txt-' + quesOrder).val() == '') {
+			$("#overlay-toast").html('Please finish editing the Question');
+			showToast();
+		} else {
+			var questionId = $('#bs-question-' + quesOrder).attr('data-quesref');
+			var url = "./updatequestionfromsurvey.do?order=" + quesOrder + "&questionId=" + questionId;
+			callAjaxFormSubmit(url, function(data) {
+				$("#overlay-toast").html(data);
+				showToast();
+			}, 'bs-question-' + quesOrder);
 		}
 	}
 	
@@ -189,7 +210,7 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 		if ($(this).data('nextquest') == false) {
 			currentQues ++;
 			var newQuestTemplateWithTopTxt = '<div class="bd-quest-item hide">'
-				+ '<form id="bs-question-' + currentQues + '" data-quesnum="' + currentQues + '" data-state="new">'
+				+ '<form id="bs-question-' + currentQues + '" data-quesnum="' + currentQues + '" data-state="new" data-quesref="">'
 				+ '<div class="bd-q-pu-header clearfix">'
 					+ '<div class="float-left bd-q-pu-header-lft">I Would Like To Add Another Question</div>'
 				+ '</div>'
@@ -272,9 +293,10 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 
 $('body').on('blur', '.bd-mcq-txt', function(){
 	if ($(this).parent().is(':last-child')) {
+		var addMcqTextOption = $(this).attr('name')[$(this).attr('name').length - 3];
 		var htmlData = '<div class="bd-mcq-row clearfix">'
 				+ '<div class="float-left bd-mcq-lbl">Option</div>'
-				+ '<input name="sb-answers-' + currentQues + '[]" class="float-left bd-mcq-txt">'
+				+ '<input name="sb-answers-' + addMcqTextOption + '[]" class="float-left bd-mcq-txt">'
 				+ '<div class="float-left bd-mcq-close"></div>'
 			+ '</div>';
 		$(this).parent().after(htmlData);
@@ -283,11 +305,6 @@ $('body').on('blur', '.bd-mcq-txt', function(){
 $('body').on('click', '.bd-mcq-close', function(){
 	$(this).parent().remove();
 });
-
-function addQuestionCallback(response) {
-	$("#overlay-toast").html(response);
-	showToast();
-}
 
 // Remove question from survey
 $('body').on('click', '.srv-tbl-rem', function(){

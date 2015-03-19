@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -355,16 +356,17 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyQuestionsAnswerOption surveyQuestionsAnswerOption = null;
 		if (answers != null) {
 			for (SurveyAnswerOptions answer : answers) {
-				surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
-				surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
-				surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
-				surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
-				surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
-				surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-				surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 				if (answer != null && !answer.getAnswerText().equals("")) {
+					surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
+					surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
+					surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
+					surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
+					surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
+					surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+					surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 					surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
 					surveyQuestionsAnswerOption.setAnswerOrder(answer.getAnswerOrder());
+
 					surveyQuestionsAnswerOptionDao.save(surveyQuestionsAnswerOption);
 					surveyQuestionsAnswerOptionDao.flush();
 				}
@@ -588,22 +590,41 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		List<SurveyQuestionsAnswerOption> surveyQuestionsAnswerOptionList = surveyQuestion.getSurveyQuestionsAnswerOptions();
 
 		if (answers != null && surveyQuestionsAnswerOptionList != null) {
-			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsAnswerOptionList) {
-				for (SurveyAnswerOptions answer : answers) {
-
-					if (surveyQuestionsAnswerOption.getSurveyQuestionsAnswerOptionsId() != answer.getAnswerId()) {
-						continue;
-					}
-					surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
-					surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-
-					if (answer != null && !answer.getAnswerText().equals("")) {
-						surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
-						LOG.info("Updating Answer with text: " + answer.getAnswerText());
-						surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
-						surveyQuestionsAnswerOptionDao.flush();
-					}
+			Iterator<SurveyQuestionsAnswerOption> surveyQuestionsAnswerIterator = surveyQuestionsAnswerOptionList.iterator();
+			
+			// modifying options
+			SurveyQuestionsAnswerOption surveyQuestionsAnswerOption;
+			for (SurveyAnswerOptions answer : answers) {
+				if (surveyQuestionsAnswerIterator.hasNext()) {
+					surveyQuestionsAnswerOption = surveyQuestionsAnswerIterator.next();
 				}
+				else {
+					surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
+					
+					surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
+					surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
+					surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
+					surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+				}
+				
+				surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
+				surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+
+				if (answer != null && !answer.getAnswerText().equals("")) {
+					surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
+					LOG.info("Updating Answer with text: " + answer.getAnswerText());
+					surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
+					surveyQuestionsAnswerOptionDao.flush();
+				}
+			}
+			
+			// removing extra options
+			while (surveyQuestionsAnswerIterator.hasNext()) {
+				surveyQuestionsAnswerOption = surveyQuestionsAnswerIterator.next();
+				surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_INACTIVE);
+				
+				surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
+				surveyQuestionsAnswerOptionDao.flush();
 			}
 		}
 		LOG.debug("Method modifyAnswersToQuestion() finished.");
