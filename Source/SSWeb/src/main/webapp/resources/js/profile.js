@@ -38,6 +38,7 @@ function paintProfilePage(result) {
 		currentProfileIden = result.iden;
 		var contactDetails = result.contact_details;
 		var headContentHtml = "";
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		$("#profile-main-content").show();
 		if(contactDetails != undefined){
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
@@ -77,9 +78,22 @@ function paintProfilePage(result) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
             	$("#prof-company-logo").css("background-size","100% auto");
             }
-            if(result.profileImageUrl != undefined) {
+            if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","cover");
+            }else {
+            	if(profileLevel == 'COMPANY'){
+            		$("#prof-image").addClass("comp-default-img");
+        		}
+        		else if(profileLevel == 'REGION'){
+        			$("#prof-image").addClass("region-default-img");
+        		}
+        		else if(profileLevel == 'BRANCH') {
+        			$("#prof-image").addClass("office-default-img");
+        		}
+        		else if(profileLevel == 'INDIVIDUAL'){
+        			$("#prof-image").addClass("pers-default-big");
+        		}
             }
             
             var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
@@ -297,7 +311,7 @@ function paintIndividualForBranch(data) {
 				if(individual.contact_details != undefined){
 					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel cursor-pointer branch-individual" data-profilename="'+individual.profileName+'">';
 					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img pers-default-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
 					individualsHtml=  individualsHtml+'		</div>';
 					individualsHtml=  individualsHtml+'</div>';
@@ -341,7 +355,7 @@ function paintIndividualsForRegion(data) {
 					if(individual.contact_details != undefined){
 						individualsHtml = individualsHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel cursor-pointer region-individual" data-openstatus="closed" data-profilename="'+individual.profileName+'" data-agentid="'+individual.branchId+'">';
 						individualsHtml = individualsHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
-						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img pers-default-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 						individualsHtml = individualsHtml +'		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
 						individualsHtml = individualsHtml +'	</div>';
 						individualsHtml = individualsHtml +'</div>' ;
@@ -363,7 +377,10 @@ function paintIndividualsForRegion(data) {
 
 function paintProfileImage(imgDivClass) {
 	$("."+imgDivClass).each(function(){
-		$(this).css("background", "url("+$(this).data('imageurl')+") no-repeat center");
+		var imageUrl = $(this).attr('data-imageurl');
+		if(imageUrl == "" || imageUrl == undefined) {
+			$(this).css("background", "url("+imageUrl+") no-repeat center");
+		}		
 	});
 }
 
@@ -382,7 +399,7 @@ function paintCompanyIndividuals(data) {
 				if(compIndividual.contact_details != undefined){
 					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 cursor-pointer comp-individual" data-profilename="'+compIndividual.profileName+'" data-agentid = '+compIndividual.iden+'>';
 					compIndividualsHtml = compIndividualsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img pers-default-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
 					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-txt">'+compIndividual.contact_details.name+'</div>';
 					compIndividualsHtml = compIndividualsHtml+'	</div>';
 					compIndividualsHtml = compIndividualsHtml+'</div>';
