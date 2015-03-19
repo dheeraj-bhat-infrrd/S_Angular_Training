@@ -2805,9 +2805,14 @@ button.paypal.is-active {
     box-shadow: 0px 0px 13px 4px #CCC;
 }
 
+.body-no-scroll-y{
+    overflow: hidden;
+}
+
 .body-no-scroll{
     overflow: hidden;
 }
+
 .sb-quests-error {
     text-align: center;
     color: rgb(240, 75, 75);
@@ -3366,8 +3371,8 @@ button.paypal.is-active {
     height: 36px;
     margin-bottom: -13px;
     width: 32px;
-    background: url(../images/close.png) no-repeat center;
-    background-size: 22px;
+    background: url(../images/close_check.png) no-repeat left center;
+    background-size: auto 22px;
 }
 
 .reg-cap-nw-adj{
@@ -3414,10 +3419,19 @@ button.paypal.is-active {
     background-color: #666 !important;
 }
 
+.bg-black-success{
+    background-color: #95E566 !important;
+}
+
+.bg-black-success .err-new-close{
+    background-position: right center;
+    background-size: auto 22px;
+}
+
 .header-right {
     position: relative;
-    height: 65px;
-    line-height: 78px;
+    height: 55px;
+    line-height: 66px;
     font-size: 14px;
     margin-top: -10px;
 }
@@ -5039,15 +5053,15 @@ tr.u-tbl-header td {
 .srv-tbl-edit {
     display: none;
     cursor: pointer;
-    margin-left: 20px;
+    margin-left: 15px;
     color: #145C7F;
 }
 
 .srv-tbl-rem {
     display: none;
     cursor: pointer;
-    margin-left: 20px;
-    margin-right: 20px;
+    margin-left: 15px;
+    margin-right: 10px;
     color: #145C7F;
 }
 
@@ -5094,6 +5108,16 @@ tr.u-tbl-header td {
     margin-top: 10px;
 }
 
+.bd-q-pu-txt-edit {
+    padding: 0 40px 0 10px; 
+    border: 1px solid #3E9DCB;
+    height: 40px;
+    border-radius: 2px;
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+}
+
 .bd-q-pu-close {
     right: 0;
     top: 0;
@@ -5111,7 +5135,7 @@ tr.u-tbl-header td {
 
 .bd-q-pu-done-wrapper {
     line-height: 40px;
-    width: 215px;
+    width: 120px;
     margin: 20px auto 0;
 }
 
@@ -5121,6 +5145,15 @@ tr.u-tbl-header td {
 }
 
 .bd-q-btn-done {
+    background-color: #3E9DCB;
+    color: #fff;
+    width: 120px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bd-q-btn-done-edit {
     background-color: #3E9DCB;
     color: #fff;
     width: 120px;
@@ -5290,4 +5323,63 @@ tr.u-tbl-header td {
 .bd-ans-scale {
     background: url(../images/scale.png) no-repeat center;
     background-size: 100% auto;
+}
+
+.srv-tbl-move-up, .srv-tbl-move-dn {
+    cursor: pointer;
+    display: none;
+    width: 20px;
+    height: 55px;
+}
+
+.srv-tbl-move-up {
+    background: url(../images/sb-reorder-up.png) no-repeat center;
+    margin-left: 10px;
+}
+
+.srv-tbl-move-dn {
+    background: url(../images/sb-reorder-down.png) no-repeat center;
+}
+
+.srv-tbl-btns {
+    margin-right: 10px;
+}
+
+.disclaimer {
+    color: #fff;
+    font-size: 12px;
+}
+
+.sb-edit-q-wrapper{
+    background-color: #fff;
+    border: 1px solid #D2DEDF;
+    border-radius: 3px;
+    padding: 20px;
+    margin: 0 auto;
+}
+.bd-srv-q-tbl {
+    margin-bottom: 50px;
+}
+
+.bd-q-status-wrapper {
+    background: url(../images/bd-bg.png) repeat-x center;
+    line-height: 40px;
+    margin: 10px 0;
+}
+
+.bd-spinner {
+    width: 20px;
+    padding: 0 20px;
+    color: #fff;
+    background: url(../images/spinner-small.gif) no-repeat center;
+    background-size: 20px;
+    background-color: #fff;
+    display: inline-block;
+}
+
+.bd-q-status-txt {
+    background-color: #fff;
+    display: inline-block;
+    padding: 0px 10px;
+    margin-left: -10px;
 }

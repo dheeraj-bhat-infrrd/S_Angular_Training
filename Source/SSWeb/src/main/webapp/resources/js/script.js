@@ -31,6 +31,7 @@ function showError(msg){
     $('#err-nw-txt').html(msg);
     $('#err-nw-wrapper').removeClass('bg-black-info');
     $('#err-nw-wrapper').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
 
 function hideError(){
@@ -41,13 +42,14 @@ function showInfo(msg){
 	buildMessageDiv();
     $('#err-nw-txt').html(msg);
     $('#err-nw-wrapper').slideDown(200);
-    $('#err-nw-wrapper').addClass('bg-black-info');
+    $(window).scrollTop($('#err-nw-wrapper').offset().top);
+    $('#err-nw-wrapper').addClass('bg-black-success');
 }
 
 function hideInfo(){
     $('#err-nw-wrapper').slideUp(200);
     setTimeout(function(){
-        $('#err-nw-wrapper').removeClass('bg-black-info');
+        $('#err-nw-wrapper').removeClass('bg-black-success');
     },200);
 }
 
