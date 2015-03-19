@@ -25,7 +25,6 @@ import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
@@ -45,8 +44,6 @@ public class HierarchyManagementController {
 
 	@Autowired
 	private MessageUtils messageUtils;
-	@Autowired
-	private HierarchyManagementService hierarchyManagementService;
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
 	@Autowired
@@ -83,10 +80,10 @@ public class HierarchyManagementController {
 							DisplayMessageType.ERROR_MESSAGE));
 				}
 				LOG.debug("Calling service for checking the status of regions already added");
-				isRegionAdditionAllowed = hierarchyManagementService.isRegionAdditionAllowed(user, accountType);
+				isRegionAdditionAllowed = organizationManagementService.isRegionAdditionAllowed(user, accountType);
 
 				LOG.debug("Calling service for checking the status of branches already added");
-				isBranchAdditionAllowed = hierarchyManagementService.isBranchAdditionAllowed(user, accountType);
+				isBranchAdditionAllowed = organizationManagementService.isBranchAdditionAllowed(user, accountType);
 
 				LOG.debug("Obtaining profile name from settings present in session");
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
@@ -133,7 +130,7 @@ public class HierarchyManagementController {
 		try {
 			try {
 				LOG.debug("Calling service to get the list of branches in company");
-				List<Branch> branches = hierarchyManagementService.getAllBranchesForCompany(user.getCompany());
+				List<Branch> branches = organizationManagementService.getAllBranchesForCompany(user.getCompany());
 				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
 
 				model.addAttribute("branches", branches);
@@ -178,7 +175,7 @@ public class HierarchyManagementController {
 		try {
 			try {
 				LOG.debug("Calling service to get the list of regions in company");
-				List<Region> regions = hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
+				List<Region> regions = organizationManagementService.getAllRegionsForCompany(user.getCompany());
 				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
 
 				model.addAttribute("regions", regions);
@@ -213,7 +210,7 @@ public class HierarchyManagementController {
 		try {
 			try {
 				LOG.debug("Calling service to get the list of regions in company");
-				List<Region> regions = hierarchyManagementService.getAllRegionsForCompany(user.getCompany());
+				List<Region> regions = organizationManagementService.getAllRegionsForCompany(user.getCompany());
 				LOG.debug("Sucessfully executed service to get the list of regions in company : " + regions);
 
 				model.addAttribute("regions", regions);
@@ -252,7 +249,7 @@ public class HierarchyManagementController {
 			try {
 				regionId = Long.parseLong(request.getParameter("regionId"));
 				LOG.debug("Calling service to deactivate region");
-				hierarchyManagementService.updateRegionStatus(user, regionId, CommonConstants.STATUS_INACTIVE);
+				organizationManagementService.updateRegionStatus(user, regionId, CommonConstants.STATUS_INACTIVE);
 				LOG.debug("Successfully executed service to deactivate region");
 			}
 			catch (NumberFormatException e) {
@@ -292,7 +289,7 @@ public class HierarchyManagementController {
 			try {
 				regionId = Long.parseLong(request.getParameter("regionId"));
 				LOG.debug("Calling service to get the count of branches in region");
-				long branchCount = hierarchyManagementService.getCountBranchesInRegion(regionId);
+				long branchCount = organizationManagementService.getCountBranchesInRegion(regionId);
 				LOG.debug("Successfully executed service to get the count of branches in region : " + branchCount);
 
 				if (branchCount > 0l) {
@@ -335,7 +332,7 @@ public class HierarchyManagementController {
 				branchId = Long.parseLong(request.getParameter("branchId"));
 
 				LOG.debug("Calling service to deactivate branch");
-				hierarchyManagementService.updateBranchStatus(user, branchId, CommonConstants.STATUS_INACTIVE);
+				organizationManagementService.updateBranchStatus(user, branchId, CommonConstants.STATUS_INACTIVE);
 				LOG.debug("Successfully executed service to deactivate branch");
 			}
 			catch (NumberFormatException e) {
@@ -374,7 +371,7 @@ public class HierarchyManagementController {
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
 				LOG.debug("Calling service to get the count of users in branch");
-				long usersCount = hierarchyManagementService.getCountUsersInBranch(branchId);
+				long usersCount = organizationManagementService.getCountUsersInBranch(branchId);
 				LOG.debug("Successfully executed service to get the count of users in branch : " + usersCount);
 
 				if (usersCount > 0l) {
@@ -689,7 +686,7 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to update branch with Id : " + branchId);
-				hierarchyManagementService.updateBranch(branchId, regionId, branchName, branchAddress1, branchAddress2, user);
+				organizationManagementService.updateBranch(branchId, regionId, branchName, branchAddress1, branchAddress2, user);
 				LOG.debug("Successfully executed service to update a branch");
 
 				model.addAttribute("message",
@@ -751,7 +748,7 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
-				hierarchyManagementService.updateRegion(regionId, regionName, regionAddress1, regionAddress2, user);
+				organizationManagementService.updateRegion(regionId, regionName, regionAddress1, regionAddress2, user);
 				LOG.debug("Successfully executed service to update a region");
 
 				model.addAttribute("message",
