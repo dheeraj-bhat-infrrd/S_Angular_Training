@@ -87,7 +87,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 				organizationUnitSettings = userSettings.getBranchSettings().get(columnValue);
 				break;
 			case CommonConstants.AGENT_ID_COLUMN:
-				organizationUnitSettings = userSettings.getAgentSettings().get(columnValue);
+				organizationUnitSettings = userSettings.getAgentSettings();
 				break;
 			default:
 				LOG.error("Invalid value passed for columnName. It should be either of companyId/regionId/branchId/agentId.");
@@ -183,10 +183,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
 			internalMax = 0;
-			surveyDetailsToPopulate.add(survey.getCustomerName());
-			surveyDetailsToPopulate.add(survey.getCustomerName());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
+			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+			surveyDetailsToPopulate.add(survey.getCustomerLastName());
+			surveyDetailsToPopulate.add(survey.getCreatedOn());
+			surveyDetailsToPopulate.add(survey.getModifiedOn());
 			surveyDetailsToPopulate.add(survey.getScore());
 			surveyDetailsToPopulate.add(survey.getMood());
 			surveyDetailsToPopulate.add(survey.getReview());
@@ -261,11 +261,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
 			internalMax = 0;
-			surveyDetailsToPopulate.add(survey.getCustomerName());
-			surveyDetailsToPopulate.add(survey.getCustomerName());
+			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+			surveyDetailsToPopulate.add(survey.getCustomerLastName());
 			surveyDetailsToPopulate.add(survey.getCustomerEmail());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
+			surveyDetailsToPopulate.add(survey.getCreatedOn());
+			surveyDetailsToPopulate.add(survey.getModifiedOn());
+			surveyDetailsToPopulate.add(survey.getUrl());
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
 			if (internalMax > max)
@@ -275,7 +276,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		surveyDetailsToPopulate.add("Last Name");
 		surveyDetailsToPopulate.add("Email Id");
 		surveyDetailsToPopulate.add("Started On");
-		surveyDetailsToPopulate.add("Completed On");
+		surveyDetailsToPopulate.add("Last Updated On");
+		surveyDetailsToPopulate.add("Link To Survey");
 		for (counter = 1; counter <= max; counter++) {
 			internalMax++;
 			surveyDetailsToPopulate.add("Question " + counter);
