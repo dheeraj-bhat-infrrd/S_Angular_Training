@@ -58,7 +58,7 @@
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 2 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4) && highestrole == 1}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
@@ -106,7 +106,7 @@
 				<div class="hdr-link-item hdr-link-active">
 					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 2 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4) && highestrole == 1}">
 					<div class="hdr-link-item">
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
