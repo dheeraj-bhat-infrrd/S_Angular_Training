@@ -58,6 +58,9 @@
         display: none;
         margin: 0;
     }
+    .txt-header-small{
+        font-size: 18px;
+    }
     .content-wrapper{
         margin: 0 -15px;
     }
@@ -252,6 +255,12 @@
     .m-inp-img, .header-search-icn, .pro-left-wrapper-login{
         display: block;
     }
+    .disclaimer {
+        font-size: 11px;
+        padding: 0 10px;
+        margin-top: 11px;
+        color: #333;
+    }
 }
 
 
@@ -336,7 +345,7 @@
     }
     .hdr-logo{
         width: 150px;
-        background: url(../images/ss-logo.png) no-repeat center;
+        background: url(../images/ss-logo.png) no-repeat left center;
         background-size: 80%;
     }
     .hdr-link-item{
@@ -352,6 +361,10 @@
     .blue-ext-right-adj{
         display: block;
         height: 44px;
+    }
+    .disclaimer {
+        font-size: 12px;
+        margin-top: 0;
     }
 }
 
@@ -372,7 +385,8 @@
         width: 300px;
     }
     .reg-txt-top1{
-        font-size: 24px;
+        font-size: 16px;
+        margin-top: -10px;
     }
     .reg-item{
         margin-bottom: 0;
@@ -380,6 +394,13 @@
     .reg-inp{
         width: 100% !important;
         margin-bottom: 7px;
+        height: 40px;
+    }
+    .disclaimer {
+        font-size: 9px;
+    }
+    .reg-txt-top2 {
+        margin-bottom: 5px;
     }
     .reg-captcha-wrapper{
         margin-bottom: 7px;
