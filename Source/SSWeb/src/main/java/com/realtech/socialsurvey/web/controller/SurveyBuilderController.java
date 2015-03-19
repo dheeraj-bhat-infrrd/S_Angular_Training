@@ -131,10 +131,6 @@ public class SurveyBuilderController {
 				SurveyAnswerOptions surveyAnswerOptions;
 				int answerOrder = 1;
 				for (String answerStr : strAnswers) {
-					/*if (answerStr.equals("")) {
-						LOG.error("Answer text cannot be empty !");
-						throw new InvalidInputException("Answer text cannot be empty !");
-					}*/
 					if (!answerStr.equals("")) {
 						surveyAnswerOptions = new SurveyAnswerOptions();
 						surveyAnswerOptions.setAnswerText(answerStr);
@@ -144,9 +140,14 @@ public class SurveyBuilderController {
 						answerOrder++;
 					}
 				}
+				if (answerOrder <= 2) {
+					LOG.error("Atleast enter two options");
+					throw new InvalidInputException("Atleast enter two options");
+				}
+
 				questionDetails.setAnswers(answers);
 			}
-
+			
 			// Adding the question to survey
 			long surveyQuestionMappingId = surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
@@ -154,7 +155,6 @@ public class SurveyBuilderController {
 
 			statusMap.put("questionId", surveyQuestionMappingId + "");
 			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
-			statusJson = new Gson().toJson(statusMap);;
 			
 			LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController finished successfully");
 		}
@@ -186,7 +186,9 @@ public class SurveyBuilderController {
 	public String updateQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
+		Map<String, String> statusMap = new HashMap<String, String>();
 		String message = "";
+		String statusJson = "";
 
 		try {
 			// Check if survey is default one and clone it
@@ -206,26 +208,18 @@ public class SurveyBuilderController {
 
 			// Creating new SurveyQuestionDetails from form
 			String questionType = request.getParameter("sb-question-type-" + order);
-			// String questionType = request.getParameter("sb-question-edit-type");
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
 			questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
-			// questionDetails.setQuestion(request.getParameter("sb-question-edit-txt"));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setIsRatingQuestion(1);
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
-				// List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
 				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
-				// List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
 
 				int answerOrder = 1;
 				SurveyAnswerOptions surveyAnswer;
 				for (String answerStr : strAnswerTexts) {
-					/*if (answerStr.equals("")) {
-						LOG.error("Answer text cannot be empty");
-						throw new InvalidInputException("Answer text cannot be empty !");
-					}*/
 					if (!answerStr.equals("")) {
 						surveyAnswer = new SurveyAnswerOptions();
 						surveyAnswer.setAnswerText(answerStr);
@@ -235,41 +229,39 @@ public class SurveyBuilderController {
 						answerOrder++;
 					}
 				}
-				/*for (String answerIdStr : strAnswerIds) {
-					long answerId = Long.parseLong(answerIdStr);
-
-					surveyAnswer = new SurveyAnswerOptions();
-					String answerStr = strAnswerTexts.get(answerOrder);
-					if (answerStr.equals("")) {
-						LOG.error("Answer text cannot be empty");
-						throw new InvalidInputException("Answer text cannot be empty !");
-					}
-					surveyAnswer.setAnswerText(answerStr);
-					surveyAnswer.setAnswerId(answerId);
-					answers.add(surveyAnswer);
-
-					answerOrder++;
-				}*/
+				
+				if (answerOrder <= 2) {
+					LOG.error("Atleast enter two options");
+					throw new InvalidInputException("Atleast enter two options");
+				}
 				questionDetails.setAnswers(answers);
 			}
 			surveyBuilder.updateQuestionAndAnswers(user, surveyQuestionId, questionDetails);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
+			
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 			LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException while updating question. Reason:" + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while updating question. Reason: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
 		catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
-		return message;
+
+		statusMap.put("message", message);
+		statusJson = new Gson().toJson(statusMap);
+		return statusJson;
 	}
 
 	/**

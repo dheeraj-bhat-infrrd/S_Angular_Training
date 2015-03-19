@@ -5134,6 +5134,15 @@ tr.u-tbl-header td {
     cursor: pointer;
 }
 
+.bd-q-edit-btn-done {
+    background-color: #3E9DCB;
+    color: #fff;
+    width: 120px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
 .bd-ans-options-wrapper {
     background-color: #fff;
     border: 1px solid #D2DEDF;
