@@ -79,6 +79,10 @@
 							</div>
 						</div>
 					</div>
+					<div class="bd-q-status-wrapper text-center hide">
+						<span class="bd-spinner">`</span>
+						<span class="bd-q-status-txt">Saving</span>
+					</div>
 				</div>
 			</form>
 			</div>
