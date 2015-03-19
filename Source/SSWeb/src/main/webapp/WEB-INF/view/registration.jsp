@@ -51,14 +51,14 @@
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-lname"></div>
 						<c:choose>
-						<c:when test="${not empty lastname && not lastname eq 'null'}">
-							<input class="rfr_txt_fld" id="reg-lname" name="lastname" value="${lastname}"
-							placeholder="<spring:message code="label.lastname.key" />">
-						</c:when>
-						<c:otherwise>
-							<input class="rfr_txt_fld" id="reg-lname" name="lastname"
-							placeholder="<spring:message code="label.lastname.key" />">
-						</c:otherwise>
+							<c:when test="${not empty lastname}">
+								<input class="rfr_txt_fld" id="reg-lname" name="lastname" value="${lastname}"
+								placeholder="<spring:message code="label.lastname.key" />">
+							</c:when>
+							<c:otherwise>
+								<input class="rfr_txt_fld" id="reg-lname" name="lastname"
+								placeholder="<spring:message code="label.lastname.key" />">
+							</c:otherwise>
 					</c:choose>
 						
 					</div>

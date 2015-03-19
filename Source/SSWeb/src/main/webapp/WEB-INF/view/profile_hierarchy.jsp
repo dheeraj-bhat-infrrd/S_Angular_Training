@@ -54,3 +54,4 @@
 			</c:forEach>
 		</c:when>
 	</c:choose>
+</div>
