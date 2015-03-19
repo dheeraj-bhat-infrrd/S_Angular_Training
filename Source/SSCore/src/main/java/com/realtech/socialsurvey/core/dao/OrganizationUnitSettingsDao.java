@@ -96,5 +96,5 @@ public interface OrganizationUnitSettingsDao {
 	 * @return
 	 */
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName);
-
+	
 }

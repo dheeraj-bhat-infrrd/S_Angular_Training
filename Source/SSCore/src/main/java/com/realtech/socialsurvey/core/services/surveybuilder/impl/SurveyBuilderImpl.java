@@ -307,7 +307,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		// TODO Add the default question which will be shown at the end of survey.
 		SurveyQuestionDetails surveyQuestionDetails = new SurveyQuestionDetails();
 		surveyQuestionDetails.setIsRatingQuestion(CommonConstants.STATUS_ACTIVE);
-		surveyQuestionDetails.setQuestion("How was your overall experience with our agent?");
+		surveyQuestionDetails.setQuestion("How would you rate your overall experience??");
 		surveyQuestionDetails.setIsRatingQuestion(CommonConstants.YES);
 		surveyQuestionDetails.setQuestionType("sb-master");
 		surveyQuestions.add(surveyQuestionDetails);

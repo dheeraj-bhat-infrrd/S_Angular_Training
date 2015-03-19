@@ -382,4 +382,17 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
+
+	/*
+	 * Mongo column and collection constants
+	 */
+	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
+	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	
+	/*
+	 * Constants related to Dash board profile.
+	 */
+	public static final int MAX_SURVEY_SCORE = 5;
+	public static final int MAX_SENT_SURVEY_COUNT = 10;
+	public static final int MAX_SOCIAL_POSTS = 10;
 }

@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -14,8 +16,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
@@ -27,6 +33,8 @@ import com.realtech.socialsurvey.core.services.authentication.AuthenticationServ
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -52,9 +60,14 @@ public class LoginController {
 	private UserManagementService userManagementService;
 	@Autowired
 	private SessionHelper sessionHelper;
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	@RequestMapping(value = "/login")
 	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Information aa gayi");
+		LOG.debug("DEBUG aa gaya");
+		LOG.error("Error aa gaya");
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
@@ -104,7 +117,7 @@ public class LoginController {
 		try {
 			user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(true);
-			
+
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
 				LicenseDetail licenseDetail = licenseDetails.get(0);
@@ -126,7 +139,7 @@ public class LoginController {
 
 				LOG.debug("Company profile not complete, redirecting to company information page");
 				redirectTo = JspResolver.COMPANY_INFORMATION;
-				if(redirectTo.equals(JspResolver.COMPANY_INFORMATION)){
+				if (redirectTo.equals(JspResolver.COMPANY_INFORMATION)) {
 					List<VerticalsMaster> verticalsMasters = null;
 					try {
 						verticalsMasters = organizationManagementService.getAllVerticalsMaster();
@@ -135,7 +148,7 @@ public class LoginController {
 						throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
 								DisplayMessageConstants.GENERAL_ERROR, e);
 					}
-					model.addAttribute("verticals",verticalsMasters);
+					model.addAttribute("verticals", verticalsMasters);
 				}
 			}
 			else {
@@ -214,8 +227,25 @@ public class LoginController {
 	 * Start the dashboard page
 	 */
 	@RequestMapping(value = "/dashboard")
-	public String initDashboardPage() {
+	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
+		HttpSession session = request.getSession(false);
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		try {
+			setUserInModel(model, sessionHelper.getCurrentUser(), accountType);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
+			model.addAttribute("message", "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
+					+ e.getMessage());
+			return "errorpage500";
+		}
+		catch (SolrException e) {
+			LOG.error("SolrException caught in initDashboardPage while setting details about user. Nested exception is ", e);
+			model.addAttribute("message",
+					"SolrException caught in initDashboardPage while setting details about user. Nested exception is " + e.getMessage());
+			return "errorpage500";
+		}
 		return JspResolver.DASHBOARD;
 	}
 
@@ -456,5 +486,106 @@ public class LoginController {
 		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
 	}
+
+	@SuppressWarnings("unchecked")
+	private Model setUserInModel(Model model, User user, AccountType accountType) throws InvalidInputException, SolrException {
+		model.addAttribute("userId", user.getUserId());
+		model.addAttribute("emailId", user.getEmailId());
+		model.addAttribute("accountType", accountType);
+		List<Long> regionIds = new ArrayList<>();
+		List<Long> branchIds = new ArrayList<>();
+		for (UserProfile userProfile : user.getUserProfiles()) {
+			switch (userProfile.getProfilesMaster().getProfileId()) {
+				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+					model.addAttribute("companyAdmin", true);
+					if (accountType == AccountType.ENTERPRISE) {
+						String regionsJson = solrSearchService.searchRegions("", user.getCompany(), 0, -1);
+						List<Region> regions = new ArrayList<>();
+						List<String> regionNames = new ArrayList<>();
+						regions.addAll((List<Region>) new Gson().fromJson(regionsJson, new TypeToken<List<Region>>() {}.getType()));
+						for (Region region : regions) {
+							regionIds.add(region.getRegionId());
+							regionNames.add(region.getRegionName());
+						}
+						model.addAttribute("regionNames", regionNames);
+						model.addAttribute("regionIds", regionIds);
+					}
+					else if (accountType == AccountType.COMPANY) {
+						String branchesJson = solrSearchService.searchBranches("", user.getCompany(), 0, -1);
+						List<Branch> branches = new ArrayList<>();
+						List<String> branchNames = new ArrayList<>();
+						branches.addAll((List<Branch>) new Gson().fromJson(branchesJson, new TypeToken<List<Branch>>() {}.getType()));
+						for (Branch branch : branches) {
+							branchIds.add(branch.getBranchId());
+							branchNames.add(branch.getBranchName());
+						}
+						model.addAttribute("branchNames", branchNames);
+						model.addAttribute("branchIds", branchIds);
+					}
+					return model;
+				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+					model.addAttribute("regionAdmin", true);
+					// Add list of region Ids, user is admin of. Currently adding only 1st region id.
+					regionIds.add(userProfile.getRegionId());
+					model.addAttribute("regionIds", regionIds);
+					break;
+
+				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+					model.addAttribute("branchAdmin", true);
+					// Add list of branch Ids, user is admin of.  Currently adding only 1st branch id.
+					branchIds.add(userProfile.getBranchId());
+					model.addAttribute("branchIds", branchIds);
+					break;
+
+				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+					model.addAttribute("agent", true);
+					break;
+
+				default:
+
+			}
+		}
+		return model;
+	}
+
+	/*
+	 * private void setSettingVariablesInSession(HttpSession session) {
+	 * LOG.info("Settings related session values being set."); if
+	 * (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) { //
+	 * setting the logo name UserSettings userSettings = (UserSettings)
+	 * session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION); // check if company
+	 * has a logo if (userSettings.getCompanySettings().getLogo() != null) {
+	 * LOG.debug("Settings logo image from company settings");
+	 * session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION,
+	 * userSettings.getCompanySettings().getLogo()); } else {
+	 * LOG.debug("Could not find logo settings in company. Checking in lower heirarchy."); // TODO:
+	 * Check the lower level hierarchy for logo } // check for the mail content String body = null;
+	 * FileContentReplacements replacements = new FileContentReplacements();
+	 * replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER +
+	 * EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY); if
+	 * (userSettings.getCompanySettings().getMail_content() == null) {
+	 * LOG.debug("Setting default survey participation mail body."); // set the mail contents try {
+	 * body = fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * body); } catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation"); } } else {
+	 * LOG.debug("Company already has mail body settings. Hence, setting the same"); if
+	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION,
+	 * userSettings.getCompanySettings() .getMail_content().getTake_survey_mail().getMail_body()); }
+	 * else { try { body = fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body); }
+	 * catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation"); } } if
+	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null)
+	 * { session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * userSettings.getCompanySettings()
+	 * .getMail_content().getTake_survey_reminder_mail().getMail_body()); } else { try { body =
+	 * fileOperations.replaceFileContents(replacements);
+	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
+	 * body); } catch (InvalidInputException e) {
+	 * LOG.warn("Could not set mail content for survey participation reminder"); } } } } }
+	 */
 }
 // JIRA SS-21 : by RM-06 : EOC
