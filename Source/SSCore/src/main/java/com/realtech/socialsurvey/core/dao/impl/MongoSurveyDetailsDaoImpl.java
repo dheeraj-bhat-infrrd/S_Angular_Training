@@ -163,6 +163,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
 		update.set(CommonConstants.SURVEY_CLICKED_COLUMN, true);
+		update.set(CommonConstants.CREATED_ON, new Date());
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
@@ -520,7 +521,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.limit(rows);
 		}
 
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
@@ -586,7 +587,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (rows > -1) {
 			query.limit(rows);
 		}
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
 		LOG.info("Method to fetch all the incoplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() finished.");
