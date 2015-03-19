@@ -38,11 +38,21 @@ function fetchCompanyHierarchy() {
 	var profileName = $("#profile-name").val();
     fetchHierarchy("companyProfileName", profileName);
 }
+/**
+ * Method to change the arrow in tabs according to the form displayed 
+ * @param spanId
+ */
+function changeTabArrow(spanId) {
+	$('.bd-hdr-span').removeClass('bd-hdr-active');
+    $('.bd-hdr-span').removeClass('bd-hdr-active-arr');
+    $("#"+spanId).addClass('bd-hdr-active');
+    $("#"+spanId).addClass('bd-hdr-active-arr');
+}
 
 /**
  * function to get the edit form based on tab value 
  */
-function getEditSectionForm(tabValue) {
+function getEditSectionFormByTab(tabValue) {
 	switch(tabValue){
     case 'region': 
     	getRegionEditPage();
@@ -63,11 +73,33 @@ function getEditSectionForm(tabValue) {
 }
 
 /**
+ * Method to get the edit section form based on the account type of user
+ */
+function getEditSectionByAccountType() {
+	var accountType = $("#account-type").val();
+	switch(accountType){
+    case 'Enterprise': 
+    	getRegionEditPage();
+        break;
+    case 'Company': 
+        getOfficeEditPage();
+        break;
+    case 'Team': 
+    	getIndividualEditPage();
+        break;
+    default: 
+    	showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+        break;
+	}
+}
+
+/**
  * function to get the region edit page
  */
 function getRegionEditPage(){
 	var url = "./getregioneditpage.do";
 	callAjaxGET(url, paintEditSection, true);
+	changeTabArrow("hr-region-tab");
 }
 
 /**
@@ -76,6 +108,7 @@ function getRegionEditPage(){
 function getOfficeEditPage(){
 	var url = "./getofficeeditpage.do";
 	callAjaxGET(url, paintEditSection, true);
+	changeTabArrow("hr-office-tab");
 }
 /**
  * function to get the individual edit page
@@ -83,6 +116,7 @@ function getOfficeEditPage(){
 function getIndividualEditPage(){
 	var url = "./getindividualeditpage.do";
 	callAjaxGET(url, paintEditSection, true);
+	changeTabArrow("hr-individual-tab");
 }
 
 function paintEditSection(data) {
