@@ -5134,7 +5134,7 @@ tr.u-tbl-header td {
     cursor: pointer;
 }
 
-.bd-q-edit-btn-done {
+.bd-q-btn-done-edit {
     background-color: #3E9DCB;
     color: #fff;
     width: 120px;
@@ -5340,4 +5340,27 @@ tr.u-tbl-header td {
 }
 .bd-srv-q-tbl {
     margin-bottom: 50px;
+}
+
+.bd-q-status-wrapper {
+    background: url(../images/bd-bg.png) repeat-x center;
+    line-height: 40px;
+    margin: 10px 0;
+}
+
+.bd-spinner {
+    width: 20px;
+    padding: 0 20px;
+    color: #fff;
+    background: url(../images/spinner-small.gif) no-repeat center;
+    background-size: 20px;
+    background-color: #fff;
+    display: inline-block;
+}
+
+.bd-q-status-txt {
+    background-color: #fff;
+    display: inline-block;
+    padding: 0px 10px;
+    margin-left: -10px;
 }
