@@ -105,7 +105,6 @@
 -->
                 
                 <div class="bd-q-pu-done-wrapper clearfix">
-                    <div class="bd-q-btn-cancel float-left">Cancel</div>
                     <div class="bd-q-btn-done float-left">Done</div>
                 </div>
             </div>
@@ -191,8 +190,8 @@
                     $(this).find('.srv-tbl-move-dn').hide();
                 }
             }else{
-                $(this).find('.srv-tbl-rem').hide();
-                $(this).find('.srv-tbl-edit').hide();
+//                $(this).find('.srv-tbl-rem').hide();
+//                $(this).find('.srv-tbl-edit').hide();
             }
         });
         
@@ -289,10 +288,6 @@
                     $(this).data('nextquest','true');
                 }
             }
-//            else{
-//                $(this).parent().next('.bs-ans-wrapper').hide();
-//                $(this).parent().parent().next('.bd-quest-item').hide();
-//            }
             if($(this).data('qno') != '1'){
                 $(this).next('.bd-q-pu-close').show();
             }
@@ -300,6 +295,14 @@
         
         $(document).on('click','.bd-q-pu-close',function(){
             $(this).parent().parent().remove(); 
+        });
+        
+        $(document).on('click','.srv-tbl-edit',function(){
+            
+            var editQuestion = '<div class="sb-edit-q-wrapper"><div class="bd-quest-item"> <div class="bd-q-pu-header bd-q-pu-header-adj clearfix"> <div class="float-left bd-q-pu-header-lft">Edit Your Question Here</div></div><div class="bd-q-pu-txt-wrapper pos-relative"> <input class="bd-q-pu-txt-edit" data-nextquest="false"></div><div class="bs-ans-wrapper hide" style="display: block;"> <div class="bd-and-header-txt">I want my customer replying using</div><div class="bd-ans-options-wrapper"> <div class="bd-ans-header clearfix"> <div class="bd-ans-hd-container clearfix float-left"> <div id="" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel">Rating</div><div id="" class="bd-tab-com float-left bd-ans-tab-item">Comment</div><div id="" class="bd-tab-mcq float-left bd-ans-tab-item">Mutiple Choice</div></div></div><div id="" class="bd-ans-type-rating bd-ans-type-item"> <div class="bd-and-tier2">My Customers can answer using</div><div class="row clearfix bd-ans-type bd-ans-type-rating-adj"> <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"> <div class="bd-ans-img-wrapper"> <div class="bd-ans-img bd-ans-smiley"></div><div class="bd-ans-img-txt">Smiley</div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"> <div class="bd-ans-img-wrapper"> <div class="bd-ans-img bd-ans-star"></div><div class="bd-ans-img-txt">Stars</div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"> <div class="bd-ans-img-wrapper"> <div class="bd-ans-img bd-ans-scale"></div><div class="bd-ans-img-txt">Scale</div></div></div></div></div><div id="" class="bd-ans-type-mcq bd-ans-type-item hide"> <div class="bd-and-tier2">My Customers can answer from</div><div class="clearfix bd-ans-type bd-ans-type-mcq-adj"> <div class="bd-mcq-row clearfix"> <div class="float-left bd-mcq-lbl">Option</div><input class="float-left bd-mcq-txt"> <div class="float-left bd-mcq-close"></div></div><div class="bd-mcq-row clearfix"> <div class="float-left bd-mcq-lbl">Option</div><input class="float-left bd-mcq-txt"> <div class="float-left bd-mcq-close"></div></div></div></div><div id="" class="bd-ans-type-com bd-ans-type-item hide"> <div class="clearfix bd-com-wrapper"> <div class="float-left bd-com-chk"></div><div class="float-left bd-com-txt">Textarea</div></div></div></div></div></div><div class="bd-q-pu-done-wrapper clearfix"><div class="bd-q-btn-done float-left">Done</div></div></div>';
+            
+            
+            $(this).parent().parent().after(editQuestion);
         });
         
     });
