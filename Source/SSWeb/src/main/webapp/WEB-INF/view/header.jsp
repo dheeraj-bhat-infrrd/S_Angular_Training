@@ -62,7 +62,7 @@
 				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a>
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${highestrole == 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId != 5}">
@@ -110,7 +110,7 @@
 				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a>
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${highestrole == 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId != 5}">

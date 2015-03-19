@@ -32,6 +32,14 @@ function checkUserAuthorization(){
 }
 
 /**
+ * Method to fetch the company hierarchy
+ */
+function fetchCompanyHierarchy() {
+	var profileName = $("#profile-name").val();
+    fetchHierarchy("companyProfileName", profileName);
+}
+
+/**
  * function to get the edit form based on tab value 
  */
 function getEditSectionForm(tabValue) {
@@ -113,7 +121,7 @@ function paintEditSection(data) {
 	$("#selected-user-txt").keyup(function() {
 		var text = $(this).val();
 		usersStartIndex = 0;	
-		if (text.length > 1) {
+		if (text.length > 0) {
 			delay(function() {
 				getUsersList(text,usersStartIndex,numOfRows);
 			}, 500);
@@ -190,10 +198,12 @@ function paintEditSection(data) {
 	
 	$("#selected-region-txt").keyup(function() {
 		var text = $("#selected-region-txt").val();
-		if (text.length > 1) {
+		if (text.length > 0) {
 			delay(function() {
 				populateRegionsSelector(text);
 			}, 500);
+		}else{
+			$("#regions-droplist").slideUp(200);
 		}
 	});
 	
@@ -233,10 +243,12 @@ function paintEditSection(data) {
 	
 	$("#selected-office-txt").keyup(function() {
 		var text = $("#selected-office-txt").val();
-		if (text.length > 1) {
+		if (text.length > 0) {
 			delay(function() {
 				populateOfficesSelector(text);
 			}, 500);
+		}else {
+			$("#offices-droplist").slideUp(200);
 		}
 	});
 	
@@ -396,6 +408,7 @@ function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-region-form");
+	fetchCompanyHierarchy();
 }
 
 /**
@@ -557,6 +570,7 @@ function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-office-form");
+	fetchCompanyHierarchy();
 }
 
 /**
@@ -584,14 +598,9 @@ function populateRegionsSelectorCallBack(data) {
 			$.each(searchResult,function(i,region) {
 					htmlData = htmlData +'<div data-regionId="'+region.regionId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-region-option">'+region.regionName+'</div>';
 			});
-			if(htmlData != ""){
-				$("#regions-droplist").html(htmlData).slideDown(200);	
-			}
-			else {
-				$("#regions-droplist").html(htmlData).slideUp(200);	
-			}
-			
-			
+		}
+		if(htmlData != ""){
+			$("#regions-droplist").html(htmlData).slideDown(200);
 			// bind the click event of selector
 			$('.hm-region-option').click(function(e) {
 				e.stopPropagation();
@@ -604,7 +613,12 @@ function populateRegionsSelectorCallBack(data) {
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-region-option").removeClass("hm-dd-item-keys-selected");
 			});
-			
+			/*$("#selected-region-txt").keydown(function(e){
+				bindArrowKeysWithSelector(e, "selected-region-txt", "regions-droplist", populateRegionsSelector, "selected-region-id-hidden", "data-regionid");
+			});	*/		
+		}
+		else {
+			$("#regions-droplist").html(htmlData).slideUp(200);	
 		}
 	}	
 }
@@ -717,6 +731,7 @@ function addIndividualCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-individual-form");
+	fetchCompanyHierarchy();
 }
 
 /**
@@ -744,12 +759,9 @@ function populateOfficesSelectorCallBack(data) {
 			$.each(searchResult,function(i,branch) {
 					htmlData = htmlData +'<div data-regionid="'+branch.regionId+'" data-officeid="'+branch.branchId+'" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-office-option">'+branch.branchName+'</div>';
 			});
-			if(htmlData != ""){
-				$("#offices-droplist").html(htmlData).slideDown(200);	
-			}
-			else {
-				$("#offices-droplist").html(htmlData).slideUp(200);	
-			}
+		}
+		if(htmlData != ""){
+			$("#offices-droplist").html(htmlData).slideDown(200);	
 			
 			// bind the click event of selector
 			$('.hm-office-option').click(function(e) {
@@ -764,12 +776,14 @@ function populateOfficesSelectorCallBack(data) {
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-office-option").removeClass("hm-dd-item-keys-selected");
 			});
-			
+		}
+		else {
+			$("#offices-droplist").html(htmlData).slideUp(200);	
 		}
 	}	
 }
 
-function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,dataAttr) {
+function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,attrName) {
 	if(e.which == 40) {
 		var text = $("#"+textBoxId).val();
 		if(text == undefined) {
@@ -806,7 +820,7 @@ function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hidd
 			selectedItem = $("#"+dropListId+" :first-child");
 		}
 		$('#'+textBoxId).val($(selectedItem).html());
-		$('#'+hiddenFieldId).val($(selectedItem).data(dataAttr));
+		$('#'+hiddenFieldId).val($(selectedItem).attr(attrName));
 		$('#'+dropListId).slideToggle(200);	
 	}
 }

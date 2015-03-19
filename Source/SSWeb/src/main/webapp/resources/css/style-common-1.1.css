@@ -158,6 +158,10 @@ a, a:hover, a:visited{
     text-shadow: 2px 2px 46px rgba(255,255,255,0.5);
 }
 
+.txt-header-small{
+    font-size: 22px;
+}
+
 .index-body {
     background: url(../images/bg-main.png) no-repeat center;
     background-size: cover;
@@ -221,8 +225,10 @@ a, a:hover, a:visited{
 .c-panel-txt-top {
     position: relative;
     z-index: 99;
-    font-size: 30px;
+    font-size: 22px;
     margin-bottom: 5px;
+    font-weight: bold !important;
+    font-family: opensans;
 }
 
 .pic-bot-txt {
@@ -322,7 +328,7 @@ a, a:hover, a:visited{
 }
 
 .reg-txt-top1 {
-    font-size: 28px;
+    font-size: 22px;
     margin-top: -14px;
     font-weight: bold;
     letter-spacing: 1px;
@@ -350,7 +356,7 @@ a, a:hover, a:visited{
     background-color: rgba(0, 159, 224, 0.8);
     color: #fff;
     margin-right: 5px;
-    padding: 0 50px;
+    padding: 0 25px;
     position: relative;
 }
 
@@ -584,6 +590,8 @@ a, a:hover, a:visited{
     position: relative;
     z-index: 99;
     font-size: 13px;
+    line-height: 20px;
+    padding-top: 5px;
 }
 
 .blue-ext-right {
@@ -703,4 +711,10 @@ a, a:hover, a:visited{
 
 .row.row-dash-top-adj {
     margin-bottom: -80px;
+}
+
+.disclaimer {
+    color: #fff;
+    font-size: 12px;
+    margin-top: -5px;
 }
