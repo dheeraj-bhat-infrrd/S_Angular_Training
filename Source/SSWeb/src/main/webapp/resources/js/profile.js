@@ -568,17 +568,18 @@ function paintHiddenReviewsCount(data) {
 			}else {
 				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
 			}
+			
+			$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
+			$("#prof-hidden-review-count").click(function(){
+				$('#prof-review-item').html('');
+				$(this).hide();
+				startIndex = 0;
+				minScore = 0;
+				$("#profile-fetch-info").attr("fetch-all-reviews", "true");
+				$(window).scrollTop($('#reviews-container').offset().top);
+				fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
+			});
 		}
-		$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
-		$("#prof-hidden-review-count").click(function(){
-			$('#prof-review-item').html('');
-			$(this).hide();
-			startIndex = 0;
-			minScore = 0;
-			$("#profile-fetch-info").attr("fetch-all-reviews", "true");
-			$(window).scrollTop($('#reviews-container').offset().top);
-			fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
-		});
 	}
 }
 

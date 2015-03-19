@@ -969,12 +969,14 @@ function paintProfImage(imgDivClass) {
 $(window).scroll(function() {
 	var newIndex = startIndex + numOfRows;
 	var totalReviews = $("#prof-company-review-count").html();
-	totalReviews = totalReviews.substr(0, totalReviews.indexOf(' '));
+	if(totalReviews != undefined) {
+		totalReviews = totalReviews.substr(0, totalReviews.indexOf(' '));
 
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex <= totalReviews) {
-		fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
-		startIndex = newIndex;
-	}
+		if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex <= totalReviews) {
+			fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
+			startIndex = newIndex;
+		}
+	}	
 });
 
 function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
