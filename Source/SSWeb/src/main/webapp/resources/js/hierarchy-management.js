@@ -105,6 +105,9 @@ function paintEditSection(data) {
 	$("#selected-user-txt").click(function() {
 		getUsersList("",usersStartIndex,numOfRows);
 	});
+	$("#selected-user-txt").keydown(function(e) {
+		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
+	});
 	
 	$("#btn-region-save").click(function(e){
 		if(validateRegionForm()){
@@ -118,18 +121,20 @@ function paintEditSection(data) {
 		}
 	});
 
-	$("#selected-user-txt").keyup(function() {
-		var text = $(this).val();
-		usersStartIndex = 0;	
-		if (text.length > 0) {
-			delay(function() {
-				getUsersList(text,usersStartIndex,numOfRows);
-			}, 500);
-		}
-		else {
-			delay(function() {
-				getUsersList("",usersStartIndex,numOfRows);
-			}, 500);
+	$("#selected-user-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $(this).val();
+			usersStartIndex = 0;	
+			if (text.length > 0) {
+				delay(function() {
+					getUsersList(text,usersStartIndex,numOfRows);
+				}, 500);
+			}
+			else {
+				delay(function() {
+					getUsersList("",usersStartIndex,numOfRows);
+				}, 500);
+			}
 		}
 	});
 	
@@ -196,14 +201,16 @@ function paintEditSection(data) {
 		$("#assign-to-droplist").slideToggle(200);
 	});
 	
-	$("#selected-region-txt").keyup(function() {
-		var text = $("#selected-region-txt").val();
-		if (text.length > 0) {
-			delay(function() {
-				populateRegionsSelector(text);
-			}, 500);
-		}else{
-			$("#regions-droplist").slideUp(200);
+	$("#selected-region-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $("#selected-region-txt").val();
+			if (text.length > 0) {
+				delay(function() {
+					populateRegionsSelector(text);
+				}, 500);
+			}else{
+				$("#regions-droplist").slideUp(200);
+			}
 		}
 	});
 	
@@ -613,9 +620,9 @@ function populateRegionsSelectorCallBack(data) {
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-region-option").removeClass("hm-dd-item-keys-selected");
 			});
-			/*$("#selected-region-txt").keydown(function(e){
+			$("#selected-region-txt").keydown(function(e){
 				bindArrowKeysWithSelector(e, "selected-region-txt", "regions-droplist", populateRegionsSelector, "selected-region-id-hidden", "data-regionid");
-			});	*/		
+			});			
 		}
 		else {
 			$("#regions-droplist").html(htmlData).slideUp(200);	
@@ -784,6 +791,7 @@ function populateOfficesSelectorCallBack(data) {
 }
 
 function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,attrName) {
+	console.log(e.which);
 	if(e.which == 40) {
 		var text = $("#"+textBoxId).val();
 		if(text == undefined) {

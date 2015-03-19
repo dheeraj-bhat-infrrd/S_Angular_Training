@@ -13,6 +13,10 @@ function fetchCompanyProfile() {
 function fetchCompanyProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this company");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatings(result.iden);
@@ -30,10 +34,11 @@ function fetchCompanyProfileCallBack(data) {
 }
 
 function paintProfilePage(result) {
-	if(result != undefined) {
+	if(result != undefined && result != "") {
 		currentProfileIden = result.iden;
 		var contactDetails = result.contact_details;
 		var headContentHtml = "";
+		$("#profile-main-content").show();
 		if(contactDetails != undefined){
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
@@ -591,6 +596,10 @@ function fetchRegionProfile(regionProfileName) {
 function fetchRegionProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this region");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatingsForRegion(result.iden);
@@ -703,6 +712,10 @@ function fetchBranchProfile(branchProfileName) {
 function fetchBranchProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this office");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatingsForBranch(result.iden);
@@ -820,6 +833,10 @@ function fetchAgentProfile(agentProfileName){
 function fetchAgentProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this individual");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		paintIndividualDetails(result);
