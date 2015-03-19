@@ -87,7 +87,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 				organizationUnitSettings = userSettings.getBranchSettings().get(columnValue);
 				break;
 			case CommonConstants.AGENT_ID_COLUMN:
-				organizationUnitSettings = userSettings.getAgentSettings().get(columnValue);
+				organizationUnitSettings = userSettings.getAgentSettings();
 				break;
 			default:
 				LOG.error("Invalid value passed for columnName. It should be either of companyId/regionId/branchId/agentId.");
