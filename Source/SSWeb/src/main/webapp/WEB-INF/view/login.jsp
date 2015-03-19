@@ -54,7 +54,7 @@
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-password"></div>
 						<input type="password" class="rfr_txt_fld" id="login-pwd" data-non-empty="true"
-							name="j_password" placeholder='<spring:message code="label.password.key"/>' value="raremile@">
+							name="j_password" placeholder='<spring:message code="label.password.key"/>'>
 					</div>
 				</div>
 				<div class="btn-forgot-passwd-link">
