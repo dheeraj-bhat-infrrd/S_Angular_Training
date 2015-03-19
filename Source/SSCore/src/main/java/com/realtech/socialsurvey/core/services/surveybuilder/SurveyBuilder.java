@@ -129,6 +129,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException;
+	public SurveyQuestion getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException;
 
 	/**
 	 * Method to update Survey Question and answers

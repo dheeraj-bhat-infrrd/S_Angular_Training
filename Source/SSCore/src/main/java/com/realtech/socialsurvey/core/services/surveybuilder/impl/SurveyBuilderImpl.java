@@ -82,6 +82,13 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
+	public SurveyQuestion getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException {
+		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, surveyQuestionMappingId);
+		return surveyQuestionsMapping.getSurveyQuestion();
+	}
+
+	@Override
+	@Transactional
 	public boolean isSurveyBuildingAllowed(User user) throws InvalidInputException {
 		LOG.info("Method isSurveyBuildingAllowed() started for user: " + user);
 		if (user == null) {
@@ -595,22 +602,22 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			// modifying options
 			SurveyQuestionsAnswerOption surveyQuestionsAnswerOption;
 			for (SurveyAnswerOptions answer : answers) {
-				if (surveyQuestionsAnswerIterator.hasNext()) {
-					surveyQuestionsAnswerOption = surveyQuestionsAnswerIterator.next();
-				}
-				else {
-					surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
-					
-					surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
-					surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
-					surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
-					surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-				}
-				
-				surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
-				surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-
 				if (answer != null && !answer.getAnswerText().equals("")) {
+					if (surveyQuestionsAnswerIterator.hasNext()) {
+						surveyQuestionsAnswerOption = surveyQuestionsAnswerIterator.next();
+					}
+					else {
+						surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
+						
+						surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
+						surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
+						surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
+						surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+					}
+					
+					surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
+					surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+
 					surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
 					LOG.info("Updating Answer with text: " + answer.getAnswerText());
 					surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
