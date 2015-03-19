@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -77,6 +78,13 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException {
 		SurveyQuestion surveyQuestion = surveyQuestionDao.findById(SurveyQuestion.class, surveyQuestionId);
 		return surveyQuestion;
+	}
+
+	@Override
+	@Transactional
+	public SurveyQuestion getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException {
+		SurveyQuestionsMapping surveyQuestionsMapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, surveyQuestionMappingId);
+		return surveyQuestionsMapping.getSurveyQuestion();
 	}
 
 	@Override
@@ -257,7 +265,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 	@Override
 	@Transactional
-	public void addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
+	public long addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestionDetails) throws InvalidInputException {
 		LOG.info("Method addQuestionToExistingSurvey() started.");
 		if (user == null) {
 			LOG.error("Invalid argument. Null value is passed for user.");
@@ -279,8 +287,10 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 		SurveyQuestion surveyQuestion = addNewQuestionsAndAnswers(user, survey, surveyQuestionDetails.getQuestion(),
 				surveyQuestionDetails.getQuestionType(), surveyQuestionDetails.getAnswers());
-		mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
+		long surveyQuestionMappingId = mapQuestionToSurvey(user, surveyQuestionDetails, surveyQuestion, survey, CommonConstants.STATUS_ACTIVE);
 		LOG.info("Method addQuestionToExistingSurvey() finished.");
+		
+		return surveyQuestionMappingId;
 	}
 
 	// JIRA SS-119 by RM-05
@@ -333,6 +343,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyQuestion surveyQuestion = new SurveyQuestion();
 		surveyQuestion.setSurveyQuestion(question);
 		surveyQuestion.setSurveyQuestionsCode(questionType);
+		surveyQuestion.setStatus(CommonConstants.STATUS_ACTIVE);
 		surveyQuestion.setCreatedBy(String.valueOf(user.getUserId()));
 		surveyQuestion.setModifiedBy(String.valueOf(user.getUserId()));
 		surveyQuestion.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -352,16 +363,17 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		SurveyQuestionsAnswerOption surveyQuestionsAnswerOption = null;
 		if (answers != null) {
 			for (SurveyAnswerOptions answer : answers) {
-				surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
-				surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
-				surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
-				surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
-				surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
-				surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
-				surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 				if (answer != null && !answer.getAnswerText().equals("")) {
+					surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
+					surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
+					surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
+					surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
+					surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
+					surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+					surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 					surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
 					surveyQuestionsAnswerOption.setAnswerOrder(answer.getAnswerOrder());
+
 					surveyQuestionsAnswerOptionDao.save(surveyQuestionsAnswerOption);
 					surveyQuestionsAnswerOptionDao.flush();
 				}
@@ -373,7 +385,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 	/**
 	 * Creates a new entry for new survey question mapping into database.
 	 */
-	private void mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey, int status) {
+	private long mapQuestionToSurvey(User user, SurveyQuestionDetails surveyQuestionDetails, SurveyQuestion surveyQuestion, Survey survey, int status) {
 		LOG.debug("Method mapQuestionToSurvey() started to map questions with survey.");
 		SurveyQuestionsMapping surveyQuestionsMapping = new SurveyQuestionsMapping();
 		surveyQuestionsMapping.setIsRatingQuestion(surveyQuestionDetails.getIsRatingQuestion());
@@ -400,6 +412,7 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		surveyQuestionsMappingDao.flush();
 
 		LOG.debug("Method mapQuestionToSurvey() finished.");
+		return surveyQuestionsMapping.getSurveyQuestionsMappingId();
 	}
 
 	@Override
@@ -584,22 +597,41 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 		List<SurveyQuestionsAnswerOption> surveyQuestionsAnswerOptionList = surveyQuestion.getSurveyQuestionsAnswerOptions();
 
 		if (answers != null && surveyQuestionsAnswerOptionList != null) {
-			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : surveyQuestionsAnswerOptionList) {
-				for (SurveyAnswerOptions answer : answers) {
-
-					if (surveyQuestionsAnswerOption.getSurveyQuestionsAnswerOptionsId() != answer.getAnswerId()) {
-						continue;
+			Iterator<SurveyQuestionsAnswerOption> surveyQuestionsAnswerIterator = surveyQuestionsAnswerOptionList.iterator();
+			
+			// modifying options
+			SurveyQuestionsAnswerOption surveyQuestionsAnswerOption;
+			for (SurveyAnswerOptions answer : answers) {
+				if (answer != null && !answer.getAnswerText().equals("")) {
+					if (surveyQuestionsAnswerIterator.hasNext()) {
+						surveyQuestionsAnswerOption = surveyQuestionsAnswerIterator.next();
 					}
+					else {
+						surveyQuestionsAnswerOption = new SurveyQuestionsAnswerOption();
+						
+						surveyQuestionsAnswerOption.setSurveyQuestion(surveyQuestion);
+						surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_ACTIVE);
+						surveyQuestionsAnswerOption.setCreatedBy(String.valueOf(user.getUserId()));
+						surveyQuestionsAnswerOption.setCreatedOn(new Timestamp(System.currentTimeMillis()));
+					}
+					
 					surveyQuestionsAnswerOption.setModifiedBy(String.valueOf(user.getUserId()));
 					surveyQuestionsAnswerOption.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 
-					if (answer != null && !answer.getAnswerText().equals("")) {
-						surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
-						LOG.info("Updating Answer with text: " + answer.getAnswerText());
-						surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
-						surveyQuestionsAnswerOptionDao.flush();
-					}
+					surveyQuestionsAnswerOption.setAnswer(answer.getAnswerText());
+					LOG.info("Updating Answer with text: " + answer.getAnswerText());
+					surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
+					surveyQuestionsAnswerOptionDao.flush();
 				}
+			}
+			
+			// removing extra options
+			while (surveyQuestionsAnswerIterator.hasNext()) {
+				surveyQuestionsAnswerOption = surveyQuestionsAnswerIterator.next();
+				surveyQuestionsAnswerOption.setStatus(CommonConstants.STATUS_INACTIVE);
+				
+				surveyQuestionsAnswerOptionDao.saveOrUpdate(surveyQuestionsAnswerOption);
+				surveyQuestionsAnswerOptionDao.flush();
 			}
 		}
 		LOG.debug("Method modifyAnswersToQuestion() finished.");

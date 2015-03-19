@@ -50,8 +50,16 @@
 					</div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-lname"></div>
-						<input class="rfr_txt_fld" id="complete-reg-lname"
-							name="lastName" value="${lastName}" placeholder='<spring:message code="label.lastname.key" />'>
+					<c:choose>
+						<c:when test="${not empty lastName && not lastName eq 'null'}">
+							<input class="rfr_txt_fld" id="complete-reg-lname" name="lastName" value="${lastName}" 
+								placeholder='<spring:message code="label.lastname.key" />'>
+						</c:when>
+						<c:otherwise>
+							<input class="rfr_txt_fld" id="complete-reg-lname" name="lastName"
+								placeholder="<spring:message code="label.lastname.key" />">
+						</c:otherwise>
+					</c:choose>
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +20,9 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyDetail;
+import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -90,11 +93,12 @@ public class SurveyBuilderController {
 	public String addQuestionToExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
+		Map<String, String> statusMap = new HashMap<String, String>();
 		String message = "";
+		String statusJson = "";
 
 		try {
-			
-			//Check if survey is default one and clone it
+			// Check if survey is default one and clone it
 			surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
 			
 			// Getting the survey for user
@@ -102,13 +106,16 @@ public class SurveyBuilderController {
 			if (survey == null) {
 				survey = surveyBuilder.createNewSurvey(user);
 			}
+			
+			// Order of question 
+			String order = request.getParameter("order");
 
 			// Creating new SurveyQuestionDetails from form
-			String questionType = request.getParameter("sb-question-type");
+			String questionType = request.getParameter("sb-question-type-" + order);
 			int activeQuestionsInSurvey = (int) surveyBuilder.countActiveQuestionsInSurvey(survey);
 
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
-			questionDetails.setQuestion(request.getParameter("sb-question-txt"));
+			questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setQuestionOrder(activeQuestionsInSurvey + 1);
 
@@ -121,41 +128,52 @@ public class SurveyBuilderController {
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
-				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers[]"));
+				List<String> strAnswers = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
 
 				SurveyAnswerOptions surveyAnswerOptions;
 				int answerOrder = 1;
 				for (String answerStr : strAnswers) {
-					if (answerStr.equals("")) {
-						LOG.error("Answer text cannot be empty !");
-						throw new InvalidInputException("Answer text cannot be empty !");
-					}
-					surveyAnswerOptions = new SurveyAnswerOptions();
-					surveyAnswerOptions.setAnswerText(answerStr);
-					surveyAnswerOptions.setAnswerOrder(answerOrder);
-					answers.add(surveyAnswerOptions);
+					if (!answerStr.equals("")) {
+						surveyAnswerOptions = new SurveyAnswerOptions();
+						surveyAnswerOptions.setAnswerText(answerStr);
+						surveyAnswerOptions.setAnswerOrder(answerOrder);
+						answers.add(surveyAnswerOptions);
 
-					answerOrder++;
+						answerOrder++;
+					}
 				}
+				if (answerOrder <= 2) {
+					LOG.error("Atleast enter two options");
+					throw new InvalidInputException("Atleast enter two options");
+				}
+
 				questionDetails.setAnswers(answers);
 			}
-
+			
 			// Adding the question to survey
-			surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
-
+			long surveyQuestionMappingId = surveyBuilder.addQuestionToExistingSurvey(user, survey, questionDetails);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MAPPING_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
+
+			statusMap.put("questionId", surveyQuestionMappingId + "");
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
+			
 			LOG.info("Method addQuestionToExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_SURVEY_ANSWER, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
 		catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
-		return message;
+		
+		statusMap.put("message", message);
+		statusJson = new Gson().toJson(statusMap);
+		return statusJson;
 	}
 
 	/**
@@ -170,70 +188,82 @@ public class SurveyBuilderController {
 	public String updateQuestionFromExistingSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
+		Map<String, String> statusMap = new HashMap<String, String>();
 		String message = "";
+		String statusJson = "";
 
-		try {			
-			//Check if survey is default one and clone it
+		try {
+			// Check if survey is default one and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+
 			long surveyQuestionId;
-			
-			if(oldToNewQuestionMap != null){
+			if (oldToNewQuestionMap != null) {
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
 				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
-			else{
+			else {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-
 			}
-			String questionType = request.getParameter("sb-question-edit-type");
 
+			// Order of question 
+			String order = request.getParameter("order");
+
+			// Creating new SurveyQuestionDetails from form
+			String questionType = request.getParameter("sb-question-type-" + order);
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
-			questionDetails.setQuestion(request.getParameter("sb-question-edit-txt"));
+			questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setIsRatingQuestion(1);
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
-				List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
-				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
+				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
 
+				int answerOrder = 1;
 				SurveyAnswerOptions surveyAnswer;
-				int answerOrder = 0;
-				for (String answerIdStr : strAnswerIds) {
-					long answerId = Long.parseLong(answerIdStr);
+				for (String answerStr : strAnswerTexts) {
+					if (!answerStr.equals("")) {
+						surveyAnswer = new SurveyAnswerOptions();
+						surveyAnswer.setAnswerText(answerStr);
+						surveyAnswer.setAnswerOrder(answerOrder);
+						answers.add(surveyAnswer);
 
-					surveyAnswer = new SurveyAnswerOptions();
-					String answerStr = strAnswerTexts.get(answerOrder);
-					if (answerStr.equals("")) {
-						LOG.error("Answer text cannot be empty");
-						throw new InvalidInputException("Answer text cannot be empty !");
+						answerOrder++;
 					}
-					surveyAnswer.setAnswerText(answerStr);
-					surveyAnswer.setAnswerId(answerId);
-					answers.add(surveyAnswer);
-
-					answerOrder++;
+				}
+				
+				if (answerOrder <= 2) {
+					LOG.error("Atleast enter two options");
+					throw new InvalidInputException("Atleast enter two options");
 				}
 				questionDetails.setAnswers(answers);
 			}
 			surveyBuilder.updateQuestionAndAnswers(user, surveyQuestionId, questionDetails);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_MODIFY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
+			
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 			LOG.info("Method updateQuestionFromExistingSurvey of SurveyBuilderController finished successfully");
 		}
 		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException while updating question. Reason:" + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while updating question. Reason: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
 		catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException while adding Question to Survey: " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.NO_SURVEY_FOUND, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.ERROR);
 		}
-		return message;
+
+		statusMap.put("message", message);
+		statusJson = new Gson().toJson(statusMap);
+		return statusJson;
 	}
 
 	/**
@@ -251,18 +281,16 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			
-			//Check if default survey is mapped and clone it
+			// Check if default survey is mapped and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
+
 			long surveyQuestionId;
-			
-			if(oldToNewQuestionMap != null){
+			if (oldToNewQuestionMap != null) {
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
 				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
-			else{
+			else {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-
 			}
 
 			surveyBuilder.deactivateQuestionSurveyMapping(user, surveyQuestionId);
@@ -300,21 +328,19 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			//Check if default survey is mapped and clone it
+			// Check if default survey is mapped and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
-			
+
 			String questionIdsStr = request.getParameter("questionIds");
 			List<String> surveyQuestionIdStrs = Arrays.asList(questionIdsStr.split(","));
 
-			LOG.info(questionIdsStr);
 			for (String questionIdStr : surveyQuestionIdStrs) {
-				if(oldToNewQuestionMap != null){
+				if (oldToNewQuestionMap != null) {
 					LOG.info(" Mapping question id : " + questionIdStr + " to : " + oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
 					surveyBuilder.deactivateQuestionSurveyMapping(user, oldToNewQuestionMap.get(Long.parseLong(questionIdStr)));
 				}
-				else{
+				else {
 					surveyBuilder.deactivateQuestionSurveyMapping(user, Long.parseLong(questionIdStr));
-
 				}
 			}
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTIONS_DISABLE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
@@ -347,20 +373,19 @@ public class SurveyBuilderController {
 		String message = "";
 
 		try {
-			//Check if default survey is mapped and clone it
+			// Check if default survey is mapped and clone it
 			Map<Long, Long> oldToNewQuestionMap = surveyBuilder.checkIfSurveyIsDefaultAndClone(user);
-			long surveyQuestionId;
 			
-			if(oldToNewQuestionMap != null){
+			long surveyQuestionId;
+			if (oldToNewQuestionMap != null) {
 				surveyQuestionId = oldToNewQuestionMap.get(Long.parseLong(request.getParameter("questionId")));
 				LOG.info(" Mapping question id : " + surveyQuestionId + " to : " + oldToNewQuestionMap.get(surveyQuestionId));
 			}
-			else{
+			else {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
-
 			}
-			String reorderType = request.getParameter("reorderType");
 
+			String reorderType = request.getParameter("reorderType");
 			surveyBuilder.reorderQuestion(user, surveyQuestionId, reorderType);
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.SURVEY_QUESTION_REORDER_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
 					.getMessage();
@@ -424,6 +449,50 @@ public class SurveyBuilderController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return surveyJson;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/getsurveyquestion", method = RequestMethod.GET)
+	public String getSurveyQuestionDetails(Model model, HttpServletRequest request) {
+		LOG.info("Method getSurveyQuestionDetails of SurveyBuilderController called");
+		String surveyQuestionJson = "";
+
+		SurveyQuestionDetails surveyQuestion = new SurveyQuestionDetails();
+		try {
+			long questionMappingId = Long.parseLong(request.getParameter("questionId"));
+			SurveyQuestion question = surveyBuilder.getSurveyQuestionFromMapping(questionMappingId);
+
+			surveyQuestion.setQuestionId(questionMappingId);
+			surveyQuestion.setQuestion(question.getSurveyQuestion());
+			surveyQuestion.setQuestionType(question.getSurveyQuestionsCode());
+
+			// For each answer
+			SurveyAnswerOptions surveyAnswerOptions = null;
+			List<SurveyAnswerOptions> answerOptionsToQuestion = new ArrayList<SurveyAnswerOptions>();
+			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : question.getSurveyQuestionsAnswerOptions()) {
+				if (surveyQuestionsAnswerOption.getStatus() != CommonConstants.STATUS_ACTIVE) {
+					continue;
+				}
+				
+				surveyAnswerOptions = new SurveyAnswerOptions();
+
+				surveyAnswerOptions.setAnswerId(surveyQuestionsAnswerOption.getSurveyQuestionsAnswerOptionsId());
+				surveyAnswerOptions.setAnswerText(surveyQuestionsAnswerOption.getAnswer());
+				surveyAnswerOptions.setAnswerOrder(surveyQuestionsAnswerOption.getAnswerOrder());
+
+				answerOptionsToQuestion.add(surveyAnswerOptions);
+			}
+			surveyQuestion.setAnswers(answerOptionsToQuestion);
+			
+			// Converting to json
+			surveyQuestionJson = new Gson().toJson(surveyQuestion);
+			LOG.info("Method getSurveyQuestionDetails of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			LOG.warn("InvalidInputException while fetching SurveyQuestion: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return surveyQuestionJson;
 	}
 
 	/**

@@ -124,7 +124,8 @@
     }
     .header-links{
         background-color: #fff;
-        height: auto;
+        overflow: auto;
+        height: 100%;
         position: absolute;
         width: 100%;
         margin: 0;
@@ -982,6 +983,7 @@
         width: auto;
         top: 0px;
         padding: 0;
+        width: 275px;
     }
     .dash-main-left{
         height: 310px;
@@ -1121,14 +1123,12 @@
     .srv-tbl-txt {
         font-size: 13px;
     }
-    .float-right.srv-tbl-rem, .float-right.srv-tbl-edit{
+    .float-left.srv-tbl-rem, .float-left.srv-tbl-edit{
         float: left !important;
         font-size: 13px;
         line-height: 26px;
-        margin-bottom: 15px;
     }
     .srv-tbl-rem{
-        margin-left: 108px;
         margin-right: 0px;
     }
     .bd-svry-header{
@@ -1159,7 +1159,6 @@
         margin-top: 5px;
     }
     .bd-q-pu-done-wrapper{
-        width: 172px;
         margin: 10px auto 0;
     }
     .bd-q-btn-cancel{
@@ -1231,6 +1230,18 @@
         background-size: 32px auto;
         position: absolute;
         right: 10px;
+    }
+    .srv-tbl-move-up, .srv-tbl-move-dn{
+        height: 26px;
+        float: left !important;
+    }
+    .srv-tbl-btns{
+        float: left !important;
+        margin-left: 51px;
+        margin-bottom: 10px;
+    }
+    .srv-tbl-move-dn{
+        margin-left: 10px;
     }
 }
 
