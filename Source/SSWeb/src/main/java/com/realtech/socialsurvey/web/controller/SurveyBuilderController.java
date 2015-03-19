@@ -131,16 +131,18 @@ public class SurveyBuilderController {
 				SurveyAnswerOptions surveyAnswerOptions;
 				int answerOrder = 1;
 				for (String answerStr : strAnswers) {
-					if (answerStr.equals("")) {
+					/*if (answerStr.equals("")) {
 						LOG.error("Answer text cannot be empty !");
 						throw new InvalidInputException("Answer text cannot be empty !");
-					}
-					surveyAnswerOptions = new SurveyAnswerOptions();
-					surveyAnswerOptions.setAnswerText(answerStr);
-					surveyAnswerOptions.setAnswerOrder(answerOrder);
-					answers.add(surveyAnswerOptions);
+					}*/
+					if (!answerStr.equals("")) {
+						surveyAnswerOptions = new SurveyAnswerOptions();
+						surveyAnswerOptions.setAnswerText(answerStr);
+						surveyAnswerOptions.setAnswerOrder(answerOrder);
+						answers.add(surveyAnswerOptions);
 
-					answerOrder++;
+						answerOrder++;
+					}
 				}
 				questionDetails.setAnswers(answers);
 			}
@@ -199,20 +201,41 @@ public class SurveyBuilderController {
 				surveyQuestionId = Long.parseLong(request.getParameter("questionId"));
 			}
 
-			String questionType = request.getParameter("sb-question-edit-type");
+			// Order of question 
+			String order = request.getParameter("order");
+
+			// Creating new SurveyQuestionDetails from form
+			String questionType = request.getParameter("sb-question-type-" + order);
+			// String questionType = request.getParameter("sb-question-edit-type");
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
-			questionDetails.setQuestion(request.getParameter("sb-question-edit-txt"));
+			questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
+			// questionDetails.setQuestion(request.getParameter("sb-question-edit-txt"));
 			questionDetails.setQuestionType(questionType);
 			questionDetails.setIsRatingQuestion(1);
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
-				List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
-				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
+				// List<String> strAnswerIds = Arrays.asList(request.getParameterValues("sb-edit-answers-id[]"));
+				List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-answers-" + order + "[]"));
+				// List<String> strAnswerTexts = Arrays.asList(request.getParameterValues("sb-edit-answers-text[]"));
 
+				int answerOrder = 1;
 				SurveyAnswerOptions surveyAnswer;
-				int answerOrder = 0;
-				for (String answerIdStr : strAnswerIds) {
+				for (String answerStr : strAnswerTexts) {
+					/*if (answerStr.equals("")) {
+						LOG.error("Answer text cannot be empty");
+						throw new InvalidInputException("Answer text cannot be empty !");
+					}*/
+					if (!answerStr.equals("")) {
+						surveyAnswer = new SurveyAnswerOptions();
+						surveyAnswer.setAnswerText(answerStr);
+						surveyAnswer.setAnswerOrder(answerOrder);
+						answers.add(surveyAnswer);
+
+						answerOrder++;
+					}
+				}
+				/*for (String answerIdStr : strAnswerIds) {
 					long answerId = Long.parseLong(answerIdStr);
 
 					surveyAnswer = new SurveyAnswerOptions();
@@ -226,7 +249,7 @@ public class SurveyBuilderController {
 					answers.add(surveyAnswer);
 
 					answerOrder++;
-				}
+				}*/
 				questionDetails.setAnswers(answers);
 			}
 			surveyBuilder.updateQuestionAndAnswers(user, surveyQuestionId, questionDetails);

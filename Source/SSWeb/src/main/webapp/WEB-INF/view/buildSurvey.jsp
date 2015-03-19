@@ -14,7 +14,7 @@
 		<div class="bd-q-wrapper">
 			
 			<div class="bd-quest-item">
-			<form id="bs-question-1" data-quesnum="1" data-state="new">
+			<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new">
 				<div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
 					<div class="float-left bd-q-pu-header-lft"><spring:message code="label.create.surveyquestions.key" /></div>
 					<div class="float-right bd-q-pu-header-rt cursor-pointer"><spring:message code="label.needhelp.key" /></div>
