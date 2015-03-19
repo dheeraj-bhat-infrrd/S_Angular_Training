@@ -20,7 +20,9 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Survey;
 import com.realtech.socialsurvey.core.entities.SurveyAnswerOptions;
 import com.realtech.socialsurvey.core.entities.SurveyDetail;
+import com.realtech.socialsurvey.core.entities.SurveyQuestion;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
+import com.realtech.socialsurvey.core.entities.SurveyQuestionsAnswerOption;
 import com.realtech.socialsurvey.core.entities.SurveyTemplate;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -447,6 +449,50 @@ public class SurveyBuilderController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return surveyJson;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/getsurveyquestion", method = RequestMethod.GET)
+	public String getSurveyQuestionDetails(Model model, HttpServletRequest request) {
+		LOG.info("Method getSurveyQuestionDetails of SurveyBuilderController called");
+		String surveyQuestionJson = "";
+
+		SurveyQuestionDetails surveyQuestion = new SurveyQuestionDetails();
+		try {
+			long questionMappingId = Long.parseLong(request.getParameter("questionId"));
+			SurveyQuestion question = surveyBuilder.getSurveyQuestionFromMapping(questionMappingId);
+
+			surveyQuestion.setQuestionId(questionMappingId);
+			surveyQuestion.setQuestion(question.getSurveyQuestion());
+			surveyQuestion.setQuestionType(question.getSurveyQuestionsCode());
+
+			// For each answer
+			SurveyAnswerOptions surveyAnswerOptions = null;
+			List<SurveyAnswerOptions> answerOptionsToQuestion = new ArrayList<SurveyAnswerOptions>();
+			for (SurveyQuestionsAnswerOption surveyQuestionsAnswerOption : question.getSurveyQuestionsAnswerOptions()) {
+				if (surveyQuestionsAnswerOption.getStatus() != CommonConstants.STATUS_ACTIVE) {
+					continue;
+				}
+				
+				surveyAnswerOptions = new SurveyAnswerOptions();
+
+				surveyAnswerOptions.setAnswerId(surveyQuestionsAnswerOption.getSurveyQuestionsAnswerOptionsId());
+				surveyAnswerOptions.setAnswerText(surveyQuestionsAnswerOption.getAnswer());
+				surveyAnswerOptions.setAnswerOrder(surveyQuestionsAnswerOption.getAnswerOrder());
+
+				answerOptionsToQuestion.add(surveyAnswerOptions);
+			}
+			surveyQuestion.setAnswers(answerOptionsToQuestion);
+			
+			// Converting to json
+			surveyQuestionJson = new Gson().toJson(surveyQuestion);
+			LOG.info("Method getSurveyQuestionDetails of SurveyBuilderController finished successfully");
+		}
+		catch (InvalidInputException e) {
+			LOG.warn("InvalidInputException while fetching SurveyQuestion: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return surveyQuestionJson;
 	}
 
 	/**

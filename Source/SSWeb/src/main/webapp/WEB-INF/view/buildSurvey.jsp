@@ -13,7 +13,7 @@
 	<div class="container bd-q-container">
 		<div class="bd-q-wrapper">
 			
-			<div class="bd-quest-item">
+			<div id="bd-quest-item" class="bd-quest-item">
 			<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new" data-status="new">
 				<div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
 					<div class="float-left bd-q-pu-header-lft"><spring:message code="label.create.surveyquestions.key" /></div>
