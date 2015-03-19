@@ -1,5 +1,6 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row hm-header-row-main clearfix">
@@ -48,6 +49,8 @@
 <div id="temp-message" class="hide"></div>
 <input class="ignore-clear" type="hidden" name="isUserAuthorized" id="is-user-authorized" value="${isUserAuthorized}"/>
 <input class="ignore-clear" type="hidden" id="profile-name" value="${profileName}"/>
+<input class="ignore-clear" type="hidden" id="account-type" value="${user.company.licenseDetails[0].accountsMaster.accountName}"/>
+
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Build Hierarchy");
