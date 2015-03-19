@@ -2,7 +2,7 @@
  * js functions for hierarchy and user management
  */
 var usersStartIndex = 0;
-var numOfRows = 6;
+var numOfRows = 10;
 
 /**
  * function to display success/failure message to user after an action
@@ -131,7 +131,10 @@ function paintEditSection(data) {
 			return false;
 		});
 		return false;
-	}	
+	}
+	
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
 	
 	/**
 	 * bind the click events
@@ -213,25 +216,7 @@ function paintEditSection(data) {
 		$("#assign-to-txt").val($(this).html());
 		$("#assign-to-txt").attr("data-assignto",assignToOption);
 		
-		switch(assignToOption) {
-			case 'company':
-				disableRegionSelector();
-				disableOfficeSelector();
-				break;
-			case 'region':
-				$("#selected-region-txt").prop("disabled",false);
-				disableOfficeSelector();
-				$("#bd-region-selector").show();
-				break;
-			case 'office':
-				$("#selected-office-txt").prop("disabled",false);
-				$("#bd-office-selector").show();
-				disableRegionSelector();
-				break;
-			default:
-				$("#selected-region-txt").prop("disabled",false);
-				$("#selected-office-txt").prop("disabled",false);
-		}
+		showSelectorsByAssignToOption(assignToOption);
 		$("#assign-to-droplist").slideToggle(200);
 	});
 	
@@ -298,6 +283,32 @@ function paintEditSection(data) {
 			addIndividual("edit-individual-form");
 		}
 	});
+}
+/**
+ * Method to show/hide the other selectors based on the assign to option selected
+ * @param assignToOption
+ */
+function showSelectorsByAssignToOption(assignToOption) {
+	console.log("selector----------"+assignToOption);
+	switch(assignToOption) {
+	case 'company':
+		disableRegionSelector();
+		disableOfficeSelector();
+		break;
+	case 'region':
+		$("#selected-region-txt").prop("disabled",false);
+		disableOfficeSelector();
+		$("#bd-region-selector").show();
+		break;
+	case 'office':
+		$("#selected-office-txt").prop("disabled",false);
+		$("#bd-office-selector").show();
+		disableRegionSelector();
+		break;
+	default:
+		$("#selected-region-txt").prop("disabled",false);
+		$("#selected-office-txt").prop("disabled",false);
+	}
 }
 
 function showAdminPrivilegesChk(){
