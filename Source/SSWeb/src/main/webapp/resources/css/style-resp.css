@@ -2,6 +2,7 @@
 @media (max-width: 767px) {
     body{
         font-size: 12px;
+        -webkit-user-select: none;                  
     }
     .login-main-wrapper{
         background: #fff;
