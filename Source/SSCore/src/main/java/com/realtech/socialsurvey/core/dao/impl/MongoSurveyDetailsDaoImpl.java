@@ -178,17 +178,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// columnValue field can contain respective values for the columnName.
 
 	@Override
-	public long getSentSurveyCount(String columnName, long columnValue) {
+	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() started.");
-		Query query;
-		if (columnName == null) {
-			query = null;
-		}
-		else {
+		Date startDate = getNdaysBackDate(noOfDays);
+
+		Query query = new Query();
+		if (columnName != null) {
 			query = new Query(Criteria.where(columnName).is(columnValue));
 		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+	}
+
+	// This method returns all the surveys that have been clicked by customers so far.
+	// If columnName field is passed null value it returns count of all the survey.
+	// "columnName" field can contain either of "agentId/branchId/regionId/companyId".
+	// "columnValue" field can contain respective values for the columnName.
+
+	@Override
+	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays) {
+		LOG.info("Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started.");
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(noOfDays);
+		Query query = new Query(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true));
+		query.addCriteria(Criteria.where("surveyResponse").size(0));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
+		LOG.info("Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished.");
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// This method returns all the surveys that have been completed by customers so far.
@@ -197,14 +217,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// "columnValue" field can contain respective values for the columnName.
 
 	@Override
-	public long getCompletedSurveyCount(String columnName, long columnValue) {
+	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(noOfDays);
+		Query query = new Query(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// This method returns all the surveys that are not yet completed by customers.
@@ -213,14 +236,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// "columnValue" field can contain respective values for the columnName.
 
 	@Override
-	public long getIncompleteSurveyCount(String columnName, long columnValue) {
+	public long getIncompleteSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() started.");
-		Query query = new Query(Criteria.where("stage").ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(noOfDays);
+		Query query = new Query(Criteria.where(CommonConstants.STAGE_COLUMN).ne(CommonConstants.SURVEY_STAGE_COMPLETE));
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// This method returns a map of customers count based upon their mood.
@@ -320,7 +346,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
 		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
 		LOG.info("Method to get count of total number of surveys taken in a given month and year, getTotalSurveyCountByMonth() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	@Override
@@ -328,14 +354,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
 				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
-		Calendar calendar = Calendar.getInstance();
-		Date endDate = calendar.getTime();
-		calendar.add(5, noOfDays * (-1));
-		Date startDate = calendar.getTime();
-		if (noOfDays == -1) {
-			calendar.setTimeInMillis(0);
-			startDate = calendar.getTime();
-		}
+		Date startDate = getNdaysBackDate(noOfDays);
+		Date endDate = Calendar.getInstance().getTime();
 
 		Query query = new Query();
 
@@ -397,7 +417,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				.is(columnValue)
 				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
 						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
-		long count = mongoTemplate.count(query, SurveyDetails.class);
+		long count = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		if (count < 3) {
 			LOG.info(columnName + " " + columnValue + " does not qualify for calculation of rating. Returning...");
 			return -1;
@@ -418,30 +438,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	// Method to get count of posts shared by customers on various social networking sites for
 	// "agent/branch/region/company/all".
-	// Returns a map of Social Networking Site and posts count on that site.
+	// Returns posts count on that site.
 
 	@Override
-	public Map<String, Long> getSocialPostsCount(String columnName, long columnValue) {
+	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
-		TypedAggregation<SurveyDetails> aggregation;
-		if (columnName == null) {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation
-					.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(numberOfDays);
+		Query query = new Query(Criteria.where("sharedOn").exists(true));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		else {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
-					Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
-		}
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() finished.");
-		return postCountSplit;
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// Method to get count of surveys initiated by customers and agents separately.
@@ -490,7 +500,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 
-
 		/**
 		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
 		 * are to be fetched else fetch all the records
@@ -532,7 +541,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 
-
 		/**
 		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
 		 * are to be fetched else fetch all the records
@@ -553,5 +561,64 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount);
 		return feedBackCount;
 	}
+
+	/*
+	 * Returns a list of survey which are not yet competed by customers.Sorted on date (
+	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
+	 * value for respective column. limitScore is the max score under which reviews have to be shown
+	 */
+
+	@Override
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+		LOG.info("Method to fetch all the incomplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() started.");
+		Query query = new Query();
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		if (startScore > 0 && limitScore > 0) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		if (start > -1) {
+			query.skip(start);
+		}
+		if (rows > -1) {
+			query.limit(rows);
+		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
+		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+
+		LOG.info("Method to fetch all the incoplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() finished.");
+		return surveysWithReviews;
+	}
+	
+	/*
+	 *  Method to increase reminder count by 1.
+	 */
+	@Override
+	public void updateReminderCount(long agentId, String customerEmail){
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.inc(CommonConstants.REMINDER_COUNT_COLUMN, 1);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
+	}
+
+	private Date getNdaysBackDate(int noOfDays) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(5, noOfDays * (-1));
+		Date startDate = calendar.getTime();
+		if (noOfDays == -1) {
+			calendar.setTimeInMillis(0);
+			startDate = calendar.getTime();
+		}
+		return startDate;
+	}
+
 	// JIRA SS-137 and 158 : EOC
 }
