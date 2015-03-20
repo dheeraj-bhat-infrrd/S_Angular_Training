@@ -25,6 +25,8 @@ function populateActiveSurveyQuestions(response) {
 		setTimeout(function() {
 			showError(surveyDetail.status);
 		}, 3000);
+	} else {
+		hideError();
 	}
 	
 	if (surveyQuestions != null) {
@@ -116,75 +118,89 @@ $(document).on('mouseout', '.bd-srv-tbl-row', function() {
 // Add Survey Question overlay
 $('#btn-add-question').click(function() {
 	$('#bd-srv-pu').show();
-	$('body').addClass('body-no-scroll');
+	$(document).addClass('body-no-scroll');
 });
 
 function revertQuestionOverlay() {
 	$('#bd-quest-item').html(bdQuestItemRevert);
 	$('#bd-srv-pu').hide();
-	$('body').removeClass('body-no-scroll');
-	loadActiveSurveyQuestions();
+	$(document).removeClass('body-no-scroll');
 	currentQues = 1;
 }
 
-$('.bd-q-btn-done').click(function() {
-	createPopupConfirm("Discard Changes", "You have unsaved Changes", "Save", "Cancel");
-	
-	var lastQuestion = currentQues - 1;
-	$('body').on('click', '#overlay-continue', function(){
-		// submit for adding question
-		if (lastQuestion > 0 && $('#bs-question-' + lastQuestion).attr('data-state') == 'new'
-			&& $('#bs-question-' + lastQuestion).attr('data-status') == 'edited') {
-			
-			if ($('#sb-question-txt-' + lastQuestion).val() == '' || $('#sb-question-type-' + lastQuestion).val() == '') {
-				$("#overlay-toast").html('Please finish adding the Question');
-				showToast();
-			} else {
-				var url = "./addquestiontosurvey.do?order=" + lastQuestion;
-				$('#bs-question-' + lastQuestion).attr('data-state', 'editable');
-				$('#bs-question-' + quesOrder).attr('data-status', 'new');
-				callAjaxFormSubmit(url, function(data) {
-					var map =  $.parseJSON(data);
-					$("#overlay-toast").html(map.message);
+$('.bd-q-btn-done').click(function(e) {
+	e.stopPropagation();
+	createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
+
+	$('#overlay-continue').click(function(){
+		var lastQuestion = currentQues - 1;
+		var count = 1;
+		while (count <= lastQuestion) {
+			// submit for adding question
+			if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'new'
+				&& $('#bs-question-' + count).attr('data-status') == 'edited') {
+				
+				if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
+					$("#overlay-toast").html('Please finish adding the Question');
 					showToast();
-					
-					if (map.status == "success") {
-						$('#bs-question-' + lastQuestion).attr('data-quesref', map.questionId);
-						revertQuestionOverlay();
-					} else {
-						$('#bs-question-' + quesOrder).attr('data-state', 'new');
-						$('#bs-question-' + quesOrder).attr('data-status', 'edited');
-					}
-				}, 'bs-question-' + lastQuestion);
+				} else {
+					var url = "./addquestiontosurvey.do?order=" + count;
+					$('#bs-question-' + count).attr('data-state', 'editable');
+					$('#bs-question-' + count).attr('data-status', 'new');
+					callAjaxFormSubmit(url, function(data) {
+						var map =  $.parseJSON(data);
+						$("#overlay-toast").html(map.message);
+						showToast();
+						
+						if (map.status == "success") {
+							$('#bs-question-' + count).attr('data-quesref', map.questionId);
+							revertQuestionOverlay();
+						} else {
+							$('#bs-question-' + count).attr('data-state', 'new');
+							$('#bs-question-' + count).attr('data-status', 'edited');
+						}
+					}, 'bs-question-' + count);
+				}
 			}
-		}
-		// submit for modifying question
-		else if (lastQuestion > 0 && $('#bs-question-' + lastQuestion).attr('data-state') == 'editable'
-			&& $('#bs-question-' + lastQuestion).attr('data-status') == 'edited') {
-			
-			if ($('#sb-question-txt-' + lastQuestion).val() == '' || $('#sb-question-type-' + lastQuestion).val() == '') {
-				$("#overlay-toast").html('Please finish editing the Question');
-				showToast();
-			} else {
-				var questionId = $('#bs-question-' + lastQuestion).attr('data-quesref');
-				var url = "./updatequestionfromsurvey.do?order=" + lastQuestion + "&questionId=" + questionId;
-				callAjaxFormSubmit(url, function(data) {
-					var map =  $.parseJSON(data);
-					$("#overlay-toast").html(map.message);
+			// submit for modifying question
+			else if (count > 0 && $('#bs-question-' + count).attr('data-state') == 'editable'
+				&& $('#bs-question-' + count).attr('data-status') == 'edited') {
+				
+				if ($('#sb-question-txt-' + count).val() == '' || $('#sb-question-type-' + count).val() == '') {
+					$("#overlay-toast").html('Please finish editing the Question');
 					showToast();
-					
-					if (map.status == "success") {
-						revertQuestionOverlay();
-						$('#bs-question-' + quesOrder).attr('data-status', 'new');
-					} else {
-						$('#bs-question-' + quesOrder).attr('data-status', 'edited');
-					}
-				}, 'bs-question-' + lastQuestion);
+				} else {
+					var questionId = $('#bs-question-' + count).attr('data-quesref');
+					var url = "./updatequestionfromsurvey.do?order=" + count + "&questionId=" + questionId;
+					callAjaxFormSubmit(url, function(data) {
+						var map =  $.parseJSON(data);
+						$("#overlay-toast").html(map.message);
+						showToast();
+						
+						if (map.status == "success") {
+							revertQuestionOverlay();
+							$('#bs-question-' + count).attr('data-status', 'new');
+						} else {
+							$('#bs-question-' + count).attr('data-status', 'edited');
+						}
+					}, 'bs-question-' + count);
+				}
 			}
+			count ++;
 		}
 		
+		loadActiveSurveyQuestions();
 		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
 		overlayRevert();
+	});
+	$('#overlay-cancel').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		overlayRevert();
+		
+		revertQuestionOverlay();
+		loadActiveSurveyQuestions();
 	});
 });
 
@@ -407,7 +423,7 @@ $(document).on('click', '.bd-com-chk', function() {
 	}
 });
 
-// Add another question and submit previous
+// Submit previous question
 var currentQues = 1;
 $(document).on("focus", '.bd-q-pu-txt', function() {
 	var quesOrder = $(this).closest('form').data('quesnum') - 1;
@@ -563,14 +579,14 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 	}*/
 });
 
-$('body').on('blur', '.bd-mcq-txt', function(){
+$(document).on('blur', '.bd-mcq-txt', function(){
 	// changing status to edited
 	var addMcqTextOption = $(this).attr('name')[$(this).attr('name').length - 3];
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
 });
 
-$('body').on('blur', '.bd-mcq-txt', function(){
+$(document).on('blur', '.bd-mcq-txt', function(){
 	if ($(this).parent().is(':last-child')) {
 		var addMcqTextOption = $(this).attr('name')[$(this).attr('name').length - 3];
 
@@ -587,7 +603,7 @@ $('body').on('blur', '.bd-mcq-txt', function(){
 	}
 });
 
-$('body').on('click', '.bd-mcq-close', function(){
+$(document).on('click', '.bd-mcq-close', function(){
 	$(this).parent().remove();
 	
 	// changing status to edited
@@ -597,22 +613,29 @@ $('body').on('click', '.bd-mcq-close', function(){
 });
 
 // Remove Question from survey
-$('body').on('click', '.srv-tbl-rem', function(e){
+$(document).on('click', '.srv-tbl-rem', function(e){
 	e.stopPropagation();
 	var questionId = $(this).parent().parent().data('questionid');
 	var url = "./removequestionfromsurvey.do?questionId=" + questionId;
 	
 	createPopupConfirm("Delete Question", "Do you want to delete the question ?", "Delete", "Cancel");
-	$('body').on('click', '#overlay-continue', function(){
-		callAjaxPOST(url, commonActiveSurveyCallback, true);
-		
+	$('#overlay-continue').click(function(){
 		overlayRevert();
 		$('#overlay-continue').unbind('click');
+
+		callAjaxPOST(url, commonActiveSurveyCallback, true);
+	});
+	$('#overlay-cancel').click(function(){
+		$('#overlay-continue').unbind('click');
+		$('#overlay-cancel').unbind('click');
+		overlayRevert();
+		
+		loadActiveSurveyQuestions();
 	});
 });
 
 // Reorder Question in survey
-$('body').on('click', '.srv-tbl-move-up', function(){
+$(document).on('click', '.srv-tbl-move-up', function(){
 	var formData = new FormData();
 	formData.append("questionId", $(this).parent().parent().data('questionid'));
 	formData.append("reorderType", "up");
@@ -620,7 +643,7 @@ $('body').on('click', '.srv-tbl-move-up', function(){
 	callAjaxPOSTWithTextData("./reorderQuestion.do", commonActiveSurveyCallback, true, formData);
 });
 
-$('body').on('click', '.srv-tbl-move-dn', function(){
+$(document).on('click', '.srv-tbl-move-dn', function(){
 	var formData = new FormData();
 	formData.append("questionId", $(this).parent().parent().data('questionid'));
 	formData.append("reorderType", "down");
@@ -644,12 +667,6 @@ function overlayRevert() {
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
 }
-$('body').on('click', '#overlay-cancel', function(){
-	$('#overlay-continue').unbind('click');
-	overlayRevert();
-	
-	revertQuestionOverlay();
-});
 
 // Progress Bar
 function hideProgress(formId) {

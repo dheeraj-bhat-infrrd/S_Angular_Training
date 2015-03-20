@@ -213,7 +213,13 @@ public class SurveyBuilderController {
 			SurveyQuestionDetails questionDetails = new SurveyQuestionDetails();
 			questionDetails.setQuestion(request.getParameter("sb-question-txt-" + order));
 			questionDetails.setQuestionType(questionType);
-			questionDetails.setIsRatingQuestion(1);
+
+			if (questionType.indexOf(CommonConstants.QUESTION_RATING) != -1) {
+				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_TRUE);
+			}
+			else {
+				questionDetails.setIsRatingQuestion(CommonConstants.QUESTION_RATING_VALUE_FALSE);
+			}
 
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
 				List<SurveyAnswerOptions> answers = new ArrayList<SurveyAnswerOptions>();
