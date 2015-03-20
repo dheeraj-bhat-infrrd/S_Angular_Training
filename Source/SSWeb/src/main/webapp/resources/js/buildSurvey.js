@@ -330,7 +330,7 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 $(document).on('input', '.bd-mcq-txt', function(){
 	// changing status to edited
 	var name = $(this).attr('name');
-	var addMcqTextOption = name.substr(name.lastIndexOf("-") + 1, 2);
+	var addMcqTextOption = name.substring(name.lastIndexOf("-") + 1, name.lastIndexOf("["));
 	
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
@@ -339,7 +339,7 @@ $(document).on('input', '.bd-mcq-txt', function(){
 $(document).on('blur', '.bd-mcq-txt', function(){
 	if ($(this).parent().is(':last-child')) {
 		var name = $(this).attr('name');
-		var addMcqTextOption = name.substr(name.lastIndexOf("-") + 1, 2);
+		var addMcqTextOption = name.substring(name.lastIndexOf("-") + 1, name.lastIndexOf("["));
 
 		// changing status to edited
 		showStatus('#bs-question-' + addMcqTextOption, 'Edited');
@@ -359,7 +359,7 @@ $(document).on('click', '.bd-mcq-close', function(){
 	
 	// changing status to edited
 	var name = $(this).attr('name');
-	var addMcqTextOption = name.substr(name.lastIndexOf("-") + 1, 2);
+	var addMcqTextOption = name.substring(name.lastIndexOf("-") + 1, name.lastIndexOf("["));
 
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
