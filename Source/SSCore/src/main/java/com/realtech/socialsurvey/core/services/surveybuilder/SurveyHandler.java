@@ -42,9 +42,11 @@ public interface SurveyHandler {
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
 	
 	public String getApplicationBaseUrl();
-
-	public String getSwearWords();
 	
 	public void updateSurveyAsClicked(long agentId, String customerEmail);
+	
+	public String getSwearWords();
+
+	public void updateReminderCount(long agentId, String customerEmail);
 
 }

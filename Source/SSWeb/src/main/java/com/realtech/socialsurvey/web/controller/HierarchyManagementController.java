@@ -972,6 +972,42 @@ public class HierarchyManagementController {
 
 	}
 
+	// JIRA SS-137 BY RM-05 : BOC
+	/**
+	 * Method to fetch branch along with settings for update
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/fetchbranchesforregion", method = RequestMethod.GET)
+	public String fetchBranchesInRegion(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchBranchesInRegion called in controller");
+		String strRegionId = request.getParameter("regionId");
+		long regionId = 0l;
+		String branches = null;
+		try {
+			try {
+				regionId = Long.parseLong(strRegionId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing regionId in fetchBranchesInRegion.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			branches = solrSearchService.searchBranchesByRegion(regionId, CommonConstants.INITIAL_INDEX, -1);
+			LOG.debug("Fetched branch .branchToUpdateJson is :" + branches);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching branches in a region. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method fetchBranchesInRegion finished in controller. Returning : " + branches);
+		return branches;
+
+	}
+	// JIRA SS-137 BY RM-05 : EOC
+	
 	/**
 	 * Method to get page containing form for editing region
 	 * 

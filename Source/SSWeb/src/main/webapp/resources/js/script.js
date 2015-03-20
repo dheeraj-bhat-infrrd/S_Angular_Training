@@ -7,8 +7,8 @@ var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\")
 var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
-var nameRegex = /^[a-zA-Z]*$/;
-var lastNameRegEx = /^[a-zA-Z ]*$/;
+var nameRegex = /^[a-zA-Z ]*$/;
+var lastNameRegEx = /^[a-zA-Z0-9 ]*$/;
 var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
 var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
@@ -29,7 +29,7 @@ function buildMessageDiv(){
 function showError(msg){
 	buildMessageDiv();
     $('#err-nw-txt').html(msg);
-    $('#err-nw-wrapper').removeClass('bg-black-info');
+    $('#err-nw-wrapper').removeClass('bg-black-success');
     $('#err-nw-wrapper').slideDown(200);
     $(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
