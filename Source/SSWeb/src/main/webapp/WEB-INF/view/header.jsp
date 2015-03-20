@@ -56,7 +56,7 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="header-links-item">
@@ -104,7 +104,7 @@
 			<div class="float-left hdr-logo"></div>
 			<div class="float-left hdr-links clearfix">
 				<div class="hdr-link-item hdr-link-active">
-					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
 				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
 					<div class="hdr-link-item">
