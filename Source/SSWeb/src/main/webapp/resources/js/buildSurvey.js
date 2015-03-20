@@ -61,7 +61,7 @@ $('#btn-add-question').click(function() {
 function revertQuestionOverlay() {
 	var url = "./revertquestionoverlay.do";
 	callAjaxGET(url, function(data) {
-		$('#bd-quest-item').html(data);
+		$('#bd-quest-wrapper').html(data);
 	}, true);
 	
 	$('#bd-srv-pu').hide();
@@ -160,6 +160,7 @@ $(document).on('click', '.srv-tbl-edit', function() {
 		$('.sb-edit-q-wrapper').remove();
 		$('.bd-q-pu-done-wrapper').remove();
 		$('.bd-srv-tbl-row-' + questionId).after(response);
+		revertQuestionOverlay();
 	}, true);
 });
 
