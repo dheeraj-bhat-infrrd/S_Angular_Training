@@ -82,7 +82,7 @@ function paintProfilePage(result) {
             	 $("#prof-image").css("background-size","cover");
             }
             
-            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
+            var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             if(contactDetails.about_me != undefined) {
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
             }
@@ -97,7 +97,7 @@ function paintProfilePage(result) {
             if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
-                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
+                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
             }
             
             var webAddresses = contactDetails.web_addresses;
