@@ -861,6 +861,63 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Successfully sent survey completion mail");
 	}
+	
+	@Override
+	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException {
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+		
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+		
+		LOG.info("Queueing survey reminder email to : " + recipientMailId);
+		
+		// format for the survey complete mail is RECIPIENT^^<comman separated recipients>$$NAME^^<displayName>$$AGENTNAME^^<agentName>
+		StringBuilder contentBuilder =  new StringBuilder();
+		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
+		contentBuilder.append("$$").append("NAME^^").append(displayName);
+		contentBuilder.append("$$").append("AGENTNAME^^").append(agentName);
+		LOG.debug("queueing content: "+contentBuilder.toString());
+		queueProducer.queueEmail(EmailHeader.ACCOUNT_UPGRADE, contentBuilder.toString());
+		LOG.info("Queued the survey completion mail");
+		
+	}
+	
+	@Override
+	public void sendSurveyReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException, UndeliveredEmailException {
+		
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+		
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+		
+		LOG.info("Sending survey reminder email to : " + recipientMailId);		
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_SUBJECT;
+
+		
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_REMINDER_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, agentName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent survey completion mail");
+	}
+
 
 }
 // JIRA: SS-7: By RM02: EOC

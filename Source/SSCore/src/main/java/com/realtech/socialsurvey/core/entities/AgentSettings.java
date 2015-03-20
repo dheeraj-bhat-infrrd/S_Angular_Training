@@ -22,7 +22,7 @@ public class AgentSettings extends OrganizationUnitSettings {
 	public void setHobbies(List<String> hobbies) {
 		this.hobbies = hobbies;
 	}
-
+	
 	@Override
 	public String toString() {
 		return super.toString();
