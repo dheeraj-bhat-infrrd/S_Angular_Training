@@ -119,6 +119,7 @@ $(document).on('mouseout', '.bd-srv-tbl-row', function() {
 $('#btn-add-question').click(function() {
 	$('#bd-srv-pu').show();
 	$(document).addClass('body-no-scroll');
+	//revertQuestionOverlay();
 });
 
 function revertQuestionOverlay() {
@@ -189,10 +190,13 @@ $('.bd-q-btn-done').click(function(e) {
 			count ++;
 		}
 		
-		loadActiveSurveyQuestions();
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		overlayRevert();
+		revertQuestionOverlay();
+		setTimeout(function() {
+			loadActiveSurveyQuestions();
+		}, 3000);
 	});
 	$('#overlay-cancel').click(function(){
 		$('#overlay-continue').unbind('click');
@@ -211,8 +215,8 @@ $(document).on('click', '.bd-q-pu-close', function() {
 // Question edit
 $(document).on('click', '.srv-tbl-edit', function() {
 	var questionId = $(this).parent().parent().data('questionid');
-	
 	var url = "./getsurveyquestion.do?questionId=" + questionId;
+
 	callAjaxGET(url, function(response) {
 		var surveyQuestion = $.parseJSON(response);
 		var questionId = surveyQuestion.questionId;
@@ -252,8 +256,15 @@ $(document).on('click', '.srv-tbl-edit', function() {
 							+ '<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item">Mutiple Choice</div>';
 						}
 						editQuestion = editQuestion + '</div>'
-					+ '</div>'
-					+ '<div id="" class="bd-ans-type-rating bd-ans-type-item">'
+					+ '</div>';
+					if (questionTypeCode == "sb-range-smiles" || questionTypeCode == "sb-range-star" || questionTypeCode == "sb-range-scale") {
+						editQuestion = editQuestion
+						+ '<div id="" class="bd-ans-type-rating bd-ans-type-item">';
+					} else {
+						editQuestion = editQuestion
+						+ '<div id="" class="bd-ans-type-rating bd-ans-type-item hide">';
+					}
+					editQuestion = editQuestion
 						+ '<div class="bd-and-tier2">My Customers can answer using</div>'
 						+ '<div class="row clearfix bd-ans-type bd-ans-type-rating-adj">'
 							+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
@@ -296,8 +307,15 @@ $(document).on('click', '.srv-tbl-edit', function() {
 								editQuestion = editQuestion + '</div>'
 							+ '</div>'
 						+ '</div>'
-					+ '</div>'
-					+ '<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">'
+					+ '</div>';
+					if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
+						editQuestion = editQuestion
+						+ '<div id="" class="bd-ans-type-mcq bd-ans-type-item">';
+					} else {
+						editQuestion = editQuestion
+						+ '<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">';
+					}
+					editQuestion = editQuestion
 						+ '<div class="bd-and-tier2">My Customers can answer from</div>'
 						+ '<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">';
 							if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
@@ -325,8 +343,15 @@ $(document).on('click', '.srv-tbl-edit', function() {
 								+ '</div>';
 							}
 						editQuestion = editQuestion + '</div>'
-					+ '</div>'
-					+ '<div id="" class="bd-ans-type-com bd-ans-type-item hide">'
+					+ '</div>';
+					if (questionTypeCode == "sb-sel-desc") {
+						editQuestion = editQuestion
+						+ '<div id="" class="bd-ans-type-com bd-ans-type-item">';
+					} else {
+						editQuestion = editQuestion
+						+ '<div id="" class="bd-ans-type-com bd-ans-type-item hide">';
+					}
+					editQuestion = editQuestion
 						+ '<div class="clearfix bd-com-wrapper">'
 							+ '<div class="float-left bd-com-chk"></div>'
 							+ '<div class="float-left bd-com-txt">Textarea</div>'
@@ -345,6 +370,8 @@ $(document).on('click', '.srv-tbl-edit', function() {
     	+ '</div>'
     + '</div>';
 						
+	$('.sb-edit-q-wrapper').remove();
+	$('.bd-q-pu-done-wrapper').remove();
 	$('.bd-srv-tbl-row-' + questionId).after(editQuestion);
 	}, true);
 });
