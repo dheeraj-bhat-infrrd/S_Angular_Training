@@ -26,7 +26,7 @@
   <fields>
     <field name="branchId" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
     <field name="companyId" type="long" indexed="true" stored="true" />
-    <field name="regionId" type="long" indexed="false" stored="true" />
+    <field name="regionId" type="long" indexed="true" stored="true" />
     <field name="branchName" type="text" indexed="true" stored="true" />
     <field name="regionName" type="text" indexed="false" stored="true"/>
     <field name="isDefaultBySystem" type="long" indexed="true" stored="true" />
