@@ -100,13 +100,13 @@ function validateRegEmailId(elementId) {
 		} else {
 			// $('#overlay-toast').html('Please enter a valid email id.');
 			// showToast();
-			showRegErr('Please enter a valid email id');
+			showRegErr('Please enter a valid email address');
 			return false;
 		}
 	} else {
 		// $('#overlay-toast').html('Please enter email id.');
 		// showToast();
-		showRegErr('Please enter email id');
+		showRegErr('Please enter email address');
 		return false;
 	}
 }
