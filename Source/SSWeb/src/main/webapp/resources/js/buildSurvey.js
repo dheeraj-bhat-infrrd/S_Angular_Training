@@ -1,5 +1,4 @@
 // Populate Existing Survey Questions 
-var bdQuestItemRevert = '<form id="bs-question-1" data-quesnum="1" data-quesref="" data-state="new" data-status="new"><div class="bd-q-pu-header bd-q-pu-header-adj clearfix"><div class="float-left bd-q-pu-header-lft">Create Your Survey Questions Here</div><div class="float-right bd-q-pu-header-rt cursor-pointer">Need Help?</div></div><div class="bd-q-pu-txt-wrapper pos-relative"><input type="hidden" id="sb-question-type-1" name="sb-question-type-1" data-state="new"/><input id="sb-question-txt-1" name="sb-question-txt-1" class="bd-q-pu-txt" data-nextquest="false" data-qno="1"><div class="bd-q-pu-close hide"></div></div><div class="bs-ans-wrapper hide"><div class="bd-and-header-txt">I want my customer reply using</div><div class="bd-ans-options-wrapper"><div class="bd-ans-header clearfix"><div class="bd-ans-hd-container clearfix float-left"><div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel">Range</div><div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item">Comment</div><div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item">Multiple Choice</div></div></div><div id="" class="bd-ans-type-rating bd-ans-type-item"><div class="bd-and-tier2">My Customers can answer using</div><div class="row clearfix bd-ans-type bd-ans-type-rating-adj"><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-smiles" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-smiley"></div><div class="bd-ans-img-txt">Smiley</div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-star" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-star"></div><div class="bd-ans-img-txt">Stars</div></div></div><div class="col-lg-4 col-md-4 col-sm-4 col-xs-12"><div data-id="sb-range-scale" class="bd-ans-img-wrapper"><div class="bd-ans-img bd-ans-scale"></div><div class="bd-ans-img-txt">Scale</div></div></div></div></div><div id="" class="bd-ans-type-mcq bd-ans-type-item hide"><div class="bd-and-tier2">My Customers can answer from</div><div class="clearfix bd-ans-type bd-ans-type-mcq-adj"><div class="bd-mcq-row clearfix"><div class="float-left bd-mcq-lbl">Option</div><input name="sb-answers-1[]" class="float-left bd-mcq-txt"><div class="float-left bd-mcq-close hide"></div></div><div class="bd-mcq-row clearfix"><div class="float-left bd-mcq-lbl">Option</div><input name="sb-answers-1[]" class="float-left bd-mcq-txt"><div class="float-left bd-mcq-close hide"></div></div></div></div><div id="" class="bd-ans-type-com bd-ans-type-item hide"><div class="clearfix bd-com-wrapper"><div class="float-left bd-com-chk"></div><div class="float-left bd-com-txt">Textarea</div></div></div></div><div class="bd-q-status-wrapper text-center hide"><span class="bd-spinner">`</span><span class="bd-q-status-txt">Saving</span></div></div></form>';
 function commonActiveSurveyCallback(response){
 	showInfo(response);
 	loadActiveSurveyQuestions();
@@ -8,71 +7,9 @@ function commonActiveSurveyCallback(response){
 
 function loadActiveSurveyQuestions() {
 	var url = "./getactivesurveyquestions.do";
-	callAjaxGET(url, populateActiveSurveyQuestions, true);
-}
-
-function populateActiveSurveyQuestions(response) {
-	if (response == "") {
-		return;
-	}
-	
-	var surveyDetail = $.parseJSON(response);
-	var surveyQuestions = surveyDetail.questions;
-	var htmlData = "";
-
-	// setting status of survey
-	if (surveyDetail.status != "") {
-		setTimeout(function() {
-			showError(surveyDetail.status);
-		}, 3000);
-	} else {
-		hideError();
-	}
-	
-	if (surveyQuestions != null) {
-		var lengthQuestions = surveyQuestions.length;
-		var countQues = 1;
-		
-		// For Each Question
-		$.each(surveyQuestions, function(i, surveyQuestion) {
-			// Question start
-			htmlData = htmlData + '<div class="bd-srv-tbl-row clearfix bd-srv-tbl-row-' + surveyQuestion.questionId + '" data-questionid="' + surveyQuestion.questionId + '">';
-
-			// Question order
-			htmlData = htmlData + '<div class="float-left srv-tbl-num"><span>' + surveyQuestion.questionOrder + '</span></div>';
-			
-			// Question Text
-			var questionTypeCode = surveyQuestion.questionType.trim();
-			htmlData = htmlData + '<div class="float-left srv-tbl-txt" q-type="' + questionTypeCode + '">' + surveyQuestion.question + '</div>';
-
-			// Buttons
-			htmlData = htmlData + '<div class="srv-tbl-btns clearfix float-right">';
-			if (countQues == 1) {
-				htmlData = htmlData + '<div class="float-left srv-tbl-move-dn"></div>';
-			}
-			else if (countQues == lengthQuestions) {
-				htmlData = htmlData + '<div class="float-left srv-tbl-move-up"></div>';
-			}
-			else {
-				htmlData = htmlData
-					+ '<div class="float-left srv-tbl-move-dn"></div>'
-					+ '<div class="float-left srv-tbl-move-up"></div>';
-			}
-			htmlData = htmlData
-				+ '<div class="float-right srv-tbl-rem">Remove</div>'
-				+ '<div class="float-right srv-tbl-edit">Edit</div>';
-			htmlData = htmlData + '</div>';
-			
-			// Question End
-			htmlData = htmlData + '</div>';
-			
-			countQues++;
-		});
-		
-		$('#bs-ques-wrapper').html(htmlData);
-	} else {
-		$('#bs-ques-wrapper').html('');
-	}
+	callAjaxGET(url, function(data) {
+		$('#bs-ques-wrapper').html(data);
+	}, true);
 }
 
 // On Hover
@@ -119,11 +56,14 @@ $(document).on('mouseout', '.bd-srv-tbl-row', function() {
 $('#btn-add-question').click(function() {
 	$('#bd-srv-pu').show();
 	$(document).addClass('body-no-scroll');
-	//revertQuestionOverlay();
 });
 
 function revertQuestionOverlay() {
-	$('#bd-quest-item').html(bdQuestItemRevert);
+	var url = "./revertquestionoverlay.do";
+	callAjaxGET(url, function(data) {
+		$('#bd-quest-item').html(data);
+	}, true);
+	
 	$('#bd-srv-pu').hide();
 	$(document).removeClass('body-no-scroll');
 	currentQues = 1;
@@ -193,7 +133,6 @@ $('.bd-q-btn-done').click(function(e) {
 		$('#overlay-continue').unbind('click');
 		$('#overlay-cancel').unbind('click');
 		overlayRevert();
-		revertQuestionOverlay();
 		setTimeout(function() {
 			loadActiveSurveyQuestions();
 		}, 3000);
@@ -218,161 +157,9 @@ $(document).on('click', '.srv-tbl-edit', function() {
 	var url = "./getsurveyquestion.do?questionId=" + questionId;
 
 	callAjaxGET(url, function(response) {
-		var surveyQuestion = $.parseJSON(response);
-		var questionId = surveyQuestion.questionId;
-		var questionTypeCode = surveyQuestion.questionType.trim();
-		var editQuestion = '<div class="sb-edit-q-wrapper">'
-			+ '<form id="bs-question-' + questionId + '" data-quesnum="' + questionId + '">'
-			+ '<div class="bd-q-pu-header clearfix">'
-				+ '<div class="float-left bd-q-pu-header-lft">Edit Your Question Here</div>'
-			+ '</div>'
-			+ '<div class="bd-q-pu-txt-wrapper pos-relative">'
-				+ '<input type="hidden" id="sb-question-type-' + questionId + '" name="sb-question-type-' + questionId + '" value="' + questionTypeCode + '"/>'
-				+ '<input id="sb-question-txt-' + questionId + '" name="sb-question-txt-' + questionId 
-					+ '" class="bd-q-pu-txt-edit" data-nextquest="false" value="' + surveyQuestion.question + '">'
-				+ '<div class="bd-q-pu-close hide"></div>'
-			+ '</div>'
-			+ '<div class="bs-ans-wrapper hide" style="display: block;">'
-				+ '<div class="bd-and-header-txt">I want my customer replying using</div>'
-				+ '<div class="bd-ans-options-wrapper">'
-					+ '<div class="bd-ans-header clearfix">'
-						+ '<div class="bd-ans-hd-container clearfix float-left">';
-						if (questionTypeCode == "sb-range-smiles" || questionTypeCode == "sb-range-star" || questionTypeCode == "sb-range-scale") {
-							editQuestion = editQuestion
-							+ '<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel">Rating</div>'
-							+ '<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item">Comment</div>'
-							+ '<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item">Mutiple Choice</div>';
-						}
-						else if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
-							editQuestion = editQuestion
-							+ '<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item">Rating</div>'
-							+ '<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item">Comment</div>'
-							+ '<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item bd-ans-tab-sel">Mutiple Choice</div>';
-						}
-						else if (questionTypeCode == "sb-sel-desc") {
-							editQuestion = editQuestion
-							+ '<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item">Rating</div>'
-							+ '<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item bd-ans-tab-sel">Comment</div>'
-							+ '<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item">Mutiple Choice</div>';
-						}
-						editQuestion = editQuestion + '</div>'
-					+ '</div>';
-					if (questionTypeCode == "sb-range-smiles" || questionTypeCode == "sb-range-star" || questionTypeCode == "sb-range-scale") {
-						editQuestion = editQuestion
-						+ '<div id="" class="bd-ans-type-rating bd-ans-type-item">';
-					} else {
-						editQuestion = editQuestion
-						+ '<div id="" class="bd-ans-type-rating bd-ans-type-item hide">';
-					}
-					editQuestion = editQuestion
-						+ '<div class="bd-and-tier2">My Customers can answer using</div>'
-						+ '<div class="row clearfix bd-ans-type bd-ans-type-rating-adj">'
-							+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
-								+ '<div data-id="sb-range-smiles" class="bd-ans-img-wrapper">';
-								if (questionTypeCode == "sb-range-smiles") {
-									editQuestion = editQuestion
-									+ '<div class="bd-ans-img bd-ans-smiley bd-img-sel"></div>'
-									+ '<div class="bd-ans-img-txt">Smiley</div>';
-								} else {
-									editQuestion = editQuestion
-									+ '<div class="bd-ans-img bd-ans-smiley"></div>'
-									+ '<div class="bd-ans-img-txt">Smiley</div>';
-								}
-								editQuestion = editQuestion + '</div>'
-							+ '</div>'
-							+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
-								+ '<div data-id="sb-range-star" class="bd-ans-img-wrapper">';
-								if (questionTypeCode == "sb-range-star") {
-									editQuestion = editQuestion
-									+ '<div class="bd-ans-img bd-ans-star bd-img-sel"></div>'
-									+ '<div class="bd-ans-img-txt">Stars</div>';
-								} else {
-									editQuestion = editQuestion
-									+ '<div class="bd-ans-img bd-ans-star"></div>'
-									+ '<div class="bd-ans-img-txt">Stars</div>';
-								}
-								editQuestion = editQuestion + '</div>'
-							+ '</div>'
-							+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
-								+ '<div data-id="sb-range-scale" class="bd-ans-img-wrapper">';
-								if (questionTypeCode == "sb-range-star") {
-									editQuestion = editQuestion
-									+ '<div class="bd-ans-img bd-ans-scale bd-img-sel"></div>'
-									+ '<div class="bd-ans-img-txt">Scale</div>';
-								} else {
-									editQuestion = editQuestion
-									+ '<div class="bd-ans-img bd-ans-scale"></div>'
-									+ '<div class="bd-ans-img-txt">Scale</div>';
-								}
-								editQuestion = editQuestion + '</div>'
-							+ '</div>'
-						+ '</div>'
-					+ '</div>';
-					if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
-						editQuestion = editQuestion
-						+ '<div id="" class="bd-ans-type-mcq bd-ans-type-item">';
-					} else {
-						editQuestion = editQuestion
-						+ '<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">';
-					}
-					editQuestion = editQuestion
-						+ '<div class="bd-and-tier2">My Customers can answer from</div>'
-						+ '<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">';
-							if (questionTypeCode == "sb-sel-mcq" && surveyQuestion.answers.length > 0) {
-								var countAns = 1;
-								$.each(surveyQuestion.answers, function(i, answer) {
-									editQuestion = editQuestion
-									+ '<div class="bd-mcq-row clearfix">'
-										+ '<div class="float-left bd-mcq-lbl">Option</div>'
-										+ '<input name="sb-answers-' + questionId + '[]" class="float-left bd-mcq-txt" value="' + answer.answerText + '">'
-										+ '<div class="float-left bd-mcq-close"></div>'
-									+ '</div>';
-									countAns ++;
-								});
-							} else {
-								editQuestion = editQuestion
-								+ '<div class="bd-mcq-row clearfix">'
-									+ '<div class="float-left bd-mcq-lbl">Option</div>'
-									+ '<input name="sb-answers-' + questionId + '[]" class="float-left bd-mcq-txt">'
-									+ '<div class="float-left bd-mcq-close hide"></div>'
-								+ '</div>'
-								+ '<div class="bd-mcq-row clearfix">'
-									+ '<div class="float-left bd-mcq-lbl">Option</div>'
-									+ '<input name="sb-answers-' + questionId + '[]" class="float-left bd-mcq-txt">'
-									+ '<div class="float-left bd-mcq-close hide"></div>'
-								+ '</div>';
-							}
-						editQuestion = editQuestion + '</div>'
-					+ '</div>';
-					if (questionTypeCode == "sb-sel-desc") {
-						editQuestion = editQuestion
-						+ '<div id="" class="bd-ans-type-com bd-ans-type-item">';
-					} else {
-						editQuestion = editQuestion
-						+ '<div id="" class="bd-ans-type-com bd-ans-type-item hide">';
-					}
-					editQuestion = editQuestion
-						+ '<div class="clearfix bd-com-wrapper">'
-							+ '<div class="float-left bd-com-chk"></div>'
-							+ '<div class="float-left bd-com-txt">Textarea</div>'
-						+ '</div>'
-					+ '</div>'
-				+ '</div>'
-				+ '<div class="bd-q-status-wrapper text-center hide">'
-					+ '<span class="bd-spinner">`</span>'
-					+ '<span class="bd-q-status-txt">Saving</span>'
-				+ '</div>'
-			+ '</div>'
-		+ '</form>'
-		+ '</div>'
-    	+ '<div class="bd-q-pu-done-wrapper clearfix">'
-    		+ '<div data-quesnum="' + questionId + '" class="bd-q-btn-done-edit float-left">Done</div>'
-    	+ '</div>'
-    + '</div>';
-						
-	$('.sb-edit-q-wrapper').remove();
-	$('.bd-q-pu-done-wrapper').remove();
-	$('.bd-srv-tbl-row-' + questionId).after(editQuestion);
+		$('.sb-edit-q-wrapper').remove();
+		$('.bd-q-pu-done-wrapper').remove();
+		$('.bd-srv-tbl-row-' + questionId).after(response);
 	}, true);
 });
 
@@ -518,86 +305,19 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 	showStatus('#bs-question-' + quesPresent, 'Edited');
 	$('#bs-question-' + quesPresent).attr('data-status', 'edited');
 	
-	// activating next question
+	// populating next question
 	if ($(this).val().trim().length > 0) {
 		$(this).parent().next('.bs-ans-wrapper').show();
+
 		if ($(this).data('nextquest') == false) {
 			currentQues ++;
-			var newQuestTemplateWithTopTxt = '<div class="bd-quest-item hide">'
-				+ '<form id="bs-question-' + currentQues + '" data-quesnum="' + currentQues + '" data-state="new" data-status="new" data-quesref="">'
-				+ '<div class="bd-q-pu-header clearfix">'
-					+ '<div class="float-left bd-q-pu-header-lft">I Would Like To Add Another Question</div>'
-				+ '</div>'
-				+ '<div class="bd-q-pu-txt-wrapper pos-relative">'
-					+ '<input type="hidden" id="sb-question-type-' + currentQues + '" name="sb-question-type-' + currentQues + '" data-state="new"/>'
-					+ '<input id="sb-question-txt-' + currentQues + '" name="sb-question-txt-' + currentQues + '" class="bd-q-pu-txt" data-nextquest="false" data-qno="' + currentQues + '">'
-					+ '<div class="bd-q-pu-close hide"></div>'
-				+ '</div>'
-				+ '<div class="bs-ans-wrapper hide">'
-					+ '<div class="bd-and-header-txt">I want my customer replying using</div>'
-					+ '<div class="bd-ans-options-wrapper">'
-						+ '<div class="bd-ans-header clearfix">'
-							+ '<div class="bd-ans-hd-container clearfix float-left">'
-								+ '<div data-id="sb-range" class="bd-tab-rat float-left bd-ans-tab-item bd-ans-tab-sel">Rating</div>'
-								+ '<div data-id="sb-sel-desc" class="bd-tab-com float-left bd-ans-tab-item">Comment</div>'
-								+ '<div data-id="sb-sel-mcq" class="bd-tab-mcq float-left bd-ans-tab-item">Mutiple Choice</div>'
-							+ '</div>'
-						+ '</div>'
-						+ '<div id="" class="bd-ans-type-rating bd-ans-type-item">'
-							+ '<div class="bd-and-tier2">My Customers can answer using</div>'
-							+ '<div class="row clearfix bd-ans-type bd-ans-type-rating-adj">'
-								+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
-									+ '<div data-id="sb-range-smiles" class="bd-ans-img-wrapper">'
-										+ '<div class="bd-ans-img bd-ans-smiley"></div>'
-										+ '<div class="bd-ans-img-txt">Smiley</div>'
-									+ '</div>'
-								+ '</div>'
-								+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
-									+ '<div data-id="sb-range-star" class="bd-ans-img-wrapper">'
-										+ '<div class="bd-ans-img bd-ans-star"></div>'
-										+ '<div class="bd-ans-img-txt">Stars</div>'
-									+ '</div>'
-								+ '</div>'
-								+ '<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">'
-									+ '<div data-id="sb-range-scale" class="bd-ans-img-wrapper">'
-										+ '<div class="bd-ans-img bd-ans-scale"></div>'
-										+ '<div class="bd-ans-img-txt">Scale</div>'
-									+ '</div>'
-								+ '</div>'
-							+ '</div>'
-						+ '</div>'
-						+ '<div id="" class="bd-ans-type-mcq bd-ans-type-item hide">'
-							+ '<div class="bd-and-tier2">My Customers can answer from</div>'
-							+ '<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">'
-								+ '<div class="bd-mcq-row clearfix">'
-									+ '<div class="float-left bd-mcq-lbl">Option</div>'
-									+ '<input name="sb-answers-' + currentQues + '[]" class="float-left bd-mcq-txt">'
-									+ '<div class="float-left bd-mcq-close hide"></div>'
-								+ '</div>'
-								+ '<div class="bd-mcq-row clearfix">'
-									+ '<div class="float-left bd-mcq-lbl">Option</div>'
-									+ '<input name="sb-answers-' + currentQues + '[]" class="float-left bd-mcq-txt">'
-									+ '<div class="float-left bd-mcq-close hide"></div>'
-									+ '</div>'
-								+ '</div>'
-							+ '</div>'
-							+ '<div id="" class="bd-ans-type-com bd-ans-type-item hide">'
-								+ '<div class="clearfix bd-com-wrapper">'
-									+ '<div class="float-left bd-com-chk"></div>'
-									+ '<div class="float-left bd-com-txt">Textarea</div>'
-								+ '</div>'
-							+ '</div>'
-						+ '</div>'
-						+ '<div class="bd-q-status-wrapper text-center hide">'
-							+ '<span class="bd-spinner">`</span>'
-							+ '<span class="bd-q-status-txt">Saving</span>'
-						+ '</div>'
-					+ '</div>'
-				+ '</form>'
-				+ '</div>';
-			$(this).parent().parent().after(newQuestTemplateWithTopTxt);
-			$(this).parent().parent().next('.bd-quest-item').show();
-			$(this).data('nextquest', 'true');
+			
+			var url = "./populatenewform.do?order=" + currentQues;
+			$('#sb-question-txt-' + quesPresent).data('nextquest', 'true');
+			callAjaxGET(url, function(data) {
+				$('#bs-question-' + quesPresent).after(data);
+				$('#bs-question-' + quesPresent).next('.bd-quest-item').show();
+			}, true);
 		}
 	}
 	
@@ -606,16 +326,19 @@ $(document).on("input", '.bd-q-pu-txt', function() {
 	}*/
 });
 
-$(document).on('blur', '.bd-mcq-txt', function(){
+$(document).on('input', '.bd-mcq-txt', function(){
 	// changing status to edited
-	var addMcqTextOption = $(this).attr('name')[$(this).attr('name').length - 3];
+	var name = $(this).attr('name');
+	var addMcqTextOption = name.substr(name.lastIndexOf("-") + 1, 2);
+	
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
 });
 
 $(document).on('blur', '.bd-mcq-txt', function(){
 	if ($(this).parent().is(':last-child')) {
-		var addMcqTextOption = $(this).attr('name')[$(this).attr('name').length - 3];
+		var name = $(this).attr('name');
+		var addMcqTextOption = name.substr(name.lastIndexOf("-") + 1, 2);
 
 		// changing status to edited
 		showStatus('#bs-question-' + addMcqTextOption, 'Edited');
@@ -634,7 +357,9 @@ $(document).on('click', '.bd-mcq-close', function(){
 	$(this).parent().remove();
 	
 	// changing status to edited
-	var addMcqTextOption = $(this).prev().attr('name')[$(this).prev().attr('name').length - 3];
+	var name = $(this).attr('name');
+	var addMcqTextOption = name.substr(name.lastIndexOf("-") + 1, 2);
+
 	showStatus('#bs-question-' + addMcqTextOption, 'Edited');
 	$('#bs-question-' + addMcqTextOption).attr('data-status', 'edited');
 });
