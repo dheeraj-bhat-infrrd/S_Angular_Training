@@ -510,7 +510,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     border-radius: 50%;
     text-align: center;
     line-height: 40px;
-    margin-top: 14px;
+    margin-top: 10px;
     position: relative;
     color: #fff;
     text-transform: uppercase;
@@ -3438,6 +3438,7 @@ button.paypal.is-active {
 
 .hr-txt1, .hr-txt2{
     height: 60px;
+    line-height: 55px;
 }
 
 .hr-txt2 {
@@ -3445,6 +3446,7 @@ button.paypal.is-active {
     font-weight: bold !important;
     margin-left: 20px;
     padding-right: 40px;
+    background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }
 
 .hr-dd-wrapper {
@@ -4547,7 +4549,7 @@ td.v-tbl-spacer {
     border-radius: 0;
     height: 28px;
     line-height: 28px;
-    margin-top: 20px;
+    margin-top: 16px;
     margin-left: 15px;
     text-align: center;
     position: relative;
@@ -4941,7 +4943,7 @@ tr.u-tbl-header td {
 }
 
 .float-right.header-right.clearfix.hr-dsh-adj-rt{
-    margin-top: -15px;
+/*    margin-top: -15px;*/
 }
 
 .inp-err-comm{
@@ -5126,6 +5128,15 @@ tr.u-tbl-header td {
 }
 
 .bd-q-btn-done {
+    background-color: #3E9DCB;
+    color: #fff;
+    width: 120px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bd-q-btn-done-pu {
     background-color: #3E9DCB;
     color: #fff;
     width: 120px;
@@ -5363,4 +5374,28 @@ tr.u-tbl-header td {
     display: inline-block;
     padding: 0px 10px;
     margin-left: -10px;
+}
+.contact-us-pu {
+    background-color: #fff;
+    border: 1px solid #D2DEDF;
+    border-radius: 3px;
+    padding: 20px;
+    width: 90%;
+    margin: 100px auto;
+}
+
+.cntct-us-btns-wrapper {
+    line-height: 40px;
+    width: 215px;
+    margin: 20px auto 0;
+}
+
+.bd-q-pu-txtarea {
+    padding: 10px;
+    border: 1px solid #3E9DCB;
+    height: 140px;
+    border-radius: 2px;
+    display: block;
+    width: 100%;
+    margin-top: 10px;
 }
