@@ -370,9 +370,10 @@
 }
 
 .lp-con-icn {
-    height: 44px;
+    height: 32px;
     width: 36px;
     margin-right: 10px;
+    background-size: 20px !important;
 }
 
 .update-card-details-txt{

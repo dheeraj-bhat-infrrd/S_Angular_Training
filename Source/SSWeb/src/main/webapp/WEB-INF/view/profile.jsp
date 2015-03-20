@@ -105,6 +105,11 @@
                 
                 <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">
+                        <div class="left-panel-header cursor-pointer">Download VCard</div>
+                    </div>
+                </div>
+                <div class="prof-left-row prof-left-info bord-bot-dc">
+                    <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
                             <!--contact info comes here  -->
@@ -162,7 +167,7 @@
                 <div class="rt-content-main bord-bot-dc clearfix">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Tweets</div>
-                        <div class="tweet-panel tweet-panel-left">
+                        <div class="tweet-panel tweet-panel-left tweet-panel-left-adj">
                             <div class="tweet-panel-item bord-bot-dc clearfix">
                                 <div class="tweet-icn icn-tweet float-left"></div>
                                 <div class="tweet-txt float-left">
@@ -269,6 +274,7 @@
 //                $('.prof-name-container').height(h2);
                 var rowW = $('.lp-con-row').width() - 55 - 10;
                 $('.lp-con-row-item').width(rowW+'px');
+                $('.footer-main-wrapper').hide();
                 $('.footer-main-wrapper').hide();
             }else{
                 $('.prof-name-container,#prof-image').height(200);
