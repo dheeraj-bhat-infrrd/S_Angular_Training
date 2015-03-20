@@ -237,11 +237,6 @@
             $('body').addClass('body-no-scroll-y');
         }); 
         
-        $('.bd-q-btn-cancel').click(function(){
-            $('#bd-srv-pu').hide();
-            $('body').removeClass('body-no-scroll-y');
-        }); 
-        
         $('.bd-q-btn-done').click(function(){
             $('#bd-srv-pu').hide();
             $('body').removeClass('body-no-scroll-y');
