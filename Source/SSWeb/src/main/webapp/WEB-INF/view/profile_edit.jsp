@@ -213,10 +213,10 @@
 						<div class="left-panel-content" id="contant-info-container">
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mail"></div>
-								<div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div>
-								<%-- <input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}">
+								<%-- <div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div> --%>
+								<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}">
 								<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
-								<div id="email-id-work-lock" data-state="unlocked" data-control="user" class="hide float-left"></div> --%>
+								<div id="email-id-work-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-web"></div>

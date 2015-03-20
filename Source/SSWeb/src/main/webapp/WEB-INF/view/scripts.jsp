@@ -1,4 +1,4 @@
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
@@ -15,6 +15,12 @@
 <script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
 <script>
 	$('#header-logo').click(function(){
