@@ -3618,6 +3618,14 @@ button.paypal.is-active {
 .dash-lp-item {
     padding-left: 15px;
     line-height: 35px;
+    max-height : 200px;
+    overflow-x : hidden;
+}
+
+.dash-lp-item-grp {
+    max-height : 200px;
+    position: relative;
+    padding-right: 15px;
 }
 
 .dash-lp-txt span {
@@ -3785,12 +3793,23 @@ button.paypal.is-active {
 
 .dsg-g-rbn {
     position: absolute;
-    background: url(../images/Ribbon.png) no-repeat center;
     background-size: 83%;
     height: 72px;
     width: 240px;
     top: 142px;
     left: -8px;
+}
+
+.dsg-g-rbn-1{
+	background: url(../images/ribbon1.png) no-repeat center;
+}
+
+.dsg-g-rbn-2{
+	background: url(../images/Ribbon.png) no-repeat center;
+}
+
+.dsg-g-rbn-3{
+	background: url(../images/ribbon3.png) no-repeat center;
 }
 
 .hm-hdr-bord-bot {
@@ -5375,6 +5394,7 @@ tr.u-tbl-header td {
     padding: 0px 10px;
     margin-left: -10px;
 }
+
 .contact-us-pu {
     background-color: #fff;
     border: 1px solid #D2DEDF;

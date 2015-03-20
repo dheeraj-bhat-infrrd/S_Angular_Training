@@ -77,7 +77,7 @@ public interface SurveyBuilder {
 	 * @param user
 	 * @throws InvalidInputException
 	 */
-	public void addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestions) throws InvalidInputException;
+	public long addQuestionToExistingSurvey(User user, Survey survey, SurveyQuestionDetails surveyQuestions) throws InvalidInputException;
 
 	/**
 	 * Method to mark survey to questions mapping as inactive in SURVEY_QUESTIONS_MAPPING.
@@ -129,6 +129,7 @@ public interface SurveyBuilder {
 	 * @throws InvalidInputException
 	 */
 	public SurveyQuestion getSurveyQuestion(long surveyQuestionId) throws InvalidInputException;
+	public SurveyQuestion getSurveyQuestionFromMapping(long surveyQuestionMappingId) throws InvalidInputException;
 
 	/**
 	 * Method to update Survey Question and answers
