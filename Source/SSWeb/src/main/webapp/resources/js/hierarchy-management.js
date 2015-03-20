@@ -2,7 +2,7 @@
  * js functions for hierarchy and user management
  */
 var usersStartIndex = 0;
-var numOfRows = 6;
+var numOfRows = 10;
 
 /**
  * function to display success/failure message to user after an action
@@ -38,11 +38,21 @@ function fetchCompanyHierarchy() {
 	var profileName = $("#profile-name").val();
     fetchHierarchy("companyProfileName", profileName);
 }
+/**
+ * Method to change the arrow in tabs according to the form displayed 
+ * @param spanId
+ */
+function changeTabArrow(spanId) {
+	$('.bd-hdr-span').removeClass('bd-hdr-active');
+    $('.bd-hdr-span').removeClass('bd-hdr-active-arr');
+    $("#"+spanId).addClass('bd-hdr-active');
+    $("#"+spanId).addClass('bd-hdr-active-arr');
+}
 
 /**
  * function to get the edit form based on tab value 
  */
-function getEditSectionForm(tabValue) {
+function getEditSectionFormByTab(tabValue) {
 	switch(tabValue){
     case 'region': 
     	getRegionEditPage();
@@ -63,11 +73,33 @@ function getEditSectionForm(tabValue) {
 }
 
 /**
+ * Method to get the edit section form based on the account type of user
+ */
+function getEditSectionByAccountType() {
+	var accountType = $("#account-type").val();
+	switch(accountType){
+    case 'Enterprise': 
+    	getRegionEditPage();
+        break;
+    case 'Company': 
+        getOfficeEditPage();
+        break;
+    case 'Team': 
+    	getIndividualEditPage();
+        break;
+    default: 
+    	showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+        break;
+	}
+}
+
+/**
  * function to get the region edit page
  */
 function getRegionEditPage(){
 	var url = "./getregioneditpage.do";
 	callAjaxGET(url, paintEditSection, true);
+	changeTabArrow("hr-region-tab");
 }
 
 /**
@@ -76,6 +108,7 @@ function getRegionEditPage(){
 function getOfficeEditPage(){
 	var url = "./getofficeeditpage.do";
 	callAjaxGET(url, paintEditSection, true);
+	changeTabArrow("hr-office-tab");
 }
 /**
  * function to get the individual edit page
@@ -83,6 +116,7 @@ function getOfficeEditPage(){
 function getIndividualEditPage(){
 	var url = "./getindividualeditpage.do";
 	callAjaxGET(url, paintEditSection, true);
+	changeTabArrow("hr-individual-tab");
 }
 
 function paintEditSection(data) {
@@ -97,13 +131,19 @@ function paintEditSection(data) {
 			return false;
 		});
 		return false;
-	}	
+	}
+	
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
 	
 	/**
 	 * bind the click events
 	 */
 	$("#selected-user-txt").click(function() {
 		getUsersList("",usersStartIndex,numOfRows);
+	});
+	$("#selected-user-txt").keydown(function(e) {
+		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
 	});
 	
 	$("#btn-region-save").click(function(e){
@@ -118,18 +158,20 @@ function paintEditSection(data) {
 		}
 	});
 
-	$("#selected-user-txt").keyup(function() {
-		var text = $(this).val();
-		usersStartIndex = 0;	
-		if (text.length > 0) {
-			delay(function() {
-				getUsersList(text,usersStartIndex,numOfRows);
-			}, 500);
-		}
-		else {
-			delay(function() {
-				getUsersList("",usersStartIndex,numOfRows);
-			}, 500);
+	$("#selected-user-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $(this).val();
+			usersStartIndex = 0;	
+			if (text.length > 0) {
+				delay(function() {
+					getUsersList(text,usersStartIndex,numOfRows);
+				}, 500);
+			}
+			else {
+				delay(function() {
+					getUsersList("",usersStartIndex,numOfRows);
+				}, 500);
+			}
 		}
 	});
 	
@@ -174,36 +216,20 @@ function paintEditSection(data) {
 		$("#assign-to-txt").val($(this).html());
 		$("#assign-to-txt").attr("data-assignto",assignToOption);
 		
-		switch(assignToOption) {
-			case 'company':
-				disableRegionSelector();
-				disableOfficeSelector();
-				break;
-			case 'region':
-				$("#selected-region-txt").prop("disabled",false);
-				disableOfficeSelector();
-				$("#bd-region-selector").show();
-				break;
-			case 'office':
-				$("#selected-office-txt").prop("disabled",false);
-				$("#bd-office-selector").show();
-				disableRegionSelector();
-				break;
-			default:
-				$("#selected-region-txt").prop("disabled",false);
-				$("#selected-office-txt").prop("disabled",false);
-		}
+		showSelectorsByAssignToOption(assignToOption);
 		$("#assign-to-droplist").slideToggle(200);
 	});
 	
-	$("#selected-region-txt").keyup(function() {
-		var text = $("#selected-region-txt").val();
-		if (text.length > 0) {
-			delay(function() {
-				populateRegionsSelector(text);
-			}, 500);
-		}else{
-			$("#regions-droplist").slideUp(200);
+	$("#selected-region-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $("#selected-region-txt").val();
+			if (text.length > 0) {
+				delay(function() {
+					populateRegionsSelector(text);
+				}, 500);
+			}else{
+				$("#regions-droplist").slideUp(200);
+			}
 		}
 	});
 	
@@ -257,6 +283,32 @@ function paintEditSection(data) {
 			addIndividual("edit-individual-form");
 		}
 	});
+}
+/**
+ * Method to show/hide the other selectors based on the assign to option selected
+ * @param assignToOption
+ */
+function showSelectorsByAssignToOption(assignToOption) {
+	console.log("selector----------"+assignToOption);
+	switch(assignToOption) {
+	case 'company':
+		disableRegionSelector();
+		disableOfficeSelector();
+		break;
+	case 'region':
+		$("#selected-region-txt").prop("disabled",false);
+		disableOfficeSelector();
+		$("#bd-region-selector").show();
+		break;
+	case 'office':
+		$("#selected-office-txt").prop("disabled",false);
+		$("#bd-office-selector").show();
+		disableRegionSelector();
+		break;
+	default:
+		$("#selected-region-txt").prop("disabled",false);
+		$("#selected-office-txt").prop("disabled",false);
+	}
 }
 
 function showAdminPrivilegesChk(){
@@ -436,7 +488,7 @@ function paintUsersList(data) {
 			$.each(usersList,function(i,user) {
 				var displayName = user.firstName;
 				if(user.lastName != undefined) {
-					displayName = displayName + user.lastName;
+					displayName = displayName +" "+ user.lastName;
 				}
 				htmlData = htmlData +'<div class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-user-options" data-userid="'+user.userId+'">'+displayName+'</div>';
 			});
@@ -613,9 +665,9 @@ function populateRegionsSelectorCallBack(data) {
 			$(".hm-dd-hover").hover(function() {
 				$(".hm-region-option").removeClass("hm-dd-item-keys-selected");
 			});
-			/*$("#selected-region-txt").keydown(function(e){
+			$("#selected-region-txt").keydown(function(e){
 				bindArrowKeysWithSelector(e, "selected-region-txt", "regions-droplist", populateRegionsSelector, "selected-region-id-hidden", "data-regionid");
-			});	*/		
+			});			
 		}
 		else {
 			$("#regions-droplist").html(htmlData).slideUp(200);	
@@ -784,6 +836,7 @@ function populateOfficesSelectorCallBack(data) {
 }
 
 function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hiddenFieldId,attrName) {
+	console.log(e.which);
 	if(e.which == 40) {
 		var text = $("#"+textBoxId).val();
 		if(text == undefined) {
