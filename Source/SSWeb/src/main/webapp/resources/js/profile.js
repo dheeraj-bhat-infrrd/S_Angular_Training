@@ -82,7 +82,7 @@ function paintProfilePage(result) {
             	 $("#prof-image").css("background-size","cover");
             }
             
-            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
+            var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             if(contactDetails.about_me != undefined) {
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
             }
