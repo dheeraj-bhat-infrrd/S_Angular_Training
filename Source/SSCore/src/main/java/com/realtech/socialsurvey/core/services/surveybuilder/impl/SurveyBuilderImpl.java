@@ -554,21 +554,22 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 			throw new InvalidInputException("Invalid argument passed. Atleast two answers should be given in method addNewQuestionsAndAnswers.");
 		}
 
-		modifyQuestionAndAnswers(user, questionId, surveyQuestionDetails.getQuestion(), surveyQuestionDetails.getQuestionType(),
-				surveyQuestionDetails.getAnswers());
+		modifyQuestionAndAnswers(user, questionId, surveyQuestionDetails);
 		LOG.info("Method updateQuestionAndAnswers() finished");
 	}
 
 	/**
 	 * Method to modify question as well as all the answers for each question.
 	 */
-	private SurveyQuestion modifyQuestionAndAnswers(User user, long questionId, String question, String questionType,
-			List<SurveyAnswerOptions> answers) {
+	private SurveyQuestion modifyQuestionAndAnswers(User user, long questionId, SurveyQuestionDetails questionDetails) {
 		LOG.debug("Method modifyQuestionAndAnswers() started.");
 		SurveyQuestion surveyQuestion = null;
+		String question = questionDetails.getQuestion();
+		String questionType = questionDetails.getQuestionType();
 
 		if (question != null && !questionType.equals("")) {
-			surveyQuestion = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, questionId).getSurveyQuestion();
+			SurveyQuestionsMapping mapping = surveyQuestionsMappingDao.findById(SurveyQuestionsMapping.class, questionId);
+			surveyQuestion = mapping.getSurveyQuestion();
 
 			surveyQuestion.setSurveyQuestion(question);
 			surveyQuestion.setSurveyQuestionsCode(questionType);
@@ -577,12 +578,18 @@ public class SurveyBuilderImpl implements SurveyBuilder {
 
 			// Save answers only if question type is Multiple Choice &
 			if (questionType.indexOf(CommonConstants.QUESTION_MULTIPLE_CHOICE) != -1) {
+				List<SurveyAnswerOptions> answers = questionDetails.getAnswers();
 				if (answers != null && !answers.isEmpty() && answers.size() >= 2) {
 					modifyAnswersToQuestion(user, surveyQuestion, answers);
 				}
 			}
 			surveyQuestionDao.saveOrUpdate(surveyQuestion);
 			surveyQuestionDao.flush();
+			
+			// updating question rating status
+			mapping.setIsRatingQuestion(questionDetails.getIsRatingQuestion());
+			surveyQuestionsMappingDao.saveOrUpdate(mapping);
+			surveyQuestionsMappingDao.flush();
 		}
 		LOG.debug("Method modifyQuestionAndAnswers() finished");
 		return surveyQuestion;
