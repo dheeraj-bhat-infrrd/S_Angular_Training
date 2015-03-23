@@ -20,7 +20,13 @@ public interface JspResolver {
 	public static final String PAYMENT = "payment";
 	public static final String LANDING = "landing";
 	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
+	
 	public static final String SURVEY_BUILDER = "buildSurvey";
+	public static final String SURVEY_BUILDER_QUESTION_OVERLAY = "buildSurvey_questionoverlay";
+	public static final String SURVEY_BUILDER_QUESTION_LIST = "buildSurvey_questionlist";
+	public static final String SURVEY_BUILDER_QUESTION_EDIT = "buildSurvey_questionedit";
+	public static final String SURVEY_BUILDER_QUESTION_NEW = "buildSurvey_questionnew";
+	
 	public static final String DASHBOARD = "dashboard";
 	public static final String USER_MANAGEMENT = "view-user-management";
 	public static final String USER_LIST_FOR_MANAGEMENT = "userlist";
