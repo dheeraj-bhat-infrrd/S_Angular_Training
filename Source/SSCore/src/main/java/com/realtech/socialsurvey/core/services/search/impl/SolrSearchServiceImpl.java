@@ -163,6 +163,47 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	/**
+	 * Method to perform search of branches from solr based on the region id.
+	 * 
+	 * @param regionId
+	 * @param start
+	 * @param rows
+	 * @return list of branches
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public String searchBranchesByRegion(long regionId, int start, int rows) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBranchesByRegion() to search branches in a region started");
+		String branchResult = null;
+		QueryResponse response = null;
+		try {
+
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery query = new SolrQuery();
+			query.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			query.setStart(start);
+
+			if (rows > 0) {
+				query.setRows(rows);
+			}
+
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(query);
+			SolrDocumentList documentList = response.getResults();
+			branchResult = JSONUtil.toJSON(documentList);
+
+			LOG.debug("Results obtained from solr :" + branchResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranchesByRegion() to search branches in a region finished");
+		return branchResult;
+	}
+
+	/**
 	 * Method to add region into solr
 	 */
 	@Override
@@ -402,6 +443,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		try {
 			SolrQuery solrQuery = new SolrQuery();
+
 			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR, CommonConstants.TITLE_SOLR,
 					CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR, CommonConstants.PROFILE_URL_SOLR };
 			solrQuery.setFields(fields);
@@ -526,6 +568,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.BRANCHES_SOLR, branches);
 			document.addField(CommonConstants.REGIONS_SOLR, regions);
 			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
+			document.addField(CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin());
+			document.addField(CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin());
 			LOG.debug("response while adding user is: " + response);
 			solrServer.add(document);
 			solrServer.commit();
@@ -671,5 +715,128 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method searchUsersByIden finished for iden : " + iden);
 		return results;
+	}
+	
+	/**
+	 * Method to perform search of region from solr based on the input Region id
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchRegionById(long regionId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchRegionById called for regionId :" + regionId);
+		if (regionId < 0) {
+			throw new InvalidInputException("Region id is null while searching for region");
+		}
+		String regionName = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":"+ CommonConstants.STATUS_ACTIVE);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if(results.size()!=0)
+				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_COLUMN);
+		}catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing region search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.debug("Region search result is : " + regionName);
+		return regionName;
+	}
+	
+	/**
+	 * Method to perform search of branch name from solr based on the input branch id
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBrancNameById called for branchId :" + branchId);
+		if (branchId < 0) {
+			throw new InvalidInputException("Branch id is null while searching for Branch");
+		}
+		String branchName = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.BRANCH_ID_SOLR + ":" + branchId);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":"+ CommonConstants.STATUS_ACTIVE);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if(results.size()!=0)
+				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_COLUMN);
+		}catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.debug("Branch search result is : " + branchName);
+		return branchName;
+	}
+	
+	/**
+	 * Method to perform search of region, branch or Agent name from solr based on the input pattern for a specific company
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException, SolrException{
+		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company started");
+		String result = null;
+		QueryResponse response = null;
+		searchKey = searchKey+"*";
+		try {
+			SolrServer solrServer;
+			switch(searchColumn){
+				case CommonConstants.REGION_NAME_SOLR : 
+					solrServer = new HttpSolrServer(solrRegionUrl);
+					break;
+				case CommonConstants.BRANCH_NAME_SOLR : 
+					solrServer = new HttpSolrServer(solrBranchUrl);
+					break;
+				case CommonConstants.USER_DISPLAY_NAME_SOLR : 
+					solrServer = new HttpSolrServer(solrUserUrl);
+					if(columnName.equals(CommonConstants.REGION_ID_COLUMN)){
+						columnName = "regions";
+					}
+					else if(columnName.equals(CommonConstants.BRANCH_ID_COLUMN)){
+						columnName = "branches";
+					}
+					break;
+				default :
+					solrServer = new HttpSolrServer(solrRegionUrl);
+			}
+			SolrQuery query = new SolrQuery();
+			query.setQuery(columnName + ":" + id);
+			
+			query.addFilterQuery(searchColumn + ":" + searchKey);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+
+			LOG.debug("Querying solr for searching "+searchColumn);
+			response = solrServer.query(query);
+			SolrDocumentList documentList = response.getResults();
+			result = JSONUtil.toJSON(documentList);
+
+			LOG.debug("Results obtained from solr :" + result);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing region, branch or agent search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
+		return result;
+
 	}
 }

@@ -15,9 +15,11 @@
 }
 
 body {
-    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
-    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
-    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
+/*
+    -webkit-touch-callout: none;                
+    -webkit-text-size-adjust: none;             
+    -webkit-user-select: none;                  
+*/
     color: #666;
     font-size: 14px;
 }
@@ -510,7 +512,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     border-radius: 50%;
     text-align: center;
     line-height: 40px;
-    margin-top: 14px;
+    margin-top: 10px;
     position: relative;
     color: #fff;
     text-transform: uppercase;
@@ -1066,10 +1068,6 @@ button.paypal.is-active {
     margin-right: 1px;
 }
 
-.st-rating-wrapper {
-    margin-right: 30px;
-}
-
 .st-rating-input {
     width: 75px;
     height: 50px;
@@ -1397,6 +1395,10 @@ button.paypal.is-active {
     margin: 0 !important;
 }
 
+.st-rating-wrapper {
+    margin-right: 30px;
+}
+
 .prof-name {
     font-size: 22px;
 }
@@ -1464,6 +1466,7 @@ button.paypal.is-active {
     width: 40px;
     margin-right: 10px;
     cursor: pointer;
+    margin-top: 3px;
 }
 
 .prof-left-row {
@@ -1472,8 +1475,8 @@ button.paypal.is-active {
 }
 
 .left-panel-header {
-    line-height: 36px;
-    font-size: 18px;
+    line-height: 32px;
+    font-size: 16px;
 }
 
 .left-panel-content {
@@ -1485,7 +1488,7 @@ button.paypal.is-active {
 }
 
 .lp-row {
-    line-height: 44px;
+    line-height: 32px;
     padding-left: 10px;
 }
 
@@ -1497,7 +1500,7 @@ button.paypal.is-active {
 }
 .main-con-header {
     font-size: 16px;
-/*    margin-bottom: 15px;*/
+    margin-bottom: 15px;
 }
 
 .rt-content-main {
@@ -1530,21 +1533,21 @@ button.paypal.is-active {
 }
 
 .tweet-text-main{
-    line-height: 24px;
+    line-height: 22px;
 }
 
 .tweet-text-link{
     color: #5CC8EF;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .tweet-text-time{
-    font-size: 12px;
+    font-size: 11px;
 }
 
 .tweet-panel-item, .posts-panel-item{
-    padding-bottom: 20px;
-    margin-bottom: 15px;
+    padding-bottom: 10px;
+    margin-bottom: 0px;
 }
 
 .tweet-panel-item:last-child{
@@ -3438,6 +3441,7 @@ button.paypal.is-active {
 
 .hr-txt1, .hr-txt2{
     height: 60px;
+    line-height: 55px;
 }
 
 .hr-txt2 {
@@ -3445,6 +3449,7 @@ button.paypal.is-active {
     font-weight: bold !important;
     margin-left: 20px;
     padding-right: 40px;
+    background: url(../images/sb-dd-icn-pd.png) no-repeat right center;
 }
 
 .hr-dd-wrapper {
@@ -3616,6 +3621,14 @@ button.paypal.is-active {
 .dash-lp-item {
     padding-left: 15px;
     line-height: 35px;
+    max-height : 200px;
+    overflow-x : hidden;
+}
+
+.dash-lp-item-grp {
+    max-height : 200px;
+    position: relative;
+    padding-right: 15px;
 }
 
 .dash-lp-txt span {
@@ -3783,12 +3796,23 @@ button.paypal.is-active {
 
 .dsg-g-rbn {
     position: absolute;
-    background: url(../images/Ribbon.png) no-repeat center;
     background-size: 83%;
     height: 72px;
     width: 240px;
     top: 142px;
     left: -8px;
+}
+
+.dsg-g-rbn-1{
+	background: url(../images/ribbon1.png) no-repeat center;
+}
+
+.dsg-g-rbn-2{
+	background: url(../images/Ribbon.png) no-repeat center;
+}
+
+.dsg-g-rbn-3{
+	background: url(../images/ribbon3.png) no-repeat center;
 }
 
 .hm-hdr-bord-bot {
@@ -4575,7 +4599,7 @@ td.v-tbl-spacer {
     border-radius: 0;
     height: 28px;
     line-height: 28px;
-    margin-top: 20px;
+    margin-top: 16px;
     margin-left: 15px;
     text-align: center;
     position: relative;
@@ -4969,7 +4993,7 @@ tr.u-tbl-header td {
 }
 
 .float-right.header-right.clearfix.hr-dsh-adj-rt{
-    margin-top: -15px;
+/*    margin-top: -15px;*/
 }
 
 .inp-err-comm{
@@ -5154,6 +5178,24 @@ tr.u-tbl-header td {
 }
 
 .bd-q-btn-done {
+    background-color: #3E9DCB;
+    color: #fff;
+    width: 120px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bd-q-btn-done-pu {
+    background-color: #3E9DCB;
+    color: #fff;
+    width: 120px;
+    text-align: center;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.bd-q-btn-done-edit {
     background-color: #3E9DCB;
     color: #fff;
     width: 120px;
@@ -5359,4 +5401,59 @@ tr.u-tbl-header td {
 }
 .bd-srv-q-tbl {
     margin-bottom: 50px;
+}
+
+.bd-q-status-wrapper {
+    background: url(../images/bd-bg.png) repeat-x center;
+    line-height: 40px;
+    margin: 10px 0;
+}
+
+.bd-spinner {
+    width: 20px;
+    padding: 0 20px;
+    color: #fff;
+    background: url(../images/spinner-small.gif) no-repeat center;
+    background-size: 20px;
+    background-color: #fff;
+    display: inline-block;
+}
+
+.bd-q-status-txt {
+    background-color: #fff;
+    display: inline-block;
+    padding: 0px 10px;
+    margin-left: -10px;
+}
+
+.contact-us-pu {
+    background-color: #fff;
+    border: 1px solid #D2DEDF;
+    border-radius: 3px;
+    padding: 20px;
+    width: 90%;
+    margin: 100px auto;
+}
+
+.cntct-us-btns-wrapper {
+    line-height: 40px;
+    width: 215px;
+    margin: 20px auto 0;
+}
+
+.bd-q-pu-txtarea {
+    padding: 10px;
+    border: 1px solid #3E9DCB;
+    height: 140px;
+    border-radius: 2px;
+    display: block;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.mgn-top-10m{
+    margin-top: -10px;
+}
+.tweet-panel-left-adj {
+    margin-bottom: -15px;
 }

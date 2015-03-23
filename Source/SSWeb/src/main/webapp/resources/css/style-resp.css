@@ -2,6 +2,7 @@
 @media (max-width: 767px) {
     body{
         font-size: 12px;
+        -webkit-user-select: none;                  
     }
     .login-main-wrapper{
         background: #fff;
@@ -1171,6 +1172,12 @@
         font-size: 13px;
         width: 100px;
     }
+    
+    .bd-q-btn-done-pu{
+        line-height: 32px;
+        font-size: 13px;
+        width: 100px;
+    }
     .bd-ans-hd-container{
         margin: 0;
         width: 100%;
@@ -1242,6 +1249,9 @@
     }
     .srv-tbl-move-dn{
         margin-left: 10px;
+    }
+    .cntct-us-btns-wrapper{
+        width: 172px;
     }
 }
 
