@@ -81,6 +81,22 @@ public class SurveyBuilderController {
 		return JspResolver.MESSAGE_HEADER;
 	}
 
+	@RequestMapping(value = "/revertquestionoverlay", method = RequestMethod.GET)
+	public String revertAddQuestionOverlay(Model model, HttpServletRequest request) {
+		LOG.info("Method revertAddQuestionOverlay started");
+		return JspResolver.SURVEY_BUILDER_QUESTION_OVERLAY;
+	}
+
+	@RequestMapping(value = "/populatenewform", method = RequestMethod.GET)
+	public String populateNewForm(Model model, HttpServletRequest request) {
+		LOG.info("Method populateNewForm started");
+		
+		String order = request.getParameter("order");
+		model.addAttribute("order", order);
+		
+		return JspResolver.SURVEY_BUILDER_QUESTION_NEW;
+	}
+
 	/**
 	 * Method to add question to existing survey
 	 * 
@@ -419,12 +435,10 @@ public class SurveyBuilderController {
 	 * @param request
 	 * @return
 	 */
-	@ResponseBody
 	@RequestMapping(value = "/getactivesurveyquestions", method = RequestMethod.GET)
 	public String getActiveSurveyDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method getSurveyDetails of SurveyBuilderController called");
 		User user = sessionHelper.getCurrentUser();
-		String surveyJson = "";
 		String status = "";
 
 		SurveyDetail surveyDetail = new SurveyDetail();
@@ -446,22 +460,19 @@ public class SurveyBuilderController {
 			}
 			surveyDetail.setStatus(status);
 
-			// Converting to json
-			surveyJson = new Gson().toJson(surveyDetail);
+			model.addAttribute("surveyDetail", surveyDetail);
 			LOG.info("Method getSurveyDetails of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
 			LOG.warn("InvalidInputException while disabling Survey from company: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return surveyJson;
+		return JspResolver.SURVEY_BUILDER_QUESTION_LIST;
 	}
 	
-	@ResponseBody
 	@RequestMapping(value = "/getsurveyquestion", method = RequestMethod.GET)
 	public String getSurveyQuestionDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method getSurveyQuestionDetails of SurveyBuilderController called");
-		String surveyQuestionJson = "";
 
 		SurveyQuestionDetails surveyQuestion = new SurveyQuestionDetails();
 		try {
@@ -490,15 +501,14 @@ public class SurveyBuilderController {
 			}
 			surveyQuestion.setAnswers(answerOptionsToQuestion);
 			
-			// Converting to json
-			surveyQuestionJson = new Gson().toJson(surveyQuestion);
+			model.addAttribute("surveyQuestion", surveyQuestion);
 			LOG.info("Method getSurveyQuestionDetails of SurveyBuilderController finished successfully");
 		}
 		catch (InvalidInputException e) {
 			LOG.warn("InvalidInputException while fetching SurveyQuestion: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		return surveyQuestionJson;
+		return JspResolver.SURVEY_BUILDER_QUESTION_EDIT;
 	}
 
 	/**
