@@ -4126,10 +4126,38 @@ button.paypal.is-active {
 .bd-hr-img {
     height: 32px;
     width: 32px;
-    background-color: #f1f1f1;
     margin-top: 7px;
     margin-right: 15px;
     border-radius: 50%;
+}
+
+.pers-default-img {
+ 	background: url(../images/place-holder-individual.png) no-repeat center;
+ 	background-size: 20px;
+}
+
+.pers-default-big {
+ 	background: url(../images/place-holder-individual.png) no-repeat center;
+ 	background-size: auto !important;
+	border: 1px dashed #ccc;
+}
+ 
+.region-default-img {
+	background: url(../images/place-holder-Region.png) no-repeat center;
+	background-size: auto !important;
+	border: 1px dashed #ccc;
+}
+
+.office-default-img {
+	background: url(../images/place-holder-Office.png) no-repeat center;
+	background-size: auto !important;
+	border: 1px dashed #ccc;
+}
+
+.comp-default-img {
+	background: url(../images/place-holder-Company.png) no-repeat center;
+	background-size: auto !important;
+	border: 1px dashed #ccc;
 }
 
 .bd-lt-l1 {
