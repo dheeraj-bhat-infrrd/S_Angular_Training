@@ -568,6 +568,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.BRANCHES_SOLR, branches);
 			document.addField(CommonConstants.REGIONS_SOLR, regions);
 			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
+			document.addField(CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin());
+			document.addField(CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin());
 			LOG.debug("response while adding user is: " + response);
 			solrServer.add(document);
 			solrServer.commit();
