@@ -1,19 +1,19 @@
-<td class="u-tbl-edit-td" colspan="9">
+
     <div class="v-um-edit-wrapper clearfix">
         <div class="v-edit-lft col-lg-6 col-md-6 col-sm-6 col-xs-12">
             <div class="v-edit-row clearfix">
                 <div class="float-left v-ed-lbl">User Name</div>
                 <div class="float-left v-ed-txt-sm">
-                    <input class="v-ed-txt-item" placeholder="First Name">
+                    <input class="v-ed-txt-item" placeholder="First Name" value="${firstName}">
                 </div>
                 <div class="float-left v-ed-txt-sm v-ed-txt-sm-adj">
-                    <input class="v-ed-txt-item" placeholder="Last Name">
+                    <input class="v-ed-txt-item" placeholder="Last Name" value="${lastName}">
                 </div>
             </div>
             <div class="v-edit-row clearfix">
                 <div class="float-left v-ed-lbl">Email Address</div>
                 <div class="float-left v-ed-txt">
-                    <input class="v-ed-txt-item" placeholder="Email Address">
+                    <input class="v-ed-txt-item" placeholder="Email Address" value="${emailId}">
                 </div>
             </div>
             <div class="v-edit-row clearfix">
@@ -76,4 +76,3 @@
         </div>
         <div class="v-edt-btn-sav">Save Changes</div>
     </div>
-</td>
