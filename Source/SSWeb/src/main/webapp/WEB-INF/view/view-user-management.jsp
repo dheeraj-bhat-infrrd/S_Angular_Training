@@ -18,71 +18,23 @@
 </head>
 
 <body>
-    <div class="hdr-wrapper">
-        <div class="container hdr-container clearfix">
-            <div class="float-left hdr-logo"></div>
-            <div class="float-right clearfix hdr-btns-wrapper">
-                <div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
-                <div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
-            </div>
-        </div>
-    </div>
     <div class="hm-header-main-wrapper">
         <div class="container">
             <div class="hm-header-row hm-header-row-main clearfix">
-                <div class="float-left hm-header-row-left text-center">User Management</div>
+                <div class="float-left hm-header-row-left text-center"><spring:message code="label.header.usermanagement.key" /></div>
             </div>
         </div>
     </div>
 
     <div class="container v-um-container">
         <div class="v-um-header clearfix">
-            <div class="v-um-hdr-left float-left">Browse Users</div>
+            <div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
             <div class="v-um-hdr-right float-right">
-                <input class="v-um-inp" placeholder="Search User">
+                <input class="v-um-inp" placeholder="Search User" onkeyup="searchUsersByNameEmailLoginId(this.value)">
             </div>
         </div>
-        <div class="v-um-tbl-wrapper">
-            <table class="v-um-tbl">
-                <tr class="u-tbl-header">
-                    <td class="v-tbl-uname">Username</td>
-                    <td class="v-tbl-email">Email Address</td>
-                    <td class="v-tbl-rgn-adm text-center">Region</br/>Admin</td>
-                    <td class="v-tbl-of-adm text-center">Office<br/>Admin</td>
-                    <td class="v-tbl-ln-of text-center">Loan<br/>Officer</td>
-                    <td class="v-tbl-mail"></td>
-                    <td class="v-tbl-online"></td>
-                    <td class="v-tbl-rem"></td>
-                    <td class="v-tbl-edit"></td>
-                </tr>
-                <tr class="u-tbl-row">
-                    <td class="v-tbl-uname">Annalisa Detrick</td>
-                    <td class="v-tbl-email">annalisa@detrick.com</td>
-                    <td class="v-tbl-rgn-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-of-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-ln-of v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-mail v-tbl-icn v-icn-fmail"></td>
-                    <td class="v-tbl-online v-tbl-icn v-icn-onl v-icn-onl-off"></td>
-                    <td class="v-tbl-rem v-tbl-icn v-icn-rem-user"></td>
-                    <td class="v-tbl-edit v-tbl-icn v-icn-edit-user"></td>
-                </tr>
-                <tr class="u-tbl-row">
-                    <td class="v-tbl-uname">Annalisa Detrick</td>
-                    <td class="v-tbl-email">annalisa@detrick.com</td>
-                    <td class="v-tbl-rgn-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-of-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-ln-of v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-mail v-tbl-icn v-icn-fmail"></td>
-                    <td class="v-tbl-online v-tbl-icn v-icn-ofl v-icn-onl-off"></td>
-                    <td class="v-tbl-rem v-tbl-icn v-icn-rem-user"></td>
-                    <td class="v-tbl-edit v-tbl-icn v-icn-edit-user"></td>
-                </tr>
-<!--
-                <tr class="u-tbl-row u-tbl-row-sel">
-                        
-                </tr>
--->
-            </table>
+        <div class="v-um-tbl-wrapper" id="user-list">
+        	<!-- Fill in the user list jsp -->
         </div>
     </div>
 
@@ -92,7 +44,15 @@
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
     $(document).ready(function() {
-        
+    	$(document).ready(function(){
+    		doStopAjaxRequestForUsersList = false;
+    		if($('#server-message>div').hasClass("error-message")){
+    			isUserManagementAuthorized = false;
+    			$('#server-message').show();
+    			//var errorMessage = $('#server-message p').text();
+    		}
+    		initUserManagementPage();		
+    	});
         $(document).on('click','.v-tbl-icn',function(e){
             e.stopPropagation();
         });

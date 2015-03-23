@@ -35,7 +35,7 @@ $(document).on('blur', '#um-emailid', function() {
 
 function initUserManagementPage() {
 	UsersListStartIndex = 0;
-	paintUserDetailsForm("");
+	//paintUserDetailsForm("");
 	paintUserListInUserManagement();
 }
 
@@ -324,33 +324,19 @@ function paintUserDetailsForm(userId) {
  * Function paint the user list in user management page
  */
 function paintUserListInUserManagement() {
-	var jsonData;
+	// var jsonData;
 	var payload = {
 		"startIndex" : UsersListStartIndex,
 		"batchSize" : batchSize
 	};
-	var success = false;
+	//var success = false;
 	$.ajax({
 		url : "./findusersforcompany.do",
 		type : "GET",
 		data : payload,
-		dataType : "JSON",
+		dataType : "html",
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				var jsonData = data.responseJSON;
-				if (jsonData.length < batchSize) {
-					doStopAjaxRequestForUsersList = true;
-					$('#um-view-more-users').hide();
-				}
-				if (jsonData.length == 0) {
-					return false;
-				}
-				paintUsersList(jsonData);
-			}
+			$('#user-list').html(data);
 		},
 		error : function(e) {
 			console.error("error : " + e);
