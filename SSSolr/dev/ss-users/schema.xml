@@ -50,6 +50,8 @@
     <field name="status" type="integer" indexed="true" stored="true" />
     <field name="isOwner" type="integer" indexed="true" stored="true" />
     <field name="isAgent" type="boolean" indexed="true" stored="true" />
+    <field name="isBranchAdmin" type="boolean" indexed="true" stored="true" />
+    <field name="isRegionAdmin" type="boolean" indexed="true" stored="true" />
     <field name="regions" type="long" indexed="true" stored="true" multiValued="true" />
     <field name="branches" type="long" indexed="true" stored="true" multiValued="true" />
     <field name="agentIds" type="long" indexed="true" stored="true" multiValued="true" />

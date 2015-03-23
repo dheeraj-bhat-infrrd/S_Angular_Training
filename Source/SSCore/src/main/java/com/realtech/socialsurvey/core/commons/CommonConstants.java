@@ -287,6 +287,8 @@ public interface CommonConstants {
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
 	public static final String IS_AGENT_SOLR = "isAgent";
+	public static final String IS_BRANCH_ADMIN_SOLR = "isBranchAdmin";
+	public static final String IS_REGION_ADMIN_SOLR = "isRegionAdmin";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
 	public static final String ABOUT_ME_SOLR = "aboutMe";
