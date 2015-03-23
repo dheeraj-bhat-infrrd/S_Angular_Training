@@ -357,6 +357,18 @@ public class UserManagementController {
 		LOG.info("Method to find users by email id finished.");
 		return users;
 	}
+	
+	@RequestMapping(value = "/findusers", method = RequestMethod.GET)
+	public String findUsersByEmailIdAndRedirectToPage(Model model, HttpServletRequest request){
+		LOG.info("Finding users and redirecting to search page");
+		String users = findUserByEmail(model, request);
+		// convert users to Object
+		Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>(){}.getType();
+		List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+		model.addAttribute("userslist", usersList);
+		LOG.debug("Users List: "+usersList.toString());
+		return JspResolver.USER_LIST_FOR_MANAGEMENT;
+	}
 
 	/*
 	 * Method to remove an existing user. Soft delete is done.
@@ -960,6 +972,22 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.CHANGE_PASSWORD;
+	}
+	
+	@RequestMapping(value="/finduserassignments", method = RequestMethod.GET)
+	public String getUserAssignments(Model model, HttpServletRequest request){
+		LOG.info("Getting user assignments");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
+		String userId = request.getParameter("userId");
+		
+		// set the request parameters in model
+		model.addAttribute("firstName", firstName);
+		model.addAttribute("lastName", lastName);
+		model.addAttribute("emailId", emailId);
+		model.addAttribute("userId", userId);
+		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
 	}
 
 	// verify change password parameters

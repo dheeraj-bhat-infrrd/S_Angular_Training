@@ -569,23 +569,16 @@ function searchUsersByNameEmailLoginId(searchKey) {
 	var payload = {
 		"searchKey" : searchKey
 	};
-	var success = false;
 	$.ajax({
-		url : "./finduserbyemail.do",
+		url : "./findusers.do",
 		type : "GET",
-		dataType : "JSON",
+		dataType : "HTML",
 		data : payload,
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
+			$('#user-list').html(data);
 		},
-		complete : function(data) {
-			if (success) {
-				paintUsersList(data.responseJSON);
-			}
-		},
-		error : function() {
-
+		error : function(e) {
+			console.error("error : " + e);
 		}
 	});
 
@@ -728,4 +721,30 @@ function searchBranchesForUserCallBack(jsonData) {
 		}
 		$('#um-assignto').parent().append(branchListContainer);
 	}
+}
+
+/*
+ * Function paint the user list in user management page
+ */
+function getUserAssignments(firstName, lastName, emailId, userId) {
+	// var jsonData;
+	var payload = {
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"emailId" : emailId,
+		"userId" : userId
+	};
+	//var success = false;
+	$.ajax({
+		url : "./finduserassignments.do",
+		type : "GET",
+		data : payload,
+		dataType : "html",
+		success : function(data) {
+			$('#user-details-and-assignments-'+userId).html(data);
+		},
+		error : function(e) {
+			console.error("error : " + e);
+		}
+	});
 }

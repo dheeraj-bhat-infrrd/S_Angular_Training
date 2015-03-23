@@ -90,7 +90,7 @@ public class UserFromSearch {
 		this.status = status;
 	}
 
-	public boolean isRegionAdmin() {
+	public boolean getIsRegionAdmin() {
 		return isRegionAdmin;
 	}
 
@@ -98,7 +98,7 @@ public class UserFromSearch {
 		this.isRegionAdmin = isRegionAdmin;
 	}
 
-	public boolean isBranchAdmin() {
+	public boolean getIsBranchAdmin() {
 		return isBranchAdmin;
 	}
 
@@ -106,7 +106,7 @@ public class UserFromSearch {
 		this.isBranchAdmin = isBranchAdmin;
 	}
 
-	public boolean isAgent() {
+	public boolean getIsAgent() {
 		return isAgent;
 	}
 

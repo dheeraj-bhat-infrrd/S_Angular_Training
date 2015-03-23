@@ -30,6 +30,7 @@ public interface JspResolver {
 	public static final String DASHBOARD = "dashboard";
 	public static final String USER_MANAGEMENT = "view-user-management";
 	public static final String USER_LIST_FOR_MANAGEMENT = "userlist";
+	public static final String USER_MANAGEMENT_EDIT_USER_DETAILS = "um-edit-row";
 	public static final String USER_DETAILS = "userdetails";
 	public static final String USER_LIST = "userslist";
 	public static final String USER_ID_ON_INVITE = "useridoninvite";
