@@ -262,8 +262,8 @@ public interface CommonConstants {
 	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
 	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
 	public static final String EMAIL_REGEX = "^[\\w-_\\.+]*[\\w-_\\.]\\@([\\w]+\\.)+[\\w]+[\\w]$";
-	public static final String FIRST_NAME_REGEX = "[a-zA-Z]+";
-	public static final String LAST_NAME_REGEX = "[a-zA-Z ]+";
+	public static final String FIRST_NAME_REGEX = "[a-zA-Z ]+";
+	public static final String LAST_NAME_REGEX = "[a-zA-Z0-9 ]+";
 
 	/**
 	 * Solr document related constants
@@ -287,6 +287,8 @@ public interface CommonConstants {
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
 	public static final String IS_AGENT_SOLR = "isAgent";
+	public static final String IS_BRANCH_ADMIN_SOLR = "isBranchAdmin";
+	public static final String IS_REGION_ADMIN_SOLR = "isRegionAdmin";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
 	public static final String ABOUT_ME_SOLR = "aboutMe";
@@ -382,4 +384,17 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
+
+	/*
+	 * Mongo column and collection constants
+	 */
+	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
+	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	
+	/*
+	 * Constants related to Dash board profile.
+	 */
+	public static final int MAX_SURVEY_SCORE = 5;
+	public static final int MAX_SENT_SURVEY_COUNT = 10;
+	public static final int MAX_SOCIAL_POSTS = 10;
 }

@@ -44,10 +44,21 @@ public class Region implements Serializable {
 	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
+	public String getRegionName() {
+		return regionName;
+	}
+
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
 	private String region;
+
+	@Transient
+	private String regionName;
 	
 	private int status;
 	
