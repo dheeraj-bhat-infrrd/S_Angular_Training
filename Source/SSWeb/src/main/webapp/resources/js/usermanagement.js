@@ -275,17 +275,12 @@ function deleteUser(userId) {
 			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
 			}
+			// hide the row of the user deleted
+			$('#user-row-'+userId).hide();
 		},
 		complete : function() {
-			$('#overlay-cancel').click();
 			hideOverlay();
-			if (success) {
-				// paint blank user details form
-				$('#um-user-' + userId).remove();
-				paintUserDetailsForm("");
-				UsersListStartIndex = 0;
-				paintUserListInUserManagement();
-			}
+			
 		},
 		error : function(e) {
 			console.error("error : " + e);

@@ -7,14 +7,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.title.registeruser.key"/></title>
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
 </head>
 
 <body>
@@ -39,9 +31,6 @@
     </div>
 
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
     $(document).ready(function() {
     	$(document).ready(function(){
@@ -81,6 +70,12 @@
                 var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
                 getUserAssignments(firstName, lastName, emailId, userId);
             }
+        });
+        
+        $(document).on('click','.v-icn-rem-user', function(){
+        	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+        	alert(userId);
+        	deleteUser(userId);
         });
         
     });
