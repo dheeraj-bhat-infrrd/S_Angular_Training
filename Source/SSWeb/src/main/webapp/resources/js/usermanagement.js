@@ -260,7 +260,6 @@ function confirmDeleteUser(userId) {
  * Function to deactivate a user and remove from company
  */
 function deleteUser(userId) {
-	var success = false;
 	var payload = {
 		"userIdToRemove" : userId
 	};
@@ -719,7 +718,7 @@ function searchBranchesForUserCallBack(jsonData) {
 }
 
 /*
- * Function paint the user list in user management page
+ * Function search for user
  */
 function getUserAssignments(firstName, lastName, emailId, userId) {
 	// var jsonData;
@@ -743,3 +742,24 @@ function getUserAssignments(firstName, lastName, emailId, userId) {
 		}
 	});
 }
+
+function reinviteUser(firstName, lastName, emailId) {
+	var payload = {
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"emailId" : emailId
+	};
+	$.ajax({
+		url : "./reinviteuser.do",
+		type : "GET",
+		data : payload,
+		dataType : "html",
+		success : function(data) {
+			$('#message-header').html(data);
+		},
+		error : function(e) {
+			console.error("error : " + e);
+		}
+	});
+}
+
