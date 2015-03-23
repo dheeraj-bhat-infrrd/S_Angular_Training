@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -286,6 +289,10 @@ public class UserManagementController {
 			try {
 				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
 				// convert users to Object
+				Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>(){}.getType();
+				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+				model.addAttribute("userslist", usersList);
+				LOG.debug("Users List: "+usersList.toString());
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
