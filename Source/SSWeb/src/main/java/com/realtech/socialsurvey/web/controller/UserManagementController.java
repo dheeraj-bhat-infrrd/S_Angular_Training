@@ -989,6 +989,34 @@ public class UserManagementController {
 		model.addAttribute("userId", userId);
 		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
 	}
+	
+	@RequestMapping(value="/reinviteuser", method=RequestMethod.GET)
+	public String sendInvitationForRegistration(Model model, HttpServletRequest request){
+		LOG.debug("Sending invitation to user");
+		String emailId = request.getParameter("emailId");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		User user = sessionHelper.getCurrentUser();
+		try{
+			if(emailId == null || emailId.isEmpty()){
+				LOG.warn("Email id is not present to resend invitation");
+				throw new InvalidInputException("Invalid email id.",DisplayMessageConstants.INVALID_EMAILID);
+			}
+			if(firstName == null || firstName.isEmpty()){
+				LOG.warn("First Name is not present to resend invitation");
+				throw new InvalidInputException("Invalid first name.",DisplayMessageConstants.INVALID_FIRSTNAME);
+			}
+			LOG.debug("Sending invitation...");
+			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
+			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}catch (NonFatalException e) {
+			LOG.error("NonFatalException while reinviting user. Reason : " + e.getMessage(), e);
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
+	}
 
 	// verify change password parameters
 	private void validateChangePasswordFormParameters(String oldPassword, String newPassword, String confirmNewPassword) throws InvalidInputException {

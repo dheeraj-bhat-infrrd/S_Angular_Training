@@ -78,6 +78,13 @@
         	deleteUser(userId);
         });
         
+        $(document).on('click','.v-icn-fmail', function(){
+        	 var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+             var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+             var emailId = $(this).parent().find('.fetch-email').html();
+             reinviteUser(firstName, lastName, emailId);
+        });
+        
     });
 </script>
 
