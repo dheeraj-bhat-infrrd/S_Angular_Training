@@ -11,7 +11,6 @@ import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -255,7 +254,6 @@ public class UserManagementController {
 	 * user is company admin who can assign different roles to other users.
 	 */
 	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.GET)
-	@ResponseBody
 	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		String startIndexStr = request.getParameter("startIndex");
@@ -287,6 +285,7 @@ public class UserManagementController {
 			}
 			try {
 				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
+				// convert users to Object
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
@@ -295,15 +294,18 @@ public class UserManagementController {
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+			/*ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
 			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
 			String errorMessage = JSONUtil.toJSON(errorResponse);
-			return errorMessage;
+			return errorMessage;*/
 		}
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
 		// return user details page on success
-		return users;
+		//return users;
+		return JspResolver.USER_LIST_FOR_MANAGEMENT;
 	}
 
 	/*
