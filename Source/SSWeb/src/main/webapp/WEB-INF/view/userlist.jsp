@@ -30,7 +30,7 @@
 		<c:if test="${userfromsearch.status == 2}">
 			<c:set var="regstatustickclass" value="v-icn-fmail"/>
 			<c:set var="userstatustickclass" value="v-icn-off"/></c:if>
-		<tr class="u-tbl-row">
+		<tr class="u-tbl-row" id="user-row-${userfromsearch.userId}">
 			<td class="v-tbl-uname fetch-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 			<td class="v-tbl-email fetch-email">${userfromsearch.emailId}</td>
 			<td class="v-tbl-rgn-adm v-tbl-icn ${regionadmintickclass}"></td>
