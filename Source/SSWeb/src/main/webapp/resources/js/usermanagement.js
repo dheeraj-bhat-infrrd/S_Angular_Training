@@ -35,7 +35,7 @@ $(document).on('blur', '#um-emailid', function() {
 
 function initUserManagementPage() {
 	UsersListStartIndex = 0;
-	paintUserDetailsForm("");
+	//paintUserDetailsForm("");
 	paintUserListInUserManagement();
 }
 
@@ -260,7 +260,6 @@ function confirmDeleteUser(userId) {
  * Function to deactivate a user and remove from company
  */
 function deleteUser(userId) {
-	var success = false;
 	var payload = {
 		"userIdToRemove" : userId
 	};
@@ -275,17 +274,12 @@ function deleteUser(userId) {
 			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
 			}
+			// hide the row of the user deleted
+			$('#user-row-'+userId).hide();
 		},
 		complete : function() {
-			$('#overlay-cancel').click();
 			hideOverlay();
-			if (success) {
-				// paint blank user details form
-				$('#um-user-' + userId).remove();
-				paintUserDetailsForm("");
-				UsersListStartIndex = 0;
-				paintUserListInUserManagement();
-			}
+			
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -324,33 +318,19 @@ function paintUserDetailsForm(userId) {
  * Function paint the user list in user management page
  */
 function paintUserListInUserManagement() {
-	var jsonData;
+	// var jsonData;
 	var payload = {
 		"startIndex" : UsersListStartIndex,
 		"batchSize" : batchSize
 	};
-	var success = false;
+	//var success = false;
 	$.ajax({
 		url : "./findusersforcompany.do",
 		type : "GET",
 		data : payload,
-		dataType : "JSON",
+		dataType : "html",
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				var jsonData = data.responseJSON;
-				if (jsonData.length < batchSize) {
-					doStopAjaxRequestForUsersList = true;
-					$('#um-view-more-users').hide();
-				}
-				if (jsonData.length == 0) {
-					return false;
-				}
-				paintUsersList(jsonData);
-			}
+			$('#user-list').html(data);
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -583,23 +563,16 @@ function searchUsersByNameEmailLoginId(searchKey) {
 	var payload = {
 		"searchKey" : searchKey
 	};
-	var success = false;
 	$.ajax({
-		url : "./finduserbyemail.do",
+		url : "./findusers.do",
 		type : "GET",
-		dataType : "JSON",
+		dataType : "HTML",
 		data : payload,
 		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
+			$('#user-list').html(data);
 		},
-		complete : function(data) {
-			if (success) {
-				paintUsersList(data.responseJSON);
-			}
-		},
-		error : function() {
-
+		error : function(e) {
+			console.error("error : " + e);
 		}
 	});
 
@@ -743,3 +716,50 @@ function searchBranchesForUserCallBack(jsonData) {
 		$('#um-assignto').parent().append(branchListContainer);
 	}
 }
+
+/*
+ * Function search for user
+ */
+function getUserAssignments(firstName, lastName, emailId, userId) {
+	// var jsonData;
+	var payload = {
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"emailId" : emailId,
+		"userId" : userId
+	};
+	//var success = false;
+	$.ajax({
+		url : "./finduserassignments.do",
+		type : "GET",
+		data : payload,
+		dataType : "html",
+		success : function(data) {
+			$('#user-details-and-assignments-'+userId).html(data);
+		},
+		error : function(e) {
+			console.error("error : " + e);
+		}
+	});
+}
+
+function reinviteUser(firstName, lastName, emailId) {
+	var payload = {
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"emailId" : emailId
+	};
+	$.ajax({
+		url : "./reinviteuser.do",
+		type : "GET",
+		data : payload,
+		dataType : "html",
+		success : function(data) {
+			$('#message-header').html(data);
+		},
+		error : function(e) {
+			console.error("error : " + e);
+		}
+	});
+}
+
