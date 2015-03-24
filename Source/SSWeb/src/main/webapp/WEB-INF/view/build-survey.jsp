@@ -19,6 +19,20 @@
 
 <body>
     
+    <div id="view-srv-pu" class="bd-srv-pu">
+        <div class="container view-srv-container">
+            <div class="bd-q-wrapper">
+                <div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
+                    <div class="float-left bd-q-pu-header-lft">View Survey</div>
+                </div>
+                <div class="vs-q-wrapper">
+                    <div class="vs-q-item">Lorem ipsum is some dummy text. Lorem ipsum is some dummy text.</div>
+                    <div class="vs-ans-item"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="bd-srv-pu" class="bd-srv-pu hide">
         <div class="container bd-q-container">
             <div class="bd-q-wrapper">
