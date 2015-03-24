@@ -36,7 +36,7 @@ public interface SurveyHandler {
 	 */
 	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
 
-	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent) throws SolrException, NoRecordsFetchedException,
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException,
 			SolrServerException, InvalidInputException;
 
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
