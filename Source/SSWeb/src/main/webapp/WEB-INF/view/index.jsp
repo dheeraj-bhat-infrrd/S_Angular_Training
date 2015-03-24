@@ -68,36 +68,34 @@
 						</div>
 						<div class="float-left c-pic-img c-pic-top-2">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">Faramarz Moeen Ziai</div>
+								<div class="pic-bot-txt-bot">SVP. Mortgage</div>
 							</div>
 						</div>
 					</div>
 					<div class="clearfix c-pic-panel-bot">
 						<div class="float-left c-pic-img c-pic-bot-1">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">John Jackson</div>
+								<div class="pic-bot-txt-bot">Counselor, Professional Services</div>
 							</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-bot-2">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">Tyler Morton</div>
+								<div class="pic-bot-txt-bot">Broker-Owner, Real Estate</div>
 							</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-bot-3">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">Laura Ryan</div>
+								<div class="pic-bot-txt-bot">Director. Real Estate</div>
+							</div>
+						</div>
+                        <div class="float-left c-pic-img c-pic-bot-4">
+							<div class="pic-bot-txt">
+								<div class="pic-bot-txt-top">David Kawata</div>
+								<div class="pic-bot-txt-bot">CEO, Software</div>
 							</div>
 						</div>
 					</div>
