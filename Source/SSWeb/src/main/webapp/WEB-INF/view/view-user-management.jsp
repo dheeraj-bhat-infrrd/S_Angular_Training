@@ -7,92 +7,41 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.title.registeruser.key"/></title>
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
-	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
 </head>
 
 <body>
-    <div class="hdr-wrapper">
-        <div class="container hdr-container clearfix">
-            <div class="float-left hdr-logo"></div>
-            <div class="float-right clearfix hdr-btns-wrapper">
-                <div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
-                <div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
-            </div>
-        </div>
-    </div>
     <div class="hm-header-main-wrapper">
         <div class="container">
             <div class="hm-header-row hm-header-row-main clearfix">
-                <div class="float-left hm-header-row-left text-center">User Management</div>
+                <div class="float-left hm-header-row-left text-center"><spring:message code="label.header.usermanagement.key" /></div>
             </div>
         </div>
     </div>
 
     <div class="container v-um-container">
         <div class="v-um-header clearfix">
-            <div class="v-um-hdr-left float-left">Browse Users</div>
+            <div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
             <div class="v-um-hdr-right float-right">
-                <input class="v-um-inp" placeholder="Search User">
+                <input class="v-um-inp" placeholder="Search User" onkeyup="searchUsersByNameEmailLoginId(this.value)">
             </div>
         </div>
-        <div class="v-um-tbl-wrapper">
-            <table class="v-um-tbl">
-                <tr class="u-tbl-header">
-                    <td class="v-tbl-uname">Username</td>
-                    <td class="v-tbl-email">Email Address</td>
-                    <td class="v-tbl-rgn-adm text-center">Region</br/>Admin</td>
-                    <td class="v-tbl-of-adm text-center">Office<br/>Admin</td>
-                    <td class="v-tbl-ln-of text-center">Loan<br/>Officer</td>
-                    <td class="v-tbl-mail"></td>
-                    <td class="v-tbl-online"></td>
-                    <td class="v-tbl-rem"></td>
-                    <td class="v-tbl-edit"></td>
-                </tr>
-                <tr class="u-tbl-row">
-                    <td class="v-tbl-uname">Annalisa Detrick</td>
-                    <td class="v-tbl-email">annalisa@detrick.com</td>
-                    <td class="v-tbl-rgn-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-of-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-ln-of v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-mail v-tbl-icn v-icn-fmail"></td>
-                    <td class="v-tbl-online v-tbl-icn v-icn-onl v-icn-onl-off"></td>
-                    <td class="v-tbl-rem v-tbl-icn v-icn-rem-user"></td>
-                    <td class="v-tbl-edit v-tbl-icn v-icn-edit-user"></td>
-                </tr>
-                <tr class="u-tbl-row">
-                    <td class="v-tbl-uname">Annalisa Detrick</td>
-                    <td class="v-tbl-email">annalisa@detrick.com</td>
-                    <td class="v-tbl-rgn-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-of-adm v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-ln-of v-tbl-icn v-icn-tick"></td>
-                    <td class="v-tbl-mail v-tbl-icn v-icn-fmail"></td>
-                    <td class="v-tbl-online v-tbl-icn v-icn-ofl v-icn-onl-off"></td>
-                    <td class="v-tbl-rem v-tbl-icn v-icn-rem-user"></td>
-                    <td class="v-tbl-edit v-tbl-icn v-icn-edit-user"></td>
-                </tr>
-<!--
-                <tr class="u-tbl-row u-tbl-row-sel">
-                        
-                </tr>
--->
-            </table>
+        <div class="v-um-tbl-wrapper" id="user-list">
+        	<!-- Fill in the user list jsp -->
         </div>
     </div>
 
 
-<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
     $(document).ready(function() {
-        
+    	$(document).ready(function(){
+    		doStopAjaxRequestForUsersList = false;
+    		if($('#server-message>div').hasClass("error-message")){
+    			isUserManagementAuthorized = false;
+    			$('#server-message').show();
+    			//var errorMessage = $('#server-message p').text();
+    		}
+    		initUserManagementPage();		
+    	});
         $(document).on('click','.v-tbl-icn',function(e){
             e.stopPropagation();
         });
@@ -107,15 +56,33 @@
             $(this).parent().slideToggle(200);
         });
         
-        $(document).on('click','.u-tbl-row',function(){
-            if($(this).hasClass('u-tbl-row-sel')){
-                $(this).removeClass('u-tbl-row-sel');
-                $(this).next('.u-tbl-row').hide();
+        $(document).on('click','.v-icn-edit-user',function(){
+            if($(this).parent().hasClass('u-tbl-row-sel')){
+                $(this).parent().removeClass('u-tbl-row-sel');
+                $(this).parent().next('.u-tbl-row').hide();
             }else{
-                var editRow = $('<tr class="u-tbl-row u-tbl-row-sel">');
-                $(this).after(editRow);
-                $(this).addClass('u-tbl-row-sel');
+                $(this).parent().next('.u-tbl-row').show();
+                $(this).parent().addClass('u-tbl-row-sel');
+                // make an ajax call and fetch the details of the user
+                var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+                var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+                var emailId = $(this).parent().find('.fetch-email').html();
+                var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+                getUserAssignments(firstName, lastName, emailId, userId);
             }
+        });
+        
+        $(document).on('click','.v-icn-rem-user', function(){
+        	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+        	alert(userId);
+        	deleteUser(userId);
+        });
+        
+        $(document).on('click','.v-icn-fmail', function(){
+        	 var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+             var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+             var emailId = $(this).parent().find('.fetch-email').html();
+             reinviteUser(firstName, lastName, emailId);
         });
         
     });
