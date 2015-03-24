@@ -312,7 +312,6 @@ public class UserManagementController {
 		String users = "";
 		int startIndex = 0;
 		int batchSize = 0;
-
 		try {
 			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
@@ -331,7 +330,6 @@ public class UserManagementController {
 					LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
 					batchSize = SOLR_BATCH_SIZE;
 				}
-
 				startIndex = Integer.parseInt(startIndexStr);
 				batchSize = Integer.parseInt(batchSizeStr);
 			}
