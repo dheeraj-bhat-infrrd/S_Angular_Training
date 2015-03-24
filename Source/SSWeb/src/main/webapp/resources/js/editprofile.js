@@ -898,6 +898,12 @@ function fetchHierarchy(attrName, attrValue) {
 	callAjaxGET(url, paintHierarchy, true);
 }
 
+//Hierarchy data population
+function fetchCompanyHierarchy(attrName, attrValue) {
+	var url = "./getcompanyhierarchy.do?" + attrName + "=" + attrValue;
+	callAjaxGET(url, paintHierarchy, true);
+}
+
 function paintHierarchy(data) {
 	$("#prof-hierarchy-container").html(data);
 	$("#prof-hierarchy-container").show();
