@@ -858,7 +858,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
 			regionsResult = JSONUtil.toJSON(results);
-			LOG.debug("User search result is : " + regionsResult);
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing Regions search");
@@ -887,7 +886,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
 			branchesResult = JSONUtil.toJSON(results);
-			LOG.debug("User search result is : " + branchesResult);
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing Branches search");

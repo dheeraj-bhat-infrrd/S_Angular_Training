@@ -1,6 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+
 <!DOCTYPE">
 <html>
 <head>
@@ -58,7 +61,8 @@ $(document).ready(function() {
 	// remove user
 	$(document).on('click', '.v-icn-rem-user', function(){
 		var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-		deleteUser(userId);
+		var adminId = '${user.userId}';
+		confirmDeleteUser(userId, adminId);
 	});
 	
 	// resend verification mail
@@ -79,9 +83,6 @@ $(document).ready(function() {
 			$(this).parent().addClass('u-tbl-row-sel');
 			
 			// make an ajax call and fetch the details of the user
-			var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
-			var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
-			var emailId = $(this).parent().find('.fetch-email').html();
 			var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
 			getUserAssignments(userId);
 		}
@@ -89,14 +90,14 @@ $(document).ready(function() {
 	
 	// de-activate user profile
 	$(document).on('click', '.tbl-switch-on', function(){
-		var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-		deleteUser(userId);
+		var profileId = $(this).parent().data('profile-id');
+		updateUserProfile(profileId, 0);
 	});
 
 	// activate user profile
 	$(document).on('click', '.tbl-switch-off', function(){
-		var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-		deleteUser(userId);
+		var profileId = $(this).parent().data('profile-id');
+		updateUserProfile(profileId, 1);
 	});
 });
 </script>
