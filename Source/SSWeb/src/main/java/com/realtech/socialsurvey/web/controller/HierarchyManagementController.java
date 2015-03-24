@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.util.List;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
@@ -79,16 +80,18 @@ public class HierarchyManagementController {
 					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.HIERARCHY_MANAGEMENT_NOT_AUTHORIZED,
 							DisplayMessageType.ERROR_MESSAGE));
 				}
-				LOG.debug("Calling service for checking the status of regions already added");
+				LOG.debug("Calling service for checking the if the region addition is allowed");
 				isRegionAdditionAllowed = organizationManagementService.isRegionAdditionAllowed(user, accountType);
 
-				LOG.debug("Calling service for checking the status of branches already added");
+				LOG.debug("Calling service for checking the if the branches addition is allowed");
 				isBranchAdditionAllowed = organizationManagementService.isBranchAdditionAllowed(user, accountType);
 
 				LOG.debug("Obtaining profile name from settings present in session");
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				profileName = companySettings.getProfileName();
 				LOG.debug("Profile name obtained is : " + profileName);
+
+				LOG.debug("Obtaining profile level for the user");
 
 			}
 			catch (InvalidInputException e) {
@@ -784,8 +787,10 @@ public class HierarchyManagementController {
 		String searchRegionJson = null;
 		String strStart = request.getParameter("start");
 		String strRows = request.getParameter("rows");
+		HttpSession session = request.getSession(false);
 		int start = 0;
 		int rows = -1;
+		Set<Long> regionIds = null;
 		try {
 			if (regionPattern == null || regionPattern.isEmpty()) {
 				regionPattern = "*";
@@ -816,8 +821,12 @@ public class HierarchyManagementController {
 			}
 
 			try {
+				int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+				if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
+				}
 				LOG.debug("Calling solr search service to get the regions");
-				searchRegionJson = solrSearchService.searchRegions(regionPattern, user.getCompany(), start, rows + 1);
+				searchRegionJson = solrSearchService.searchRegions(regionPattern, user.getCompany(), regionIds, start, rows + 1);
 				LOG.debug("Calling solr search service to get the regions");
 			}
 			catch (InvalidInputException e) {
@@ -853,6 +862,8 @@ public class HierarchyManagementController {
 		String strRows = request.getParameter("rows");
 		int start = 0;
 		int rows = -1;
+		HttpSession session = request.getSession(false);
+		Set<Long> ids = null;
 		try {
 			if (branchPattern == null || branchPattern.isEmpty()) {
 				branchPattern = "*";
@@ -881,9 +892,32 @@ public class HierarchyManagementController {
 					LOG.error("Number format exception while parsing rows value" + strRows + ".Reason :" + e.getMessage(), e);
 				}
 			}
+
+			int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+			String idColumnName = null;
+			/**
+			 * Selective fetch of branches is done in the case of region admin or branch admin
+			 */
+			try {
+				if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+					ids = organizationManagementService.getRegionIdsForUser(user, highestRole);
+					idColumnName = CommonConstants.REGION_ID_SOLR;
+
+				}
+				else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+					ids = organizationManagementService.getBranchIdsForUser(user, highestRole);
+					idColumnName = CommonConstants.BRANCH_ID_SOLR;
+				}
+
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				LOG.error("Exception occured while getting branchIds for user.Reason:" + e.getMessage());
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
 			try {
 				LOG.debug("Calling solr search service to get the branches");
-				searchBranchJson = solrSearchService.searchBranches(branchPattern, user.getCompany(), start, rows + 1);
+				searchBranchJson = solrSearchService.searchBranches(branchPattern, user.getCompany(), idColumnName, ids, start, rows + 1);
 				LOG.debug("Calling solr search service to get the branches");
 			}
 			catch (InvalidInputException e) {
@@ -1006,8 +1040,9 @@ public class HierarchyManagementController {
 		return branches;
 
 	}
+
 	// JIRA SS-137 BY RM-05 : EOC
-	
+
 	/**
 	 * Method to get page containing form for editing region
 	 * 

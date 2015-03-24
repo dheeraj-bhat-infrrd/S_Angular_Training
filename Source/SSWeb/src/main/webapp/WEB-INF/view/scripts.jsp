@@ -21,6 +21,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
 <script>
 	$('#header-logo').click(function(){
