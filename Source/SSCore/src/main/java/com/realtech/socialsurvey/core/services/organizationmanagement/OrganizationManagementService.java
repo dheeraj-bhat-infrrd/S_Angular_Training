@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
@@ -224,13 +225,22 @@ public interface OrganizationManagementService {
 	public Region getDefaultRegionForCompany(Company company) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
-	 * Method to get all branches under the region whose regionId is providedf
+	 * Method to get all branches under the region whose regionId is provided
 	 * 
 	 * @param regionId
 	 * @return
 	 * @throws InvalidInputException
 	 */
 	public List<Branch> getBranchesByRegionId(long regionId) throws InvalidInputException;
+
+	/**
+	 * Method to get all branches under the regions specified
+	 * 
+	 * @param regionIds
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<Branch> getBranchesByRegionIds(Set<Long> regionIds) throws InvalidInputException;
 
 	/**
 	 * Method to add a branch
@@ -337,11 +347,11 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
-	 * @throws UserAssignmentException 
+	 * @throws UserAssignmentException
 	 */
 	public void addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
 			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException;
-	
+
 	/**
 	 * Method to fetch all branches of a company
 	 * 
@@ -530,5 +540,27 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void insertBranchSettings(Branch branch) throws InvalidInputException;
+
+	/**
+	 * Method to get the list of region ids for a user and profile master id specified
+	 * 
+	 * @param user
+	 * @param profileMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public Set<Long> getRegionIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method to get the list of branch ids for a user and profile master id specified
+	 * 
+	 * @param user
+	 * @param profileMasterId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException;
 
 }
