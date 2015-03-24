@@ -246,7 +246,7 @@ $(document).on('click', '#overlay-cancel', function() {
 function confirmDeleteUser(userId, adminId) {
 	if (userId == adminId) {
 		$('#overlay-continue').hide();
-		createPopupInfo("Access Denied", "Can not delete the admin account!");
+		createPopupInfo("Access Denied", "Can not delete the admin account !!!");
 		return;
 	}
 	
