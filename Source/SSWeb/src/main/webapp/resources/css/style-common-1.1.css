@@ -187,7 +187,7 @@ a, a:hover, a:visited{
 
 .c-pic-top-1 {
     position: relative;
-    width: 475px;
+    width: 535px;
     height: 180px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
@@ -196,25 +196,31 @@ a, a:hover, a:visited{
 }
 
 .c-pic-top-2 {
-    background: url(../images/homep1.png) no-repeat center;
+    background: url(../images/home5.jpg) no-repeat center;
     background-size: cover;
 }
 
 .c-pic-img {
     position: relative;
-    width: 235px;
+    width: 175px;
     height: 180px;
     background-color: #000;
 }
 
 .c-pic-bot-2 {
-    background: url(../images/homep3.png) no-repeat center;
+    background: url(../images/home2.jpg) no-repeat center;
     background-size: cover;
     margin-right: 5px;
 }
 
 .c-pic-bot-3 {
-    background: url(../images/homep4.png) no-repeat center;
+    background: url(../images/home3.jpg) no-repeat center;
+    background-size: cover;
+    margin-right: 5px;
+}
+
+.c-pic-bot-4 {
+    background: url(../images/home4.jpg) no-repeat center;
     background-size: cover;
 }
 
@@ -235,11 +241,11 @@ a, a:hover, a:visited{
     bottom: 0;
     width: 100%;
     padding: 0 10px;
-    height: 40px;
+    height: 55px;
 }
 
 .c-pic-bot-1 {
-    background: url(../images/homep2.png) no-repeat center;
+    background: url(../images/home1.jpg) no-repeat center;
     background-size: cover;
     margin-right: 5px;
 }
