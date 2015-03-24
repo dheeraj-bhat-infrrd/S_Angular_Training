@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -311,6 +312,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			LOG.error("IOException caught in downloadCompleteSurveyData() while trying to create excel file at " + fileLocation);
 			throw e;
 		}
+	}
+	
+	@Override
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException{
+		Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
+		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType));
+		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType));
+		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType));
+		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType));
+		return map;
 	}
 }
 // JIRA SS-137 BY RM05:EOC
