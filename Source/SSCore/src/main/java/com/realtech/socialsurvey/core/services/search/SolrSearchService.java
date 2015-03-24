@@ -118,6 +118,10 @@ public interface SolrSearchService {
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
+	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
+	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
 
 	/**
