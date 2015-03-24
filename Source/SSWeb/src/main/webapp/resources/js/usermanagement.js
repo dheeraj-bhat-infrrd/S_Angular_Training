@@ -2,7 +2,7 @@ var UsersListStartIndex = 0;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
-var batchSize = 20;
+var userBatchSize = 20;
 var isAddUser = true;
 
 $(document).on('click', '.um-user-row', function() {
@@ -273,9 +273,12 @@ function deleteUser(userId) {
 			$('#message-header').html(data);
 			if ($('#common-message-header').hasClass("success-message")) {
 				success = true;
+				showInfo($('#display-msg-div').text());
+			} else {
+				showError($('#display-msg-div').text());
 			}
 			// hide the row of the user deleted
-			$('#user-row-'+userId).hide();
+			$('#user-row-' + userId).hide();
 		},
 		complete : function() {
 			hideOverlay();
@@ -318,10 +321,9 @@ function paintUserDetailsForm(userId) {
  * Function paint the user list in user management page
  */
 function paintUserListInUserManagement() {
-	// var jsonData;
 	var payload = {
 		"startIndex" : UsersListStartIndex,
-		"batchSize" : batchSize
+		"batchSize" : userBatchSize
 	};
 	//var success = false;
 	$.ajax({
@@ -695,10 +697,10 @@ function searchBranchesForUser(branchPattern) {
 }
 
 function searchBranchesForUserCallBack(jsonData) {
-
 	var branchListContainer = $('<div>').attr({
 		"class" : "um-branch-list"
 	});
+	
 	$('#um-assignto').parent().find('.um-branch-list').remove();
 	var searchResult = jsonData;
 	if (searchResult != null) {
@@ -718,29 +720,25 @@ function searchBranchesForUserCallBack(jsonData) {
 }
 
 /*
- * Function search for user
+ * Function fetch assignments for user
  */
-function getUserAssignments(firstName, lastName, emailId, userId) {
-	// var jsonData;
-	var payload = {
-		"firstName" : firstName,
-		"lastName" : lastName,
-		"emailId" : emailId,
-		"userId" : userId
-	};
-	//var success = false;
-	$.ajax({
-		url : "./finduserassignments.do",
+function getUserAssignments(userId) {
+	var url = "./finduserassignments.do?userId=" + userId; 
+	callAjaxGET(url, function(data) {
+		$('#user-details-and-assignments-' + userId).html(data);
+	}, true);
+	
+	/*$.ajax({
+		url : "./finduserassignments.do?userId=" + userId,
 		type : "GET",
-		data : payload,
 		dataType : "html",
 		success : function(data) {
-			$('#user-details-and-assignments-'+userId).html(data);
+			$('#user-details-and-assignments-' + userId).html(data);
 		},
 		error : function(e) {
 			console.error("error : " + e);
 		}
-	});
+	});*/
 }
 
 function reinviteUser(firstName, lastName, emailId) {
@@ -756,10 +754,15 @@ function reinviteUser(firstName, lastName, emailId) {
 		dataType : "html",
 		success : function(data) {
 			$('#message-header').html(data);
+			if ($('#common-message-header').hasClass("success-message")) {
+				success = true;
+				showInfo($('#display-msg-div').text());
+			} else {
+				showError($('#display-msg-div').text());
+			}
 		},
 		error : function(e) {
 			console.error("error : " + e);
 		}
 	});
 }
-
