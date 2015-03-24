@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
-<c:choose>
+<%-- <c:choose>
 	<c:when	test="${user.companyAdmin}">
 		<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
 	</c:when>
@@ -11,11 +11,11 @@
 	<c:when	test="${user.branchAdmin}">
 		<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
 	</c:when>
-</c:choose>
+</c:choose> --%>
 <div class="bd-hr-lp-content-wrapper">
 	<!-- Regions -->
 	<c:choose>
-		<c:when test="${not empty regions && user.companyAdmin}">
+		<c:when test="${not empty regions}">
 			<c:forEach var="region" items="${regions}">
 				<div class="bd-hr-item-l1 comp-region" data-openstatus="closed" data-regionid="${region.regionId}">
 					<div class="bd-hr-item bd-lt-l1 clearfix">
@@ -29,7 +29,7 @@
 
 	<!-- Branches -->
 	<c:choose>
-		<c:when test="${not empty branches && (user.companyAdmin || user.regionAdmin)}">
+		<c:when test="${not empty branches}">
 			<c:forEach var="branch" items="${branches}">
 				<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="${branch.branchId}">
 					<div class="bd-hr-item bd-lt-l2 clearfix">
@@ -43,7 +43,7 @@
 
 	<!-- Individuals -->
 	<c:choose>
-		<c:when test="${not empty individuals && (user.companyAdmin || user.regionAdmin || user.branchAdmin)}">
+		<c:when test="${not empty individuals}">
 			<c:forEach var="individual" items="${individuals}">
 				<div class="bd-hr-item-l1 comp-individual" data-agentid="${individual.iden}">
 					<div class="bd-hr-item bd-lt-l3 clearfix">
