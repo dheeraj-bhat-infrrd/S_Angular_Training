@@ -8,7 +8,8 @@ public class SurveyDetails {
 	private long agentId;
 	private String agentName;
 	private int reminderCount;
-	private String customerName;
+	private String customerFirstName;
+	private String customerLastName;
 	private String customerEmail;
 	private long companyId;
 	private long regionId;
@@ -17,10 +18,12 @@ public class SurveyDetails {
 	private double score;
 	private String review;
 	private String mood;
-	private Date updatedOn;
+	private Date createdOn;
+	private Date modifiedOn;
 	private List<String> sharedOn;
 	String custRelationWithAgent;
 	private String initiatedBy;
+	private String url;
 	private List<SurveyResponse> surveyResponse;
 	
 	public long getAgentId() {
@@ -41,11 +44,17 @@ public class SurveyDetails {
 	public void setReminderCount(int reminderCount) {
 		this.reminderCount = reminderCount;
 	}
-	public String getCustomerName() {
-		return customerName;
+	public String getCustomerFirstName() {
+		return customerFirstName;
 	}
-	public void setCustomerName(String customerName) {
-		this.customerName = customerName;
+	public void setCustomerFirstName(String customerFirstName) {
+		this.customerFirstName = customerFirstName;
+	}
+	public String getCustomerLastName() {
+		return customerLastName;
+	}
+	public void setCustomerLastName(String customerLastName) {
+		this.customerLastName = customerLastName;
 	}
 	public String getCustomerEmail() {
 		return customerEmail;
@@ -95,11 +104,11 @@ public class SurveyDetails {
 	public void setMood(String mood) {
 		this.mood = mood;
 	}
-	public Date getUpdatedOn() {
-		return updatedOn;
+	public Date getModifiedOn() {
+		return modifiedOn;
 	}
-	public void setUpdatedOn(Date updatedOn) {
-		this.updatedOn = updatedOn;
+	public void setModifiedOn(Date modifiedOn) {
+		this.modifiedOn = modifiedOn;
 	}
 	public List<String> getSharedOn() {
 		return sharedOn;
@@ -124,5 +133,17 @@ public class SurveyDetails {
 	}
 	public void setSurveyResponse(List<SurveyResponse> surveyResponse) {
 		this.surveyResponse = surveyResponse;
+	}
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+	public void setCreatedOn(Date createdOn) {
+		this.createdOn = createdOn;
+	}
+	public String getUrl() {
+		return url;
+	}
+	public void setUrl(String url) {
+		this.url = url;
 	}
 }

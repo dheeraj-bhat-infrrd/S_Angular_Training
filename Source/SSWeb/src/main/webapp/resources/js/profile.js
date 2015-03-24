@@ -881,3 +881,17 @@ function findProList(iden,searchcritrianame){
 	}
 	
 }
+
+function downloadVCard(agentName){
+	if(agentName == undefined || agentName == ""){
+		return;
+	}
+	var url = window.location.origin + "/rest/profile/downloadvcard/"+agentName;
+	//callAjaxGET(url, afterDownloadVCard, true);
+	window.open(url, "_blank");
+}
+
+function afterDownloadVCard(data){
+	console.log("V Card download complete");
+}
+
