@@ -879,6 +879,7 @@ public class UserManagementController {
 			try {
 				// change user's password
 				authenticationService.changePassword(user, password);
+				solrSearchService.addUserToSolr(user);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);

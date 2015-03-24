@@ -91,7 +91,7 @@
 					<div class="dsh-inp-wrapper">
 						<input id="dsh-sel-item" class="dash-sel-item" type="text"
 							placeholder="Start typing..."
-							onkeyup="searchBranchRegionOrAgent(this.value)">
+							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
 						<div id="dsh-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
@@ -194,22 +194,28 @@
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
             <div class="float-left stats-left clearfix">
                 <div class="dash-sub-head">Utilization over time</div>
-                <div class="clearfix dash-sel-wrapper">
+                <div id="graph-sel-div" class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Choose</div>
-                    <select class="float-left dash-sel-item">
-                        <option value="volvo">Region</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
+                    <select id="graph-sel-list" class="float-left dash-sel-item">
                     </select>
                 </div>
+                
+                <div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
+					<div class="float-left dash-sel-lbl">Choose</div>
+					<div class="dsh-inp-wrapper">
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text"
+							placeholder="Start typing..."
+							onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
+						<div id="dsh-grph-srch-res" class="dsh-sb-dd"></div>
+					</div>
+				</div>
+                
                 <div class="clearfix dash-sel-wrapper">
-                    <div class="float-left dash-sel-lbl">Duration</div>
-                    <select class="float-left dash-sel-item">
-                        <option value="volvo">20 Days</option>
-                        <option value="saab">Saab</option>
-                        <option value="mercedes">Mercedes</option>
-                        <option value="audi">Audi</option>
+                    <div class="float-left dash-sel-lbl">Format</div>
+                    <select id="dsh-grph-format" class="float-left dash-sel-item">
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
                     </select>
                 </div>
             </div>
@@ -367,60 +373,6 @@
 						paintDashboard(companyAdmin, regionAdmin, branchAdmin,
 								regionNames, regionIds, branchNames, branchIds,
 								agent, accountType);
-
-						// Graph
-						//        google.setOnLoadCallback(drawChart);
-
-						drawChart();
-
-						function drawChart() {
-							var data = google.visualization.arrayToDataTable([
-									[ 'Month', 'No. of surveys sent',
-											'No. of surveys clicked',
-											'No. of surveys completed',
-											'No. of social posts' ],
-									[ 'Jan', 500, 200, 150, 0 ],
-									[ 'Feb', 550, 200, 200, 50 ],
-									[ 'Mar', 540, 220, 180, 80 ],
-									[ 'Apr', 660, 300, 400, 120 ],
-									[ 'May', 600, 400, 300, 200 ],
-									[ 'Jun', 560, 500, 100, 230 ],
-									[ 'Jul', 640, 300, 450, 420 ],
-									[ 'Aug', 630, 250, 340, 350 ],
-									[ 'Sep', 560, 450, 270, 500 ],
-									[ 'Oct', 460, 500, 300, 400 ],
-									[ 'Nov', 690, 100, 500, 300 ],
-									[ 'Dec', 700, 200, 400, 540 ] ]);
-
-							var options = {
-								//                title: 'Company Performance',
-								chartArea : {
-									width : '90%',
-									height : '80%'
-								},
-								colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)',
-										'rgb(255,242,0)', 'rgb(255,202,145)' ],
-								legend : {
-									position : 'none'
-								}
-							};
-
-							var chart = new google.visualization.LineChart(
-									document.getElementById('util-gph-item'));
-
-							chart.draw(data, options);
-							console.log('draw chart mtd');
-						}
-
-						var oldConW = $('.container').width();
-						var newConW = $('.container').width();
-						$(window).resize(function() {
-							newConW = $('.container').width();
-							if (newConW != oldConW) {
-								drawChart();
-								oldConW = $('.container').width();
-							}
-						});
 
 						// 		$('#dsh-inc-srvey').perfectScrollbar('update');
 					});
