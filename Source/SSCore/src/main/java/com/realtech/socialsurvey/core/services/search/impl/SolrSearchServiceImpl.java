@@ -45,6 +45,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SolrSearchServiceImpl.class);
 	private static final String SOLR_EDIT_REPLACE = "set";
+	
 	@Value("${SOLR_REGION_URL}")
 	private String solrRegionUrl;
 
@@ -837,6 +838,63 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
 		return result;
+	}
 
+	@Override
+	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Regions");
+		}
+		LOG.info("Method fetchRegionsByCompany() called for company id : " + companyId);
+		String regionsResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			
+			LOG.debug("Querying solr for searching regions");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			regionsResult = JSONUtil.toJSON(results);
+			LOG.debug("User search result is : " + regionsResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing Regions search");
+			throw new SolrException("Exception while performing search for Regions. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method fetchRegionsByCompany() finished for company id : " + companyId);
+		return regionsResult;
+	}
+
+	@Override
+	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Branches");
+		}
+		LOG.info("Method fetchBranchesByCompany() called for company id : " + companyId);
+		String branchesResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			branchesResult = JSONUtil.toJSON(results);
+			LOG.debug("User search result is : " + branchesResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing Branches search");
+			throw new SolrException("Exception while performing search for Branches. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method fetchBranchesByCompany() finished for company id : " + companyId);
+		return branchesResult;
 	}
 }
