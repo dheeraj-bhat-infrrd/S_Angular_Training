@@ -313,6 +313,7 @@ public class UserManagementController {
 		String users = "";
 		int startIndex = 0;
 		int batchSize = 0;
+		
 		try {
 			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
@@ -322,16 +323,16 @@ public class UserManagementController {
 			
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
-			if (startIndexStr == null || startIndexStr.isEmpty()) {
-				LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
-				throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
-			}
-			if (batchSizeStr == null || batchSizeStr.isEmpty()) {
-				LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
-				batchSize = SOLR_BATCH_SIZE;
-			}
-			
 			try {
+				if (startIndexStr == null || startIndexStr.isEmpty()) {
+					LOG.error("Invalid value found in startIndex. It cannot be null or empty.");
+					throw new InvalidInputException("Invalid value found in startIndex. It cannot be null or empty.");
+				}
+				if (batchSizeStr == null || batchSizeStr.isEmpty()) {
+					LOG.error("Invalid value found in batchSizeStr. It cannot be null or empty.");
+					batchSize = SOLR_BATCH_SIZE;
+				}
+				
 				startIndex = Integer.parseInt(startIndexStr);
 				batchSize = Integer.parseInt(batchSizeStr);
 			}
@@ -344,7 +345,7 @@ public class UserManagementController {
 				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
 				
 				// convert users to Object
-				Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>(){}.getType();
+				Type searchedUsersList = new TypeToken<List<UserFromSearch>>(){}.getType();
 				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
 				model.addAttribute("userslist", usersList);
 				LOG.debug("Users List: "+usersList.toString());
@@ -358,15 +359,9 @@ public class UserManagementController {
 			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(), nonFatalException);
 			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
-			/*ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			String errorMessage = JSONUtil.toJSON(errorResponse);
-			return errorMessage;*/
 		}
+
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
-		// return user details page on success
-		//return users;
 		return JspResolver.USER_LIST_FOR_MANAGEMENT;
 	}
 
