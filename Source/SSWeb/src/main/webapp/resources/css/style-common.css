@@ -4813,7 +4813,8 @@ tr.u-tbl-header td {
 }
 
 .v-edt-tbl-icn {
-    min-height: 40px;
+    cursor: pointer;
+	min-height: 40px;
 }
 
 .v-edt-tbl-switch {
