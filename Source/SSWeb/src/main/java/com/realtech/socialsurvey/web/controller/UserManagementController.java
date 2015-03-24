@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.HashMap;
@@ -19,10 +20,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.amazonaws.util.json.JSONException;
 import com.amazonaws.util.json.JSONObject;
+import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -75,7 +78,7 @@ public class UserManagementController {
 	private SolrSearchService solrSearchService;
 
 	private final static int SOLR_BATCH_SIZE = 20;
-	
+
 	// JIRA SS-42 BY RM05 BOC
 	/*
 	 * Method to show the User Management Page to a user on clicking UserManagement link.
@@ -159,7 +162,7 @@ public class UserManagementController {
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {
-							String branches = solrSearchService.searchBranches("", admin.getCompany(), 0, 0);
+							String branches = solrSearchService.searchBranches("", admin.getCompany(),null, null, 0, 0);
 							branches = branches.substring(1, branches.length() - 1);
 							JSONObject defaultBranch = new JSONObject(branches);
 							// assign new user to default branch in case of team account type
@@ -254,7 +257,6 @@ public class UserManagementController {
 	 * user is company admin who can assign different roles to other users.
 	 */
 	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.GET)
-	@ResponseBody
 	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
 		String startIndexStr = request.getParameter("startIndex");
@@ -286,6 +288,11 @@ public class UserManagementController {
 			}
 			try {
 				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
+				// convert users to Object
+				Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>() {}.getType();
+				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+				model.addAttribute("userslist", usersList);
+				LOG.debug("Users List: " + usersList.toString());
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
@@ -294,15 +301,19 @@ public class UserManagementController {
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching for user id. Reason : " + nonFatalException.getStackTrace(), nonFatalException);
-			ErrorResponse errorResponse = new ErrorResponse();
-			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
-			String errorMessage = JSONUtil.toJSON(errorResponse);
-			return errorMessage;
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+			/*
+			 * ErrorResponse errorResponse = new ErrorResponse();
+			 * errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			 * errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED); String errorMessage =
+			 * JSONUtil.toJSON(errorResponse); return errorMessage;
+			 */
 		}
 		LOG.info("Method to fetch users by company , findUsersForCompany() finished.");
 		// return user details page on success
-		return users;
+		// return users;
+		return JspResolver.USER_LIST_FOR_MANAGEMENT;
 	}
 
 	/*
@@ -346,6 +357,18 @@ public class UserManagementController {
 		}
 		LOG.info("Method to find users by email id finished.");
 		return users;
+	}
+
+	@RequestMapping(value = "/findusers", method = RequestMethod.GET)
+	public String findUsersByEmailIdAndRedirectToPage(Model model, HttpServletRequest request) {
+		LOG.info("Finding users and redirecting to search page");
+		String users = findUserByEmail(model, request);
+		// convert users to Object
+		Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>() {}.getType();
+		List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+		model.addAttribute("userslist", usersList);
+		LOG.debug("Users List: " + usersList.toString());
+		return JspResolver.USER_LIST_FOR_MANAGEMENT;
 	}
 
 	/*
@@ -595,8 +618,9 @@ public class UserManagementController {
 				organizationManagementService.assignRegionToUser(admin, regionId, assigneeUser, true);
 			}
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
-				LOG.error("Exception while assigning user as region admin.Reason:"+e.getMessage(), e);
-				throw new NonFatalException("Exception while assigning user as region admin.Reason:"+e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+				LOG.error("Exception while assigning user as region admin.Reason:" + e.getMessage(), e);
+				throw new NonFatalException("Exception while assigning user as region admin.Reason:" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
 		// TODO add success message.
@@ -739,11 +763,11 @@ public class UserManagementController {
 				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
-				
-				if(lastName != null && !lastName.isEmpty()) {
+
+				if (lastName != null && !lastName.isEmpty()) {
 					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
 				}
-				
+
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
@@ -882,9 +906,9 @@ public class UserManagementController {
 			else {
 				LOG.debug("License details not found for the user's company");
 			}
-			
+
 			// updating the flags for user profiles
-			
+
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
@@ -950,6 +974,52 @@ public class UserManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
 		return JspResolver.CHANGE_PASSWORD;
+	}
+
+	@RequestMapping(value = "/finduserassignments", method = RequestMethod.GET)
+	public String getUserAssignments(Model model, HttpServletRequest request) {
+		LOG.info("Getting user assignments");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		String emailId = request.getParameter("emailId");
+		String userId = request.getParameter("userId");
+
+		// set the request parameters in model
+		model.addAttribute("firstName", firstName);
+		model.addAttribute("lastName", lastName);
+		model.addAttribute("emailId", emailId);
+		model.addAttribute("userId", userId);
+		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
+	}
+
+	@RequestMapping(value = "/reinviteuser", method = RequestMethod.GET)
+	public String sendInvitationForRegistration(Model model, HttpServletRequest request) {
+		LOG.debug("Sending invitation to user");
+		String emailId = request.getParameter("emailId");
+		String firstName = request.getParameter("firstName");
+		String lastName = request.getParameter("lastName");
+		User user = sessionHelper.getCurrentUser();
+		try {
+			if (emailId == null || emailId.isEmpty()) {
+				LOG.warn("Email id is not present to resend invitation");
+				throw new InvalidInputException("Invalid email id.", DisplayMessageConstants.INVALID_EMAILID);
+			}
+			if (firstName == null || firstName.isEmpty()) {
+				LOG.warn("First Name is not present to resend invitation");
+				throw new InvalidInputException("Invalid first name.", DisplayMessageConstants.INVALID_FIRSTNAME);
+			}
+			LOG.debug("Sending invitation...");
+			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
+			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while reinviting user. Reason : " + e.getMessage(), e);
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		return JspResolver.MESSAGE_HEADER;
 	}
 
 	// verify change password parameters
