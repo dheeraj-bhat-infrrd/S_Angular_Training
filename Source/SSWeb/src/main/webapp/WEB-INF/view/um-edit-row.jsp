@@ -7,16 +7,16 @@
 		<div class="v-edit-row clearfix">
 			<div class="float-left v-ed-lbl">User Name</div>
 			<div class="float-left v-ed-txt-sm">
-				<input class="v-ed-txt-item" placeholder="First Name" value="${firstName}">
+				<input class="v-ed-txt-item" placeholder="First Name" value="${firstName}" readonly>
 			</div>
 			<div class="float-left v-ed-txt-sm v-ed-txt-sm-adj">
-				<input class="v-ed-txt-item" placeholder="Last Name" value="${lastName}">
+				<input class="v-ed-txt-item" placeholder="Last Name" value="${lastName}" readonly>
 			</div>
 		</div>
 		<div class="v-edit-row clearfix">
 			<div class="float-left v-ed-lbl">Email Address</div>
 			<div class="float-left v-ed-txt">
-				<input class="v-ed-txt-item" placeholder="Email Address" value="${emailId}">
+				<input class="v-ed-txt-item" placeholder="Email Address" value="${emailId}" readonly>
 			</div>
 		</div>
 		<div class="v-edit-row clearfix">

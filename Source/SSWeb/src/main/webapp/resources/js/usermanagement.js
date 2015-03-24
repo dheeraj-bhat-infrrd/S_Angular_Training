@@ -255,7 +255,7 @@ function confirmDeleteUser(userId, adminId) {
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete User");
-	$('#overlay-text').html("Are you sure you want to delete user??<br>This action will remove all the user details.");
+	$('#overlay-text').html("Are you sure you want to delete user ?");
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
@@ -263,6 +263,9 @@ function confirmDeleteUser(userId, adminId) {
  * Function to deactivate a user and remove from company
  */
 function deleteUser(userId) {
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
+	
 	var payload = {
 		"userIdToRemove" : userId
 	};
