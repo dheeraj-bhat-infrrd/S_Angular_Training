@@ -1,7 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
+import java.util.Map;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -30,6 +32,8 @@ public interface DashboardService {
 	public void downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
 
 	public void downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
+	
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException;
 
 }
 // JIRA SS-137 BY RM05:EOC

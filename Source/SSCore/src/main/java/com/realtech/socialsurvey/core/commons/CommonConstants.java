@@ -136,11 +136,12 @@ public interface CommonConstants {
 	 */
 	public static final String AGENT_ID_COLUMN = "agentId";
 	public static final String CUSTOMER_EMAIL_COLUMN = "customerEmail";
+	public static final String CREATED_ON = "createdOn";
 	public static final String UPDATED_ON = "updatedOn";
 	public static final String MODIFIED_ON_COLUMN = "modifiedOn";
 	public static final String SCORE_COLUMN = "score";
 	public static final String SHARED_ON_COLUMN = "sharedOn";
-	public static final String INITIATED_BY_COLUMN = "initiatedBy";
+	public static final String INITIATED_BY_COLUMN = "initiated By";
 	public static final String STAGE_COLUMN = "stage";
 	public static final String REMINDER_COUNT_COLUMN = "reminderCount";
 	public static final String MOOD_COLUMN = "mood";
@@ -287,6 +288,8 @@ public interface CommonConstants {
 	public static final String ADDRESS1 = "address1";
 	public static final String ADDRESS2 = "address2";
 	public static final String IS_AGENT_SOLR = "isAgent";
+	public static final String IS_BRANCH_ADMIN_SOLR = "isBranchAdmin";
+	public static final String IS_REGION_ADMIN_SOLR = "isRegionAdmin";
 	public static final boolean IS_AGENT_TRUE_SOLR = true;
 	public static final boolean IS_AGENT_FALSE_SOLR = false;
 	public static final String ABOUT_ME_SOLR = "aboutMe";

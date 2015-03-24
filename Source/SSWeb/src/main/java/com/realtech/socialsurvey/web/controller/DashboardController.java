@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +75,6 @@ public class DashboardController {
 	public String getSurveyCount(Model model, HttpServletRequest request) {
 		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started.");
 		Map<String, Object> surveyCount = new HashMap<String, Object>();
-		// try {
 		User user = sessionHelper.getCurrentUser();
 		String columnName = request.getParameter("columnName");
 		long columnValue = 0;
@@ -115,6 +115,52 @@ public class DashboardController {
 
 		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
 		return new Gson().toJson(surveyCount);
+	}
+
+	/*
+	 * Method to get survey details for generating graph.
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/surveydetailsforgraph")
+	public String getSurveyDetailsForGraph(Model model, HttpServletRequest request) {
+		LOG.info("Method to get survey details for generating graph, getGraphDetailsForWeek() started.");
+		try {
+			User user = sessionHelper.getCurrentUser();
+			String columnName = request.getParameter("columnName");
+			String reportType = request.getParameter("reportType");
+			long columnValue = 0;
+			if (columnName == null || columnName.isEmpty()) {
+				LOG.error("Null/Empty value found for field columnName.");
+				throw new NonFatalException("Null/Empty value found for field columnName.");
+			}
+			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+				columnValue = user.getCompany().getCompanyId();
+			}
+			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+				columnValue = user.getUserId();
+			}
+			else {
+				try {
+					columnValue = Long.parseLong(request.getParameter("columnValue"));
+				}
+				catch (NumberFormatException e) {
+					LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
+					throw e;
+				}
+			}
+			LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
+			try {
+				return new Gson().toJson(dashboardService.getSurveyDetailsForGraph(columnName, columnValue, reportType));
+			}
+			catch (ParseException e) {
+				LOG.error("Parse Exception occurred in getSurveyDetailsForGraph(). Nested exception is ", e);
+				return e.getMessage();
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal EXception caught in getSurveyDetailsForGraph() while getting details of surveys for graph. Nested exception is ", e);
+			return e.getMessage();
+		}
 	}
 
 	@ResponseBody
