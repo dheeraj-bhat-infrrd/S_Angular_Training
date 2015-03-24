@@ -105,7 +105,7 @@
                 
                 <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">
-                        <div class="left-panel-header cursor-pointer">Download VCard</div>
+                        <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
                     </div>
                 </div>
                 <div class="prof-left-row prof-left-info bord-bot-dc">
@@ -298,7 +298,10 @@
             $('#contact-us-pu-wrapper').hide();
             $('body').removeClass('body-no-scroll-y');
         }); 
-        
+        $(document).on('click','.vcard-download', function(){
+        	var agentName = $("#agent-profile-name").val();
+        	downloadVCard(agentName);
+        });
         
     });
 </script>
