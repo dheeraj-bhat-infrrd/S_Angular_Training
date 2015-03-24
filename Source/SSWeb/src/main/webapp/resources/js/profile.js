@@ -13,6 +13,10 @@ function fetchCompanyProfile() {
 function fetchCompanyProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this company");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatings(result.iden);
@@ -30,10 +34,11 @@ function fetchCompanyProfileCallBack(data) {
 }
 
 function paintProfilePage(result) {
-	if(result != undefined) {
+	if(result != undefined && result != "") {
 		currentProfileIden = result.iden;
 		var contactDetails = result.contact_details;
 		var headContentHtml = "";
+		$("#profile-main-content").show();
 		if(contactDetails != undefined){
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
@@ -50,7 +55,7 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
-            headContentHtml = headContentHtml +'	<div class="float-left review-count-left" id="prof-company-review-count"></div>';
+            headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
             headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
             headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
@@ -77,7 +82,7 @@ function paintProfilePage(result) {
             	 $("#prof-image").css("background-size","cover");
             }
             
-            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
+            var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             if(contactDetails.about_me != undefined) {
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
             }
@@ -92,7 +97,7 @@ function paintProfilePage(result) {
             if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
-                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
+                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
             }
             
             var webAddresses = contactDetails.web_addresses;
@@ -591,6 +596,10 @@ function fetchRegionProfile(regionProfileName) {
 function fetchRegionProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this region");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatingsForRegion(result.iden);
@@ -703,6 +712,10 @@ function fetchBranchProfile(branchProfileName) {
 function fetchBranchProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this office");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatingsForBranch(result.iden);
@@ -820,6 +833,10 @@ function fetchAgentProfile(agentProfileName){
 function fetchAgentProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this individual");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		paintIndividualDetails(result);

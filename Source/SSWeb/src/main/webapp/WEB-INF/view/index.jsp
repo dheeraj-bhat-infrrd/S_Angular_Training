@@ -138,7 +138,7 @@
 						<div class="clearfix reg-item">
 							<input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Join Now">
 						</div>
-                        <div class="disclaimer">* By clicking the Join Now button you agree to Social-Survey's terms of service, user agreement and privacy policy.</div>
+                        <div class="disclaimer">* By joining, I agree to Social-Survey's terms and conditions.</div>
 						<input type="hidden" value="${message}" name="message" id="message"/>
 					</form>
 					
