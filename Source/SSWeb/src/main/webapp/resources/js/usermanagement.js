@@ -238,21 +238,24 @@ function createPopupInfo(header, body) {
 	$('#overlay-continue').removeClass("btn-disabled");
 }
 
-function confirmDeleteUser(userId) {
-	var adminId = $('#hm-main-content-wrapper').attr("data-admin-id");
+$(document).on('click', '#overlay-cancel', function() {
+	$('#overlay-continue').removeAttr("onclick");
+	$('#overlay-main').hide();
+});
+
+function confirmDeleteUser(userId, adminId) {
 	if (userId == adminId) {
 		$('#overlay-continue').hide();
 		createPopupInfo("Access Denied", "Can not delete the admin account!");
-		return false;
+		return;
 	}
+	
 	$('#overlay-main').show();
 	$('#overlay-continue').show();
 	$('#overlay-continue').html("Delete");
 	$('#overlay-cancel').html("Cancel");
 	$('#overlay-header').html("Delete User");
-	$('#overlay-text')
-			.html(
-					"Are you sure you want to delete user??<br>This action will remove all the user details.");
+	$('#overlay-text').html("Are you sure you want to delete user??<br>This action will remove all the user details.");
 	$('#overlay-continue').attr("onclick", "deleteUser('" + userId + "');");
 }
 
@@ -264,25 +267,25 @@ function deleteUser(userId) {
 		"userIdToRemove" : userId
 	};
 	showOverlay();
+	
 	$.ajax({
 		url : "./removeexistinguser.do",
 		type : "POST",
 		dataType : "html",
 		data : payload,
 		success : function(data) {
-			$('#message-header').html(data);
-			if ($('#common-message-header').hasClass("success-message")) {
-				success = true;
-				showInfo($('#display-msg-div').text());
+			var map =  $.parseJSON(data);
+			if (map.status == "success") {
+				showInfo(map.message);
 			} else {
-				showError($('#display-msg-div').text());
+				showError(map.message);
 			}
+			
 			// hide the row of the user deleted
 			$('#user-row-' + userId).hide();
 		},
 		complete : function() {
 			hideOverlay();
-			
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -555,11 +558,6 @@ function validateAssignToBranchName() {
 	}
 }
 
-$(document).on('click', '#overlay-cancel', function() {
-	$('#overlay-continue').removeAttr("onclick");
-	$('#overlay-main').hide();
-});
-
 function searchUsersByNameEmailLoginId(searchKey) {
 	UsersListStartIndex = 0;
 	var payload = {
@@ -727,18 +725,6 @@ function getUserAssignments(userId) {
 	callAjaxGET(url, function(data) {
 		$('#user-details-and-assignments-' + userId).html(data);
 	}, true);
-	
-	/*$.ajax({
-		url : "./finduserassignments.do?userId=" + userId,
-		type : "GET",
-		dataType : "html",
-		success : function(data) {
-			$('#user-details-and-assignments-' + userId).html(data);
-		},
-		error : function(e) {
-			console.error("error : " + e);
-		}
-	});*/
 }
 
 function reinviteUser(firstName, lastName, emailId) {
@@ -747,22 +733,61 @@ function reinviteUser(firstName, lastName, emailId) {
 		"lastName" : lastName,
 		"emailId" : emailId
 	};
+	showOverlay();
+
 	$.ajax({
 		url : "./reinviteuser.do",
 		type : "GET",
 		data : payload,
 		dataType : "html",
 		success : function(data) {
-			$('#message-header').html(data);
-			if ($('#common-message-header').hasClass("success-message")) {
-				success = true;
-				showInfo($('#display-msg-div').text());
+			var map =  $.parseJSON(data);
+			if (map.status == "success") {
+				showInfo(map.message);
 			} else {
-				showError($('#display-msg-div').text());
+				showError(map.message);
 			}
+		},
+		complete : function() {
+			hideOverlay();
 		},
 		error : function(e) {
 			console.error("error : " + e);
+		}
+	});
+}
+
+function updateUserProfile(profileId, profileStatus) {
+	var payload = {
+		"profileId" : profileId,
+		"status" : profileStatus
+	};
+	showOverlay();
+	
+	$.ajax({
+		url : "./updateuserprofile.do",
+		type : "POST",
+		dataType : "html",
+		data : payload,
+		success : function(data) {
+			var map =  $.parseJSON(data);
+			if (map.status == "success") {
+				showInfo(map.message);
+				if (profileStatus == 1) {
+					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-off');
+					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-on');
+					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'Active');
+				} else if (profileStatus == 0) {
+					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
+					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
+					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');
+				}
+			} else {
+				showError(map.message);
+			}
+		},
+		complete : function() {
+			hideOverlay();
 		}
 	});
 }

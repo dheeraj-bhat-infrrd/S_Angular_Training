@@ -428,12 +428,15 @@ public class UserManagementController {
 	/*
 	 * Method to remove an existing user. Soft delete is done.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/removeexistinguser", method = RequestMethod.POST)
 	public String removeExistingUser(Model model, HttpServletRequest request) {
 		LOG.info("Method to deactivate an existing user called.");
+		Map<String, String> statusMap = new HashMap<String, String>();
+		String message = "";
+		long userIdToRemove = 0;
+		
 		try {
-
-			long userIdToRemove = 0;
 			try {
 				userIdToRemove = Long.parseLong(request.getParameter("userIdToRemove"));
 			}
@@ -441,6 +444,7 @@ public class UserManagementController {
 				LOG.error("Number format exception while parsing user Id", e);
 				throw new NonFatalException("Number format execption while parsing user id", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			if (userIdToRemove < 0) {
 				LOG.error("Invalid user Id found to remove in removeExistingUser().");
 				throw new InvalidInputException("Invalid user Id found to remove in removeExistingUser().",
@@ -452,23 +456,29 @@ public class UserManagementController {
 				LOG.error("No user found in current session in removeExistingUser().");
 				throw new InvalidInputException("No user found in current session in removeExistingUser().");
 			}
+			
 			try {
 				userManagementService.removeExistingUser(user, userIdToRemove);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
 			}
+			
 			LOG.debug("Removing user {} from solr.", userIdToRemove);
 			solrSearchService.removeUserFromSolr(userIdToRemove);
-			model.addAttribute("message",
-					messageUtils.getDisplayMessage(DisplayMessageConstants.USER_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.USER_DELETE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while removing user. Reason : " + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			statusMap.put("status", CommonConstants.ERROR);
+			message = messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
+
 		LOG.info("Method to remove an existing user finished.");
-		return JspResolver.MESSAGE_HEADER;
+		statusMap.put("message", message);
+		return new Gson().toJson(statusMap);
 	}
 
 	/*
@@ -1148,7 +1158,6 @@ public class UserManagementController {
 		}
 		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException while parsing userId. Reason : " + e.getMessage(), e);
-			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
 		}
 
@@ -1156,32 +1165,75 @@ public class UserManagementController {
 		return JspResolver.USER_MANAGEMENT_EDIT_USER_DETAILS;
 	}
 	
+	@ResponseBody
+	@RequestMapping(value="/updateuserprofile", method=RequestMethod.POST)
+	public String updateUserProfile(Model model, HttpServletRequest request){
+		LOG.info("Method updateUserProfile() called from UserManagementController");
+		Map<String, String> statusMap = new HashMap<String, String>();
+		String message = "";
+		
+		try {
+			User user = sessionHelper.getCurrentUser();
+			long profileId = Long.parseLong(request.getParameter("profileId"));
+			int status = Integer.parseInt(request.getParameter("status"));
+			
+			userManagementService.updateUserProfile(user, profileId, status);
+
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while parsing profileId. Reason : " + e.getMessage(), e);
+			statusMap.put("status", CommonConstants.ERROR);
+			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while updating profile. Reason : " + e.getMessage(), e);
+			statusMap.put("status", CommonConstants.ERROR);
+			message = messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+		
+		statusMap.put("message", message);
+		LOG.info("Method updateUserProfile() finished from UserManagementController");
+		return new Gson().toJson(statusMap);
+	}
+	
+	@ResponseBody
 	@RequestMapping(value="/reinviteuser", method=RequestMethod.GET)
 	public String sendInvitationForRegistration(Model model, HttpServletRequest request){
-		LOG.debug("Sending invitation to user");
-		String emailId = request.getParameter("emailId");
-		String firstName = request.getParameter("firstName");
-		String lastName = request.getParameter("lastName");
+		LOG.info("Sending invitation to user");
+		Map<String, String> statusMap = new HashMap<String, String>();
+		String message = "";
 		User user = sessionHelper.getCurrentUser();
-		try{
-			if(emailId == null || emailId.isEmpty()){
+		
+		try {
+			String emailId = request.getParameter("emailId");
+			String firstName = request.getParameter("firstName");
+			String lastName = request.getParameter("lastName");
+			if (emailId == null || emailId.isEmpty()) {
 				LOG.warn("Email id is not present to resend invitation");
-				throw new InvalidInputException("Invalid email id.",DisplayMessageConstants.INVALID_EMAILID);
+				throw new InvalidInputException("Invalid email id.", DisplayMessageConstants.INVALID_EMAILID);
 			}
-			if(firstName == null || firstName.isEmpty()){
+			if (firstName == null || firstName.isEmpty()) {
 				LOG.warn("First Name is not present to resend invitation");
-				throw new InvalidInputException("Invalid first name.",DisplayMessageConstants.INVALID_FIRSTNAME);
+				throw new InvalidInputException("Invalid first name.", DisplayMessageConstants.INVALID_FIRSTNAME);
 			}
+
 			LOG.debug("Sending invitation...");
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
-			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
-		}catch (NonFatalException e) {
-			LOG.error("NonFatalException while reinviting user. Reason : " + e.getMessage(), e);
-			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 		}
-		return JspResolver.MESSAGE_HEADER;
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while reinviting user. Reason : " + e.getMessage(), e);
+			statusMap.put("status", CommonConstants.ERROR);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+		}
+
+		LOG.info("Invitation sent to user");
+		statusMap.put("message", message);
+		return new Gson().toJson(statusMap);
 	}
 
 	// verify change password parameters

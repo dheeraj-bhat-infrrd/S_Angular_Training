@@ -64,23 +64,28 @@
 					<!-- <td class="v-edt-tbl-rem"></td> -->
 				</tr>
 				
-				<c:forEach var="profile" items="${profiles}">
-					<tr class="v-edt-tbl-row">
-						<td class="v-edt-tbl-assign-to">${profile.entityName}</td>
-						<td class="v-edt-tbl-role">${profile.role}</td>
-						<c:choose>
-							<c:when test="${profile.status == 1}">
-								<c:set var="profilestatusclass" value="tbl-switch-on"/>
-								<td class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-on" title="<spring:message code="label.active.key" />"></td>
-							</c:when>
-							<c:otherwise>
-								<c:set var="profilestatusclass" value="tbl-switch-off"/>
-								<td class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-off" title="<spring:message code="label.inactive.key" />"></td>
-							</c:otherwise>
-						</c:choose>
-						<!-- <td class="v-edt-tbl-rem v-edt-tbl-icn v-icn-rem-user"></td> -->
-					</tr>
-				</c:forEach>
+				<c:choose>
+					<c:when test="${not empty profiles}">
+						<c:forEach var="profile" items="${profiles}">
+							<tr class="v-edt-tbl-row" id="v-edt-tbl-row-${profile.profileId}" data-profile-id="${profile.profileId}">
+								<td class="v-edt-tbl-assign-to">${profile.entityName}</td>
+								<td class="v-edt-tbl-role">${profile.role}</td>
+								<c:choose>
+									<c:when test="${profile.status == 1}">
+										<td class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-on" title="<spring:message code="label.active.key" />"></td>
+									</c:when>
+									<c:otherwise>
+										<td class="v-edt-tbl-status v-edt-tbl-icn v-edt-tbl-switch tbl-switch-off" title="<spring:message code="label.inactive.key" />"></td>
+									</c:otherwise>
+								</c:choose>
+								<!-- <td class="v-edt-tbl-rem v-edt-tbl-icn v-icn-rem-user"></td> -->
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<tr class="v-edt-tbl-row"><spring:message code="label.nouserprofilesfound.key" /></tr>
+					</c:otherwise>
+				</c:choose>
 			</table>
 		</div>
 	</div>
