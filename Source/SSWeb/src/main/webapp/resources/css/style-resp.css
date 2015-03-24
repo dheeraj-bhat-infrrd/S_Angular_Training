@@ -1253,6 +1253,22 @@
     .cntct-us-btns-wrapper{
         width: 172px;
     }
+    .vs-ans-row{
+        font-size: 12px;
+    }
+    .vs-tbl-num, .float-left.vs-ans-lbl{
+        display: none;
+    }
+    .vs-srv-tbl-row .srv-tbl-txt {
+        font-size: 13px;
+        width: 100% !important;
+        margin: 0;
+        padding: 0;
+        line-height: 34px;
+    }
+    .float-left.vs-ans-txt {
+        width: 100%;
+    }
 }
 
 
@@ -1496,6 +1512,9 @@
     .bd-mcq-txt{
         width: 400px;
     }
+    .float-left.vs-ans-txt {
+        width: 505px;
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1620,6 +1639,9 @@
         width: 680px !important;
         font-size: 14px;
     }
+    .float-left.vs-ans-txt {
+        width: 705px;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -1629,6 +1651,9 @@
         left: -84px;
         top: -36px;
         transform: scale(0.85);
+    }
+    .srv-tbl-txt{
+        width: 884px !important;
     }
     
 }
