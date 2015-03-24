@@ -3834,8 +3834,8 @@ button.paypal.is-active {
 
 .util-gph-legend {
     position: absolute;
-    top: 170px;
-    line-height: 30px;
+    top: 200px;
+    line-height: 25px;
     left: -210px;
     font-size: 13px;
     width: 182px;
