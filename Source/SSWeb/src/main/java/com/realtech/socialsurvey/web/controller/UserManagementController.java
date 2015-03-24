@@ -87,7 +87,7 @@ public class UserManagementController {
 	private SolrSearchService solrSearchService;
 
 	private final static int SOLR_BATCH_SIZE = 20;
-	
+
 	// JIRA SS-42 BY RM05 BOC
 	/*
 	 * Method to show the User Management Page to a user on clicking UserManagement link.
@@ -213,7 +213,7 @@ public class UserManagementController {
 
 						// If account type is team assign user to default branch
 						if (accountType.getValue() == CommonConstants.ACCOUNTS_MASTER_TEAM) {
-							String branches = solrSearchService.searchBranches("", admin.getCompany(), 0, 0);
+							String branches = solrSearchService.searchBranches("", admin.getCompany(),null, null, 0, 0);
 							branches = branches.substring(1, branches.length() - 1);
 							JSONObject defaultBranch = new JSONObject(branches);
 							// assign new user to default branch in case of team account type
@@ -348,7 +348,7 @@ public class UserManagementController {
 				Type searchedUsersList = new TypeToken<List<UserFromSearch>>(){}.getType();
 				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
 				model.addAttribute("userslist", usersList);
-				LOG.debug("Users List: "+usersList.toString());
+				LOG.debug("Users List: " + usersList.toString());
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
@@ -407,16 +407,16 @@ public class UserManagementController {
 		LOG.info("Method to find users by email id finished.");
 		return users;
 	}
-	
+
 	@RequestMapping(value = "/findusers", method = RequestMethod.GET)
-	public String findUsersByEmailIdAndRedirectToPage(Model model, HttpServletRequest request){
+	public String findUsersByEmailIdAndRedirectToPage(Model model, HttpServletRequest request) {
 		LOG.info("Finding users and redirecting to search page");
 		String users = findUserByEmail(model, request);
 		// convert users to Object
-		Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>(){}.getType();
+		Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>() {}.getType();
 		List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
 		model.addAttribute("userslist", usersList);
-		LOG.debug("Users List: "+usersList.toString());
+		LOG.debug("Users List: " + usersList.toString());
 		return JspResolver.USER_LIST_FOR_MANAGEMENT;
 	}
 
@@ -677,8 +677,9 @@ public class UserManagementController {
 				organizationManagementService.assignRegionToUser(admin, regionId, assigneeUser, true);
 			}
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
-				LOG.error("Exception while assigning user as region admin.Reason:"+e.getMessage(), e);
-				throw new NonFatalException("Exception while assigning user as region admin.Reason:"+e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+				LOG.error("Exception while assigning user as region admin.Reason:" + e.getMessage(), e);
+				throw new NonFatalException("Exception while assigning user as region admin.Reason:" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
 		// TODO add success message.
@@ -821,11 +822,11 @@ public class UserManagementController {
 				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
 				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
 				String lastName = urlParams.get(CommonConstants.LAST_NAME);
-				
-				if(lastName != null && !lastName.isEmpty()) {
+
+				if (lastName != null && !lastName.isEmpty()) {
 					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
 				}
-				
+
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
@@ -937,6 +938,7 @@ public class UserManagementController {
 			try {
 				// change user's password
 				authenticationService.changePassword(user, password);
+				solrSearchService.addUserToSolr(user);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
@@ -970,9 +972,9 @@ public class UserManagementController {
 			else {
 				LOG.debug("License details not found for the user's company");
 			}
-			
+
 			// updating the flags for user profiles
-			
+
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
@@ -1205,6 +1207,7 @@ public class UserManagementController {
 			String emailId = request.getParameter("emailId");
 			String firstName = request.getParameter("firstName");
 			String lastName = request.getParameter("lastName");
+
 			if (emailId == null || emailId.isEmpty()) {
 				LOG.warn("Email id is not present to resend invitation");
 				throw new InvalidInputException("Invalid email id.", DisplayMessageConstants.INVALID_EMAILID);
@@ -1216,7 +1219,7 @@ public class UserManagementController {
 
 			LOG.debug("Sending invitation...");
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
-
+			
 			message = messageUtils.getDisplayMessage(DisplayMessageConstants.INVITATION_RESEND_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 		}

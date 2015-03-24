@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -256,8 +257,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId,
-			long regionId) throws InvalidInputException {
+	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
+			throws InvalidInputException {
 		LOG.info("Method aggregateUserProfile() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -299,8 +300,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					// Individual
 					else if (user.isAgent()) {
 						LOG.debug("Aggregate Profile for Agent of Company account type");
-						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId), settings
-								.getAgentSettings());
+						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId),
+								settings.getAgentSettings());
 					}
 					break;
 
@@ -502,7 +503,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		
+
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations,
 				unitSettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -516,7 +517,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (associations == null) {
 			throw new InvalidInputException("Association name passed can not be null");
 		}
-		
+
 		LOG.info("Adding associations");
 		organizationUnitSettingsDao
 				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_ASSOCIATION, associations, agentSettings);
@@ -1094,7 +1095,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					agentSettings);
 		}
 	}
-	
+
 	/**
 	 * Method to fetch reviews based on the profile level specified, iden is one of
 	 * agentId/branchId/regionId or companyId based on the profile level
@@ -1111,5 +1112,45 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
 		surveyDetails = surveyDetailsDao.getIncompleteSurvey(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore);
 		return surveyDetails;
+	}
+
+	/**
+	 * Method to fetch all users for the list of branches specified
+	 */
+	@Override
+	public List<AgentSettings> getIndividualsByBranchIds(Set<Long> branchIds) throws InvalidInputException {
+		LOG.info("Method getIndividualsByBranchIds called for branchIds:" + branchIds);
+		List<AgentSettings> users = null;
+		if (branchIds != null && !branchIds.isEmpty()) {
+			users = new ArrayList<AgentSettings>();
+			for (long branchId : branchIds) {
+				List<AgentSettings> tempUsers = getIndividualsByBranchId(branchId);
+				if (tempUsers != null && !tempUsers.isEmpty()) {
+					users.addAll(tempUsers);
+				}
+			}
+		}
+		LOG.info("Method getIndividualsByBranchIds executed successfully");
+		return users;
+	}
+
+	/**
+	 * Method to fetch all users under the specified list of regions
+	 */
+	@Override
+	public List<AgentSettings> getIndividualsByRegionIds(Set<Long> regionIds) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getIndividualsByBranchIds called for regionIds:" + regionIds);
+		List<AgentSettings> users = null;
+		if (regionIds != null && !regionIds.isEmpty()) {
+			users = new ArrayList<AgentSettings>();
+			for (long regionId : regionIds) {
+				List<AgentSettings> tempUsers = getIndividualsByRegionId(regionId);
+				if (tempUsers != null && !tempUsers.isEmpty()) {
+					users.addAll(tempUsers);
+				}
+			}
+		}
+		LOG.info("Method getIndividualsByRegionIds executed successfully");
+		return users;
 	}
 }
