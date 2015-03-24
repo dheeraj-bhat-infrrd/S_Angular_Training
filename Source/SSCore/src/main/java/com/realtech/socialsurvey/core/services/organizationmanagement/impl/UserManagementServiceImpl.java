@@ -866,6 +866,31 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Method to update a user finished for user : " + userIdToUpdate);
 	}
+	
+	/*
+	 * Method to update the given userprofile as active or inactive.
+	 */
+	@Transactional
+	@Override
+	public void updateUserProfile(User admin, long profileIdToUpdate, int status) throws InvalidInputException {
+		LOG.info("Method to update a user called for user profile: " + profileIdToUpdate);
+		if (admin == null) {
+			throw new InvalidInputException("No admin user present.");
+		}
+		
+		LOG.info("Method to assign user to a branch called by user : " + admin.getUserId());
+		UserProfile userProfile = userProfileDao.findById(UserProfile.class, profileIdToUpdate);
+		if (userProfile == null) {
+			throw new InvalidInputException("No user profile present for the specified userId");
+		}
+
+		userProfile.setModifiedBy(String.valueOf(admin.getUserId()));
+		userProfile.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		userProfile.setStatus(status);
+
+		userProfileDao.update(userProfile);
+		LOG.info("Method to update a user finished for user : " + profileIdToUpdate);
+	}
 
 	/**
 	 * Sends an email to user with the link to complete registration. User has to provide password

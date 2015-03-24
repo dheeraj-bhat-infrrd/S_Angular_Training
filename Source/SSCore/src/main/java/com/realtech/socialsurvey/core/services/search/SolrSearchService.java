@@ -60,7 +60,6 @@ public interface SolrSearchService {
 	 */
 	public String searchBranchesByRegion(long regionId, int start, int rows) throws InvalidInputException, SolrException;
 
-	
 	/**
 	 * Method to add a region to solr
 	 * 
@@ -111,6 +110,10 @@ public interface SolrSearchService {
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
+	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
+	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
 
 	/**
@@ -135,13 +138,14 @@ public interface SolrSearchService {
 	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException;
 
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
-	
-	public SolrDocumentList searchUsersByIden(long iden,String idenFieldName,int startIndex,int noOfRows) throws InvalidInputException,SolrException;
+
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
+			SolrException;
 
 	public String searchRegionById(long regionId) throws InvalidInputException, SolrException;
 
 	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException;
-	
+
 	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
 			SolrException;
 }
