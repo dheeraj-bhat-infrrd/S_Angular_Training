@@ -926,3 +926,11 @@ function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hidd
 		$('#'+dropListId).slideToggle(200);	
 	}
 }
+
+function showViewHierarchyPage() {
+	var url = "./viewhierarchy.do";
+	callAjaxGET(url, viewHierarchyCallBack, true);
+}
+function viewHierarchyCallBack(data) {
+	$("#main-content").html(data);
+}
