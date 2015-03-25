@@ -1000,6 +1000,7 @@ public class UserManagementController {
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, user.getStatus() + "");
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
+			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
 			LOG.debug("Successfully modified user detail in solr");
 			
 			LOG.debug("Adding newly registered user to principal session");
