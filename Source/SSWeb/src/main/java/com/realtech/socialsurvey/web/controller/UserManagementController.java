@@ -24,8 +24,11 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
@@ -42,6 +45,7 @@ import com.realtech.socialsurvey.core.services.authentication.AuthenticationServ
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -64,7 +68,6 @@ public class UserManagementController {
 	private static final String ROLE_ADMIN = "Admin";
 	private static final String ROLE_USER = "User";
 	
-
 	@Autowired
 	private MessageUtils messageUtils;
 
@@ -73,7 +76,10 @@ public class UserManagementController {
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
-
+	
+	@Autowired
+	private ProfileManagementService profileManagementService;
+	
 	@Autowired
 	private AuthenticationService authenticationService;
 
@@ -938,7 +944,6 @@ public class UserManagementController {
 			try {
 				// change user's password
 				authenticationService.changePassword(user, password);
-				solrSearchService.addUserToSolr(user);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
@@ -948,19 +953,24 @@ public class UserManagementController {
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
 
-			LOG.debug("Adding newly added user {} to mongo", user.getFirstName());
-			userManagementService.insertAgentSettings(user);
-			LOG.debug("Added newly added user {} to mongo", user.getFirstName());
-
-			LOG.debug("Adding newly registered user to principal session");
-			sessionHelper.loginOnRegistration(emailId, password);
-			LOG.debug("Successfully added registered user to principal session");
+			// Updating Name
+			LOG.debug("Updating newly activated user {} to mongo", user.getFirstName());
+			AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
+			ContactDetailsSettings contactDetails = agentSettings.getContact_details();
+			contactDetails.setName(user.getFirstName() + " " + user.getLastName());
 			
+			profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetails);
+			LOG.debug("Updated newly activated user {} to mongo", user.getFirstName());
+
 			LOG.debug("Modifying user detail in solr");
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, user.getStatus() + "");
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
 			LOG.debug("Successfully modified user detail in solr");
+			
+			LOG.debug("Adding newly registered user to principal session");
+			sessionHelper.loginOnRegistration(emailId, password);
+			LOG.debug("Successfully added registered user to principal session");
 			
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
 			if (licenseDetails != null && !licenseDetails.isEmpty()) {
