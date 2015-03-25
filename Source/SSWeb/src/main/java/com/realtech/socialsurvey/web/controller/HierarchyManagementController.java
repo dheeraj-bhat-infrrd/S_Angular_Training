@@ -115,6 +115,20 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Method to get the view hierarchy page
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/viewhierarchy", method = RequestMethod.GET)
+	public String showViewHierarchyPage(Model model, HttpServletRequest request) {
+		LOG.info("Method showViewHierarchyPage called");
+
+		LOG.info("Method showViewHierarchyPage executed successfully");
+		return JspResolver.VIEW_HIERARCHY;
+	}
+
+	/**
 	 * Fetch the list of branches for the company
 	 * 
 	 * @param model
