@@ -33,73 +33,73 @@
 	</div>
 
 <script>
-$(document).ready(function() {
-	$(document).attr("title", "User Management");
-	initUserManagementPage();		
+    $(document).ready(function() {
+        $(document).attr("title", "User Management");
+        initUserManagementPage();		
 
-	doStopAjaxRequestForUsersList = false;
-	if($('#server-message>div').hasClass("error-message")){
-		isUserManagementAuthorized = false;
-		$('#server-message').show();
-		//var errorMessage = $('#server-message p').text();
-	}
-	
-	$(document).on('click', '.v-tbl-icn', function(e){
-		e.stopPropagation();
-	});
-	
-	$(document).on('click', '.v-ed-txt-dd', function(){
-		$(this).next('.v-ed-dd-wrapper').slideToggle(200);
-	});
-	
-	$(document).on('click', '.v-ed-dd-item', function(e){
-		e.stopPropagation();
-		$(this).parent().prev('.v-ed-txt-dd').val($(this).html());
-		$(this).parent().slideToggle(200);
-	});
-	
-	// remove user
-	$(document).on('click', '.v-icn-rem-user', function(){
-		var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-		var adminId = '${user.userId}';
-		confirmDeleteUser(userId, adminId);
-	});
-	
-	// resend verification mail
-	$(document).on('click', '.v-icn-fmail', function(){
-		 var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
-		 var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
-		 var emailId = $(this).parent().find('.fetch-email').html();
-		 reinviteUser(firstName, lastName, emailId);
-	});
-	
-	// edit user
-	$(document).on('click', '.v-icn-edit-user', function(){
-		if ($(this).parent().hasClass('u-tbl-row-sel')) {
-			$(this).parent().removeClass('u-tbl-row-sel');
-			$(this).parent().next('.u-tbl-row').hide();
-		} else {
-			$(this).parent().next('.u-tbl-row').show();
-			$(this).parent().addClass('u-tbl-row-sel');
-			
-			// make an ajax call and fetch the details of the user
-			var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-			getUserAssignments(userId);
-		}
-	});
-	
-	// de-activate user profile
-	$(document).on('click', '.tbl-switch-on', function(){
-		var profileId = $(this).parent().data('profile-id');
-		updateUserProfile(profileId, 0);
-	});
+        doStopAjaxRequestForUsersList = false;
+        if($('#server-message>div').hasClass("error-message")){
+            isUserManagementAuthorized = false;
+            $('#server-message').show();
+            //var errorMessage = $('#server-message p').text();
+        }
 
-	// activate user profile
-	$(document).on('click', '.tbl-switch-off', function(){
-		var profileId = $(this).parent().data('profile-id');
-		updateUserProfile(profileId, 1);
-	});
-});
+        $(document).on('click', '.v-tbl-icn', function(e){
+            e.stopPropagation();
+        });
+
+        $(document).on('click', '.v-ed-txt-dd', function(){
+            $(this).next('.v-ed-dd-wrapper').slideToggle(200);
+        });
+
+        $(document).on('click', '.v-ed-dd-item', function(e){
+            e.stopPropagation();
+            $(this).parent().prev('.v-ed-txt-dd').val($(this).html());
+            $(this).parent().slideToggle(200);
+        });
+
+        // remove user
+        $(document).on('click', '.v-icn-rem-user', function(){
+            var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+            var adminId = '${user.userId}';
+            confirmDeleteUser(userId, adminId);
+        });
+
+        // resend verification mail
+        $(document).on('click', '.v-icn-fmail', function(){
+             var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+             var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+             var emailId = $(this).parent().find('.fetch-email').html();
+             reinviteUser(firstName, lastName, emailId);
+        });
+
+        // edit user
+    //	$(document).on('click', '.v-icn-edit-user', function(){
+    //		if ($(this).parent().hasClass('u-tbl-row-sel')) {
+    //			$(this).parent().removeClass('u-tbl-row-sel');
+    //			$(this).parent().next('.u-tbl-row').hide();
+    //		} else {
+    //			$(this).parent().next('.u-tbl-row').show();
+    //			$(this).parent().addClass('u-tbl-row-sel');
+    //			
+    //			// make an ajax call and fetch the details of the user
+    //			var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+    //			getUserAssignments(userId);
+    //		}
+    //	});
+
+        // de-activate user profile
+        $(document).on('click', '.tbl-switch-on', function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 0);
+        });
+
+        // activate user profile
+        $(document).on('click', '.tbl-switch-off', function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 1);
+        });
+    });
 </script>
 
 </body>
