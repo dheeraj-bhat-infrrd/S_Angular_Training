@@ -844,29 +844,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return result;
 	}
 
-	/**
-	 * Method to get space separated ids from set of ids
-	 * 
-	 * @param ids
-	 * @return
-	 */
-	private String getSpaceSeparatedStringFromIds(Set<Long> ids) {
-		LOG.debug("Method getSpaceSeparatedStringFromIds called for ids:" + ids);
-		StringBuilder idsSb = new StringBuilder();
-		int count = 0;
-		if (ids != null && !ids.isEmpty()) {
-			for (Long id : ids) {
-				if (count != 0) {
-					idsSb.append(" ");
-				}
-				idsSb.append(id);
-				count++;
-			}
-		}
-		LOG.debug("Method getSpaceSeparatedStringFromIds executed successfully. Returning:" + idsSb.toString());
-		return idsSb.toString();
-	}
-
 	@Override
 	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
 		if (companyId < 0) {
@@ -920,5 +897,28 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method fetchBranchesByCompany() finished for company id : " + companyId);
 		return branchesResult;
+	}
+
+	/**
+	 * Method to get space separated ids from set of ids
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	private String getSpaceSeparatedStringFromIds(Set<Long> ids) {
+		LOG.debug("Method getSpaceSeparatedStringFromIds called for ids:" + ids);
+		StringBuilder idsSb = new StringBuilder();
+		int count = 0;
+		if (ids != null && !ids.isEmpty()) {
+			for (Long id : ids) {
+				if (count != 0) {
+					idsSb.append(" ");
+				}
+				idsSb.append(id);
+				count++;
+			}
+		}
+		LOG.debug("Method getSpaceSeparatedStringFromIds executed successfully. Returning:" + idsSb.toString());
+		return idsSb.toString();
 	}
 }

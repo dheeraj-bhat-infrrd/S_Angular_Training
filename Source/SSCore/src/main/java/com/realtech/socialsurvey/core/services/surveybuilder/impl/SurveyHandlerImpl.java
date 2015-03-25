@@ -66,7 +66,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Transactional
 	public SurveyDetails storeInitialSurveyDetails(long agentId,
 			String customerEmail, String firstName, String lastName,
-			int reminderCount, String custRelationWithAgent)
+			int reminderCount, String custRelationWithAgent, String url)
 			throws SolrException, NoRecordsFetchedException,
 			SolrServerException, InvalidInputException {
 
@@ -91,15 +91,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyDetails.setAgentId(agentId);
 		surveyDetails.setAgentName(agentName);
 		surveyDetails.setBranchId(branchId);
-		surveyDetails.setCustomerName(firstName + " " + lastName);
+		surveyDetails.setCustomerFirstName(firstName);
+		surveyDetails.setCustomerLastName(lastName);
 		surveyDetails.setCompanyId(companyId);
 		surveyDetails.setCustomerEmail(customerEmail);
 		surveyDetails.setRegionId(regionId);
 		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
 		surveyDetails.setReminderCount(reminderCount);
-		surveyDetails.setUpdatedOn(new Date());
+		surveyDetails.setModifiedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
 		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
+		surveyDetails.setUrl(url);
 		SurveyDetails survey = surveyDetailsDao
 				.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
