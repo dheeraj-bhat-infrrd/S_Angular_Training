@@ -4,11 +4,13 @@ import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -316,17 +318,10 @@ public class UserManagementController {
 	@RequestMapping(value = "/findusersforcompany", method = RequestMethod.GET)
 	public String findUsersForCompany(Model model, HttpServletRequest request) {
 		LOG.info("Method to fetch user by user, findUserByUserId() started.");
-		String users = "";
 		int startIndex = 0;
 		int batchSize = 0;
 		
 		try {
-			User admin = sessionHelper.getCurrentUser();
-			if (admin == null) {
-				LOG.error("No user found in session");
-				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
-			}
-			
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
 			try {
@@ -347,12 +342,51 @@ public class UserManagementController {
 				throw new NonFatalException("NumberFormatException while searching for user id", e);
 			}
 			
+			User admin = sessionHelper.getCurrentUser();
+			if (admin == null) {
+				LOG.error("No user found in session");
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
+			
+			// fetching admin details
+			UserFromSearch adminUser;
 			try {
-				users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
-				
-				// convert users to Object
+				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
+				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
+			}
+			catch (SolrServerException e) {
+				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrServerException while searching for user id.", e);
+			}
+
+			// fetching users from solr
+			try {
+				String users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
 				Type searchedUsersList = new TypeToken<List<UserFromSearch>>(){}.getType();
 				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+				
+				// Company admin : able to edit any user
+				if (admin.getIsOwner() == 1) {
+					for (UserFromSearch user : usersList) {
+						user.setCanEdit(true);
+					}
+				}
+				// Region admin : able to edit users only in his region 
+				else if (admin.getIsOwner() != 1 && admin.isRegionAdmin()) {
+					for (UserFromSearch user : usersList) {
+						boolean hasCommon = Collections.disjoint(adminUser.getRegions(), user.getRegions());
+						user.setCanEdit(!hasCommon);
+					}
+				}
+				// Branch admin : able to edit users only in his office
+				else if (admin.getIsOwner() != 1 && admin.isBranchAdmin()) {
+					for (UserFromSearch user : usersList) {
+						boolean hasCommon = Collections.disjoint(adminUser.getBranches(), user.getBranches());
+						user.setCanEdit(!hasCommon);
+					}
+				}
+				
 				model.addAttribute("userslist", usersList);
 				LOG.debug("Users List: " + usersList.toString());
 			}
