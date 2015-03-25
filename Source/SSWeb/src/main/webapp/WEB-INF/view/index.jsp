@@ -34,7 +34,7 @@
 						<div class="float-left h-pwd-wrapper">
 							<div class="h-lbl clearfix">
 								<div class="float-left">Password</div>
-								<div class="float-right fgt-pwd"><a href ="./forgotpassword.do">Forgot your Password?</a></div>
+								<div class="float-right fgt-pwd"><a href ="./forgotpassword.do">Forgot Password?</a></div>
 							</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-pwd"></div>
@@ -43,7 +43,7 @@
 						</div>
 						<div class="float-left h-login-btn-wrapper">
 							<div id="login-submit" class="h-btn-login">
-								<span class="h-btn-login-txt hide">Submit</span>
+								<span class="h-btn-login-txt">Sign In</span>
 							</div>
 						</div>
 					</form>
