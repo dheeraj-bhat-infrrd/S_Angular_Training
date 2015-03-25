@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -370,6 +371,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery("companyId:" + companyId);
 			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -502,6 +504,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
+			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
