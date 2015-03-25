@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -183,10 +184,10 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
 			internalMax = 0;
-			surveyDetailsToPopulate.add(survey.getCustomerName());
-			surveyDetailsToPopulate.add(survey.getCustomerName());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
+			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+			surveyDetailsToPopulate.add(survey.getCustomerLastName());
+			surveyDetailsToPopulate.add(survey.getCreatedOn());
+			surveyDetailsToPopulate.add(survey.getModifiedOn());
 			surveyDetailsToPopulate.add(survey.getScore());
 			surveyDetailsToPopulate.add(survey.getMood());
 			surveyDetailsToPopulate.add(survey.getReview());
@@ -261,11 +262,12 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		List<Object> surveyDetailsToPopulate = new ArrayList<>();
 		for (SurveyDetails survey : surveyDetails) {
 			internalMax = 0;
-			surveyDetailsToPopulate.add(survey.getCustomerName());
-			surveyDetailsToPopulate.add(survey.getCustomerName());
+			surveyDetailsToPopulate.add(survey.getCustomerFirstName());
+			surveyDetailsToPopulate.add(survey.getCustomerLastName());
 			surveyDetailsToPopulate.add(survey.getCustomerEmail());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
-			surveyDetailsToPopulate.add(survey.getUpdatedOn());
+			surveyDetailsToPopulate.add(survey.getCreatedOn());
+			surveyDetailsToPopulate.add(survey.getModifiedOn());
+			surveyDetailsToPopulate.add(survey.getUrl());
 			data.put((++counter).toString(), surveyDetailsToPopulate);
 			surveyDetailsToPopulate = new ArrayList<>();
 			if (internalMax > max)
@@ -275,7 +277,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		surveyDetailsToPopulate.add("Last Name");
 		surveyDetailsToPopulate.add("Email Id");
 		surveyDetailsToPopulate.add("Started On");
-		surveyDetailsToPopulate.add("Completed On");
+		surveyDetailsToPopulate.add("Last Updated On");
+		surveyDetailsToPopulate.add("Link To Survey");
 		for (counter = 1; counter <= max; counter++) {
 			internalMax++;
 			surveyDetailsToPopulate.add("Question " + counter);
@@ -309,6 +312,16 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 			LOG.error("IOException caught in downloadCompleteSurveyData() while trying to create excel file at " + fileLocation);
 			throw e;
 		}
+	}
+	
+	@Override
+	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException{
+		Map<String, Map<String, Long>> map = new HashMap<String, Map<String, Long>>();
+		map.put("clicked", surveyDetailsDao.getClickedSurveyByCriteria(columnName, columnValue, reportType));
+		map.put("sent", surveyDetailsDao.getSentSurveyByCriteria(columnName, columnValue, reportType));
+		map.put("complete", surveyDetailsDao.getCompletedSurveyByCriteria(columnName, columnValue, reportType));
+		map.put("socialposts", surveyDetailsDao.getSocialPostsCountByCriteria(columnName, columnValue, reportType));
+		return map;
 	}
 }
 // JIRA SS-137 BY RM05:EOC
