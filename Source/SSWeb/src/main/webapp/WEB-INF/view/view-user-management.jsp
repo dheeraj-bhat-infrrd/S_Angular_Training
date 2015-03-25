@@ -60,33 +60,26 @@
 
         // remove user
         $(document).on('click', '.v-icn-rem-user', function(){
-            var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+        	if ($(this).hasClass('v-tbl-icn-disabled')) {
+        		return;
+        	}
+
+        	var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
             var adminId = '${user.userId}';
             confirmDeleteUser(userId, adminId);
         });
 
         // resend verification mail
         $(document).on('click', '.v-icn-fmail', function(){
-             var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
-             var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
-             var emailId = $(this).parent().find('.fetch-email').html();
-             reinviteUser(firstName, lastName, emailId);
-        });
+        	if ($(this).hasClass('v-tbl-icn-disabled')) {
+        		return;
+        	}
 
-        // edit user
-    //	$(document).on('click', '.v-icn-edit-user', function(){
-    //		if ($(this).parent().hasClass('u-tbl-row-sel')) {
-    //			$(this).parent().removeClass('u-tbl-row-sel');
-    //			$(this).parent().next('.u-tbl-row').hide();
-    //		} else {
-    //			$(this).parent().next('.u-tbl-row').show();
-    //			$(this).parent().addClass('u-tbl-row-sel');
-    //			
-    //			// make an ajax call and fetch the details of the user
-    //			var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-    //			getUserAssignments(userId);
-    //		}
-    //	});
+        	var firstName = $(this).parent().find('.fetch-name').attr('data-first-name');
+            var lastName = $(this).parent().find('.fetch-name').attr('data-last-name');
+            var emailId = $(this).parent().find('.fetch-email').html();
+            reinviteUser(firstName, lastName, emailId);
+        });
 
         // de-activate user profile
         $(document).on('click', '.tbl-switch-on', function(){
