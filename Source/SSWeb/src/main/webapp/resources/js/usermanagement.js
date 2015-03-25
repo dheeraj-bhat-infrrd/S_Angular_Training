@@ -796,7 +796,11 @@ function updateUserProfile(profileId, profileStatus) {
 }
 
 $(document).on('click', '.v-icn-edit-user', function(){
-    if ($(this).parent().hasClass('u-tbl-row-sel')) {
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	if ($(this).parent().hasClass('u-tbl-row-sel')) {
         $(this).parent().removeClass('u-tbl-row-sel');
         $(this).parent().next('.u-tbl-row').hide();
     } else {
