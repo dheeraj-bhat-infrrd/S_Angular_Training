@@ -725,10 +725,54 @@ function searchBranchesForUserCallBack(jsonData) {
  */
 function getUserAssignments(userId) {
 	var url = "./finduserassignments.do?userId=" + userId; 
-	callAjaxGET(url, function(data) {
+	callAjaxGET(url, function(data){
 		$('#user-details-and-assignments-' + userId).html(data);
-	}, true);
+		
+		var assignToOption = $("#assign-to-txt").attr('data-assignto');
+		showSelectorsByAssignToOption(assignToOption);
+		
+		/**
+		 * bind the click and keyup events
+		 */		
+		bindAssignToSelectorClick();
+		bindOfficeSelectorEvents();
+		bindRegionSelectorEvents();
+		bindAdminCheckBoxClick();
+		
+		$("#btn-save-user-assignment").click(function(e){
+			if(validateIndividualForm()){
+				saveUserAssignment("user-assignment-form");
+			}
+		});
+		
+		$(document).on('click', 'body', function() {
+            $('.dd-droplist').slideUp(200);
+        });
+		
+	} , true);
+	
 }
+
+/**
+ * Method to save the assignment of user with branch/region or company
+ * @param formId
+ */
+function saveUserAssignment(formId) {
+	var url = "./addindividual.do";
+	showOverlay();
+	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId);
+}
+
+/**
+ * callback for saveUserAssignment
+ * @param data
+ */
+function saveUserAssignmentCallBack(data) {
+	hideOverlay();
+	displayMessage(data);
+	//TODO refresh the right section with latest assignments
+}
+
 
 function reinviteUser(firstName, lastName, emailId) {
 	var payload = {
@@ -796,15 +840,21 @@ function updateUserProfile(profileId, profileStatus) {
 }
 
 $(document).on('click', '.v-icn-edit-user', function(){
-    if ($(this).parent().hasClass('u-tbl-row-sel')) {
-        $(this).parent().removeClass('u-tbl-row-sel');
-        $(this).parent().next('.u-tbl-row').hide();
-    } else {
-        $(this).parent().next('.u-tbl-row').show();
-        $(this).parent().addClass('u-tbl-row-sel');
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
 
+	if ($(this).parent().hasClass('u-tbl-row-sel')) {
+        $(this).parent().removeClass('u-tbl-row-sel');
+        $(this).parent().next('.u-tbl-row').slideUp(200);
+    } else {
         // make an ajax call and fetch the details of the user
         var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+		$(".user-assignment-edit-div").html("");
+		$(".user-row").removeClass('u-tbl-row-sel');
+		$(".user-assignment-edit-row").slideUp();
         getUserAssignments(userId);
+        $(this).parent().next('.u-tbl-row').slideDown(200);
+        $(this).parent().addClass('u-tbl-row-sel');
     }
 });
