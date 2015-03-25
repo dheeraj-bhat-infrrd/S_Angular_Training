@@ -725,9 +725,27 @@ function searchBranchesForUserCallBack(jsonData) {
  */
 function getUserAssignments(userId) {
 	var url = "./finduserassignments.do?userId=" + userId; 
-	callAjaxGET(url, function(data) {
+	callAjaxGET(url, function(data){
 		$('#user-details-and-assignments-' + userId).html(data);
-	}, true);
+		
+		var assignToOption = $("#assign-to-txt").attr('data-assignto');
+		showSelectorsByAssignToOption(assignToOption);
+		
+		/**
+		 * bind the click and keyup events
+		 */		
+		bindAssignToSelectorClick();
+		bindOfficeSelectorEvents();
+		bindRegionSelectorEvents();
+		bindAdminCheckBoxClick();
+		
+		$(document).on('click', 'body', function() {
+            $('.dd-droplist').slideUp(200);
+        });
+		
+	} , true);
+	
+	
 }
 
 function reinviteUser(firstName, lastName, emailId) {
@@ -797,14 +815,13 @@ function updateUserProfile(profileId, profileStatus) {
 
 $(document).on('click', '.v-icn-edit-user', function(){
     if ($(this).parent().hasClass('u-tbl-row-sel')) {
-        $(this).parent().removeClass('u-tbl-row-sel');
-        $(this).parent().next('.u-tbl-row').hide();
+    	$(this).parent().removeClass('u-tbl-row-sel');
+        $(this).parent().next('.u-tbl-row').slideUp(200);
     } else {
-        $(this).parent().next('.u-tbl-row').show();
-        $(this).parent().addClass('u-tbl-row-sel');
-
-        // make an ajax call and fetch the details of the user
+    	// make an ajax call and fetch the details of the user
         var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
         getUserAssignments(userId);
+        $(this).parent().addClass('u-tbl-row-sel');
+        $(this).parent().next('.u-tbl-row').slideDown(200);
     }
 });
