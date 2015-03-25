@@ -36,7 +36,7 @@
 			<div id="page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 		</div>
 	</div>
-
+<div id="temp-message" class="hide"></div>
 <script>
     $(document).ready(function() {
         $(document).attr("title", "User Management");
