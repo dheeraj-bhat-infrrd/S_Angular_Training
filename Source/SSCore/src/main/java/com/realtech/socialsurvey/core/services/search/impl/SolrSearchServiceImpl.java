@@ -517,6 +517,38 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		return usersResult;
 	}
 
+	@Override
+	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+			MalformedURLException {
+		LOG.info("Method countUsersByCompany() called for company id : " + companyId);
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		long resultsCount = 0l;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+			response = solrServer.query(solrQuery);
+			
+			resultsCount = response.getResults().getNumFound();
+			LOG.debug("User search result count is : " + resultsCount);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method countUsersByCompany() finished for company id : " + companyId);
+		return resultsCount;
+	}
+
 	/**
 	 * Method to add User into solr
 	 */
