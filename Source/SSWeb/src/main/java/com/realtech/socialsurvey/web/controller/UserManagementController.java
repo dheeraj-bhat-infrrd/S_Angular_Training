@@ -991,16 +991,16 @@ public class UserManagementController {
 			LOG.debug("Updating newly activated user {} to mongo", user.getFirstName());
 			AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
 			ContactDetailsSettings contactDetails = agentSettings.getContact_details();
-			contactDetails.setName(user.getFirstName() + " " + user.getLastName());
+			contactDetails.setName(user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 			
 			profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetails);
 			LOG.debug("Updated newly activated user {} to mongo", user.getFirstName());
 
 			LOG.debug("Modifying user detail in solr");
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, user.getStatus() + "");
+			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf(user.getStatus()));
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
+			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, (user.getLastName() != null ? user.getLastName() : ""));
+			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 			LOG.debug("Successfully modified user detail in solr");
 			
 			LOG.debug("Adding newly registered user to principal session");
