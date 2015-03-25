@@ -156,6 +156,15 @@ public class UserManagementController {
 				LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
 				throw new NonFatalException("MalformedURLException while fetching branches", e);
 			}
+			
+			try {
+				long usersCount = solrSearchService.countUsersByCompany(companyId, 0, SOLR_BATCH_SIZE);
+				session.setAttribute("usersCount", usersCount);
+			}
+			catch (MalformedURLException e) {
+				LOG.error("MalformedURLException while fetching users count. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("MalformedURLException while fetching users count", e);
+			}
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);

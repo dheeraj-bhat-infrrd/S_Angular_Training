@@ -80,7 +80,7 @@
 			<div class="float-left v-ed-lbl"></div>
 			<div class="float-left v-ed-txt pos-relative">
 				<div class="bd-frm-check-wrapper clearfix">
-					<div class="float-left bd-check-img"></div>
+					<div class="float-left bd-check-img" style="color: transparent;">`</div>
 					<input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
 	            	<div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
 				</div>
