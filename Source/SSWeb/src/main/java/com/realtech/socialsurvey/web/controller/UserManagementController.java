@@ -379,6 +379,9 @@ public class UserManagementController {
 				if (admin.getIsOwner() == 1) {
 					for (UserFromSearch user : usersList) {
 						user.setCanEdit(true);
+						if (user.getIsOwner() == 1) {
+							user.setCanEdit(false);
+						}
 					}
 				}
 				// Region admin : able to edit users only in his region 
@@ -417,9 +420,9 @@ public class UserManagementController {
 	/*
 	 * Method to find a user on the basis of email id provided.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/finduserbyemail", method = RequestMethod.GET)
-	public @ResponseBody
-	String findUserByEmail(Model model, HttpServletRequest request) {
+	public String findUserByEmail(Model model, HttpServletRequest request) {
 		LOG.info("Method to find users by email id called.");
 		String users = "";
 		try {
@@ -462,7 +465,7 @@ public class UserManagementController {
 		LOG.info("Finding users and redirecting to search page");
 		String users = findUserByEmail(model, request);
 		// convert users to Object
-		Type searchedUsersList = new com.google.gson.reflect.TypeToken<List<UserFromSearch>>() {}.getType();
+		Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
 		List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
 		model.addAttribute("userslist", usersList);
 		LOG.debug("Users List: " + usersList.toString());

@@ -1,5 +1,5 @@
 var userStartIndex = 0;
-var userBatchSize = 5;
+var userBatchSize = 10;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
