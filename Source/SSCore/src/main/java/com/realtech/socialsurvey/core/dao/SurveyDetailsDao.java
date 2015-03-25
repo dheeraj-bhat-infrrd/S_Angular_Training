@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.dao;
 
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -51,5 +52,13 @@ public interface SurveyDetailsDao {
 	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columNValue, int start, int rows, double startScore, double limitScore);
 
 	public void updateReminderCount(long agentId, String customerEmail);
+
+	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+
+	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+
+	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
+
+	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
 
 }
