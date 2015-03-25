@@ -3,6 +3,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
+
 <div class="v-um-edit-wrapper clearfix">
 	<div class="v-edit-lft col-lg-6 col-md-6 col-sm-6 col-xs-12">
 		<form id="user-assignment-form">
@@ -93,7 +94,7 @@
 	</div>
 	
 	<div class="v-edit-rt col-lg-6 col-md-6 col-sm-6 col-xs-12">
-		<div class="v-edt-tbl-wrapper">
+		<div id="profile-tbl-wrapper-${userId}" class="v-edt-tbl-wrapper" style="max-height: 205px;">
 			<table class="v-edt-tbl">
 				<tr class="v-edt-tbl-header">
 					<td class="v-edt-tbl-assign-to"><spring:message code="label.assignedto.key" /></td>

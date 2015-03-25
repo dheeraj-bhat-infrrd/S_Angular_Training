@@ -751,7 +751,6 @@ function getUserAssignments(userId) {
 		$(document).on('click', 'body', function() {
             $('.dd-droplist').slideUp(200);
         });
-		
 	} , true);
 	
 }
@@ -856,9 +855,15 @@ $(document).on('click', '.v-icn-edit-user', function(){
 		$(".user-assignment-edit-div").html("");
 		$(".user-row").removeClass('u-tbl-row-sel');
 		$(".user-assignment-edit-row").slideUp();
-        getUserAssignments(userId);
+
+		getUserAssignments(userId);
+
         $(this).parent().next('.u-tbl-row').slideDown(200);
         $(this).parent().addClass('u-tbl-row-sel');
+        
+		setTimeout(function() {
+			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
+		}, 1000);
     }
 });
 
