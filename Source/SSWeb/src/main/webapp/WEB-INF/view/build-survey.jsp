@@ -19,6 +19,48 @@
 
 <body>
     
+    <div id="view-srv-pu" class="bd-srv-pu hide">
+        <div class="container view-srv-container">
+            <div class="bd-q-wrapper">
+                <div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
+                    <div class="float-left bd-q-pu-header-lft">View Survey</div>
+                </div>
+                <div class="vs-q-wrapper">
+                    <div class="vs-srv-tbl-row clearfix">
+                        <div class="float-left vs-tbl-num">
+                            <span>1</span>
+                        </div>
+                        <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
+                        <div class="clearfix vs-ans-row">
+                            <div class="float-left vs-ans-lbl">Ans:</div>
+                            <div class="float-left vs-ans-txt">Some random asn asweef sj adhf fkdshjhj hjdkjyu </div>
+                        </div>
+                    </div>
+                    <div class="vs-srv-tbl-row clearfix">
+                        <div class="float-left vs-tbl-num">
+                            <span>2</span>
+                        </div>
+                        <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
+                        <div class="clearfix vs-ans-row">
+                            <div class="float-left vs-ans-lbl">Ans:</div>
+                            <div class="float-left vs-ans-txt vs-ans-icn vs-ans-icn-smiley"></div>
+                        </div>
+                    </div>
+                    <div class="vs-srv-tbl-row clearfix">
+                        <div class="float-left vs-tbl-num">
+                            <span>3</span>
+                        </div>
+                        <div class="float-left srv-tbl-txt">Lorem ipsum sample question Lorem ipsum sample question</div>
+                        <div class="clearfix vs-ans-row">
+                            <div class="float-left vs-ans-lbl">Ans:</div>
+                            <div class="float-left vs-ans-txt vs-ans-icn vs-ans-icn-star"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div id="bd-srv-pu" class="bd-srv-pu hide">
         <div class="container bd-q-container">
             <div class="bd-q-wrapper">
