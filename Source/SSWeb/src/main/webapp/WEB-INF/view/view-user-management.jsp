@@ -32,8 +32,8 @@
 			<!-- Fill in the user list jsp -->
 		</div>
 		<div style="width: 100px; margin: 0 auto;">
-			<div id="page-previous" class="float-left paginate-button">Prev</div>
-			<div id="page-next" class="float-right paginate-button">Next</div>
+			<div id="page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
+			<div id="page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
 		</div>
 	</div>
 
