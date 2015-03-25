@@ -814,14 +814,19 @@ function updateUserProfile(profileId, profileStatus) {
 }
 
 $(document).on('click', '.v-icn-edit-user', function(){
-    if ($(this).parent().hasClass('u-tbl-row-sel')) {
-    	$(this).parent().removeClass('u-tbl-row-sel');
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
+
+	if ($(this).parent().hasClass('u-tbl-row-sel')) {
+        $(this).parent().removeClass('u-tbl-row-sel');
         $(this).parent().next('.u-tbl-row').slideUp(200);
     } else {
-    	// make an ajax call and fetch the details of the user
+        $(this).parent().next('.u-tbl-row').slideDown(200);
+        $(this).parent().addClass('u-tbl-row-sel');
+
+        // make an ajax call and fetch the details of the user
         var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
         getUserAssignments(userId);
-        $(this).parent().addClass('u-tbl-row-sel');
-        $(this).parent().next('.u-tbl-row').slideDown(200);
     }
 });
