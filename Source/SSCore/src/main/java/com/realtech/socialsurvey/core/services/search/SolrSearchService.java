@@ -6,6 +6,7 @@ package com.realtech.socialsurvey.core.services.search;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Set;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
@@ -23,30 +24,37 @@ import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 public interface SolrSearchService {
 
 	/**
-	 * Method to perform search of regions from solr based on the input pattern and company
+	 * Method to perform search of regions from solr based on input pattern , company and regionIds
+	 * if provided
 	 * 
 	 * @param regionPattern
 	 * @param company
 	 * @param start
 	 * @param rows
+	 * @param regionIds
 	 * @return
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public String searchRegions(String regionPattern, Company company, int start, int rows) throws InvalidInputException, SolrException;
+	public String searchRegions(String regionPattern, Company company, Set<Long> regionIds, int start, int rows) throws InvalidInputException,
+			SolrException;
 
 	/**
-	 * Method to perform search of branches from solr based on the input pattern and company
+	 * Method to perform search of branches from solr based on the input pattern, company and
+	 * ids(ids could be either regionIds or branchIds and idColumnName is set accordingly )
 	 * 
 	 * @param branchPattern
 	 * @param company
+	 * @param idColumnName
+	 * @param ids
 	 * @param start
 	 * @param rows
 	 * @return
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public String searchBranches(String branchPattern, Company company, int start, int rows) throws InvalidInputException, SolrException;
+	public String searchBranches(String branchPattern, Company company, String idColumnName, Set<Long> ids, int start, int rows)
+			throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to perform search of branches from solr based on the region id.
@@ -60,7 +68,6 @@ public interface SolrSearchService {
 	 */
 	public String searchBranchesByRegion(long regionId, int start, int rows) throws InvalidInputException, SolrException;
 
-	
 	/**
 	 * Method to add a region to solr
 	 * 
@@ -111,6 +118,10 @@ public interface SolrSearchService {
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
+	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
+	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
 	public void removeUserFromSolr(long userIdToRemove) throws SolrException;
 
 	/**
@@ -135,13 +146,14 @@ public interface SolrSearchService {
 	public SolrDocument getUserByUniqueId(long userId) throws InvalidInputException, SolrServerException;
 
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
-	
-	public SolrDocumentList searchUsersByIden(long iden,String idenFieldName,int startIndex,int noOfRows) throws InvalidInputException,SolrException;
+
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
+			SolrException;
 
 	public String searchRegionById(long regionId) throws InvalidInputException, SolrException;
 
 	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException;
-	
+
 	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
 			SolrException;
 }

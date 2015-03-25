@@ -3,6 +3,7 @@
  */
 var usersStartIndex = 0;
 var numOfRows = 10;
+/*in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile*/
 
 /**
  * function to display success/failure message to user after an action
@@ -34,9 +35,9 @@ function checkUserAuthorization(){
 /**
  * Method to fetch the company hierarchy
  */
-function fetchCompanyHierarchy() {
+function fetchCompleteHierarchy() {
 	var profileName = $("#profile-name").val();
-    fetchHierarchy("companyProfileName", profileName);
+	fetchCompanyHierarchy("companyProfileName", profileName);
 }
 /**
  * Method to change the arrow in tabs according to the form displayed 
@@ -73,16 +74,36 @@ function getEditSectionFormByTab(tabValue) {
 }
 
 /**
- * Method to get the edit section form based on the account type of user
+ * Method to get the edit section form based on the account type and highest role of user
  */
-function getEditSectionByAccountType() {
+function getEditSection() {
 	var accountType = $("#account-type").val();
+	var highestRole = $("#highest-role").val();
 	switch(accountType){
-    case 'Enterprise': 
-    	getRegionEditPage();
+    case 'Enterprise':
+    	if(highestRole == 1) {
+    		getRegionEditPage();
+    	}
+    	else if(highestRole == 2) {
+    		getOfficeEditPage();
+    	}
+    	else if(highestRole == 3){
+    		getIndividualEditPage();
+    	}
+    	else {
+    		showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+    	}
         break;
     case 'Company': 
-        getOfficeEditPage();
+    	if(highestRole == 1 || highestRole == 2) {
+    		getOfficeEditPage();
+    	}
+    	else if(highestRole == 3){
+    		getIndividualEditPage();
+    	}
+    	else {
+    		showErrorMobileAndWeb("Sorry you are not authorized to build hierarchy");
+    	}
         break;
     case 'Team': 
     	getIndividualEditPage();
@@ -460,7 +481,7 @@ function addRegionCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-region-form");
-	fetchCompanyHierarchy();
+	fetchCompleteHierarchy();
 }
 
 /**
@@ -622,7 +643,7 @@ function addOfficeCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-office-form");
-	fetchCompanyHierarchy();
+	fetchCompleteHierarchy();
 }
 
 /**
@@ -783,7 +804,7 @@ function addIndividualCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
 	resetInputFields("edit-individual-form");
-	fetchCompanyHierarchy();
+	fetchCompleteHierarchy();
 }
 
 /**
