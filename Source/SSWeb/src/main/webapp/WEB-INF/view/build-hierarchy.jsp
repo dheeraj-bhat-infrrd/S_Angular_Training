@@ -65,7 +65,6 @@ $(document).ready(function() {
 	getEditSection();
 	
     $(document).on('click', 'body', function() {
-    	console.log("body clicked");
         $('.dd-com-list').slideUp(200);
     });
     
