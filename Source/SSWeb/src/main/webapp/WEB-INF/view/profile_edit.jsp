@@ -443,6 +443,17 @@
 				</c:choose>
 				</div>
 				<div class="bd-hr-left-panel">
+				<c:choose>
+					<c:when	test="${user.companyAdmin}">
+						<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
+					</c:when>
+					<c:when	test="${user.regionAdmin}">
+						<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
+					</c:when>
+					<c:when	test="${user.branchAdmin}">
+						<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
+					</c:when>
+				</c:choose>
         			<div id ="prof-hierarchy-container" class="hide">
         				<!-- hierarchy structure comes here  -->
         			</div>

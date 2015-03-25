@@ -72,15 +72,18 @@ public class LoginController {
 			switch (status) {
 				case AUTH_ERROR:
 					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_USER_CREDENTIALS, DisplayMessageType.ERROR_MESSAGE));
 					break;
 				case SESSION_ERROR:
 					model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.SESSION_EXPIRED, DisplayMessageType.ERROR_MESSAGE));
 					break;
 				case LOGOUT:
 					model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
-					model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+					model.addAttribute("message",
+							messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 					break;
 			}
 		}
@@ -154,23 +157,23 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					/*UserProfile highestUserProfile = null;
-					UserProfile companyAdminProfile = null;
-					// fetch the highest user profile for user
-					try {
-						highestUserProfile = userManagementService.getHighestUserProfileForUser(user);
-						companyAdminProfile = authenticationService.getCompanyAdminProfileForUser(user);
-					}
-					catch (NoRecordsFetchedException e) {
-						LOG.error("No user profiles found for the user");
-						return JspResolver.ERROR_PAGE;
-					}*/
-					
-					//Compute all conditions for user and if user is CA then check for profile completion stage.
-					if(user.isCompanyAdmin()){
-						UserProfile adminProfile=null;
-						for(UserProfile userProfile:user.getUserProfiles()){
-							if((userProfile.getCompany().getCompanyId()==user.getCompany().getCompanyId())&&(userProfile.getProfilesMaster().getProfileId()==CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
+					/*
+					 * UserProfile highestUserProfile = null; UserProfile companyAdminProfile =
+					 * null; // fetch the highest user profile for user try { highestUserProfile =
+					 * userManagementService.getHighestUserProfileForUser(user); companyAdminProfile
+					 * = authenticationService.getCompanyAdminProfileForUser(user); } catch
+					 * (NoRecordsFetchedException e) {
+					 * LOG.error("No user profiles found for the user"); return
+					 * JspResolver.ERROR_PAGE; }
+					 */
+
+					// Compute all conditions for user and if user is CA then check for profile
+					// completion stage.
+					if (user.isCompanyAdmin()) {
+						UserProfile adminProfile = null;
+						for (UserProfile userProfile : user.getUserProfiles()) {
+							if ((userProfile.getCompany().getCompanyId() == user.getCompany().getCompanyId())
+									&& (userProfile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID))
 								adminProfile = userProfile;
 						}
 						redirectTo = getRedirectionFromProfileCompletionStage(adminProfile.getProfileCompletionStage());
@@ -178,8 +181,8 @@ public class LoginController {
 					else {
 						redirectTo = JspResolver.LANDING;
 					}
-					
-					if(redirectTo.equals(JspResolver.LANDING)){
+
+					if (redirectTo.equals(JspResolver.LANDING)) {
 						// get the user's canonical settings
 						LOG.info("Fetching the user's canonical settings and setting it in session");
 						sessionHelper.getCanonicalSettings(session);
@@ -189,7 +192,7 @@ public class LoginController {
 				}
 				else {
 					LOG.info("No User profile present");
-					//TODO: add logic for what happens when no user profile present
+					// TODO: add logic for what happens when no user profile present
 				}
 			}
 
@@ -276,16 +279,17 @@ public class LoginController {
 				LOG.error("Invalid Input exception in verifying registered user. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
-			
+
 			// Send reset password link
 			try {
-				authenticationService.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName(), user.getCompany().getCompanyId());
+				authenticationService
+						.sendResetPasswordLink(emailId, user.getFirstName() + " " + user.getLastName(), user.getCompany().getCompanyId());
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in sending reset password link. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
 			model.addAttribute("message",
 					messageUtils.getDisplayMessage(DisplayMessageConstants.PASSWORD_RESET_LINK_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -323,6 +327,7 @@ public class LoginController {
 		}
 		return JspResolver.RESET_PASSWORD;
 	}
+
 	// RM-06 : EOC
 
 	/**
@@ -359,7 +364,7 @@ public class LoginController {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
-			
+
 			long companyId = 0;
 			try {
 				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
@@ -368,7 +373,7 @@ public class LoginController {
 				LOG.error("Invalid company id found in URL parameters. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			// fetch user object with email Id
 			try {
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
@@ -377,12 +382,12 @@ public class LoginController {
 				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
 			}
-			
+
 			if (user.getStatus() == CommonConstants.STATUS_NOT_VERIFIED || user.getStatus() == CommonConstants.STATUS_INACTIVE) {
 				LOG.error("Account with EmailId entered is either inactive or not verified");
 				throw new InvalidInputException("Your Account is either inactive or not verified", DisplayMessageConstants.INVALID_ACCOUNT);
 			}
-			
+
 			// change user's password
 			try {
 				authenticationService.changePassword(user, password);
@@ -391,7 +396,7 @@ public class LoginController {
 				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			LOG.info("Reset user password executed successfully");
 			model.addAttribute("status", DisplayMessageType.SUCCESS_MESSAGE);
 			model.addAttribute("message",
@@ -474,7 +479,7 @@ public class LoginController {
 				redirectTo = JspResolver.ACCOUNT_TYPE_SELECTION;
 				break;
 			case CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE:
-				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE; 
+				redirectTo = "redirect:./" + CommonConstants.PRE_PROCESSING_BEFORE_LOGIN_STAGE;
 				break;
 			case CommonConstants.DASHBOARD_STAGE:
 				redirectTo = JspResolver.LANDING;
@@ -499,7 +504,7 @@ public class LoginController {
 				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
 					model.addAttribute("companyAdmin", true);
 					if (accountType == AccountType.ENTERPRISE) {
-						String regionsJson = solrSearchService.searchRegions("", user.getCompany(), 0, -1);
+						String regionsJson = solrSearchService.searchRegions("", user.getCompany(), null, 0, -1);
 						List<Region> regions = new ArrayList<>();
 						List<String> regionNames = new ArrayList<>();
 						regions.addAll((List<Region>) new Gson().fromJson(regionsJson, new TypeToken<List<Region>>() {}.getType()));
@@ -511,7 +516,7 @@ public class LoginController {
 						model.addAttribute("regionIds", regionIds);
 					}
 					else if (accountType == AccountType.COMPANY) {
-						String branchesJson = solrSearchService.searchBranches("", user.getCompany(), 0, -1);
+						String branchesJson = solrSearchService.searchBranches("", user.getCompany(), null, null, 0, -1);
 						List<Branch> branches = new ArrayList<>();
 						List<String> branchNames = new ArrayList<>();
 						branches.addAll((List<Branch>) new Gson().fromJson(branchesJson, new TypeToken<List<Branch>>() {}.getType()));
@@ -525,14 +530,16 @@ public class LoginController {
 					return model;
 				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
 					model.addAttribute("regionAdmin", true);
-					// Add list of region Ids, user is admin of. Currently adding only 1st region id.
+					// Add list of region Ids, user is admin of. Currently adding only 1st region
+					// id.
 					regionIds.add(userProfile.getRegionId());
 					model.addAttribute("regionIds", regionIds);
 					break;
 
 				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
 					model.addAttribute("branchAdmin", true);
-					// Add list of branch Ids, user is admin of.  Currently adding only 1st branch id.
+					// Add list of branch Ids, user is admin of. Currently adding only 1st branch
+					// id.
 					branchIds.add(userProfile.getBranchId());
 					model.addAttribute("branchIds", branchIds);
 					break;
