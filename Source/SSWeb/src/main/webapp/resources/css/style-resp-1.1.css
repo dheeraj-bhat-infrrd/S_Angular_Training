@@ -50,6 +50,8 @@
         text-align: center;
         line-height: 44px;
         height: 44px;
+        border-radius: 0;
+        font-size: 13px;
     }
     .hero-txt-wrapper{
         width: 100%;
