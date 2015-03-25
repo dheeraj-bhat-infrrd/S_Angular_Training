@@ -249,7 +249,8 @@
 							<div id="sad-smile" star-no="3"
 								class="sq-smile-icn-wrapper sq-sad-smile"></div>
 						</div>
-
+					<div id="pst-srvy-div">
+						<input id="post-survey" type="CHECKBOX" checked>I want to share my survey
 					</div>
 					<div class="sq-np-wrapper clearfix">
 						<div id="prev-textarea-smiley"
@@ -260,6 +261,7 @@
 					<!-- <div class="sq-btn-wrapper">
 					<div id="submit" class="sq-btn-continue hide">Submit</div>
 				</div> -->
+				</div>
 				</div>
 
 				<!-- Div for MC type questions -->
