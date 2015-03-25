@@ -104,10 +104,10 @@ public class SurveyManagementController {
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			try {
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerFirstName()+" "+survey.getCustomerLastName(), survey.getAgentName());
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerName(), survey.getAgentName());
+					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName()+" "+survey.getCustomerLastName(), survey.getAgentName());
 				}
 			}
 			catch (InvalidInputException e) {
@@ -171,6 +171,7 @@ public class SurveyManagementController {
 			String captchaResponse;
 			String challengeField;
 			String custRelationWithAgent;
+			String url;
 			try {
 				String user = request.getParameter(CommonConstants.AGENT_ID_COLUMN);
 				agentId = Long.parseLong(user);
@@ -180,6 +181,7 @@ public class SurveyManagementController {
 				captchaResponse = request.getParameter("captchaResponse");
 				challengeField = request.getParameter("recaptcha_challenge_field");
 				custRelationWithAgent = request.getParameter("relationship");
+				url = getApplicationBaseUrl() + "rest/survey/showsurveypage/" + agentId;
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
@@ -191,7 +193,7 @@ public class SurveyManagementController {
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
-				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent);
+				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
 				surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 				if (survey != null) {
 					stage = survey.getStage();
@@ -228,8 +230,8 @@ public class SurveyManagementController {
 	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
-		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent);
+			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
+		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
 	}
 
 	private String getApplicationBaseUrl() {

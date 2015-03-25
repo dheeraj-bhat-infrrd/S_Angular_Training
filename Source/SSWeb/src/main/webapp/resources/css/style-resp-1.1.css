@@ -50,6 +50,8 @@
         text-align: center;
         line-height: 44px;
         height: 44px;
+        border-radius: 0;
+        font-size: 13px;
     }
     .hero-txt-wrapper{
         width: 100%;
@@ -279,14 +281,14 @@
         margin-bottom: 15px;
     }
     .c-pic-top-1{
-        width: 477px;
+        width: 536px;
         margin-right: 7px;
     }
     .c-pic-panel-top {
         margin-bottom: 7px;
     }
     .c-pic-img{
-        width: 235px;
+        width: 175px;
     }
     .c-pic-bot-1{
         margin-right: 7px;
@@ -376,10 +378,10 @@
         width: 625px;
     }
     .c-pic-top-1{
-        width: 415px;
+        width: 466px;
     }
     .c-pic-img{
-        width: 205px;
+        width: 152px;
     }
     .c-reg-panel{
         width: 300px;
