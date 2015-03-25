@@ -53,7 +53,7 @@
 					</c:otherwise>
 				</c:choose>
 
-				<tr class="u-tbl-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
+				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
 					<td class="v-tbl-uname fetch-name" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email">${userfromsearch.emailId}</td>
 					<td class="v-tbl-rgn-adm ${regionadmintickclass}"></td>
@@ -78,13 +78,12 @@
 					<td class="v-tbl-rem ${admincaneditclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
 					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user" title="<spring:message code="label.edit.key" />"></td>
 				</tr>
-				<tr class="u-tbl-row u-tbl-row-sel hide">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td" colspan="9">
+				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="9">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
 			</c:forEach>
-			<!--<tr class="u-tbl-row u-tbl-row-sel"></tr>-->
 		</c:when>
 		<c:otherwise>
 			<tr class="u-tbl-row"><spring:message code="label.nousersfound.key" /></tr>

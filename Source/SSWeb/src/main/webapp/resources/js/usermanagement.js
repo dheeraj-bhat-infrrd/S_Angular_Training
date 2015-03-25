@@ -739,14 +739,40 @@ function getUserAssignments(userId) {
 		bindRegionSelectorEvents();
 		bindAdminCheckBoxClick();
 		
+		$("#btn-save-user-assignment").click(function(e){
+			if(validateIndividualForm()){
+				saveUserAssignment("user-assignment-form");
+			}
+		});
+		
 		$(document).on('click', 'body', function() {
             $('.dd-droplist').slideUp(200);
         });
 		
 	} , true);
 	
-	
 }
+
+/**
+ * Method to save the assignment of user with branch/region or company
+ * @param formId
+ */
+function saveUserAssignment(formId) {
+	var url = "./addindividual.do";
+	showOverlay();
+	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId);
+}
+
+/**
+ * callback for saveUserAssignment
+ * @param data
+ */
+function saveUserAssignmentCallBack(data) {
+	hideOverlay();
+	displayMessage(data);
+	//TODO refresh the right section with latest assignments
+}
+
 
 function reinviteUser(firstName, lastName, emailId) {
 	var payload = {
@@ -822,11 +848,13 @@ $(document).on('click', '.v-icn-edit-user', function(){
         $(this).parent().removeClass('u-tbl-row-sel');
         $(this).parent().next('.u-tbl-row').slideUp(200);
     } else {
-        $(this).parent().next('.u-tbl-row').slideDown(200);
-        $(this).parent().addClass('u-tbl-row-sel');
-
         // make an ajax call and fetch the details of the user
         var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+		$(".user-assignment-edit-div").html("");
+		$(".user-row").removeClass('u-tbl-row-sel');
+		$(".user-assignment-edit-row").slideUp();
         getUserAssignments(userId);
+        $(this).parent().next('.u-tbl-row').slideDown(200);
+        $(this).parent().addClass('u-tbl-row-sel');
     }
 });

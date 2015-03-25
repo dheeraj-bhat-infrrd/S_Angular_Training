@@ -31,7 +31,7 @@
 			<!-- Fill in the user list jsp -->
 		</div>
 	</div>
-
+<div id="temp-message" class="hide"></div>
 <script>
     $(document).ready(function() {
         $(document).attr("title", "User Management");
