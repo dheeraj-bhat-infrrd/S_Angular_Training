@@ -43,7 +43,7 @@
 					<c:set var="userstatustickclass" value="v-icn-off"/>
 				</c:if>
 				
-				<tr class="u-tbl-row" id="user-row-${userfromsearch.userId}">
+				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}">
 					<td class="v-tbl-uname fetch-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email">${userfromsearch.emailId}</td>
 					<td class="v-tbl-rgn-adm ${regionadmintickclass}"></td>
@@ -68,13 +68,12 @@
 					<td class="v-tbl-rem v-tbl-icn v-icn-rem-user" title="Remove"></td>
 					<td class="v-tbl-edit v-tbl-icn v-icn-edit-user" title="Edit"></td>
 				</tr>
-				<tr class="u-tbl-row u-tbl-row-sel hide">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td" colspan="9">
+				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="9">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
 			</c:forEach>
-			<!--<tr class="u-tbl-row u-tbl-row-sel"></tr>-->
 		</c:when>
 		<c:otherwise>
 			<tr class="u-tbl-row"><spring:message code="label.nousersfound.key" /></tr>
