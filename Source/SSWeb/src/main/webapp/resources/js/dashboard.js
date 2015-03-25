@@ -144,7 +144,6 @@ function showCompanyAdminFlow(accountType) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-//	$("#dsh-srch-survey-div").hide();
 	bindSelectButtons();
 
 	populateSurveyStatisticsList("companyId");
@@ -162,7 +161,6 @@ function showRegionAdminFlow(accountType, regionId) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-	$("#dsh-srch-survey-div").hide();
 	bindSelectButtons();
 
 	populateSurveyStatisticsList("regionId");
@@ -181,6 +179,7 @@ function showBranchAdminFlow(accountType, branchId) {
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
+	$("#dsh-grph-srch-survey-div").hide();
 	bindSelectButtons();
 
 	populateSurveyStatisticsList("branchId");
@@ -199,7 +198,7 @@ function showAgentFlow() {
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
-
+	$("#dsh-grph-srch-survey-div").hide();
 	showSurveyCount("agentId", 0, 30);
 	showSurveyStatisticsGraphically("agentId", 0);
 }
@@ -382,7 +381,7 @@ function paintSurveyStatistics(data) {
 	if (isNaN(clicked)){
 		clicked = 0;
 	}
-	var icnForClicked = prcntForClicked * 20 / sentSurveyCount;
+	var icnForClicked = clicked * 20 / sentSurveyCount;
 	icnForClicked = Math.round(icnForClicked);
 	for (var i = 0; i < parseInt(icnForClicked); i++) {
 		clickedSurveyDiv += "<div class='float-left stat-icn-img stat-icn-img-blue'></div>";
@@ -394,7 +393,7 @@ function paintSurveyStatistics(data) {
 	var completed = parseInt(data.responseJSON.completedSurvey);
 	if (isNaN(completed))
 		completed = 0;
-	var icnForCompleted = prcntForCompleted * 20 / sentSurveyCount;
+	var icnForCompleted = completed * 20 / sentSurveyCount;
 	icnForCompleted = Math.round(icnForCompleted);
 	for (var i = 0; i < parseInt(icnForCompleted); i++) {
 		completedSurveyDiv += '<div class="float-left stat-icn-img stat-icn-img-yellow"></div>';
@@ -408,7 +407,7 @@ function paintSurveyStatistics(data) {
 	if (isNaN(socialPosts)){
 		socialPosts = 0;
 	}
-	var icnForSocialPosts = prcntForSocialPosts * 20 / sentSurveyCount;
+	var icnForSocialPosts = socialPosts * 20 / sentSurveyCount;
 	icnForSocialPosts = Math.round(icnForSocialPosts);
 	for (var i = 0; i < parseInt(icnForSocialPosts); i++) {
 		socialPostsDiv += '<div class="float-left stat-icn-img stat-icn-img-red"></div>';
