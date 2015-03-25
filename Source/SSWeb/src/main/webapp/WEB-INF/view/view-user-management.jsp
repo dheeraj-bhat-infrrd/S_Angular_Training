@@ -24,14 +24,22 @@
 		<div class="v-um-header clearfix">
 			<div class="v-um-hdr-left float-left"><spring:message code="label.usermanagement.head.browseruser.key" /></div>
 			<div class="v-um-hdr-right float-right">
-				<input class="v-um-inp" placeholder="Search User" onkeyup="searchUsersByNameEmailLoginId(this.value)">
+				<input class="v-um-inp" placeholder="<spring:message code="label.searchuser.key" />" onkeyup="searchUsersByNameEmailLoginId(this.value)">
+				<input type="hidden" id="users-count" value="${usersCount}">
 			</div>
 		</div>
 		<div class="v-um-tbl-wrapper" id="user-list">
 			<!-- Fill in the user list jsp -->
 		</div>
+		<div style="width: 100px; margin: 0 auto;">
+			<div id="page-previous" class="float-left paginate-button"><spring:message code="label.previous.key" /></div>
+			<div id="page-next" class="float-right paginate-button"><spring:message code="label.next.key" /></div>
+		</div>
 	</div>
+<div id="temp-message" class="hide"></div>
 
+<script src="${pageContext.request.contextPath}/resources/perfect-scrollbar/js/perfect-scrollbar.jquery.js"></script>
+<script src="${pageContext.request.contextPath}/resources/perfect-scrollbar/js/perfect-scrollbar.js"></script>
 <script>
     $(document).ready(function() {
         $(document).attr("title", "User Management");
