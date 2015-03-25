@@ -45,7 +45,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SolrSearchServiceImpl.class);
 	private static final String SOLR_EDIT_REPLACE = "set";
-	
+
 	@Value("${SOLR_REGION_URL}")
 	private String solrRegionUrl;
 
@@ -857,7 +857,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
-			
+
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -885,7 +885,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
-			
+
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -895,7 +895,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("SolrServerException while performing Branches search");
 			throw new SolrException("Exception while performing search for Branches. Reason : " + e.getMessage(), e);
 		}
-
 		LOG.info("Method fetchBranchesByCompany() finished for company id : " + companyId);
 		return branchesResult;
 	}
