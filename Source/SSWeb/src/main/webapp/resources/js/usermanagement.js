@@ -745,6 +745,9 @@ function getUserAssignments(userId) {
 		$("#btn-save-user-assignment").click(function(e){
 			if(validateIndividualForm()){
 				saveUserAssignment("user-assignment-form");
+				setTimeout(function() {
+					getUserAssignments(userId);
+				}, 2000);
 			}
 		});
 		
