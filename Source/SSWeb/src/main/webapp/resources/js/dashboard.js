@@ -601,13 +601,25 @@ function paintProfileDetails(data) {
 	if (data.responseJSON.company != undefined)
 		$("#company").html(data.responseJSON.company);
 	$("#socl-post").html(data.responseJSON.socialPosts);
-	circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
+	if((parseInt(data.responseJSON.socialPosts) / maxSocialPosts)>1)
+		circle1.animate(1);
+	else
+		circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
 	$("#srv-snt-cnt").html(data.responseJSON.surveyCount);
-	circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
+	if((parseInt(data.responseJSON.surveyCount) / maxSurveySent)>1)
+		circle2.animate(1);
+	else
+		circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
 	$("#srv-scr").html(data.responseJSON.socialScore + "/5");
-	circle3.animate(parseInt(data.responseJSON.socialScore) / 5);
+	if((parseInt(data.responseJSON.socialScore) / 5)>1)
+		circle3.animate(1);
+	else
+		circle3.animate(parseInt(data.responseJSON.socialScore) / 5);
 	var profileCompleted = parseInt(data.responseJSON.profileCompleteness);
-	circle4.animate(profileCompleted / 100);
+	if((profileCompleted / 100)>1)
+		circle4.animate(1);
+	else
+		circle4.animate(profileCompleted / 100);
 
 	$("#pro-cmplt-stars").find('.dsh-star-item').removeClass('sq-full-star');
 	var starVal = profileCompleted * 5 / 100;
