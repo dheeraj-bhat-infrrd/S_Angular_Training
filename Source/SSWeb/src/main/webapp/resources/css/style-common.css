@@ -5522,3 +5522,8 @@ tr.u-tbl-header td {
 .vs-ans-icn-star {
     background: url(../images/full-star.png) no-repeat center;
 }
+
+.paginate-button {
+    cursor: pointer;
+	color: #5CC8EF;
+}
