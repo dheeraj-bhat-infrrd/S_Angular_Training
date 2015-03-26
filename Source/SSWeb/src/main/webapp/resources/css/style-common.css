@@ -4460,6 +4460,13 @@ button.paypal.is-active {
     width: 50%;
 }
 
+.v-tbl-icn-disabled {
+    cursor: auto;
+    opacity: 0.3;
+    height: 39px;
+    width: 50%;
+}
+
 .hm-header-right {
     background-color: #009FE0;
     color: #fff;
@@ -5514,4 +5521,9 @@ tr.u-tbl-header td {
 
 .vs-ans-icn-star {
     background: url(../images/full-star.png) no-repeat center;
+}
+
+.paginate-button {
+    cursor: pointer;
+	color: #5CC8EF;
 }

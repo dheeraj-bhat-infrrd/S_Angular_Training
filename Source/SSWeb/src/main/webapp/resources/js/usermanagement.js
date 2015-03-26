@@ -1,8 +1,8 @@
-var UsersListStartIndex = 0;
+var userStartIndex = 0;
+var userBatchSize = 10;
 var doStopAjaxRequestForUsersList = false;
 var listOfBranchesForAdmin;
 var isUserManagementAuthorized = true;
-var userBatchSize = 20;
 var isAddUser = true;
 
 $(document).on('click', '.um-user-row', function() {
@@ -34,9 +34,10 @@ $(document).on('blur', '#um-emailid', function() {
 });
 
 function initUserManagementPage() {
-	UsersListStartIndex = 0;
+	userStartIndex = 0;
 	//paintUserDetailsForm("");
-	paintUserListInUserManagement();
+	paintUserListInUserManagement(userStartIndex);
+	updatePaginateButtons();
 }
 
 function selectBranch(element) {
@@ -123,7 +124,7 @@ function assignUserToBranch(userId, branchId) {
 		complete : function() {
 			if (success) {
 				paintUserDetailsForm(userId);
-				UsersListStartIndex = 0;
+				userStartIndex = 0;
 				paintUserListInUserManagement();
 			}
 			hideOverlay();
@@ -206,7 +207,7 @@ function inviteUser() {
 			if (success) {
 				var userId = $('#mh-userId').val();
 				paintUserDetailsForm(userId);
-				UsersListStartIndex = 0;
+				userStartIndex = 0;
 				paintUserListInUserManagement();
 			} else {
 				var userId = $('#mh-existing-userId').val();
@@ -326,9 +327,9 @@ function paintUserDetailsForm(userId) {
 /*
  * Function paint the user list in user management page
  */
-function paintUserListInUserManagement() {
+function paintUserListInUserManagement(startIndex) {
 	var payload = {
-		"startIndex" : UsersListStartIndex,
+		"startIndex" : startIndex,
 		"batchSize" : userBatchSize
 	};
 	//var success = false;
@@ -339,6 +340,8 @@ function paintUserListInUserManagement() {
 		dataType : "html",
 		success : function(data) {
 			$('#user-list').html(data);
+			userStartIndex = startIndex;
+			updatePaginateButtons();
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -562,7 +565,7 @@ function validateAssignToBranchName() {
 }
 
 function searchUsersByNameEmailLoginId(searchKey) {
-	UsersListStartIndex = 0;
+	userStartIndex = 0;
 	var payload = {
 		"searchKey" : searchKey
 	};
@@ -582,10 +585,10 @@ function searchUsersByNameEmailLoginId(searchKey) {
 }
 
 function paintUsersList(data) {
-	if (UsersListStartIndex == 0) {
+	if (userStartIndex == 0) {
 		$('#um-user-list').find('tbody').html("");
 	}
-	UsersListStartIndex += data.length;
+	userStartIndex += data.length;
 	var searchResult = data;
 	if (searchResult != null) {
 		var len = searchResult.length;
@@ -725,10 +728,60 @@ function searchBranchesForUserCallBack(jsonData) {
  */
 function getUserAssignments(userId) {
 	var url = "./finduserassignments.do?userId=" + userId; 
-	callAjaxGET(url, function(data) {
+	callAjaxGET(url, function(data){
 		$('#user-details-and-assignments-' + userId).html(data);
-	}, true);
+		
+		var assignToOption = $("#assign-to-txt").attr('data-assignto');
+		showSelectorsByAssignToOption(assignToOption);
+		
+		/**
+		 * bind the click and keyup events
+		 */		
+		bindAssignToSelectorClick();
+		bindOfficeSelectorEvents();
+		bindRegionSelectorEvents();
+		bindAdminCheckBoxClick();
+		
+		$("#btn-save-user-assignment").click(function(e){
+			if(validateIndividualForm()){
+				saveUserAssignment("user-assignment-form");
+				
+				// refreshing right section after assignment
+				setTimeout(function() {
+					getUserAssignments(userId);
+				}, 2000);
+			}
+		});
+		
+		setTimeout(function() {
+			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
+		}, 1000);
+
+		$(document).on('click', 'body', function() {
+            $('.dd-droplist').slideUp(200);
+        });
+	} , true);
 }
+
+/**
+ * Method to save the assignment of user with branch/region or company
+ * @param formId
+ */
+function saveUserAssignment(formId) {
+	var url = "./addindividual.do";
+	showOverlay();
+	callAjaxFormSubmit(url, saveUserAssignmentCallBack, formId);
+}
+
+/**
+ * callback for saveUserAssignment
+ * @param data
+ */
+function saveUserAssignmentCallBack(data) {
+	hideOverlay();
+	displayMessage(data);
+}
+
 
 function reinviteUser(firstName, lastName, emailId) {
 	var payload = {
@@ -796,15 +849,57 @@ function updateUserProfile(profileId, profileStatus) {
 }
 
 $(document).on('click', '.v-icn-edit-user', function(){
-    if ($(this).parent().hasClass('u-tbl-row-sel')) {
-        $(this).parent().removeClass('u-tbl-row-sel');
-        $(this).parent().next('.u-tbl-row').hide();
-    } else {
-        $(this).parent().next('.u-tbl-row').show();
-        $(this).parent().addClass('u-tbl-row-sel');
+	if ($(this).hasClass('v-tbl-icn-disabled')) {
+		return;
+	}
 
+	if ($(this).parent().hasClass('u-tbl-row-sel')) {
+        $(this).parent().removeClass('u-tbl-row-sel');
+        $(this).parent().next('.u-tbl-row').slideUp(200);
+    } else {
         // make an ajax call and fetch the details of the user
         var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-        getUserAssignments(userId);
+		$(".user-assignment-edit-div").html("");
+		$(".user-row").removeClass('u-tbl-row-sel');
+		$(".user-assignment-edit-row").slideUp();
+
+		getUserAssignments(userId);
+
+        $(this).parent().next('.u-tbl-row').slideDown(200);
+        $(this).parent().addClass('u-tbl-row-sel');
+        
+		setTimeout(function() {
+			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
+		}, 1000);
     }
 });
+
+$(document).on('click', '#page-previous', function(){
+	var newIndex = userStartIndex - userBatchSize;
+	if (newIndex < $('#users-count').val()) {
+		paintUserListInUserManagement(newIndex);
+	}
+});
+
+$(document).on('click', '#page-next', function(){
+	var newIndex = userStartIndex + userBatchSize;
+	if (newIndex < $('#users-count').val()) {
+		paintUserListInUserManagement(newIndex);
+	}
+});
+
+function updatePaginateButtons() {
+	// next button
+	if (userStartIndex <= 0) {
+		$('#page-previous').removeClass('paginate-button');
+	} else {
+		$('#page-previous').addClass('paginate-button');
+	}
+	
+	// previous button
+	if (userStartIndex + userBatchSize >= $('#users-count').val()) {
+		$('#page-next').removeClass('paginate-button');
+	} else {
+		$('#page-next').addClass('paginate-button');
+	}
+}

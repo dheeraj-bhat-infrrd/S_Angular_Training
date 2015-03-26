@@ -43,18 +43,28 @@
 					<c:set var="userstatustickclass" value="v-icn-off"/>
 				</c:if>
 				
-				<tr class="u-tbl-row" id="user-row-${userfromsearch.userId}">
-					<td class="v-tbl-uname fetch-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
+				<!-- if admin can edit -->
+				<c:choose>
+					<c:when test="${userfromsearch.canEdit}">
+						<c:set var="admincaneditclass" value="v-tbl-icn"/>
+					</c:when>
+					<c:otherwise>
+						<c:set var="admincaneditclass" value="v-tbl-icn-disabled"/>
+					</c:otherwise>
+				</c:choose>
+
+				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
+					<td class="v-tbl-uname fetch-name" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email">${userfromsearch.emailId}</td>
 					<td class="v-tbl-rgn-adm ${regionadmintickclass}"></td>
 					<td class="v-tbl-of-adm ${branchadmintickclass}"></td>
 					<td class="v-tbl-ln-of ${agenttickclass}"></td>
 					<c:choose>
 						<c:when test="${not empty regstatustickclass}">
-							<td class="v-tbl-mail v-tbl-icn ${regstatustickclass}" title="<spring:message code="label.resendmail.key" />"></td>
+							<td class="v-tbl-mail ${admincaneditclass} ${regstatustickclass}" title="<spring:message code="label.resendmail.key" />"></td>
 						</c:when>
 						<c:otherwise>
-							<td class="v-tbl-mail v-tbl-icn"></td>
+							<td class="v-tbl-mail ${admincaneditclass}"></td>
 						</c:otherwise>
 					</c:choose>
 					<c:choose>
@@ -65,16 +75,15 @@
 							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.inactive.key" />"></td>
 						</c:otherwise>
 					</c:choose>
-					<td class="v-tbl-rem v-tbl-icn v-icn-rem-user" title="Remove"></td>
-					<td class="v-tbl-edit v-tbl-icn v-icn-edit-user" title="Edit"></td>
+					<td class="v-tbl-rem ${admincaneditclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
+					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user" title="<spring:message code="label.edit.key" />"></td>
 				</tr>
-				<tr class="u-tbl-row u-tbl-row-sel hide">
-					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td" colspan="9">
+				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
+					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="9">
 						<!-- data populated from um-edit-row.jsp -->
 					</td>
 				</tr>
 			</c:forEach>
-			<!--<tr class="u-tbl-row u-tbl-row-sel"></tr>-->
 		</c:when>
 		<c:otherwise>
 			<tr class="u-tbl-row"><spring:message code="label.nousersfound.key" /></tr>

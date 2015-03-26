@@ -196,19 +196,7 @@ function paintEditSection(data) {
 		}
 	});
 	
-	$('.bd-check-img').click(function(e) {
-		 $(this).toggleClass('bd-check-img-checked');
-		/**
-		 * If class is "bd-check-img-checked", check box is unchecked ,
-		 * hence setting the hidden value as false
-		 */
-		 if($(this).hasClass('bd-check-img-checked') ){
-			$(this).next("#is-admin-chk").val("false");
-		 }
-		 else {
-			$(this).next("#is-admin-chk").val("true");
-		 }
-    });
+	bindAdminCheckBoxClick();
 	
 	$('.bd-cust-rad-img').click(function(e) {
         $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
@@ -226,21 +214,35 @@ function paintEditSection(data) {
         $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
     });
 	
-	$('#assign-to-selector').click(function(e) {
-		e.stopPropagation();
-		$("#assign-to-droplist").slideToggle(200);
+	bindAssignToSelectorClick();
+	
+	bindRegionSelectorEvents();
+	
+	$("#btn-office-save").click(function(e){
+		if(validateOfficeForm()){
+			addOffice("edit-office-form");
+		}
 	});
 	
-	$('.hm-assignto-options').click(function(e) {
-		e.stopPropagation();
-		var assignToOption = $(this).attr('data-assign-to-option');
-		$("#assign-to-txt").val($(this).html());
-		$("#assign-to-txt").attr("data-assignto",assignToOption);
-		
-		showSelectorsByAssignToOption(assignToOption);
-		$("#assign-to-droplist").slideToggle(200);
+	$('#office-name-txt').blur(function() {
+		if(validateOfficeName(this.id)){
+			hideError();
+		}
 	});
 	
+	bindOfficeSelectorEvents();
+	
+	$("#btn-individual-save").click(function(e){
+		if(validateIndividualForm()){
+			addIndividual("edit-individual-form");
+		}
+	});
+}
+
+/**
+ * binds the click and keyup of region selector
+ */
+function bindRegionSelectorEvents(){
 	$("#selected-region-txt").keyup(function(e) {
 		if(e.which != 38 && e.which != 40 && e.which != 13) {
 			var text = $("#selected-region-txt").val();
@@ -264,19 +266,12 @@ function paintEditSection(data) {
 			populateRegionsSelector(regionPattern);
 		}		
 	});
-	
-	$("#btn-office-save").click(function(e){
-		if(validateOfficeForm()){
-			addOffice("edit-office-form");
-		}
-	});
-	
-	$('#office-name-txt').blur(function() {
-		if(validateOfficeName(this.id)){
-			hideError();
-		}
-	});
-	
+}
+
+/**
+ * binds the click and keyup of office selector
+ */
+function bindOfficeSelectorEvents(){
 	$("#office-selector").click(function(e){
 		e.stopPropagation();
 		if(!$('#selected-office-txt').is(':disabled')){
@@ -298,12 +293,45 @@ function paintEditSection(data) {
 			$("#offices-droplist").slideUp(200);
 		}
 	});
-	
-	$("#btn-individual-save").click(function(e){
-		if(validateIndividualForm()){
-			addIndividual("edit-individual-form");
-		}
+}
+
+/**
+ * binds the click of assign to selector
+ */
+function bindAssignToSelectorClick(){
+	$('#assign-to-selector').click(function(e) {
+		e.stopPropagation();
+		$("#assign-to-droplist").slideToggle(200);
 	});
+	
+	$('.hm-assignto-options').click(function(e) {
+		e.stopPropagation();
+		var assignToOption = $(this).attr('data-assign-to-option');
+		$("#assign-to-txt").val($(this).html());
+		$("#assign-to-txt").attr("data-assignto",assignToOption);
+		
+		showSelectorsByAssignToOption(assignToOption);
+		$("#assign-to-droplist").slideToggle(200);
+	});
+}
+
+/**
+ * binds the check and uncheck of admin privileges checkbox
+ */
+function bindAdminCheckBoxClick(){
+	$('.bd-check-img').click(function(e) {
+		 $(this).toggleClass('bd-check-img-checked');
+		/**
+		 * If class is "bd-check-img-checked", check box is unchecked ,
+		 * hence setting the hidden value as false
+		 */
+		 if($(this).hasClass('bd-check-img-checked') ){
+			$(this).next("#is-admin-chk").val("false");
+		 }
+		 else {
+			$(this).next("#is-admin-chk").val("true");
+		 }
+   });
 }
 /**
  * Method to show/hide the other selectors based on the assign to option selected
@@ -897,4 +925,12 @@ function bindArrowKeysWithSelector(e,textBoxId,dropListId,populatorFunction,hidd
 		$('#'+hiddenFieldId).val($(selectedItem).attr(attrName));
 		$('#'+dropListId).slideToggle(200);	
 	}
+}
+
+function showViewHierarchyPage() {
+	var url = "./viewhierarchy.do";
+	callAjaxGET(url, viewHierarchyCallBack, true);
+}
+function viewHierarchyCallBack(data) {
+	$("#main-content").html(data);
 }
