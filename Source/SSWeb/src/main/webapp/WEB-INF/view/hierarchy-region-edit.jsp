@@ -55,7 +55,7 @@
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-check-wrapper clearfix">
 	             <div class="float-left bd-check-img"></div>
-	             <input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
+	             <input type="hidden" name="isAdmin" value="true" id="is-admin-chk" class="ignore-clear">
 	             <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
 	         </div>
 	     </div>
