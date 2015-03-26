@@ -430,42 +430,56 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// Aggregate parentProfile data with userProfile
 		LockSettings parentLock = parentProfile.getLockSettings();
 		if (parentLock != null) {
+			// Logo
 			if (parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() && parentProfile.getLogo() != null) {
 				userProfile.setLogo(parentProfile.getLogo());
 				userLock.setLogoLocked(true);
 			}
-			if (parentLock.getIsDisplayNameLocked() && !userLock.getIsDisplayNameLocked() && parentProfile.getContact_details().getName() != null) {
-				userProfile.getContact_details().setName(parentProfile.getContact_details().getName());
-				userLock.setDisplayNameLocked(true);
+			
+			// Basic Contact details
+			if (parentProfile.getContact_details() != null) {
+				if (parentLock.getIsDisplayNameLocked() && !userLock.getIsDisplayNameLocked() && parentProfile.getContact_details().getName() != null) {
+					userProfile.getContact_details().setName(parentProfile.getContact_details().getName());
+					userLock.setDisplayNameLocked(true);
+				}
+				if (parentLock.getIsAboutMeLocked() && !userLock.getIsAboutMeLocked() && parentProfile.getContact_details().getAbout_me() != null) {
+					userProfile.getContact_details().setAbout_me(parentProfile.getContact_details().getAbout_me());
+					userLock.setAboutMeLocked(true);
+				}
 			}
-			if (parentLock.getIsWebAddressLocked() && !userLock.getIsWebAddressLocked()
-					&& userProfile.getContact_details().getWeb_addresses() != null) {
-				userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
-				userLock.setWebAddressLocked(true);
+
+			// Web addresses
+			if (parentProfile.getContact_details().getWeb_addresses() != null) {
+				if (parentLock.getIsWebAddressLocked() && !userLock.getIsWebAddressLocked()
+						&& userProfile.getContact_details().getWeb_addresses() != null) {
+					userProfile.getContact_details().getWeb_addresses().setWork(parentProfile.getContact_details().getWeb_addresses().getWork());
+					userLock.setWebAddressLocked(true);
+				}
+				if (parentLock.getIsBlogAddressLocked() && !userLock.getIsBlogAddressLocked()
+						&& userProfile.getContact_details().getWeb_addresses() != null) {
+					userProfile.getContact_details().getWeb_addresses().setBlogs(parentProfile.getContact_details().getWeb_addresses().getBlogs());
+					userLock.setBlogAddressLocked(true);
+				}
 			}
-			if (parentLock.getIsBlogAddressLocked() && !userLock.getIsBlogAddressLocked()
-					&& userProfile.getContact_details().getWeb_addresses() != null) {
-				userProfile.getContact_details().getWeb_addresses().setBlogs(parentProfile.getContact_details().getWeb_addresses().getBlogs());
-				userLock.setBlogAddressLocked(true);
-			}
-			if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
-					&& userProfile.getContact_details().getContact_numbers() != null) {
-				userProfile.getContact_details().getContact_numbers().setWork(parentProfile.getContact_details().getContact_numbers().getWork());
-				userLock.setWorkPhoneLocked(true);
-			}
-			if (parentLock.getIsPersonalPhoneLocked() && !userLock.getIsPersonalPhoneLocked()
-					&& userProfile.getContact_details().getContact_numbers() != null) {
-				userProfile.getContact_details().getContact_numbers()
-						.setPersonal(parentProfile.getContact_details().getContact_numbers().getPersonal());
-				userLock.setPersonalPhoneLocked(true);
-			}
-			if (parentLock.getIsFaxPhoneLocked() && !userLock.getIsFaxPhoneLocked() && userProfile.getContact_details().getContact_numbers() != null) {
-				userProfile.getContact_details().getContact_numbers().setFax(parentProfile.getContact_details().getContact_numbers().getFax());
-				userLock.setFaxPhoneLocked(true);
-			}
-			if (parentLock.getIsAboutMeLocked() && !userLock.getIsAboutMeLocked() && parentProfile.getContact_details().getAbout_me() != null) {
-				userProfile.getContact_details().setAbout_me(parentProfile.getContact_details().getAbout_me());
-				userLock.setAboutMeLocked(true);
+			
+			// Phone numbers
+			if (parentProfile.getContact_details().getContact_numbers() != null) {
+				if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
+						&& userProfile.getContact_details().getContact_numbers() != null) {
+					userProfile.getContact_details().getContact_numbers().setWork(parentProfile.getContact_details().getContact_numbers().getWork());
+					userLock.setWorkPhoneLocked(true);
+				}
+				if (parentLock.getIsPersonalPhoneLocked() && !userLock.getIsPersonalPhoneLocked()
+						&& userProfile.getContact_details().getContact_numbers() != null) {
+					userProfile.getContact_details().getContact_numbers()
+							.setPersonal(parentProfile.getContact_details().getContact_numbers().getPersonal());
+					userLock.setPersonalPhoneLocked(true);
+				}
+				if (parentLock.getIsFaxPhoneLocked() && !userLock.getIsFaxPhoneLocked()
+						&& userProfile.getContact_details().getContact_numbers() != null) {
+					userProfile.getContact_details().getContact_numbers().setFax(parentProfile.getContact_details().getContact_numbers().getFax());
+					userLock.setFaxPhoneLocked(true);
+				}
 			}
 		}
 		LOG.debug("Method aggregateProfileData() finished from ProfileManagementService");
