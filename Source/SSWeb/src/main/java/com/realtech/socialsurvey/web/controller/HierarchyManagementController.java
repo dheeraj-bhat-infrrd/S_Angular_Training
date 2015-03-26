@@ -115,6 +115,20 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Method to get the view hierarchy page
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/viewhierarchy", method = RequestMethod.GET)
+	public String showViewHierarchyPage(Model model, HttpServletRequest request) {
+		LOG.info("Method showViewHierarchyPage called");
+
+		LOG.info("Method showViewHierarchyPage executed successfully");
+		return JspResolver.VIEW_HIERARCHY;
+	}
+
+	/**
 	 * Fetch the list of branches for the company
 	 * 
 	 * @param model
@@ -560,6 +574,7 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/addindividual", method = RequestMethod.POST)
 	public String addIndividual(Model model, HttpServletRequest request) {
 		LOG.info("Method to add an individual called in controller");
+		
 		try {
 			String strRegionId = request.getParameter("regionId");
 			String strBranchId = request.getParameter("officeId");
@@ -570,6 +585,7 @@ public class HierarchyManagementController {
 			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
 				selectedUserEmail = request.getParameter("selectedUserEmailArray");
 			}
+
 			long selectedUserId = 0l;
 			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
 				try {
@@ -617,7 +633,6 @@ public class HierarchyManagementController {
 			}
 
 			User user = sessionHelper.getCurrentUser();
-
 			try {
 				LOG.debug("Calling service to add/assign invidual(s)");
 				organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds, isAdmin);
@@ -630,17 +645,16 @@ public class HierarchyManagementController {
 				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
 			}
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
-				throw new InvalidInputException("Exception occured while adding an individual.REason : " + e.getMessage(),
-						DisplayMessageConstants.GENERAL_ERROR, e);
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding an individual. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
 		}
+		
 		LOG.info("Successfully completed controller to add an individual");
 		return JspResolver.MESSAGE_HEADER;
-
 	}
 
 	/**
