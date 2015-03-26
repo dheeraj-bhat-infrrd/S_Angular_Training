@@ -1468,10 +1468,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
 		
 		// check if user profile already exists
-		for (UserProfile profile : assigneeUser.getUserProfiles()) {
-			if (profile.getRegionId() == userProfile.getRegionId() && profile.getBranchId() == userProfile.getBranchId()
-					&& profile.getProfilesMaster() == userProfile.getProfilesMaster() && profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
-				throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
+			for (UserProfile profile : assigneeUser.getUserProfiles()) {
+				if (profile.getRegionId() == userProfile.getRegionId() && profile.getBranchId() == userProfile.getBranchId()
+						&& profile.getProfilesMaster() == userProfile.getProfilesMaster() && profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
 			}
 		}
 		
@@ -1586,10 +1588,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
 		
 		// check if user profile already exists
-		for (UserProfile profile : assigneeUser.getUserProfiles()) {
-			if (profile.getBranchId() == userProfile.getBranchId() && profile.getProfilesMaster() == userProfile.getProfilesMaster()
-					&& profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
-				throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
+			for (UserProfile profile : assigneeUser.getUserProfiles()) {
+				if (profile.getBranchId() == userProfile.getBranchId() && profile.getProfilesMaster() == userProfile.getProfilesMaster()
+						&& profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
 			}
 		}
 		
