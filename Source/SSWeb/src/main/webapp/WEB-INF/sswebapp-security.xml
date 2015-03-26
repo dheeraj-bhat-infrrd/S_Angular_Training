@@ -19,6 +19,8 @@
 		<intercept-url pattern="/companyprofile.do" access="permitAll" />
 		<intercept-url pattern="/initfindapro.do" access="permitAll" />
 		
+		<intercept-url pattern="/testpage.do" access="permitAll" />
+		
 		<intercept-url pattern="/verification.do" access="permitAll" />
 		<intercept-url pattern="/emailverification.do" access="permitAll" />
 
@@ -29,6 +31,7 @@
 		
 		<intercept-url pattern="/forgotPassword.do" access="permitAll" />
 		<intercept-url pattern="/sendresetpasswordlink.do" access="permitAll" />
+		<intercept-url pattern="/setnewpassword.do" access="permitAll" />
 		<intercept-url pattern="/resetPassword.do" access="permitAll" />
 
 		<intercept-url pattern="/testpage.do" access="permitAll" />	

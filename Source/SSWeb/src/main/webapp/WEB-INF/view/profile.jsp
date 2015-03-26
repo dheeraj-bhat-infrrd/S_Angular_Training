@@ -18,6 +18,27 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
 </head>
 <body>
+    
+    <div id="contact-us-pu-wrapper" class="bd-srv-pu hide">
+        <div class="container cntct-us-container">
+            <div class="contact-us-pu">
+                <div class="bd-quest-item">
+                    <div class="bd-q-pu-header bd-q-pu-header-adj clearfix">
+                        <div class="float-left bd-q-pu-header-lft">Please enter your message.</div>
+                    </div>
+                    <div class="bd-q-pu-txt-wrapper pos-relative">
+                        <textarea class="bd-q-pu-txtarea"></textarea>
+                    </div>
+                </div>
+                <div class="cntct-us-btns-wrapper clearfix">
+                    <div class="bd-q-btn-cancel float-left">Cancel</div>
+                    <div class="bd-q-btn-done-pu float-left">Send</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
 <input type="hidden" value="${companyProfileName}" id="company-profile-name">
 <input type="hidden" value="${regionProfileName}" id="region-profile-name">
 <input type="hidden" value="${branchProfileName}" id="branch-profile-name">
@@ -27,11 +48,6 @@
     <div class="container hdr-container clearfix">
         <div class="float-left hdr-logo"></div>
         <div class="float-left hdr-links clearfix">
-            <!-- <div class="hdr-link-item hdr-link-active">Dashboard</div>
-            <div class="hdr-link-item">Build Hierarchy</div>
-            <div class="hdr-link-item">Build Survey</div>
-            <div class="hdr-link-item">User Management</div> -->
-        </div>
         <div class="float-right clearfix hdr-btns-wrapper">
             <div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key"/></div>
             <div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key"/></div>
@@ -54,7 +70,7 @@
     </div>
 </div>
 
-<div id="" class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
     <div class="container">
         <div class="row prof-pic-name-wrapper">
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
@@ -87,6 +103,11 @@
         <div class="row">
             <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
+                <div class="prof-left-row prof-left-info bord-bot-dc">
+                    <div class="left-contact-wrapper">
+                        <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
+                    </div>
+                </div>
                 <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
@@ -146,7 +167,7 @@
                 <div class="rt-content-main bord-bot-dc clearfix">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Tweets</div>
-                        <div class="tweet-panel tweet-panel-left">
+                        <div class="tweet-panel tweet-panel-left tweet-panel-left-adj">
                             <div class="tweet-panel-item bord-bot-dc clearfix">
                                 <div class="tweet-icn icn-tweet float-left"></div>
                                 <div class="tweet-txt float-left">
@@ -254,12 +275,34 @@
                 var rowW = $('.lp-con-row').width() - 55 - 10;
                 $('.lp-con-row-item').width(rowW+'px');
                 $('.footer-main-wrapper').hide();
+                $('.footer-main-wrapper').hide();
             }else{
                 $('.prof-name-container,#prof-image').height(200);
                 $('.lp-con-row-item').width('auto');
                 $('.footer-main-wrapper').show();
             }
         }
+        
+        $(document).on('click','.bd-q-contact-us',function(){
+            $('#contact-us-pu-wrapper').show();
+            $('body').addClass('body-no-scroll-y');
+        });
+        
+        $(document).on('click','.bd-q-btn-cancel',function(){
+            $('#contact-us-pu-wrapper').hide();
+            $('body').removeClass('body-no-scroll-y');
+        });
+        
+        $(document).on('click','.bd-q-btn-done-pu',function(){
+            // perform deault functions
+            $('#contact-us-pu-wrapper').hide();
+            $('body').removeClass('body-no-scroll-y');
+        }); 
+        $(document).on('click','.vcard-download', function(){
+        	var agentName = $("#agent-profile-name").val();
+        	downloadVCard(agentName);
+        });
+        
     });
 </script>
 

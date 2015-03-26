@@ -232,8 +232,8 @@
     color: #fff;
 }
 .input-icon-internal {
-    height: 46px;
-    width: 46px;
+    height: 36px;
+    width: 36px;
     margin: 1px 1px 0 0;
     border-radius: 2px;
     position: relative;
@@ -333,7 +333,8 @@
 .st-score-txt {
     height: 110px;
     line-height: 26px;
-    width: 360px;
+    width: 50%;
+    border-right: 1px solid #dcdcdc;
 }
 
 .icn-spanner {
@@ -369,9 +370,10 @@
 }
 
 .lp-con-icn {
-    height: 44px;
+    height: 32px;
     width: 36px;
     margin-right: 10px;
+    background-size: 20px !important;
 }
 
 .update-card-details-txt{

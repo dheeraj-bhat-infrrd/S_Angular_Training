@@ -7,8 +7,8 @@ var emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\")
 var zipcodeRegex = /^\d{5}([\-]?\d{4})?$/;
 var phoneRegex = /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/;
 var passwordRegex = /^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$/;
-var nameRegex = /^[a-zA-Z]*$/;
-var lastNameRegEx = /^[a-zA-Z ]*$/;
+var nameRegex = /^[a-zA-Z ]*$/;
+var lastNameRegEx = /^[a-zA-Z0-9 ]*$/;
 var companyNameRegEx = /^[a-zA-Z0-9 ]*$/;
 var numberRegEx = /^[1-9][0-9]*?$/;
 var minPwdLength = 6;
@@ -16,8 +16,8 @@ var maxPwdLength = 15;
 var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
 var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
 
-$(document).ready(function(){
-    if($('.err-nw-wrapper').length == 0){
+function buildMessageDiv(){
+	if($('.err-nw-wrapper').length == 0){
         var errorDiv = $("<div id='err-nw-wrapper' class='err-nw-wrapper'>");
             var closeSpan = $('<span class="err-new-close">');
             var textSpan = $('<span id="err-nw-txt">');
@@ -25,12 +25,13 @@ $(document).ready(function(){
             errorDiv.append(textSpan);
         $('.hm-header-main-wrapper').after(errorDiv);
     }
-});
-
+}
 function showError(msg){
+	buildMessageDiv();
     $('#err-nw-txt').html(msg);
-    $('#err-nw-wrapper').removeClass('bg-black-info');
+    $('#err-nw-wrapper').removeClass('bg-black-success');
     $('#err-nw-wrapper').slideDown(200);
+    $(window).scrollTop($('#err-nw-wrapper').offset().top);
 }
 
 function hideError(){
@@ -38,15 +39,17 @@ function hideError(){
 }
 
 function showInfo(msg){
+	buildMessageDiv();
     $('#err-nw-txt').html(msg);
     $('#err-nw-wrapper').slideDown(200);
-    $('#err-nw-wrapper').addClass('bg-black-info');
+    $(window).scrollTop($('#err-nw-wrapper').offset().top);
+    $('#err-nw-wrapper').addClass('bg-black-success');
 }
 
 function hideInfo(){
     $('#err-nw-wrapper').slideUp(200);
     setTimeout(function(){
-        $('#err-nw-wrapper').removeClass('bg-black-info');
+        $('#err-nw-wrapper').removeClass('bg-black-success');
     },200);
 }
 
@@ -58,7 +61,24 @@ function showRegErr(msg){
 function hideRegErr(){
     $('#reg-err-pu').fadeOut();
 }
-
+function showErrorMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showError(msg);
+	}
+}
+function showInfoMobileAndWeb(msg) {
+	if($(window).width() < 768){
+		$('#overlay-toast').html(msg);
+		showToast();
+	}
+	else {
+		showInfo(msg);
+	}
+}
 $(document).on('click', '.err-new-close', function() {
 	hideError();
 	hideInfo();
@@ -534,30 +554,15 @@ function validatePhoneNumber(elementId) {
 
 //Function to validate Address 1
 function validateAddress1(elementId){
-	if ($(window).width()<768) {
-		if ($('#'+elementId).val() != "") {
-				return true;
-		} else {
-			// $('#overlay-toast').html('Please enter address.');
-			// showToast();
-			showError('Please enter address');
-			return false;
-		}
-	} else {
-    	if ($('#'+elementId).val() != "") {
-			// $('#'+elementId).parent().next('.login-reg-err').hide();
+	if ($('#'+elementId).val() != "") {
 			return true;
-		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter address.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
-			showError('Please enter address');
-			return false;
-		}
+	} else {
+		showErrorMobileAndWeb('Please enter address');
+		return false;
 	}
 }
 
-//Function to validate Address 2
-function validateAddress2(elementId){
+function validateAddress2(elementId) {
 	return true;
 }
 
@@ -589,62 +594,6 @@ function validateBranchName(elementId){
 			}
 		}else{
 			$('#'+elementId).next('.input-error-2').html('Please enter branch name.');
-			$('#'+elementId).next('.input-error-2').show();
-			return false;
-		}
-	}
-}
-
-//Function to validate Region name
-function validateRegionName(elementId){
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-				return true;
-			}else {
-				$('#overlay-toast').html('Please enter a valid region name.');
-				showToast();
-				return false;
-			}
-		}else{
-			$('#overlay-toast').html('Please enter region name.');
-			showToast();
-			return false;
-		}
-	}else{
-    	if ($('#'+elementId).val() != "") {
-			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-				$('#'+elementId).next('.input-error-2').hide();
-				return true;
-			}else {
-				$('#'+elementId).next('.input-error-2').html('Please enter a valid region name.');
-				$('#'+elementId).next('.input-error-2').show();
-				return false;
-			}
-		}else{
-			$('#'+elementId).next('.input-error-2').html('Please enter region name.');
-			$('#'+elementId).next('.input-error-2').show();
-			return false;
-		}
-	}
-}
-
-//Function to validate Company/Enterprise Address 1
-function validateCompanyEnterpriseAddress1(elementId){
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-				return true;
-		}else{
-			$('#overlay-toast').html('Please enter address.');
-			showToast();
-			return false;
-		}
-	}else{
-    	if ($('#'+elementId).val() != "") {
-				$('#'+elementId).next('.input-error-2').hide();
-				return true;
-		}else{
-			$('#'+elementId).next('.input-error-2').html('Please enter address.');
 			$('#'+elementId).next('.input-error-2').show();
 			return false;
 		}
@@ -754,6 +703,25 @@ $(window).resize(function(){
        $('body').removeClass('body-no-scroll');
    }
 });
+
+
+
+function upgradeToPaidPlan(){
+	 console.log("upgrade plan button clicked");
+	 var url = "./upgradetopaidplanpage.do";
+	    
+	    $.ajax({
+	    	url: url,
+	    	type: "GET",
+	    	success: function(data){
+	        	$('#outer-payment').html(data);
+	        	$('#outer-payment').show();
+	        	},
+	        error : function(e) {
+	    			console.log(e);
+	    		}
+	    	});
+}
 
 /*function upgradePlan(){
 	console.log("upgrade plan button clicked");

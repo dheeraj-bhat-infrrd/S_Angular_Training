@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.List;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -11,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -30,6 +35,12 @@ import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import ezvcard.Ezvcard;
+import ezvcard.VCard;
+import ezvcard.VCardVersion;
+import ezvcard.parameter.EmailType;
+import ezvcard.parameter.TelephoneType;
+import ezvcard.property.Kind;
 
 /**
  * JIRA:SS-117 by RM02 Class with rest services for fetching various profiles
@@ -1144,6 +1155,103 @@ public class ProfileController {
 		LOG.info("Method getProListByProfile called for iden:" + iden + " and profileLevel:" + profileLevel);
 		return response;
 
+	}
+	
+	/**
+	 * Downloads the vcard
+	 * @param id
+	 * @return
+	 */
+	@RequestMapping(value = "/downloadvcard/{id}", method = RequestMethod.GET)
+	@ResponseBody
+	public Response downloadVCard(@PathVariable String id, HttpServletResponse response){
+		LOG.info("Downloading vcard for profile id: "+id);
+		try{
+			if(id == null || id.isEmpty()){
+				LOG.error("Profile id missing to download vcard");
+				throw new InputValidationException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
+						CommonConstants.SERVICE_CODE_GENERAL, "Profile id missing to download vcard"),
+						"Expected profile id, but is null or empty");
+			}
+			OrganizationUnitSettings individualProfile = null;
+			try{
+				individualProfile = profileManagementService.getIndividualByProfileName(id);
+				if(individualProfile != null){
+					LOG.debug("Creating Vcard for the profile");
+					VCard vCard = new VCard();
+					vCard.setKind(Kind.individual());
+					// Set the name
+					if(individualProfile.getProfileName() != null){
+						LOG.debug("Setting profile name as formatted name in the vcard");
+						vCard.setFormattedName(individualProfile.getProfileName());
+					}
+					// set the contact number
+					if(individualProfile.getContact_details() != null){
+						ContactDetailsSettings contactDetails = individualProfile.getContact_details();
+						// set the contact number
+						if(contactDetails.getContact_numbers() != null){
+							if(contactDetails.getContact_numbers().getWork() != null){
+								LOG.debug("Setting work contact number");
+								vCard.addTelephoneNumber(contactDetails.getContact_numbers().getWork(), TelephoneType.WORK);
+							}
+							if(contactDetails.getContact_numbers().getPersonal() != null){
+								LOG.debug("Setting cell contact number");
+								vCard.addTelephoneNumber(contactDetails.getContact_numbers().getPersonal(), TelephoneType.CELL);
+							}
+							if(contactDetails.getContact_numbers().getFax() != null){
+								LOG.debug("Setting fax number");
+								vCard.addTelephoneNumber(contactDetails.getContact_numbers().getFax(), TelephoneType.FAX);
+							}
+						}
+						// setting email addresses
+						if(contactDetails.getMail_ids() != null){
+							if(contactDetails.getMail_ids().getWork() != null && contactDetails.getMail_ids().getIsWorkEmailVerified()){
+								LOG.debug("Adding work email address");
+								vCard.addEmail(contactDetails.getMail_ids().getWork(), EmailType.WORK);
+							}
+							if(contactDetails.getMail_ids().getPersonal() != null && contactDetails.getMail_ids().getIsPersonalEmailVerified()){
+								LOG.debug("Adding personla email address");
+								vCard.addEmail(contactDetails.getMail_ids().getPersonal(), EmailType.HOME);
+							}
+						}
+						// setting the title
+						if(contactDetails.getTitle() != null){
+							LOG.debug("Setting title: "+contactDetails.getTitle());
+							vCard.addTitle(contactDetails.getTitle());
+						}
+						
+						// validate to version 4
+						LOG.warn(vCard.validate(VCardVersion.V4_0).toString());
+						
+						// send it to the response
+						response.setContentType("text/vcf");
+						response.setHeader("Content-Disposition", String.format("attachment; filename=\"%s\"", individualProfile.getProfileName()+".vcf"));
+						OutputStream responseStream = null;
+						try {
+							responseStream = response.getOutputStream();
+							Ezvcard.write(vCard).go(responseStream);
+						}
+						catch (IOException e) {
+							e.printStackTrace();
+						}finally{
+							try {
+								responseStream.close();
+							}
+							catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					}
+					
+				}
+			}catch (InvalidInputException | NoRecordsFetchedException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_GENERAL,
+						CommonConstants.SERVICE_CODE_GENERAL, "Profile name for individual is invalid"), e.getMessage());
+			}
+		}catch(BaseRestException e){
+			return getErrorResponse(e);
+		}
+		return null;
 	}
 
 	/**

@@ -4,8 +4,10 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -43,9 +45,11 @@ import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
-import com.realtech.socialsurvey.core.services.organizationmanagement.HierarchyManagementService;
+import com.realtech.socialsurvey.core.exception.UserAlreadyExistsException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
@@ -61,28 +65,13 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
 
 	@Autowired
-	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
-
-	@Autowired
-	private HierarchyManagementService hierarchyManagementService;
-
-	@Autowired
 	private GenericDao<Company, Long> companyDao;
 
 	@Autowired
 	private GenericDao<User, Long> userDao;
 
 	@Autowired
-	private GenericDao<Region, Long> regionDao;
-
-	@Autowired
-	private GenericDao<Branch, Long> branchDao;
-
-	@Autowired
 	private GenericDao<LicenseDetail, Long> licenceDetailDao;
-
-	@Autowired
-	private GenericDao<UserProfile, Long> userProfileDao;
 
 	@Autowired
 	private GenericDao<ProfilesMaster, Integer> profilesMasterDao;
@@ -92,9 +81,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private UserManagementService userManagementService;
-
-	@Autowired
-	private SolrSearchService solrSearchService;
 
 	@Autowired
 	private GenericDao<DisabledAccount, Long> disabledAccountDao;
@@ -108,9 +94,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Autowired
 	private ProfileManagementService profileManagementService;
 
-	@Autowired
-	private Utils utils;
-
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -122,7 +105,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
 	public User addCompanyInformation(User user, Map<String, String> organizationalDetails) throws SolrException, InvalidInputException {
 		LOG.info("Method addCompanyInformation started for user " + user.getLoginName());
-		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE);
+		Company company = addCompany(user, organizationalDetails.get(CommonConstants.COMPANY_NAME), CommonConstants.STATUS_ACTIVE,
+				organizationalDetails.get(CommonConstants.VERTICAL));
 
 		LOG.debug("Calling method for updating company of user");
 		updateCompanyForUser(user, company);
@@ -157,65 +141,67 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("account type is not valid while adding account type fro company");
 		}
 		AccountType accountType = AccountType.getAccountType(accountTypeValue);
-		
-		LOG.debug("Creating default hierarchy and user profiles for the selected account type :"+accountType.getName());
-		createDefaultHierarchy(user,accountType);
+
+		LOG.debug("Creating default hierarchy and user profiles for the selected account type :" + accountType.getName());
+		createDefaultHierarchy(user, accountType);
 		LOG.debug("Successfully created default hierarchy and user profiles");
-		
+
 		user = userDao.findById(User.class, user.getUserId());
 		userManagementService.setProfilesOfUser(user);
 		solrSearchService.addUserToSolr(user);
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
-	
+
 	/**
 	 * Method to add default branch/region/user profiles for a user and account type
+	 * 
 	 * @param user
 	 * @param accountType
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	private void createDefaultHierarchy(User user,AccountType accountType) throws InvalidInputException, SolrException {
+	private void createDefaultHierarchy(User user, AccountType accountType) throws InvalidInputException, SolrException {
 		LOG.debug("Method createDefaultHierarchy started for user : " + user.getLoginName());
 
 		LOG.debug("Adding the default region");
-		Region region = hierarchyManagementService.addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES,
-				CommonConstants.DEFAULT_ADDRESS, null);
+		Region region = addNewRegion(user, CommonConstants.DEFAULT_REGION_NAME, CommonConstants.YES, CommonConstants.DEFAULT_ADDRESS, null);
 		ProfilesMaster profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for region admin");
-		UserProfile userProfileRegionAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfileRegionAdmin = userManagementService.createUserProfile(user, user.getCompany(), user.getEmailId(),
+				CommonConstants.DEFAULT_AGENT_ID, CommonConstants.DEFAULT_BRANCH_ID, region.getRegionId(), profilesMaster.getProfileId(),
+				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
+				String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileRegionAdmin);
 
 		LOG.debug("Adding the default branch");
-		Branch branch = hierarchyManagementService.addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+		Branch branch = addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
 				CommonConstants.DEFAULT_ADDRESS, null);
 		profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
 
 		LOG.debug("Creating user profile for branch admin");
-		UserProfile userProfileBranchAdmin = createUserProfile(user, user.getCompany(), user.getEmailId(), CommonConstants.DEFAULT_AGENT_ID,
-				branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
-				CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+		UserProfile userProfileBranchAdmin = userManagementService.createUserProfile(user, user.getCompany(), user.getEmailId(),
+				CommonConstants.DEFAULT_AGENT_ID, branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(),
+				CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()),
+				String.valueOf(user.getUserId()));
 		userProfileDao.save(userProfileBranchAdmin);
-		
+
 		/**
 		 * For an individual, a default agent profile is created
 		 */
-		if(accountType == AccountType.INDIVIDUAL) {
+		if (accountType == AccountType.INDIVIDUAL) {
 			profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 			LOG.debug("Creating user profile for agent");
-			UserProfile userProfileAgent = createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(), branch.getBranchId(),
-					region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE, CommonConstants.STATUS_ACTIVE,
-					String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
+			UserProfile userProfileAgent = userManagementService.createUserProfile(user, user.getCompany(), user.getEmailId(), user.getUserId(),
+					branch.getBranchId(), region.getRegionId(), profilesMaster.getProfileId(), CommonConstants.PROFILE_STAGES_COMPLETE,
+					CommonConstants.STATUS_ACTIVE, String.valueOf(user.getUserId()), String.valueOf(user.getUserId()));
 			userProfileDao.save(userProfileAgent);
-			
+
 		}
 
-		LOG.debug("Updating profile stage to payment stage for account type :"+accountType.getName());
+		LOG.debug("Updating profile stage to payment stage for account type :" + accountType.getName());
 		userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
 				CommonConstants.DASHBOARD_STAGE);
 
@@ -251,12 +237,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	/*
 	 * This method adds a new company into the COMPANY table.
 	 */
-	private Company addCompany(User user, String companyName, int isRegistrationComplete) {
+	private Company addCompany(User user, String companyName, int isRegistrationComplete, String vertical) {
 		LOG.debug("Method addCompany started for user " + user.getLoginName());
 		Company company = new Company();
 		company.setCompany(companyName);
 		company.setIsRegistrationComplete(isRegistrationComplete);
 		company.setStatus(CommonConstants.STATUS_ACTIVE);
+
+		// We fetch the vertical and set it
+		VerticalsMaster verticalsMaster = verticalMastersDao.findByColumn(VerticalsMaster.class, CommonConstants.VERTICALS_MASTER_NAME_COLUMN,
+				vertical).get(CommonConstants.INITIAL_INDEX);
+		company.setVerticalsMaster(verticalsMaster);
+
 		company.setCreatedBy(String.valueOf(user.getUserId()));
 		company.setModifiedBy(String.valueOf(user.getUserId()));
 		company.setCreatedOn(new Timestamp(System.currentTimeMillis()));
@@ -290,8 +282,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	private void updateCompanyForUserProfile(User user, Company company) {
 		LOG.debug("Method updateCompanyForUserProfile started for user " + user.getLoginName());
 		user = userDao.findById(User.class, user.getUserId());
-		// List<UserProfile> userProfiles = userProfileDao.findByColumn(UserProfile.class, "user",
-		// user);
+
 		List<UserProfile> userProfiles = user.getUserProfiles();
 		if (userProfiles != null) {
 			for (UserProfile userProfile : userProfiles) {
@@ -344,7 +335,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
-		// TODO set lock settings
 		companySettings.setLockSettings(new LockSettings());
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -437,29 +427,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		branch = branchDao.save(branch);
 		LOG.debug("Method addBranch finished.");
 		return branch;
-	}
-
-	private UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId,
-			int profileMasterId, String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy) {
-		LOG.info("Method createUserProfile called for username : " + user.getLoginName());
-		UserProfile userProfile = new UserProfile();
-		userProfile.setAgentId(agentId);
-		userProfile.setBranchId(branchId);
-		userProfile.setCompany(company);
-		userProfile.setEmailId(emailId);
-		userProfile.setIsProfileComplete(isProfileComplete);
-		userProfile.setProfilesMaster(profilesMasterDao.findById(ProfilesMaster.class, profileMasterId));
-		userProfile.setProfileCompletionStage(profileCompletionStage);
-		userProfile.setRegionId(regionId);
-		userProfile.setStatus(CommonConstants.STATUS_ACTIVE);
-		userProfile.setUser(user);
-		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
-		userProfile.setCreatedOn(currentTimestamp);
-		userProfile.setModifiedOn(currentTimestamp);
-		userProfile.setCreatedBy(createdBy);
-		userProfile.setModifiedBy(modifiedBy);
-		LOG.debug("Method createUserProfile() finished");
-		return userProfile;
 	}
 
 	@Override
@@ -944,9 +911,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException(" upgradeToCompany : Company parameter is null");
 		}
 
-		// In case of upgrading to Company plan we check if default branch exists and upgrade it to
-		// a branch
-		// We also add the branch settings to mongo collection BRANCH_SETTINGS and to solr.
+		/**
+		 * In case of upgrading to Company plan we check if default branch exists and upgrade it to
+		 * a branch We also add the branch settings to mongo collection BRANCH_SETTINGS and to solr.
+		 */
 
 		LOG.debug("checking if only default branch exists and fetching it");
 		Branch defaultBranch = fetchDefaultBranch(company);
@@ -954,7 +922,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			LOG.debug("Default branch exists. Upgrading it to branch");
 			Branch upgradedBranch = upgradeDefaultBranch(defaultBranch);
 			LOG.debug("Adding the upgraded branch to mongo collection BRANCH_SETTINGS");
-			hierarchyManagementService.insertBranchSettings(upgradedBranch);
+			insertBranchSettings(upgradedBranch);
 			LOG.debug("Successfully added settings to mongo, adding the new branch to solr");
 			solrSearchService.addOrUpdateBranchToSolr(upgradedBranch);
 			LOG.debug("Solr update successful");
@@ -989,21 +957,26 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException(" upgradeToCompany : fromAccountsMaster parameter is invalid");
 		}
 
-		// In case of upgrading to Enterprise plan we check if default branch exists and upgrade it
-		// to a branch
-		// And then we upgrade find the default region and upgrade it user made region.
-		// We also add the branch settings to mongo collection BRANCH_SETTINGS and to solr.
+		/**
+		 * In case of upgrading to Enterprise plan we check if default branch exists and upgrade it
+		 * to a branch And then we upgrade find the default region and upgrade it user made region.
+		 * We also add the branch settings to mongo collection BRANCH_SETTINGS and to solr.
+		 */
 
 		LOG.debug("checking if only default branch exists and fetching it");
 		Branch defaultBranch = fetchDefaultBranch(company);
 		if (defaultBranch != null) {
+
 			LOG.debug("Default branch exists. Upgrading it to branch");
 			Branch upgradedBranch = upgradeDefaultBranch(defaultBranch);
+
 			LOG.debug("Adding the upgraded branch to mongo collection BRANCH_SETTINGS");
-			hierarchyManagementService.insertBranchSettings(upgradedBranch);
+			insertBranchSettings(upgradedBranch);
+
 			LOG.debug("Successfully added settings to mongo, adding the new branch to solr");
 			solrSearchService.addOrUpdateBranchToSolr(upgradedBranch);
 			LOG.debug("Solr update successful");
+
 			LOG.debug("Fetching the default region");
 			Region defaultRegion = fetchDefaultRegion(company);
 			if (defaultRegion == null) {
@@ -1012,9 +985,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			}
 			LOG.debug("Default region exists, upgrading it");
 			Region upgradedRegion = upgradeDefaultRegion(defaultRegion);
+
 			LOG.debug("Adding the upgraded region to mongo collection REGION_SETTINGS");
-			hierarchyManagementService.insertRegionSettings(upgradedRegion);
+			insertRegionSettings(upgradedRegion);
 			LOG.debug("Successfully added settings to mongo, adding the new region to solr");
+
 			solrSearchService.addOrUpdateRegionToSolr(upgradedRegion);
 			LOG.debug("Solr update successful");
 		}
@@ -1031,8 +1006,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			}
 			LOG.debug("Default region exists, upgrading it");
 			Region upgradedRegion = upgradeDefaultRegion(defaultRegion);
+
 			LOG.debug("Adding the upgraded region to mongo collection REGION_SETTINGS");
-			hierarchyManagementService.insertRegionSettings(upgradedRegion);
+			insertRegionSettings(upgradedRegion);
+
 			LOG.debug("Successfully added settings to mongo, adding the new region to solr");
 			solrSearchService.addOrUpdateRegionToSolr(upgradedRegion);
 			LOG.debug("Solr update successful");
@@ -1094,8 +1071,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 					throw new InvalidInputException(" upgradeAccount : fromAccountsMaster parameter is invalid: value is : "
 							+ currentAccountsMasterId);
 				}
-				// In case of upgrading to the team account we need to change only the license
-				// details table and add default branch to solr.
+				/**
+				 * In case of upgrading to the team account we need to change only the license
+				 * details table and add default branch to solr.
+				 */
 				LOG.debug("checking if only default branch exists and fetching it");
 				Branch defaultBranch = fetchDefaultBranch(company);
 				if (defaultBranch != null) {
@@ -1357,6 +1336,1228 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		branches = branchDao.findProjectionsByKeyValue(Branch.class, columnNames, queries);
 		LOG.info("Method getBranchesByRegionId completed successfully");
+		return branches;
+	}
+
+	/**
+	 * Method to add a new region and assign the user to the newly created region if userId or
+	 * emailId is provided
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public Region addNewRegionWithUser(User user, String regionName, int isDefaultBySystem, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+		LOG.info("Method addNewRegionWithUser called for user:" + user + " regionName:" + regionName + " isDefaultBySystem:" + isDefaultBySystem
+				+ " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:" + isAdmin);
+
+		Region region = addNewRegion(user, regionName, isDefaultBySystem, address1, address2);
+
+		LOG.debug("Adding default branch for the new region created");
+		addNewBranch(user, region.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME, CommonConstants.DEFAULT_ADDRESS, null);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * newly created region
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the region");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the region");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method addNewRegionWithUser completed successfully");
+		return region;
+	}
+
+	/**
+	 * Method to get the list of users for emailIds specified, and if the user doesn't exist for
+	 * that company invite the user
+	 * 
+	 * @param emailIdsArray
+	 * @param adminUser
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private List<User> getUsersFromEmailIds(String[] emailIdsArray, User adminUser) throws InvalidInputException {
+		LOG.info("Method getUsersFromEmailIds called for emailIdsArray:" + emailIdsArray);
+		List<User> users = new ArrayList<User>();
+		for (String emailId : emailIdsArray) {
+			User user = null;
+			try {
+				user = userManagementService.getUserByLoginName(adminUser, emailId);
+			}
+			catch (NoRecordsFetchedException e) {
+				/**
+				 * if no user is present with the specified emailId, send an invite to register
+				 */
+				String firstName = emailId.substring(0, emailId.indexOf("@"));
+				try {
+					user = userManagementService.inviteUserToRegister(adminUser, firstName, null, emailId);
+				}
+				catch (UserAlreadyExistsException | UndeliveredEmailException e1) {
+					LOG.debug("Exception in getUsersFromEmailIds while inviting a new user. Reason:" + e1.getMessage(), e1);
+				}
+			}
+			if (user != null) {
+				users.add(user);
+			}
+		}
+		LOG.info("Method getUsersFromEmailIds executed successfully. Returning users size :" + users.size());
+		return users;
+	}
+
+	/**
+	 * Method to assign a region to a user
+	 * 
+	 * @throws SolrException
+	 */
+	@Transactional
+	@Override
+	public void assignRegionToUser(User adminUser, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (adminUser == null) {
+			throw new InvalidInputException("Admin user is null in assignRegionToUser");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in assignRegionToUser");
+		}
+		if (assigneeUser == null) {
+			throw new InvalidInputException("assignee user is null in assignRegionToUser");
+		}
+		LOG.info("Method to assignRegionToUser called for regionId : " + regionId + " and assigneeUser : " + assigneeUser.getUserId() + " isAdmin:"
+				+ isAdmin);
+		int profileMasterId = 0;
+		if (isAdmin) {
+			profileMasterId = CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID;
+		}
+		else {
+			profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		}
+		LOG.debug("Fetching default branch for region : " + regionId);
+		Branch defaultBranch = getDefaultBranchForRegion(regionId);
+
+		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
+				assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE,
+				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		userProfileDao.save(userProfile);
+
+		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.debug("Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId());
+			assigneeUser.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(assigneeUser);
+		}
+		/**
+		 * add newly created user profile to the list of user profiles in user object
+		 */
+		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = new ArrayList<UserProfile>();
+		}
+		userProfiles.add(userProfile);
+		assigneeUser.setUserProfiles(userProfiles);
+
+		userManagementService.setProfilesOfUser(assigneeUser);
+		solrSearchService.addUserToSolr(assigneeUser);
+		LOG.info("Method to assignRegionToUser finished for regionId : " + regionId + " and userId : " + assigneeUser.getUserId());
+	}
+
+	/**
+	 * Method to add a new region and assign the user to the newly created branch if userId or
+	 * emailId is provided
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public Branch addNewBranchWithUser(User user, String branchName, long regionId, int isDefaultBySystem, String address1, String address2,
+			long selectedUserId, String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException,
+			UserAssignmentException {
+		LOG.info("Method addNewBranchWithUser called for user:" + user + " branchName:" + branchName + "regionId: " + regionId
+				+ " isDefaultBySystem:" + isDefaultBySystem + " selectedUserId:" + selectedUserId + " emailIdsArray:" + emailIdsArray + " isAdmin:"
+				+ isAdmin);
+
+		Branch branch = addNewBranch(user, regionId, isDefaultBySystem, branchName, address1, address2);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * newly created branch
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the branch");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the branch");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method addNewBranchWithUser completed successfully");
+		return branch;
+	}
+
+	/**
+	 * Method to assign a branch to a user
+	 */
+	@Override
+	@Transactional
+	public void assignBranchToUser(User adminUser, long branchId, long regionId, User assigneeUser, boolean isAdmin) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (adminUser == null) {
+			throw new InvalidInputException("Admin user is null in assignBranchToUser");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in assignBranchToUser");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in assignBranchToUser");
+		}
+		if (assigneeUser == null) {
+			throw new InvalidInputException("assignee user is null in assignBranchToUser");
+		}
+		LOG.info("Method assignBranchToUser called for adminUser:" + adminUser + " branchId:" + branchId + " regionId" + regionId + "assigneeUser:"
+				+ assigneeUser + " isAdmin:" + isAdmin);
+		int profileMasterId = 0;
+		if (isAdmin) {
+			profileMasterId = CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID;
+		}
+		else {
+			profileMasterId = CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID;
+		}
+
+		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
+				assigneeUser.getUserId(), branchId, regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
+				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		userProfileDao.save(userProfile);
+
+		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
+			LOG.debug("Updating isAtleastOneProfileComplete as active for user : " + assigneeUser.getUserId());
+			assigneeUser.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+			userDao.update(assigneeUser);
+		}
+		/**
+		 * add newly created user profile to the list of user profiles in user object
+		 */
+		List<UserProfile> userProfiles = assigneeUser.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = new ArrayList<UserProfile>();
+		}
+		userProfiles.add(userProfile);
+		assigneeUser.setUserProfiles(userProfiles);
+
+		userManagementService.setProfilesOfUser(assigneeUser);
+		solrSearchService.addUserToSolr(assigneeUser);
+
+		LOG.info("Method assignBranchToUser executed successfully");
+
+	}
+
+	/**
+	 * Method to add a new user or assign existing user under a company/region or branch
+	 * 
+	 * @throws UserAssignmentException
+	 */
+	@Override
+	@Transactional
+	public void addIndividual(User adminUser, long selectedUserId, long branchId, long regionId, String[] emailIdsArray, boolean isAdmin)
+			throws InvalidInputException, NoRecordsFetchedException, SolrException, UserAssignmentException {
+		LOG.info("Method addIndividual called for adminUser:" + adminUser + " branchId:" + branchId + " regionId:" + regionId + " isAdmin:" + isAdmin);
+		List<User> assigneeUsers = null;
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId);
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			assigneeUsers = new ArrayList<User>();
+			assigneeUsers.add(assigneeUser);
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list for the email addresses provided");
+			assigneeUsers = getUsersFromEmailIds(emailIdsArray, adminUser);
+		}
+		if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+			/**
+			 * if branchId is provided, add the individual to specified branch
+			 */
+			if (branchId > 0l) {
+				LOG.debug("assigning individual(s) to branch :" + branchId + " in addIndividual");
+				for (User assigneeUser : assigneeUsers) {
+					assignBranchToUser(adminUser, branchId, regionId, assigneeUser, isAdmin);
+				}
+			}
+			/**
+			 * else if regionId is provided, add the individual to specified region
+			 */
+			else if (regionId > 0l) {
+				LOG.debug("assigning individual(s) to region :" + regionId + " in addIndividual");
+				for (User assigneeUser : assigneeUsers) {
+					assignRegionToUser(adminUser, regionId, assigneeUser, isAdmin);
+				}
+			}
+			/**
+			 * else assign the individual to company (i.e under default region)
+			 */
+			else {
+				LOG.debug("assigning individual(s) to company in addIndividual");
+				Region region = getDefaultRegionForCompany(adminUser.getCompany());
+				if (region == null) {
+					throw new NoRecordsFetchedException("No default region found for company while adding individual");
+				}
+				for (User assigneeUser : assigneeUsers) {
+					assignRegionToUser(adminUser, region.getRegionId(), assigneeUser, isAdmin);
+				}
+			}
+
+		}
+
+		LOG.info("Method addNewIndividual executed successfully");
+	}
+
+	@Autowired
+	private GenericDao<Branch, Long> branchDao;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
+	private GenericDao<Region, Long> regionDao;
+
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
+
+	@Autowired
+	private SolrSearchService solrSearchService;
+
+	@Autowired
+	private Utils utils;
+
+	/**
+	 * Fetch list of branches in a company
+	 * 
+	 * @param company
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getAllBranchesForCompany(Company company) throws InvalidInputException {
+		if (company == null) {
+			LOG.error("Company object passed can not be null");
+			throw new InvalidInputException("Invalid Company passed");
+		}
+		LOG.info("Fetching the list of branches for company :" + company.getCompany());
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
+		LOG.info("Branch list fetched for the company " + company);
+		return branchList;
+	}
+
+	/**
+	 * Fetch list of regions in a company
+	 * 
+	 * @param company
+	 * @return List of regions
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<Region> getAllRegionsForCompany(Company company) throws InvalidInputException {
+		if (company == null) {
+			LOG.error("Company object passed can not be null");
+			throw new InvalidInputException("Invalid Company passed");
+		}
+
+		LOG.info("Fetching the list of regions for company :" + company.getCompany());
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+
+		List<Region> regionList = regionDao.findByKeyValue(Region.class, queries);
+		LOG.info("Region list fetched for the company " + company);
+		return regionList;
+	}
+
+	/**
+	 * Updates status of a branch
+	 * 
+	 * @param user
+	 * @param branchId
+	 * @param status
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public void updateBranchStatus(User user, long branchId, int status) throws InvalidInputException, SolrException {
+		LOG.info("Update branch of id :" + branchId + " status to :" + status);
+		if (user == null) {
+			throw new InvalidInputException("User is null in updateRegionStatus");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("BranchId is not set in updateRegionStatus");
+		}
+
+		LOG.debug("Fetching the branch object by ID");
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			LOG.error("No branch present with the branch Id :" + branchId);
+			throw new InvalidInputException("No branch present with the branch Id :" + branchId);
+		}
+
+		branch.setStatus(status);
+		branch.setModifiedBy(String.valueOf(user.getUserId()));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		branchDao.update(branch);
+
+		LOG.debug("Updating document of the branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+		LOG.info("Branch status for branch ID :" + branchId + "/t successfully updated to:" + status);
+	}
+
+	/**
+	 * Updates the status of region
+	 * 
+	 * @param regionId
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public void updateRegionStatus(User user, long regionId, int status) throws InvalidInputException, SolrException {
+		LOG.info("Method updateRegionStatus called for regionId : " + regionId + " and status : " + status);
+		if (user == null) {
+			throw new InvalidInputException("User is null in updateRegionStatus");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in updateRegionStatus");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		region.setStatus(status);
+		region.setModifiedBy(String.valueOf(user.getUserId()));
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		regionDao.update(region);
+
+		LOG.debug("Updating document of the region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
+		LOG.info("Region status for region ID :" + regionId + "/t successfully updated to " + status);
+	}
+
+	/**
+	 * Fetch list of branches in a company for a Region
+	 * 
+	 * @param regionId
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getAllBranchesInRegion(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<Branch> branchList = branchDao.findByKeyValue(Branch.class, queries);
+
+		LOG.info("Branch list fetched for the region " + region);
+		return branchList;
+	}
+
+	/**
+	 * Method to fetch count of branches in a company for a Region
+	 * 
+	 * @param regionId
+	 * @return List of branches
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public long getCountBranchesInRegion(long regionId) throws InvalidInputException {
+		if (regionId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllBranchesForRegion");
+		}
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			LOG.error("No region present with the region Id :" + regionId);
+			throw new InvalidInputException("No region present with the region Id :" + regionId);
+		}
+		LOG.info("Fetching the list of branches for region :" + region);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.REGION_COLUMN, region);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
+
+		LOG.info("Branch list fetched for the region " + region);
+		return branchCount;
+	}
+
+	/**
+	 * Method to fetch UserProfiles associated with a branch
+	 * 
+	 * @param company
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public List<UserProfile> getAllUserProfilesInBranch(long branchId) throws InvalidInputException {
+		if (branchId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllUserProfilesForBranch");
+		}
+		LOG.info("Fetching the list of users for branch :" + branchId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		List<UserProfile> userList = userProfileDao.findByKeyValue(UserProfile.class, queries);
+
+		LOG.info("Users list fetched for the branch " + branchId);
+		return userList;
+	}
+
+	/**
+	 * Method to fetch count of UserProfiles associated with a branch
+	 * 
+	 * @param company
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public long getCountUsersInBranch(long branchId) throws InvalidInputException {
+		if (branchId <= 0l) {
+			throw new InvalidInputException("RegionId is not set in getAllUserProfilesForBranch");
+		}
+		LOG.info("Fetching the list of users for branch :" + branchId);
+
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.BRANCH_ID_COLUMN, branchId);
+		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long usersCount = userProfileDao.findNumberOfRowsByKeyValue(UserProfile.class, queries);
+
+		LOG.info("Users list fetched for the branch " + branchId);
+		return usersCount;
+	}
+
+	/**
+	 * Method to check if branches allowed to be added have succeeded the max limit for a user and
+	 * account type
+	 * 
+	 * @param user
+	 * @param accountType
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public boolean isBranchAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
+		LOG.info("Method to check if further branch addition is allowed, called for user : " + user);
+		if (user == null) {
+			throw new InvalidInputException("User is null in isBranchAdditionAllowed");
+		}
+		if (accountType == null) {
+			throw new InvalidInputException("Account type is null in isBranchAdditionAllowed");
+		}
+		boolean isBranchAdditionAllowed = true;
+		/**
+		 * check is branch addition allowed on the basis of account type
+		 */
+		switch (accountType) {
+			case INDIVIDUAL:
+				LOG.debug("Checking branch addition for account type INDIVIDUAL");
+				isBranchAdditionAllowed = false;
+				break;
+			case TEAM:
+				LOG.debug("Checking branch addition for account type TEAM");
+				isBranchAdditionAllowed = false;
+				break;
+			case COMPANY:
+				LOG.debug("Checking branch addition for account type COMPANY");
+				isBranchAdditionAllowed = true;
+				break;
+			case ENTERPRISE:
+				LOG.debug("Checking branch addition for account type INDIVIDUAL");
+				isBranchAdditionAllowed = true;
+				break;
+			default:
+				throw new InvalidInputException("Account type is invalid in isBranchAdditionAllowed");
+		}
+		/**
+		 * check is branch addition is allowed on the basis of profile level of the user, it is
+		 * allowed only for the region and company admin
+		 */
+		if (isBranchAdditionAllowed) {
+			if (user.isCompanyAdmin() || user.isRegionAdmin()) {
+				isBranchAdditionAllowed = true;
+			}
+			else {
+				isBranchAdditionAllowed = false;
+			}
+		}
+		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isBranchAdditionAllowed is :" + isBranchAdditionAllowed);
+
+		return isBranchAdditionAllowed;
+	}
+
+	/**
+	 * Method to check if regions allowed to be added have succeeded the max limit for a user and
+	 * account type
+	 * 
+	 * @param user
+	 * @param accountType
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	@Override
+	@Transactional
+	public boolean isRegionAdditionAllowed(User user, AccountType accountType) throws InvalidInputException {
+		LOG.info("Method to check if further region addition is allowed called for user : " + user);
+		if (user == null) {
+			throw new InvalidInputException("User is null in isRegionAdditionAllowed");
+		}
+		if (accountType == null) {
+			throw new InvalidInputException("Account type is null in isRegionAdditionAllowed");
+		}
+		boolean isRegionAdditionAllowed = true;
+		/**
+		 * check is region addition allowed on the basis of account type
+		 */
+		switch (accountType) {
+			case INDIVIDUAL:
+				LOG.debug("Checking Region addition for account type INDIVIDUAL");
+				isRegionAdditionAllowed = false;
+				break;
+			case TEAM:
+				LOG.debug("Checking Region addition for account type TEAM");
+				isRegionAdditionAllowed = false;
+				break;
+			case COMPANY:
+				LOG.debug("Checking Region addition for account type COMPANY");
+				isRegionAdditionAllowed = false;
+				break;
+			case ENTERPRISE:
+				LOG.debug("Checking Region addition for account type ENTERPRISE");
+				isRegionAdditionAllowed = true;
+				break;
+			default:
+				throw new InvalidInputException("Account type is invalid in isRegionAdditionAllowed");
+		}
+		/**
+		 * check is region allowed on the basis of profile level of the user, region addition is
+		 * allowed only if the user is company admin
+		 */
+		if (isRegionAdditionAllowed) {
+			if (user.isCompanyAdmin()) {
+				isRegionAdditionAllowed = true;
+			}
+			else {
+				isRegionAdditionAllowed = false;
+			}
+		}
+		LOG.info("Returning from isRegionAdditionAllowed for user : " + user.getUserId() + " isRegionAdditionAllowed is :" + isRegionAdditionAllowed);
+		return isRegionAdditionAllowed;
+	}
+
+	/**
+	 * Method to add a new branch from UI
+	 * 
+	 * @param user
+	 * @param regionId
+	 * @param branchName
+	 * @param branchAddress1
+	 * @param branchAddress2
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public Branch addNewBranch(User user, long regionId, int isDefaultBySystem, String branchName, String branchAddress1, String branchAddress2)
+			throws InvalidInputException, SolrException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in addNewBranch");
+		}
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null in addNewBranch");
+		}
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
+			throw new InvalidInputException("Branch address is null in addNewBranch");
+		}
+		LOG.info("Method add new branch called for regionId : " + regionId + " and branchName : " + branchName);
+		Region region = null;
+		LOG.debug("Fetching region for branch to be added");
+		/**
+		 * If region is selected by user, select it from db
+		 */
+		if (regionId > 0l) {
+			region = regionDao.findById(Region.class, regionId);
+		}
+		/**
+		 * else select the default region from db for that company
+		 */
+		else {
+			LOG.debug("Selecting the default region for company");
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.COMPANY, user.getCompany());
+			queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.YES);
+			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
+			if (regions != null && !regions.isEmpty()) {
+				region = regions.get(0);
+			}
+		}
+		if (region == null) {
+			throw new InvalidInputException("No region is present in db for the company while adding branch");
+		}
+
+		Branch branch = addBranch(user, region, branchName, isDefaultBySystem);
+		branch.setAddress1(branchAddress1);
+		branch.setAddress2(branchAddress2);
+
+		LOG.debug("Adding new branch into mongo");
+		insertBranchSettings(branch);
+
+		LOG.debug("Updating branch table with profile name");
+		branchDao.update(branch);
+
+		LOG.debug("Adding newly added branch to solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+
+		LOG.info("Successfully completed method add new branch for regionId : " + region.getRegionId() + " and branchName : " + branchName);
+		return branch;
+
+	}
+
+	/**
+	 * Method to generate profile name and profile url for a branch and also set them in
+	 * organization unit settings
+	 * 
+	 * @param branch
+	 * @param organizationSettings
+	 * @throws InvalidInputException
+	 */
+	private void generateAndSetBranchProfileNameAndUrl(Branch branch, OrganizationUnitSettings organizationSettings) throws InvalidInputException {
+		LOG.debug("Method to generate branch profile name called for branch: " + branch);
+		String branchProfileName = null;
+		if (branch == null) {
+			throw new InvalidInputException("Branch is null in generateAndSetRegionProfileNameAndUrl");
+		}
+		String branchName = branch.getBranch();
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null or empty in generateAndSetRegionProfileNameAndUrl");
+		}
+
+		branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
+
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getCompany().getCompanyId(),
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		if (companySettings != null) {
+			String companyProfileName = companySettings.getProfileName();
+			String branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
+
+			LOG.debug("Checking if profileName:" + branchProfileName + " is already taken by a branch in the company :" + branch.getCompany());
+			/**
+			 * Uniqueness of profile name is checked by url since combination of company profile
+			 * name and branch profile name is unique
+			 */
+			OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(branchProfileUrl,
+					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+			/**
+			 * if there exists a branch with the profile name formed, append branch iden to get the
+			 * unique profile name and also regenerate url with new profile name
+			 */
+			if (regionSettings != null) {
+				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
+				branchProfileName = branchProfileName + branch.getBranchId();
+				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
+			}
+			organizationSettings.setProfileName(branchProfileName);
+			organizationSettings.setProfileUrl(branchProfileUrl);
+			/**
+			 * set profile name in branch for setting value in sql tables
+			 */
+			branch.setProfileName(branchProfileName);
+		}
+		else {
+			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
+		}
+
+		LOG.debug("Method to generate and set branch profile name and url excecuted successfully");
+	}
+
+	/**
+	 * Method to form ContactDetailsSettings object from branch
+	 * 
+	 * @param branch
+	 * @return
+	 */
+	private ContactDetailsSettings getContactDetailsSettingsFromBranch(Branch branch) {
+		LOG.debug("Method getContactDetailsSettingsFromBranch called for branch :" + branch);
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(branch.getBranch());
+		contactSettings.setAddress1(branch.getAddress1());
+		contactSettings.setAddress2(branch.getAddress2());
+
+		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
+		return contactSettings;
+	}
+
+	/**
+	 * Method to form ContactDetailsSettings object from region
+	 * 
+	 * @param region
+	 * @return
+	 */
+	private ContactDetailsSettings getContactDetailsSettingsFromRegion(Region region) {
+		LOG.debug("Method getContactDetailsSettingsFromRegion called for branch :" + region);
+		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
+		contactSettings.setName(region.getRegion());
+		contactSettings.setAddress1(region.getAddress1());
+		contactSettings.setAddress2(region.getAddress2());
+
+		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
+		return contactSettings;
+	}
+
+	/**
+	 * Method to add a new region
+	 * 
+	 * @param user
+	 * @param regionName
+	 * @param address1
+	 * @param address2
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public Region addNewRegion(User user, String regionName, int isDefaultBySystem, String address1, String address2) throws InvalidInputException,
+			SolrException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in addNewRegion");
+		}
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null in addNewRegion");
+		}
+		LOG.info("Method add new region called for regionName : " + regionName);
+
+		Region region = addRegion(user, isDefaultBySystem, regionName);
+		region.setAddress1(address1);
+		region.setAddress2(address2);
+
+		LOG.debug("Calling method to insert region settings");
+		insertRegionSettings(region);
+
+		regionDao.update(region);
+
+		LOG.debug("Updating solr with newly inserted region");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
+		LOG.info("Successfully completed method add new region for regionName : " + regionName);
+		return region;
+	}
+
+	/**
+	 * Method to generate profile name and profile url for a region and also set them in
+	 * organization unit settings
+	 * 
+	 * @param region
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	private void generateAndSetRegionProfileNameAndUrl(Region region, OrganizationUnitSettings organizationSettings) throws InvalidInputException {
+		LOG.debug("Method generateAndSetRegionProfileNameAndUrl called for region: " + region);
+		String regionProfileName = null;
+		if (region == null) {
+			throw new InvalidInputException("Region is null in generateAndSetRegionProfileNameAndUrl");
+		}
+		String regionName = region.getRegion();
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null or empty in generateAndSetRegionProfileNameAndUrl");
+		}
+
+		regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
+		LOG.debug("Checking if profileName:" + regionProfileName + " is already taken by a region in the company :" + region.getCompany());
+
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getCompany().getCompanyId(),
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		if (companySettings != null) {
+			String companyProfileName = companySettings.getProfileName();
+			String regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
+
+			/**
+			 * Uniqueness of profile name is checked by url since combination of company profile
+			 * name and region profile name is unique
+			 */
+			OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(regionProfileUrl,
+					MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+			/**
+			 * if there exists a region with the profile name formed, append region iden to get the
+			 * unique profile name and also regenerate url with new profile name
+			 */
+			if (regionSettings != null) {
+				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
+				regionProfileName = regionProfileName + region.getRegionId();
+				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
+			}
+			organizationSettings.setProfileName(regionProfileName);
+			organizationSettings.setProfileUrl(regionProfileUrl);
+
+			/**
+			 * Set the profile name in region object to update in sql later
+			 */
+			region.setProfileName(regionProfileName);
+		}
+		else {
+			LOG.warn("Company settings not found in generateAndSetRegionProfileNameAndUrl");
+		}
+
+		LOG.debug("Method generateAndSetRegionProfileNameAndUrl excecuted successfully");
+	}
+
+	/**
+	 * Method to update a branch
+	 * 
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress1, String branchAddress2, User user)
+			throws InvalidInputException, SolrException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update branch");
+		}
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null in update branch");
+		}
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
+			throw new InvalidInputException("Branch address is null in update branch");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in update branch");
+		}
+
+		LOG.info("Method update branch called for branchId:" + branchId + " ,regionId:" + regionId + " branchName : " + branchName
+				+ " ,branchAddress:" + branchAddress1);
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			throw new InvalidInputException("No branch present for the required id in database while updating branch");
+		}
+		LOG.debug("Checking if the region of branch is changed");
+
+		/**
+		 * In case of branch attached to default region, regionId is 0 hence perform update only
+		 * when the regionId is not the default one
+		 */
+		if (regionId > 0l && regionId != branch.getRegion().getRegionId()) {
+			Region region = regionDao.findById(Region.class, regionId);
+			if (region == null) {
+				throw new InvalidInputException("No region present for the required id in database while updating branch");
+			}
+			branch.setRegion(region);
+		}
+		branch.setBranch(branchName);
+		branch.setAddress1(branchAddress1);
+		branch.setAddress2(branchAddress2);
+		branch.setModifiedBy(String.valueOf(user.getUserId()));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		branchDao.update(branch);
+
+		LOG.debug("Update branch in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		LOG.debug("Updating branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+		LOG.info("Method to update branch completed successfully");
+	}
+
+	/**
+	 * Method to update a region
+	 * 
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public void updateRegion(long regionId, String regionName, String regionAddress1, String regionAddress2, User user) throws InvalidInputException,
+			SolrException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update region");
+		}
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null in update region");
+		}
+		if (regionAddress1 == null || regionAddress1.isEmpty()) {
+			throw new InvalidInputException("Region address is null in update region");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in update region");
+		}
+		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress1:" + regionAddress1);
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			throw new InvalidInputException("No region present for the required id in database while updating region");
+		}
+		region.setRegion(regionName);
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		region.setModifiedBy(String.valueOf(user.getUserId()));
+		region.setAddress1(regionAddress1);
+		region.setAddress2(regionAddress2);
+		regionDao.update(region);
+
+		LOG.debug("Updating region in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.debug("Updating region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
+		LOG.info("Method to update region completed successfully");
+	}
+
+	/**
+	 * Method to check whether a user can view region based on his profiles
+	 * 
+	 * @param userProfiles
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	private boolean isRegionViewAllowed(List<UserProfile> userProfiles) {
+		// TODO implement this
+		return true;
+	}
+
+	/**
+	 * Method to check whether a user can view branch based on his profiles
+	 * 
+	 * @param userProfiles
+	 * @return
+	 */
+	@SuppressWarnings("unused")
+	private boolean isBranchViewAllowed(List<UserProfile> userProfiles) {
+		// TODO implement this
+		return true;
+	}
+
+	/**
+	 * Method to check whether a user has privileges to build hierarchy
+	 */
+	@Override
+	public boolean canBuildHierarchy(User user, AccountType accountType) {
+		// TODO implement this
+		return true;
+	}
+
+	/**
+	 * Method to check whether a user has privileges to edit company information
+	 */
+	@Override
+	public boolean canEditCompany(User user, AccountType accountType) {
+		// TODO Auto-generated method stub
+		return true;
+	}
+
+	/**
+	 * Method to insert region settings into mongo
+	 * 
+	 * @param region
+	 * @throws InvalidInputException
+	 */
+	public void insertRegionSettings(Region region) throws InvalidInputException {
+		LOG.info("Method for inserting region settings called for region : " + region);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(region.getRegionId());
+		organizationSettings.setCreatedBy(region.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(region.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
+
+		// Calling method to generate and set region profile name and url
+		generateAndSetRegionProfileNameAndUrl(region, organizationSettings);
+
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
+		organizationSettings.setContact_details(contactSettings);
+		organizationSettings.setLockSettings(new LockSettings());
+
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		LOG.info("Method for inserting region settings finished");
+	}
+
+	/**
+	 * Method to insert branch settings into mongo
+	 * 
+	 * @param branch
+	 * @throws InvalidInputException
+	 */
+	public void insertBranchSettings(Branch branch) throws InvalidInputException {
+		LOG.info("Method to insert branch settings called for branch : " + branch);
+		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
+		organizationSettings.setIden(branch.getBranchId());
+		organizationSettings.setCreatedBy(branch.getCreatedBy());
+		organizationSettings.setCreatedOn(System.currentTimeMillis());
+		organizationSettings.setModifiedBy(branch.getModifiedBy());
+		organizationSettings.setModifiedOn(System.currentTimeMillis());
+
+		// Calling method to generate and set profile name and profile url
+		generateAndSetBranchProfileNameAndUrl(branch, organizationSettings);
+
+		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationSettings.setContact_details(contactSettings);
+		organizationSettings.setLockSettings(new LockSettings());
+
+		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+		LOG.info("Method to insert branch settings finished for branch : " + branch);
+	}
+
+	/**
+	 * Method to get the list of region ids for a user and profile master id specified
+	 */
+	@Override
+	@Transactional
+	public Set<Long> getRegionIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException {
+		if (profileMasterId <= 0l) {
+			throw new InvalidInputException("Profile master id is not specified in getRegionIdsForUser");
+		}
+		if (user == null) {
+			throw new InvalidInputException("User is null in getRegionIdsForUser");
+		}
+		LOG.info("Method getRegionIdsForUser called for profileMasterId: " + profileMasterId + " and user:" + user);
+		Set<Long> regionIds = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = userManagementService.getAllUserProfilesForUser(user);
+		}
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			throw new NoRecordsFetchedException("No user profile found for the user in getRegionIdsForUser");
+		}
+		regionIds = new HashSet<Long>();
+		for (UserProfile userProfile : userProfiles) {
+			if (userProfile.getProfilesMaster().getProfileId() == profileMasterId) {
+				regionIds.add(userProfile.getRegionId());
+			}
+		}
+		LOG.info("Method getRegionIdsForUser executed successfully. Returning: " + regionIds);
+		return regionIds;
+	}
+
+	/**
+	 * Method to get the list of branch ids for a user and profile master id specified
+	 */
+	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException {
+		if (profileMasterId <= 0l) {
+			throw new InvalidInputException("Profile master id is not specified in getBranchIdsForUser");
+		}
+		if (user == null) {
+			throw new InvalidInputException("User is null in getBranchIdsForUser");
+		}
+		LOG.info("Method getBranchIdsForUser called for profileMasterId: " + profileMasterId + " and user:" + user);
+		Set<Long> branchIds = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = userManagementService.getAllUserProfilesForUser(user);
+		}
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			throw new NoRecordsFetchedException("No user profile found for the user in getBranchIdsForUser");
+		}
+		branchIds = new HashSet<Long>();
+		for (UserProfile userProfile : userProfiles) {
+			if (userProfile.getProfilesMaster().getProfileId() == profileMasterId) {
+				branchIds.add(userProfile.getBranchId());
+			}
+		}
+		return branchIds;
+	}
+
+	/**
+	 * Method to get all branches under the regions specified
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getBranchesByRegionIds(Set<Long> regionIds) throws InvalidInputException {
+		LOG.info("Method getBranchesByRegionIds called for regionIds:" + regionIds);
+		List<Branch> branches = null;
+		if (regionIds != null && !regionIds.isEmpty()) {
+			branches = new ArrayList<Branch>();
+			for (long regionId : regionIds) {
+				List<Branch> tempBranches = getBranchesByRegionId(regionId);
+				if (tempBranches != null && !tempBranches.isEmpty()) {
+					branches.addAll(tempBranches);
+				}
+			}
+		}
+		LOG.info("Method getBranchesByRegionIds executed successfully");
 		return branches;
 	}
 }

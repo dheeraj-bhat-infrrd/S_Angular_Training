@@ -31,6 +31,17 @@ public class Branch implements Serializable {
 	private long branchId;
 
 	private String branch;
+	
+	@Transient
+	private String branchName;
+
+	public String getBranchName() {
+		return branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
 
 	@Column(name="CREATED_BY")
 	private String createdBy;

@@ -60,7 +60,7 @@
 					</div>
 
 				</div>
-				<c:if test="${accounttypeval ne 2 }">
+				<c:if test="${accounttypeval > 2 && accounttypeval < 5 }">
 					<div class="hm-item-row clearfix" id="um-assignto-con">
 						<div class="um-item-row-left text-right">
 							<spring:message code="label.assignto.key" />
