@@ -5,16 +5,9 @@ public class LinkedInToken {
 	private String linkedInId;
 	private String linkedInPageLink;
 	private String linkedInAccessToken;
-	private String linkedInAccessTokenSecret;
+	// private String linkedInAccessTokenSecret;
 	private long linkedInAccessTokenCreatedOn;
-
-	public long getLinkedInAccessTokenCreatedOn() {
-		return linkedInAccessTokenCreatedOn;
-	}
-
-	public void setLinkedInAccessTokenCreatedOn(long linkedInAccessTokenCreatedOn) {
-		this.linkedInAccessTokenCreatedOn = linkedInAccessTokenCreatedOn;
-	}
+	private long linkedInAccessTokenExpiresIn;
 
 	public String getLinkedInId() {
 		return linkedInId;
@@ -39,18 +32,33 @@ public class LinkedInToken {
 	public void setLinkedInPageLink(String linkedInPageLink) {
 		this.linkedInPageLink = linkedInPageLink;
 	}
-	
-	public String getLinkedInAccessTokenSecret() {
+
+	/*public String getLinkedInAccessTokenSecret() {
 		return linkedInAccessTokenSecret;
 	}
 
 	public void setLinkedInAccessTokenSecret(String linkedInAccessTokenSecret) {
 		this.linkedInAccessTokenSecret = linkedInAccessTokenSecret;
+	}*/
+
+	public long getLinkedInAccessTokenCreatedOn() {
+		return linkedInAccessTokenCreatedOn;
+	}
+
+	public void setLinkedInAccessTokenCreatedOn(long linkedInAccessTokenCreatedOn) {
+		this.linkedInAccessTokenCreatedOn = linkedInAccessTokenCreatedOn;
+	}
+
+	public long getLinkedInAccessTokenExpiresIn() {
+		return linkedInAccessTokenExpiresIn;
+	}
+
+	public void setLinkedInAccessTokenExpiresIn(long linkedInAccessTokenExpiresIn) {
+		this.linkedInAccessTokenExpiresIn = linkedInAccessTokenExpiresIn;
 	}
 
 	@Override
 	public String toString() {
 		return "LinkdenInToken [linkedInId=" + linkedInId + ", linkedInPageLink=" + linkedInPageLink + "]";
 	}
-
 }

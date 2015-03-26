@@ -13,6 +13,10 @@ function fetchCompanyProfile() {
 function fetchCompanyProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this company");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatings(result.iden);
@@ -30,10 +34,12 @@ function fetchCompanyProfileCallBack(data) {
 }
 
 function paintProfilePage(result) {
-	if(result != undefined) {
+	if(result != undefined && result != "") {
 		currentProfileIden = result.iden;
 		var contactDetails = result.contact_details;
 		var headContentHtml = "";
+		var profileLevel = $("#profile-fetch-info").attr("profile-level");
+		$("#profile-main-content").show();
 		if(contactDetails != undefined){
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
@@ -50,7 +56,7 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
-            headContentHtml = headContentHtml +'	<div class="float-left review-count-left" id="prof-company-review-count"></div>';
+            headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
             headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
             headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
@@ -72,12 +78,25 @@ function paintProfilePage(result) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
             	$("#prof-company-logo").css("background-size","100% auto");
             }
-            if(result.profileImageUrl != undefined) {
+            if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","cover");
+            }else {
+            	if(profileLevel == 'COMPANY'){
+            		$("#prof-image").addClass("comp-default-img");
+        		}
+        		else if(profileLevel == 'REGION'){
+        			$("#prof-image").addClass("region-default-img");
+        		}
+        		else if(profileLevel == 'BRANCH') {
+        			$("#prof-image").addClass("office-default-img");
+        		}
+        		else if(profileLevel == 'INDIVIDUAL'){
+        			$("#prof-image").addClass("pers-default-big");
+        		}
             }
             
-            var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
+            var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             if(contactDetails.about_me != undefined) {
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
             }
@@ -92,7 +111,7 @@ function paintProfilePage(result) {
             if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
-                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
+                contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
             }
             
             var webAddresses = contactDetails.web_addresses;
@@ -292,7 +311,7 @@ function paintIndividualForBranch(data) {
 				if(individual.contact_details != undefined){
 					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel cursor-pointer branch-individual" data-profilename="'+individual.profileName+'">';
 					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img pers-default-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
 					individualsHtml=  individualsHtml+'		</div>';
 					individualsHtml=  individualsHtml+'</div>';
@@ -336,7 +355,7 @@ function paintIndividualsForRegion(data) {
 					if(individual.contact_details != undefined){
 						individualsHtml = individualsHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel cursor-pointer region-individual" data-openstatus="closed" data-profilename="'+individual.profileName+'" data-agentid="'+individual.branchId+'">';
 						individualsHtml = individualsHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
-						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img pers-default-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
 						individualsHtml = individualsHtml +'		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
 						individualsHtml = individualsHtml +'	</div>';
 						individualsHtml = individualsHtml +'</div>' ;
@@ -358,7 +377,10 @@ function paintIndividualsForRegion(data) {
 
 function paintProfileImage(imgDivClass) {
 	$("."+imgDivClass).each(function(){
-		$(this).css("background", "url("+$(this).data('imageurl')+") no-repeat center");
+		var imageUrl = $(this).attr('data-imageurl');
+		if(imageUrl == "" || imageUrl == undefined) {
+			$(this).css("background", "url("+imageUrl+") no-repeat center");
+		}		
 	});
 }
 
@@ -377,7 +399,7 @@ function paintCompanyIndividuals(data) {
 				if(compIndividual.contact_details != undefined){
 					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 cursor-pointer comp-individual" data-profilename="'+compIndividual.profileName+'" data-agentid = '+compIndividual.iden+'>';
 					compIndividualsHtml = compIndividualsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img pers-default-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
 					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-txt">'+compIndividual.contact_details.name+'</div>';
 					compIndividualsHtml = compIndividualsHtml+'	</div>';
 					compIndividualsHtml = compIndividualsHtml+'</div>';
@@ -568,17 +590,18 @@ function paintHiddenReviewsCount(data) {
 			}else {
 				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
 			}
+			
+			$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
+			$("#prof-hidden-review-count").click(function(){
+				$('#prof-review-item').html('');
+				$(this).hide();
+				startIndex = 0;
+				minScore = 0;
+				$("#profile-fetch-info").attr("fetch-all-reviews", "true");
+				$(window).scrollTop($('#reviews-container').offset().top);
+				fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
+			});
 		}
-		$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
-		$("#prof-hidden-review-count").click(function(){
-			$('#prof-review-item').html('');
-			$(this).hide();
-			startIndex = 0;
-			minScore = 0;
-			$("#profile-fetch-info").attr("fetch-all-reviews", "true");
-			$(window).scrollTop($('#reviews-container').offset().top);
-			fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
-		});
 	}
 }
 
@@ -590,6 +613,10 @@ function fetchRegionProfile(regionProfileName) {
 function fetchRegionProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this region");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatingsForRegion(result.iden);
@@ -702,6 +729,10 @@ function fetchBranchProfile(branchProfileName) {
 function fetchBranchProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this office");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		fetchAverageRatingsForBranch(result.iden);
@@ -819,6 +850,10 @@ function fetchAgentProfile(agentProfileName){
 function fetchAgentProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
+		if(response.entity == "" || response.status == 500) {
+			showErrorMobileAndWeb("We could not find profile for this individual");
+			return false;
+		}
 		var result = $.parseJSON(response.entity);
 		paintProfilePage(result);
 		paintIndividualDetails(result);
@@ -846,3 +881,17 @@ function findProList(iden,searchcritrianame){
 	}
 	
 }
+
+function downloadVCard(agentName){
+	if(agentName == undefined || agentName == ""){
+		return;
+	}
+	var url = window.location.origin + "/rest/profile/downloadvcard/"+agentName;
+	//callAjaxGET(url, afterDownloadVCard, true);
+	window.open(url, "_blank");
+}
+
+function afterDownloadVCard(data){
+	console.log("V Card download complete");
+}
+

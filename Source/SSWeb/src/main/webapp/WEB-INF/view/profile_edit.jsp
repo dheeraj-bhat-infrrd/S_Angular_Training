@@ -82,7 +82,20 @@
 							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background-image:initial; background: no-repeat center; background-size: cover;"></div>
+							<c:choose>
+								<c:when test="${user.companyAdmin}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit comp-default-img  pos-relative cursor-pointer"></div>
+								</c:when>
+								<c:when test="${user.regionAdmin}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit region-default-img pos-relative cursor-pointer"></div>
+								</c:when>
+								<c:when test="${user.branchAdmin}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit office-default-img pos-relative cursor-pointer"></div>
+								</c:when>
+								<c:when test="${user.agent}">
+									<div id="prof-image-edit" class="prof-image prof-image-edit pers-default-img-big pos-relative cursor-pointer"></div>
+								</c:when>
+							</c:choose>							
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
@@ -213,6 +226,7 @@
 						<div class="left-panel-content" id="contant-info-container">
 							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mail"></div>
+								<%-- <div class="float-left lp-con-row-item" data-email="work">${mailIds.work}</div> --%>
 								<input id="email-id-work" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-email="work" data-status="${mailIds.isWorkEmailVerified}" value="${mailIds.work}">
 								<input id="email-id-work-old" type="hidden" value="${mailIds.work}">
 								<div id="email-id-work-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
@@ -428,11 +442,22 @@
 					</c:otherwise>
 				</c:choose>
 				</div>
-				
-				<div id="prof-hierarchy-container">
-					<!-- Hierarchy is displayed here  -->
-				</div>
-				
+				<div class="bd-hr-left-panel">
+				<c:choose>
+					<c:when	test="${user.companyAdmin}">
+						<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
+					</c:when>
+					<c:when	test="${user.regionAdmin}">
+						<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
+					</c:when>
+					<c:when	test="${user.branchAdmin}">
+						<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
+					</c:when>
+				</c:choose>
+        			<div id ="prof-hierarchy-container" class="hide">
+        				<!-- hierarchy structure comes here  -->
+        			</div>
+   				</div>
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -530,7 +555,6 @@
 
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Profile Settings");

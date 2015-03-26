@@ -25,10 +25,6 @@
 }
 
 body {
-    -webkit-touch-callout: none;                /* prevent callout to copy image, etc when tap to hold */
-    -webkit-text-size-adjust: none;             /* prevent webkit from resizing text to fit */
-    -webkit-user-select: none;                  /* prevent copy paste, to allow, change 'none' to 'text' */
-    color: #3e3e3e;
 }
 
 input,textarea{
@@ -118,7 +114,7 @@ a, a:hover, a:visited{
 }
 
 .h-inp {
-    width: 212px;
+    width: 192px;
     height: 33px;
     border: 0;
     border-radius: 3px;
@@ -140,11 +136,14 @@ a, a:hover, a:visited{
 }
 
 .h-btn-login {
-    width: 40px;
-    height: 40px;
-    background: url(../images/btn-login.png) no-repeat center;
-    background-size: 36px;
+    width: 80px;
+    line-height: 35px;
     cursor: pointer;
+    color: #fff;
+    background-color: #7fba00;
+    text-align: center;
+    font-size: 12px;
+    border-radius: 3px;
 }
 
 .hero-txt-wrapper {
@@ -156,6 +155,10 @@ a, a:hover, a:visited{
     text-align: center;
     line-height: 34px;
     text-shadow: 2px 2px 46px rgba(255,255,255,0.5);
+}
+
+.txt-header-small{
+    font-size: 22px;
 }
 
 .index-body {
@@ -177,7 +180,7 @@ a, a:hover, a:visited{
 }
 
 .h-login-btn-wrapper {
-    margin: 30px 10px 10px 0;
+    margin: 35px 10px 10px 0;
 }
 
 .c-pic-panel {
@@ -187,7 +190,7 @@ a, a:hover, a:visited{
 
 .c-pic-top-1 {
     position: relative;
-    width: 475px;
+    width: 535px;
     height: 180px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
@@ -196,33 +199,41 @@ a, a:hover, a:visited{
 }
 
 .c-pic-top-2 {
-    background: url(../images/homep1.png) no-repeat center;
+    background: url(../images/home5.jpg) no-repeat center;
     background-size: cover;
 }
 
 .c-pic-img {
     position: relative;
-    width: 235px;
+    width: 175px;
     height: 180px;
     background-color: #000;
 }
 
 .c-pic-bot-2 {
-    background: url(../images/homep3.png) no-repeat center;
+    background: url(../images/home2.jpg) no-repeat center;
     background-size: cover;
     margin-right: 5px;
 }
 
 .c-pic-bot-3 {
-    background: url(../images/homep4.png) no-repeat center;
+    background: url(../images/home3.jpg) no-repeat center;
+    background-size: cover;
+    margin-right: 5px;
+}
+
+.c-pic-bot-4 {
+    background: url(../images/home4.jpg) no-repeat center;
     background-size: cover;
 }
 
 .c-panel-txt-top {
     position: relative;
     z-index: 99;
-    font-size: 30px;
+    font-size: 22px;
     margin-bottom: 5px;
+    font-weight: bold !important;
+    font-family: opensans;
 }
 
 .pic-bot-txt {
@@ -233,11 +244,11 @@ a, a:hover, a:visited{
     bottom: 0;
     width: 100%;
     padding: 0 10px;
-    height: 40px;
+    height: 55px;
 }
 
 .c-pic-bot-1 {
-    background: url(../images/homep2.png) no-repeat center;
+    background: url(../images/home1.jpg) no-repeat center;
     background-size: cover;
     margin-right: 5px;
 }
@@ -322,7 +333,7 @@ a, a:hover, a:visited{
 }
 
 .reg-txt-top1 {
-    font-size: 28px;
+    font-size: 22px;
     margin-top: -14px;
     font-weight: bold;
     letter-spacing: 1px;
@@ -350,7 +361,7 @@ a, a:hover, a:visited{
     background-color: rgba(0, 159, 224, 0.8);
     color: #fff;
     margin-right: 5px;
-    padding: 0 50px;
+    padding: 0 25px;
     position: relative;
 }
 
@@ -584,6 +595,8 @@ a, a:hover, a:visited{
     position: relative;
     z-index: 99;
     font-size: 13px;
+    line-height: 20px;
+    padding-top: 5px;
 }
 
 .blue-ext-right {
@@ -703,4 +716,10 @@ a, a:hover, a:visited{
 
 .row.row-dash-top-adj {
     margin-bottom: -80px;
+}
+
+.disclaimer {
+    color: #fff;
+    font-size: 12px;
+    font-family: opensanslight !important;
 }
