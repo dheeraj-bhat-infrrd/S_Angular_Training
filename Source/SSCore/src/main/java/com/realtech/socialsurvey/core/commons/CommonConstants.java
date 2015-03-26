@@ -147,6 +147,7 @@ public interface CommonConstants {
 	public static final String MOOD_COLUMN = "mood";
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
 	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
+	public static final String DEFAULT_MONGO_ID_COLUMN = "_id";
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -315,6 +316,7 @@ public interface CommonConstants {
 	public static final int QUESTION_RATING_VALUE_TRUE = 1;
 	public static final int QUESTION_RATING_VALUE_FALSE = 0;
 	public static final int SURVEY_STAGE_COMPLETE = -1;
+	public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
 
 	/**
 	 * Error codes
@@ -398,4 +400,5 @@ public interface CommonConstants {
 	public static final int MAX_SURVEY_SCORE = 5;
 	public static final int MAX_SENT_SURVEY_COUNT = 10;
 	public static final int MAX_SOCIAL_POSTS = 10;
+	public static final String DATE_FORMAT = "dd-MM-yyyy";
 }

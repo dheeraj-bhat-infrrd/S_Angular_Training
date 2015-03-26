@@ -1,10 +1,13 @@
 package com.realtech.socialsurvey.web.rest;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.apache.solr.common.SolrDocument;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,6 +69,9 @@ public class SurveyManagementController {
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
+	@Value("${MOODS_TO_SEND_MAIL}")
+	private String moodsToSendMail;
+
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
@@ -96,18 +102,65 @@ public class SurveyManagementController {
 			String feedback = request.getParameter("feedback");
 			String mood = request.getParameter("mood");
 			String customerEmail = request.getParameter("customerEmail");
-			long agentId = Long.valueOf(request.getParameter("agentId"));
+			String agentIdStr = request.getParameter("agentId");
+			long agentId = 0;
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				LOG.error("Null/empty value found for agentId in storeFeedback().");
+				throw new InvalidInputException("Null/empty value found for agentId in storeFeedback().");
+			}
+			try {
+				agentId = Long.valueOf(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException occurred in storeFeedback() while getting agentId.");
+			}
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 
+			if (mood == null || mood.isEmpty()) {
+				LOG.error("Null/empty value found for mood in storeFeedback().");
+				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
+			}
+			List<String> emailIdsToSendMail = new ArrayList<>();
+			SolrDocument solrDocument = null;
+			try {
+				solrDocument = solrSearchService.getUserByUniqueId(agentId);
+			}
+			catch (SolrServerException e) {
+				LOG.error("SolrServerException occurred in storeFeedback() while fetching email id of agent. NEsted exception is ", e);
+			}
+			if (solrDocument != null && !solrDocument.isEmpty()) {
+				emailIdsToSendMail.add(solrDocument.get(CommonConstants.USER_EMAIL_ID_SOLR).toString());
+			}
+
+			if (!moodsToSendMail.isEmpty() && moodsToSendMail != null) {
+				List<String> moods = new ArrayList<>(Arrays.asList(moodsToSendMail.split(",")));
+				if (moods.contains(mood)) {
+					emailIdsToSendMail = surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId);
+				}
+			}
 			// Sending email to the customer telling about successful completion of survey.
 			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
 			try {
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerFirstName()+" "+survey.getCustomerLastName(), survey.getAgentName());
+					emailServices.queueSurveyCompletionMail(customerEmail, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
+							survey.getAgentName());
 				}
 				else {
-					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName()+" "+survey.getCustomerLastName(), survey.getAgentName());
+					emailServices.sendSurveyCompletionMail(customerEmail, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
+							survey.getAgentName());
+				}
+				if (enableKafka.equals(CommonConstants.YES)) {
+					for (String emailId : emailIdsToSendMail) {
+						emailServices.queueSurveyCompletionMailToAdmins(emailId, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
+								survey.getAgentName(), mood);
+					}
+				}
+				else {
+					for (String emailId : emailIdsToSendMail) {
+						emailServices.sendSurveyCompletionMailToAdmins(emailId, survey.getCustomerFirstName() + " " + survey.getCustomerLastName(),
+								survey.getAgentName(), mood);
+					}
 				}
 			}
 			catch (InvalidInputException e) {
