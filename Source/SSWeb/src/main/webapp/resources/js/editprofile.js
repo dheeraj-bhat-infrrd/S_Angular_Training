@@ -44,6 +44,31 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	}
 });
 
+$('.prof-edditable').hover(
+	function(){
+		$(this).next('.lp-edit-locks').show();
+	},
+	function(){
+		$(this).next('.lp-edit-locks').hide();
+	}
+);
+$('.prof-edditable-sin').hover(
+	function(){
+		$(this).next('.lp-edit-locks').show();
+	},
+	function(){
+		$(this).next('.lp-edit-locks').hide();
+	}
+);
+$('#prof-logo').hover(
+	function(){
+		$(this).prev('.prof-img-lock').show();
+	},
+	function(){
+		$(this).prev('.prof-img-lock').hide();
+	}
+);
+
 
 // Lock Settings
 $(document).on('click', '.lp-edit-locks', function(e) {

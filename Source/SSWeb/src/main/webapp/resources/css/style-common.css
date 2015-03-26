@@ -3139,6 +3139,7 @@ button.paypal.is-active {
 	height: 46px;
 	background: url(../images/locks.png) no-repeat;
 	background-position: -218px center;
+	display: none;
 }
 
 .lp-ach-item-img{
@@ -3236,7 +3237,7 @@ button.paypal.is-active {
 
 .prof-img-lock{
 	background: rgba(255,255,255,0.6) url(../images/locks.png) no-repeat;
-	background-position: -123px center;
+	background-position: -223px center;
 }
 .prof-img-lock-locked{
 	background-position: 4px center;
