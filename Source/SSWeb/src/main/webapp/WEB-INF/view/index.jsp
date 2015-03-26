@@ -34,7 +34,7 @@
 						<div class="float-left h-pwd-wrapper">
 							<div class="h-lbl clearfix">
 								<div class="float-left">Password</div>
-								<div class="float-right fgt-pwd"><a href ="./forgotpassword.do">Forgot your Password?</a></div>
+								<div class="float-right fgt-pwd"><a href ="./forgotpassword.do">Forgot Password?</a></div>
 							</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-pwd"></div>
@@ -43,7 +43,7 @@
 						</div>
 						<div class="float-left h-login-btn-wrapper">
 							<div id="login-submit" class="h-btn-login">
-								<span class="h-btn-login-txt hide">Submit</span>
+								<span class="h-btn-login-txt">Sign In</span>
 							</div>
 						</div>
 					</form>
@@ -52,56 +52,50 @@
 			</div>
 			
 			<div class="hero-txt-wrapper">
-				<span class="txt-bold">Control</span> your online 
-				<span class="txt-bold">presence, read, write</span> and 
-				<span class="txt-bold">Share reviews</span>
+				<span class="txt-bold">read, write</span> and 
+				<span class="txt-bold">Share </span>reviews<br/>
+                <span class="txt-header-small">Social Survey is where </span>
+                <span class="txt-bold txt-header-small">Professionals</span> <span class="txt-header-small">and</span>
+                <span class="txt-bold txt-header-small">Customers </span><span class="txt-header-small">connect</span>
 			</div>
 			<div class="content-wrapper clearfix">
 				<div class="float-left c-pic-panel">
 					<div class="clearfix c-pic-panel-top">
 						<div class="float-left c-pic-top-1">
 							<div class="blue-ext-left"></div>
-							<div class="c-panel-txt-top txt-bold">What is Lorem Ipsum?</div>
-							<div class="c-panel-txt-bot">Lorem Ipsum is simply dummy
-								text of the printing and typesetting industry. Lorem Ipsum has
-								been the industry's standard dummy text ever since the 1500s,
-								when an unknown printer took a galley of type and scrambled it
-								to make a type specimen book. It has survived not only five
-								centuries, but also the leap into electronic typesetting,
-								remaining essentially unchanged.</div>
+							<div class="c-panel-txt-top txt-bold">Manage Your Online Reputation!</div>
+							<div class="c-panel-txt-bot">Don't let one bad review be the way customers find you online. With Social-Survey you can Automate survey requests, connect to your point of sale system and syndicate surveys. To view all of our features - <b>Click Here</b></div>
 						</div>
 						<div class="float-left c-pic-img c-pic-top-2">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">Faramarz Moeen Ziai</div>
+								<div class="pic-bot-txt-bot">SVP. Mortgage</div>
 							</div>
 						</div>
 					</div>
 					<div class="clearfix c-pic-panel-bot">
 						<div class="float-left c-pic-img c-pic-bot-1">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">John Jackson</div>
+								<div class="pic-bot-txt-bot">Counselor, Professional Services</div>
 							</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-bot-2">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">Tyler Morton</div>
+								<div class="pic-bot-txt-bot">Broker-Owner, Real Estate</div>
 							</div>
 						</div>
 						<div class="float-left c-pic-img c-pic-bot-3">
 							<div class="pic-bot-txt">
-<!--
-								<div class="pic-bot-txt-top">John Doe</div>
-								<div class="pic-bot-txt-bot">CEO</div>
--->
+								<div class="pic-bot-txt-top">Laura Ryan</div>
+								<div class="pic-bot-txt-bot">Director. Real Estate</div>
+							</div>
+						</div>
+                        <div class="float-left c-pic-img c-pic-bot-4">
+							<div class="pic-bot-txt">
+								<div class="pic-bot-txt-top">David Kawata</div>
+								<div class="pic-bot-txt-bot">CEO, Software</div>
 							</div>
 						</div>
 					</div>
@@ -114,8 +108,8 @@
 					</div>
 					
 			   		<form id="registration-form" class="registration-form-cls" method="POST" action="./registration.do">
-						<div class="reg-txt-top1">Get Started - It's Free</div>
-						<div class="reg-txt-top2">Sign Up to Start Your Survey</div>
+						<div class="reg-txt-top1">Create Your Free Account</div>
+						<div class="reg-txt-top2">Registration Takes Less Than 2 Minutes</div>
 						<div class="clearfix reg-item reg-item-bord-top">
 							<div class="m-inp-img-fname m-inp-img"></div>
 							<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
@@ -140,8 +134,9 @@
 						</div>
 						<div id="recaptcha" class="hide"></div>
 						<div class="clearfix reg-item">
-							<input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Submit">
+							<input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Join Now">
 						</div>
+                        <div class="disclaimer">* By joining, I agree to Social-Survey's terms and conditions.</div>
 						<input type="hidden" value="${message}" name="message" id="message"/>
 					</form>
 					
@@ -151,7 +146,7 @@
 			<div id="pro-wrapper" class="pro-wrapper clearfix">
 				<div id="pro-list-con" class="pro-left-wrapper float-left">
 					<div class="blue-ext-right blue-ext-right-adj hide"></div>
-					<div class="fp-txt-1">Find a professional</div>
+					<div class="fp-txt-1">Read and Write reviews - Find a professional</div>
 				</div>
 				
 				<form id="find-pro-form" method="POST" action="./findapro.do">
@@ -163,7 +158,7 @@
 						<input id="find-pro-last-name" name="find-pro-last-name" class="pro-inp" placeholder="Last Name">
 						<input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
 						<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10">
-						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Submit">
+						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Search">
 					</div>
 				</form>
 				

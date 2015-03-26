@@ -923,17 +923,26 @@ function fetchHierarchy(attrName, attrValue) {
 	callAjaxGET(url, paintHierarchy, true);
 }
 
+//Hierarchy data population
+function fetchCompanyHierarchy(attrName, attrValue) {
+	var url = "./getcompanyhierarchy.do?" + attrName + "=" + attrValue;
+	callAjaxGET(url, paintHierarchy, true);
+}
+
 function paintHierarchy(data) {
 	$("#prof-hierarchy-container").html(data);
+	$("#prof-hierarchy-container").show();
 	
 	// Click on region
 	$(document).on('click', '.comp-region', function(){
-		if($(this).data("openstatus") == "closed") {
-			fetchRegionHierarchyOnClick($(this).data('regionid'));
-			$(this).data("openstatus", "open");
+		if($(this).attr("data-openstatus") == "closed") {
+			//console.log("inside closed ---"+$(this).attr("data-openstatus"));
+			fetchRegionHierarchyOnClick($(this).attr('data-regionid'));
+			$(this).attr("data-openstatus", "open");
 		} else {
-			$('#comp-region-branches-' + $(this).data('regionid')).slideUp(200);
-			$(this).data("openstatus", "closed");
+			$('#comp-region-branches-' + $(this).attr('data-regionid')).slideUp(200);
+			$(this).attr("data-openstatus", "closed");
+			//console.log("inside else ---"+$(this).attr("data-openstatus"));
 		}
 	});
 	
@@ -951,18 +960,19 @@ function fetchRegionHierarchyOnClick(regionId) {
 	callAjaxGET(url, function(data) {
 		$("#comp-region-branches-" + regionId).html(data).slideDown(200);
 		bindClickBranchForIndividuals("comp-region-branch");
+		bindClickForIndividuals("comp-region-individual");
 	}, true);
 }
 
 function bindClickBranchForIndividuals(bindingClass) {
 	$("." + bindingClass).click(function(e){
 		e.stopPropagation();
-		if($(this).data("openstatus") == "closed") {
-			fetchBranchHierarchyOnClick($(this).data('branchid'));
-			$(this).data("openstatus","open");
+		if($(this).attr("data-openstatus") == "closed") {
+			fetchBranchHierarchyOnClick($(this).attr('data-branchid'));
+			$(this).attr("data-openstatus","open");
 		} else {
-			$('#comp-branch-individuals-' + $(this).data('branchid')).slideUp(200);
-			$(this).data("openstatus","closed");
+			$('#comp-branch-individuals-' + $(this).attr('data-branchid')).slideUp(200);
+			$(this).attr("data-openstatus","closed");
 		}
 	});
 }
@@ -973,12 +983,16 @@ function fetchBranchHierarchyOnClick(branchId) {
 	callAjaxGET(url, function(data) {
 		$("#comp-branch-individuals-" + branchId).html(data).slideDown(200);
 		paintProfImage("comp-individual-prof-image");
+		bindClickForIndividuals("comp-individual");
 	}, true);
 }
 
 function paintProfImage(imgDivClass) {
 	$("." + imgDivClass).each(function(){
-		$(this).css("background", "url(" + $(this).data('imageurl') + ") no-repeat center");
+		var imageUrl = $(this).attr('data-imageurl');
+		if(imageUrl != "" && imageUrl != undefined) {
+			$(this).css("background", "url(" + imageUrl + ") no-repeat center");
+		}		
 	});
 }
 
@@ -986,12 +1000,14 @@ function paintProfImage(imgDivClass) {
 $(window).scroll(function() {
 	var newIndex = startIndex + numOfRows;
 	var totalReviews = $("#prof-company-review-count").html();
-	totalReviews = totalReviews.substr(0, totalReviews.indexOf(' '));
+	if(totalReviews != undefined) {
+		totalReviews = totalReviews.substr(0, totalReviews.indexOf(' '));
 
-	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex <= totalReviews) {
-		fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
-		startIndex = newIndex;
-	}
+		if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && newIndex <= totalReviews) {
+			fetchReviews(attrName, attrVal, minScore, newIndex, numOfRows);
+			startIndex = newIndex;
+		}
+	}	
 });
 
 function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
@@ -1000,7 +1016,7 @@ function fetchReviews(attrName, attrVal, minScore, startIndex, numOfRows) {
 	callAjaxGET(url, function(data) {
 		$("#prof-review-item").append(data);
 		$(".review-ratings").each(function() {
-			changeRatingPattern($(this).data("rating"), $(this));
+			changeRatingPattern($(this).attr("data-rating"), $(this));
 		});
 		
 		$('.icn-plus-open').click(function(){
@@ -1080,4 +1096,10 @@ function callBackOnUpdateMailIds(data) {
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+}
+
+function bindClickForIndividuals(elementClass) {
+	$("."+elementClass).click(function(e){
+		e.stopPropagation();
+	});
 }

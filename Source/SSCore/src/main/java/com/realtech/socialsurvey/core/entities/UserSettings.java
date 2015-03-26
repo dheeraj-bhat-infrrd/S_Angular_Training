@@ -10,7 +10,7 @@ public class UserSettings {
 	private OrganizationUnitSettings companySettings;
 	private Map<Long, OrganizationUnitSettings> regionSettings;
 	private Map<Long, OrganizationUnitSettings> branchSettings;
-	private Map<Long, AgentSettings> agentSettings;
+	private AgentSettings agentSettings;
 
 	public OrganizationUnitSettings getCompanySettings() {
 		return companySettings;
@@ -36,12 +36,11 @@ public class UserSettings {
 		this.branchSettings = branchSettings;
 	}
 
-	public Map<Long, AgentSettings> getAgentSettings() {
+	public AgentSettings getAgentSettings() {
 		return agentSettings;
 	}
 
-	public void setAgentSettings(Map<Long, AgentSettings> agentSettings) {
+	public void setAgentSettings(AgentSettings agentSettings) {
 		this.agentSettings = agentSettings;
 	}
-
 }

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,10 +39,13 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
+import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionPastDueException;
+import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.payment.exception.SubscriptionUpgradeUnsuccessfulException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -77,6 +81,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+	
+	@Autowired
+	private SurveyBuilder surveyBuilder;
 	
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
@@ -274,7 +281,7 @@ public class OrganizationManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/addaccounttype", method = RequestMethod.POST)
-	public String addAccountType(Model model, HttpServletRequest request) {
+	public String addAccountType(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("Method addAccountType of UserManagementController called");
 		String strAccountType = request.getParameter("accounttype");
 		try {
@@ -286,9 +293,19 @@ public class OrganizationManagementController {
 			User user = sessionHelper.getCurrentUser();
 
 			LOG.debug("Checking if payment has already been made.");
-			if (gateway.checkIfPaymentMade(user.getCompany())) {
+			if (gateway.checkIfPaymentMade(user.getCompany()) && user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
+			}
+			
+			//We check if there is mapped survey for the company and add a default survey if not.
+			if(surveyBuilder.checkForExistingSurvey(user) == null){
+				surveyBuilder.addDefaultSurveyToCompany(user);
+			}
+			
+			if(Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE){
+				LOG.debug("Since its a free account type returning no popup jsp");
+				return null;
 			}
 
 			model.addAttribute("accounttype", strAccountType);
@@ -723,6 +740,7 @@ public class OrganizationManagementController {
 	public Object upgradePlanForUserInSession(HttpServletRequest request, Model model) {
 		LOG.info("Upgrading the user's subscription");
 		String accountType = request.getParameter(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		String nonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
 		String message = null;
 
 		LOG.info("Fetching the user in session");
@@ -745,10 +763,14 @@ public class OrganizationManagementController {
 				throw new InvalidInputException("Error while parsing account type ", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 			LOG.info("Making the API call to upgrade");
-			gateway.upgradePlanForSubscription(user, newAccountsMasterId);
+			gateway.upgradePlanForSubscription(user, newAccountsMasterId, nonce);
 			LOG.info("Upgrade successful");
 
 			switch (newAccountsMasterId) {
+				case CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL:
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_INDIVIDUAL_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
+						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+					break;
 				case CommonConstants.ACCOUNTS_MASTER_TEAM:
 					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
 							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
@@ -767,14 +789,14 @@ public class OrganizationManagementController {
 		catch (InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
-
+			
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 
 		}
 		catch (PaymentException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-
+			
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionPastDueException e) {
@@ -787,6 +809,16 @@ public class OrganizationManagementController {
 			LOG.error("SubscriptionUpgradeUnsuccessfulException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+		}
+		catch (CreditCardException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+		}
+		catch (SubscriptionUnsuccessfulException e) {
+			LOG.error("Exception has occured : " + e.getMessage(), e);
+			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 
@@ -816,7 +848,29 @@ public class OrganizationManagementController {
 
 		LOG.debug("Adding the current plan in the model and the upgrade flag");
 		model.addAttribute(CommonConstants.CURRENT_LICENSE_ID, currentLicenseDetail.getAccountsMaster().getAccountsMasterId());
-		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.STATUS_ACTIVE);
+		model.addAttribute(CommonConstants.UPGRADE_FLAG, CommonConstants.YES);
+
+		LOG.info("Returning the upgrade account selection page");
+		return JspResolver.ACCOUNT_TYPE_SELECTION;
+
+	}
+	
+	/**
+	 * Method for displaying the upgrade page to upgrade from free account
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/upgradetopaidplanpage", method = RequestMethod.GET)
+	public String upgradeToPaidPlanPage(HttpServletRequest request, Model model) {
+
+		LOG.info("Upgrade page requested.");
+
+		LOG.debug("Retrieveing the user from session to get his current plan details");
+
+		LOG.debug("Adding the current plan in the model and the upgrade flag");
+		model.addAttribute(CommonConstants.PAID_PLAN_UPGRADE_FLAG, CommonConstants.YES);
 
 		LOG.info("Returning the upgrade account selection page");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;

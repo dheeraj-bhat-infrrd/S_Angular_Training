@@ -130,7 +130,7 @@ public class ProfileManagementController {
 		LOG.info("Starting the ProfileEdit page");
 		return JspResolver.PROFILE_EDIT;
 	}
-
+	
 	private LockSettings fetchParentLockSettings(Model model, User user, AccountType accountType, UserSettings settings) {
 		LOG.debug("Method fetchParentLockSettings() called from ProfileManagementService");
 		LockSettings parentLock = null;
@@ -160,13 +160,9 @@ public class ProfileManagementController {
 		LOG.debug("Method fetchUserProfile() called from ProfileManagementService");
 		OrganizationUnitSettings profile = null;
 		try {
-			long agentId = 0;
 			long branchId = 0;
 			long regionId = 0;
 
-			if (settings.getAgentSettings().size() > 0) {
-				agentId = user.getUserProfiles().get(0).getAgentId();
-			}
 			if (settings.getBranchSettings().size() > 0) {
 				branchId = user.getUserProfiles().get(0).getBranchId();
 			}
@@ -174,8 +170,8 @@ public class ProfileManagementController {
 				regionId = user.getUserProfiles().get(0).getRegionId();
 			}
 
-			LOG.debug("agentId: " + agentId + ", branchId: " + branchId + ", regionId: " + regionId);
-			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, agentId, branchId, regionId);
+			LOG.debug("branchId: " + branchId + ", regionId: " + regionId);
+			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, branchId, regionId);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
@@ -327,8 +323,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setLockSettings(lockSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Lock Settings updated successfully");
 			model.addAttribute("message",
@@ -459,8 +453,7 @@ public class ProfileManagementController {
 				userSettings.getRegionSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -469,18 +462,16 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getRegionSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.ABOUT_ME_SOLR, aboutMe);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, aboutMe);
 			}
 			else {
 				throw new InvalidInputException("Error occurred while updating About me.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("About me details updated successfully");
 			model.addAttribute("message",
@@ -563,8 +554,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -573,17 +563,19 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				solrSearchService.editUserInSolr(agentId, CommonConstants.TITLE_SOLR, title);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR,
+							name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR,
+							name.substring(name.indexOf(' ') + 1));
 				}
 				else {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
 			}
 			else {
@@ -591,8 +583,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Basic Detail updated successfully");
 			model.addAttribute("message",
@@ -696,8 +686,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -706,19 +695,18 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.USER_DISPLAY_NAME_SOLR, name);
-				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS1, address1);
-				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS2, address2);
-				// solrSearchService.editUserInSolr(agentId, CommonConstants.ADDRESS, address1 + ", " + address2);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR,
+							name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR,
+							name.substring(name.indexOf(' ') + 1));
 				}
 				else {
-					solrSearchService.editUserInSolr(agentId, CommonConstants.USER_FIRST_NAME_SOLR, name);
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
 				}
 			}
 			else {
@@ -726,8 +714,6 @@ public class ProfileManagementController {
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Profile addresses updated successfully");
 			model.addAttribute("message",
@@ -822,22 +808,19 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				profileManagementService.updateLogo(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, logoUrl);
 				agentSettings.setLogo(logoUrl);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in uploading logo.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setLogo(logoUrl);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setLogoInSession(session, userSettings);
 
 			LOG.info("Logo uploaded successfully");
@@ -934,26 +917,24 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				profileManagementService.updateProfileImage(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						profileImageUrl);
 				agentSettings.setProfileImageUrl(profileImageUrl);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 
 				// Modify Agent details in Solr
-				solrSearchService.editUserInSolr(agentId, CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR, profileImageUrl);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setProfileImageUrl(profileImageUrl);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 			sessionHelper.setProfileImageInSession(session, userSettings);
 
 			LOG.info("Profile Image uploaded successfully");
@@ -1026,8 +1007,7 @@ public class ProfileManagementController {
 				}
 				contactDetailsSettings = regionSettings.getContact_details();
 				// Send verification Links
-				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
-						regionSettings);
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings, contactDetailsSettings);
@@ -1042,8 +1022,7 @@ public class ProfileManagementController {
 				}
 				contactDetailsSettings = branchSettings.getContact_details();
 				// Send verification Links
-				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
-						branchSettings);
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings, contactDetailsSettings);
@@ -1051,28 +1030,24 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				contactDetailsSettings = agentSettings.getContact_details();
 				// Send verification Links
-				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
-						agentSettings);
+				sendVerificationLinks(contactDetailsSettings, mailIds, MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings);
 				contactDetailsSettings = updateMailSettings(contactDetailsSettings, mailIds);
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while updating emailids.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Maild ids updated successfully");
 			model.addAttribute("message",
@@ -1093,7 +1068,7 @@ public class ProfileManagementController {
 			OrganizationUnitSettings userSettings) throws InvalidInputException, UndeliveredEmailException {
 		LOG.debug("Method sendVerificationLinks() called from ProfileManagementController");
 		Map<String, String> urlParams = null;
-		
+
 		if (oldSettings == null) {
 			throw new InvalidInputException("No contact details object found for user");
 		}
@@ -1102,7 +1077,7 @@ public class ProfileManagementController {
 			LOG.debug("No maild ids added, create new mail id object in contact details");
 			mailIdSettings = new MailIdSettings();
 		}
-		
+
 		for (MiscValues mailId : mailIds) {
 			String key = mailId.getKey();
 			String emailId = mailId.getValue();
@@ -1230,8 +1205,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1240,15 +1214,14 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while updating phone numbers.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating phone numbers.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Contact numbers updated successfully");
 			model.addAttribute("message",
@@ -1375,8 +1348,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1385,15 +1357,14 @@ public class ProfileManagementController {
 				contactDetailsSettings = profileManagementService.updateAgentContactDetails(
 						MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetailsSettings);
 				agentSettings.setContact_details(contactDetailsSettings);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while updating web addresses.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while updating web addresses.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setContact_details(contactDetailsSettings);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Web addresses updated successfully");
 			model.addAttribute("message",
@@ -1518,8 +1489,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1528,15 +1498,13 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating fb token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Facebook link updated successfully");
 			model.addAttribute("message",
@@ -1629,8 +1597,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1639,15 +1606,13 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating twitter token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Twitter link updated successfully");
 			model.addAttribute("message",
@@ -1740,8 +1705,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1750,15 +1714,13 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in upadting linkedin token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("LinkedIn link updated successfully");
 			model.addAttribute("message",
@@ -1851,8 +1813,7 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
@@ -1861,15 +1822,13 @@ public class ProfileManagementController {
 				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						socialMediaTokens);
 				agentSettings.setSocialMediaTokens(socialMediaTokens);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in updating yelp token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setSocialMediaTokens(socialMediaTokens);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("YelpLinked in link updated successfully");
 			model.addAttribute("message",
@@ -1964,23 +1923,20 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				achievements = profileManagementService.addAgentAchievements(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
 						agentSettings, achievements);
 				agentSettings.setAchievements(achievements);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding achievements.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setAchievements(achievements);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Achievements updated successfully");
 			model.addAttribute("message",
@@ -2062,23 +2018,20 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				associations = profileManagementService.addAgentAssociations(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION,
 						agentSettings, associations);
 				agentSettings.setAssociations(associations);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setAssociations(associations);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Associations updated successfully");
 			model.addAttribute("message",
@@ -2160,23 +2113,20 @@ public class ProfileManagementController {
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
 			else if (user.isAgent()) {
-				long agentId = user.getUserProfiles().get(0).getAgentId();
-				AgentSettings agentSettings = userSettings.getAgentSettings().get(agentId);
+				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
 				licenses = profileManagementService.addAgentLicences(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 						authorisedIn);
 				agentSettings.setLicenses(licenses);
-				userSettings.getAgentSettings().put(agentId, agentSettings);
+				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
 			profile.setLicenses(licenses);
-			session.setAttribute(CommonConstants.USER_PROFILE, profile);
-			session.setAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION, userSettings);
 
 			LOG.info("Licence details updated successfully");
 			model.addAttribute("message",
@@ -2465,8 +2415,8 @@ public class ProfileManagementController {
 		List<AgentSettings> individuals;
 		String companyProfileName = request.getParameter("companyProfileName");
 		if (companyProfileName == "") {
-			LOG.error("Invalid companyProfileName passed in method getAdminHierarchy().");
-			throw new InvalidInputException("Invalid companyProfileName passed in method getAdminHierarchy().");
+			LOG.error("Invalid companyProfileName passed in method getCompanyHierarchy().");
+			throw new InvalidInputException("Invalid companyProfileName passed in method getCompanyHierarchy().");
 		}
 
 		// Fetching Regions under Company
@@ -2496,6 +2446,21 @@ public class ProfileManagementController {
 		LOG.debug("Method getCompanyHierarchy() finished from ProfileManagementController");
 		return model;
 	}
+	
+	@RequestMapping(value = "/getcompanyhierarchy", method = RequestMethod.GET)
+	public String getCompanyHierarchyDirect(Model model, HttpServletRequest request) {
+		LOG.info("Method getCompanyHierarchyDirect() called from ProfileManagementController");
+		try {
+			model = getCompanyHierarchy(model, request);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching company hierarchy. Reason: " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method getCompanyHierarchyDirect() finished from ProfileManagementController");
+		return JspResolver.PROFILE_HIERARCHY;
+	}
 
 	@RequestMapping(value = "/getregionhierarchy", method = RequestMethod.GET)
 	public String getRegionHierarchyOnClick(Model model, HttpServletRequest request) {
@@ -2517,10 +2482,16 @@ public class ProfileManagementController {
 		List<Branch> branches;
 		List<AgentSettings> individuals;
 
-		long regionId = Long.parseLong(request.getParameter("regionId"));
+		long regionId = 0l;
+		try {
+			regionId = Long.parseLong(request.getParameter("regionId"));
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException while parsing regionId in getRegionHierarchy.Reason :" + e.getMessage());
+			throw new InvalidInputException("Invalid regionId passed in method getRegionHierarchy().");
+		}
 		if (regionId == 0l) {
-			LOG.error("Invalid regionId passed in method getAdminHierarchy().");
-			throw new InvalidInputException("Invalid regionId passed in method getAdminHierarchy().");
+			throw new InvalidInputException("Invalid regionId passed in method getRegionHierarchy().", DisplayMessageConstants.GENERAL_ERROR);
 		}
 
 		// Fetching Branches under Region
@@ -2561,8 +2532,8 @@ public class ProfileManagementController {
 		List<AgentSettings> individuals;
 		long branchId = Long.parseLong(request.getParameter("branchId"));
 		if (branchId == 0l) {
-			LOG.error("Invalid branchId passed in method getAdminHierarchy().");
-			throw new InvalidInputException("Invalid branchId passed in method getAdminHierarchy().");
+			LOG.error("Invalid branchId passed in method getBranchHierarchy().");
+			throw new InvalidInputException("Invalid branchId passed in method getBranchHierarchy().");
 		}
 
 		// Fetching Individuals under Branch
@@ -2657,7 +2628,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid companyId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive);
+				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY,
+						fetchAbusive);
 			}
 			else if (user.isRegionAdmin()) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
@@ -2666,7 +2638,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid regionId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive);
+				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION,
+						fetchAbusive);
 			}
 			else if (user.isBranchAdmin()) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
@@ -2675,7 +2648,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid branchId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive);
+				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH,
+						fetchAbusive);
 			}
 			else if (user.isAgent()) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
@@ -2684,7 +2658,8 @@ public class ProfileManagementController {
 					throw new InvalidInputException("Invalid agentId passed in method fetchReviews().");
 				}
 
-				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL, fetchAbusive);
+				reviewCount = profileManagementService.getReviewsCount(agentId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_INDIVIDUAL,
+						fetchAbusive);
 			}
 		}
 		catch (InvalidInputException e) {
@@ -2750,7 +2725,7 @@ public class ProfileManagementController {
 		LOG.info("Method fetchAverageRating() finished from ProfileManagementController");
 		return averageRating + "";
 	}
-	
+
 	/**
 	 * Method to verify a new emailId
 	 * 
@@ -2762,14 +2737,16 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/emailverification")
 	public String verifyAccount(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
 		LOG.info("Method to verify email called");
-		
+
 		try {
 			profileManagementService.updateEmailVerificationStatus(encryptedUrlParams);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.EMAIL_VERIFICATION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while verifying email. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_VERIFICATION_URL, DisplayMessageType.ERROR_MESSAGE));
 		}
 		LOG.info("Method to verify email finished");
 		return JspResolver.LOGIN;

@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -45,6 +46,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SolrSearchServiceImpl.class);
 	private static final String SOLR_EDIT_REPLACE = "set";
+
 	@Value("${SOLR_REGION_URL}")
 	private String solrRegionUrl;
 
@@ -58,18 +60,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	private SolrSearchUtils solrSearchUtils;
 
 	/**
-	 * Method to perform search of regions from solr based on the input pattern and company
-	 * 
-	 * @param regionPattern
-	 * @param company
-	 * @param start
-	 * @param rows
-	 * @return
-	 * @throws InvalidInputException
-	 * @throws SolrException
+	 * Method to perform search of regions from solr based on input pattern , company and regionIds
+	 * if provided
 	 */
 	@Override
-	public String searchRegions(String regionPattern, Company company, int start, int rows) throws InvalidInputException, SolrException {
+	public String searchRegions(String regionPattern, Company company, Set<Long> regionIds, int start, int rows) throws InvalidInputException,
+			SolrException {
 		LOG.info("Method searchRegions called for regionPattern :" + regionPattern);
 		if (regionPattern == null) {
 			throw new InvalidInputException("Region pattern is null while searching for region");
@@ -87,7 +83,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.REGION_NAME_SOLR + ":" + regionPattern);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_COLUMN + ":"
-					+ CommonConstants.STATUS_ACTIVE);
+					+ CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
+
+			if (regionIds != null && !regionIds.isEmpty()) {
+				String regionIdsStr = getSpaceSeparatedStringFromIds(regionIds);
+				solrQuery.addFilterQuery(CommonConstants.REGION_ID_SOLR + ":(" + regionIdsStr + ")");
+			}
+
 			solrQuery.setStart(start);
 			if (rows > 0) {
 				solrQuery.setRows(rows);
@@ -110,19 +112,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	/**
-	 * Method to perform search of branches from solr based on the input pattern and company
-	 * 
-	 * @param branchPattern
-	 * @param company
-	 * @param start
-	 * @param rows
-	 * @return
-	 * @throws InvalidInputException
-	 * @throws SolrException
+	 * Method to perform search of branches from solr based on the input pattern, company and
+	 * branchIds
 	 */
 	@Override
-	public String searchBranches(String branchPattern, Company company, int start, int rows) throws InvalidInputException, SolrException {
-		LOG.info("Method searchBranches called for branchPattern :" + branchPattern);
+	public String searchBranches(String branchPattern, Company company, String idColumnName, Set<Long> branchIds, int start, int rows)
+			throws InvalidInputException, SolrException {
+		LOG.info("Method searchBranches called for branchPattern :" + branchPattern + " idColumnName:" + idColumnName);
 		if (branchPattern == null) {
 			throw new InvalidInputException("Branch pattern is null while searching for branch");
 		}
@@ -140,7 +136,54 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery query = new SolrQuery();
 			query.setQuery(CommonConstants.BRANCH_NAME_SOLR + ":" + branchPattern);
 			query.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + company.getCompanyId(), CommonConstants.STATUS_SOLR + ":"
-					+ CommonConstants.STATUS_ACTIVE);
+					+ CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":" + CommonConstants.NO);
+			query.setStart(start);
+			if (branchIds != null && !branchIds.isEmpty()) {
+				if (idColumnName == null || idColumnName.isEmpty()) {
+					throw new InvalidInputException("column name is not specified in search branches");
+				}
+				String idsStr = getSpaceSeparatedStringFromIds(branchIds);
+				query.addFilterQuery(idColumnName + ":(" + idsStr + ")");
+			}
+			if (rows > 0) {
+				query.setRows(rows);
+			}
+
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(query);
+			SolrDocumentList documentList = response.getResults();
+			branchResult = JSONUtil.toJSON(documentList);
+
+			LOG.debug("Results obtained from solr :" + branchResult);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranches finished for branchPattern :" + branchPattern);
+		return branchResult;
+	}
+
+	/**
+	 * Method to perform search of branches from solr based on the region id.
+	 * 
+	 * @param regionId
+	 * @param start
+	 * @param rows
+	 * @return list of branches
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public String searchBranchesByRegion(long regionId, int start, int rows) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBranchesByRegion() to search branches in a region started");
+		String branchResult = null;
+		QueryResponse response = null;
+		try {
+
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery query = new SolrQuery();
+			query.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			query.setStart(start);
 
 			if (rows > 0) {
@@ -158,7 +201,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("SolrServerException while performing branch search");
 			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
 		}
-		LOG.info("Method searchBranches finished for branchPattern :" + branchPattern);
+		LOG.info("Method searchBranchesByRegion() to search branches in a region finished");
 		return branchResult;
 	}
 
@@ -328,6 +371,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery("companyId:" + companyId);
 			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -402,6 +446,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		QueryResponse response = null;
 		try {
 			SolrQuery solrQuery = new SolrQuery();
+
 			String[] fields = { CommonConstants.USER_ID_SOLR, CommonConstants.USER_DISPLAY_NAME_SOLR, CommonConstants.TITLE_SOLR,
 					CommonConstants.ABOUT_ME_SOLR, CommonConstants.PROFILE_IMAGE_URL_SOLR, CommonConstants.PROFILE_URL_SOLR };
 			solrQuery.setFields(fields);
@@ -459,6 +504,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
+			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -473,7 +519,39 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
 		return usersResult;
 	}
-	
+
+	@Override
+	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
+			MalformedURLException {
+		LOG.info("Method countUsersByCompany() called for company id : " + companyId);
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		long resultsCount = 0l;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+			response = solrServer.query(solrQuery);
+			
+			resultsCount = response.getResults().getNumFound();
+			LOG.debug("User search result count is : " + resultsCount);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method countUsersByCompany() finished for company id : " + companyId);
+		return resultsCount;
+	}
+
 	/**
 	 * Method to add User into solr
 	 */
@@ -491,7 +569,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
-			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + user.getLastName());
+
+			String displayName = user.getFirstName();
+			if (user.getLastName() != null) {
+				displayName = displayName + " " + user.getLastName();
+			}
+			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, displayName);
 
 			/**
 			 * add/update profile url and profile name in solr only when they are not null
@@ -521,6 +604,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			document.addField(CommonConstants.BRANCHES_SOLR, branches);
 			document.addField(CommonConstants.REGIONS_SOLR, regions);
 			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
+			document.addField(CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin());
+			document.addField(CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin());
 			LOG.debug("response while adding user is: " + response);
 			solrServer.add(document);
 			solrServer.commit();
@@ -666,5 +751,209 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.info("Method searchUsersByIden finished for iden : " + iden);
 		return results;
+	}
+
+	/**
+	 * Method to perform search of region from solr based on the input Region id
+	 * 
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchRegionById(long regionId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchRegionById called for regionId :" + regionId);
+		if (regionId < 0) {
+			throw new InvalidInputException("Region id is null while searching for region");
+		}
+		String regionName = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":" + CommonConstants.STATUS_ACTIVE);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if (results.size() != 0)
+				regionName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.REGION_NAME_COLUMN);
+		}
+		catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing region search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.debug("Region search result is : " + regionName);
+		return regionName;
+	}
+
+	/**
+	 * Method to perform search of branch name from solr based on the input branch id
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException {
+		LOG.info("Method searchBrancNameById called for branchId :" + branchId);
+		if (branchId < 0) {
+			throw new InvalidInputException("Branch id is null while searching for Branch");
+		}
+		String branchName = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.BRANCH_ID_SOLR + ":" + branchId);
+			solrQuery.addFilterQuery(CommonConstants.STATUS_COLUMN + ":" + CommonConstants.STATUS_ACTIVE);
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			if (results.size() != 0)
+				branchName = (String) results.get(CommonConstants.INITIAL_INDEX).getFieldValue(CommonConstants.BRANCH_NAME_COLUMN);
+		}
+		catch (SolrServerException e) {
+			LOG.error("UnsupportedEncodingException while performing branch search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.debug("Branch search result is : " + branchName);
+		return branchName;
+	}
+
+	/**
+	 * Method to perform search of region, branch or Agent name from solr based on the input pattern
+	 * for a specific company
+	 * 
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	@Override
+	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
+			SolrException {
+		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company started");
+		String result = null;
+		QueryResponse response = null;
+		searchKey = searchKey + "*";
+		try {
+			SolrServer solrServer;
+			switch (searchColumn) {
+				case CommonConstants.REGION_NAME_SOLR:
+					solrServer = new HttpSolrServer(solrRegionUrl);
+					break;
+				case CommonConstants.BRANCH_NAME_SOLR:
+					solrServer = new HttpSolrServer(solrBranchUrl);
+					break;
+				case CommonConstants.USER_DISPLAY_NAME_SOLR:
+					solrServer = new HttpSolrServer(solrUserUrl);
+					if (columnName.equals(CommonConstants.REGION_ID_COLUMN)) {
+						columnName = "regions";
+					}
+					else if (columnName.equals(CommonConstants.BRANCH_ID_COLUMN)) {
+						columnName = "branches";
+					}
+					break;
+				default:
+					solrServer = new HttpSolrServer(solrRegionUrl);
+			}
+			SolrQuery query = new SolrQuery();
+			query.setQuery(columnName + ":" + id);
+
+			query.addFilterQuery(searchColumn + ":" + searchKey);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+
+			LOG.debug("Querying solr for searching " + searchColumn);
+			response = solrServer.query(query);
+			SolrDocumentList documentList = response.getResults();
+			result = JSONUtil.toJSON(documentList);
+
+			LOG.debug("Results obtained from solr :" + result);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing region, branch or agent search");
+			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
+		return result;
+	}
+
+	@Override
+	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Regions");
+		}
+		LOG.info("Method fetchRegionsByCompany() called for company id : " + companyId);
+		String regionsResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrRegionUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+
+			LOG.debug("Querying solr for searching regions");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			regionsResult = JSONUtil.toJSON(results);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing Regions search");
+			throw new SolrException("Exception while performing search for Regions. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method fetchRegionsByCompany() finished for company id : " + companyId);
+		return regionsResult;
+	}
+
+	@Override
+	public String fetchBranchesByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Branches");
+		}
+		LOG.info("Method fetchBranchesByCompany() called for company id : " + companyId);
+		String branchesResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+
+			LOG.debug("Querying solr for searching branches");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			branchesResult = JSONUtil.toJSON(results);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing Branches search");
+			throw new SolrException("Exception while performing search for Branches. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method fetchBranchesByCompany() finished for company id : " + companyId);
+		return branchesResult;
+	}
+
+	/**
+	 * Method to get space separated ids from set of ids
+	 * 
+	 * @param ids
+	 * @return
+	 */
+	private String getSpaceSeparatedStringFromIds(Set<Long> ids) {
+		LOG.debug("Method getSpaceSeparatedStringFromIds called for ids:" + ids);
+		StringBuilder idsSb = new StringBuilder();
+		int count = 0;
+		if (ids != null && !ids.isEmpty()) {
+			for (Long id : ids) {
+				if (count != 0) {
+					idsSb.append(" ");
+				}
+				idsSb.append(id);
+				count++;
+			}
+		}
+		LOG.debug("Method getSpaceSeparatedStringFromIds executed successfully. Returning:" + idsSb.toString());
+		return idsSb.toString();
 	}
 }
