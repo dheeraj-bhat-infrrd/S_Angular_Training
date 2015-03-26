@@ -9,6 +9,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -41,9 +43,16 @@ public class Survey implements Serializable {
 
 	@Column(name = "STATUS")
 	private int status;
+	
+	@Column(name = "IS_SURVEY_BUILDING_COMPLETE")
+	private int isSurveyBuildingComplete;
 
 	@Column(name = "SURVEY_NAME")
 	private String surveyName;
+	
+	@ManyToOne
+	@JoinColumn(name="VERTICAL_ID")
+	private VerticalsMaster verticalsMaster;
 
 	// bi-directional many-to-one association to SurveyCompanyMapping
 	@OneToMany(mappedBy = "survey", fetch = FetchType.LAZY)
@@ -54,6 +63,14 @@ public class Survey implements Serializable {
 	private List<SurveyQuestionsMapping> surveyQuestionsMappings;
 
 	public Survey() {}
+	
+	public int getIsSurveyBuildingComplete() {
+		return isSurveyBuildingComplete;
+	}
+
+	public void setIsSurveyBuildingComplete(int isSurveyBuildingComplete) {
+		this.isSurveyBuildingComplete = isSurveyBuildingComplete;
+	}
 
 	public long getSurveyId() {
 		return this.surveyId;
@@ -154,4 +171,13 @@ public class Survey implements Serializable {
 
 		return surveyCompanyMapping;
 	}
+	
+	public VerticalsMaster getVerticalsMaster() {
+		return verticalsMaster;
+	}
+
+	public void setVerticalsMaster(VerticalsMaster verticalsMaster) {
+		this.verticalsMaster = verticalsMaster;
+	}
+
 }

@@ -1,10 +1,14 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.sql.Timestamp;
+import java.text.DateFormatSymbols;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
@@ -163,6 +167,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
 		Update update = new Update();
 		update.set(CommonConstants.SURVEY_CLICKED_COLUMN, true);
+		update.set(CommonConstants.CREATED_ON, new Date());
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateSurveyAsClicked() to mark survey as clicked finished.");
@@ -178,17 +183,37 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// columnValue field can contain respective values for the columnName.
 
 	@Override
-	public long getSentSurveyCount(String columnName, long columnValue) {
+	public long getSentSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() started.");
-		Query query;
-		if (columnName == null) {
-			query = null;
-		}
-		else {
+		Date startDate = getNdaysBackDate(noOfDays);
+
+		Query query = new Query();
+		if (columnName != null) {
 			query = new Query(Criteria.where(columnName).is(columnValue));
 		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
 		LOG.info("Method to get count of total number of surveys sent so far, getSentSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
+	}
+
+	// This method returns all the surveys that have been clicked by customers so far.
+	// If columnName field is passed null value it returns count of all the survey.
+	// "columnName" field can contain either of "agentId/branchId/regionId/companyId".
+	// "columnValue" field can contain respective values for the columnName.
+
+	@Override
+	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays) {
+		LOG.info("Method to get count of total number of surveys clicked so far, getClickedSurveyCount() started.");
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(noOfDays);
+		Query query = new Query(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true));
+		query.addCriteria(Criteria.where("surveyResponse").size(0));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
+		LOG.info("Method to get count of total number of surveys clicked so far, getClickedSurveyCount() finished.");
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// This method returns all the surveys that have been completed by customers so far.
@@ -197,14 +222,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// "columnValue" field can contain respective values for the columnName.
 
 	@Override
-	public long getCompletedSurveyCount(String columnName, long columnValue) {
+	public long getCompletedSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() started.");
-		Query query = new Query(Criteria.where("stage").is(CommonConstants.SURVEY_STAGE_COMPLETE));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(noOfDays);
+		Query query = new Query(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to get count of total number of surveys completed so far, getCompletedSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// This method returns all the surveys that are not yet completed by customers.
@@ -213,14 +241,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	// "columnValue" field can contain respective values for the columnName.
 
 	@Override
-	public long getIncompleteSurveyCount(String columnName, long columnValue) {
+	public long getIncompleteSurveyCount(String columnName, long columnValue, int noOfDays) {
 		LOG.info("Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() started.");
-		Query query = new Query(Criteria.where("stage").ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(noOfDays);
+		Query query = new Query(Criteria.where(CommonConstants.STAGE_COLUMN).ne(CommonConstants.SURVEY_STAGE_COMPLETE));
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to get count of surveys which are not yet completed, getIncompleteSurveyCount() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// This method returns a map of customers count based upon their mood.
@@ -320,7 +351,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
 		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
 		LOG.info("Method to get count of total number of surveys taken in a given month and year, getTotalSurveyCountByMonth() finished.");
-		return mongoTemplate.count(query, SurveyDetails.class);
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	@Override
@@ -328,14 +359,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
 				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
-		Calendar calendar = Calendar.getInstance();
-		Date endDate = calendar.getTime();
-		calendar.add(5, noOfDays * (-1));
-		Date startDate = calendar.getTime();
-		if (noOfDays == -1) {
-			calendar.setTimeInMillis(0);
-			startDate = calendar.getTime();
-		}
+		Date startDate = getNdaysBackDate(noOfDays);
+		Date endDate = Calendar.getInstance().getTime();
 
 		Query query = new Query();
 
@@ -397,7 +422,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				.is(columnValue)
 				.andOperator(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate),
 						Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)));
-		long count = mongoTemplate.count(query, SurveyDetails.class);
+		long count = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 		if (count < 3) {
 			LOG.info(columnName + " " + columnValue + " does not qualify for calculation of rating. Returning...");
 			return -1;
@@ -418,30 +443,20 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 
 	// Method to get count of posts shared by customers on various social networking sites for
 	// "agent/branch/region/company/all".
-	// Returns a map of Social Networking Site and posts count on that site.
+	// Returns posts count on that site.
 
 	@Override
-	public Map<String, Long> getSocialPostsCount(String columnName, long columnValue) {
+	public long getSocialPostsCount(String columnName, long columnValue, int numberOfDays) {
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() started.");
-		TypedAggregation<SurveyDetails> aggregation;
-		if (columnName == null) {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation
-					.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
+		Date endDate = Calendar.getInstance().getTime();
+		Date startDate = getNdaysBackDate(numberOfDays);
+		Query query = new Query(Criteria.where("sharedOn").exists(true));
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
-		else {
-			aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(columnName).is(columnValue)),
-					Aggregation.unwind(CommonConstants.SHARED_ON_COLUMN), Aggregation.group(CommonConstants.SHARED_ON_COLUMN).count().as("count"));
-		}
-		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
-		Map<String, Long> postCountSplit = new HashMap<>();
-		if (result != null) {
-			@SuppressWarnings("unchecked") List<BasicDBObject> postsCount = (List<BasicDBObject>) result.getRawResults().get("result");
-			for (BasicDBObject post : postsCount) {
-				postCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
-			}
-		}
+		query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate).lte(endDate));
 		LOG.info("Method to count number of social posts by customers, getSocialPostsCount() finished.");
-		return postCountSplit;
+		return mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);
 	}
 
 	// Method to get count of surveys initiated by customers and agents separately.
@@ -490,7 +505,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
 
-
 		/**
 		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
 		 * are to be fetched else fetch all the records
@@ -511,7 +525,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			query.limit(rows);
 		}
 
-		query.with(new Sort(Sort.Direction.DESC, CommonConstants.UPDATED_ON));
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.SCORE_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 
@@ -531,7 +545,6 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 * fetching only completed surveys
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
-
 
 		/**
 		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
@@ -553,5 +566,417 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		LOG.info("Method getFeedBacksCount executed successfully.Returning feedBackCount:" + feedBackCount);
 		return feedBackCount;
 	}
+
+	/*
+	 * Returns a list of survey which are not yet competed by customers.Sorted on date (
+	 * descending). ColumnName can be "agentId/branchId/regionId/companyId". ColumnValue should be
+	 * value for respective column. limitScore is the max score under which reviews have to be shown
+	 */
+
+	@Override
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+		LOG.info("Method to fetch all the incomplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() started.");
+		Query query = new Query();
+		if (columnName != null) {
+			query.addCriteria(Criteria.where(columnName).is(columnValue));
+		}
+		if (startScore > 0 && limitScore > 0) {
+			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
+		}
+		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).ne(CommonConstants.SURVEY_STAGE_COMPLETE));
+		if (start > -1) {
+			query.skip(start);
+		}
+		if (rows > -1) {
+			query.limit(rows);
+		}
+		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
+		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
+
+		LOG.info("Method to fetch all the incoplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() finished.");
+		return surveysWithReviews;
+	}
+
+	/*
+	 * Method to increase reminder count by 1.
+	 */
+	@Override
+	public void updateReminderCount(long agentId, String customerEmail) {
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.inc(CommonConstants.REMINDER_COUNT_COLUMN, 1);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
+	}
+
+	/*
+	 * Method to get count of clicked surveys based upon criteria(Weekly/Monthly/Yearly)
+	 */
+	@Override
+	public Map<String, Long> getClickedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+		LOG.info("Method to get");
+		TypedAggregation<SurveyDetails> aggregation;
+		Date endDate = new Date();
+		int numberOfPastDaysToConsider = 7;
+		String criteriaColumn = "";
+		switch (groupByCriteria) {
+			case "weekly":
+				numberOfPastDaysToConsider = 7;
+				criteriaColumn = "dayOfMonth";
+				break;
+			case "monthly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteriaColumn = "week";
+				break;
+			case "yearly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+				criteriaColumn = "month";
+				break;
+		}
+		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
+				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true)), Aggregation.match(Criteria.where(
+				columnName).is(columnValue)), Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN)
+				.ne(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)),
+				Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(modifiedOn)").as("groupCol"), Aggregation
+						.group("groupCol").count().as("count"));
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+		Map<String, Long> clickedSurveys = new LinkedHashMap<>();
+		if (result != null) {
+
+			if (criteriaColumn.equals("dayOfMonth")) {
+				Date currDate = new Date();
+				int reductionInDate = 1;
+				for (int i = 0; i < 7; i++) {
+					clickedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					currDate = getNdaysBackDate(++reductionInDate);
+				}
+			}
+			else if (criteriaColumn.equals("week")) {
+				Date currDate = new Date();
+				int reductionInDate = 0;
+				for (int i = 0; i < 4; i++) {
+					clickedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					reductionInDate += 7;
+					currDate = getNdaysBackDate(reductionInDate);
+				}
+			}
+			else if (criteriaColumn.equals("month")) {
+				for (int i = 0; i < 12; i++) {
+					clickedSurveys.put(getMonthAsString(i).toString(), 0l);
+				}
+			}
+			Calendar calendar = Calendar.getInstance();
+			@SuppressWarnings("unchecked") List<BasicDBObject> clicked = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject clickedSurvey : clicked) {
+				if (criteriaColumn == "dayOfMonth") {
+					for (String date : clickedSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get("_id").toString()))
+							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
+					}
+				}
+				if (criteriaColumn == "week") {
+					for (String date : clickedSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(clickedSurvey.get("_id").toString())+1)
+							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
+					}
+				}
+				if (criteriaColumn == "month")
+					for (String date : clickedSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get("_id").toString()))
+							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
+					}
+			}
+		}
+		return clickedSurveys;
+	}
+
+	/*
+	 * Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly)
+	 */
+	@Override
+	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+		LOG.info("Method to get");
+		TypedAggregation<SurveyDetails> aggregation;
+		Date endDate = new Date();
+		int numberOfPastDaysToConsider = 7;
+		String criteriaColumn = "";
+		switch (groupByCriteria) {
+			case "weekly":
+				numberOfPastDaysToConsider = 7;
+				criteriaColumn = "dayOfMonth";
+				break;
+			case "monthly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteriaColumn = "week";
+				break;
+			case "yearly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+				criteriaColumn = "month";
+				break;
+		}
+		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
+				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria
+				.where(columnName).is(columnValue)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
+				.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol").count()
+				.as("count"));
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+		Map<String, Long> sentSurveys = new LinkedHashMap<>();
+		if (result != null) {
+			
+			if (criteriaColumn.equals("dayOfMonth")) {
+				Date currDate = new Date();
+				int reductionInDate = 1;
+				for (int i = 0; i < 7; i++) {
+					sentSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					currDate = getNdaysBackDate(++reductionInDate);
+				}
+			}
+			else if (criteriaColumn.equals("week")) {
+				Date currDate = new Date();
+				int reductionInDate = 0;
+				for (int i = 0; i < 4; i++) {
+					sentSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					reductionInDate += 7;
+					currDate = getNdaysBackDate(reductionInDate);
+				}
+			}
+			else if (criteriaColumn.equals("month")) {
+				for (int i = 0; i < 12; i++) {
+					sentSurveys.put(getMonthAsString(i).toString(), 0l);
+				}
+			}
+			Calendar calendar = Calendar.getInstance();
+			@SuppressWarnings("unchecked") List<BasicDBObject> sent = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject sentSurvey : sent) {
+				if (criteriaColumn == "dayOfMonth") {
+					for (String date : sentSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+					}
+				}
+				if (criteriaColumn == "week") {
+					for (String date : sentSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get("_id").toString())+1)
+							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+					}
+				}
+				if (criteriaColumn == "month")
+					for (String date : sentSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+					}
+			}
+		}
+		return sentSurveys;
+	}
+
+	/*
+	 * Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly)
+	 */
+	@Override
+	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+		LOG.info("Method to get");
+		TypedAggregation<SurveyDetails> aggregation;
+		Date endDate = new Date();
+		int numberOfPastDaysToConsider = 7;
+		String criteriaColumn = "";
+		switch (groupByCriteria) {
+			case "weekly":
+				numberOfPastDaysToConsider = 7;
+				criteriaColumn = "dayOfMonth";
+				break;
+			case "monthly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteriaColumn = "week";
+				break;
+			case "yearly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+				criteriaColumn = "month";
+				break;
+		}
+		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, 
+				Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE)), 
+				Aggregation.match(Criteria.where(columnName).is(columnValue)), 
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lt(endDate)), 
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), 
+				Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
+				.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), 
+				Aggregation.group("groupCol").count().as("count"));
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+		Map<String, Long> completedSurveys = new LinkedHashMap<>();
+		if (result != null) {
+			if (criteriaColumn.equals("dayOfMonth")) {
+				Date currDate = new Date();
+				int reductionInDate = 1;
+				for (int i = 0; i < 7; i++) {
+					completedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					currDate = getNdaysBackDate(++reductionInDate);
+				}
+			}
+			else if (criteriaColumn.equals("week")) {
+				Date currDate = new Date();
+				int reductionInDate = 0;
+				for (int i = 0; i < 4; i++) {
+					completedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					reductionInDate += 7;
+					currDate = getNdaysBackDate(reductionInDate);
+				}
+			}
+			else if (criteriaColumn.equals("month")) {
+				for (int i = 0; i < 12; i++) {
+					completedSurveys.put(getMonthAsString(i).toString(), 0l);
+				}
+			}
+			Calendar calendar = Calendar.getInstance();
+			@SuppressWarnings("unchecked") List<BasicDBObject> completed = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject completedSurvey : completed) {
+				if (criteriaColumn == "dayOfMonth")
+					for (String date : completedSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get("_id").toString()))
+							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
+					}
+				if (criteriaColumn == "week") {
+					for (String date : completedSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(completedSurvey.get("_id").toString())+1)
+							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
+					}
+				}
+				if (criteriaColumn == "month")
+					for (String date : completedSurveys.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get("_id").toString()))
+							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
+					}
+			}
+		}
+		return completedSurveys;
+	}
+
+	/*
+	 * Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly)
+	 */
+	@Override
+	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
+		LOG.info("Method to get");
+		TypedAggregation<SurveyDetails> aggregation;
+		Date endDate = new Date();
+		int numberOfPastDaysToConsider = 7;
+		String criteriaColumn = "";
+		switch (groupByCriteria) {
+			case "weekly":
+				endDate = getNdaysBackDate(7);
+				numberOfPastDaysToConsider = 7;
+				criteriaColumn = "dayOfMonth";
+				break;
+			case "monthly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_WEEK));
+				numberOfPastDaysToConsider = 30 + Calendar.getInstance().get(Calendar.DAY_OF_WEEK);
+				criteriaColumn = "week";
+				break;
+			case "yearly":
+				endDate = getNdaysBackDate(Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+				numberOfPastDaysToConsider = 365 + Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+				criteriaColumn = "month";
+				break;
+		}
+		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.SHARED_ON_COLUMN)
+				.exists(true)), Aggregation.match(Criteria.where(columnName).is(columnValue)), Aggregation.match(Criteria.where(
+				CommonConstants.MODIFIED_ON_COLUMN).lt(endDate)),
+				Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation
+						.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")")
+						.as("groupCol"), Aggregation.group("groupCol").count().as("count"));
+
+		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);
+		Map<String, Long> socialPosts = new LinkedHashMap<>();
+		if (result != null) {
+				if (criteriaColumn.equals("dayOfMonth")) {
+					Date currDate = new Date();
+					int reductionInDate = 1;
+					for (int i = 0; i < 7; i++) {
+						socialPosts.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+						currDate = getNdaysBackDate(++reductionInDate);
+					}
+				}
+				else if (criteriaColumn.equals("week")) {
+					Date currDate = new Date();
+					int reductionInDate = 0;
+					for (int i = 0; i < 4; i++) {
+						socialPosts.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+						reductionInDate += 7;
+						currDate = getNdaysBackDate(reductionInDate);
+					}
+				}
+				else if (criteriaColumn.equals("month")) {
+					for (int i = 0; i < 12; i++) {
+						socialPosts.put(getMonthAsString(i).toString(), 0l);
+					}
+				}
+				Calendar calendar = Calendar.getInstance();
+			@SuppressWarnings("unchecked") List<BasicDBObject> sent = (List<BasicDBObject>) result.getRawResults().get("result");
+			for (BasicDBObject sentSurvey : sent) {
+				if (criteriaColumn == "dayOfMonth")
+					for (String date : socialPosts.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+					}
+				if (criteriaColumn == "week") {
+					for (String date : socialPosts.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get("_id").toString())+1)
+							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+					}
+				}
+				if (criteriaColumn == "month")
+					for (String date : socialPosts.keySet()) {
+						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
+					}
+			}
+		}
+		return socialPosts;
+	}
+
+	private Date getNdaysBackDate(int noOfDays) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.add(Calendar.DATE, noOfDays * (-1));
+		Date startDate = calendar.getTime();
+		return startDate;
+	}
+
+	private String getMonthAsString(int monthInt) {
+		String month = "Invalid Month";
+		DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
+		month = dateFormatSymbols.getMonths()[monthInt];
+		return month;
+	}
+
 	// JIRA SS-137 and 158 : EOC
 }

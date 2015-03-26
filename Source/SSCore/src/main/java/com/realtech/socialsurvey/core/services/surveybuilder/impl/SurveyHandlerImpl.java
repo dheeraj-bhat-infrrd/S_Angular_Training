@@ -66,7 +66,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Transactional
 	public SurveyDetails storeInitialSurveyDetails(long agentId,
 			String customerEmail, String firstName, String lastName,
-			int reminderCount, String custRelationWithAgent)
+			int reminderCount, String custRelationWithAgent, String url)
 			throws SolrException, NoRecordsFetchedException,
 			SolrServerException, InvalidInputException {
 
@@ -91,15 +91,17 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyDetails.setAgentId(agentId);
 		surveyDetails.setAgentName(agentName);
 		surveyDetails.setBranchId(branchId);
-		surveyDetails.setCustomerName(firstName + " " + lastName);
+		surveyDetails.setCustomerFirstName(firstName);
+		surveyDetails.setCustomerLastName(lastName);
 		surveyDetails.setCompanyId(companyId);
 		surveyDetails.setCustomerEmail(customerEmail);
 		surveyDetails.setRegionId(regionId);
 		surveyDetails.setStage(CommonConstants.INITIAL_INDEX);
 		surveyDetails.setReminderCount(reminderCount);
-		surveyDetails.setUpdatedOn(new Date());
+		surveyDetails.setModifiedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
 		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
+		surveyDetails.setUrl(url);
 		SurveyDetails survey = surveyDetailsDao
 				.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
@@ -163,6 +165,25 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email finished.");
 		return surveyDetails;
 	}
+	
+	/*
+	 * Method to update a survey as clicked when user triggers the survey and page of the first question starts loading. 
+	 */
+	public void updateSurveyAsClicked(long agentId, String customerEmail){
+		LOG.info("Method updateSurveyAsClicked() to mark the survey as clicked, started");
+		surveyDetailsDao.updateSurveyAsClicked(agentId, customerEmail);
+		LOG.info("Method updateSurveyAsClicked() to mark the survey as clicked, finished");
+	}
+	
+	/*
+	 * Method to increase reminder count by 1. This method is called every time a reminder mail is sent to the customer.
+	 */
+	@Override
+	public void updateReminderCount(long agentId, String customerEmail){
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() started.");
+		surveyDetailsDao.updateReminderCount(agentId, customerEmail);
+		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
+	}
 
 	@Override
 	public String getApplicationBaseUrl() {
@@ -197,16 +218,6 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 					e);
 			throw e;
 		}
-	}
-
-	/*
-	 * Method to update a survey as clicked when user triggers the survey and
-	 * page of the first question starts loading.
-	 */
-	public void updateSurveyAsClicked(long agentId, String customerEmail) {
-		LOG.info("Method updateSurveyAsClicked() to mark the survey as clicked, started");
-		surveyDetailsDao.updateSurveyAsClicked(agentId, customerEmail);
-		LOG.info("Method updateSurveyAsClicked() to mark the survey as clicked, finished");
 	}
 }
 // JIRA SS-119 by RM-05:EOC

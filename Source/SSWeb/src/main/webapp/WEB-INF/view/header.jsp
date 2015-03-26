@@ -1,8 +1,11 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+<!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -16,14 +19,16 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.css">
+	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
-	</div>
-	<div class="overlay-loader hide"></div>
-	<div class="overlay-payment hide"></div>
-
+    </div>
+    <div class="overlay-payment hide" id="outer-payment"></div>
+    <div class="overlay-loader hide"></div>
+    
 	<div id="overlay-main" class="overlay-main hide">
 		<div class="overlay-disable-wrapper">
 			<div id="overlay-header" class="ol-header">
@@ -53,19 +58,19 @@
 		<div class="header-slider">
 			<div id="header-links-slider" class="header-links header-links-slider float-left clearfix">
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 2 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a>
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 1}">
+				<c:if test="${highestrole == 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId != 5}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1 && highestrole != 4}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId > 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId <5 && highestrole != 4}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
@@ -101,21 +106,23 @@
 			<div class="float-left hdr-logo"></div>
 			<div class="float-left hdr-links clearfix">
 				<div class="hdr-link-item hdr-link-active">
-					<a href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
+					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
 				</div>
-				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3) && highestrole == 1}">
+				<c:if test="${(user.company.licenseDetails[0].accountsMaster.accountsMasterId == 2 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 3 || user.company.licenseDetails[0].accountsMaster.accountsMasterId == 4) && (highestrole == 1 || highestrole == 2 || highestrole == 3)}">
 					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.company.key" /></a>
+						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 1}">
+				<c:if test="${highestrole == 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId != 5}">
 					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
+								code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId != 1 && highestrole != 4}">
+				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId > 1 && user.company.licenseDetails[0].accountsMaster.accountsMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
+						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
+								code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
 			</div>
@@ -142,7 +149,11 @@
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
-<!--						<a class="initial-dd-item" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>-->
+						<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId == 5}">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradetopaidplanpage.do')">
+								<spring:message	code="label.header.upgrade.key" />
+							</div>
+						</c:if>
 					</div>
 				</div>
                 <div class="float-left user-info-sing-out">

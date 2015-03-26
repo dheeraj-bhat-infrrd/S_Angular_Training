@@ -166,6 +166,10 @@ a, a:hover, a:visited{
     line-height: 33px;
 }
 
+.txt-header-small{
+    font-size: 18px;
+}
+
 .index-body {
     background: url(../images/bg-main.png) no-repeat center;
     background-size: cover;
@@ -223,6 +227,11 @@ a, a:hover, a:visited{
 
 .c-pic-bot-3 {
     background: url(../images/Person4.png) no-repeat center;
+    background-size: cover;
+}
+
+.c-pic-bot-4 {
+    background: url(../images/Person5.png) no-repeat center;
     background-size: cover;
 }
 
