@@ -44,30 +44,27 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	}
 });
 
-$('.prof-edditable').hover(
-	function(){
-		$(this).next('.lp-edit-locks').show();
-	},
-	function(){
-		$(this).next('.lp-edit-locks').hide();
-	}
-);
-$('.prof-edditable-sin').hover(
-	function(){
-		$(this).next('.lp-edit-locks').show();
-	},
-	function(){
-		$(this).next('.lp-edit-locks').hide();
-	}
-);
-$('#prof-logo').hover(
-	function(){
-		$(this).prev('.prof-img-lock').show();
-	},
-	function(){
-		$(this).prev('.prof-img-lock').hide();
-	}
-);
+// On hover for lock icons
+$(document).on('mouseover', '#prof-logo-container', function(e) {
+	$(this).find('.prof-img-lock:first').show();
+});
+$(document).on('mouseout', '#prof-logo-container', function(e) {
+	$(this).find('.prof-img-lock:first').hide();
+});
+
+$(document).on('mouseover', '#prof-name-container', function(e) {
+	$(this).find('.lp-edit-locks:first').show();
+});
+$(document).on('mouseout', '#prof-name-container', function(e) {
+	$(this).find('.lp-edit-locks:first').hide();
+});
+
+$(document).on('mouseover', '.lp-con-row', function(e) {
+	$(this).find('.lp-edit-locks:first').show();
+});
+$(document).on('mouseout', '.lp-con-row', function(e) {
+	$(this).find('.lp-edit-locks:first').hide();
+});
 
 
 // Lock Settings

@@ -114,7 +114,7 @@
 			</div>
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
-					<div class="float-left lp-edit-wrapper clearfix float-left">
+					<div id="prof-name-container" class="float-left lp-edit-wrapper clearfix float-left">
 						<c:choose>
 							<c:when	test="${parentLock.isDisplayNameLocked && not user.agent}">
 								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
@@ -196,7 +196,7 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
 							<form class="form_contact_image" enctype="multipart/form-data">
 								<input type="file" id="prof-logo" class="con_img_inp_file">
 							</form>
