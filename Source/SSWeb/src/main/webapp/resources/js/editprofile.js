@@ -71,20 +71,17 @@ $(document).on('mouseout', '.lp-con-row', function(e) {
 $(document).on('click', '.lp-edit-locks', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
-	// var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if ($(this).attr('data-control') == 'user') {
 		if($(this).hasClass('lp-edit-locks-locked')) {
 			$(this).removeClass('lp-edit-locks-locked');
 			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-			//$("#" + fieldId).attr("readonly", false);
 			
 		} else {
 			$(this).addClass('lp-edit-locks-locked');
 			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
-			//$("#" + fieldId).attr("readonly", true);
 		}
 	} else {
 		$('#overlay-toast').html("Settings locked by Admin");
@@ -95,20 +92,17 @@ $(document).on('click', '.lp-edit-locks', function(e) {
 $(document).on('click', '.prof-img-lock-item', function(e) {
 	e.stopImmediatePropagation();
 	var lockId = $(this).attr("id");
-	// var fieldId = lockId.substr(0, lockId.lastIndexOf("-lock"));
 
 	if ($(this).attr('data-control') == 'user') {
 		if($(this).hasClass('prof-img-lock-locked')) {
 			$(this).removeClass('prof-img-lock-locked');
 			$(this).attr('data-state', 'unlocked');
 			updateLockSettings(lockId, false);
-			// $("#" + fieldId).attr("disabled", false);
 
 		} else {
 			$(this).addClass('prof-img-lock-locked');
 			$(this).attr('data-state', 'locked');
 			updateLockSettings(lockId, true);
-			// $("#" + fieldId).attr("disabled", true);
 		}
 	} else {
 		$('#overlay-toast').html("Settings locked by Admin");
