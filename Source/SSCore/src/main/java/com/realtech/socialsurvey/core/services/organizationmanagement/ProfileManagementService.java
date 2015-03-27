@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
@@ -151,6 +152,15 @@ public interface ProfileManagementService {
 	public List<AgentSettings> getIndividualsByBranchId(long branchId) throws InvalidInputException;
 
 	/**
+	 * Method to fetch all users for the list of branches specified
+	 * 
+	 * @param branchIds
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<AgentSettings> getIndividualsByBranchIds(Set<Long> branchIds) throws InvalidInputException;
+
+	/**
 	 * Method to fetch all users under the specified region of specified company
 	 * 
 	 * @param companyProfileName
@@ -171,6 +181,16 @@ public interface ProfileManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public List<AgentSettings> getIndividualsByRegionId(long regionId) throws InvalidInputException, NoRecordsFetchedException;
+
+	/**
+	 * Method to fetch all users under the specified list of regions
+	 * 
+	 * @param regionIds
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 */
+	public List<AgentSettings> getIndividualsByRegionIds(Set<Long> regionIds) throws InvalidInputException, NoRecordsFetchedException;
 
 	/**
 	 * Method to fetch all individuals directly linked to a company
@@ -290,7 +310,7 @@ public interface ProfileManagementService {
 			throws InvalidInputException, UndeliveredEmailException;
 
 	public void updateEmailVerificationStatus(String urlParamsStr) throws InvalidInputException;
-	
+
 	/**
 	 * Method to fetch reviews based on the profile level specified, iden is one of
 	 * agentId/branchId/regionId or companyId based on the profile level

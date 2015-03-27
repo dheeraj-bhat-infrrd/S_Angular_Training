@@ -11,15 +11,21 @@
 		        <input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
 		        <div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 		        	<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
-		            <div data-assign-to-option="region" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
-		            <div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+		            <c:if test="${highestrole == 1 || highestrole == 2}">
+		            	<div data-assign-to-option="region" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
+		            </c:if>
+		            <c:if test="${highestrole == 1}">
+		            	<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+		            </c:if>
 		        </div>
 	        </c:when>
 	        <c:when test="${accountType == 'Company'}">
 		    	<input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
 	        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	        		<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
-	            	<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+	            	<c:if test="${highestrole == 1}">
+	            		<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+	            	</c:if>
 	        	</div>
 		    </c:when>
 		    <c:when test="${accountType == 'Team'}">
@@ -88,7 +94,7 @@
 	    <div class="float-left bd-frm-right">
 	        <div class="bd-frm-check-wrapper clearfix">
 	            <div class="float-left bd-check-img"></div>
-	            <input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
+	            <input type="hidden" name="isAdmin" value="true" id="is-admin-chk" class="ignore-clear">
 	            <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
 	        </div>
 	    </div>

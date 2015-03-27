@@ -522,13 +522,13 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 }
 
 .footer-main-wrapper {
-    height: 78px;
+    height: 55px;
     background-color: #F9F9FB;
     border-top: 1px solid #dcdcdc;
 }
 
 .footer-text {
-    line-height: 78px;
+    line-height: 55px;
     color: #888;
     font-size: 12px;
 }
@@ -4460,6 +4460,13 @@ button.paypal.is-active {
     width: 50%;
 }
 
+.v-tbl-icn-disabled {
+    cursor: auto;
+    opacity: 0.3;
+    height: 39px;
+    width: 50%;
+}
+
 .hm-header-right {
     background-color: #009FE0;
     color: #fff;
@@ -4703,6 +4710,7 @@ tr.u-tbl-row td {
 
 .v-um-tbl {
     width: 100%;
+    margin-bottom: 50px;
 }
 
 tr.u-tbl-header td {
@@ -4813,7 +4821,8 @@ tr.u-tbl-header td {
 }
 
 .v-edt-tbl-icn {
-    min-height: 40px;
+    cursor: pointer;
+	min-height: 40px;
 }
 
 .v-edt-tbl-switch {
@@ -5027,11 +5036,15 @@ tr.u-tbl-header td {
     font-size: 16px;
 }
 
-.bd-srv-tbl-row {
+.bd-srv-tbl-row, .vs-srv-tbl-row {
     line-height: 55px;
 }
 
 .bd-srv-tbl-row:nth-child(even){
+    background-color: #F9F9FB;
+}
+
+.vs-srv-tbl-row:nth-child(even){
     background-color: #F9F9FB;
 }
 
@@ -5045,7 +5058,7 @@ tr.u-tbl-header td {
 
 .srv-tbl-txt {
     font-size: 16px;
-    margin-left: 8px;
+/*    margin-left: 8px;*/
     margin-right: 10px;
     width: 884px;
     display: table-cell;
@@ -5053,6 +5066,10 @@ tr.u-tbl-header td {
     line-height: 28px;
     padding-top: 14px;
     padding-bottom: 13px;
+    height: 55px;
+    float: none !important;
+    padding: 0;
+    line-height: normal;
 }
 
 .srv-tbl-chk {
@@ -5072,6 +5089,19 @@ tr.u-tbl-header td {
 }
 
 .srv-tbl-num span {
+    display: inline-block;
+    height: 40px;
+    width: 40px;
+    background-color: #E1E1E1;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 40px;
+    margin-top: 8px;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.vs-tbl-num span {
     display: inline-block;
     height: 40px;
     width: 40px;
@@ -5457,4 +5487,43 @@ tr.u-tbl-header td {
 }
 .tweet-panel-left-adj {
     margin-bottom: -15px;
+}
+
+.vs-q-wrapper {
+    margin: 10px 0 30px;
+}
+
+.vs-ans-row {
+    clear: both;
+    line-height: 22px;
+}
+
+.float-left.vs-ans-lbl {
+    margin-left: 60px;
+    margin-right: 10px;
+}
+
+.float-left.vs-ans-txt {
+    width: 885px;
+}
+
+.vs-srv-tbl-row.clearfix {
+    padding-bottom: 10px;
+}
+.vs-ans-icn {
+    width: 40px !important;
+    height: 40px !important;
+}
+
+.vs-ans-icn-smiley {
+    background: url(../images/happy.png) no-repeat center;
+}
+
+.vs-ans-icn-star {
+    background: url(../images/full-star.png) no-repeat center;
+}
+
+.paginate-button {
+    cursor: pointer;
+	color: #5CC8EF;
 }

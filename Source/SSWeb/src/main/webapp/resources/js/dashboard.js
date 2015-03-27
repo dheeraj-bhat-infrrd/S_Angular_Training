@@ -144,7 +144,6 @@ function showCompanyAdminFlow(accountType) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-//	$("#dsh-srch-survey-div").hide();
 	bindSelectButtons();
 
 	populateSurveyStatisticsList("companyId");
@@ -162,7 +161,6 @@ function showRegionAdminFlow(accountType, regionId) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-	$("#dsh-srch-survey-div").hide();
 	bindSelectButtons();
 
 	populateSurveyStatisticsList("regionId");
@@ -181,6 +179,7 @@ function showBranchAdminFlow(accountType, branchId) {
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
+	$("#dsh-grph-srch-survey-div").hide();
 	bindSelectButtons();
 
 	populateSurveyStatisticsList("branchId");
@@ -199,7 +198,7 @@ function showAgentFlow() {
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
-
+	$("#dsh-grph-srch-survey-div").hide();
 	showSurveyCount("agentId", 0, 30);
 	showSurveyStatisticsGraphically("agentId", 0);
 }
@@ -377,45 +376,45 @@ function paintSurveyStatistics(data) {
 	sentSurveyDiv += " <div id='survey-sent' class='float-left stat-icn-txt-rt'></div>";
 	$('#all-surv-icn').html(sentSurveyDiv);
 	$("#survey-sent").html(sentSurveyCount);
-
-	var prcntForClicked = parseInt(data.responseJSON.clickedSurvey) * 100
-			/ sentSurveyCount;
-	if (isNaN(prcntForClicked))
-		prcntForClicked = 0;
-	prcntForClicked = Math.round(prcntForClicked);
-	var icnForClicked = prcntForClicked * 20 / 100;
+	var clicked = 0;
+	clicked = parseInt(data.responseJSON.clickedSurvey);
+	if (isNaN(clicked)){
+		clicked = 0;
+	}
+	var icnForClicked = clicked * 20 / sentSurveyCount;
+	icnForClicked = Math.round(icnForClicked);
 	for (var i = 0; i < parseInt(icnForClicked); i++) {
 		clickedSurveyDiv += "<div class='float-left stat-icn-img stat-icn-img-blue'></div>";
 	}
 	clickedSurveyDiv += "<div id='survey-clicked' class='float-left stat-icn-txt-rt'></div>";
 	$("#clicked-surv-icn").html(clickedSurveyDiv);
-	$("#survey-clicked").html(prcntForClicked + "%");
+	$("#survey-clicked").html(clicked);
 
-	var prcntForCompleted = parseInt(data.responseJSON.completedSurvey) * 100
-			/ sentSurveyCount;
-	if (isNaN(prcntForCompleted))
-		prcntForCompleted = 0;
-	prcntForCompleted = Math.round(prcntForCompleted);
-	var icnForCompleted = prcntForCompleted * 20 / 100;
+	var completed = parseInt(data.responseJSON.completedSurvey);
+	if (isNaN(completed))
+		completed = 0;
+	var icnForCompleted = completed * 20 / sentSurveyCount;
+	icnForCompleted = Math.round(icnForCompleted);
 	for (var i = 0; i < parseInt(icnForCompleted); i++) {
 		completedSurveyDiv += '<div class="float-left stat-icn-img stat-icn-img-yellow"></div>';
 	}
 	completedSurveyDiv += "<div id='survey-completed' class='float-left stat-icn-txt-rt'></div>";
 	$("#completed-surv-icn").html(completedSurveyDiv);
-	$("#survey-completed").html(prcntForCompleted + "%");
-
-	var prcntForSocialPosts = parseInt(data.responseJSON.socialPosts) * 100
-			/ sentSurveyCount;
-	if (isNaN(prcntForSocialPosts))
-		prcntForSocialPosts = 0;
-	prcntForSocialPosts = Math.round(prcntForSocialPosts);
-	var icnForSocialPosts = prcntForSocialPosts * 20 / 100;
+	$("#survey-completed").html(completed);
+	
+	var socialPosts = 0;
+	socialPosts = parseInt(data.responseJSON.socialPosts);
+	if (isNaN(socialPosts)){
+		socialPosts = 0;
+	}
+	var icnForSocialPosts = socialPosts * 20 / sentSurveyCount;
+	icnForSocialPosts = Math.round(icnForSocialPosts);
 	for (var i = 0; i < parseInt(icnForSocialPosts); i++) {
 		socialPostsDiv += '<div class="float-left stat-icn-img stat-icn-img-red"></div>';
 	}
 	socialPostsDiv += '<div id="social-posts" class="float-left stat-icn-txt-rt"></div>';
 	$("#social-post-icn").html(socialPostsDiv);
-	$("#social-posts").html(prcntForSocialPosts + "%");
+	$("#social-posts").html(socialPosts);
 }
 
 function showSurveyGraph(columnName, columnValue, format) {
@@ -602,13 +601,25 @@ function paintProfileDetails(data) {
 	if (data.responseJSON.company != undefined)
 		$("#company").html(data.responseJSON.company);
 	$("#socl-post").html(data.responseJSON.socialPosts);
-	circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
+	if((parseInt(data.responseJSON.socialPosts) / maxSocialPosts)>1)
+		circle1.animate(1);
+	else
+		circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
 	$("#srv-snt-cnt").html(data.responseJSON.surveyCount);
-	circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
+	if((parseInt(data.responseJSON.surveyCount) / maxSurveySent)>1)
+		circle2.animate(1);
+	else
+		circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
 	$("#srv-scr").html(data.responseJSON.socialScore + "/5");
-	circle3.animate(parseInt(data.responseJSON.socialScore) / 5);
+	if((parseInt(data.responseJSON.socialScore) / 5)>1)
+		circle3.animate(1);
+	else
+		circle3.animate(parseInt(data.responseJSON.socialScore) / 5);
 	var profileCompleted = parseInt(data.responseJSON.profileCompleteness);
-	circle4.animate(profileCompleted / 100);
+	if((profileCompleted / 100)>1)
+		circle4.animate(1);
+	else
+		circle4.animate(profileCompleted / 100);
 
 	$("#pro-cmplt-stars").find('.dsh-star-item').removeClass('sq-full-star');
 	var starVal = profileCompleted * 5 / 100;

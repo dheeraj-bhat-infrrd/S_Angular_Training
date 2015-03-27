@@ -120,6 +120,9 @@ public interface UserManagementService {
 	// Method to update status of the given user as active or inactive.
 	public void updateUser(User admin, long userIdToUpdate, boolean isActive) throws InvalidInputException;
 
+	// Method to update status of the given user profile as active or inactive.
+	public void updateUserProfile(User admin, long profileIdToUpdate, int status) throws InvalidInputException;
+
 	/*
 	 * Sends an email to user with the link to complete registration. User has to provide password
 	 * to set. Also, user can choose to change name.
