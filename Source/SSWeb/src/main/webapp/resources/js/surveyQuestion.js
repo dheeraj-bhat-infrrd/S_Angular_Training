@@ -15,6 +15,8 @@ var stage;
 var isSmileTypeQuestion;
 var swearWords = [];
 var isAbusive;
+var autoPost;
+var autoPostScore = 3;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -39,7 +41,6 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 		"relationship" : relationship
 	};
 	$.ajax({
-		// TODO provide mapping
 		url : "./../triggersurvey",
 		type : "GET",
 		dataType : "JSON",
@@ -67,6 +68,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 }
 
 function paintSurveyPage(jsonData) {
+	$("#pst-srvy-div").hide();
 	questions = jsonData.responseJSON.survey;
 	stage = jsonData.responseJSON.stage;
 	if (stage != undefined)
@@ -90,6 +92,7 @@ function paintSurveyPageFromJson() {
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
+	question.replace(/[name]/gi, agentName);
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (questionType == "sb-range-star") {
@@ -196,7 +199,7 @@ function storeCustomerAnswer(customerResponse) {
 	});
 }
 
-function updateCustomeResponse(feedback) {
+function updateCustomerResponse(feedback) {
 	isAbusive = false;
 	var feedbackArr = feedback.split(" ");
 	for (var i = 0; i < feedbackArr.length; i++) {
@@ -232,6 +235,20 @@ function showFeedbackPage(mood) {
 	case "happy":
 		question = "Please share your kind words about us!";
 		$("#ques-text-textarea").html(question);
+		var currResponse = 0;
+		var counter = 0;
+		for(var i=0;i<questions.length;i++){
+			var currQuestion = questions[i];
+			if((currQuestion.questionType=='sb-range-smiles')||(currQuestion.questionType=='sb-range-scale')
+					||(currQuestion.questionType=='sb-range-star')){
+				if(!isNaN(parseInt(currQuestion.customerResponse))){
+					counter++;
+					currResponse += parseInt(currQuestion.customerResponse);
+				}
+			}
+		}
+		if(currResponse/(counter) >= autoPostScore)
+			$("#pst-srvy-div").show();
 		break;
 	case "neutral":
 		question = "Please share your views to help us improve our quality!";
@@ -314,6 +331,23 @@ function paintRangeScale() {
 	}
 }
 
+function showMasterQuestionPage(){
+	if (isSmileTypeQuestion) {
+		showFeedbackPage(mood);
+	} else {
+		if ($('#pst-srvy-div').is(':visible'))
+			autoPost = $('#post-survey').is(":checked");
+		var feedback = $("#text-area").val();
+		updateCustomerResponse(feedback);
+		$("div[data-ques-type]").hide();
+		$("div[data-ques-type='error']").show();
+		$('#content-head').html('Survey Completed');
+		$('#content').html("Congratulations! You have completed survey for "
+			+ agentName+ ".\nThanks for your participation.");
+	}
+	return;
+}
+
 // Starting click events.
 
 // Code to be executed on click of stars of rating question.
@@ -360,21 +394,7 @@ $('.sq-np-item-next')
 		.click(
 				function() {
 					if (questionDetails.questionType == "sb-master") {
-						if (isSmileTypeQuestion) {
-							showFeedbackPage(mood);
-						} else {
-							var feedback = $("#text-area").val();
-							updateCustomeResponse(feedback);
-							$("div[data-ques-type]").hide();
-							$("div[data-ques-type='error']").show();
-							$('#content-head').html('Survey Completed');
-							$('#content')
-									.html(
-											"Congratulations! You have completed survey for "
-													+ agentName
-													+ ".\nThanks for your participation!.");
-						}
-						return;
+						showMasterQuestionPage();
 					}
 
 					if (questionDetails.questionType == "sb-sel-mcq"

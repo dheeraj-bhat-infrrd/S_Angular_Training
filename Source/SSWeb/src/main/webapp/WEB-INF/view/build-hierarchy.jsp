@@ -1,10 +1,12 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+<!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
 <div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
     <div class="container">
-        <div class="hm-header-row hm-header-row-main clearfix">
+    	<div class="hm-header-row hm-header-row-main clearfix">
             <div class="float-left hm-header-row-left text-center"><spring:message code="label.buildcompanyhierarchy.key"/></div>
+            <div class="float-right hm-header-right text-center" onclick="javascript:showViewHierarchyPage()"><spring:message code="label.viewcompanyhierachy.key"/></div>
         </div>
     </div>
 </div>
@@ -13,6 +15,7 @@
 </div>
 <div class="container bd-hr-container">
    <div class="bd-hr-left-panel col-lg-3 col-md-3 col-sm-3">
+   <div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
         <div id ="prof-hierarchy-container" class="hide">
         	<!-- hierarchy structure comes here  -->
         </div>
@@ -39,7 +42,6 @@
 	                    </div> --%>
                 </div>
             </div>
-            
             <div id="bd-edit-form-section" class="bd-hr-form-wrapper">
             </div>
             
@@ -50,19 +52,20 @@
 <input class="ignore-clear" type="hidden" name="isUserAuthorized" id="is-user-authorized" value="${isUserAuthorized}"/>
 <input class="ignore-clear" type="hidden" id="profile-name" value="${profileName}"/>
 <input class="ignore-clear" type="hidden" id="account-type" value="${user.company.licenseDetails[0].accountsMaster.accountName}"/>
+<input class="ignore-clear" type="hidden" id="highest-role" value="${highestrole}"/>
 
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Build Hierarchy");
 	checkUserAuthorization();
-	fetchCompanyHierarchy();
+	fetchCompleteHierarchy();
+	
 	/**
-	*	display the form according to account type
+	*	display the form according to account type and highest role
 	*/
-	getEditSectionByAccountType();
+	getEditSection();
 	
     $(document).on('click', 'body', function() {
-    	console.log("body clicked");
         $('.dd-com-list').slideUp(200);
     });
     

@@ -4,8 +4,10 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -53,6 +55,7 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @DependsOn("generic")
@@ -1463,6 +1466,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		
+		// check if user profile already exists
+		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
+			for (UserProfile profile : assigneeUser.getUserProfiles()) {
+				if (profile.getRegionId() == userProfile.getRegionId() && profile.getBranchId() == userProfile.getBranchId()
+						&& profile.getProfilesMaster() == userProfile.getProfilesMaster() && profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
+			}
+		}
+		
 		userProfileDao.save(userProfile);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
@@ -1572,6 +1586,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), branchId, regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		
+		// check if user profile already exists
+		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
+			for (UserProfile profile : assigneeUser.getUserProfiles()) {
+				if (profile.getBranchId() == userProfile.getBranchId() && profile.getProfilesMaster() == userProfile.getProfilesMaster()
+						&& profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
+			}
+		}
+		
 		userProfileDao.save(userProfile);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
@@ -1593,7 +1618,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		solrSearchService.addUserToSolr(assigneeUser);
 
 		LOG.info("Method assignBranchToUser executed successfully");
-
 	}
 
 	/**
@@ -1923,26 +1947,40 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Account type is null in isBranchAdditionAllowed");
 		}
 		boolean isBranchAdditionAllowed = true;
+		/**
+		 * check is branch addition allowed on the basis of account type
+		 */
 		switch (accountType) {
 			case INDIVIDUAL:
-				LOG.info("Checking branch addition for account type INDIVIDUAL");
-				// No branch addition is allowed for individual
+				LOG.debug("Checking branch addition for account type INDIVIDUAL");
 				isBranchAdditionAllowed = false;
 				break;
 			case TEAM:
-				LOG.info("Checking branch addition for account type TEAM");
+				LOG.debug("Checking branch addition for account type TEAM");
 				isBranchAdditionAllowed = false;
 				break;
 			case COMPANY:
-				LOG.info("Checking branch addition for account type COMPANY");
+				LOG.debug("Checking branch addition for account type COMPANY");
 				isBranchAdditionAllowed = true;
 				break;
 			case ENTERPRISE:
-				LOG.info("Checking branch addition for account type INDIVIDUAL");
+				LOG.debug("Checking branch addition for account type INDIVIDUAL");
 				isBranchAdditionAllowed = true;
 				break;
 			default:
 				throw new InvalidInputException("Account type is invalid in isBranchAdditionAllowed");
+		}
+		/**
+		 * check is branch addition is allowed on the basis of profile level of the user, it is
+		 * allowed only for the region and company admin
+		 */
+		if (isBranchAdditionAllowed) {
+			if (user.isCompanyAdmin() || user.isRegionAdmin()) {
+				isBranchAdditionAllowed = true;
+			}
+			else {
+				isBranchAdditionAllowed = false;
+			}
 		}
 		LOG.info("Returning from isBranchAdditionAllowed for user : " + user.getUserId() + " isBranchAdditionAllowed is :" + isBranchAdditionAllowed);
 
@@ -1969,27 +2007,40 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Account type is null in isRegionAdditionAllowed");
 		}
 		boolean isRegionAdditionAllowed = true;
+		/**
+		 * check is region addition allowed on the basis of account type
+		 */
 		switch (accountType) {
 			case INDIVIDUAL:
-				LOG.info("Checking Region addition for account type INDIVIDUAL");
-				// No region addition is allowed for individual
+				LOG.debug("Checking Region addition for account type INDIVIDUAL");
 				isRegionAdditionAllowed = false;
 				break;
 			case TEAM:
-				LOG.info("Checking Region addition for account type TEAM");
-				// No region addition is allowed for team
+				LOG.debug("Checking Region addition for account type TEAM");
 				isRegionAdditionAllowed = false;
 				break;
 			case COMPANY:
-				LOG.info("Checking Region addition for account type COMPANY");
+				LOG.debug("Checking Region addition for account type COMPANY");
 				isRegionAdditionAllowed = false;
 				break;
 			case ENTERPRISE:
-				LOG.info("Checking Region addition for account type ENTERPRISE");
+				LOG.debug("Checking Region addition for account type ENTERPRISE");
 				isRegionAdditionAllowed = true;
 				break;
 			default:
 				throw new InvalidInputException("Account type is invalid in isRegionAdditionAllowed");
+		}
+		/**
+		 * check is region allowed on the basis of profile level of the user, region addition is
+		 * allowed only if the user is company admin
+		 */
+		if (isRegionAdditionAllowed) {
+			if (user.isCompanyAdmin()) {
+				isRegionAdditionAllowed = true;
+			}
+			else {
+				isRegionAdditionAllowed = false;
+			}
 		}
 		LOG.info("Returning from isRegionAdditionAllowed for user : " + user.getUserId() + " isRegionAdditionAllowed is :" + isRegionAdditionAllowed);
 		return isRegionAdditionAllowed;
@@ -2450,6 +2501,86 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		LOG.info("Method to insert branch settings finished for branch : " + branch);
+	}
+
+	/**
+	 * Method to get the list of region ids for a user and profile master id specified
+	 */
+	@Override
+	@Transactional
+	public Set<Long> getRegionIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException {
+		if (profileMasterId <= 0l) {
+			throw new InvalidInputException("Profile master id is not specified in getRegionIdsForUser");
+		}
+		if (user == null) {
+			throw new InvalidInputException("User is null in getRegionIdsForUser");
+		}
+		LOG.info("Method getRegionIdsForUser called for profileMasterId: " + profileMasterId + " and user:" + user);
+		Set<Long> regionIds = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = userManagementService.getAllUserProfilesForUser(user);
+		}
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			throw new NoRecordsFetchedException("No user profile found for the user in getRegionIdsForUser");
+		}
+		regionIds = new HashSet<Long>();
+		for (UserProfile userProfile : userProfiles) {
+			if (userProfile.getProfilesMaster().getProfileId() == profileMasterId) {
+				regionIds.add(userProfile.getRegionId());
+			}
+		}
+		LOG.info("Method getRegionIdsForUser executed successfully. Returning: " + regionIds);
+		return regionIds;
+	}
+
+	/**
+	 * Method to get the list of branch ids for a user and profile master id specified
+	 */
+	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException {
+		if (profileMasterId <= 0l) {
+			throw new InvalidInputException("Profile master id is not specified in getBranchIdsForUser");
+		}
+		if (user == null) {
+			throw new InvalidInputException("User is null in getBranchIdsForUser");
+		}
+		LOG.info("Method getBranchIdsForUser called for profileMasterId: " + profileMasterId + " and user:" + user);
+		Set<Long> branchIds = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			userProfiles = userManagementService.getAllUserProfilesForUser(user);
+		}
+		if (userProfiles == null || userProfiles.isEmpty()) {
+			throw new NoRecordsFetchedException("No user profile found for the user in getBranchIdsForUser");
+		}
+		branchIds = new HashSet<Long>();
+		for (UserProfile userProfile : userProfiles) {
+			if (userProfile.getProfilesMaster().getProfileId() == profileMasterId) {
+				branchIds.add(userProfile.getBranchId());
+			}
+		}
+		return branchIds;
+	}
+
+	/**
+	 * Method to get all branches under the regions specified
+	 */
+	@Override
+	@Transactional
+	public List<Branch> getBranchesByRegionIds(Set<Long> regionIds) throws InvalidInputException {
+		LOG.info("Method getBranchesByRegionIds called for regionIds:" + regionIds);
+		List<Branch> branches = null;
+		if (regionIds != null && !regionIds.isEmpty()) {
+			branches = new ArrayList<Branch>();
+			for (long regionId : regionIds) {
+				List<Branch> tempBranches = getBranchesByRegionId(regionId);
+				if (tempBranches != null && !tempBranches.isEmpty()) {
+					branches.addAll(tempBranches);
+				}
+			}
+		}
+		LOG.info("Method getBranchesByRegionIds executed successfully");
+		return branches;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
