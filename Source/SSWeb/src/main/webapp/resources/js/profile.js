@@ -216,7 +216,7 @@ function paintCompanyRegions(data) {
 			$(".region-icon").click(function(e) {
 				e.stopPropagation();
 				var regionProfileName = $(this).data("profilename");
-				var url = window.location.origin +"/regionprofile/"+companyProfileName+"/region/"+regionProfileName+".do";
+				var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
 				window.open(url, "_blank");
 			});
 			
@@ -269,7 +269,7 @@ function paintBranchesForRegion(data) {
 			$(".branch-icon").click(function(e){
 				e.stopPropagation();
 				var branchProfileName = $(this).data("profilename");
-				var url = window.location.origin +"/branchprofile/"+companyProfileName+"/branch/"+branchProfileName+".do";
+				var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
 				window.open(url, "_blank");				
 			});
 			bindClickToFetchBranchIndividuals("comp-region-branch");
@@ -333,7 +333,7 @@ function bindClickToFetchIndividualProfile(bindingClass) {
 	$("."+bindingClass).click(function(e){
 		e.stopPropagation();
 		var agentProfileName = $(this).data("profilename");
-		var url = window.location.origin +"/individualprofile/"+agentProfileName+".do";
+		var url = window.location.origin +"/pages/"+agentProfileName;
 		window.open(url, "_blank");				
 	});
 }
