@@ -554,31 +554,40 @@ $('.sq-sad-smile').click(function() {
 	isSmileTypeQuestion = true;
 });
 
-$('#start-btn').click(
-		function() {
-			var firstName = $('#firstName').val().trim();
-			var lastName = $('#lastName').val().trim();
-			var email = $('#email').val().trim();
-			var captchaResponse = $('#captcha-text').val();
-			var recaptcha_challenge_field = $('#recaptcha_challenge_field')
-					.val();
-			if (!validateUserFirstName('firstName')) {
-				$('#overlay-toast').html('Please enter valid First Name!');
-				showToast();
-				return;
-			}
-			if (!validateUserEmailId('email')) {
-				$('#overlay-toast').html('Please enter valid Email Id!');
-				showToast();
-				return;
-			}
-			var agentId = $('#prof-container').attr("data-agentId");
-			var agentName = $('#prof-container').attr("data-agentName");
-			var e = document.getElementById("cust-agnt-rel");
-			var relationship = e.options[e.selectedIndex].value;
-			initSurvey(firstName, lastName, email, agentId, agentName,
-					captchaResponse, recaptcha_challenge_field, relationship);
-		});
+$('#start-btn').click(function() {
+	var firstName = $('#firstName').val().trim();
+	var lastName = $('#lastName').val().trim();
+	var email = $('#email').val().trim();
+	var captchaResponse = $('#captcha-text').val();
+	var recaptcha_challenge_field = $('#recaptcha_challenge_field').val();
+	
+	if (!validateUserFirstName('firstName')) {
+		$('#overlay-toast').html('Please enter valid First Name!');
+		showToast();
+		return;
+	}
+	if (!validateUserEmailId('email')) {
+		$('#overlay-toast').html('Please enter valid Email Id!');
+		showToast();
+		return;
+	}
+	
+	var agentId = $('#prof-container').attr("data-agentId");
+	var agentName = $('#prof-container').attr("data-agentName");
+	var e = document.getElementById("cust-agnt-rel");
+	var relationship = e.options[e.selectedIndex].value;
+	initSurvey(firstName, lastName, email, agentId, agentName,
+			captchaResponse, recaptcha_challenge_field, relationship);
+	
+	// Google analytics for reviews
+	ga('send', {
+		'hitType': 'event',
+		'eventCategory': 'review',
+		'eventAction': 'click',
+		'eventLabel': 'Reviews',
+		'eventValue': agentId
+	});
+});
 
 $('input[type="range"]').rangeslider({
 	polyfill : false,
