@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -2281,7 +2280,7 @@ public class ProfileManagementController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/companyprofile/{profileName}", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/companyprofile/{profileName}", method = RequestMethod.GET)
 	public String initCompanyProfilePage(@PathVariable String profileName, Model model) {
 		LOG.info("Service to initiate company profile page called");
 		String message = null;
@@ -2295,7 +2294,7 @@ public class ProfileManagementController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_COMPANY);
 		LOG.info("Service to initiate company profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
-	}
+	}*/
 
 	/**
 	 * Method to return region profile page
@@ -2305,7 +2304,7 @@ public class ProfileManagementController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/regionprofile/{companyProfileName}/region/{regionProfileName}")
+	/*@RequestMapping(value = "/regionprofile/{companyProfileName}/region/{regionProfileName}")
 	public String initRegionProfilePage(@PathVariable String companyProfileName, @PathVariable String regionProfileName, Model model) {
 		LOG.info("Service to initiate region profile page called");
 		String message = null;
@@ -2326,7 +2325,7 @@ public class ProfileManagementController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_REGION);
 		LOG.info("Service to initiate region profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
-	}
+	}*/
 
 	/**
 	 * Method to return branch profile page
@@ -2336,7 +2335,7 @@ public class ProfileManagementController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/branchprofile/{companyProfileName}/branch/{branchProfileName}")
+	/*@RequestMapping(value = "/branchprofile/{companyProfileName}/branch/{branchProfileName}")
 	public String initBranchProfilePage(@PathVariable String companyProfileName, @PathVariable String branchProfileName, Model model) {
 		LOG.info("Service to initiate branch profile page called");
 		String message = null;
@@ -2357,7 +2356,7 @@ public class ProfileManagementController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_BRANCH);
 		LOG.info("Service to initiate branch profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
-	}
+	}*/
 
 	/**
 	 * Method to return agent profile page
@@ -2366,7 +2365,7 @@ public class ProfileManagementController {
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value = "/individualprofile/{agentProfileName}")
+	/*@RequestMapping(value = "/individualprofile/{agentProfileName}")
 	public String initBranchProfilePage(@PathVariable String agentProfileName, Model model) {
 		LOG.info("Service to initiate agent profile page called");
 		String message = null;
@@ -2380,7 +2379,7 @@ public class ProfileManagementController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 		LOG.info("Service to initiate agent profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
-	}
+	}*/
 
 	// Fetch Admin hierarchy
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
