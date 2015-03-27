@@ -370,7 +370,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings != null) {
 
 			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
-			profileName = profileName + iden;
+			profileName = profileName +"-"+ iden;
 		}
 		LOG.debug("Successfully generated profile name. Returning : " + profileName);
 		return profileName;
@@ -2147,15 +2147,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 * Uniqueness of profile name is checked by url since combination of company profile
 			 * name and branch profile name is unique
 			 */
-			OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(branchProfileUrl,
+			OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(branchProfileUrl,
 					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 			/**
 			 * if there exists a branch with the profile name formed, append branch iden to get the
 			 * unique profile name and also regenerate url with new profile name
 			 */
-			if (regionSettings != null) {
+			if (branchSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				branchProfileName = branchProfileName + branch.getBranchId();
+				branchProfileName = branchProfileName +"-"+ branch.getBranchId();
 				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 			}
 			organizationSettings.setProfileName(branchProfileName);
@@ -2285,7 +2285,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (regionSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				regionProfileName = regionProfileName + region.getRegionId();
+				regionProfileName = regionProfileName +"-"+ region.getRegionId();
 				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 			}
 			organizationSettings.setProfileName(regionProfileName);
