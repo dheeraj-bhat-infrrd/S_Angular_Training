@@ -10,6 +10,7 @@ public class RegionFromSearch {
 	private long companyId;
 	private long isDefaultBySystem;
 	private int status;
+	private String address;
 
 	public long getRegionId() {
 		return regionId;
@@ -51,9 +52,17 @@ public class RegionFromSearch {
 		this.status = status;
 	}
 
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	@Override
 	public String toString() {
-		return "regionId: " + regionId + "\tregionName: " + regionName + "\tcompanyId: " + companyId + "\tisDefaultBySystem: " + isDefaultBySystem
-				+ "\tstatus: " + status;
+		return "RegionFromSearch [regionId=" + regionId + ", regionName=" + regionName + ", companyId=" + companyId + ", isDefaultBySystem="
+				+ isDefaultBySystem + ", status=" + status + ", address=" + address + "]";
 	}
 }
