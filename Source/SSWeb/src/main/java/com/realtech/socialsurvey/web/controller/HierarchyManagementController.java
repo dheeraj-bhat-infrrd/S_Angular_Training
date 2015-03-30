@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
@@ -13,12 +14,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
+import com.realtech.socialsurvey.core.entities.BranchSearchResultWrapper;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
+import com.realtech.socialsurvey.core.entities.RegionSearchResultWrapper;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -116,6 +123,7 @@ public class HierarchyManagementController {
 
 	/**
 	 * Method to get the view hierarchy page
+	 * 
 	 * @param model
 	 * @param request
 	 * @return
@@ -123,7 +131,21 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/viewhierarchy", method = RequestMethod.GET)
 	public String showViewHierarchyPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showViewHierarchyPage called");
-
+		User user = sessionHelper.getCurrentUser();
+		String companyName = null;
+		try {
+			Company company = user.getCompany();
+			if (company == null) {
+				throw new NoRecordsFetchedException("company not found for the current user", DisplayMessageConstants.GENERAL_ERROR);
+			}
+			companyName = company.getCompany();
+			model.addAttribute("companyName", companyName);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException in showViewHierarchyPage. Reason:" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 		LOG.info("Method showViewHierarchyPage executed successfully");
 		return JspResolver.VIEW_HIERARCHY;
 	}
@@ -574,7 +596,7 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/addindividual", method = RequestMethod.POST)
 	public String addIndividual(Model model, HttpServletRequest request) {
 		LOG.info("Method to add an individual called in controller");
-		
+
 		try {
 			String strRegionId = request.getParameter("regionId");
 			String strBranchId = request.getParameter("officeId");
@@ -652,7 +674,7 @@ public class HierarchyManagementController {
 			LOG.error("NonFatalException while adding an individual. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		
+
 		LOG.info("Successfully completed controller to add an individual");
 		return JspResolver.MESSAGE_HEADER;
 	}
@@ -1053,6 +1075,103 @@ public class HierarchyManagementController {
 		LOG.info("Method fetchBranchesInRegion finished in controller. Returning : " + branches);
 		return branches;
 
+	}
+
+	/**
+	 * Method to fetch branches for a region in hierarchy view page
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/fetchhierarchyviewbranches", method = RequestMethod.GET)
+	public String fetchHierarchyViewBranches(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchHierarchyViewBranches called in controller");
+		String strRegionId = request.getParameter("regionId");
+		long regionId = 0l;
+		List<BranchFromSearch> branches = null;
+		try {
+			try {
+				regionId = Long.parseLong(strRegionId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing regionId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			String branchesJson = solrSearchService.searchBranchesByRegion(regionId, CommonConstants.INITIAL_INDEX, -1);
+			LOG.debug("Fetched branch .branches json is :" + branchesJson);
+			Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+			branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+
+			model.addAttribute("branches", branches);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching branches in a region . Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Method fetchHierarchyViewBranches finished in controller. Returning : " + branches);
+		return JspResolver.VIEW_HIERARCHY_BRANCH_LIST;
+	}
+
+	/**
+	 * Method to fetch the hierarchy list for edit
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/fetchhierarchyviewlist", method = RequestMethod.GET)
+	public String fetchHierarchyViewList(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchHierarchyViewList called");
+		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
+		int highestRole = (int) session.getAttribute(CommonConstants.HIGHEST_ROLE_ID_IN_SESSION);
+		Set<Long> regionIds = null;
+		Set<Long> branchIds = null;
+		List<RegionFromSearch> regions = null;
+		List<BranchFromSearch> branches = null;
+		String jspToReturn = null;
+		try {
+
+			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, 0, -1);
+				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
+				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
+				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
+			}
+			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				LOG.debug("Getting list of regions for the region admin");
+				regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
+
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, 0, -1);
+				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
+				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
+
+				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
+			}
+			else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				LOG.debug("Getting list of branches for the branch admin");
+				branchIds = organizationManagementService.getBranchIdsForUser(user, highestRole);
+
+				String branchesJson = solrSearchService.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, 0, -1);
+				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+				branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+				jspToReturn = JspResolver.VIEW_HIERARCHY_BRANCH_LIST;
+			}
+			else {
+				throw new InvalidInputException("not aurhorised to view hierarchy", DisplayMessageConstants.HIERARCHY_EDIT_NOT_AUTHORIZED);
+			}
+			model.addAttribute("regions", regions);
+			model.addAttribute("branches", branches);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			jspToReturn = JspResolver.MESSAGE_HEADER;
+		}
+		LOG.info("Method fetchHierarchyViewList executed successfully. JspToReturn: " + jspToReturn);
+		return jspToReturn;
 	}
 
 	// JIRA SS-137 BY RM-05 : EOC

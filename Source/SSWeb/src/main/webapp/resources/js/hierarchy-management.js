@@ -931,6 +931,111 @@ function showViewHierarchyPage() {
 	var url = "./viewhierarchy.do";
 	callAjaxGET(url, viewHierarchyCallBack, true);
 }
+
 function viewHierarchyCallBack(data) {
 	$("#main-content").html(data);
+}
+
+function fetchHierarchyViewBranches(regionId) {
+	var url = "./fetchhierarchyviewbranches.do?regionId="+regionId;
+	callAjaxGET(url, function(data) {
+		paintHierarchyViewBranches(data,regionId);
+	}, true);
+}
+
+function paintHierarchyViewBranches(data,regionId) {
+	$("#td-region-edit-"+regionId).parent(".tr-region-edit").after(data);
+	$("#tr-region-"+regionId).slideDown(200);
+	$(".tr-region-edit").slideUp(200);
+	
+	bindBranchListClicks();
+}
+
+function bindBranchListClicks(){
+	$(".branch-edit-icn").click(function(e){
+		e.stopPropagation();
+		var branchId = $(this).attr("data-branchid");
+		if($(this).attr('clicked') == "false"){
+			showBranchEdit(branchId);
+			$(this).attr('clicked','true');
+		}
+		else {
+			hideBranchEdit(branchId);
+			$(this).attr('clicked','false');
+		}		
+	});
+}
+
+function fetchHierarchyViewList() {
+	var url = "./fetchhierarchyviewlist.do";
+	callAjaxGET(url, paintHierarchyViewList, true);
+}
+function paintHierarchyViewList(data) {
+	$("#hierarchy-list-header").after(data);
+	bindRegionListClicks();
+    $('.v-tbl-icn').click(function(e){
+        e.stopPropagation();
+    });
+    bindBranchListClicks();
+}
+
+function bindRegionListClicks() {
+	$(".region-row").click(function(e){
+		var regionId = $(this).attr("data-regionid");
+		if($(this).attr('clicked') == "false"){
+			fetchHierarchyViewBranches(regionId);
+			 $(this).attr('clicked','true');
+		}
+		else {
+			$('.branch-row-'+regionId).html("").hide(); 
+            $(this).attr('clicked','false');
+		}
+	});
+	$(".region-edit-icn").click(function(e){
+		e.stopPropagation();
+		var regionId = $(this).attr("data-regionid");
+		if($(this).attr('clicked') == "false"){
+			showRegionEdit(regionId);
+			$(this).attr('clicked','true');
+		}
+		else {
+			hideRegionEdit(regionId);
+			$(this).attr('clicked','false');
+		}		
+	});
+}
+
+function showRegionEdit(regionId) {
+	var url = "./getregioneditpage.do";
+	callAjaxGET(url, function(data){
+		showRegionEditCallBack(data, regionId);
+	}, true);
+}
+function showRegionEditCallBack(data,regionId) {
+	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
+	$("#td-region-edit-"+regionId).html(data).slideDown(200);
+	
+}
+
+function hideRegionEdit(branchId) {
+	$("#td-region-edit-"+branchId).hide();
+	$("#td-region-edit-"+branchId).parent(".tr-region-edit").hide();
+}
+
+function showBranchEdit(branchId) {
+	var url = "./getofficeeditpage.do";
+	callAjaxGET(url, function(data){
+		showBranchEditCallBack(data, branchId);
+	}, true);
+}
+
+function showBranchEditCallBack(data,branchId) {
+	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").slideDown(200);
+	$("#td-branch-edit-"+branchId).html(data).slideDown(200);
+	
+}
+
+function hideBranchEdit(branchId) {
+	$("#td-branch-edit-"+branchId).slideUp(200);
+	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").hide();
 }
