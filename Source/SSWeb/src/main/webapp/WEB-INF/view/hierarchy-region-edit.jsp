@@ -1,5 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<form id="edit-region-form">
+<form id="edit-region-form" class="edit-region-form">
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.regionname.key"/></div>
 	     <div class="float-left bd-frm-right">
