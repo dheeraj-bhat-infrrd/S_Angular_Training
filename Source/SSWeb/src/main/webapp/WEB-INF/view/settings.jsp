@@ -129,11 +129,36 @@
 								<div class="st-dd-wrapper hide" id="st-dd-wrapper-min-post"></div>
 							</div>
 						</div>
+						<div>
+							<div id="atpst-chk-box" class="float-left bd-check-img"></div>
+							<div class="float-left bd-check-txt">Allow user to autopost</div>
+						</div>
 					</div>
 				</div>
 				</form>
 			</div>
 		</div>
+		
+		<!-- Starting code for Text for Happy/Neutral/Sad flow -->
+		<div class="um-top-container">
+				<div class="um-header"><spring:message code="label.flow.text.key" /></div>
+				<div class="clearfix um-panel-content">
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl">Please enter text to be shown for Happy Customer</div>
+						<textarea id="happy-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+					</div>
+					
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl">Please enter text to be shown for Neutral Customer</div>
+						<textarea id="neutral-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+					</div>
+					
+					<div class="bd-mcq-row clearfix txtareaRow">
+						<div class="float-left cs-gq-lbl">Please enter text to be shown for Sad Customer</div>
+						<textarea id="sad-text" class="float-left textarea-bd-mcq-txt" style=""></textarea>
+					</div>
+				</div>
+			</div>
 		
 		<div class="um-top-container">
 			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
