@@ -5527,3 +5527,20 @@ tr.u-tbl-header td {
     cursor: pointer;
 	color: #5CC8EF;
 }
+
+.cs-gq-lbl {
+	font-size: 14px;
+	font-weight: bold !important;
+	line-height: 40px;
+	width: 350px;
+}
+
+.txtareaRow{
+	width: auto;
+}
+
+.textarea-bd-mcq-txt {
+  width: 500px;
+  padding: 10px;
+  height: 100px;
+}

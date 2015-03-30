@@ -6,7 +6,7 @@ var batchSize = 1;
 var totalReviews = 0;
 var reviewsFetchedSoFar = 0;
 var startIndexInc = 0;
-var batchSizeInc = 1;
+var batchSizeInc = 10;
 var totalReviewsInc = 0;
 var surveyFetchedSoFarInc = 0;
 // colName and colValue contains profile level of logged in user and value for
@@ -65,7 +65,7 @@ $("#prnt-dsh-inc-srvey").scroll(
 function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 		regionIds, branchNames, branchIds, agent, accountType) {
 	
-
+	showDisplayPic();
 	var oldConW = $('.container').width();
 	var newConW = $('.container').width();
 	$(window).resize(function() {
@@ -132,6 +132,34 @@ function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 								+ colName + "&columnValue=" + colValue;
 					});
 
+}
+
+function showDisplayPic(){
+	console.log('Reached Method');
+	var success = false;
+	$.ajax({
+		url : "./getdisplaypiclocation.do",
+		type : "GET",
+		dataType : "JSON",
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				console.log("Image location : "+data.responseJSON);
+				var imageUrl = data.responseJSON;
+				if(imageUrl != '' && imageUrl != undefined){
+					$("#dsh-prsn-img").css("background", "url("+imageUrl+") no-repeat center");
+					$("#dsh-prsn-img").css("background-size","cover");
+				}
+				return data.responseJSON;
+			}
+		},
+		error : function() {
+			
+		}
+	});
 }
 
 function showCompanyAdminFlow(accountType) {
@@ -816,28 +844,30 @@ function paintIncompleteSurvey(result) {
 		divToPopulate += '<div class="dash-lp-item clearfix">'
 				+ '<div class="float-left dash-lp-txt">' + survey.customerFirstName+" "+survey.customerLastName
 				+ ' <span>' + survey.modifiedOn + '</span></div>'
-				+ '<div data-custname=' + survey.customerFirstName+" "+survey.customerLastName
+				+ '<div data-custname=' + survey.customerFirstName+' '+survey.customerLastName
 				+ ' data-agentname=' + survey.agentName + ' data-custemail='
-				+ survey.customerEmail
+				+ survey.customerEmail + ' data-agentId=' + survey.agentId
 				+ ' class="float-right dash-lp-rt-img"></div></div>';
 	});
 	$("#dsh-inc-srvey").html(divToPopulate);
 	$('#dsh-inc-srvey').perfectScrollbar();
 
 	$('.dash-lp-rt-img').click(function() {
+		var agentId = $(this).data("agentId");
 		var agentName = $(this).data("agentname");
 		var customerEmail = $(this).data("custemail");
 		var customerName = $(this).data("custname");
-		sendSurveyReminderMail(agentName, customerEmail, customerName);
+		sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
 	});
 }
 
-function sendSurveyReminderMail(agentName, customerEmail, customerName) {
+function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName) {
 	var success = false;
 	var payload = {
 		"agentName" : agentName,
 		"customerEmail" : customerEmail,
-		"customerName" : customerName
+		"customerName" : customerName,
+		"agentId" : agentId
 	};
 	$.ajax({
 		url : "./sendsurveyremindermail.do",

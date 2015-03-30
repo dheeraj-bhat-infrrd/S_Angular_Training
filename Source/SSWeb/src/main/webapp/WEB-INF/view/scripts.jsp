@@ -27,4 +27,8 @@
 	$('#header-logo').click(function(){
 		showMainContent('./dashboard.do');
 	});
+	
+	$(document).ready(function() {
+		loadDisplayPicture();
+	});
 </script>
