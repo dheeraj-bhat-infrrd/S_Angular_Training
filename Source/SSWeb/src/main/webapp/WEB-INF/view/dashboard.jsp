@@ -4,7 +4,7 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left hr-dsh-adj-lft">Dashboard</div>
-            <div class="float-right header-right clearfix hr-dsh-adj-rt">
+           <!--  <div class="float-right header-right clearfix hr-dsh-adj-rt">
                 <div class="float-left hr-txt1">View As</div>
                 <div id="hr-txt2" class="float-left hr-txt2">Agent</div>
                 <div id="hr-dd-wrapper" class="hr-dd-wrapper hide">
@@ -12,7 +12,7 @@
                     <div class="hr-dd-item">Region Admin</div>
                     <div class="hr-dd-item">Company Admin</div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
