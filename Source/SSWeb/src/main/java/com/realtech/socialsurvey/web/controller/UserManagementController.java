@@ -1209,8 +1209,11 @@ public class UserManagementController {
 			model.addAttribute("firstName", user.getFirstName());
 			model.addAttribute("lastName", user.getLastName());
 			model.addAttribute("emailId", user.getEmailId());
-			model.addAttribute("profiles", userAssignments);
 			model.addAttribute("userId", user.getUserId());
+
+			// returning in descending order
+			Collections.reverse(userAssignments);
+			model.addAttribute("profiles", userAssignments);
 		}
 		catch (NumberFormatException e) {
 			LOG.error("NumberFormatException while parsing userId. Reason : " + e.getMessage(), e);

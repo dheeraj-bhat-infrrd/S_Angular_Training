@@ -745,17 +745,22 @@ function getUserAssignments(userId) {
 		$("#btn-save-user-assignment").click(function(e){
 			if(validateIndividualForm()){
 				saveUserAssignment("user-assignment-form");
+				
+				// refreshing right section after assignment
 				setTimeout(function() {
 					getUserAssignments(userId);
 				}, 2000);
 			}
 		});
 		
+		setTimeout(function() {
+			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
+		}, 1000);
+
 		$(document).on('click', 'body', function() {
             $('.dd-droplist').slideUp(200);
         });
 	} , true);
-	
 }
 
 /**
@@ -775,7 +780,6 @@ function saveUserAssignment(formId) {
 function saveUserAssignmentCallBack(data) {
 	hideOverlay();
 	displayMessage(data);
-	//TODO refresh the right section with latest assignments
 }
 
 

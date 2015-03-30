@@ -1470,7 +1470,7 @@ button.paypal.is-active {
 }
 
 .prof-left-row {
-    padding: 15px 0;
+    padding: 10px 0;
     border-right: 1px solid #dcdcdc;
 }
 
@@ -1854,7 +1854,7 @@ button.paypal.is-active {
 }
 
 .prof-name-edit {
-	height: 44px;
+	height: 34px;
 	background-color: #f1f1f1;
     border: 1px solid #dcdcdc;
 }
@@ -2870,6 +2870,7 @@ button.paypal.is-active {
     height: 50px;
     font-size: 12px;
     color: #5CC8EF;
+    margin-left: 15px;
 }
 
 .prof-user-logo {
@@ -2887,9 +2888,9 @@ button.paypal.is-active {
     text-align: center;
 }
 
-.hm-hr-row-right {
+/* .hm-hr-row-right {
     margin-top: 15px;
-}
+} */
 
 .icn-blog {
     background: url(../images/blog.png) no-repeat center;
@@ -3147,9 +3148,10 @@ button.paypal.is-active {
 .lp-edit-locks{
 	cursor: pointer;
 	width: 46px;
-	height: 46px;
+	height: 34px;
 	background: url(../images/locks.png) no-repeat;
 	background-position: -218px center;
+	display: none;
 }
 
 .lp-ach-item-img{
@@ -3246,8 +3248,10 @@ button.paypal.is-active {
 }
 
 .prof-img-lock{
+	cursor: pointer;
 	background: rgba(255,255,255,0.6) url(../images/locks.png) no-repeat;
-	background-position: -123px center;
+	background-position: -223px center;
+	display: none;
 }
 .prof-img-lock-locked{
 	background-position: 4px center;
@@ -4510,7 +4514,7 @@ tr.v-tbl-row {
     border-top: 0 !important;
 }
 
-.v-line-cmp {
+.v-line-rgn {
     border-left: 3px solid #6296D9;
     border-bottom: 1px solid #dcdcdc;
     height: 41px;
@@ -4520,7 +4524,7 @@ tr.v-tbl-row {
     border-top: 1px solid #dcdcdc;
 }
 
-.v-line-rgn {
+.v-line-brnch {
     border-left: 3px solid #61A64B;
     border-bottom: 1px solid #dcdcdc;
     height: 41px;
@@ -4528,7 +4532,16 @@ tr.v-tbl-row {
     top: 0;
     width: 100%;
     left: 25%;
-    border-top: 1px solid #dcdcdc;
+    /* border-top: 1px solid #dcdcdc; */
+}
+
+.td-region-edit .edit-region-form{
+	margin: 30px auto;
+	width: 500px;
+}
+.td-branch-edit .edit-office-form{
+	margin: 30px auto;
+	width: 500px;
 }
 
 .v-line-ind{
@@ -4584,7 +4597,7 @@ td.v-tbl-spacer {
     background-color: #FAFAFB;
 }
 
-.v-tbl-row-rgn {
+.v-tbl-row-brnch {
     background-color: #FAFAFB;
 }
 
@@ -5526,4 +5539,8 @@ tr.u-tbl-header td {
 .paginate-button {
     cursor: pointer;
 	color: #5CC8EF;
+}
+
+.tweet-panel-item.bord-bot-dc.clearfix {
+ padding-top: 10px;
 }
