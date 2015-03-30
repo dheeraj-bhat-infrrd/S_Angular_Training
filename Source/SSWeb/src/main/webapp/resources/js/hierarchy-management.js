@@ -945,10 +945,13 @@ function fetchHierarchyViewBranches(regionId) {
 
 function paintHierarchyViewBranches(data,regionId) {
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").after(data);
-	//$("#tr-region-"+regionId).after(data);
 	$("#tr-region-"+regionId).slideDown(200);
 	$(".tr-region-edit").slideUp(200);
 	
+	bindBranchListClicks();
+}
+
+function bindBranchListClicks(){
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
@@ -969,6 +972,14 @@ function fetchHierarchyViewList() {
 }
 function paintHierarchyViewList(data) {
 	$("#hierarchy-list-header").after(data);
+	bindRegionListClicks();
+    $('.v-tbl-icn').click(function(e){
+        e.stopPropagation();
+    });
+    bindBranchListClicks();
+}
+
+function bindRegionListClicks() {
 	$(".region-row").click(function(e){
 		var regionId = $(this).attr("data-regionid");
 		if($(this).attr('clicked') == "false"){
@@ -992,9 +1003,6 @@ function paintHierarchyViewList(data) {
 			$(this).attr('clicked','false');
 		}		
 	});
-    $('.v-tbl-icn').click(function(e){
-        e.stopPropagation();
-    });
 }
 
 function showRegionEdit(regionId) {
