@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.surveybuilder;
 
+import java.util.List;
 import org.apache.solr.client.solrj.SolrServerException;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -48,5 +49,7 @@ public interface SurveyHandler {
 	public String getSwearWords();
 
 	public void updateReminderCount(long agentId, String customerEmail);
+
+	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId);
 
 }

@@ -5544,3 +5544,19 @@ tr.u-tbl-header td {
 .tweet-panel-item.bord-bot-dc.clearfix {
  padding-top: 10px;
 }
+.cs-gq-lbl {
+	font-size: 14px;
+	font-weight: bold !important;
+	line-height: 40px;
+	width: 350px;
+}
+
+.txtareaRow{
+	width: auto;
+}
+
+.textarea-bd-mcq-txt {
+  width: 500px;
+  padding: 10px;
+  height: 100px;
+}
