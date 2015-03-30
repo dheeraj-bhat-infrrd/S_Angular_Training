@@ -712,6 +712,7 @@ function showReviews(columnName, columnValue) {
 		url : "./fetchdashboardreviews.do",
 		type : "GET",
 		dataType : "JSON",
+		async:false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
