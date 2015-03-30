@@ -669,8 +669,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
+				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					clickedSurveys.put(getMonthAsString(i).toString(), 0l);
+					clickedSurveys.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -756,8 +757,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
+				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					sentSurveys.put(getMonthAsString(i).toString(), 0l);
+					sentSurveys.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -846,8 +848,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
+				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					completedSurveys.put(getMonthAsString(i).toString(), 0l);
+					completedSurveys.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -934,8 +937,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					}
 				}
 				else if (criteriaColumn.equals("month")) {
+					int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 					for (int i = 0; i < 12; i++) {
-						socialPosts.put(getMonthAsString(i).toString(), 0l);
+						socialPosts.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 					}
 				}
 				Calendar calendar = Calendar.getInstance();
@@ -977,7 +981,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		String month = "Invalid Month";
 		DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
 		month = dateFormatSymbols.getMonths()[monthInt];
-		return month.substring(0, 2);
+		return month.substring(0, 3);
 	}
 
 	// JIRA SS-137 and 158 : EOC
