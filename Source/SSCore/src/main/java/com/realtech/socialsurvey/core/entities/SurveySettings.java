@@ -10,6 +10,9 @@ public class SurveySettings {
 	private int survey_reminder_interval_in_days;
 	private int max_number_of_survey_reminders;
 	private boolean isReminderDisabled;
+	private String happyText;
+	private String neutralText;
+	private String sadText;
 
 	public float getAuto_post_score() {
 		return auto_post_score;
@@ -49,6 +52,30 @@ public class SurveySettings {
 
 	public void setReminderDisabled(boolean isReminderDisabled) {
 		this.isReminderDisabled = isReminderDisabled;
+	}
+
+	public String getHappyText() {
+		return happyText;
+	}
+
+	public void setHappyText(String happyText) {
+		this.happyText = happyText;
+	}
+
+	public String getNeutralText() {
+		return neutralText;
+	}
+
+	public void setNeutralText(String neutralText) {
+		this.neutralText = neutralText;
+	}
+
+	public String getSadText() {
+		return sadText;
+	}
+
+	public void setSadText(String sadText) {
+		this.sadText = sadText;
 	}
 
 	@Override
