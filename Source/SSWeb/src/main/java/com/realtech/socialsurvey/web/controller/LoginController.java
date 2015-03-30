@@ -16,14 +16,17 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -428,6 +431,68 @@ public class LoginController {
 		model.addAttribute("message",
 				messageUtils.getDisplayMessage(DisplayMessageConstants.USER_LOGOUT_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
 		return JspResolver.LOGIN;
+	}
+
+	/**
+	 * Method to get location of display picture
+	 * 
+	 * @param
+	 * @param request
+	 * @param response
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/getdisplaypiclocation")
+	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
+		LOG.info("fetching display picture");
+		String imageUrl = "";
+		try {
+			User user = sessionHelper.getCurrentUser();
+			if (user == null) {
+				LOG.error("No user found in current session.");
+				throw new InvalidInputException("No user found in current session.");
+			}
+			if (user.isCompanyAdmin()) {
+				imageUrl = organizationManagementService.getCompanySettings(user).getProfileImageUrl();
+			}
+			else if (user.isRegionAdmin()) {
+				long regionId = 0;
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+						regionId = profile.getRegionId();
+						break;
+					}
+				}
+				if (regionId != 0)
+					imageUrl = organizationManagementService.getRegionSettings(regionId).getProfileImageUrl();
+			}
+			else if (user.isBranchAdmin()) {
+				long branchId = 0;
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+						branchId = profile.getBranchId();
+						break;
+					}
+				}
+				if (branchId != 0)
+					imageUrl = organizationManagementService.getBranchSettings(branchId).getOrganizationUnitSettings().getProfileImageUrl();
+			}
+			else if (user.isAgent()) {
+				sessionHelper.getCanonicalSettings(request.getSession());
+				UserSettings userSettings = (UserSettings) request.getSession().getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+				if (userSettings != null) {
+					AgentSettings agentSettings = userSettings.getAgentSettings();
+					if (agentSettings != null) {
+						imageUrl = agentSettings.getProfileImageUrl();
+					}
+				}
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal Exception occurred in getDisplayPictureLocation(). Nested exception is ", e);
+			return e.getMessage();
+		}
+		return new Gson().toJson(imageUrl);
 	}
 
 	/**

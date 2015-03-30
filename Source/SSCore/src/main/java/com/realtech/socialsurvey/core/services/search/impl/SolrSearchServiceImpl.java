@@ -183,7 +183,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
 			SolrQuery query = new SolrQuery();
 			query.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
-			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":"
+					+ CommonConstants.NO);
 			query.setStart(start);
 
 			if (rows > 0) {
@@ -276,6 +277,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
 
+		String address = branch.getAddress1();
+		if (address != null && branch.getAddress2() != null) {
+			address = address + " " + branch.getAddress2();
+		}
+		document.addField(CommonConstants.BRANCH_ADDRESS_SOLR, address);
+
 		LOG.debug("Method getSolrDocumentFromBranch finished for branch " + branch);
 		return document;
 	}
@@ -295,6 +302,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
+		String address = region.getAddress1();
+		if (address != null && region.getAddress2() != null) {
+			address = address + " " + region.getAddress2();
+		}
+		document.addField(CommonConstants.REGION_ADDRESS_SOLR, address);
 
 		LOG.debug("Method getSolrDocumentFromRegion finished for region " + region);
 		return document;
@@ -521,8 +533,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
-			MalformedURLException {
+	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException {
 		LOG.info("Method countUsersByCompany() called for company id : " + companyId);
 		if (companyId < 0) {
 			throw new InvalidInputException("Pattern is null or empty while searching for Users");
@@ -539,7 +550,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
 			response = solrServer.query(solrQuery);
-			
+
 			resultsCount = response.getResults().getNumFound();
 			LOG.debug("User search result count is : " + resultsCount);
 		}
