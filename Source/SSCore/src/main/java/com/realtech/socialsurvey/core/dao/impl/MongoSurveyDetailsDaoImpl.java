@@ -275,7 +275,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (result != null) {
 			@SuppressWarnings("unchecked") List<BasicDBObject> moodCount = (List<BasicDBObject>) result.getRawResults().get("result");
 			for (BasicDBObject o : moodCount) {
-				moodSplit.put(o.get("_id").toString(), Long.parseLong(o.get("count").toString()));
+				moodSplit.put(o.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString(), Long.parseLong(o.get("count").toString()));
 			}
 		}
 		LOG.info("Method to get customers according to their mood, getCountOfCustomersByMood() finished.");
@@ -303,7 +303,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (result != null) {
 			@SuppressWarnings("unchecked") List<BasicDBObject> reminderCount = (List<BasicDBObject>) result.getRawResults().get("result");
 			for (BasicDBObject reminder : reminderCount) {
-				reminderCountSplit.put(reminder.get("_id").toString(), Long.parseLong(reminder.get("count").toString()));
+				reminderCountSplit.put(reminder.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString(), Long.parseLong(reminder.get("count").toString()));
 			}
 		}
 		LOG.info("Method to get customers according to the number of reminder emails sent, getCountOfCustomersByReminderMails() finished.");
@@ -330,7 +330,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (result != null) {
 			@SuppressWarnings("unchecked") List<BasicDBObject> stageCount = (List<BasicDBObject>) result.getRawResults().get("result");
 			for (BasicDBObject stage : stageCount) {
-				stageCountSplit.put(stage.get("_id").toString(), Long.parseLong(stage.get("count").toString()));
+				stageCountSplit.put(stage.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString(), Long.parseLong(stage.get("count").toString()));
 			}
 		}
 		LOG.info("Method to get customers according to stage of survey, getCountOfCustomersByStage() finished.");
@@ -479,7 +479,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		if (result != null) {
 			@SuppressWarnings("unchecked") List<BasicDBObject> initiatorCount = (List<BasicDBObject>) result.getRawResults().get("result");
 			for (BasicDBObject post : initiatorCount) {
-				initiatorCountSplit.put(post.get("_id").toString(), Long.parseLong(post.get("count").toString()));
+				initiatorCountSplit.put(post.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString(), Long.parseLong(post.get("count").toString()));
 			}
 		}
 		LOG.info("Method to count number of surveys initiators, getCountOfSurveyInitiators() finished.");
@@ -643,8 +643,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
 		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
 				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true)), Aggregation.match(Criteria.where(
-				columnName).is(columnValue)), Aggregation.match(Criteria.where(CommonConstants.STAGE_COLUMN)
-				.ne(CommonConstants.SURVEY_STAGE_COMPLETE)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)),
+				columnName).is(columnValue)), Aggregation.match(Criteria.where("surveyResponse").size(0)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)),
 				Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN).andExpression(criteriaColumn + "(modifiedOn)").as("groupCol"), Aggregation
 						.group("groupCol").count().as("count"));
 
@@ -656,22 +655,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				Date currDate = new Date();
 				int reductionInDate = 1;
 				for (int i = 0; i < 7; i++) {
-					clickedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
-					currDate = getNdaysBackDate(++reductionInDate);
+					currDate = getNdaysBackDate(reductionInDate++);
+					clickedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 				}
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
 				int reductionInDate = 0;
 				for (int i = 0; i < 4; i++) {
-					clickedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					clickedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
 					currDate = getNdaysBackDate(reductionInDate);
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
+				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					clickedSurveys.put(getMonthAsString(i).toString(), 0l);
+					clickedSurveys.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -679,22 +679,22 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			for (BasicDBObject clickedSurvey : clicked) {
 				if (criteriaColumn == "dayOfMonth") {
 					for (String date : clickedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
 					}
 				}
 				if (criteriaColumn == "week") {
 					for (String date : clickedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(clickedSurvey.get("_id").toString())+1)
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString())+1)
 							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
 					}
 				}
 				if (criteriaColumn == "month")
 					for (String date : clickedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
 					}
 			}
@@ -703,11 +703,11 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	}
 
 	/*
-	 * Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly)
+	 * Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly).
 	 */
 	@Override
 	public Map<String, Long> getSentSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
-		LOG.info("Method to get");
+		LOG.info("Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
@@ -743,22 +743,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				Date currDate = new Date();
 				int reductionInDate = 1;
 				for (int i = 0; i < 7; i++) {
-					sentSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
-					currDate = getNdaysBackDate(++reductionInDate);
+					currDate = getNdaysBackDate(reductionInDate++);
+					sentSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 				}
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
 				int reductionInDate = 0;
 				for (int i = 0; i < 4; i++) {
-					sentSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					sentSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
 					currDate = getNdaysBackDate(reductionInDate);
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
+				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					sentSurveys.put(getMonthAsString(i).toString(), 0l);
+					sentSurveys.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -766,35 +767,36 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			for (BasicDBObject sentSurvey : sent) {
 				if (criteriaColumn == "dayOfMonth") {
 					for (String date : sentSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 				}
 				if (criteriaColumn == "week") {
 					for (String date : sentSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get("_id").toString())+1)
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString())+1)
 							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 				}
 				if (criteriaColumn == "month")
 					for (String date : sentSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 			}
 		}
+		LOG.info("Method to get count of sent surveys based upon criteria(Weekly/Monthly/Yearly) getSentSurveyByCriteria() finished.");
 		return sentSurveys;
 	}
 
 	/*
-	 * Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly)
+	 * Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly).
 	 */
 	@Override
 	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
-		LOG.info("Method to get");
+		LOG.info("Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly) getCompletedSurveyByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
@@ -832,22 +834,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				Date currDate = new Date();
 				int reductionInDate = 1;
 				for (int i = 0; i < 7; i++) {
-					completedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
-					currDate = getNdaysBackDate(++reductionInDate);
+					currDate = getNdaysBackDate(reductionInDate++);
+					completedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 				}
 			}
 			else if (criteriaColumn.equals("week")) {
 				Date currDate = new Date();
 				int reductionInDate = 0;
 				for (int i = 0; i < 4; i++) {
-					completedSurveys.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+					completedSurveys.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 					reductionInDate += 7;
 					currDate = getNdaysBackDate(reductionInDate);
 				}
 			}
 			else if (criteriaColumn.equals("month")) {
+				int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 				for (int i = 0; i < 12; i++) {
-					completedSurveys.put(getMonthAsString(i).toString(), 0l);
+					completedSurveys.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 				}
 			}
 			Calendar calendar = Calendar.getInstance();
@@ -855,34 +858,35 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			for (BasicDBObject completedSurvey : completed) {
 				if (criteriaColumn == "dayOfMonth")
 					for (String date : completedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
 					}
 				if (criteriaColumn == "week") {
 					for (String date : completedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(completedSurvey.get("_id").toString())+1)
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString())+1)
 							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
 					}
 				}
 				if (criteriaColumn == "month")
 					for (String date : completedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
 					}
 			}
 		}
+		LOG.info("Method to get count of completed surveys based upon criteria(Weekly/Monthly/Yearly) getCompletedSurveyByCriteria() finished.");
 		return completedSurveys;
 	}
 
 	/*
-	 * Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly)
+	 * Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly).
 	 */
 	@Override
 	public Map<String, Long> getSocialPostsCountByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException {
-		LOG.info("Method to get");
+		LOG.info("Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly), getSocialPostsCountByCriteria() started.");
 		TypedAggregation<SurveyDetails> aggregation;
 		Date endDate = new Date();
 		int numberOfPastDaysToConsider = 7;
@@ -919,22 +923,23 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 					Date currDate = new Date();
 					int reductionInDate = 1;
 					for (int i = 0; i < 7; i++) {
-						socialPosts.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
-						currDate = getNdaysBackDate(++reductionInDate);
+						socialPosts.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
+						currDate = getNdaysBackDate(reductionInDate++);
 					}
 				}
 				else if (criteriaColumn.equals("week")) {
 					Date currDate = new Date();
 					int reductionInDate = 0;
 					for (int i = 0; i < 4; i++) {
-						socialPosts.put(new SimpleDateFormat("dd-MM-yyyy").format(currDate).toString(), 0l);
+						socialPosts.put(new SimpleDateFormat(CommonConstants.DATE_FORMAT).format(currDate).toString(), 0l);
 						reductionInDate += 7;
 						currDate = getNdaysBackDate(reductionInDate);
 					}
 				}
 				else if (criteriaColumn.equals("month")) {
+					int currMonth = Calendar.getInstance().get(Calendar.MONTH);
 					for (int i = 0; i < 12; i++) {
-						socialPosts.put(getMonthAsString(i).toString(), 0l);
+						socialPosts.put(getMonthAsString((currMonth++)%12).toString(), 0l);
 					}
 				}
 				Calendar calendar = Calendar.getInstance();
@@ -942,25 +947,26 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 			for (BasicDBObject sentSurvey : sent) {
 				if (criteriaColumn == "dayOfMonth")
 					for (String date : socialPosts.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 				if (criteriaColumn == "week") {
 					for (String date : socialPosts.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get("_id").toString())+1)
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.WEEK_OF_YEAR) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString())+1)
 							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 				}
 				if (criteriaColumn == "month")
 					for (String date : socialPosts.keySet()) {
-						calendar.setTime(new SimpleDateFormat("dd-MM-yyyy").parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get("_id").toString()))
+						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
+						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 			}
 		}
+		LOG.info("Method to get count of social posts based upon criteria(Weekly/Monthly/Yearly), getSocialPostsCountByCriteria() finished.");
 		return socialPosts;
 	}
 
@@ -975,7 +981,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		String month = "Invalid Month";
 		DateFormatSymbols dateFormatSymbols = new DateFormatSymbols();
 		month = dateFormatSymbols.getMonths()[monthInt];
-		return month;
+		return month.substring(0, 3);
 	}
 
 	// JIRA SS-137 and 158 : EOC
