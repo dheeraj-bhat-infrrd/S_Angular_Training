@@ -14,11 +14,11 @@
 							</c:when>
 							<c:when	test="${parentLock.isDisplayNameLocked && user.agent}">
 								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}" readonly>
-								<div id="prof-name-lock" data-state="locked" data-control="parent" class="hide lp-edit-locks float-left lp-edit-locks-locked"></div>
+								<div id="prof-name-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
 							</c:when>
 							<c:when	test="${not parentLock.isDisplayNameLocked && user.agent}">
 								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
-								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="hide lp-edit-locks float-left"></div>
+								<div id="prof-name-lock" data-state="unlocked" data-control="user" class="float-left"></div>
 							</c:when>
 							<c:when	test="${not parentLock.isDisplayNameLocked && lock.isDisplayNameLocked && not user.agent}">
 								<input id="prof-name" class="prof-name prof-name-txt prof-edditable" value="${contactdetail.name}">
