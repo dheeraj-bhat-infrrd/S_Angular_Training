@@ -34,15 +34,13 @@
    </fieldType>
    <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
   </types>
-
   <fields>
     <field name="regionId" type="long" indexed="true" stored="true" required="true" multiValued="false" /> 
     <field name="companyId" type="long" indexed="true" stored="true" />
     <field name="regionName" type="text" indexed="true" stored="true" />
     <field name="isDefaultBySystem" type="long" indexed="true" stored="true" />
     <field name="status" type="integer" indexed="true" stored="true" />
-    <field name="address1" type="text" indexed="true" stored="true"/>
-    <field name="address2" type="text" indexed="true" stored="true"/>
+    <field name="address" type="text" indexed="false" stored="true"/>
     <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
   </fields>
 
