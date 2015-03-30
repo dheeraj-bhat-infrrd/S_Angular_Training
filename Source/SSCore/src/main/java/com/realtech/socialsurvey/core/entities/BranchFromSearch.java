@@ -12,6 +12,7 @@ public class BranchFromSearch {
 	private long companyId;
 	private long isDefaultBySystem;
 	private int status;
+	private String address;
 
 	public long getBranchId() {
 		return branchId;
@@ -68,10 +69,18 @@ public class BranchFromSearch {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
 
 	@Override
 	public String toString() {
-		return "branchId: " + branchId + "\tbranchName: " + branchName + "regionId: " + regionId + "\tregionName: " + regionName + "\t\tcompanyId: "
-				+ companyId + "\tisDefaultBySystem: " + isDefaultBySystem + "\tstatus: " + status;
+		return "BranchFromSearch [branchId=" + branchId + ", branchName=" + branchName + ", regionId=" + regionId + ", regionName=" + regionName
+				+ ", companyId=" + companyId + ", isDefaultBySystem=" + isDefaultBySystem + ", status=" + status + ", address=" + address + "]";
 	}
+
 }
