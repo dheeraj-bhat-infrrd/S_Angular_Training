@@ -228,7 +228,7 @@ $('#edit-participation-reminder-mail-content').click(function(){
 $('#save-participation-reminder-mail-content').click(function(){
 	$('#mailcategory').val('participationremindermail');
 	updateMailContent("mail-body-settings-form");
-	
+	;
 	$('#survey-participation-reminder-mailcontent').ckeditorGet().setReadOnly(true);
 	
 	$(this).hide();
@@ -384,4 +384,50 @@ function displayPopup(data){
     	console.log("Showing popup");
     }
 	$("#temp-div").html("");
+}
+
+$('#happy-text').blur(function() {
+	  saveTextForMoodFlow($("#happy-text").val(), "happy");
+});
+
+$('#neutral-text').blur(function() {
+	saveTextForMoodFlow($("#neutral-text").val(), "neutral");
+});
+
+$('#sad-text').blur(function() {
+	saveTextForMoodFlow($("#sad-text").val(), "sad");
+});
+
+$('#atpst-chk-box').click(function(){
+	if($('#atpst-chk-box').hasClass('bd-check-img-checked')){
+		$('#atpst-chk-box').removeClass('bd-check-img-checked');
+	}
+	else{
+		$('#atpst-chk-box').addClass('bd-check-img-checked');
+	}
+});
+
+function saveTextForMoodFlow(content, mood){
+	var payload = {
+		"text" : content,
+		"mood" : mood
+	};
+	var success = false;
+	$.ajax({
+		url : "./storetextforflow.do",
+		type : "GET",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				$('#overlay-toast').html("Content added successfully!");
+			}
+		},
+		error : function() {
+			$('#overlay-toast').html("Oops! Something went wrong. Please try again later.");
+		}
+	});
 }

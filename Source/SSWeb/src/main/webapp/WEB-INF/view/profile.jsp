@@ -222,19 +222,32 @@
         	If region profile name is mentioned, fetch the region profile 
         	since this would be a call to fetch region profile page 
         */
+        
+        var gaLabel;
+        var gaName;
+        
         var regionProfileName = $("#region-profile-name").val();
         var branchProfileName = $("#branch-profile-name").val();
         var agentProfileName = $("#agent-profile-name").val();
         if(regionProfileName.length > 0) {
         	fetchRegionProfile(regionProfileName);
+        	gaLabel = 'region';
+        	gaName = regionProfileName;
         }
         else if(branchProfileName.length > 0){
         	fetchBranchProfile(branchProfileName);
-        }else if(agentProfileName.length > 0){
+        	gaLabel = 'office';
+        	gaName = branchProfileName;
+        }
+        else if(agentProfileName.length > 0){
         	fetchAgentProfile(agentProfileName);
+        	gaLabel = 'individual';
+        	gaName = agentProfileName;
         } 
         else{
         	fetchCompanyProfile();
+        	gaLabel = 'company';
+        	gaName = companyProfileName;
         }
         
        
@@ -303,7 +316,26 @@
         	downloadVCard(agentName);
         });
         
+    	// Google analytics for reviews
+    	ga('send', {
+    		'hitType': 'event',
+    		'eventCategory': 'review',
+    		'eventAction': 'click',
+    		'eventLabel': gaLabel,
+    		'eventValue': gaName
+    	});
     });
+</script>
+
+<script>
+// Google analytics tracking code
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-61251431-1', 'auto');
+ga('send', 'pageview');
 </script>
 
 </body>
