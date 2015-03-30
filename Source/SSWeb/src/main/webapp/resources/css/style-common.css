@@ -1854,7 +1854,7 @@ button.paypal.is-active {
 }
 
 .prof-name-edit {
-	height: 44px;
+	height: 34px;
 	background-color: #f1f1f1;
     border: 1px solid #dcdcdc;
 }
@@ -3147,9 +3147,10 @@ button.paypal.is-active {
 .lp-edit-locks{
 	cursor: pointer;
 	width: 46px;
-	height: 46px;
+	height: 34px;
 	background: url(../images/locks.png) no-repeat;
 	background-position: -218px center;
+	display: none;
 }
 
 .lp-ach-item-img{
@@ -3246,8 +3247,10 @@ button.paypal.is-active {
 }
 
 .prof-img-lock{
+	cursor: pointer;
 	background: rgba(255,255,255,0.6) url(../images/locks.png) no-repeat;
-	background-position: -123px center;
+	background-position: -223px center;
+	display: none;
 }
 .prof-img-lock-locked{
 	background-position: 4px center;
@@ -5526,4 +5529,21 @@ tr.u-tbl-header td {
 .paginate-button {
     cursor: pointer;
 	color: #5CC8EF;
+}
+
+.cs-gq-lbl {
+	font-size: 14px;
+	font-weight: bold !important;
+	line-height: 40px;
+	width: 350px;
+}
+
+.txtareaRow{
+	width: auto;
+}
+
+.textarea-bd-mcq-txt {
+  width: 500px;
+  padding: 10px;
+  height: 100px;
 }
