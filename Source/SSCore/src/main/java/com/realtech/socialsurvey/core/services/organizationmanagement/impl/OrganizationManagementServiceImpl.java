@@ -55,6 +55,7 @@ import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.PaymentException;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
 
 @DependsOn("generic")
@@ -1465,6 +1466,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		
+		// check if user profile already exists
+		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
+			for (UserProfile profile : assigneeUser.getUserProfiles()) {
+				if (profile.getRegionId() == userProfile.getRegionId() && profile.getBranchId() == userProfile.getBranchId()
+						&& profile.getProfilesMaster() == userProfile.getProfilesMaster() && profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
+			}
+		}
+		
 		userProfileDao.save(userProfile);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
@@ -1574,6 +1586,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), branchId, regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
+		
+		// check if user profile already exists
+		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
+			for (UserProfile profile : assigneeUser.getUserProfiles()) {
+				if (profile.getBranchId() == userProfile.getBranchId() && profile.getProfilesMaster() == userProfile.getProfilesMaster()
+						&& profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					throw new InvalidInputException(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS);
+				}
+			}
+		}
+		
 		userProfileDao.save(userProfile);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
@@ -1595,7 +1618,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		solrSearchService.addUserToSolr(assigneeUser);
 
 		LOG.info("Method assignBranchToUser executed successfully");
-
 	}
 
 	/**

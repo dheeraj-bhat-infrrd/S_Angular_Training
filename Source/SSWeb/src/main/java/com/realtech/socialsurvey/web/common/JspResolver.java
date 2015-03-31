@@ -20,13 +20,13 @@ public interface JspResolver {
 	public static final String PAYMENT = "payment";
 	public static final String LANDING = "landing";
 	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
-	
+
 	public static final String SURVEY_BUILDER = "buildSurvey";
 	public static final String SURVEY_BUILDER_QUESTION_OVERLAY = "buildSurvey_questionoverlay";
 	public static final String SURVEY_BUILDER_QUESTION_LIST = "buildSurvey_questionlist";
 	public static final String SURVEY_BUILDER_QUESTION_EDIT = "buildSurvey_questionedit";
 	public static final String SURVEY_BUILDER_QUESTION_NEW = "buildSurvey_questionnew";
-	
+
 	public static final String DASHBOARD = "dashboard";
 	public static final String USER_MANAGEMENT = "view-user-management";
 	public static final String USER_LIST_FOR_MANAGEMENT = "userlist";
@@ -61,6 +61,9 @@ public interface JspResolver {
 	public static final String PROFILE_HIERARCHY_CLICK_BRANCH = "profile_hierarchy_branch";
 	public static final String PROFILE_PAGE = "profile";
 	public static final String BUILD_HIERARCHY = "build-hierarchy";
+	public static final String VIEW_HIERARCHY = "hierarchy-view";
+	public static final String VIEW_HIERARCHY_REGION_LIST = "hierarchy-view-regions-list";
+	public static final String VIEW_HIERARCHY_BRANCH_LIST = "hierarchy-view-branches-list";
 	public static final String HIERARCHY_REGION_EDIT = "hierarchy-region-edit";
 	public static final String HIERARCHY_OFFICE_EDIT = "hierarchy-office-edit";
 	public static final String HIERARCHY_INDIVIDUAL_EDIT = "hierarchy-individual-edit";

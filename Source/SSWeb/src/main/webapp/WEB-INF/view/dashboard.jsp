@@ -4,7 +4,7 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left hr-dsh-adj-lft">Dashboard</div>
-            <div class="float-right header-right clearfix hr-dsh-adj-rt">
+           <!--  <div class="float-right header-right clearfix hr-dsh-adj-rt">
                 <div class="float-left hr-txt1">View As</div>
                 <div id="hr-txt2" class="float-left hr-txt2">Agent</div>
                 <div id="hr-dd-wrapper" class="hr-dd-wrapper hide">
@@ -12,7 +12,7 @@
                     <div class="hr-dd-item">Region Admin</div>
                     <div class="hr-dd-item">Company Admin</div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -50,7 +50,7 @@
                         <div class="dsh-g-wrap dsh-g-wrap-4">
                             <div class="dsh-graph-item dsh-graph-item-1">
                                 <div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>
-                                <div id="" class="dsh-graph-num dsh-graph-num-4 person-img"></div>
+                                <div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
                                 <div id="" class="dsh-graph-txt dsh-graph-txt-4">Profile Completed</div>
                                 <div id="badges" class="dsg-g-rbn"></div>
                             </div>
@@ -72,7 +72,7 @@
                             <div class="float-left dsh-star-item no-star"></div>
                             <div id="profile-completed" class="float-right dsh-rating-item">3/5</div>
                         </div>
-                        <div class="dsh-btn-complete">Complete Your Profile</div>
+                        <div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')">Complete Your Profile</div>
                     </div>
                 </div>
             </div>
@@ -109,70 +109,24 @@
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">No. of surveys sent</div>
 					<div id="all-surv-icn" class="float-left stat-icns-item clearfix">
-						<!-- <div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div class="float-left stat-icn-img stat-icn-img-green"></div>
-						<div id="survey-sent" class="float-left stat-icn-txt-rt"></div> -->
 					</div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Surveys clicked</div>
 					<div id="clicked-surv-icn"
 						class="float-left stat-icns-item clearfix">
-						<!-- <div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div class="float-left stat-icn-img stat-icn-img-blue"></div>
-						<div id="survey-clicked" class="float-left stat-icn-txt-rt">70%</div> -->
 					</div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Surveys completed</div>
 					<div id="completed-surv-icn"
 						class="float-left stat-icns-item clearfix">
-						<!-- <div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
-						<div id="survey-completed" class="float-left stat-icn-txt-rt">8.5%</div> -->
 					</div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Social posts</div>
 					<div id="social-post-icn"
 						class="float-left stat-icns-item clearfix">
-						<!-- <div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div class="float-left stat-icn-img stat-icn-img-red"></div>
-						<div id="social-posts" class="float-left stat-icn-txt-rt">80%</div> -->
 					</div>
 				</div>
 				<!--

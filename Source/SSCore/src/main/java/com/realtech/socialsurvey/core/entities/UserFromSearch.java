@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.entities;
 
+import java.util.List;
+
 /**
  * User entity from the search
  */
@@ -17,6 +19,25 @@ public class UserFromSearch {
 	private boolean isRegionAdmin;
 	private boolean isBranchAdmin;
 	private boolean isAgent;
+	private List<String> regions;
+	private List<String> branches;
+	private boolean canEdit;
+
+	public List<String> getRegions() {
+		return regions;
+	}
+
+	public void setRegions(List<String> regions) {
+		this.regions = regions;
+	}
+
+	public List<String> getBranches() {
+		return branches;
+	}
+
+	public void setBranches(List<String> branches) {
+		this.branches = branches;
+	}
 
 	public long getUserId() {
 		return userId;
@@ -113,10 +134,18 @@ public class UserFromSearch {
 	public void setAgent(boolean isAgent) {
 		this.isAgent = isAgent;
 	}
-	
-	@Override
-	public String toString(){
-		return "user id: "+userId+"\temailId: "+emailId+"\tdisplayName: "+displayName+"\tstatus: "+status+"\tisRegionAdmin: "+isRegionAdmin+"\tisBranchAdmin: "+isBranchAdmin+"\tisAgent: "+isAgent;
+
+	public boolean getCanEdit() {
+		return canEdit;
 	}
 
+	public void setCanEdit(boolean canEdit) {
+		this.canEdit = canEdit;
+	}
+
+	@Override
+	public String toString() {
+		return "user id: " + userId + "\temailId: " + emailId + "\tdisplayName: " + displayName + "\tstatus: " + status + "\tisRegionAdmin: "
+				+ isRegionAdmin + "\tisBranchAdmin: " + isBranchAdmin + "\tisAgent: " + isAgent + "\tcanEdit: " + canEdit;
+	}
 }

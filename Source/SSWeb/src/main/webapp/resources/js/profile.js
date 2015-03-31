@@ -475,7 +475,7 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
-		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerName+'</div>';
+		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
 		if(date != null){
 			reviewsHtml=  reviewsHtml+'			<div class="ppl-head-2">'+date.getDate() +" "+ date.getMonthName()+" "+date.getFullYear()+'</div>'; 
 		}

@@ -16,13 +16,13 @@
 									</form>
 								</c:when>
 								<c:when	test="${parentLock.isLogoLocked && user.agent}">
-									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="hide prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
+									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-locked"></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file" disabled>
 									</form>
 								</c:when>
 								<c:when	test="${not parentLock.isLogoLocked && user.agent}">
-									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class="hide prof-img-lock-item prof-img-lock"></div>
+									<div id="prof-logo-lock" data-state="unlocked" data-control="user" class=""></div>
 									<form class="form_contact_image" enctype="multipart/form-data">
 										<input type="file" id="prof-logo" class="con_img_inp_file">
 									</form>
@@ -42,7 +42,7 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
 							<form class="form_contact_image" enctype="multipart/form-data">
 								<input type="file" id="prof-logo" class="con_img_inp_file">
 							</form>

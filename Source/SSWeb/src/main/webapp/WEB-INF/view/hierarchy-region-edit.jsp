@@ -1,5 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-<form id="edit-region-form">
+<form id="edit-region-form" class="edit-region-form">
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.regionname.key"/></div>
 	     <div class="float-left bd-frm-right">
@@ -55,7 +55,7 @@
 	     <div class="float-left bd-frm-right">
 	         <div class="bd-frm-check-wrapper clearfix">
 	             <div class="float-left bd-check-img"></div>
-	             <input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
+	             <input type="hidden" name="isAdmin" value="true" id="is-admin-chk" class="ignore-clear">
 	             <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
 	         </div>
 	     </div>
