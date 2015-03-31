@@ -1,8 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if test="${not empty profile && not empty profile.contact_details}">
-	<c:set value="${profile.contact_details}" var="contactdetail"></c:set>
+
+<c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
+	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 </c:if>
+
 <div id="prof-address-edit-container" class="prof-user-address prof-edit-icn">
 	<input id="prof-name" class="pu-edit-fields" value="${contactdetail.name}" placeholder='<spring:message code="label.address.displayname.key"/>'>
 	<input id="prof-address1" class="pu-edit-fields" value="${contactdetail.address1}" placeholder='<spring:message code="label.address.address1.key"/>'>
