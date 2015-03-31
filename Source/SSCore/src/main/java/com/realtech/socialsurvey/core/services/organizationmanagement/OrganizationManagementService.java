@@ -562,5 +562,10 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException;
+	
+	/**
+	 * Method to get the list of all the company ids
+	 */
+	public Set<Company> getAllCompanies();
 
 }
