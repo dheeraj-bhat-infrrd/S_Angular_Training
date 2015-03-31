@@ -3480,6 +3480,18 @@ button.paypal.is-active {
     border-bottom: 0;
 }
 
+.pe-dd-item {
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 5px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.pe-dd-item: last-child {
+    border-bottom: 0;
+}
+
 .dsh-name-wrapper {
     font-size: 22px;
     text-align: center;
@@ -5071,7 +5083,7 @@ tr.u-tbl-header td {
 
 .srv-tbl-txt {
     font-size: 16px;
-/*    margin-left: 8px;*/
+	/* margin-left: 8px;*/
     margin-right: 10px;
     width: 884px;
     display: table-cell;
@@ -5080,7 +5092,7 @@ tr.u-tbl-header td {
     padding-top: 14px;
     padding-bottom: 13px;
     height: 55px;
-    float: none !important;
+    /* float: none !important; */
     padding: 0;
     line-height: normal;
 }

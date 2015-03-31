@@ -65,6 +65,20 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
+			<c:choose>
+				<c:when test="${not empty profileList}">
+					<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
+						<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
+						<div id="profile-sel" class="float-left hr-txt2 cursor-pointer"></div>
+						<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
+							<c:forEach var="userprofile" items="${profileList}">
+								<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
+							</c:forEach>
+						</div>
+					</div>
+				</c:when>
+			</c:choose>
+
 			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 				<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
 				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
@@ -72,16 +86,6 @@
 				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
 				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 			</div>
-			<c:choose>
-				<c:when test="${not empty user.userProfiles}">
-					<input type="text" name="profile-sel" id="profile-sel" class="st-item-row-txt cursor-pointer">
-					<div id="st-dd-wrapper-profiles" class="st-dd-wrapper hide" style="z-index: 9999">
-						<c:forEach var="userprofile" items="${user.userProfiles}">
-							<div class="st-dd-item">${userprofile.userProfileId}</div>
-						</c:forEach>
-					</div>
-				</c:when>
-			</c:choose>
 		</div>
 	</div>
 </div>
@@ -469,9 +473,9 @@
 						<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
 					</c:when>
 				</c:choose>
-        			<div id ="prof-hierarchy-container" class="hide">
-        				<!-- hierarchy structure comes here  -->
-        			</div>
+					<div id ="prof-hierarchy-container" class="hide">
+						<!-- hierarchy structure comes here  -->
+					</div>
    				</div>
 			</div>
 			
@@ -517,43 +521,43 @@
 					</c:choose>
 				</div>
 				
-                <div class="rt-content-main bord-bot-dc clearfix">
-                	<div class="float-left panel-tweet-wrapper">
-                        <div class="main-con-header"><spring:message code="label.sspost.key"/></div>
-                        <textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
+				<div class="rt-content-main bord-bot-dc clearfix">
+					<div class="float-left panel-tweet-wrapper">
+						<div class="main-con-header"><spring:message code="label.sspost.key"/></div>
+						<textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
 						<div class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
-                    </div>
-                    <div class="float-left panel-tweet-wrapper">
-                        <div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
-                        <div class="tweet-panel tweet-panel-left">
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
-                                <div class="tweet-icn icn-tweet float-left"></div>
-                                <div class="tweet-txt float-left">
-                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
-                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
-                                </div>
-                            </div>
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
-                                <div class="tweet-icn icn-tweet float-left"></div>
-                                <div class="tweet-txt float-left">
-                                    <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
-                                    <div class="tweet-text-link"><em>http://abblk.com</em></div>
-                                    <div class="tweet-text-time"><em>24 minutes ago</em></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+					</div>
+					<div class="float-left panel-tweet-wrapper">
+						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
+						<div class="tweet-panel tweet-panel-left">
+							<div class="tweet-panel-item bord-bot-dc clearfix">
+								<div class="tweet-icn icn-tweet float-left"></div>
+								<div class="tweet-txt float-left">
+									<div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
+									<div class="tweet-text-link"><em>http://abblk.com</em></div>
+									<div class="tweet-text-time"><em>24 minutes ago</em></div>
+								</div>
+							</div>
+							<div class="tweet-panel-item bord-bot-dc clearfix">
+								<div class="tweet-icn icn-tweet float-left"></div>
+								<div class="tweet-txt float-left">
+									<div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
+									<div class="tweet-text-link"><em>http://abblk.com</em></div>
+									<div class="tweet-text-time"><em>24 minutes ago</em></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 
 				<div id="reviews-container" class="people-say-wrapper rt-content-main">
 					<div class="main-con-header">
 						<span class="ppl-say-txt-st"><spring:message code="label.peoplesayabout.key"/></span>${contactdetail.name}
 					</div>
-                    <div id="prof-review-item" class="prof-reviews">
-	                	<!--  reviews get populated here --> 
-                    </div>
-               	</div>
+					<div id="prof-review-item" class="prof-reviews">
+						<!--  reviews get populated here --> 
+					</div>
+			   	</div>
 			</div>
 		</div>
 	</div>
@@ -617,13 +621,14 @@
 			$(this).addClass('mob-icn-active');
 		});
 		
+		// Profile View as
 		$('#profile-sel').click(function(){
-			$('#st-dd-wrapper-profiles').slideToggle(200);
+			$('#pe-dd-wrapper-profiles').slideToggle(200);
 		});
-		$('.st-dd-item').click(function(){
-			var newProfileId = $(this).html();
-			$('#profile-sel').val(newProfileId);
-			$('#st-dd-wrapper-profiles').slideToggle(200);
+		$('.pe-dd-item').click(function(){
+			var newProfileId = $(this).data('profile-id');;
+			$('#profile-sel').html(newProfileId);
+			$('#pe-dd-wrapper-profiles').slideToggle(200);
 			
 			showMainContent('./showprofilepage.do?profileId=' + newProfileId);
 		});
