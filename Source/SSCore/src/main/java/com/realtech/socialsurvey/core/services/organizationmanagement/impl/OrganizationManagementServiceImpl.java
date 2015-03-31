@@ -2582,5 +2582,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method getBranchesByRegionIds executed successfully");
 		return branches;
 	}
+
+	/**
+	 * Method to get the list of all the company ids
+	 */
+	@Override
+	public Set<Company> getAllCompanies() {
+		LOG.info("Method to get list of all companies, getAllCompanies() started");
+		@SuppressWarnings("unchecked")
+		Set<Company> companies = (Set<Company>) companyDao.findAllActive(Company.class);
+		LOG.info("Method to get list of all companies, getAllCompanies() finished");
+		return companies;
+	}
 }
 // JIRA: SS-27: By RM05: EOC
