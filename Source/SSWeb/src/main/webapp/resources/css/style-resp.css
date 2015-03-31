@@ -840,7 +840,7 @@
         font-size: 14px;
         padding-left: 10px;
         border-bottom: 0;
-        margin-top: 0;
+        margin-top: 0 !important;
     }
     .hr-dsh-adj-rt{
         line-height: 48px;
@@ -1641,6 +1641,10 @@
     }
     .float-left.vs-ans-txt {
         width: 705px;
+    }
+    .hdr-logo{
+        width: 130px;
+        background-size: 88%;
     }
 }
 
