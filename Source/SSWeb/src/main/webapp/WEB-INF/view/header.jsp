@@ -127,8 +127,8 @@
 				</c:if>
 			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
-				<div class="float-left user-info-initial">
-					<span>${fn:substring(user.firstName, 0, 1)}</span>
+				<div id="hdr-usr-img" class="float-left user-info-initial">
+					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
 						<c:if test="${highestrole == 1}">
 							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do')">

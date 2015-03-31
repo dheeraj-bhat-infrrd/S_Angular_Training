@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.SolrQuery.ORDER;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.HttpSolrServer;
@@ -45,7 +46,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(SolrSearchServiceImpl.class);
 	private static final String SOLR_EDIT_REPLACE = "set";
-	
+
 	@Value("${SOLR_REGION_URL}")
 	private String solrRegionUrl;
 
@@ -182,7 +183,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrServer solrServer = new HttpSolrServer(solrBranchUrl);
 			SolrQuery query = new SolrQuery();
 			query.setQuery(CommonConstants.REGION_ID_SOLR + ":" + regionId);
-			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
+			query.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE, CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR + ":"
+					+ CommonConstants.NO);
 			query.setStart(start);
 
 			if (rows > 0) {
@@ -275,6 +277,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
 
+		String address = branch.getAddress1();
+		if (address != null && branch.getAddress2() != null) {
+			address = address + " " + branch.getAddress2();
+		}
+		document.addField(CommonConstants.BRANCH_ADDRESS_SOLR, address);
+
 		LOG.debug("Method getSolrDocumentFromBranch finished for branch " + branch);
 		return document;
 	}
@@ -294,6 +302,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
+		String address = region.getAddress1();
+		if (address != null && region.getAddress2() != null) {
+			address = address + " " + region.getAddress2();
+		}
+		document.addField(CommonConstants.REGION_ADDRESS_SOLR, address);
 
 		LOG.debug("Method getSolrDocumentFromRegion finished for region " + region);
 		return document;
@@ -370,6 +383,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery("companyId:" + companyId);
 			solrQuery.addFilterQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -502,6 +516,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
 			solrQuery.setStart(startIndex);
 			solrQuery.setRows(noOfRows);
+			solrQuery.addSort(CommonConstants.USER_DISPLAY_NAME_SOLR, ORDER.asc);
 			LOG.debug("Querying solr for searching users");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -515,6 +530,37 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 		LOG.info("Method searchUsersByCompanyId() finished for company id : " + companyId);
 		return usersResult;
+	}
+
+	@Override
+	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException {
+		LOG.info("Method countUsersByCompany() called for company id : " + companyId);
+		if (companyId < 0) {
+			throw new InvalidInputException("Pattern is null or empty while searching for Users");
+		}
+
+		long resultsCount = 0l;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
+			solrQuery.setStart(startIndex);
+			solrQuery.setRows(noOfRows);
+			response = solrServer.query(solrQuery);
+
+			resultsCount = response.getResults().getNumFound();
+			LOG.debug("User search result count is : " + resultsCount);
+		}
+		catch (SolrServerException e) {
+			LOG.error("SolrServerException while performing User search");
+			throw new SolrException("Exception while performing search for user. Reason : " + e.getMessage(), e);
+		}
+
+		LOG.info("Method countUsersByCompany() finished for company id : " + companyId);
+		return resultsCount;
 	}
 
 	/**
@@ -857,7 +903,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
-			
+
 			LOG.debug("Querying solr for searching regions");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -885,7 +931,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrQuery solrQuery = new SolrQuery();
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE);
 			solrQuery.addFilterQuery(CommonConstants.COMPANY_ID_SOLR + ":" + companyId);
-			
+
 			LOG.debug("Querying solr for searching branches");
 			response = solrServer.query(solrQuery);
 			SolrDocumentList results = response.getResults();
@@ -895,7 +941,6 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.error("SolrServerException while performing Branches search");
 			throw new SolrException("Exception while performing search for Branches. Reason : " + e.getMessage(), e);
 		}
-
 		LOG.info("Method fetchBranchesByCompany() finished for company id : " + companyId);
 		return branchesResult;
 	}

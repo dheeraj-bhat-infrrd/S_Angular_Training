@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
-<form id="edit-office-form">
+<form id="edit-office-form" class="edit-office-form">
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.officename.key"/></div>
     <div class="float-left bd-frm-right">
@@ -92,7 +92,7 @@
     <div class="float-left bd-frm-right">
         <div class="bd-frm-check-wrapper clearfix">
             <div class="float-left bd-check-img"></div>
-            <input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
+            <input type="hidden" name="isAdmin" value="true" id="is-admin-chk" class="ignore-clear">
             <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
         </div>
     </div>

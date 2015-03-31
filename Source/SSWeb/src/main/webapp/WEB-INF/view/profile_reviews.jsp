@@ -7,9 +7,9 @@
 			<div class="ppl-review-item">
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
-						<div class="ppl-head-1">${reviewItem.customerName}</div>
+						<div class="ppl-head-1">${reviewItem.customerFirstName}+' '+${reviewItem.customerLastName}</div>
 						<div class="ppl-head-2">
-							<fmt:formatDate type="date" pattern="dd MMM, yyyy" value="${reviewItem.updatedOn}" />
+							<fmt:formatDate type="date" pattern="dd MMM, yyyy" value="${reviewItem.modifiedOn}" />
 						</div>
 					</div>
 					<div class="float-right ppl-header-right">
