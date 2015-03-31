@@ -857,7 +857,7 @@ function paintIncompleteSurvey(result) {
 				+ ' data-agentid=' + survey.agentId
 				+ ' data-agentname=' + survey.agentName + ' data-custemail='
 				+ survey.customerEmail
-				+ ' class="float-right dash-lp-rt-img"></div></div>';
+				+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
 	});
 	if(startIndexInc==0)
 		$("#dsh-inc-srvey").html(divToPopulate);

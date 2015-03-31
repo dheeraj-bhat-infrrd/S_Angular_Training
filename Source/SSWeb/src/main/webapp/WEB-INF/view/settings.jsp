@@ -16,7 +16,10 @@
 
 <div id="temp-div"></div>
 
-<div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25">
+<div id="hm-main-content-wrapper" class="hm-main-content-wrapper margin-top-25 margin-bottom-25"
+data-hpy="${cannonicalusersettings.companySettings.survey_settings.happyText}"
+data-nutl="${cannonicalusersettings.companySettings.survey_settings.neutralText}" 
+data-sad="${cannonicalusersettings.companySettings.survey_settings.sadText}">
 	<div class="container">
 		
 		<form id="encompass-form">
@@ -112,6 +115,7 @@
 						</div>
 						<div>
 							<div id="atpst-chk-box" class="float-left bd-check-img"></div>
+							<input type="hidden" id="at-pst-cb" name="autopost" value="true">
 							<div class="float-left bd-check-txt">Allow user to autopost</div>
 						</div>
 					</div>
@@ -164,6 +168,7 @@
 				<input type="hidden" name="mailcategory" id="mailcategory">
 				<div class="um-header margin-top-25"><spring:message code="label.header.email.configuration.key" /></div>
 				<div class="clearfix st-bottom-wrapper margin-top-50">
+				<div class="clearfix">Legends:&nbsp&nbsp&nbsp&nbsp[Name]:Customer's Name,&nbsp&nbsp&nbsp&nbsp[AgentName] : Agent's Name,&nbsp&nbsp&nbsp&nbsp[Link] : Url of the survey</div>
 					<div class="st-header-txt-lft-rt clearfix margin-top-25">
 						<div class="float-left st-header-txt-lft"><spring:message code="label.header.mailer.content.key" /></div>
 						<div class="float-right clearfix st-header-txt-rt">
@@ -303,5 +308,8 @@ $(document).ready(function(){
 	autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
 	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
 	autoSetReminderIntervalStatus();
+	paintTextForMood($('#hm-main-content-wrapper').attr("data-hpy"), 
+			$('#hm-main-content-wrapper').attr("data-nutl"),
+			$('#hm-main-content-wrapper').attr("data-sad"));
 });
 </script>

@@ -401,10 +401,13 @@ $('#sad-text').blur(function() {
 $('#atpst-chk-box').click(function(){
 	if($('#atpst-chk-box').hasClass('bd-check-img-checked')){
 		$('#atpst-chk-box').removeClass('bd-check-img-checked');
+		$('#at-pst-cb').val("true");
 	}
 	else{
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
+		$('#at-pst-cb').val("false");
 	}
+	updatePostScore("rating-settings-form");
 });
 
 function saveTextForMoodFlow(content, mood){
@@ -431,3 +434,15 @@ function saveTextForMoodFlow(content, mood){
 		}
 	});
 }
+
+function paintTextForMood(happyText, neutralText, sadText){
+	console.log(happyText);
+	console.log(neutralText);
+	console.log(sadText);
+	$('#happy-text').html(happyText);
+	$('#neutral-text').html(neutralText);
+	$('#sad-text').html(sadText);
+}
+
+
+
