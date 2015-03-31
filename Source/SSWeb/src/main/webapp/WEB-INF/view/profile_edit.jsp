@@ -568,7 +568,6 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 
-<script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
 <script>
