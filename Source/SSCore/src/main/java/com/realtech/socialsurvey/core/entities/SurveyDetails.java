@@ -8,6 +8,7 @@ public class SurveyDetails {
 	private long agentId;
 	private String agentName;
 	private int reminderCount;
+	private int socialPostsReminder;
 	private String customerFirstName;
 	private String customerLastName;
 	private String customerEmail;
@@ -23,6 +24,10 @@ public class SurveyDetails {
 	private List<String> sharedOn;
 	String custRelationWithAgent;
 	private String initiatedBy;
+	private Date lastReminderForIncompleteSurvey;
+	private List<Date> remindersForIncompleteSurveys;
+	private Date lastReminderForSocialPost;
+	private List<Date> remindersForSocialPosts;
 	private String url;
 	private List<SurveyResponse> surveyResponse;
 	
@@ -43,6 +48,12 @@ public class SurveyDetails {
 	}
 	public void setReminderCount(int reminderCount) {
 		this.reminderCount = reminderCount;
+	}
+	public int getSocialPostsReminder() {
+		return socialPostsReminder;
+	}
+	public void setSocialPostsReminder(int socialPostsReminder) {
+		this.socialPostsReminder = socialPostsReminder;
 	}
 	public String getCustomerFirstName() {
 		return customerFirstName;
@@ -139,6 +150,30 @@ public class SurveyDetails {
 	}
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
+	}
+	public Date getLastReminderForIncompleteSurvey() {
+		return lastReminderForIncompleteSurvey;
+	}
+	public void setLastReminderForIncompleteSurvey(Date lastReminderForIncompleteSurvey) {
+		this.lastReminderForIncompleteSurvey = lastReminderForIncompleteSurvey;
+	}
+	public List<Date> getRemindersForIncompleteSurveys() {
+		return remindersForIncompleteSurveys;
+	}
+	public void setRemindersForIncompleteSurveys(List<Date> remindersForIncompleteSurveys) {
+		this.remindersForIncompleteSurveys = remindersForIncompleteSurveys;
+	}
+	public Date getLastReminderForSocialPost() {
+		return lastReminderForSocialPost;
+	}
+	public void setLastReminderForSocialPost(Date lastReminderForSocialPost) {
+		this.lastReminderForSocialPost = lastReminderForSocialPost;
+	}
+	public List<Date> getRemindersForSocialPosts() {
+		return remindersForSocialPosts;
+	}
+	public void setRemindersForSocialPosts(List<Date> remindersForSocialPosts) {
+		this.remindersForSocialPosts = remindersForSocialPosts;
 	}
 	public String getUrl() {
 		return url;
