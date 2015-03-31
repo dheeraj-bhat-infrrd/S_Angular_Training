@@ -184,6 +184,7 @@ public interface CommonConstants {
 	public static final String SUCCESS_ATTRIBUTE = "success";
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
+	public static final String USER_PROFILE_LIST = "profileList";
 	public static final String USER_PROFILE_SETTINGS = "profileSettings";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
@@ -193,6 +194,8 @@ public interface CommonConstants {
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
 	public static final String SOCIAL_FLOW = "socialFlow";
+	public static final String BRANCHES_IN_SESSION = "branches";
+	public static final String REGIONS_IN_SESSION = "regions";
 
 	/**
 	 * Batch Constants
