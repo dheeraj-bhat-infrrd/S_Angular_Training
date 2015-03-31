@@ -38,7 +38,6 @@
 
     <div class="container v-hr-container">
         <div class="v-hr-header">Providential Utah Elite Estate</div>
-        
         <div class="v-hr-tbl-wrapper">
             <table class="v-hr-tbl">
                 <tr class="v-tbl-header">

@@ -81,10 +81,10 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
-	
+
 	@Autowired
 	private SurveyBuilder surveyBuilder;
-	
+
 	@Value("${AMAZON_ENDPOINT}")
 	private String endpoint;
 
@@ -112,9 +112,9 @@ public class OrganizationManagementController {
 
 		try {
 			logoName = fileUploadService.fileUploadHandler(fileLocal, request.getParameter("logo_name"));
-			//Setting the complete logo url in session
-			logoName = endpoint + "/" + bucket + "/" +logoName;
-			
+			// Setting the complete logo url in session
+			logoName = endpoint + "/" + bucket + "/" + logoName;
+
 			LOG.debug("Setting Logo image name to Session");
 			request.getSession(false).setAttribute(CommonConstants.LOGO_NAME, logoName);
 
@@ -161,7 +161,7 @@ public class OrganizationManagementController {
 					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
 							DisplayMessageConstants.GENERAL_ERROR, e1);
 				}
-				throw new InvalidInputException("Invalid input exception occured while validating form parameters",e.getErrorCode(),e);
+				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
 			}
 			String address = getCompleteAddress(address1, address2);
 
@@ -293,17 +293,18 @@ public class OrganizationManagementController {
 			User user = sessionHelper.getCurrentUser();
 
 			LOG.debug("Checking if payment has already been made.");
-			if (gateway.checkIfPaymentMade(user.getCompany()) && user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
+			if (gateway.checkIfPaymentMade(user.getCompany())
+					&& user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAccountsMasterId() != CommonConstants.ACCOUNTS_MASTER_FREE) {
 				LOG.debug("Payment for this company has already been made. Redirecting to dashboard.");
 				return JspResolver.PAYMENT_ALREADY_MADE;
 			}
-			
-			//We check if there is mapped survey for the company and add a default survey if not.
-			if(surveyBuilder.checkForExistingSurvey(user) == null){
+
+			// We check if there is mapped survey for the company and add a default survey if not.
+			if (surveyBuilder.checkForExistingSurvey(user) == null) {
 				surveyBuilder.addDefaultSurveyToCompany(user);
 			}
-			
-			if(Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE){
+
+			if (Integer.parseInt(strAccountType) == CommonConstants.ACCOUNTS_MASTER_FREE) {
 				LOG.debug("Since its a free account type returning no popup jsp");
 				return null;
 			}
@@ -769,7 +770,7 @@ public class OrganizationManagementController {
 			switch (newAccountsMasterId) {
 				case CommonConstants.ACCOUNTS_MASTER_INDIVIDUAL:
 					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_INDIVIDUAL_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
-						DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+							DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 					break;
 				case CommonConstants.ACCOUNTS_MASTER_TEAM:
 					message = messageUtils.getDisplayMessage(DisplayMessageConstants.TO_TEAM_SUBSCRIPTION_UPGRADE_SUCCESSFUL,
@@ -789,14 +790,14 @@ public class OrganizationManagementController {
 		catch (InvalidInputException | NoRecordsFetchedException | SolrException | UndeliveredEmailException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(null, DisplayMessageType.ERROR_MESSAGE).getMessage();
-			
+
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 
 		}
 		catch (PaymentException e) {
 			LOG.error("NonFatalException while upgrading subscription. Message : " + e.getMessage(), e);
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
-			
+
 			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
 		}
 		catch (SubscriptionPastDueException e) {
@@ -854,7 +855,7 @@ public class OrganizationManagementController {
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
 
 	}
-	
+
 	/**
 	 * Method for displaying the upgrade page to upgrade from free account
 	 * 
@@ -920,45 +921,50 @@ public class OrganizationManagementController {
 		LOG.info("Returning the confirmation page");
 		return JspResolver.UPGRADE_CONFIRMATION;
 	}
-	
+
 	/**
-	 * This controller is called to initialize the default branches and regions in case they arent done after payment.
+	 * This controller is called to initialize the default branches and regions in case they arent
+	 * done after payment.
+	 * 
 	 * @param request
 	 * @param model
 	 * @return
 	 */
-	@RequestMapping(value="/defaultbrandandregioncreation", method = RequestMethod.GET)
-	public String createDefaultBranchesAndRegions(HttpServletRequest request,Model model){
-		
+	@RequestMapping(value = "/defaultbrandandregioncreation", method = RequestMethod.GET)
+	public String createDefaultBranchesAndRegions(HttpServletRequest request, Model model) {
+
 		LOG.info("createDefaultBranchesAndRegions called to do pre processing before log in");
-		
+
 		User user = sessionHelper.getCurrentUser();
-		
+
 		try {
-			if( user == null ){
+			if (user == null) {
 				LOG.error("createDefaultBranchesAndRegions : user not found in session!");
 				throw new InvalidInputException("createDefaultBranchesAndRegions : user not found in session!");
 			}
-			
+
 			LicenseDetail currentLicenseDetail = user.getCompany().getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
 			HttpSession session = request.getSession(false);
 			AccountType accountType = null;
-			
-			if( currentLicenseDetail == null ){
+
+			if (currentLicenseDetail == null) {
 				LOG.error("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
 				throw new InvalidInputException("createDefaultBranchesAndRegions : License details not found for user with id : " + user.getUserId());
 			}
-			
+
 			AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
-			
-			if( currentAccountsMaster == null ){
-				LOG.error("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : " + currentLicenseDetail.getLicenseId());
-				throw new InvalidInputException("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : " + currentLicenseDetail.getLicenseId());
+
+			if (currentAccountsMaster == null) {
+				LOG.error("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
+						+ currentLicenseDetail.getLicenseId());
+				throw new InvalidInputException("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
+						+ currentLicenseDetail.getLicenseId());
 			}
-			
+
 			try {
 				LOG.debug("Calling sevices for adding account type of company");
-				accountType = organizationManagementService.addAccountTypeForCompany(user,String.valueOf(currentAccountsMaster.getAccountsMasterId()));
+				accountType = organizationManagementService.addAccountTypeForCompany(user,
+						String.valueOf(currentAccountsMaster.getAccountsMasterId()));
 				LOG.debug("Successfully executed sevices for adding account type of company.Returning account type : " + accountType);
 
 				LOG.debug("Adding account type in session");
@@ -993,11 +999,61 @@ public class OrganizationManagementController {
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.ERROR_PAGE;
 		}
-		
+
 		LOG.info("createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!");
-		
+
 		return JspResolver.LANDING;
-		
+
+	}
+
+	/**
+	 * This controller is called to store text to be displayed to a customer after choosing the
+	 * flow(happy/neutral/sad).
+	 * 
+	 * @param request
+	 * @param model
+	 * @return
+	 */
+	@RequestMapping(value = "/storetextforflow")
+	public void storeTextForFlow(HttpServletRequest request, Model model) {
+
+		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() started.");
+
+		User user = sessionHelper.getCurrentUser();
+
+		try {
+			if (user == null) {
+				LOG.error("storeTextForFlow() : user not found in session!");
+				throw new InvalidInputException("storeTextForFlow() : user not found in session!");
+			}
+
+			String text = request.getParameter("text");
+			String mood = request.getParameter("mood");
+
+			if (text == null || text.isEmpty()) {
+				LOG.error("Null or empty value found in storeTextForFlow() for text.");
+				throw new InvalidInputException("Null or empty value found in storeTextForFlow() for text.");
+			}
+
+			if (mood == null || mood.isEmpty()) {
+				LOG.error("Null or empty value found in storeTextForFlow() for mood.");
+				throw new InvalidInputException("Null or empty value found in storeTextForFlow() for mood.");
+			}
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
+			SurveySettings surveySettings = companySettings.getSurvey_settings();
+			if (mood.equalsIgnoreCase("happy"))
+				surveySettings.setHappyText(text);
+			else if (mood.equalsIgnoreCase("neutral"))
+				surveySettings.setNeutralText(text);
+			else if (mood.equalsIgnoreCase("sad"))
+				surveySettings.setSadText(text);
+
+			organizationManagementService.updateSurveySettings(companySettings, surveySettings);
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal exception caught in storeTextForFlow(). Nested exception is ", e);
+		}
+		LOG.info("Method to store text to be displayed to a customer after choosing the flow, storeTextForFlow() finished.");
 	}
 }
 
