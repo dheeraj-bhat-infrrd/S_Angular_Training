@@ -670,7 +670,7 @@ public class HierarchyManagementController {
 			
 			// updating session with new assignment
 			if (user.getUserId() == selectedUserId) {
-				sessionHelper.getCanonicalSettings(request.getSession());
+				sessionHelper.getCanonicalSettings(request.getSession(false));
 			}
 		}
 		catch (NonFatalException e) {
