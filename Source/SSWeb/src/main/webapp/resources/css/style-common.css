@@ -503,6 +503,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     height: 78px;
     width: 36px;
     background: url(../images/divider.png) no-repeat center;
+    display: none;
 }
 
 .user-info-initial {
@@ -540,7 +541,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-header-row-left {
     font-size: 16px;
-    line-height: 55px;
+    line-height: 40px;
     font-family: opensanslight;
     font-weight: bold !important;
 }
@@ -594,7 +595,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-item-row {
     width: 480px;
-    margin: 0 auto 25px;
+    margin: 0 auto 10px;
 }
 
 .hm-item-row-left {
@@ -800,7 +801,7 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     width: 100%;
 }
 .um-header {
-    font-size: 20px;
+    font-size: 16px;
     margin-bottom: 25px;
 }
 
@@ -815,16 +816,19 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 .um-item-row-left {
     width: 80px;
     float: left;
-    line-height: 50px;
+    line-height: 40px;
 }
 
 .um-item-row-txt {
-    border: 1px solid #e3e3e3;
-    border-radius: 3px;
-    box-shadow: 0px 2px 2px 0px #e3e3e3;
     width: 300px;
-    height: 50px;
+    height: 40px;
     padding: 0 10px;
+    border-radius: 3px;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #dcdcdc;
+    margin-right: 30px;
+    font-size: 12px;    
 }
 
 .um-tag-item-txt {
@@ -1063,14 +1067,14 @@ button.paypal.is-active {
 
 .rating-star {
     float: left;
-    height: 50px;
+    height: 40px;
     width: 35px;
     margin-right: 1px;
 }
 
 .st-rating-input {
     width: 75px;
-    height: 50px;
+    height: 40px;
     border: 1px solid #e3e3e3;
     border-radius: 3px;
     box-shadow: 0px 2px 2px 0px #e3e3e3;
@@ -1184,7 +1188,7 @@ button.paypal.is-active {
     overflow: hidden;
     background-color: #fff;
     max-width: 500px;
-    box-shadow: 0px 1px 20px 2px #7C7C7C;
+    box-shadow: 0px 0px 8px 0px #7C7C7C;
 }
 
 .ol-header {
@@ -1200,6 +1204,7 @@ button.paypal.is-active {
 
 .ol-txt {
     line-height: 32px;
+    text-align: center; 
 }
 
 .ol-btn-wrapper {
@@ -1214,7 +1219,6 @@ button.paypal.is-active {
     margin: 0 auto;
     border-radius: 3px;
     color: #fff;
-    font-family: 'opensanslight' !important;
     background-color: #5CC8EF;
     font-size: 13px;
     line-height: 36px;
@@ -3924,13 +3928,12 @@ button.paypal.is-active {
     background-color: #009FE0;
     height: 40px;
     line-height: 40px;
-    width: 222px;
+    width: 160px;
     text-align: center;
     color: #fff;
     border-radius: 3px;
     margin: 10px auto;
-    font-size: 16px;
-    font-family: 'opensanslight';
+    font-size: 13px;
     cursor: pointer;
 }
 
@@ -4202,7 +4205,7 @@ button.paypal.is-active {
 }
 
 .bd-hr-rt-header {
-    line-height: 80px;
+    line-height: 70px;
     text-align: center;
     font-size: 18px;
 }
@@ -4260,11 +4263,11 @@ button.paypal.is-active {
 
 .bd-hr-form-wrapper {
     width: 670px;
-    margin: 50px auto;
+    margin: 30px auto;
 }
 
 .bd-frm-left {
-    line-height: 50px;
+    line-height: 40px;
     margin-right: 20px;
     width: 190px;
     min-height: 10px;
@@ -4276,7 +4279,7 @@ button.paypal.is-active {
 .bd-frm-rt-txt {
     width: 275px;
     padding: 0 10px;
-    height: 50px;
+    height: 40px;
     border-radius: 4px;
     box-shadow: none;
     border: 1px solid #dcdcdc;
@@ -4306,7 +4309,7 @@ button.paypal.is-active {
 
 .bd-cust-rad-img {
     margin-right: 15px;
-    height: 50px;
+    height: 30px;
     width: 20px;
     background: url(../images/radios.png) no-repeat;
     background-position: -116px center;
@@ -4324,7 +4327,7 @@ button.paypal.is-active {
 .bd-cust-rad-txt {
     font-family: opensanslight;
     font-weight: bold !important;
-    line-height: 50px;
+    line-height: 30px;
 }
 
 .dd-com-list {
@@ -4332,7 +4335,7 @@ button.paypal.is-active {
 }
 
 .bd-frm-rt-dd-adj {
-    line-height: 50px;
+    line-height: 40px;
 }
 
 .bd-check-img {
@@ -4356,12 +4359,11 @@ button.paypal.is-active {
 }
 
 .bd-btn-save {
-    font-size: 16px;
     margin-left: 40px;
     border-radius: 3px;
-    font-size: 16px;
+    font-size: 13px;
     background-color: #009FE0;
-    line-height: 48px;
+    line-height: 40px;
     width: 148px;
     text-align: center;
     color: #fff;
@@ -4464,9 +4466,9 @@ button.paypal.is-active {
     background-color: #009FE0;
     color: #fff;
     padding: 0 20px;
-    font-size: 15px;
+    font-size: 13px;
     line-height: 40px;
-    margin-top: 11px;
+    margin-top: -2px;
     border-radius: 3px;
     cursor: pointer;
 }
@@ -5062,6 +5064,7 @@ tr.u-tbl-header td {
     height: 55px;
     float: none !important;
     padding: 0;
+    padding-left: 50px;
     line-height: normal;
 }
 
@@ -5138,7 +5141,7 @@ tr.u-tbl-header td {
     border: 1px solid #D2DEDF;
     border-radius: 3px;
     padding: 20px;
-    width: 90%;
+    width: 80%;
     margin: 100px auto;
 }
 
@@ -5147,7 +5150,7 @@ tr.u-tbl-header td {
 }
 
 .bd-q-pu-header {
-    margin-top: 15px;
+    margin-top: 10px;
     margin-bottom: 15px;
 }
 
@@ -5254,7 +5257,7 @@ tr.u-tbl-header td {
     margin-right: 4px;
     width: 150px;
     line-height: 40px;
-    border: 1px solid #F3F4F6;
+    border: 1px solid #F0F0F0;
     cursor: pointer;
     background-color: #F9F9FB;
 }
@@ -5279,8 +5282,8 @@ tr.u-tbl-header td {
 }
 
 .bd-ans-img {
-    width: 180px;
-    height: 180px;
+    width: 150px;
+    height: 150px;
     margin: 0 auto;
     cursor: pointer;
 }
@@ -5306,7 +5309,7 @@ tr.u-tbl-header td {
 }
 .bd-mcq-txt {
     height: 40px;
-    width: 500px;
+    width: 450px;
     border: 1px solid #D7D7D7;
     background-color: #FCFCFC;
     border-radius: 3px;
@@ -5318,12 +5321,12 @@ tr.u-tbl-header td {
     height: 40px;
     margin-left: 10px;
     background: url(../images/close_srv.png) no-repeat center;
-    background-size: 38px auto;
+    background-size: 32px auto;
     cursor: pointer;
 }
 
 .bd-mcq-row {
-    width: 645px;
+    width: 595px;
     margin: 0 auto 20px;
 }
 
@@ -5339,7 +5342,7 @@ tr.u-tbl-header td {
 }
 
 .bd-ans-img-wrapper {
-    margin: 20px auto 35px;
+    margin: 10px auto;
     width: 180px;
     cursor: pointer;
 }
@@ -5514,4 +5517,29 @@ tr.u-tbl-header td {
 
 .vs-ans-icn-star {
     background: url(../images/full-star.png) no-repeat center;
+}
+
+.rating-icn-sm{
+    background: url(../images/rating_star_icn.png) no-repeat center;
+    background-size: 32px auto;
+}
+
+.scale-icn-sm{
+    background: url(../images/scale_icn.png) no-repeat center;
+    background-size: 32px auto;
+}
+
+.mcq-icn-sm{
+    background: url(../images/mcq_icn.png) no-repeat center;
+    background-size: 32px auto;
+}
+
+.smiley-icn-sm{
+    background: url(../images/rating_smiley_icn.png) no-repeat center;
+    background-size: 32px auto;
+}
+
+.desc-icn-sm{
+    background: url(../images/discription_icn.png) no-repeat center;
+    background-size: 32px auto;
 }
