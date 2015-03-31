@@ -218,6 +218,9 @@ public class ProfileManagementController {
 			else {
 				selectedProfile = profileMap.get(profileId);
 			}
+			
+			// current profile
+			model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			
 			// fetching details from profile
