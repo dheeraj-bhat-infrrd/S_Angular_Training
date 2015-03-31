@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.core.dao;
 import java.util.List;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 
 /**
  * Gets the organization settings
@@ -96,5 +97,19 @@ public interface OrganizationUnitSettingsDao {
 	 * @return
 	 */
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileUrl(String profileUrl, String collectionName);
+	
+	/**
+	 * Gets a list of SiteMapEntry object for SEO
+	 * @param collectionName
+	 * @return
+	 */
+	public List<ProfileUrlEntity> fetchSEOOptimizedOrganizationUnitSettings(String collectionName, int skipCount, int numOfRecords);
+	
+	/**
+	 * Gets the count of records for SEO Optimization
+	 * @param collectionName
+	 * @return
+	 */
+	public long fetchSEOOptimizedOrganizationUnitCount(String collectionName);
 	
 }

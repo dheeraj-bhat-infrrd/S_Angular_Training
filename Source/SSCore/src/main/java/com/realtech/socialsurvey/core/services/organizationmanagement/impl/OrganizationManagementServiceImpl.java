@@ -332,11 +332,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
+		// profile url for company will be same as profile name
+		companySettings.setProfileUrl(companySettings.getProfileName());
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 		companySettings.setLockSettings(new LockSettings());
+		// set seo content flag
+		companySettings.setSeoContentModified(true);
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -2459,6 +2463,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method for inserting region settings called for region : " + region);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(region.getRegionId());
+		// set is default flag
+		boolean isDefaultFlag = false;
+		if(region.getIsDefaultBySystem() == CommonConstants.YES){
+			isDefaultFlag = true;
+		}
+		organizationSettings.setDefaultBySystem(isDefaultFlag);
+		// set the seo content mdified to true, so that batch pick this record up
+		organizationSettings.setSeoContentModified(true);
 		organizationSettings.setCreatedBy(region.getCreatedBy());
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(region.getModifiedBy());
@@ -2486,6 +2498,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method to insert branch settings called for branch : " + branch);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(branch.getBranchId());
+		// set is default flag
+		boolean isDefaultFlag = false;
+		if(branch.getIsDefaultBySystem() == CommonConstants.YES){
+			isDefaultFlag = true;
+		}
+		// set the seo content mdified to true, so that batch pick this record up
+		organizationSettings.setSeoContentModified(true);
+		organizationSettings.setDefaultBySystem(isDefaultFlag);
 		organizationSettings.setCreatedBy(branch.getCreatedBy());
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(branch.getModifiedBy());

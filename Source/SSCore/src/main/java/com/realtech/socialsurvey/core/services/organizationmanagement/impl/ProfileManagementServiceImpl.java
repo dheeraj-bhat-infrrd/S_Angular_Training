@@ -563,6 +563,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Updating contact detail information");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
 				contactDetailsSettings, unitSettings, collection);
+		// Update the seo content flag to true
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, unitSettings, collection);
 		LOG.info("Contact details updated successfully");
 		return contactDetailsSettings;
 	}
@@ -576,6 +578,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Updating contact detail information");
 		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
 				contactDetailsSettings, agentSettings);
+		// Update the seo content flag to true
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, agentSettings);
 		LOG.info("Contact details updated successfully");
 		return contactDetailsSettings;
 	}
