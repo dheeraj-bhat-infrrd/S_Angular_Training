@@ -141,7 +141,7 @@
 		
 		<!-- Starting code for Text for Happy/Neutral/Sad flow -->
 		<div class="um-top-container">
-				<div class="um-header"><spring:message code="label.flow.text.key" /></div>
+				<div class="um-header  margin-top-25"><spring:message code="label.flow.text.key" /></div>
 				<div class="clearfix um-panel-content">
 					<div class="bd-mcq-row clearfix txtareaRow">
 						<div class="float-left cs-gq-lbl">Please enter text to be shown for Happy Customer</div>
