@@ -79,7 +79,6 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/data/storeAnswer")
 	public String storeSurveyAnswer(HttpServletRequest request) {
 		LOG.info("Method storeSurveyAnswer() started to store response of customer.");
-		// TODO store answer provided by customer in mongoDB.
 		String answer = request.getParameter("answer");
 		String question = request.getParameter("question");
 		String questionType = request.getParameter("questionType");
@@ -117,6 +116,8 @@ public class SurveyManagementController {
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 
+			// TODO Search Engine Optimisation
+			
 			if (mood == null || mood.isEmpty()) {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
