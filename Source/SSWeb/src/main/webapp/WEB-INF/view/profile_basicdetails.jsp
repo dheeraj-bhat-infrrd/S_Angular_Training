@@ -33,10 +33,12 @@
 	</c:choose>
 </div>
 <div class="prof-address">
-	<div class="prof-addline1 prof-edditable">${profile.vertical}</div>
+	<div class="prof-addline1 prof-edditable">${profileSettings.vertical}</div>
 	
-	<input id="prof-title" class="prof-addline2 prof-edditable" value="${profile.contact_details.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
-	<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+	<c:if test="${profilemasterid != 1}">
+		<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
+		<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+	</c:if>
 </div>
 <div id="prof-rating-review-count" class="prof-rating clearfix">
 	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">

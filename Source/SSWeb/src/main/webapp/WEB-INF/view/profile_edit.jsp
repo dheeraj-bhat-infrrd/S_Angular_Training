@@ -69,7 +69,7 @@
 				<c:when test="${not empty profileList}">
 					<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 						<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-						<div id="profile-sel" class="float-left hr-txt2 cursor-pointer"></div>
+						<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 						<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
 							<c:forEach var="userprofile" items="${profileList}">
 								<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
@@ -160,8 +160,10 @@
 					<div class="prof-address">
 						<div class="prof-addline1 prof-edditable">${profileSettings.vertical}</div>
 						
-						<input id="prof-title" class="prof-addline2 prof-edditable" value="${profileSettings.contact_details.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
-						<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+						<c:if test="${profilemasterid != 1}">
+							<input id="prof-title" class="prof-addline2 prof-edditable" value="${contactdetail.title}" placeholder='<spring:message code="label.profiletitle.placeholder.key"/>'>
+							<div id="prof-title-lock" data-state="unlocked" data-control="user" class="hide float-left"></div>
+						</c:if>
 					</div>
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
@@ -626,8 +628,9 @@
 			$('#pe-dd-wrapper-profiles').slideToggle(200);
 		});
 		$('.pe-dd-item').click(function(){
-			var newProfileId = $(this).data('profile-id');;
-			$('#profile-sel').html(newProfileId);
+			var newProfileId = $(this).data('profile-id');
+			
+			$('#profile-sel').html($(this).html());
 			$('#pe-dd-wrapper-profiles').slideToggle(200);
 			
 			showMainContent('./showprofilepage.do?profileId=' + newProfileId);

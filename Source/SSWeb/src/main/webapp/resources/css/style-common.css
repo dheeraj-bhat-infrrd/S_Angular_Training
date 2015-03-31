@@ -3254,11 +3254,11 @@ button.paypal.is-active {
 .prof-img-lock{
 	cursor: pointer;
 	background: rgba(255,255,255,0.6) url(../images/locks.png) no-repeat;
-	background-position: -223px center;
+	background-position: -213px center;
 	display: none;
 }
 .prof-img-lock-locked{
-	background-position: 3px center;
+	background-position: 10px center;
 }
 
 .prof-edit-social-link{
@@ -5084,20 +5084,14 @@ tr.u-tbl-header td {
 }
 
 .srv-tbl-txt {
-    font-size: 16px;
-	/* margin-left: 8px;*/
-    margin-right: 10px;
-    width: 884px;
-    display: table-cell;
-    vertical-align: middle;
-    line-height: 28px;
-    padding-top: 14px;
-    padding-bottom: 13px;
-    height: 55px;
-    /* float: none !important; */
-    padding: 0;
-    padding-left: 50px;
-    line-height: normal;
+	font-size: 16px;
+	margin-right: 10px;
+	width: 884px;
+	line-height: 28px;
+	padding-top: 14px;
+	padding-bottom: 13px;
+	height: 55px;
+	padding-left: 40px;
 }
 
 .srv-tbl-chk {
@@ -5552,27 +5546,27 @@ tr.u-tbl-header td {
 }
 
 .rating-icn-sm{
-    background: url(../images/rating_star_icn.png) no-repeat center;
+    background: url(../images/rating_star_icn.png) no-repeat left center;
     background-size: 32px auto;
 }
 
 .scale-icn-sm{
-    background: url(../images/scale_icn.png) no-repeat center;
+    background: url(../images/scale_icn.png) no-repeat left center;
     background-size: 32px auto;
 }
 
 .mcq-icn-sm{
-    background: url(../images/mcq_icn.png) no-repeat center;
+    background: url(../images/mcq_icn.png) no-repeat left center;
     background-size: 32px auto;
 }
 
 .smiley-icn-sm{
-    background: url(../images/rating_smiley_icn.png) no-repeat center;
+    background: url(../images/rating_smiley_icn.png) no-repeat left center;
     background-size: 32px auto;
 }
 
 .desc-icn-sm{
-    background: url(../images/discription_icn.png) no-repeat center;
+    background: url(../images/discription_icn.png) no-repeat left center;
     background-size: 32px auto;
 }
 
