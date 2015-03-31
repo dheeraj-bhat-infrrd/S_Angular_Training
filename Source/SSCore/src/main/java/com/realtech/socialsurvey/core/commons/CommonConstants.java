@@ -147,6 +147,7 @@ public interface CommonConstants {
 	public static final String MOOD_COLUMN = "mood";
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
 	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
+	public static final String DEFAULT_MONGO_ID_COLUMN = "_id";
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -183,15 +184,18 @@ public interface CommonConstants {
 	public static final String SUCCESS_ATTRIBUTE = "success";
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
+	public static final String USER_PROFILE_LIST = "profileList";
+	public static final String USER_PROFILE_SETTINGS = "profileSettings";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
 	public static final String EMAIL_TYPE = "emailtype";
 	public static final String EMAIL_TYPE_WORK = "work";
 	public static final String EMAIL_TYPE_PERSONAL = "personal";
-	
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
 	public static final String SOCIAL_FLOW = "socialFlow";
+	public static final String BRANCHES_IN_SESSION = "branches";
+	public static final String REGIONS_IN_SESSION = "regions";
 
 	/**
 	 * Batch Constants
@@ -274,8 +278,10 @@ public interface CommonConstants {
 	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
 	public static final String STATUS_SOLR = "status";
 	public static final String REGION_NAME_SOLR = "regionName";
+	public static final String REGION_ADDRESS_SOLR = "address";
 	public static final String BRANCH_ID_SOLR = "branchId";
 	public static final String BRANCH_NAME_SOLR = "branchName";
+	public static final String BRANCH_ADDRESS_SOLR = "address";
 	public static final String USER_ID_SOLR = "userId";
 	public static final String USER_FIRST_NAME_SOLR = "firstName";
 	public static final String USER_LAST_NAME_SOLR = "lastName";
@@ -315,6 +321,7 @@ public interface CommonConstants {
 	public static final int QUESTION_RATING_VALUE_TRUE = 1;
 	public static final int QUESTION_RATING_VALUE_FALSE = 0;
 	public static final int SURVEY_STAGE_COMPLETE = -1;
+	public static final String SURVEY_CUSTOMER_MOOD_SAD = "sad";
 
 	/**
 	 * Error codes
@@ -398,4 +405,5 @@ public interface CommonConstants {
 	public static final int MAX_SURVEY_SCORE = 5;
 	public static final int MAX_SENT_SURVEY_COUNT = 10;
 	public static final int MAX_SOCIAL_POSTS = 10;
+	public static final String DATE_FORMAT = "dd-MM-yyyy";
 }

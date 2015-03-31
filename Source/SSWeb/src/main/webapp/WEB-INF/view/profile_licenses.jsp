@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if test="${not empty profile && not empty profile.licenses}">
-	<c:set value="${profile.licenses.authorized_in}" var="authorisedInList"></c:set>
+<c:if test="${not empty profileSettings && not empty profileSettings.licenses}">
+	<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 </c:if>
 <c:choose>
 	<c:when test="${not empty authorisedInList}">

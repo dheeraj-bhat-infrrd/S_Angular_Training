@@ -77,21 +77,20 @@ public class DashboardController {
 		Map<String, Object> surveyCount = new HashMap<String, Object>();
 		User user = sessionHelper.getCurrentUser();
 		String columnName = request.getParameter("columnName");
+		String columnValueStr = request.getParameter("columnValue");
 		long columnValue = 0;
+		try {
+			columnValue = Long.parseLong(columnValueStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
+			throw e;
+		}
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 			columnValue = user.getCompany().getCompanyId();
 		}
-		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN) && columnValue == 0) {
 			columnValue = user.getUserId();
-		}
-		else {
-			try {
-				columnValue = Long.parseLong(request.getParameter("columnValue"));
-			}
-			catch (NumberFormatException e) {
-				LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
-				throw e;
-			}
 		}
 		int numberOfDays = -1;
 		try {
@@ -128,25 +127,24 @@ public class DashboardController {
 			User user = sessionHelper.getCurrentUser();
 			String columnName = request.getParameter("columnName");
 			String reportType = request.getParameter("reportType");
-			long columnValue = 0;
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Null/Empty value found for field columnName.");
 				throw new NonFatalException("Null/Empty value found for field columnName.");
 			}
+			String columnValueStr = request.getParameter("columnValue");
+			long columnValue = 0;
+			try {
+				columnValue = Long.parseLong(columnValueStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
+				throw e;
+			}
 			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				columnValue = user.getCompany().getCompanyId();
 			}
-			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+			else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN) && columnValue == 0) {
 				columnValue = user.getUserId();
-			}
-			else {
-				try {
-					columnValue = Long.parseLong(request.getParameter("columnValue"));
-				}
-				catch (NumberFormatException e) {
-					LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
-					throw e;
-				}
 			}
 			LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
 			try {
