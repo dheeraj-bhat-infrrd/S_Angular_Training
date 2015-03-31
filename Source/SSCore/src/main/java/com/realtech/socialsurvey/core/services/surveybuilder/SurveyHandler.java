@@ -18,9 +18,11 @@ public interface SurveyHandler {
 	 * @throws NoRecordsFetchedException
 	 * @throws SolrException
 	 */
-/*	public void storeInitialSurveyDetails(long agentId, long companyId, long regionId, long branchId, String customerEmail, int reminderCount)
-			throws InvalidInputException, SolrException, NoRecordsFetchedException, SolrServerException;
-*/
+	/*
+	 * public void storeInitialSurveyDetails(long agentId, long companyId, long regionId, long
+	 * branchId, String customerEmail, int reminderCount) throws InvalidInputException,
+	 * SolrException, NoRecordsFetchedException, SolrServerException;
+	 */
 	/*
 	 * Method to update answers to all the questions and current stage in MongoDB.
 	 * @param agentId
@@ -33,23 +35,29 @@ public interface SurveyHandler {
 	public void updateCustomerAnswersInSurvey(long agentId, String customerEmail, String question, String questionType, String answer, int stage);
 
 	/*
-	 * Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS.
+	 * Method to update customer review and final score on the basis of rating questions in
+	 * SURVEY_DETAILS.
 	 */
 	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
 
-	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount, String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException,
-			SolrServerException, InvalidInputException;
+	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
+			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException;
 
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
-	
+
 	public String getApplicationBaseUrl();
-	
+
 	public void updateSurveyAsClicked(long agentId, String customerEmail);
-	
+
 	public String getSwearWords();
 
 	public void updateReminderCount(long agentId, String customerEmail);
 
 	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId);
 
+	public List<SurveyDetails> getIncompleteSurveyCustomersEmail(long companyId);
+
+	public void updateReminderCount(List<Long> agents, List<String> customers);
+
+	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId);
 }

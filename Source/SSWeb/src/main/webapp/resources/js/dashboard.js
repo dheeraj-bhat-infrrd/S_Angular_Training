@@ -535,6 +535,13 @@ function paintSurveyGraph(graphData) {
 		type = 'Month';
 	}
 	
+	if(format!='yearly'){
+		allTimeslots.reverse();
+		clickedSurveys.reverse();
+		sentSurveys.reverse();
+		completedSurveys.reverse();
+		socialPosts.reverse();
+	}
     var internalData = [];
     var nestedInternalData = [];
     nestedInternalData.push(type,'No. of surveys sent', 'No. of surveys clicked','No. of surveys completed', 'No. of social posts');
@@ -847,8 +854,9 @@ function paintIncompleteSurvey(result) {
 				+ '<div class="float-left dash-lp-txt">' + survey.customerFirstName+" "+survey.customerLastName
 				+ ' <span>' + survey.modifiedOn + '</span></div>'
 				+ '<div data-custname=' + survey.customerFirstName+' '+survey.customerLastName
+				+ ' data-agentid=' + survey.agentId
 				+ ' data-agentname=' + survey.agentName + ' data-custemail='
-				+ survey.customerEmail + ' data-agentId=' + survey.agentId
+				+ survey.customerEmail
 				+ ' class="float-right dash-lp-rt-img"></div></div>';
 	});
 	if(startIndexInc==0)
@@ -866,7 +874,7 @@ function paintIncompleteSurvey(result) {
 	
 
 	$('.dash-lp-rt-img').click(function() {
-		var agentId = $(this).data("agentId");
+		var agentId = $(this).data("agentid");
 		var agentName = $(this).data("agentname");
 		var customerEmail = $(this).data("custemail");
 		var customerName = $(this).data("custname");
@@ -899,8 +907,7 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 		},
 		complete : function(data) {
 			if (success) {
-				paintIncompleteSurvey(data.responseJSON);
-				startIndexInc += batchSizeInc;
+				$('#overlay-toast').html("Reminder Mail sent successfully to "+customerName);
 			}
 		},
 		error : function(e) {

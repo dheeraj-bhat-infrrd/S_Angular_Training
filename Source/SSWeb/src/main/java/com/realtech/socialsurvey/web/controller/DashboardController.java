@@ -488,8 +488,9 @@ public class DashboardController {
 	/*
 	 * Method to send a reminder email to the customer if not completed survey already.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/sendsurveyremindermail")
-	public void sendReminderMailForSurvey(Model model, HttpServletRequest request) {
+	public String sendReminderMailForSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() started.");
 		try {
 			String customerName = request.getParameter("customerName");
@@ -535,6 +536,7 @@ public class DashboardController {
 			LOG.error("NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e);
 		}
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
+		return new Gson().toJson("success");
 	}
 
 	/*
