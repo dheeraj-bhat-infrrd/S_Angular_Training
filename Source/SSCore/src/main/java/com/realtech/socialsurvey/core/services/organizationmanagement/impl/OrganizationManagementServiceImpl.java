@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -94,7 +95,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
-
+	
+	@Value("${HAPPY_TEXT}")
+	private String happyText;
+	
+	@Value("${NEUTRAL_TEXT}")
+	private String neutralText;
+	
+	@Value("${SAD_TEXT}")
+	private String sadText;
+	
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -337,6 +347,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 		companySettings.setLockSettings(new LockSettings());
+		
+		// Adding default text for various flows of survey.
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setHappyText(happyText);
+		surveySettings.setNeutralText(neutralText);
+		surveySettings.setSadText(sadText);
+		companySettings.setSurvey_settings(surveySettings);
+		
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
