@@ -91,25 +91,6 @@
 				<form id="rating-settings-form">
 					<input type="hidden" name="ratingcategory" id="ratingcategory">
 					<div class="clearfix float-right st-score-rt">
-					<!--<div class="float-left score-rt-post score-rt-auto bord-rt-dc">
-						<div class="st-score-rt-top">Set auto post score</div>
-						<div class="st-score-rt-line2 clearfix">
-							<div class="st-rating-wrapper float-left clearfix" id="rating-auto-post-parent">
-								<div class="rating-star icn-full-star"></div>
-								<div class="rating-star icn-full-star"></div>
-								<div class="rating-star icn-half-star"></div>
-								<div class="rating-star icn-no-star"></div>
-								<div class="rating-star icn-no-star"></div>
-							</div>
-							<div class="st-rating-txt float-left">
-								<c:if test="${cannonicalusersettings.companySettings !=null && cannonicalusersettings.companySettings.survey_settings!= null && cannonicalusersettings.companySettings.survey_settings.auto_post_score != null}">
-								  	<c:set var="autopostscore" value="${cannonicalusersettings.companySettings.survey_settings.auto_post_score}"/>
-								</c:if>
-								<input type="text" name="rating-auto-post" id="rating-auto-post" class="st-item-row-txt cursor-pointer" autocomplete="off" value="${autopostscore}">
-								<div class="st-dd-wrapper hide" id="st-dd-wrapper-auto-post"></div>
-							</div>
-						</div>
-					</div>-->
 					<div class="float-left score-rt-post score-rt-post-OR score-rt-min">
 						<div class="st-score-rt-top"><spring:message code="label.scorepost.min.key" /></div>
 						<div class="st-score-rt-line2 clearfix">
