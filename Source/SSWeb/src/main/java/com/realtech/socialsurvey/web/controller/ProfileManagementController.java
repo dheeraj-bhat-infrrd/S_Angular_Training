@@ -37,6 +37,7 @@ import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
@@ -48,10 +49,12 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
@@ -66,6 +69,7 @@ import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -79,6 +83,7 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class ProfileManagementController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileManagementController.class);
+	private static final String PROFILE_AGENT_VIEW = "Myself";
 
 	// JIRA SS-97 by RM-06 : BOC
 	@Autowired
@@ -112,66 +117,142 @@ public class ProfileManagementController {
 	private String bucket;
 
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
-	public String showProfilePage(Model model, HttpServletRequest request) {
-		LOG.info("ProfileEdit page called");
+	public String showProfileEditPage(Model model, HttpServletRequest request) {
+		LOG.info("Method showProfileEditPage() called from ProfileManagementService");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		UserSettings settings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
-		// Setting userProfile in session
-		OrganizationUnitSettings profile = fetchUserProfile(model, user, accountType, settings);
-		session.setAttribute(CommonConstants.USER_PROFILE, profile);
-
-		// Setting parentLock in session
-		LockSettings parentLock = fetchParentLockSettings(model, user, accountType, settings);
-		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
-
-		LOG.info("Starting the ProfileEdit page");
-		return JspResolver.PROFILE_EDIT;
-	}
-	
-	private LockSettings fetchParentLockSettings(Model model, User user, AccountType accountType, UserSettings settings) {
-		LOG.debug("Method fetchParentLockSettings() called from ProfileManagementService");
-		LockSettings parentLock = null;
 		try {
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			
+			// fetching region and branches from solr
+			long companyId = user.getCompany().getCompanyId();
+			Map<Long, RegionFromSearch> regions;
+			Map<Long, BranchFromSearch> branches;
+			try {
+				regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+				branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+			}
+			catch (InvalidInputException | SolrException | MalformedURLException e) {
+				LOG.error("Exception while fetching regions and branches from solr. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("Exception while fetching regions and branches from solr", e);
+			}
+			
+			// Populate profile list and set in session
 			long branchId = 0;
 			long regionId = 0;
+			boolean agentAdded = false;
+			RegionFromSearch region = null;
+			BranchFromSearch branch = null;
+			List<UserProfile> userProfiles = user.getUserProfiles();
+			Map<Long, String> profileNameMap = new HashMap<Long, String>();
+			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			for (UserProfile profile : userProfiles) {
+				
+				if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+					// updating profile map
+					profileMap.put(profile.getUserProfileId(), profile);
+					
+					// updating display name for drop down
+					int profileMasterId = profile.getProfilesMaster().getProfileId();
+					switch (profileMasterId) {
+						case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+							profileNameMap.put(profile.getUserProfileId(), user.getCompany().getCompany());
+							break;
+						
+						case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+							regionId = profile.getRegionId();
+							if (regionId != 0l) {
+								region = regions.get(regionId);
+							}
+							if (region.getIsDefaultBySystem() != 1) {
+								profileNameMap.put(profile.getUserProfileId(), region.getRegionName());
+							}
+							break;
 
-			if (settings.getBranchSettings().size() > 0) {
-				branchId = user.getUserProfiles().get(0).getBranchId();
-			}
-			if (settings.getRegionSettings().size() > 0) {
-				regionId = user.getUserProfiles().get(0).getRegionId();
-			}
+						case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+							branchId = profile.getBranchId();
+							if (branchId != 0l) {
+								branch = branches.get(branchId);
+							}
+							if (branch.getIsDefaultBySystem() != 1) {
+								profileNameMap.put(profile.getUserProfileId(), branch.getBranchName());
+							}
+							break;
 
-			LOG.debug("branchId: " + branchId + ", regionId: " + regionId);
-			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, settings, branchId, regionId);
+						case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+							if (!agentAdded) {
+								profileNameMap.put(profile.getUserProfileId(), PROFILE_AGENT_VIEW);
+								agentAdded = true;
+							}
+							break;
+
+						default:
+							continue;
+					}
+				}
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
+			
+			// fetching profileId
+			long profileId = 0l;
+			UserProfile selectedProfile = null;
+			try {
+				String profileIdStr = request.getParameter("profileId");
+				if (profileIdStr != null && !profileIdStr.equals("")) {
+					profileId = Long.parseLong(request.getParameter("profileId"));
+				}
+				else {
+					profileId = 0l;
+				}
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
+			}
+			
+			// Selecting and Setting Profile in session
+			if (profileId == 0l) {
+				selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+			}
+			else {
+				selectedProfile = profileMap.get(profileId);
+			}
+			
+			// current profile
+			model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			
+			// fetching details from profile
+			int profilesMaster = 0;
+			if (selectedProfile != null) {
+				branchId = selectedProfile.getBranchId();
+				regionId = selectedProfile.getRegionId();
+				profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			}
+			
+			// Setting userSettings in session
+			OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
+			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
+	
+			// Setting parentLock in session
+			LockSettings parentLock = fetchParentLockSettings(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
+			session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
 		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 		}
-		LOG.debug("Method fetchParentLockSettings() finished from ProfileManagementService");
-		return parentLock;
+
+		LOG.info("Method showProfileEditPage() finished from ProfileManagementService");
+		return JspResolver.PROFILE_EDIT;
 	}
 
-	private OrganizationUnitSettings fetchUserProfile(Model model, User user, AccountType accountType, UserSettings settings) {
+	private OrganizationUnitSettings fetchUserProfile(Model model, User user, AccountType accountType, UserSettings settings, long branchId, long regionId, int profilesMaster) {
 		LOG.debug("Method fetchUserProfile() called from ProfileManagementService");
 		OrganizationUnitSettings profile = null;
 		try {
-			long branchId = 0;
-			long regionId = 0;
-
-			if (settings.getBranchSettings().size() > 0) {
-				branchId = user.getUserProfiles().get(0).getBranchId();
-			}
-			if (settings.getRegionSettings().size() > 0) {
-				regionId = user.getUserProfiles().get(0).getRegionId();
-			}
-
-			LOG.debug("branchId: " + branchId + ", regionId: " + regionId);
-			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, branchId, regionId);
+			profile = profileManagementService.aggregateUserProfile(user, accountType, settings, branchId, regionId, profilesMaster);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
@@ -179,6 +260,20 @@ public class ProfileManagementController {
 		}
 		LOG.debug("Method fetchUserProfile() finished from ProfileManagementService");
 		return profile;
+	}
+
+	private LockSettings fetchParentLockSettings(Model model, User user, AccountType accountType, UserSettings settings, long branchId, long regionId, int profilesMaster) {
+		LOG.debug("Method fetchParentLockSettings() called from ProfileManagementService");
+		LockSettings parentLock = null;
+		try {
+			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, settings, branchId, regionId, profilesMaster);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.debug("Method fetchParentLockSettings() finished from ProfileManagementService");
+		return parentLock;
 	}
 
 	@RequestMapping(value = "/fetchaboutme", method = RequestMethod.GET)
@@ -260,14 +355,15 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelocksettings", method = RequestMethod.POST)
 	public String updateLockSettings(Model model, HttpServletRequest request) {
 		LOG.info("Method updateLockSettings() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		LockSettings lockSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			LockSettings parentLock = (LockSettings) session.getAttribute(CommonConstants.PARENT_LOCK);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -278,8 +374,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			LockSettings parentLock = (LockSettings) session.getAttribute(CommonConstants.PARENT_LOCK);
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -291,8 +387,8 @@ public class ProfileManagementController {
 				companySettings.setLockSettings(lockSettings);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -304,8 +400,8 @@ public class ProfileManagementController {
 				regionSettings.setLockSettings(lockSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -322,7 +418,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in editing LockSettings.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setLockSettings(lockSettings);
+			profileSettings.setLockSettings(lockSettings);
 
 			LOG.info("Lock Settings updated successfully");
 			model.addAttribute("message",
@@ -398,14 +494,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/addorupdateaboutme", method = RequestMethod.POST)
 	public String updateAboutMe(Model model, HttpServletRequest request) {
 		LOG.info("Method updateAboutMe() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -414,7 +510,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("About me can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings unitSettings = userSettings.getCompanySettings();
 				if (unitSettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -426,8 +523,8 @@ public class ProfileManagementController {
 				unitSettings.setContact_details(contactDetailsSettings);
 				userSettings.setCompanySettings(unitSettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -439,8 +536,8 @@ public class ProfileManagementController {
 				regionSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -452,7 +549,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -471,7 +568,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Error occurred while updating About me.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setContact_details(contactDetailsSettings);
+			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("About me details updated successfully");
 			model.addAttribute("message",
@@ -497,14 +594,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatebasicprofile", method = RequestMethod.POST)
 	public String updateBasicDetail(Model model, HttpServletRequest request) {
 		LOG.info("Method updateBasicDetail() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -515,7 +612,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Name passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -527,8 +625,8 @@ public class ProfileManagementController {
 				companySettings.setContact_details(contactDetailsSettings);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -540,8 +638,8 @@ public class ProfileManagementController {
 				regionSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -553,7 +651,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -569,10 +667,8 @@ public class ProfileManagementController {
 				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
 				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.TITLE_SOLR, title);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR,
-							name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR,
-							name.substring(name.indexOf(' ') + 1));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				}
 				else {
 					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
@@ -582,7 +678,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in upadting Basic details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setContact_details(contactDetailsSettings);
+			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Basic Detail updated successfully");
 			model.addAttribute("message",
@@ -617,14 +713,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateprofileaddress", method = RequestMethod.POST)
 	public String updateProfileAddress(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileAddress() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -647,7 +743,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("zipcode passed can not be null or empty", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -659,8 +756,8 @@ public class ProfileManagementController {
 				companySettings.setContact_details(contactDetailsSettings);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -672,8 +769,8 @@ public class ProfileManagementController {
 				regionSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -685,7 +782,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -700,10 +797,8 @@ public class ProfileManagementController {
 				// Modify Agent details in Solr
 				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_DISPLAY_NAME_SOLR, name);
 				if (name.indexOf(" ") != -1) {
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR,
-							name.substring(0, name.indexOf(' ')));
-					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR,
-							name.substring(name.indexOf(' ') + 1));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name.substring(0, name.indexOf(' ')));
+					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_LAST_NAME_SOLR, name.substring(name.indexOf(' ') + 1));
 				}
 				else {
 					solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.USER_FIRST_NAME_SOLR, name);
@@ -713,7 +808,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in editing Address details.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setContact_details(contactDetailsSettings);
+			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Profile addresses updated successfully");
 			model.addAttribute("message",
@@ -753,14 +848,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelogo", method = RequestMethod.POST)
 	public String updateLogo(Model model, HttpServletRequest request, @RequestParam("logo") MultipartFile fileLocal) {
 		LOG.info("Method updateLogo() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		String logoUrl = "";
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -778,7 +873,8 @@ public class ProfileManagementController {
 				return JspResolver.MESSAGE_HEADER;
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -787,8 +883,8 @@ public class ProfileManagementController {
 				companySettings.setLogo(logoUrl);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -797,8 +893,8 @@ public class ProfileManagementController {
 				regionSettings.setLogo(logoUrl);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -807,7 +903,7 @@ public class ProfileManagementController {
 				branchSettings.setLogo(logoUrl);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -820,7 +916,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in uploading logo.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setLogo(logoUrl);
+			profileSettings.setLogo(logoUrl);
 			sessionHelper.setLogoInSession(session, userSettings);
 
 			LOG.info("Logo uploaded successfully");
@@ -840,14 +936,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateprofileimage", method = RequestMethod.POST)
 	public String updateProfileImage(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileImage() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		String profileImageUrl = "";
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -884,7 +980,8 @@ public class ProfileManagementController {
 				e.printStackTrace();
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -894,8 +991,8 @@ public class ProfileManagementController {
 				companySettings.setProfileImageUrl(profileImageUrl);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -905,8 +1002,8 @@ public class ProfileManagementController {
 				regionSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -916,7 +1013,7 @@ public class ProfileManagementController {
 				branchSettings.setProfileImageUrl(profileImageUrl);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -934,7 +1031,7 @@ public class ProfileManagementController {
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setProfileImageUrl(profileImageUrl);
+			profileSettings.setProfileImageUrl(profileImageUrl);
 			sessionHelper.setProfileImageInSession(session, userSettings);
 
 			LOG.info("Profile Image uploaded successfully");
@@ -960,14 +1057,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateemailids", method = RequestMethod.POST)
 	public String updateEmailds(Model model, HttpServletRequest request) {
 		LOG.info("Method updateEmailds() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -984,7 +1081,8 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -999,8 +1097,8 @@ public class ProfileManagementController {
 				companySettings.setContact_details(contactDetailsSettings);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1014,8 +1112,8 @@ public class ProfileManagementController {
 				regionSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1029,7 +1127,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1047,7 +1145,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while updating emailids.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setContact_details(contactDetailsSettings);
+			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Maild ids updated successfully");
 			model.addAttribute("message",
@@ -1142,14 +1240,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatephonenumbers", method = RequestMethod.POST)
 	public String updatePhoneNumbers(Model model, HttpServletRequest request) {
 		LOG.info("Method updatePhoneNumbers() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -1166,7 +1264,8 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1178,8 +1277,8 @@ public class ProfileManagementController {
 				companySettings.setContact_details(contactDetailsSettings);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1191,8 +1290,8 @@ public class ProfileManagementController {
 				regionSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1204,7 +1303,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1221,7 +1320,7 @@ public class ProfileManagementController {
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setContact_details(contactDetailsSettings);
+			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Contact numbers updated successfully");
 			model.addAttribute("message",
@@ -1284,14 +1383,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatewebaddresses", method = RequestMethod.POST)
 	public String updateWebAddresses(Model model, HttpServletRequest request) {
 		LOG.info("Method updateWebAddresses() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		ContactDetailsSettings contactDetailsSettings = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -1309,7 +1408,8 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1321,8 +1421,8 @@ public class ProfileManagementController {
 				companySettings.setContact_details(contactDetailsSettings);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1334,8 +1434,8 @@ public class ProfileManagementController {
 				regionSettings.setContact_details(contactDetailsSettings);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1347,7 +1447,7 @@ public class ProfileManagementController {
 				branchSettings.setContact_details(contactDetailsSettings);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1364,7 +1464,7 @@ public class ProfileManagementController {
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setContact_details(contactDetailsSettings);
+			profileSettings.setContact_details(contactDetailsSettings);
 
 			LOG.info("Web addresses updated successfully");
 			model.addAttribute("message",
@@ -1428,14 +1528,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatefacebooklink", method = RequestMethod.POST)
 	public String updateFacebookLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateFacebookLink() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
@@ -1450,7 +1550,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Facebook link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1462,8 +1563,8 @@ public class ProfileManagementController {
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1475,8 +1576,8 @@ public class ProfileManagementController {
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1488,7 +1589,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1504,7 +1605,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in updating fb token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setSocialMediaTokens(socialMediaTokens);
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
 
 			LOG.info("Facebook link updated successfully");
 			model.addAttribute("message",
@@ -1536,14 +1637,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatetwitterlink", method = RequestMethod.POST)
 	public String updateTwitterLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateTwitterLink() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
@@ -1558,7 +1659,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("LinkedIn link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1570,8 +1672,8 @@ public class ProfileManagementController {
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1583,8 +1685,8 @@ public class ProfileManagementController {
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1596,7 +1698,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1612,7 +1714,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in updating twitter token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setSocialMediaTokens(socialMediaTokens);
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
 
 			LOG.info("Twitter link updated successfully");
 			model.addAttribute("message",
@@ -1644,14 +1746,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelinkedinlink", method = RequestMethod.POST)
 	public String updateLinkedInLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateLinkedInLink() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
@@ -1666,7 +1768,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("LinkedIn link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1678,8 +1781,8 @@ public class ProfileManagementController {
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1691,8 +1794,8 @@ public class ProfileManagementController {
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1704,7 +1807,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1720,7 +1823,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in upadting linkedin token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setSocialMediaTokens(socialMediaTokens);
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
 
 			LOG.info("LinkedIn link updated successfully");
 			model.addAttribute("message",
@@ -1752,14 +1855,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateyelplink", method = RequestMethod.POST)
 	public String updateYelpLink(Model model, HttpServletRequest request) {
 		LOG.info("Method updateYelpLink() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		SocialMediaTokens socialMediaTokens = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
@@ -1774,7 +1877,8 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Yelp link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1786,8 +1890,8 @@ public class ProfileManagementController {
 				companySettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1799,8 +1903,8 @@ public class ProfileManagementController {
 				regionSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1812,7 +1916,7 @@ public class ProfileManagementController {
 				branchSettings.setSocialMediaTokens(socialMediaTokens);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1828,7 +1932,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in updating yelp token.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setSocialMediaTokens(socialMediaTokens);
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
 
 			LOG.info("YelpLinked in link updated successfully");
 			model.addAttribute("message",
@@ -1867,14 +1971,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateachievements", method = RequestMethod.POST)
 	public String updateAchievements(Model model, HttpServletRequest request) {
 		LOG.info("Method updateAchievements() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		List<Achievement> achievements = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -1890,7 +1994,8 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1900,8 +2005,8 @@ public class ProfileManagementController {
 				companySettings.setAchievements(achievements);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -1911,8 +2016,8 @@ public class ProfileManagementController {
 				regionSettings.setAchievements(achievements);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -1922,7 +2027,7 @@ public class ProfileManagementController {
 				branchSettings.setAchievements(achievements);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -1936,7 +2041,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in adding achievements.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setAchievements(achievements);
+			profileSettings.setAchievements(achievements);
 
 			LOG.info("Achievements updated successfully");
 			model.addAttribute("message",
@@ -1962,14 +2067,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updateassociations", method = RequestMethod.POST)
 	public String updateAssociations(Model model, HttpServletRequest request) {
 		LOG.info("Method updateAssociations() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		List<Association> associations = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -1985,7 +2090,8 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing the Json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -1995,8 +2101,8 @@ public class ProfileManagementController {
 				companySettings.setAssociations(associations);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -2006,8 +2112,8 @@ public class ProfileManagementController {
 				regionSettings.setAssociations(associations);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -2017,7 +2123,7 @@ public class ProfileManagementController {
 				branchSettings.setAssociations(associations);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2031,7 +2137,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setAssociations(associations);
+			profileSettings.setAssociations(associations);
 
 			LOG.info("Associations updated successfully");
 			model.addAttribute("message",
@@ -2056,14 +2162,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/updatelicenses", method = RequestMethod.POST)
 	public String updateProfileLicenses(Model model, HttpServletRequest request) {
 		LOG.info("Method updateProfileLicenses() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(false);
 		Licenses licenses = null;
 
 		try {
-			HttpSession session = request.getSession(false);
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profile = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profile == null) {
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
 			}
 
@@ -2080,7 +2186,8 @@ public class ProfileManagementController {
 				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
 			}
 
-			if (user.isCompanyAdmin()) {
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
 				if (companySettings == null) {
 					throw new InvalidInputException("No company settings found in current session");
@@ -2090,8 +2197,8 @@ public class ProfileManagementController {
 				companySettings.setLicenses(licenses);
 				userSettings.setCompanySettings(companySettings);
 			}
-			else if (user.isRegionAdmin()) {
-				long regionId = user.getUserProfiles().get(0).getRegionId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
 				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
 				if (regionSettings == null) {
 					throw new InvalidInputException("No Region settings found in current session");
@@ -2101,8 +2208,8 @@ public class ProfileManagementController {
 				regionSettings.setLicenses(licenses);
 				userSettings.getRegionSettings().put(regionId, regionSettings);
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = user.getUserProfiles().get(0).getBranchId();
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
 				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
 				if (branchSettings == null) {
 					throw new InvalidInputException("No Branch settings found in current session");
@@ -2112,7 +2219,7 @@ public class ProfileManagementController {
 				branchSettings.setLicenses(licenses);
 				userSettings.getBranchSettings().put(branchId, branchSettings);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				AgentSettings agentSettings = userSettings.getAgentSettings();
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
@@ -2126,7 +2233,7 @@ public class ProfileManagementController {
 				throw new InvalidInputException("Invalid input exception occurred in adding associations.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 
-			profile.setLicenses(licenses);
+			profileSettings.setLicenses(licenses);
 
 			LOG.info("Licence details updated successfully");
 			model.addAttribute("message",
@@ -2386,16 +2493,18 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/getadminhierarchy", method = RequestMethod.GET)
 	public String getAdminHierarchy(Model model, HttpServletRequest request) {
 		LOG.info("Method getAdminHierarchy() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
 
 		try {
-			if (user.isCompanyAdmin()) {
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				model = getCompanyHierarchy(model, request);
 			}
-			else if (user.isRegionAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				model = getRegionHierarchy(model, request);
 			}
-			else if (user.isBranchAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				model = getBranchHierarchy(model, request);
 			}
 		}
@@ -2547,17 +2656,19 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchreviews", method = RequestMethod.GET)
 	public String fetchReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchReviews() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
 
 		boolean fetchAbusive = true;
 		List<SurveyDetails> reviewItems = null;
 		try {
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
 			double minScore = Double.parseDouble(request.getParameter("minScore"));
 			int startIndex = Integer.parseInt(request.getParameter("startIndex"));
 			int numRows = Integer.parseInt(request.getParameter("numOfRows"));
 
-			if (user.isCompanyAdmin()) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				long companyId = Long.parseLong(request.getParameter("companyId"));
 				if (companyId == 0l) {
 					LOG.error("Invalid companyId passed in method fetchReviews().");
@@ -2567,7 +2678,7 @@ public class ProfileManagementController {
 				reviewItems = profileManagementService.getReviews(companyId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_COMPANY, fetchAbusive);
 			}
-			else if (user.isRegionAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
 				if (regionId == 0l) {
 					LOG.error("Invalid regionId passed in method fetchReviews().");
@@ -2577,7 +2688,7 @@ public class ProfileManagementController {
 				reviewItems = profileManagementService.getReviews(regionId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_REGION, fetchAbusive);
 			}
-			else if (user.isBranchAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
 				if (branchId == 0l) {
 					LOG.error("Invalid branchId passed in method fetchReviews().");
@@ -2587,7 +2698,7 @@ public class ProfileManagementController {
 				reviewItems = profileManagementService.getReviews(branchId, minScore, maxScore, startIndex, numRows,
 						CommonConstants.PROFILE_LEVEL_BRANCH, fetchAbusive);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
 				if (agentId == 0l) {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
@@ -2613,15 +2724,17 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchreviewcount", method = RequestMethod.GET)
 	public String fetchReviewCount(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchReviewCount() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
 
 		boolean fetchAbusive = true;
 		long reviewCount = 0l;
 		try {
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+
 			double maxScore = CommonConstants.MAX_RATING_SCORE;
 			double minScore = Double.parseDouble(request.getParameter("minScore"));
 
-			if (user.isCompanyAdmin()) {
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				long companyId = Long.parseLong(request.getParameter("companyId"));
 				if (companyId == 0l) {
 					LOG.error("Invalid companyId passed in method fetchReviews().");
@@ -2631,7 +2744,7 @@ public class ProfileManagementController {
 				reviewCount = profileManagementService.getReviewsCount(companyId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_COMPANY,
 						fetchAbusive);
 			}
-			else if (user.isRegionAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
 				if (regionId == 0l) {
 					LOG.error("Invalid regionId passed in method fetchReviews().");
@@ -2641,7 +2754,7 @@ public class ProfileManagementController {
 				reviewCount = profileManagementService.getReviewsCount(regionId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_REGION,
 						fetchAbusive);
 			}
-			else if (user.isBranchAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
 				if (branchId == 0l) {
 					LOG.error("Invalid branchId passed in method fetchReviews().");
@@ -2651,7 +2764,7 @@ public class ProfileManagementController {
 				reviewCount = profileManagementService.getReviewsCount(branchId, minScore, maxScore, CommonConstants.PROFILE_LEVEL_BRANCH,
 						fetchAbusive);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
 				if (agentId == 0l) {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
@@ -2675,12 +2788,14 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/fetchaveragerating", method = RequestMethod.GET)
 	public String fetchAverageRating(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchAverageRating() called from ProfileManagementController");
-		User user = sessionHelper.getCurrentUser();
 
 		boolean aggregateAbusive = true;
 		double averageRating = 0l;
 		try {
-			if (user.isCompanyAdmin()) {
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				long companyId = Long.parseLong(request.getParameter("companyId"));
 				if (companyId == 0l) {
 					LOG.error("Invalid companyId passed in method fetchReviews().");
@@ -2689,7 +2804,7 @@ public class ProfileManagementController {
 
 				averageRating = profileManagementService.getAverageRatings(companyId, CommonConstants.PROFILE_LEVEL_COMPANY, aggregateAbusive);
 			}
-			else if (user.isRegionAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				long regionId = Long.parseLong(request.getParameter("regionId"));
 				if (regionId == 0l) {
 					LOG.error("Invalid regionId passed in method fetchReviews().");
@@ -2698,7 +2813,7 @@ public class ProfileManagementController {
 
 				averageRating = profileManagementService.getAverageRatings(regionId, CommonConstants.PROFILE_LEVEL_REGION, aggregateAbusive);
 			}
-			else if (user.isBranchAdmin()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				long branchId = Long.parseLong(request.getParameter("branchId"));
 				if (branchId == 0l) {
 					LOG.error("Invalid branchId passed in method fetchReviews().");
@@ -2707,7 +2822,7 @@ public class ProfileManagementController {
 
 				averageRating = profileManagementService.getAverageRatings(branchId, CommonConstants.PROFILE_LEVEL_BRANCH, aggregateAbusive);
 			}
-			else if (user.isAgent()) {
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 				long agentId = Long.parseLong(request.getParameter("agentId"));
 				if (agentId == 0l) {
 					LOG.error("Invalid agentId passed in method fetchReviews().");
