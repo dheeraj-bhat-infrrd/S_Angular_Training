@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -36,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -2601,6 +2607,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method getBranchesByRegionIds executed successfully");
 		return branches;
+	}
+	
+	@Override
+	public Map<Long, BranchFromSearch> fetchBranchesMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		String branchesResult = solrSearchService.fetchBranchesByCompany(companyId);
+
+		// convert branches to map
+		Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+		List<BranchFromSearch> branchList = new Gson().fromJson(branchesResult, searchedBranchesList);
+
+		Map<Long, BranchFromSearch> branches = new HashMap<Long, BranchFromSearch>();
+		for (BranchFromSearch branch : branchList) {
+			branches.put(branch.getBranchId(), branch);
+		}
+		return branches;
+	}
+
+	@Override
+	public Map<Long, RegionFromSearch> fetchRegionsMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		String regionsResult = solrSearchService.fetchRegionsByCompany(companyId);
+
+		// convert regions to map
+		Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
+		List<RegionFromSearch> regionsList = new Gson().fromJson(regionsResult, searchedRegionsList);
+
+		Map<Long, RegionFromSearch> regions = new HashMap<Long, RegionFromSearch>();
+		for (RegionFromSearch region : regionsList) {
+			regions.put(region.getRegionId(), region);
+		}
+		return regions;
 	}
 }
 // JIRA: SS-27: By RM05: EOC
