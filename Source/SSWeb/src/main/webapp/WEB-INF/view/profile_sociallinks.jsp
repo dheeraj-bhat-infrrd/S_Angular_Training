@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if test="${not empty profile && not empty profile.socialMediaTokens}">
-	<c:set value="${profile.socialMediaTokens}" var="socialMediaTokens"></c:set>
+<c:if test="${not empty profileSettings && not empty profileSettings.socialMediaTokens}">
+	<c:set value="${profileSettings.socialMediaTokens}" var="socialMediaTokens"></c:set>
 </c:if>
 <c:if test="${not empty socialMediaTokens}">
 	<c:set value="${socialMediaTokens.facebookToken}" var="facebookToken"></c:set>
