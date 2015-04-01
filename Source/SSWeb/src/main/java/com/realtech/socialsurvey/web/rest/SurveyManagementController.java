@@ -20,15 +20,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
+import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
@@ -65,6 +69,12 @@ public class SurveyManagementController {
 
 	@Autowired
 	private EmailServices emailServices;
+
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
@@ -117,7 +127,7 @@ public class SurveyManagementController {
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
 
 			// TODO Search Engine Optimisation
-			
+
 			if (mood == null || mood.isEmpty()) {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
@@ -268,8 +278,22 @@ public class SurveyManagementController {
 				String errorMessage = JSONUtil.toJSON(errorResponse);
 				return errorMessage;
 			}
+
+			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService
+					.getUserByUserId(agentId));
+			if (companySettings != null) {
+				SurveySettings surveySettings = companySettings.getSurvey_settings();
+				if (surveySettings != null) {
+					surveyAndStage.put("happyText", surveySettings.getHappyText());
+					surveyAndStage.put("neutralText", surveySettings.getNeutralText());
+					surveyAndStage.put("sadText", surveySettings.getSadText());
+					surveyAndStage.put("autopostScore", surveySettings.getAuto_post_score());
+					surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
+				}
+			}
 			surveyAndStage.put("stage", stage);
 			surveyAndStage.put("survey", surveyQuestionDetails);
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");

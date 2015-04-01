@@ -1,8 +1,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:if test="${not empty profile && not empty profile.achievements}">
-	<c:set value="${profile.achievements}" var="achievements"></c:set>
+
+<c:if test="${not empty profileSettings && not empty profileSettings.achievements}">
+	<c:set value="${profileSettings.achievements}" var="achievements"></c:set>
 </c:if>
+
 <c:choose>
 	<c:when test="${not empty achievements}">
 		<c:forEach items="${achievements}" var="achievement">
