@@ -152,12 +152,4 @@ public class SiteMapWriter {
 			writer.writeEndElement();
 		}
 	}
-	
-	public static void main(String[] args){
-		SitemapContentFecher fetcher = new TestSitemapConetentFetcher();
-		String fileName = "/Users/nishit/work/Social_Survey/sitemap.xml";
-		SiteMapWriter writer = new SiteMapWriter(fileName, fetcher);
-		writer.writeSiteMap();
-	}
-	
 }
