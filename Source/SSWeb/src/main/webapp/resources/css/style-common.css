@@ -4,6 +4,11 @@
 }
 
 @font-face{
+    font-family:'OpenSansBold';
+    src:url('../fonts/OpenSans-Bold.ttf') format('truetype');
+}
+
+@font-face{
     font-family:'OpenSans';
     src:url('../fonts/OpenSans-Regular.ttf') format('truetype');
 }
@@ -541,9 +546,9 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-header-row-left {
     font-size: 16px;
-    line-height: 40px;
-    font-family: opensanslight;
-    font-weight: bold !important;
+    line-height: 55px;
+    font-family: OpenSansBold;
+/*    font-weight: bold !important;*/
 }
 
 .hm-header-row-right {
@@ -1405,12 +1410,14 @@ button.paypal.is-active {
 
 .prof-name {
     font-size: 22px;
+    color: #666;
 }
 
 .prof-address {
     font-family: 'OpenSansLight';
     line-height: 26px;
     font-size: 18px;
+    margin-bottom: 10px;
 }
 
 .prof-addline1 {
@@ -1418,6 +1425,8 @@ button.paypal.is-active {
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+    font-family: opensanslight;
+    font-size: 16px;
 }
 
 .prof-btn-survey {
@@ -1443,6 +1452,7 @@ button.paypal.is-active {
 
 .prof-addline2 {
     font-size: 16px;
+    font-family: opensanslight;
 }
 
 .prof-btn-wrapper {
@@ -1504,7 +1514,7 @@ button.paypal.is-active {
 }
 .main-con-header {
     font-size: 16px;
-    margin-bottom: 15px;
+    margin-bottom: 5px;
 }
 
 .rt-content-main {
@@ -2884,7 +2894,8 @@ button.paypal.is-active {
 }
 
 .prof-user-addline1 {
-    font-weight: bold !important;
+/*    font-weight: bold !important;*/
+    font-family: 'OpenSansBold';
     font-size: 16px;
 }
 
@@ -3184,11 +3195,14 @@ button.paypal.is-active {
 
 .sq-i-txt-fld {
 	width: 300px;
-	height: 40px;
-	border: 1px solid #e3e3e3;
-    border-radius: 3px;
-    box-shadow: 0px 2px 2px 0px #e3e3e3;
+    height: 40px;
     padding: 0 10px;
+    border-radius: 3px;
+    outline: none;
+    box-shadow: none;
+    border: 1px solid #dcdcdc;
+    font-size: 12px;
+}
 }
 
 .lp-edit-locks-locked {
@@ -3563,6 +3577,8 @@ button.paypal.is-active {
 
 .dash-top-info {
     border-bottom: 1px solid #dcdcdc;
+    overflow: hidden;
+    height: 400px;
 }
 
 .stats-left {
@@ -3625,6 +3641,7 @@ button.paypal.is-active {
 
 .stats-right {
     margin-left: 40px;
+    margin-bottom: 18px;
 }
 
 .dash-panel-left {
@@ -3905,7 +3922,7 @@ button.paypal.is-active {
 }
 
 .reg_form_wrapper_2 {
-    width: 730px;
+    width: 740px;
     margin:  25px auto 0;
 }
 
@@ -3913,7 +3930,7 @@ button.paypal.is-active {
     line-height: 40px;
     margin-right: 30px;
     text-align: right;
-    width: 80px;
+    width: 98px;
     font-size: 14px;
 }
 
@@ -4159,6 +4176,7 @@ button.paypal.is-active {
  	background: url(../images/place-holder-individual.png) no-repeat center;
  	background-size: auto !important;
 	border: 1px dashed #ccc;
+    border-radius: 3px;
 }
  
 .region-default-img {
@@ -4221,7 +4239,7 @@ button.paypal.is-active {
 }
 
 .bd-hr-rt-header {
-    line-height: 70px;
+    line-height: 78px;
     text-align: center;
     font-size: 18px;
 }
@@ -4311,7 +4329,7 @@ button.paypal.is-active {
 
 .bd-frm-rt-dd-list {
     position: absolute;
-    top: 50px;
+    top: 39px;
     border: 1px solid #dcdcdc;
     width: 275px;
     z-index: 999;
@@ -5026,7 +5044,7 @@ tr.u-tbl-header td {
 }
 
 .float-left.hm-header-row-left.hr-dsh-adj-lft{
-    margin-top: -10px;
+/*    margin-top: -10px;*/
 }
 
 .float-right.header-right.clearfix.hr-dsh-adj-rt{
