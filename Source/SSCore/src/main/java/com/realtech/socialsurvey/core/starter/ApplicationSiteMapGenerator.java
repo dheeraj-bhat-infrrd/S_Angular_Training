@@ -23,13 +23,13 @@ public class ApplicationSiteMapGenerator {
 		ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
 		// start threads to get the sitemap entries
 		Thread companySiteMapGeneratorThread = new Thread(new SiteMapGenerator(SiteMapGenerator.DAILY_CONTENT, SiteMapGenerator.ORG_COMPANY, context));
-		companySiteMapGeneratorThread.run();
+		companySiteMapGeneratorThread.start();
 		Thread regionSiteMapGeneratorThread = new Thread(new SiteMapGenerator(SiteMapGenerator.DAILY_CONTENT, SiteMapGenerator.ORG_REGION, context));
-		regionSiteMapGeneratorThread.run();
+		regionSiteMapGeneratorThread.start();
 		Thread branchSiteMapGeneratorThread = new Thread(new SiteMapGenerator(SiteMapGenerator.DAILY_CONTENT, SiteMapGenerator.ORG_BRANCH, context));
-		branchSiteMapGeneratorThread.run();
+		branchSiteMapGeneratorThread.start();
 		Thread agentSiteMapGeneratorThread = new Thread(new SiteMapGenerator(SiteMapGenerator.DAILY_CONTENT, SiteMapGenerator.ORG_INDIVIDUAL, context));
-		agentSiteMapGeneratorThread.run();
+		agentSiteMapGeneratorThread.start();
 		try {
 			companySiteMapGeneratorThread.join();
 			regionSiteMapGeneratorThread.join();
