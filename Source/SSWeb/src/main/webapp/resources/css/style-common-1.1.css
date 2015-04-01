@@ -367,7 +367,7 @@ a, a:hover, a:visited{
 
 .pro-right-wrapper {
     position: relative;
-    width: 660px;
+    width: 600px;
     height: 70px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
@@ -720,7 +720,7 @@ input#find-pro-submit{
 }
 
 .row.row-dash-top-adj {
-    margin-bottom: -80px;
+/*    margin-bottom: -80px;*/
 }
 
 .disclaimer {
