@@ -5115,7 +5115,7 @@ tr.u-tbl-header td {
 .srv-tbl-chk {
     background: url(../images/checks.png) no-repeat;
     width: 20px;
-    height: 55px;
+    height: 50px;
     margin-right: 10px;
     margin-left: 10px;
 }
@@ -5442,7 +5442,7 @@ tr.u-tbl-header td {
     cursor: pointer;
     display: none;
     width: 20px;
-    height: 55px;
+    height: 50px;
 }
 
 .srv-tbl-move-up {
