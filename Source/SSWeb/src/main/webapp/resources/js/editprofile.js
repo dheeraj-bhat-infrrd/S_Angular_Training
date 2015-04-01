@@ -1,4 +1,4 @@
-// Varibles for processing
+// Variables for processing
 var startIndex = 0;
 var numOfRows = 3;
 var minScore = 0;
@@ -6,6 +6,7 @@ var attrName = null;
 var attrVal = null;
 var webAddressRegEx = /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
 var timer = 0;
+var profileId;
 var delay = (function() {
 	return function(callback, ms) {
 		clearTimeout(timer);
@@ -874,6 +875,7 @@ function initializeGoogleMap() {
 
 // Data population for Admin
 function paintForProfile() {
+	profileId = $('#profile-id').val();
 	var companyId = $('#prof-company-id').val();
 	var regionId = $('#prof-region-id').val();
 	var branchId = $('#prof-branch-id').val();
@@ -927,13 +929,11 @@ function paintHierarchy(data) {
 	// Click on region
 	$(document).on('click', '.comp-region', function(){
 		if($(this).attr("data-openstatus") == "closed") {
-			//console.log("inside closed ---"+$(this).attr("data-openstatus"));
 			fetchRegionHierarchyOnClick($(this).attr('data-regionid'));
 			$(this).attr("data-openstatus", "open");
 		} else {
 			$('#comp-region-branches-' + $(this).attr('data-regionid')).slideUp(200);
 			$(this).attr("data-openstatus", "closed");
-			//console.log("inside else ---"+$(this).attr("data-openstatus"));
 		}
 	});
 	

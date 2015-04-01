@@ -1,17 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
-<%-- <c:choose>
-	<c:when	test="${user.companyAdmin}">
-		<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
-	</c:when>
-	<c:when	test="${user.regionAdmin}">
-		<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
-	</c:when>
-	<c:when	test="${user.branchAdmin}">
-		<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
-	</c:when>
-</c:choose> --%>
 <div class="bd-hr-lp-content-wrapper">
 	<!-- Regions -->
 	<c:choose>

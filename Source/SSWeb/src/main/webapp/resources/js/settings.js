@@ -407,6 +407,7 @@ $('#atpst-chk-box').click(function(){
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
 		$('#at-pst-cb').val("false");
 	}
+	$('#ratingcategory').val('rating-auto-post');
 	updatePostScore("rating-settings-form");
 });
 
