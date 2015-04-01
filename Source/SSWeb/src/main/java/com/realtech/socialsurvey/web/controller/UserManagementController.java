@@ -120,18 +120,8 @@ public class UserManagementController {
 			long companyId = user.getCompany().getCompanyId();
 			// fetch region List from solr
 			try {
-				String regionsResult = solrSearchService.fetchRegionsByCompany(companyId);
-
-				// convert regions to map
-				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
-				List<RegionFromSearch> regionsList = new Gson().fromJson(regionsResult, searchedRegionsList);
-
-				Map<Long, RegionFromSearch> regions = new HashMap<Long, RegionFromSearch>();
-				for (RegionFromSearch region : regionsList) {
-					regions.put(region.getRegionId(), region);
-				}
-
-				session.setAttribute("regions", regions);
+				Map<Long, RegionFromSearch> regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+				session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
@@ -140,17 +130,8 @@ public class UserManagementController {
 
 			// fetch branch List from solr
 			try {
-				String branchesResult = solrSearchService.fetchBranchesByCompany(companyId);
-
-				// convert branches to map
-				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
-				List<BranchFromSearch> branchList = new Gson().fromJson(branchesResult, searchedBranchesList);
-
-				Map<Long, BranchFromSearch> branches = new HashMap<Long, BranchFromSearch>();
-				for (BranchFromSearch branch : branchList) {
-					branches.put(branch.getBranchId(), branch);
-				}
-				session.setAttribute("branches", branches);
+				Map<Long, BranchFromSearch> branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+				session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
@@ -331,7 +312,6 @@ public class UserManagementController {
 		int batchSize = 0;
 
 		try {
-
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
 			try {
@@ -1109,8 +1089,8 @@ public class UserManagementController {
 			long userId = Long.parseLong(request.getParameter("userId"));
 			User user = userManagementService.getUserByUserId(userId);
 
-			Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute("regions");
-			Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute("branches");
+			Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+			Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
 
 			List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
 			for (UserProfile userProfile : user.getUserProfiles()) {
