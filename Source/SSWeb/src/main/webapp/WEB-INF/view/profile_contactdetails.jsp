@@ -44,10 +44,10 @@
 				<div id="web-address-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 			</c:when>
 		</c:choose>
-			</div>
+	</div>
 </div>
 <div class="lp-con-row lp-row clearfix">
-	<div class="float-left lp-con-icn icn-web"></div>
+	<div class="float-left lp-con-icn icn-blog"></div>
 	<div>
 		<c:choose>
 			<c:when	test="${parentLock.isBlogAddressLocked && profilemasterid != 4}">
@@ -69,33 +69,6 @@
 			<c:when	test="${not parentLock.isBlogAddressLocked && not lock.isBlogAddressLocked && profilemasterid != 4}">
 				<input id="web-address-blogs" class="float-left lp-con-row-item blue-text prof-edditable-sin" data-web-address="blogs" value="${webAddresses.blogs}" placeholder='<spring:message code="label.blog.placeholder.key"/>'>
 				<div id="web-address-blogs-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
-			</c:when>
-		</c:choose>
-			</div>
-</div>
-<div class="lp-con-row lp-row clearfix">
-	<div class="float-left lp-con-icn icn-phone"></div>
-	<div class="float-left lp-edit-wrapper clearfix float-left">
-		<c:choose>
-			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
-				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
-				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-			</c:when>
-			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
-				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
-			</c:when>
-			<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
-			</c:when>
-			<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
-				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-			</c:when>
-			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4}">
-				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 			</c:when>
 		</c:choose>
 	</div>
@@ -123,6 +96,33 @@
 			<c:when	test="${not parentLock.isPersonalPhoneLocked && not lock.isPersonalPhoneLocked && profilemasterid != 4}">
 				<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>'>
 				<div id="phone-number-personal-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
+			</c:when>
+		</c:choose>
+	</div>
+</div>
+<div class="lp-con-row lp-row clearfix">
+	<div class="float-left lp-con-icn icn-phone"></div>
+	<div class="float-left lp-edit-wrapper clearfix float-left">
+		<c:choose>
+			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
+				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
+				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+			</c:when>
+			<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
+				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
+				<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
+				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
+				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+			</c:when>
+			<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4}">
+				<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+				<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 			</c:when>
 		</c:choose>
 	</div>
