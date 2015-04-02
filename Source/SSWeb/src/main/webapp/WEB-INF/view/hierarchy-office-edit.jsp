@@ -6,7 +6,7 @@
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.officename.key"/></div>
     <div class="float-left bd-frm-right">
-        <input class="bd-frm-rt-txt" name="officeName" id="office-name-txt">
+        <input class="bd-frm-rt-txt" name="officeName" id="office-name-txt" value="${branch.organizationUnitSettings.contact_details.name}">
     </div>
 </div>
 <div id="bd-assign-to" class="bd-hr-form-item clearfix">
@@ -46,13 +46,13 @@
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.addressline1.key"/></div>
     <div class="float-left bd-frm-right">
-        <input class="bd-frm-rt-txt" name="officeAddress1" id="office-address-txt">
+        <input class="bd-frm-rt-txt" name="officeAddress1" id="office-address-txt" value="${branch.organizationUnitSettings.contact_details.address1}">
     </div>
 </div>
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.addressline2.key"/></div>
     <div class="float-left bd-frm-right">
-        <input class="bd-frm-rt-txt" name="officeAddress2">
+        <input class="bd-frm-rt-txt" name="officeAddress2" value="${branch.organizationUnitSettings.contact_details.address2}"/>
     </div>
 </div>
 <div class="bd-hr-form-item clearfix">
