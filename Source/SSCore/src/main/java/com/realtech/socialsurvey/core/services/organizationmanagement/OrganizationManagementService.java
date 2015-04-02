@@ -15,6 +15,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -569,4 +570,46 @@ public interface OrganizationManagementService {
 	public Map<Long, BranchFromSearch> fetchBranchesMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
 	
 	public Map<Long, RegionFromSearch> fetchRegionsMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
+
+	/**
+	 * Method to get the list of branches from solr which are directly assigned to the company
+	 * 
+	 * @param company
+	 * @param start
+	 * @param rows
+	 * @return
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public List<BranchFromSearch> getBranchesUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException;
+
+	/**
+	 * Method to get the list of users from solr which are directly assigned to the company
+	 * 
+	 * @param company
+	 * @param start
+	 * @param rows
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public List<UserFromSearch> getUsersUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException;
+
+	/**
+	 * Method to get the list of users from solr which are directly assigned to the regions
+	 * specified
+	 * 
+	 * @param regionIds
+	 * @param start
+	 * @param rows
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	public List<UserFromSearch> getUsersUnderRegionFromSolr(Set<Long> regionIds, int start, int rows) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException;
 }
