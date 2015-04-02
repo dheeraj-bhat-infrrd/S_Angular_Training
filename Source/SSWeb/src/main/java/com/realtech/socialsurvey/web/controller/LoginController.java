@@ -73,8 +73,12 @@ public class LoginController {
 	@RequestMapping(value = "/home")
 	public String initHomePage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
 		LOG.info("Method initHomePage() called from LoginController");
-		
-		// checking for state of principal session
+		redirectOnClickLogo(response);
+		return JspResolver.INDEX;
+	}
+
+	private void redirectOnClickLogo(HttpServletResponse response) {
+		LOG.debug("Checking for state of principal session");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!(auth instanceof AnonymousAuthenticationToken)) {
 			try {
@@ -84,23 +88,12 @@ public class LoginController {
 				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
 			}
 		}
-		return JspResolver.INDEX;
 	}
 		
 	@RequestMapping(value = "/login")
 	public String initLoginPage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
 		LOG.info("Inside initLoginPage() of LoginController");
-		
-		// checking for state of principal session
-		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if (!(auth instanceof AnonymousAuthenticationToken)) {
-			try {
-				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
-			}
-			catch (IOException e) {
-				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
-			}
-		}
+		redirectOnClickLogo(response);
 		
 		if (status != null) {
 			switch (status) {
