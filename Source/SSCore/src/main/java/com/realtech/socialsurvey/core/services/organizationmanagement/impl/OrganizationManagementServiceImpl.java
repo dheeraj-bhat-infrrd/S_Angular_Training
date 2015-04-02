@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.apache.solr.common.SolrDocumentList;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -45,6 +47,7 @@ import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -1494,7 +1497,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), defaultBranch.getBranchId(), regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE,
 				CommonConstants.STATUS_ACTIVE, String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
-		
+
 		// check if user profile already exists
 		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
 			for (UserProfile profile : assigneeUser.getUserProfiles()) {
@@ -1504,7 +1507,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				}
 			}
 		}
-		
+
 		userProfileDao.save(userProfile);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
@@ -1614,7 +1617,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		UserProfile userProfile = userManagementService.createUserProfile(assigneeUser, adminUser.getCompany(), assigneeUser.getEmailId(),
 				assigneeUser.getUserId(), branchId, regionId, profileMasterId, CommonConstants.DASHBOARD_STAGE, CommonConstants.STATUS_ACTIVE,
 				String.valueOf(adminUser.getUserId()), String.valueOf(adminUser.getUserId()));
-		
+
 		// check if user profile already exists
 		if (assigneeUser.getUserProfiles() != null && !assigneeUser.getUserProfiles().isEmpty()) {
 			for (UserProfile profile : assigneeUser.getUserProfiles()) {
@@ -1624,7 +1627,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 				}
 			}
 		}
-		
+
 		userProfileDao.save(userProfile);
 
 		if (assigneeUser.getIsAtleastOneUserprofileComplete() == CommonConstants.STATUS_INACTIVE) {
@@ -1706,7 +1709,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			}
 
 		}
-
 		LOG.info("Method addNewIndividual executed successfully");
 	}
 
@@ -2668,5 +2670,84 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		return regions;
 	}
+
+	/**
+	 * Method to get the list of branches from solr which are directly assigned to the company
+	 * 
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public List<BranchFromSearch> getBranchesUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (company == null) {
+			throw new InvalidInputException("company is null in getBranchesUnderCompanyFromSolr");
+		}
+		LOG.info("Method getBranchesUnderCompanyFromSolr called for company:" + company + " and start:" + start + " rows:" + rows);
+		List<BranchFromSearch> branches = null;
+		Region defaultRegion = getDefaultRegionForCompany(company);
+		String branchesJson = solrSearchService.searchBranchesByRegion(defaultRegion.getRegionId(), start, rows);
+		LOG.debug("branchesJson obtained from solr is:" + branchesJson);
+
+		Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+		branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+
+		LOG.info("Method getBranchesUnderCompanyFromSolr executed successfully");
+		return branches;
+	}
+
+	/**
+	 * Method to get the list of users from solr which are directly assigned to the company
+	 */
+	@Override
+	@Transactional
+	public List<UserFromSearch> getUsersUnderCompanyFromSolr(Company company, int start, int rows) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (company == null) {
+			throw new InvalidInputException("company is null in getUsersUnderCompanyFromSolr");
+		}
+		LOG.info("Method getUsersUnderCompanyFromSolr called for company:" + company + " and start:" + start + " rows:" + rows);
+		List<UserFromSearch> users = null;
+		Region defaultRegion = getDefaultRegionForCompany(company);
+		Branch defaultBranch = getDefaultBranchForRegion(defaultRegion.getRegionId());
+		SolrDocumentList usersResult = solrSearchService.searchUsersByIden(defaultBranch.getBranchId(), CommonConstants.BRANCHES_SOLR, false, start,
+				rows);
+		String usersJson = JSONUtil.toJSON(usersResult);
+		LOG.debug("Solr result returned for users of company is:" + usersJson);
+		/**
+		 * convert users to Object
+		 */
+		Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+		users = new Gson().fromJson(usersJson, searchedUsersList);
+		return users;
+	}
+
+	@Override
+	@Transactional
+	public List<UserFromSearch> getUsersUnderRegionFromSolr(Set<Long> regionIds, int start, int rows) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException {
+		if (regionIds == null || regionIds.isEmpty()) {
+			throw new InvalidInputException("region ids are null in getUsersUnderRegionFromSolr");
+		}
+		LOG.info("Method getUsersUnderRegionFromSolr called for regionIds:" + regionIds + " and start:" + start + " rows:" + rows);
+		List<UserFromSearch> users = null;
+		Set<Long> branchIds = new HashSet<Long>();
+		for (long regionId : regionIds) {
+			Branch branch = getDefaultBranchForRegion(regionId);
+			branchIds.add(branch.getBranchId());
+		}
+		String usersJson = solrSearchService.searchUsersByBranches(branchIds, start, rows);
+		LOG.debug("Solr result returned for users of regions is:" + usersJson);
+		/**
+		 * convert users to Object
+		 */
+		Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+		users = new Gson().fromJson(usersJson, searchedUsersList);
+
+		LOG.info("Method getUsersUnderRegionFromSolr executed successfully");
+		return users;
+	}
+
 }
 // JIRA: SS-27: By RM05: EOC

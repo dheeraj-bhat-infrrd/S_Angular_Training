@@ -118,8 +118,7 @@ public interface SolrSearchService {
 	public String searchUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
 			MalformedURLException;
 
-	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException,
-			MalformedURLException;
+	public long countUsersByCompany(long companyId, int startIndex, int noOfRows) throws InvalidInputException, SolrException, MalformedURLException;
 
 	public String fetchRegionsByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
 
@@ -150,14 +149,83 @@ public interface SolrSearchService {
 
 	public void editUserInSolr(long userId, String key, String value) throws SolrException;
 
-	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
-			SolrException;
+	/**
+	 * Method to search for the users based on the iden specified, iden could be branchId/regionId
+	 * or companyId
+	 * 
+	 * @param iden
+	 * @param idenFieldName
+	 * @param isAgent
+	 * @param startIndex
+	 * @param noOfRows
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException;
 
+	/**
+	 * @param regionId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
 	public String searchRegionById(long regionId) throws InvalidInputException, SolrException;
 
+	/**
+	 * @param branchId
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
 	public String searchBranchNameById(long branchId) throws InvalidInputException, SolrException;
 
+	/**
+	 * @param searchColumn
+	 * @param searchKey
+	 * @param columnName
+	 * @param id
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
 	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
 			SolrException;
+
+	/**
+	 * Method to search for the users based on branches specified
+	 * @param branchIds
+	 * @param start
+	 * @param rows
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public String searchUsersByBranches(Set<Long> branchIds, int start, int rows) throws InvalidInputException, SolrException;
+
+	/**
+	 * Method to add multiple regions to solr
+	 * 
+	 * @param regions
+	 * @throws SolrException
+	 */
+	public void addRegionsToSolr(List<Region> regions) throws SolrException;
+
+	/**
+	 * Method to add multiple branches to solr
+	 * 
+	 * @param branches
+	 * @throws SolrException
+	 */
+	public void addBranchesToSolr(List<Branch> branches) throws SolrException;
+
+	/**
+	 * Method to add multiple users to solr
+	 * 
+	 * @param users
+	 * @throws SolrException
+	 */
+	public void addUsersToSolr(List<User> users) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
