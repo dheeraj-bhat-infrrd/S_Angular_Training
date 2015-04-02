@@ -733,10 +733,10 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
-		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN)
-				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate)), Aggregation.match(Criteria
-				.where(columnName).is(columnValue)), Aggregation.project(CommonConstants.MODIFIED_ON_COLUMN)
-				.andExpression(criteriaColumn + "(" + CommonConstants.MODIFIED_ON_COLUMN + ")").as("groupCol"), Aggregation.group("groupCol").count()
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON)
+				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria
+				.where(columnName).is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
+				.andExpression(criteriaColumn + "(" + CommonConstants.CREATED_ON + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
 
 		AggregationResults<SurveyDetails> result = mongoTemplate.aggregate(aggregation, SURVEY_DETAILS_COLLECTION, SurveyDetails.class);

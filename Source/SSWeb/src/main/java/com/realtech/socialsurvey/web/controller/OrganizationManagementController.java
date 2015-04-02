@@ -519,11 +519,15 @@ public class OrganizationManagementController {
 		LOG.info("Updating Survey Settings");
 		HttpSession session = request.getSession(false);
 		String ratingCategory = request.getParameter("ratingcategory");
+		String autopost = request.getParameter("autopost");
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
 		String message = "";
-
+		boolean isAutoPostEnabled = false;
 		try {
+			if(autopost!=null && !autopost.isEmpty()){
+				isAutoPostEnabled = Boolean.parseBoolean(autopost);
+			}
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
 
@@ -538,6 +542,7 @@ public class OrganizationManagementController {
 				surveySettings = new SurveySettings();
 				surveySettings.setAuto_post_score((float) autopostRating);
 				if (originalSurveySettings != null) {
+					surveySettings.setAutoPostEnabled(isAutoPostEnabled);
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
