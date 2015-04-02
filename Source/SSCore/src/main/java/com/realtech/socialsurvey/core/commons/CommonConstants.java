@@ -148,6 +148,10 @@ public interface CommonConstants {
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
 	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
 	public static final String DEFAULT_MONGO_ID_COLUMN = "_id";
+	public static final String LAST_REMINDER_FOR_INCOMPLETE_SURVEY = "lastReminderForIncompleteSurvey";
+	public static final String REMINDERS_FOR_INCOMPLETE_SURVEYS = "remindersForIncompleteSurveys";
+	public static final String LAST_REMINDER_FOR_SOCIAL_POST = "lastReminderForSocialPost";
+	public static final String REMINDERS_FOR_SOCIAL_POSTS = "remindersForSocialPosts";
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)

@@ -100,7 +100,7 @@
 
 	<div class="hdr-wrapper">
 		<div class="container hdr-container clearfix">
-			<div class="float-left hdr-logo"></div>
+			<div class="float-left hdr-logo cursor-pointer"></div>
 			<div class="float-left hdr-links clearfix">
 				<div class="hdr-link-item hdr-link-active">
 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
