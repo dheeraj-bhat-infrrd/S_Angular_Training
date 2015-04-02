@@ -3984,7 +3984,7 @@ button.paypal.is-active {
 }
 
 .reg_form_wrapper_1 {
-    width: 425px;
+    width: 433px;
     margin:  8px auto 0;
 }
 
@@ -5088,7 +5088,7 @@ tr.u-tbl-header td {
 }
 
 .bd-srv-tbl-row, .vs-srv-tbl-row {
-    line-height: 55px;
+    line-height: 50px;
 }
 
 .bd-srv-tbl-row:nth-child(even){
@@ -5114,14 +5114,14 @@ tr.u-tbl-header td {
 	line-height: 28px;
 	padding-top: 14px;
 	padding-bottom: 13px;
-	height: 55px;
+	height: 50px;
 	padding-left: 40px;
 }
 
 .srv-tbl-chk {
     background: url(../images/checks.png) no-repeat;
     width: 20px;
-    height: 55px;
+    height: 50px;
     margin-right: 10px;
     margin-left: 10px;
 }
@@ -5136,12 +5136,12 @@ tr.u-tbl-header td {
 
 .srv-tbl-num span {
     display: inline-block;
-    height: 40px;
-    width: 40px;
+    height: 35px;
+    width: 35px;
     background-color: #E1E1E1;
     border-radius: 50%;
     text-align: center;
-    line-height: 40px;
+    line-height: 35px;
     margin-top: 8px;
     margin-left: 10px;
     margin-right: 10px;
@@ -5448,7 +5448,7 @@ tr.u-tbl-header td {
     cursor: pointer;
     display: none;
     width: 20px;
-    height: 55px;
+    height: 50px;
 }
 
 .srv-tbl-move-up {
@@ -5571,27 +5571,27 @@ tr.u-tbl-header td {
 
 .rating-icn-sm{
     background: url(../images/rating_star_icn.png) no-repeat left center;
-    background-size: 32px auto;
+    background-size: 22px auto;
 }
 
 .scale-icn-sm{
     background: url(../images/scale_icn.png) no-repeat left center;
-    background-size: 32px auto;
+    background-size: 22px auto;
 }
 
 .mcq-icn-sm{
     background: url(../images/mcq_icn.png) no-repeat left center;
-    background-size: 32px auto;
+    background-size: 22px auto;
 }
 
 .smiley-icn-sm{
     background: url(../images/rating_smiley_icn.png) no-repeat left center;
-    background-size: 32px auto;
+    background-size: 22px auto;
 }
 
 .desc-icn-sm{
     background: url(../images/discription_icn.png) no-repeat left center;
-    background-size: 32px auto;
+    background-size: 22px auto;
 }
 
 .paginate-button {
