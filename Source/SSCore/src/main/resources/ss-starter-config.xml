@@ -4,8 +4,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 
-    <import resource="classpath:sscore-beans.xml" />
-    <bean id="dataSource"
+	<import resource="classpath:sscore-beans.xml" />
+	<bean id="dataSource"
 		class="org.springframework.jdbc.datasource.DriverManagerDataSource">
 		<property name="url">
 			<value>${DATABASE_URL}</value>
@@ -22,6 +22,17 @@
 		</property>
 	</bean>
 	
+	<bean id="surveyHandler"
+		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl">
+	</bean>
+	
+	<bean id="emailServices"
+		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl">
+	</bean>
+	
+	<bean id="organizationManagementService"
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl">
+	</bean>
 	<bean id="regionsFullImport" class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport" class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport" class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />

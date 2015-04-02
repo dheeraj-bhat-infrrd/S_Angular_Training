@@ -24,7 +24,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
 <script>
-	$('#header-logo').click(function(){
+	$('.hdr-logo').click(function(){
 		showMainContent('./dashboard.do');
 	});
 	

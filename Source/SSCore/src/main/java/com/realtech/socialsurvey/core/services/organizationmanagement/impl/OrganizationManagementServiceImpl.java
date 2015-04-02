@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -103,7 +104,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
-
+	
+	@Value("${HAPPY_TEXT}")
+	private String happyText;
+	
+	@Value("${NEUTRAL_TEXT}")
+	private String neutralText;
+	
+	@Value("${SAD_TEXT}")
+	private String sadText;
+	
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -348,6 +358,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 		companySettings.setLockSettings(new LockSettings());
+		
+		// Adding default text for various flows of survey.
+		SurveySettings surveySettings = new SurveySettings();
+		surveySettings.setHappyText(happyText);
+		surveySettings.setNeutralText(neutralText);
+		surveySettings.setSadText(sadText);
+		companySettings.setSurvey_settings(surveySettings);
+		
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
 		LOG.debug("Inserting company settings.");
@@ -2609,6 +2627,18 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method getBranchesByRegionIds executed successfully");
 		return branches;
+	}
+
+	/**
+	 * Method to get the list of all the company ids
+	 */
+	@Override
+	public Set<Company> getAllCompanies() {
+		LOG.info("Method to get list of all companies, getAllCompanies() started");
+		@SuppressWarnings("unchecked")
+		Set<Company> companies = (Set<Company>) companyDao.findAllActive(Company.class);
+		LOG.info("Method to get list of all companies, getAllCompanies() finished");
+		return companies;
 	}
 	
 	@Override
