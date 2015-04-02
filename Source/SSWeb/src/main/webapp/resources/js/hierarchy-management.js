@@ -947,7 +947,7 @@ function paintHierarchyViewBranches(data,regionId) {
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").after(data);
 	$("#tr-region-"+regionId).slideDown(200);
 	$(".tr-region-edit").slideUp(200);
-	
+	bindUserEditClicks();
 	bindBranchListClicks();
 }
 
@@ -964,6 +964,20 @@ function bindBranchListClicks(){
 			$(this).attr('clicked','false');
 		}		
 	});
+	$(".branch-row").click(function(e){
+		e.stopPropagation();
+		var branchId = $(this).attr("data-branchid");
+		var regionId = $(this).attr("data-regionid");
+		if($(this).attr('clicked') == "false"){
+			fetchUsersForBranch(branchId,regionId);
+			 $(this).attr('clicked','true');
+		}
+		else {
+			$('.user-row-'+branchId).html("").hide(); 
+            $(this).attr('clicked','false');
+		}
+	});
+	
 }
 
 function fetchHierarchyViewList() {
@@ -977,6 +991,7 @@ function paintHierarchyViewList(data) {
         e.stopPropagation();
     });
     bindBranchListClicks();
+    bindUserEditClicks();
 }
 
 function bindRegionListClicks() {
@@ -987,7 +1002,7 @@ function bindRegionListClicks() {
 			 $(this).attr('clicked','true');
 		}
 		else {
-			$('.branch-row-'+regionId).html("").hide(); 
+			$("tr[class*='sel-r"+regionId+"'").html("").hide();
             $(this).attr('clicked','false');
 		}
 	});
@@ -1006,24 +1021,27 @@ function bindRegionListClicks() {
 }
 
 function showRegionEdit(regionId) {
-	var url = "./getregioneditpage.do";
+	var url = "./getregioneditpage.do?regionId="+regionId;
 	callAjaxGET(url, function(data){
 		showRegionEditCallBack(data, regionId);
 	}, true);
 }
 function showRegionEditCallBack(data,regionId) {
+	$(".td-region-edit").html("").hide();
+	$(".tr-region-edit").hide();
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
 	$("#td-region-edit-"+regionId).html(data).slideDown(200);
 	
 }
 
 function hideRegionEdit(branchId) {
+	$(".td-region-edit").html("").hide();
 	$("#td-region-edit-"+branchId).hide();
-	$("#td-region-edit-"+branchId).parent(".tr-region-edit").hide();
+	$(".tr-region-edit").hide();
 }
 
 function showBranchEdit(branchId) {
-	var url = "./getofficeeditpage.do";
+	var url = "./getofficeeditpage.do?branchId="+branchId;
 	callAjaxGET(url, function(data){
 		showBranchEditCallBack(data, branchId);
 	}, true);
@@ -1032,10 +1050,41 @@ function showBranchEdit(branchId) {
 function showBranchEditCallBack(data,branchId) {
 	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").slideDown(200);
 	$("#td-branch-edit-"+branchId).html(data).slideDown(200);
-	
 }
 
 function hideBranchEdit(branchId) {
 	$("#td-branch-edit-"+branchId).slideUp(200);
 	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").hide();
+}
+
+function fetchUsersForBranch(branchId,regionId) {
+	var url="./fetchbranchusers.do?branchId="+branchId+"&regionId="+regionId;
+	callAjaxGET(url, function(data) {
+		paintUsersFromBranch(data,branchId);
+	}, true);
+}
+
+function paintUsersFromBranch(data,branchId,regionId) {
+	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").after(data);
+	$("#tr-branch-"+branchId).slideDown(200);
+	$(".tr-branch-edit").slideUp(200);
+	bindUserEditClicks();
+}
+
+function bindUserEditClicks() {
+	$('.user-edit-icn').click(function(e){
+		e.stopPropagation();
+		if($(this).attr('clicked') == "false") {
+			// make an ajax call and fetch the details of the user
+			var userId = $(this).attr('data-userid');
+			$(".user-assignment-edit-div").html("");
+			$(".user-assignment-edit-row").slideUp();
+			getUserAssignments(userId);
+			$(this).next('.user-edit-row').slideDown(200);
+	    }
+	});
+}
+
+function showUserEdit(userId) {
+	
 }

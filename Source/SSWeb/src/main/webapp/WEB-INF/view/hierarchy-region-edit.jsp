@@ -3,19 +3,19 @@
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.regionname.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" name="regionName" id="region-name-txt">
+	         <input class="bd-frm-rt-txt" name="regionName" id="region-name-txt" value="${region.contact_details.name}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.addressline1.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" name="regionAddress1" id="region-address1-txt">
+	         <input class="bd-frm-rt-txt" name="regionAddress1" id="region-address1-txt" value="${region.contact_details.address1}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.addressline2.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" id="region-address2-txt" name="regionAddress2">
+	         <input class="bd-frm-rt-txt" id="region-address2-txt" name="regionAddress2" value="${region.contact_details.address1}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">

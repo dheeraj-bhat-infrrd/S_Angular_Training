@@ -1052,7 +1052,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 		}
-		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
+		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, true,start, numOfRows);
 
 		LOG.info("Method getProListByProfileLevel finished successfully");
 		return solrSearchResult;
