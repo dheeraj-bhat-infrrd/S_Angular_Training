@@ -847,32 +847,37 @@ function updateUserProfile(profileId, profileStatus) {
 		}
 	});
 }
+bindEditUserClick();
 
-$(document).on('click', '.v-icn-edit-user', function(){
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
+function bindEditUserClick(){
+	$('.edit-user').click(function(e){
+		e.stopPropagation();
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
 
-	if ($(this).parent().hasClass('u-tbl-row-sel')) {
-        $(this).parent().removeClass('u-tbl-row-sel');
-        $(this).parent().next('.u-tbl-row').slideUp(200);
-    } else {
-        // make an ajax call and fetch the details of the user
-        var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-		$(".user-assignment-edit-div").html("");
-		$(".user-row").removeClass('u-tbl-row-sel');
-		$(".user-assignment-edit-row").slideUp();
+		if ($(this).parent().hasClass('u-tbl-row-sel')) {
+	        $(this).parent().removeClass('u-tbl-row-sel');
+	        $(this).parent().next('.user-assignment-edit-row').slideUp(200);
+	    } else {
+	        // make an ajax call and fetch the details of the user
+	        var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+			$(".user-assignment-edit-div").html("");
+			$(".user-row").removeClass('u-tbl-row-sel');
+			$(".user-assignment-edit-row").slideUp();
 
-		getUserAssignments(userId);
+			getUserAssignments(userId);
 
-        $(this).parent().next('.u-tbl-row').slideDown(200);
-        $(this).parent().addClass('u-tbl-row-sel');
-        
-		setTimeout(function() {
-			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
-		}, 1000);
-    }
-});
+	        $(this).parent().next('.user-assignment-edit-row').slideDown(200);
+	        $(this).parent().addClass('u-tbl-row-sel');
+	        
+			setTimeout(function() {
+				$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
+			}, 1000);
+	    }
+	});
+}
+
 
 $(document).on('click', '#page-previous', function(){
 	var newIndex = userStartIndex - userBatchSize;

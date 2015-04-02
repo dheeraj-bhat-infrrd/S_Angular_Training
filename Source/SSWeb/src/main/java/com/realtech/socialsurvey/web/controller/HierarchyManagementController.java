@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.solr.common.SolrDocumentList;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -1107,6 +1110,7 @@ public class HierarchyManagementController {
 			branches = new Gson().fromJson(branchesJson, searchedBranchesList);
 
 			model.addAttribute("branches", branches);
+			model.addAttribute("regionId", regionId);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching branches in a region . Reason : " + e.getMessage(), e);
@@ -1118,7 +1122,56 @@ public class HierarchyManagementController {
 	}
 
 	/**
-	 * Method to fetch the hierarchy list for edit
+	 * Method to fetch the list of users under a branch for the hierarchy view page
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/fetchbranchusers", method = RequestMethod.GET)
+	public String fetchHierarchyViewUsersForBranch(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchHierarchyViewUsersForBranch called in Hierarchy management controller");
+		String strBranchId = request.getParameter("branchId");
+		String strRegionId = request.getParameter("regionId");
+		long branchId = 0l;
+		int start = 0;
+		int rows = -1;
+		try {
+			try {
+				branchId = Long.parseLong(strBranchId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing branchId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			SolrDocumentList usersResult = solrSearchService.searchUsersByIden(branchId, CommonConstants.BRANCHES_SOLR, false, start, rows);
+			String usersJson = JSONUtil.toJSON(usersResult);
+			LOG.debug("Solr result returned for users of branch is:" + usersJson);
+			/**
+			 * convert users to Object
+			 */
+			Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+			List<UserFromSearch> usersList = new Gson().fromJson(usersJson, searchedUsersList);
+
+			model.addAttribute("users", usersList);
+			model.addAttribute("branchId", branchId);
+			model.addAttribute("regionId", strRegionId);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching users in a branch . Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+
+		LOG.info("Method fetchHierarchyViewUsersForBranch executed successfully");
+		return JspResolver.VIEW_HIERARCHY_USERS_LIST;
+
+	}
+
+	/**
+	 * Method to fetch the hierarchy list for edit fetches regions,branches and individuals directly
+	 * under the company
 	 * 
 	 * @param model
 	 * @param request
@@ -1134,32 +1187,46 @@ public class HierarchyManagementController {
 		Set<Long> branchIds = null;
 		List<RegionFromSearch> regions = null;
 		List<BranchFromSearch> branches = null;
+		List<UserFromSearch> users = null;
 		String jspToReturn = null;
+		int start = 0;
+		int rows = -1;
 		try {
 
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, 0, -1);
+				LOG.debug("fetching regions under company from solr");
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, start, rows);
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
+
+				LOG.debug("fetching branches under company from solr");
+				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(user.getCompany(), start, rows);
+
+				LOG.debug("fetching users under company from solr");
+				users = organizationManagementService.getUsersUnderCompanyFromSolr(user.getCompany(), start, rows);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of regions for the region admin");
 				regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
 
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, 0, -1);
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, start, rows);
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
 
+				LOG.debug("fetching users under region from solr");
+				users = organizationManagementService.getUsersUnderRegionFromSolr(regionIds, start, rows);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of branches for the branch admin");
 				branchIds = organizationManagementService.getBranchIdsForUser(user, highestRole);
 
-				String branchesJson = solrSearchService.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, 0, -1);
+				String branchesJson = solrSearchService
+						.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start, rows);
 				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
 				branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+
 				jspToReturn = JspResolver.VIEW_HIERARCHY_BRANCH_LIST;
 			}
 			else {
@@ -1167,6 +1234,7 @@ public class HierarchyManagementController {
 			}
 			model.addAttribute("regions", regions);
 			model.addAttribute("branches", branches);
+			model.addAttribute("individuals", users);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e);
@@ -1184,10 +1252,35 @@ public class HierarchyManagementController {
 	 * 
 	 * @param model
 	 * @return
+	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/getregioneditpage", method = RequestMethod.GET)
-	public String getRegionEditPage(Model model) {
+	public String getRegionEditPage(Model model, HttpServletRequest request) throws InvalidInputException {
 		LOG.info("Method getRegionEditPage called");
+		String strRegionId = request.getParameter("regionId");
+		boolean isUpdateCall = false;
+		try {
+			if (strRegionId != null && !strRegionId.isEmpty()) {
+				long regionId = Long.parseLong(strRegionId);
+				OrganizationUnitSettings regionSettings = null;
+				try {
+					regionSettings = organizationManagementService.getRegionSettings(regionId);
+				}
+				catch (InvalidInputException e) {
+					throw new InvalidInputException("InvalidInputException in getRegionEditPage.Reason:" + e.getMessage(),
+							DisplayMessageConstants.GENERAL_ERROR, e);
+				}
+				isUpdateCall = true;
+				model.addAttribute("region", regionSettings);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while getting region edit Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("isUpdateCall", isUpdateCall);
+		LOG.info("Method getRegionEditPage executed succesfully");
 		return JspResolver.HIERARCHY_REGION_EDIT;
 
 	}
@@ -1199,8 +1292,32 @@ public class HierarchyManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getofficeeditpage", method = RequestMethod.GET)
-	public String getOfficeEditPage(Model model) {
+	public String getOfficeEditPage(Model model, HttpServletRequest request) {
 		LOG.info("Method getOfficeEditPage called");
+		String strBranchId = request.getParameter("branchId");
+		boolean isUpdateCall = false;
+		try {
+			if (strBranchId != null && !strBranchId.isEmpty()) {
+				long branchId = Long.parseLong(strBranchId);
+				BranchSettings branchSettings = null;
+				try {
+					branchSettings = organizationManagementService.getBranchSettings(branchId);
+				}
+				catch (InvalidInputException e) {
+					throw new InvalidInputException("InvalidInputException in getOfficeEditPage.Reason:" + e.getMessage(),
+							DisplayMessageConstants.GENERAL_ERROR, e);
+				}
+				isUpdateCall = true;
+				model.addAttribute("branch", branchSettings);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while getting region edit Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("isUpdateCall", isUpdateCall);
+		LOG.info("Method getOfficeEditPage executed succesfully");
 		return JspResolver.HIERARCHY_OFFICE_EDIT;
 
 	}
