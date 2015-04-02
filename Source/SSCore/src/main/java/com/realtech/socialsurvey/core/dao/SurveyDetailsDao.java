@@ -61,4 +61,10 @@ public interface SurveyDetailsDao {
 
 	public Map<String, Long> getCompletedSurveyByCriteria(String columnName, long columnValue, String groupByCriteria) throws ParseException;
 
+	public List<SurveyDetails> getIncompleteSurveyCustomers(long companyId, int surveyReminderInterval, int maxReminders);
+
+	public void updateReminderCount(List<Long> agentId, List<String> customers);
+
+	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId, int surveyReminderInterval, int maxReminders, float autopostScore);
+
 }

@@ -567,6 +567,11 @@ public interface OrganizationManagementService {
 	 */
 	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException;
 	
+	/**
+	 * Method to get the list of all the company ids
+	 */
+	public Set<Company> getAllCompanies();
+
 	public Map<Long, BranchFromSearch> fetchBranchesMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
 	
 	public Map<Long, RegionFromSearch> fetchRegionsMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
