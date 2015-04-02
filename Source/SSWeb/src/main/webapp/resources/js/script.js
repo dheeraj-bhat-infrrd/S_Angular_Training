@@ -769,10 +769,13 @@ function loadDisplayPicture(){
 	});
 }*/
 
-//Header buttons
+// Header buttons
 $(document).on('click', '.hdr-log-btn', function() {
 	window.location = "/login.do";
 });
 $(document).on('click', '.hdr-reg-btn', function() {
 	window.location = "/";
+});
+$(document).on('click', '.hdr-logo', function() {
+	window.location = "/home.do";
 });

@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +12,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -66,11 +70,38 @@ public class LoginController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
+	@RequestMapping(value = "/home")
+	public String initHomePage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Inside initHomePage() of LoginController");
+		
+		// checking for state of principal session
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			try {
+				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
+			}
+			catch (IOException e) {
+				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
+			}
+		}
+		return JspResolver.INDEX;
+	}
+		
 	@RequestMapping(value = "/login")
-	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
-		LOG.info("Information aa gayi");
-		LOG.debug("DEBUG aa gaya");
-		LOG.error("Error aa gaya");
+	public String initLoginPage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Inside initLoginPage() of LoginController");
+		
+		// checking for state of principal session
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			try {
+				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
+			}
+			catch (IOException e) {
+				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
+			}
+		}
+		
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
