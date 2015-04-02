@@ -29,8 +29,8 @@ public class UsersFullImport implements Runnable {
 	@Override
 	@Transactional
 	public void run() {
-		int pageSize = 2;
 		int pageNo = 1;
+		int pageSize = 10;
 		List<User> users = null;
 
 		do {
