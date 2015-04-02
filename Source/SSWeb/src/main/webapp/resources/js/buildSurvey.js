@@ -69,7 +69,7 @@ function revertQuestionOverlay() {
 	currentQues = 1;
 }
 
-$('.bd-q-btn-done').click(function(e) {
+$(document).on('click', '.bd-q-btn-done', function(e) {
 	e.stopPropagation();
 	createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
 
