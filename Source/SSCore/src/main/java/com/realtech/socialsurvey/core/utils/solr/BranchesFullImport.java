@@ -29,8 +29,8 @@ public class BranchesFullImport implements Runnable {
 	@Override
 	@Transactional
 	public void run() {
-		int pageSize = 2;
 		int pageNo = 1;
+		int pageSize = 10;
 		List<Branch> branches = null;
 
 		do {

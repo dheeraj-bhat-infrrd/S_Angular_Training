@@ -20,7 +20,7 @@ public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements S
 	public List<Region> fetchRegionsPage(int offset, int pageSize) throws NoRecordsFetchedException {
 		LOG.info("Fetching paginated region results");
 
-		Query query = createHibernateQuery(offset, pageSize, "FROM Region R");
+		Query query = createHibernateQuery(offset, pageSize, "FROM Region R ORDER BY R.regionId ASC");
 		List<Region> regions = query.list();
 
 		LOG.info("Fetched paginated Region results (" + regions.size() + ") from offset: " + offset);
@@ -31,7 +31,7 @@ public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements S
 	public List<Branch> fetchBranchesPage(int offset, int pageSize) throws NoRecordsFetchedException {
 		LOG.info("Fetching paginated branch results");
 
-		Query query = createHibernateQuery(offset, pageSize, "FROM Branch B");
+		Query query = createHibernateQuery(offset, pageSize, "FROM Branch B ORDER BY B.branchId ASC");
 		List<Branch> branches = query.list();
 
 		LOG.info("Fetched paginated Branch results (" + branches.size() + ") from offset: " + offset);
@@ -42,7 +42,7 @@ public class SolrImportDaoImpl extends GenericDaoImpl<Branch, Long> implements S
 	public List<User> fetchUsersPage(int offset, int pageSize) throws NoRecordsFetchedException {
 		LOG.info("Fetching paginated user results");
 
-		Query query = createHibernateQuery(offset, pageSize, "FROM User U");
+		Query query = createHibernateQuery(offset, pageSize, "FROM User U ORDER BY U.userId ASC");
 		List<User> users = query.list();
 
 		LOG.info("Fetched paginated User results (" + users.size() + ") from offset: " + offset);
