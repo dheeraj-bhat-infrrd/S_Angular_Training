@@ -44,32 +44,26 @@ public class Region implements Serializable {
 	@Column(name = "MODIFIED_BY")
 	private String modifiedBy;
 
-	public String getRegionName() {
-		return regionName;
-	}
-
-	public void setRegionName(String regionName) {
-		this.regionName = regionName;
-	}
-
 	@Column(name = "MODIFIED_ON")
 	private Timestamp modifiedOn;
 
+	@Column(name = "REGION")
 	private String region;
+
+	@Column(name = "PROFILE_NAME")
+	private String profileName;
+
+	@Column(name = "STATUS")
+	private int status;
 
 	@Transient
 	private String regionName;
-	
-	private int status;
-	
+
 	@Transient
 	private String address1;
-	
+
 	@Transient
 	private String address2;
-	
-	@Column(name="PROFILE_NAME")
-	private String profileName;
 
 	// bi-directional many-to-one association to Branch
 	@OneToMany(mappedBy = "region", fetch = FetchType.LAZY)
@@ -153,7 +147,6 @@ public class Region implements Serializable {
 	public void setBranches(List<Branch> branches) {
 		this.branches = branches;
 	}
-	
 
 	public String getAddress1() {
 		return address1;
@@ -170,7 +163,7 @@ public class Region implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
-	
+
 	public String getProfileName() {
 		return profileName;
 	}
@@ -193,6 +186,14 @@ public class Region implements Serializable {
 		return branch;
 	}
 
+	public String getRegionName() {
+		return regionName;
+	}
+
+	public void setRegionName(String regionName) {
+		this.regionName = regionName;
+	}
+
 	public Company getCompany() {
 		return this.company;
 	}
@@ -207,5 +208,4 @@ public class Region implements Serializable {
 				+ ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + ", region=" + region + ", status=" + status + ", address1="
 				+ address1 + ", address2=" + address2 + ", profileName=" + profileName + ", branches=" + branches + ", company=" + company + "]";
 	}
-
 }
