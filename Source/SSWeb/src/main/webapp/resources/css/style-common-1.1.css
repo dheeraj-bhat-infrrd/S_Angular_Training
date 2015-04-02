@@ -464,6 +464,7 @@ input#find-pro-submit{
     background: url(../images/ss-logo.png) no-repeat;
     background-size: 65%;
     background-position: left center;
+    cursor: pointer;
 }
 
 .hdr-reg-btn {

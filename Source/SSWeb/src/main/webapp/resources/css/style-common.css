@@ -3171,8 +3171,8 @@ button.paypal.is-active {
 
 .lp-ach-item-img{
 	cursor: pointer;
-	width: 46px;
-	height: 46px;
+	width: 34px;
+	height: 34px;
 	background: url(../images/icnRemove.png) no-repeat center;
 }
 
