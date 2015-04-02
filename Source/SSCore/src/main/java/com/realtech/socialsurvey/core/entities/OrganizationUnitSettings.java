@@ -20,6 +20,8 @@ public class OrganizationUnitSettings {
 	private String logo;
 	private boolean isLocationEnabled;
 	private boolean isAccountDisabled;
+	private boolean isDefaultBySystem;
+	private boolean isSeoContentModified;
 	private ContactDetailsSettings contact_details;
 	private String vertical;
 	private CRMInfo crm_info;
@@ -105,6 +107,22 @@ public class OrganizationUnitSettings {
 
 	public void setAccountDisabled(boolean isAccountDisabled) {
 		this.isAccountDisabled = isAccountDisabled;
+	}
+
+	public boolean isDefaultBySystem() {
+		return isDefaultBySystem;
+	}
+
+	public void setDefaultBySystem(boolean isDefaultBySystem) {
+		this.isDefaultBySystem = isDefaultBySystem;
+	}
+
+	public boolean isSeoContentModified() {
+		return isSeoContentModified;
+	}
+
+	public void setSeoContentModified(boolean isSeoContentModified) {
+		this.isSeoContentModified = isSeoContentModified;
 	}
 
 	public ContactDetailsSettings getContact_details() {

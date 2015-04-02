@@ -32,8 +32,8 @@ public interface ProfileManagementService {
 	 * @param settings
 	 * @throws InvalidInputException
 	 */
-	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
-			throws InvalidInputException;
+	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
+			int profilesMaster) throws InvalidInputException;
 
 	/**
 	 * Finalize profile settings in the hierarchy
@@ -43,8 +43,8 @@ public interface ProfileManagementService {
 	 * @param settings
 	 * @throws InvalidInputException
 	 */
-	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
-			throws InvalidInputException;
+	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
+			int profilesMaster) throws InvalidInputException;
 
 	// JIRA SS-97 by RM-06 : BOC
 	/**

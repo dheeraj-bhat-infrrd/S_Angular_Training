@@ -21,7 +21,16 @@
 			<value>${DATABASE_PASSWORD}</value>
 		</property>
 	</bean>
+	
 	<bean id="surveyHandler"
-		class="com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler">
+		class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyHandlerImpl">
+	</bean>
+	
+	<bean id="emailServices"
+		class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl">
+	</bean>
+	
+	<bean id="organizationManagementService"
+		class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl">
 	</bean>
 </beans>
