@@ -204,5 +204,28 @@ public interface SolrSearchService {
 	 */
 	public String searchUsersByBranches(Set<Long> branchIds, int start, int rows) throws InvalidInputException, SolrException;
 
+	/**
+	 * Method to add multiple regions to solr
+	 * 
+	 * @param regions
+	 * @throws SolrException
+	 */
+	public void addRegionsToSolr(List<Region> regions) throws SolrException;
+
+	/**
+	 * Method to add multiple branches to solr
+	 * 
+	 * @param branches
+	 * @throws SolrException
+	 */
+	public void addBranchesToSolr(List<Branch> branches) throws SolrException;
+
+	/**
+	 * Method to add multiple users to solr
+	 * 
+	 * @param users
+	 * @throws SolrException
+	 */
+	public void addUsersToSolr(List<User> users) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC

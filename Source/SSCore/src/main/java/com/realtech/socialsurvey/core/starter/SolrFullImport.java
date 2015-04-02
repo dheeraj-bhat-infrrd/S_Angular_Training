@@ -29,11 +29,18 @@ public class SolrFullImport {
 		Thread userImportThread = new Thread(usersFullImport);
 		userImportThread.start();
 
-		// Closing the context
 		LOG.info("Started the SolrFullImport");
-		if (!regionImportThread.isAlive() && !branchImportThread.isAlive() && !userImportThread.isAlive()) {
-			((ConfigurableApplicationContext) context).close();
-			LOG.info("Finished the SolrFullImport");
+		try {
+			regionImportThread.join();
+			branchImportThread.join();
+			userImportThread.join();
 		}
+		catch (InterruptedException e) {
+			LOG.error("Exception while joining th import threads. ", e);
+		}
+
+		// Closing the context
+		LOG.info("Finished the SolrFullImport");
+		((ConfigurableApplicationContext) context).close();
 	}
 }
