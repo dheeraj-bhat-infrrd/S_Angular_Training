@@ -76,7 +76,7 @@
 						</c:otherwise>
 					</c:choose>
 					<td class="v-tbl-rem ${admincaneditclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>
-					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user" title="<spring:message code="label.edit.key" />"></td>
+					<td class="v-tbl-edit ${admincaneditclass} v-icn-edit-user edit-user" title="<spring:message code="label.edit.key" />"></td>
 				</tr>
 				<tr class="u-tbl-row u-tbl-row-sel hide user-assignment-edit-row">
 					<td id="user-details-and-assignments-${userfromsearch.userId}" class="u-tbl-edit-td user-assignment-edit-div" colspan="9">

@@ -724,8 +724,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
-			SolrException {
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException {
 		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
 				+ noOfRows);
 		if (iden <= 0l) {
@@ -743,7 +743,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
-			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			if (isAgent) {
+				solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + isAgent);
+			}
 			if (startIndex > -1) {
 				solrQuery.setStart(startIndex);
 			}
@@ -966,5 +968,42 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.debug("Method getSpaceSeparatedStringFromIds executed successfully. Returning:" + idsSb.toString());
 		return idsSb.toString();
+	}
+
+	/**
+	 * Method to search for the users based on branches specified
+	 */
+	@Override
+	public String searchUsersByBranches(Set<Long> branchIds, int start, int rows) throws InvalidInputException, SolrException {
+		if (branchIds == null || branchIds.isEmpty()) {
+			throw new InvalidInputException("branchIds are null in searchUsersByBranches");
+		}
+		LOG.info("Method searchUsersByBranches called for branchIds:" + branchIds + " start:" + start + " rows:" + rows);
+		String usersResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			String branchIdsStr = getSpaceSeparatedStringFromIds(branchIds);
+			solrQuery.addFilterQuery(CommonConstants.BRANCHES_SOLR + ":(" + branchIdsStr + ")");
+
+			solrQuery.setStart(start);
+			if (rows > 0) {
+				solrQuery.setRows(rows);
+			}
+
+			LOG.debug("Querying solr for searching users under the branches");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			usersResult = JSONUtil.toJSON(results);
+			LOG.debug("Users search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			throw new SolrException("Exception while performing search for users by branches. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByBranches executed successfully");
+		return usersResult;
 	}
 }

@@ -69,4 +69,5 @@ public interface JspResolver {
 	public static final String HIERARCHY_INDIVIDUAL_EDIT = "hierarchy-individual-edit";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
+	public static final String VIEW_HIERARCHY_USERS_LIST = "hierarchy-view-users-list";
 }
