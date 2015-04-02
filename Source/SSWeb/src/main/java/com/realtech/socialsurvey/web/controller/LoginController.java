@@ -72,7 +72,7 @@ public class LoginController {
 
 	@RequestMapping(value = "/home")
 	public String initHomePage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
-		LOG.info("Inside initHomePage() of LoginController");
+		LOG.info("Method initHomePage() called from LoginController");
 		
 		// checking for state of principal session
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
