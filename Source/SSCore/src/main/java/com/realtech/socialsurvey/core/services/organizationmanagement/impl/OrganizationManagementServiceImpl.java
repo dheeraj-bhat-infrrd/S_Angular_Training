@@ -1,6 +1,8 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
+import java.lang.reflect.Type;
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.CRMInfo;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -36,6 +41,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -332,11 +338,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setVertical(organizationalDetails.get(CommonConstants.VERTICAL));
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
+		// profile url for company will be same as profile name
+		companySettings.setProfileUrl(companySettings.getProfileName());
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 		companySettings.setLockSettings(new LockSettings());
+		// set seo content flag
+		companySettings.setSeoContentModified(true);
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -370,7 +380,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings != null) {
 
 			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
-			profileName = profileName + iden;
+			profileName = profileName +"-"+ iden;
 		}
 		LOG.debug("Successfully generated profile name. Returning : " + profileName);
 		return profileName;
@@ -2147,15 +2157,15 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 * Uniqueness of profile name is checked by url since combination of company profile
 			 * name and branch profile name is unique
 			 */
-			OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(branchProfileUrl,
+			OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileUrl(branchProfileUrl,
 					MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 			/**
 			 * if there exists a branch with the profile name formed, append branch iden to get the
 			 * unique profile name and also regenerate url with new profile name
 			 */
-			if (regionSettings != null) {
+			if (branchSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				branchProfileName = branchProfileName + branch.getBranchId();
+				branchProfileName = branchProfileName +"-"+ branch.getBranchId();
 				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 			}
 			organizationSettings.setProfileName(branchProfileName);
@@ -2285,7 +2295,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (regionSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				regionProfileName = regionProfileName + region.getRegionId();
+				regionProfileName = regionProfileName +"-"+ region.getRegionId();
 				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 			}
 			organizationSettings.setProfileName(regionProfileName);
@@ -2459,6 +2469,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method for inserting region settings called for region : " + region);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(region.getRegionId());
+		// set is default flag
+		boolean isDefaultFlag = false;
+		if(region.getIsDefaultBySystem() == CommonConstants.YES){
+			isDefaultFlag = true;
+		}
+		organizationSettings.setDefaultBySystem(isDefaultFlag);
+		// set the seo content mdified to true, so that batch pick this record up
+		organizationSettings.setSeoContentModified(true);
 		organizationSettings.setCreatedBy(region.getCreatedBy());
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(region.getModifiedBy());
@@ -2486,6 +2504,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method to insert branch settings called for branch : " + branch);
 		OrganizationUnitSettings organizationSettings = new OrganizationUnitSettings();
 		organizationSettings.setIden(branch.getBranchId());
+		// set is default flag
+		boolean isDefaultFlag = false;
+		if(branch.getIsDefaultBySystem() == CommonConstants.YES){
+			isDefaultFlag = true;
+		}
+		// set the seo content mdified to true, so that batch pick this record up
+		organizationSettings.setSeoContentModified(true);
+		organizationSettings.setDefaultBySystem(isDefaultFlag);
 		organizationSettings.setCreatedBy(branch.getCreatedBy());
 		organizationSettings.setCreatedOn(System.currentTimeMillis());
 		organizationSettings.setModifiedBy(branch.getModifiedBy());
@@ -2581,6 +2607,36 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		LOG.info("Method getBranchesByRegionIds executed successfully");
 		return branches;
+	}
+	
+	@Override
+	public Map<Long, BranchFromSearch> fetchBranchesMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		String branchesResult = solrSearchService.fetchBranchesByCompany(companyId);
+
+		// convert branches to map
+		Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
+		List<BranchFromSearch> branchList = new Gson().fromJson(branchesResult, searchedBranchesList);
+
+		Map<Long, BranchFromSearch> branches = new HashMap<Long, BranchFromSearch>();
+		for (BranchFromSearch branch : branchList) {
+			branches.put(branch.getBranchId(), branch);
+		}
+		return branches;
+	}
+
+	@Override
+	public Map<Long, RegionFromSearch> fetchRegionsMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
+		String regionsResult = solrSearchService.fetchRegionsByCompany(companyId);
+
+		// convert regions to map
+		Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
+		List<RegionFromSearch> regionsList = new Gson().fromJson(regionsResult, searchedRegionsList);
+
+		Map<Long, RegionFromSearch> regions = new HashMap<Long, RegionFromSearch>();
+		for (RegionFromSearch region : regionsList) {
+			regions.put(region.getRegionId(), region);
+		}
+		return regions;
 	}
 }
 // JIRA: SS-27: By RM05: EOC

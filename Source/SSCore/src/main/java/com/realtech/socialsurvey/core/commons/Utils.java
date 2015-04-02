@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class Utils {
 
-	private final String REGION_PROFILE_URL_PATTERN = "/%s/region/%s";
-	private final String BRANCH_PROFILE_URL_PATTERN = "/%s/branch/%s";
-	private final String AGENT_PROFILE_URL_PATTERN = "/individual/%s";
+	private final String REGION_PROFILE_URL_PATTERN = "/region/%s/%s";
+	private final String BRANCH_PROFILE_URL_PATTERN = "/office/%s/%s";
+	private final String AGENT_PROFILE_URL_PATTERN = "/%s";
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
 	/**

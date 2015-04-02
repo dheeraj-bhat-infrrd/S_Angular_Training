@@ -26,6 +26,7 @@ import com.amazonaws.services.s3.model.S3ObjectSummary;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.EncryptionHelper;
@@ -97,8 +98,25 @@ public class CloudUploadServiceImpl implements FileUploadService {
 		StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.HYPHEN);
 		amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
 		amazonFileName.append(logoName.substring(logoName.lastIndexOf(".")));
+		
+		try {
+			uploadFile(convFile, amazonFileName.toString());
+		}
+		catch (NonFatalException e) {
+			throw new InvalidInputException("Could not upload file: "+e.getMessage(), e);
+		}
 
-		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, amazonFileName.toString(), convFile);
+		LOG.info("Amazon file Name: " + amazonFileName.toString());
+		return amazonFileName.toString();
+	}
+	
+	@Override
+	public void uploadFile(File file, String fileName) throws NonFatalException{
+		LOG.info("Uploading file: "+fileName+" to Amazon S3");
+		if(file == null || fileName == null || fileName.isEmpty()){
+			throw new InvalidInputException("Either file or file name is not present");
+		}
+		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, file);
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setCacheControl(CACHE_PUBLIC);
 		putObjectRequest.setMetadata(metadata);
@@ -107,8 +125,7 @@ public class CloudUploadServiceImpl implements FileUploadService {
 
 		PutObjectResult result = s3Client.putObject(putObjectRequest);
 		LOG.info("Amazon Upload Etag: " + result.getETag());
-		LOG.info("Amazon file Name: " + amazonFileName.toString());
-		return amazonFileName.toString();
+		LOG.info("Uploaded "+fileName+" to Amazon s3");
 	}
 
 	/**
