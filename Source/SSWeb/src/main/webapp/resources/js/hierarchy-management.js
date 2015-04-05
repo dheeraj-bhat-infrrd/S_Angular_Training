@@ -153,19 +153,13 @@ function paintEditSection(data) {
 		});
 		return false;
 	}
-	
-	var assignToOption = $("#assign-to-txt").attr('data-assignto');
-	showSelectorsByAssignToOption(assignToOption);
-	
 	/**
 	 * bind the click events
 	 */
-	$("#selected-user-txt").click(function() {
-		getUsersList("",usersStartIndex,numOfRows);
-	});
-	$("#selected-user-txt").keydown(function(e) {
-		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
-	});
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	
+	bindUserSelector();
 	
 	$("#btn-region-save").click(function(e){
 		if(validateRegionForm()){
@@ -179,41 +173,9 @@ function paintEditSection(data) {
 		}
 	});
 
-	$("#selected-user-txt").keyup(function(e) {
-		if(e.which != 38 && e.which != 40 && e.which != 13) {
-			var text = $(this).val();
-			usersStartIndex = 0;	
-			if (text.length > 0) {
-				delay(function() {
-					getUsersList(text,usersStartIndex,numOfRows);
-				}, 500);
-			}
-			else {
-				delay(function() {
-					getUsersList("",usersStartIndex,numOfRows);
-				}, 500);
-			}
-		}
-	});
-	
 	bindAdminCheckBoxClick();
 	
-	$('.bd-cust-rad-img').click(function(e) {
-        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
-        $(this).toggleClass('bd-cust-rad-img-checked');
-        if($(this).data('type') == "single"){
-            $('#bd-single').show();
-            $('#bd-multiple').hide();
-            showAdminPrivilegesChk();
-        }else if($(this).data('type') == "multiple"){
-            $('#bd-single').hide();
-            $('#bd-multiple').show();
-            $('#selected-userid-hidden').val("");
-            hideAdminPrivilegesChk();
-        }
-        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
-    });
-	
+	bindSingleMultipleSelection();
 	bindAssignToSelectorClick();
 	
 	bindRegionSelectorEvents();
@@ -235,6 +197,49 @@ function paintEditSection(data) {
 	$("#btn-individual-save").click(function(e){
 		if(validateIndividualForm()){
 			addIndividual("edit-individual-form");
+		}
+	});
+}
+
+function bindSingleMultipleSelection() {
+	$('.bd-cust-rad-img').click(function(e) {
+        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+        $(this).toggleClass('bd-cust-rad-img-checked');
+        if($(this).data('type') == "single"){
+            $('#bd-single').show();
+            $('#bd-multiple').hide();
+            showAdminPrivilegesChk();
+        }else if($(this).data('type') == "multiple"){
+            $('#bd-single').hide();
+            $('#bd-multiple').show();
+            $('#selected-userid-hidden').val("");
+            hideAdminPrivilegesChk();
+        }
+        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
+    });
+}
+
+function bindUserSelector() {
+	$("#selected-user-txt").click(function() {
+		getUsersList("",usersStartIndex,numOfRows);
+	});
+	$("#selected-user-txt").keydown(function(e) {
+		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
+	});
+	$("#selected-user-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $(this).val();
+			usersStartIndex = 0;	
+			if (text.length > 0) {
+				delay(function() {
+					getUsersList(text,usersStartIndex,numOfRows);
+				}, 500);
+			}
+			else {
+				delay(function() {
+					getUsersList("",usersStartIndex,numOfRows);
+				}, 500);
+			}
 		}
 	});
 }
@@ -1031,12 +1036,23 @@ function showRegionEditCallBack(data,regionId) {
 	$(".tr-region-edit").hide();
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
 	$("#td-region-edit-"+regionId).html(data).slideDown(200);
+	bindSingleMultipleSelection();
+	bindUserSelector();
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	bindAssignToSelectorClick();
+	$("#btn-region-update").click(function(e) {
+		var regionId = $(this).attr("data-regionid");
+		if(validateRegionForm()){
+			updateRegion("edit-region-form",regionId);
+		}
+	});
 	
 }
 
-function hideRegionEdit(branchId) {
+function hideRegionEdit(regionId) {
 	$(".td-region-edit").html("").hide();
-	$("#td-region-edit-"+branchId).hide();
+	$("#td-region-edit-"+regionId).hide();
 	$(".tr-region-edit").hide();
 }
 
@@ -1050,6 +1066,12 @@ function showBranchEdit(branchId) {
 function showBranchEditCallBack(data,branchId) {
 	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").slideDown(200);
 	$("#td-branch-edit-"+branchId).html(data).slideDown(200);
+	bindSingleMultipleSelection();
+	bindUserSelector();
+	bindRegionSelectorEvents();
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	bindAssignToSelectorClick();
 }
 
 function hideBranchEdit(branchId) {
@@ -1085,6 +1107,31 @@ function bindUserEditClicks() {
 	});
 }
 
-function showUserEdit(userId) {
-	
+function updateRegion(formId,regionId) {
+	var url = "./updateregion.do";
+	showOverlay();
+	callAjaxFormSubmit(url, function(data){
+		updateRegionCallBack(data, regionId);
+	}, formId);
+}
+
+function updateRegionCallBack(data,regionId) {
+	hideOverlay();
+	displayMessage(data);
+	hideRegionEdit(regionId);
+	fetchHierarchyViewList();
+}
+
+function updateBranch(formId,branchId,regionId) {
+	var url = "./updatebranch.do";
+	callAjaxFormSubmit(url, function(data){
+		updateBranchCallBack(data,branchId,regionId);
+	}, formId);
+}
+
+function updateBranchCallBack(data,branchId,regionId) {
+	hideOverlay();
+	displayMessage(data);
+	hideBranchEdit(branchId);
+	fetchHierarchyViewBranches(regionId);
 }
