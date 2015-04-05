@@ -1079,7 +1079,8 @@ public class UserManagementController {
 		}
 		return JspResolver.CHANGE_PASSWORD;
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/finduserassignments", method = RequestMethod.GET)
 	public String getUserAssignments(Model model, HttpServletRequest request) {
 		LOG.info("Method getUserAssignments() called from UserManagementController");

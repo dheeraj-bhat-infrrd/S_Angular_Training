@@ -401,7 +401,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings != null) {
 
 			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
-			profileName = profileName +"-"+ iden;
+			profileName = profileName + "-" + iden;
 		}
 		LOG.debug("Successfully generated profile name. Returning : " + profileName);
 		return profileName;
@@ -2185,7 +2185,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (branchSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				branchProfileName = branchProfileName +"-"+ branch.getBranchId();
+				branchProfileName = branchProfileName + "-" + branch.getBranchId();
 				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 			}
 			organizationSettings.setProfileName(branchProfileName);
@@ -2315,7 +2315,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (regionSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				regionProfileName = regionProfileName +"-"+ region.getRegionId();
+				regionProfileName = regionProfileName + "-" + region.getRegionId();
 				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 			}
 			organizationSettings.setProfileName(regionProfileName);
@@ -2393,51 +2393,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	}
 
 	/**
-	 * Method to update a region
-	 * 
-	 * @throws SolrException
-	 */
-	@Override
-	@Transactional
-	public void updateRegion(long regionId, String regionName, String regionAddress1, String regionAddress2, User user) throws InvalidInputException,
-			SolrException {
-		if (user == null) {
-			throw new InvalidInputException("User is null in update region");
-		}
-		if (regionName == null || regionName.isEmpty()) {
-			throw new InvalidInputException("Region name is null in update region");
-		}
-		if (regionAddress1 == null || regionAddress1.isEmpty()) {
-			throw new InvalidInputException("Region address is null in update region");
-		}
-		if (regionId <= 0l) {
-			throw new InvalidInputException("Region id is invalid in update region");
-		}
-		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress1:" + regionAddress1);
-		Region region = regionDao.findById(Region.class, regionId);
-		if (region == null) {
-			throw new InvalidInputException("No region present for the required id in database while updating region");
-		}
-		region.setRegion(regionName);
-		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		region.setModifiedBy(String.valueOf(user.getUserId()));
-		region.setAddress1(regionAddress1);
-		region.setAddress2(regionAddress2);
-		regionDao.update(region);
-
-		LOG.debug("Updating region in mongo");
-		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
-		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
-				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
-				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-
-		LOG.debug("Updating region in solr");
-		solrSearchService.addOrUpdateRegionToSolr(region);
-
-		LOG.info("Method to update region completed successfully");
-	}
-
-	/**
 	 * Method to check whether a user can view region based on his profiles
 	 * 
 	 * @param userProfiles
@@ -2491,7 +2446,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setIden(region.getRegionId());
 		// set is default flag
 		boolean isDefaultFlag = false;
-		if(region.getIsDefaultBySystem() == CommonConstants.YES){
+		if (region.getIsDefaultBySystem() == CommonConstants.YES) {
 			isDefaultFlag = true;
 		}
 		organizationSettings.setDefaultBySystem(isDefaultFlag);
@@ -2526,7 +2481,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setIden(branch.getBranchId());
 		// set is default flag
 		boolean isDefaultFlag = false;
-		if(branch.getIsDefaultBySystem() == CommonConstants.YES){
+		if (branch.getIsDefaultBySystem() == CommonConstants.YES) {
 			isDefaultFlag = true;
 		}
 		// set the seo content mdified to true, so that batch pick this record up
@@ -2749,5 +2704,81 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return users;
 	}
 
+	/**
+	 * Method to update a region and assign user if specified
+	 */
+	@Override
+	@Transactional
+	public void updateRegion(User user, long regionId, String regionName, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update region");
+		}
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null in update region");
+		}
+		if (address1 == null || address1.isEmpty()) {
+			throw new InvalidInputException("Region address is null in update region");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in update region");
+		}
+		LOG.info("Method update region called for regionId:" + regionId + " regionName : " + regionName + " ,address1:" + address1);
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			throw new NoRecordsFetchedException("No region present for the required id in database while updating region");
+		}
+		region.setRegion(regionName);
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		region.setModifiedBy(String.valueOf(user.getUserId()));
+		region.setAddress1(address1);
+		region.setAddress2(address2);
+		regionDao.update(region);
+
+		LOG.debug("Updating region in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.debug("Updating region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * updated region
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the region");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the region");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method to update region completed successfully");
+	}
 }
 // JIRA: SS-27: By RM05: EOC

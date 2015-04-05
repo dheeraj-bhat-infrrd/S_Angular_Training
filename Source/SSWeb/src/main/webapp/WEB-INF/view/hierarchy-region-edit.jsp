@@ -1,4 +1,5 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <form id="edit-region-form" class="edit-region-form">
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.regionname.key"/></div>
@@ -15,7 +16,7 @@
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.addressline2.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" id="region-address2-txt" name="regionAddress2" value="${region.contact_details.address1}">
+	         <input class="bd-frm-rt-txt" id="region-address2-txt" name="regionAddress2" value="${region.contact_details.address2}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
@@ -63,7 +64,15 @@
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"></div>
 	     <div class="float-left bd-frm-right">
-	         <div id="btn-region-save" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+	     <c:choose>
+		     <c:when test="${isUpdateCall}">
+		     	 <input type="hidden" name="regionId" value="${region.iden}" class="ignore-clear"/>
+		     	 <div id="btn-region-update" data-regionid = "${region.iden}" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+		     </c:when>
+		     <c:otherwise>
+		      	 <div id="btn-region-save" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+		     </c:otherwise>
+	     </c:choose>
 	     </div>
 	 </div>
  </form>

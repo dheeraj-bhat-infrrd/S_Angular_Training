@@ -670,7 +670,7 @@ public class HierarchyManagementController {
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			// updating session with new assignment
 			if (user.getUserId() == selectedUserId) {
 				sessionHelper.getCanonicalSettings(request.getSession(false));
@@ -712,7 +712,7 @@ public class HierarchyManagementController {
 				}
 			}
 			catch (NumberFormatException e) {
-				throw new InvalidInputException("Error while parsing regionId in update branch.Reason : " + e.getMessage(),
+				throw new InvalidInputException("Error while parsing regionId in update branch. Reason : " + e.getMessage(),
 						DisplayMessageConstants.INVALID_REGION_SELECTED, e);
 			}
 
@@ -765,35 +765,45 @@ public class HierarchyManagementController {
 		String regionAddress1 = request.getParameter("regionAddress1");
 		String regionAddress2 = request.getParameter("regionAddress2");
 		String selectedUserIdStr = request.getParameter("selectedUserId");
-		// String selectedUserEmail = request.getParameter("selectedUserEmail");
+		String selectedUserEmail = request.getParameter("selectedUserEmail");
+
+		if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
+			selectedUserEmail = request.getParameter("selectedUserEmailArray");
+		}
+		String isAdminStr = request.getParameter("isAdmin");
+
+		long selectedUserId = 0l;
 		try {
-			long selectedUserId = 0l;
-			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
-				try {
-					selectedUserId = Long.parseLong(selectedUserIdStr);
-				}
-				catch (NumberFormatException e) {
-					throw new InvalidInputException("NumberFormatException while parsing selected userId in update region",
-							DisplayMessageConstants.INVALID_USER_SELECTED);
-				}
-			}
-			validateRegionForm(regionName);
 			long regionId = 0l;
 			try {
 				regionId = Long.parseLong(strRegionId);
 			}
 			catch (NumberFormatException e) {
-				throw new InvalidInputException("Error while parsing regionId in update region.Reason : " + e.getMessage(),
+				throw new InvalidInputException("regionid is invalid in update region. Reson:" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatExcyeption while parsing selected userId in add region",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
 
+			boolean isAdmin = false;
+			if (isAdminStr != null && !isAdminStr.isEmpty()) {
+				isAdmin = Boolean.parseBoolean(isAdminStr);
+			}
+			validateRegionForm(regionName);
+			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 			User user = sessionHelper.getCurrentUser();
-			String address = getCompleteAddress(regionAddress1, regionAddress2);
-			LOG.info("Address " + address + " is yet to be stored");
 
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
-				organizationManagementService.updateRegion(regionId, regionName, regionAddress1, regionAddress2, user);
+				organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2, selectedUserId,
+						assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to update a region");
 
 				model.addAttribute("message",
