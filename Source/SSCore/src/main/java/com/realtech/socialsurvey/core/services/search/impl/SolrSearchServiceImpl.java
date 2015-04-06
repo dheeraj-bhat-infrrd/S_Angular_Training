@@ -26,13 +26,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.SolrSearchUtils;
@@ -58,6 +63,12 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 
 	@Autowired
 	private SolrSearchUtils solrSearchUtils;
+
+	@Autowired
+	private UserManagementService userManagementService;
+
+	@Autowired
+	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 
 	/**
 	 * Method to perform search of regions from solr based on input pattern , company and regionIds
@@ -1025,6 +1036,16 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrInputDocument document;
 			for (Region region : regions) {
 				document = getSolrDocumentFromRegion(region);
+
+				// fetch RegionSettings from mongo
+				OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getRegionId(),
+						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+				
+				// update address
+				if (regionSettings.getContact_details() != null && regionSettings.getContact_details().getAddress() != null) {
+					document.addField(CommonConstants.REGION_ADDRESS_SOLR, regionSettings.getContact_details().getAddress());
+				}
+				
 				documents.add(document);
 			}
 
@@ -1055,6 +1076,16 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrInputDocument document;
 			for (Branch branch : branches) {
 				document = getSolrDocumentFromBranch(branch);
+				
+				// fetch BranchSettings from mongo
+				OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getBranchId(),
+						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+				
+				// update address
+				if (branchSettings.getContact_details() != null && branchSettings.getContact_details().getAddress() != null) {
+					document.addField(CommonConstants.BRANCH_ADDRESS_SOLR, branchSettings.getContact_details().getAddress());
+				}
+				
 				documents.add(document);
 			}
 
@@ -1084,9 +1115,32 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
 			SolrInputDocument document;
 			for (User user : users) {
+				// update profiles of user
+				userManagementService.setProfilesOfUser(user);
+				
 				document = new SolrInputDocument();
 				document = getSolrInputDocumentFromUser(user, document);
 				
+				// fetch AgentSettings from mongo
+				AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(user.getUserId());
+				
+				// update profileUrl
+				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getAbout_me() != null) {
+					document.addField(CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details().getAbout_me());
+				}
+				// update profileName
+				if (agentSettings.getProfileName() != null) {
+					document.addField(CommonConstants.PROFILE_NAME_SOLR, agentSettings.getProfileName());
+				}
+				// update profileUrl
+				if (agentSettings.getProfileUrl() != null) {
+					document.addField(CommonConstants.PROFILE_URL_SOLR, agentSettings.getProfileUrl());
+				}
+				// update profileImageUrl
+				if (agentSettings.getProfileImageUrl() != null) {
+					document.addField(CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl());
+				}
+
 				documents.add(document);
 			}
 
