@@ -696,8 +696,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : clickedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
 								.toString()))
 							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
 					}
@@ -733,9 +734,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
-		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON)
-				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria
-				.where(columnName).is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).lt(
+				endDate)), Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(columnName)
+				.is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
 				.andExpression(criteriaColumn + "(" + CommonConstants.CREATED_ON + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
 
@@ -787,9 +788,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : sentSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
-								.toString()))
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 			}
@@ -878,8 +879,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : completedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
 								.toString()))
 							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
 					}
@@ -970,9 +972,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : socialPosts.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
-								.toString()))
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 			}
@@ -1031,8 +1033,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query();
 		query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
 				Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
-				Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore),
-				Criteria.where("socialPostsReminder").lt(maxReminders)));
+				Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore), Criteria.where("socialPostsReminder").lt(maxReminders)));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished.");
 		return surveys;
