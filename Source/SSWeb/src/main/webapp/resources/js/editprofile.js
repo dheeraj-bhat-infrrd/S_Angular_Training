@@ -1032,7 +1032,12 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
-		if (reviewCount <= 1) {
+		if (reviewCount == 0) {
+			reviewCount = 'No Reviews';
+			
+			// hiding reviews-container if 0 reviews
+			$("#reviews-container").hide();
+		} else if (reviewCount == 1) {
 			reviewCount = reviewCount + ' Review';
 		} else {
 			reviewCount = reviewCount + ' Reviews';
