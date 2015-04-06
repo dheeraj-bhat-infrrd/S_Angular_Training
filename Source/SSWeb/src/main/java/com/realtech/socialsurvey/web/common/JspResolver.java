@@ -20,13 +20,11 @@ public interface JspResolver {
 	public static final String PAYMENT = "payment";
 	public static final String LANDING = "landing";
 	public static final String HIERARCHY_MANAGEMENT = "hierarchymanagement";
-
 	public static final String SURVEY_BUILDER = "buildSurvey";
 	public static final String SURVEY_BUILDER_QUESTION_OVERLAY = "buildSurvey_questionoverlay";
 	public static final String SURVEY_BUILDER_QUESTION_LIST = "buildSurvey_questionlist";
 	public static final String SURVEY_BUILDER_QUESTION_EDIT = "buildSurvey_questionedit";
 	public static final String SURVEY_BUILDER_QUESTION_NEW = "buildSurvey_questionnew";
-
 	public static final String DASHBOARD = "dashboard";
 	public static final String USER_MANAGEMENT = "view-user-management";
 	public static final String USER_LIST_FOR_MANAGEMENT = "userlist";
@@ -46,9 +44,6 @@ public interface JspResolver {
 	public static final String PROFILE_EDIT = "profile_edit";
 	public static final String PROFILE_CONTACT_DETAILS = "profile_contactdetails";
 	public static final String PROFILE_ABOUT_ME = "profile_aboutme";
-	public static final String PROFILE_ASSOCIATIONS = "profile_associations";
-	public static final String PROFILE_ACHIEVEMENTS = "profile_achievements";
-	public static final String PROFILE_LICENSES = "profile_licenses";
 	public static final String PROFILE_ADDRESS_DETAILS = "profile_addressdetails";
 	public static final String PROFILE_ADDRESS_DETAILS_EDIT = "profile_addressdetails_edit";
 	public static final String PROFILE_BASIC_DETAILS = "profile_basicdetails";
