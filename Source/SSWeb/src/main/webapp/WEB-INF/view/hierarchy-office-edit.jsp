@@ -6,7 +6,7 @@
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.officename.key"/></div>
     <div class="float-left bd-frm-right">
-        <input class="bd-frm-rt-txt" name="officeName" id="office-name-txt">
+        <input class="bd-frm-rt-txt" name="officeName" id="office-name-txt" value="${branch.branchName}">
     </div>
 </div>
 <div id="bd-assign-to" class="bd-hr-form-item clearfix">
@@ -14,7 +14,15 @@
     <div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
 	    <c:choose>
 		    <c:when test="${accountType == 'Enterprise'}">
-		    	<input id="assign-to-txt" data-assignto="region" value='<spring:message code="label.region.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+		    	<c:choose>
+			    	<c:when test="${isCompanyBranch}">
+			    		<input id="assign-to-txt" data-assignto="company" value='<spring:message code="label.company.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+			    	</c:when>
+			    	<c:otherwise>
+			    		<input id="assign-to-txt" data-assignto="region" value='<spring:message code="label.region.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+			    	</c:otherwise>
+		    	</c:choose>
+		    	
 	        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	        	<c:if test="${highestrole == 1 || highestrole == 2}">
 	            	<div data-assign-to-option="region" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
@@ -36,8 +44,8 @@
 <div id="bd-region-selector" class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.selectregion.key"/></div>
     <div class="float-left bd-frm-right pos-relative" id="region-selector">
-        <input id="selected-region-txt" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.regionselector.placeholder.key"/>'/>
-        <input type="hidden" name="regionId" id="selected-region-id-hidden"/>
+        <input id="selected-region-txt" value="${branch.regionName}" class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img" placeholder='<spring:message code="label.regionselector.placeholder.key"/>'/>
+        <input type="hidden" name="regionId" id="selected-region-id-hidden" value="${branch.regionId}"/>
         <div id="regions-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
         	<!-- regions list get populated here  -->
         </div>
@@ -46,13 +54,13 @@
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.addressline1.key"/></div>
     <div class="float-left bd-frm-right">
-        <input class="bd-frm-rt-txt" name="officeAddress1" id="office-address-txt">
+        <input class="bd-frm-rt-txt" name="officeAddress1" id="office-address-txt" value="${branch.address1}">
     </div>
 </div>
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"><spring:message code="label.addressline2.key"/></div>
     <div class="float-left bd-frm-right">
-        <input class="bd-frm-rt-txt" name="officeAddress2">
+        <input class="bd-frm-rt-txt" name="officeAddress2" value="${branch.address2}"/>
     </div>
 </div>
 <div class="bd-hr-form-item clearfix">
@@ -100,7 +108,15 @@
 <div class="bd-hr-form-item clearfix">
     <div class="float-left bd-frm-left"></div>
     <div class="float-left bd-frm-right">
-        <div class="bd-btn-save cursor-pointer" id="btn-office-save"><spring:message code="label.save.key"/></div>
+    <c:choose>
+	     <c:when test="${isUpdateCall}">
+	     	 <input type="hidden" name="branchId" value="${branch.branchId}" class="ignore-clear"/>
+	     	 <div id="btn-office-update" data-branchid = "${branch.branchId}" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+	     </c:when>
+	     <c:otherwise>
+	      	 <div id="btn-office-save" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+	     </c:otherwise>
+     </c:choose>
     </div>
 </div>
 </form>

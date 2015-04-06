@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 import com.amazonaws.services.s3.AmazonS3;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 
 /**
  * Holds methods to upload file to the application server
@@ -36,5 +37,13 @@ public interface FileUploadService {
 	 * Method to create AmazonS3 client
 	 */
 	public AmazonS3 createAmazonClient(String endpoint, String bucket);
+	
+	/**
+	 * Method to upload file
+	 * @param file
+	 * @param fileName
+	 * @throws NonFatalException
+	 */
+	public void uploadFile(File file, String fileName) throws NonFatalException;
 
 }

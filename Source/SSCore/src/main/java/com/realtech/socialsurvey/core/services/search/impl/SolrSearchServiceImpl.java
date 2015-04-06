@@ -276,12 +276,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, branch.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
-
-		String address = branch.getAddress1();
-		if (address != null && branch.getAddress2() != null) {
-			address = address + " " + branch.getAddress2();
-		}
-		document.addField(CommonConstants.BRANCH_ADDRESS_SOLR, address);
+		document.addField(CommonConstants.ADDRESS1_SOLR, branch.getAddress1());
+		document.addField(CommonConstants.ADDRESS2_SOLR, branch.getAddress2());
 
 		LOG.debug("Method getSolrDocumentFromBranch finished for branch " + branch);
 		return document;
@@ -302,11 +298,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
-		String address = region.getAddress1();
-		if (address != null && region.getAddress2() != null) {
-			address = address + " " + region.getAddress2();
-		}
-		document.addField(CommonConstants.REGION_ADDRESS_SOLR, address);
+		document.addField(CommonConstants.ADDRESS1_SOLR, region.getAddress1());
+		document.addField(CommonConstants.ADDRESS2_SOLR, region.getAddress2());
 
 		LOG.debug("Method getSolrDocumentFromRegion finished for region " + region);
 		return document;
@@ -574,51 +567,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		try {
 			solrServer = new HttpSolrServer(solrUserUrl);
 			SolrInputDocument document = new SolrInputDocument();
-			document.addField(CommonConstants.USER_ID_SOLR, user.getUserId());
-			document.addField(CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
-			document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
-			document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
-			document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
-			document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
-
-			String displayName = user.getFirstName();
-			if (user.getLastName() != null) {
-				displayName = displayName + " " + user.getLastName();
-			}
-			document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, displayName);
-
-			/**
-			 * add/update profile url and profile name in solr only when they are not null
-			 */
-			if (user.getProfileName() != null && !user.getProfileName().isEmpty()) {
-				document.addField(CommonConstants.PROFILE_NAME_SOLR, user.getProfileName());
-			}
-			if (user.getProfileUrl() != null && !user.getProfileUrl().isEmpty()) {
-				document.addField(CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl());
-			}
-
-			if (user.getCompany() != null) {
-				document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
-			}
-			document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
-			Set<Long> branches = new HashSet<Long>();
-			Set<Long> regions = new HashSet<Long>();
-			if (user.getUserProfiles() != null)
-				for (UserProfile userProfile : user.getUserProfiles()) {
-					if (userProfile.getRegionId() != 0) {
-						regions.add(userProfile.getRegionId());
-					}
-					if (userProfile.getBranchId() != 0) {
-						branches.add(userProfile.getBranchId());
-					}
-				}
-			document.addField(CommonConstants.BRANCHES_SOLR, branches);
-			document.addField(CommonConstants.REGIONS_SOLR, regions);
-			document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
-			document.addField(CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin());
-			document.addField(CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin());
+			document = getSolrInputDocumentFromUser(user, document);
+			response = solrServer.add(document);
 			LOG.debug("response while adding user is: " + response);
-			solrServer.add(document);
 			solrServer.commit();
 		}
 		catch (MalformedURLException e) {
@@ -630,6 +581,54 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while adding user to solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method to add user to solr finshed for user : " + user);
+	}
+
+	private SolrInputDocument getSolrInputDocumentFromUser(User user, SolrInputDocument document) {
+		document.addField(CommonConstants.USER_ID_SOLR, user.getUserId());
+		document.addField(CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
+		document.addField(CommonConstants.USER_LAST_NAME_SOLR, user.getLastName());
+		document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
+		document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
+		document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
+
+		String displayName = user.getFirstName();
+		if (user.getLastName() != null) {
+			displayName = displayName + " " + user.getLastName();
+		}
+		document.addField(CommonConstants.USER_DISPLAY_NAME_SOLR, displayName);
+
+		/**
+		 * add/update profile url and profile name in solr only when they are not null
+		 */
+		if (user.getProfileName() != null && !user.getProfileName().isEmpty()) {
+			document.addField(CommonConstants.PROFILE_NAME_SOLR, user.getProfileName());
+		}
+		if (user.getProfileUrl() != null && !user.getProfileUrl().isEmpty()) {
+			document.addField(CommonConstants.PROFILE_URL_SOLR, user.getProfileUrl());
+		}
+
+		if (user.getCompany() != null) {
+			document.addField(CommonConstants.COMPANY_ID_SOLR, user.getCompany().getCompanyId());
+		}
+		document.addField(CommonConstants.STATUS_SOLR, user.getStatus());
+		Set<Long> branches = new HashSet<Long>();
+		Set<Long> regions = new HashSet<Long>();
+		if (user.getUserProfiles() != null)
+			for (UserProfile userProfile : user.getUserProfiles()) {
+				if (userProfile.getRegionId() != 0) {
+					regions.add(userProfile.getRegionId());
+				}
+				if (userProfile.getBranchId() != 0) {
+					branches.add(userProfile.getBranchId());
+				}
+			}
+		document.addField(CommonConstants.BRANCHES_SOLR, branches);
+		document.addField(CommonConstants.REGIONS_SOLR, regions);
+		document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
+		document.addField(CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin());
+		document.addField(CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin());
+
+		return document;
 	}
 
 	/*
@@ -724,8 +723,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	}
 
 	@Override
-	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, int startIndex, int noOfRows) throws InvalidInputException,
-			SolrException {
+	public SolrDocumentList searchUsersByIden(long iden, String idenFieldName, boolean isAgent, int startIndex, int noOfRows)
+			throws InvalidInputException, SolrException {
 		LOG.info("Method searchUsersByIden called for iden :" + iden + "idenFieldName:" + idenFieldName + " startIndex:" + startIndex + " noOfrows:"
 				+ noOfRows);
 		if (iden <= 0l) {
@@ -743,7 +742,9 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
 					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
 			solrQuery.addFilterQuery(idenFieldName + ":" + iden);
-			solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + CommonConstants.IS_AGENT_TRUE_SOLR);
+			if (isAgent) {
+				solrQuery.addFilterQuery(CommonConstants.IS_AGENT_SOLR + ":" + isAgent);
+			}
 			if (startIndex > -1) {
 				solrQuery.setStart(startIndex);
 			}
@@ -966,5 +967,134 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		}
 		LOG.debug("Method getSpaceSeparatedStringFromIds executed successfully. Returning:" + idsSb.toString());
 		return idsSb.toString();
+	}
+
+	/**
+	 * Method to search for the users based on branches specified
+	 */
+	@Override
+	public String searchUsersByBranches(Set<Long> branchIds, int start, int rows) throws InvalidInputException, SolrException {
+		if (branchIds == null || branchIds.isEmpty()) {
+			throw new InvalidInputException("branchIds are null in searchUsersByBranches");
+		}
+		LOG.info("Method searchUsersByBranches called for branchIds:" + branchIds + " start:" + start + " rows:" + rows);
+		String usersResult = null;
+		QueryResponse response = null;
+		try {
+			SolrServer solrServer = new HttpSolrServer(solrUserUrl);
+			SolrQuery solrQuery = new SolrQuery();
+			solrQuery.setQuery(CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_ACTIVE + " OR " + CommonConstants.STATUS_SOLR + ":"
+					+ CommonConstants.STATUS_NOT_VERIFIED + " OR " + CommonConstants.STATUS_SOLR + ":" + CommonConstants.STATUS_TEMPORARILY_INACTIVE);
+			String branchIdsStr = getSpaceSeparatedStringFromIds(branchIds);
+			solrQuery.addFilterQuery(CommonConstants.BRANCHES_SOLR + ":(" + branchIdsStr + ")");
+
+			solrQuery.setStart(start);
+			if (rows > 0) {
+				solrQuery.setRows(rows);
+			}
+
+			LOG.debug("Querying solr for searching users under the branches");
+			response = solrServer.query(solrQuery);
+			SolrDocumentList results = response.getResults();
+			usersResult = JSONUtil.toJSON(results);
+			LOG.debug("Users search result is : " + usersResult);
+		}
+		catch (SolrServerException e) {
+			throw new SolrException("Exception while performing search for users by branches. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method searchUsersByBranches executed successfully");
+		return usersResult;
+	}
+
+	@Override
+	public void addRegionsToSolr(List<Region> regions) throws SolrException {
+		LOG.info("Method to add regions to solr called");
+		SolrServer solrServer;
+
+		try {
+			solrServer = new HttpSolrServer(solrRegionUrl);
+
+			List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
+			SolrInputDocument document;
+			for (Region region : regions) {
+				document = getSolrDocumentFromRegion(region);
+				documents.add(document);
+			}
+
+			UpdateResponse response = solrServer.add(documents);
+			solrServer.commit();
+			LOG.debug("response while adding regions is : " + response);
+		}
+		catch (MalformedURLException e) {
+			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method to add regions to solr finshed");
+	}
+
+	@Override
+	public void addBranchesToSolr(List<Branch> branches) throws SolrException {
+		LOG.info("Method to add branches to solr called");
+		SolrServer solrServer;
+
+		try {
+			solrServer = new HttpSolrServer(solrBranchUrl);
+
+			List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
+			SolrInputDocument document;
+			for (Branch branch : branches) {
+				document = getSolrDocumentFromBranch(branch);
+				documents.add(document);
+			}
+
+			UpdateResponse response = solrServer.add(documents);
+			solrServer.commit();
+			LOG.debug("response while adding branches is : " + response);
+		}
+		catch (MalformedURLException e) {
+			LOG.error("Exception while adding branches to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding branches to solr. Reason : " + e.getMessage(), e);
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while adding branches to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding branches to solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method to add branches to solr finshed");
+	}
+
+	@Override
+	public void addUsersToSolr(List<User> users) throws SolrException {
+		LOG.info("Method to add users to solr called");
+		SolrServer solrServer;
+
+		try {
+			solrServer = new HttpSolrServer(solrUserUrl);
+
+			List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
+			SolrInputDocument document;
+			for (User user : users) {
+				document = new SolrInputDocument();
+				document = getSolrInputDocumentFromUser(user, document);
+
+				documents.add(document);
+			}
+
+			UpdateResponse response = solrServer.add(documents);
+			solrServer.commit();
+			LOG.debug("response while adding users is: " + response);
+		}
+		catch (MalformedURLException e) {
+			LOG.error("Exception while adding users to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding users to solr. Reason : " + e.getMessage(), e);
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while adding users to solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding users to solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method to add users to solr finshed");
 	}
 }

@@ -116,46 +116,7 @@ public class UserManagementController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
 			}
-
 			long companyId = user.getCompany().getCompanyId();
-			// fetch region List from solr
-			try {
-				String regionsResult = solrSearchService.fetchRegionsByCompany(companyId);
-
-				// convert regions to map
-				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
-				List<RegionFromSearch> regionsList = new Gson().fromJson(regionsResult, searchedRegionsList);
-
-				Map<Long, RegionFromSearch> regions = new HashMap<Long, RegionFromSearch>();
-				for (RegionFromSearch region : regionsList) {
-					regions.put(region.getRegionId(), region);
-				}
-
-				session.setAttribute("regions", regions);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("MalformedURLException while fetching regions", e);
-			}
-
-			// fetch branch List from solr
-			try {
-				String branchesResult = solrSearchService.fetchBranchesByCompany(companyId);
-
-				// convert branches to map
-				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
-				List<BranchFromSearch> branchList = new Gson().fromJson(branchesResult, searchedBranchesList);
-
-				Map<Long, BranchFromSearch> branches = new HashMap<Long, BranchFromSearch>();
-				for (BranchFromSearch branch : branchList) {
-					branches.put(branch.getBranchId(), branch);
-				}
-				session.setAttribute("branches", branches);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("MalformedURLException while fetching branches", e);
-			}
 			
 			try {
 				long usersCount = solrSearchService.countUsersByCompany(companyId, 0, SOLR_BATCH_SIZE);
@@ -331,7 +292,6 @@ public class UserManagementController {
 		int batchSize = 0;
 
 		try {
-
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
 			try {
@@ -1099,7 +1059,8 @@ public class UserManagementController {
 		}
 		return JspResolver.CHANGE_PASSWORD;
 	}
-
+	
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/finduserassignments", method = RequestMethod.GET)
 	public String getUserAssignments(Model model, HttpServletRequest request) {
 		LOG.info("Method getUserAssignments() called from UserManagementController");
@@ -1109,8 +1070,8 @@ public class UserManagementController {
 			long userId = Long.parseLong(request.getParameter("userId"));
 			User user = userManagementService.getUserByUserId(userId);
 
-			Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute("regions");
-			Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute("branches");
+			Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+			Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
 
 			List<UserAssignment> userAssignments = new ArrayList<UserAssignment>();
 			for (UserProfile userProfile : user.getUserProfiles()) {
@@ -1137,7 +1098,7 @@ public class UserManagementController {
 						}
 
 						// if region is not default
-						if (region.getIsDefaultBySystem() != 1) {
+						if (region.getIsDefaultBySystem() != CommonConstants.YES) {
 							assignment.setEntityId(regionId);
 							assignment.setEntityName(region.getRegionName());
 						}
@@ -1156,7 +1117,7 @@ public class UserManagementController {
 						}
 
 						// if branch is not default
-						if (branch.getIsDefaultBySystem() != 1) {
+						if (branch.getIsDefaultBySystem() != CommonConstants.YES) {
 							assignment.setEntityId(branchId);
 							assignment.setEntityName(branch.getBranchName());
 						}
@@ -1175,7 +1136,7 @@ public class UserManagementController {
 						}
 
 						// if branch is not default
-						if (branch.getIsDefaultBySystem() != 1) {
+						if (branch.getIsDefaultBySystem() != CommonConstants.YES) {
 							assignment.setEntityId(branchId);
 							assignment.setEntityName(branch.getBranchName());
 						}

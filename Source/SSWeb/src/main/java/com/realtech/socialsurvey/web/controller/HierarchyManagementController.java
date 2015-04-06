@@ -2,9 +2,12 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.solr.common.SolrDocumentList;
+import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +22,13 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.BranchSearchResultWrapper;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
-import com.realtech.socialsurvey.core.entities.RegionSearchResultWrapper;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -669,6 +671,11 @@ public class HierarchyManagementController {
 			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+
+			// updating session with new assignment
+			if (user.getUserId() == selectedUserId) {
+				sessionHelper.getCanonicalSettings(request.getSession(false));
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding an individual. Reason : " + e.getMessage(), e);
@@ -680,7 +687,7 @@ public class HierarchyManagementController {
 	}
 
 	/**
-	 * Method to update a branch
+	 * Method to update a branch and assign a user to branch if specified
 	 * 
 	 * @param model
 	 * @param request
@@ -689,13 +696,38 @@ public class HierarchyManagementController {
 	@RequestMapping(value = "/updatebranch", method = RequestMethod.POST)
 	public String updateBranch(Model model, HttpServletRequest request) {
 		LOG.info("Method updateBranch called in HierarchyManagementController");
-		String strBranchId = request.getParameter("branchId");
-		String branchName = request.getParameter("branchName");
-		String strRegionId = request.getParameter("regionId");
-		String branchAddress1 = request.getParameter("branchAddress1");
-		String branchAddress2 = request.getParameter("branchAddress2");
 		try {
+			String strBranchId = request.getParameter("branchId");
+			String branchName = request.getParameter("officeName");
+			String branchAddress1 = request.getParameter("officeAddress1");
+			String branchAddress2 = request.getParameter("officeAddress2");
+			String strRegionId = request.getParameter("regionId");
+			String selectedUserIdStr = request.getParameter("selectedUserId");
+			String selectedUserEmail = request.getParameter("selectedUserEmail");
+
+			if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
+				selectedUserEmail = request.getParameter("selectedUserEmailArray");
+			}
+
+			String isAdminStr = request.getParameter("isAdmin");
+
+			long selectedUserId = 0l;
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatException while parsing selected userId in add branch",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
+			boolean isAdmin = false;
+			if (isAdminStr != null && !isAdminStr.isEmpty()) {
+				isAdmin = Boolean.parseBoolean(isAdminStr);
+			}
+
 			validateBranchForm(branchName, branchAddress1);
+			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 			long regionId = 0l;
 			try {
 				/**
@@ -706,7 +738,7 @@ public class HierarchyManagementController {
 				}
 			}
 			catch (NumberFormatException e) {
-				throw new InvalidInputException("Error while parsing regionId in update branch.Reason : " + e.getMessage(),
+				throw new InvalidInputException("Error while parsing regionId in update branch. Reason : " + e.getMessage(),
 						DisplayMessageConstants.INVALID_REGION_SELECTED, e);
 			}
 
@@ -720,12 +752,13 @@ public class HierarchyManagementController {
 			}
 
 			User user = sessionHelper.getCurrentUser();
-			String address = getCompleteAddress(branchAddress1, branchAddress2);
-			LOG.info("Address " + address + " is yet to be stored");
-
+			HttpSession session = request.getSession(false);
 			try {
 				LOG.debug("Calling service to update branch with Id : " + branchId);
-				organizationManagementService.updateBranch(branchId, regionId, branchName, branchAddress1, branchAddress2, user);
+				Branch branch = organizationManagementService.updateBranch(user, branchId, regionId, branchName, branchAddress1, branchAddress2,
+						selectedUserId, assigneeEmailIds, isAdmin);
+				updateBranchInSession(branch, session);
+
 				LOG.debug("Successfully executed service to update a branch");
 
 				model.addAttribute("message",
@@ -745,6 +778,32 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * method to update the branch in sessionF
+	 * 
+	 * @param branch
+	 * @param session
+	 * @throws NoRecordsFetchedException
+	 */
+	private void updateBranchInSession(Branch branch, HttpSession session) throws NoRecordsFetchedException {
+		LOG.info("Method updateBranchInSession called for branch:" + branch);
+		@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
+				.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
+		if (branches != null && branches.containsKey(branch.getBranchId())) {
+			BranchFromSearch branchInSession = branches.get(branch.getBranchId());
+			branchInSession.setBranchName(branch.getBranchName());
+			branchInSession.setAddress1(branch.getAddress1());
+			branchInSession.setBranchName(branch.getAddress2());
+			branchInSession.setRegionId(branch.getRegion().getRegionId());
+			branchInSession.setRegionName(branch.getRegion().getRegion());
+			branchInSession.setStatus(branch.getStatus());
+		}
+		else {
+			throw new NoRecordsFetchedException("Unable to update branch in session", DisplayMessageConstants.GENERAL_ERROR);
+		}
+		LOG.info("Method updateBranchInSession completed successfully");
+	}
+
+	/**
 	 * Method to update a region
 	 * 
 	 * @param model
@@ -759,35 +818,48 @@ public class HierarchyManagementController {
 		String regionAddress1 = request.getParameter("regionAddress1");
 		String regionAddress2 = request.getParameter("regionAddress2");
 		String selectedUserIdStr = request.getParameter("selectedUserId");
-		// String selectedUserEmail = request.getParameter("selectedUserEmail");
+		String selectedUserEmail = request.getParameter("selectedUserEmail");
+
+		if (selectedUserEmail == null || selectedUserEmail.isEmpty()) {
+			selectedUserEmail = request.getParameter("selectedUserEmailArray");
+		}
+		String isAdminStr = request.getParameter("isAdmin");
+
+		long selectedUserId = 0l;
 		try {
-			long selectedUserId = 0l;
-			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
-				try {
-					selectedUserId = Long.parseLong(selectedUserIdStr);
-				}
-				catch (NumberFormatException e) {
-					throw new InvalidInputException("NumberFormatException while parsing selected userId in update region",
-							DisplayMessageConstants.INVALID_USER_SELECTED);
-				}
-			}
-			validateRegionForm(regionName);
 			long regionId = 0l;
 			try {
 				regionId = Long.parseLong(strRegionId);
 			}
 			catch (NumberFormatException e) {
-				throw new InvalidInputException("Error while parsing regionId in update region.Reason : " + e.getMessage(),
+				throw new InvalidInputException("regionid is invalid in update region. Reson:" + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
+				try {
+					selectedUserId = Long.parseLong(selectedUserIdStr);
+				}
+				catch (NumberFormatException e) {
+					throw new InvalidInputException("NumberFormatExcyeption while parsing selected userId in add region",
+							DisplayMessageConstants.INVALID_USER_SELECTED);
+				}
+			}
 
+			boolean isAdmin = false;
+			if (isAdminStr != null && !isAdminStr.isEmpty()) {
+				isAdmin = Boolean.parseBoolean(isAdminStr);
+			}
+			validateRegionForm(regionName);
+			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 			User user = sessionHelper.getCurrentUser();
-			String address = getCompleteAddress(regionAddress1, regionAddress2);
-			LOG.info("Address " + address + " is yet to be stored");
+			HttpSession session = request.getSession(false);
 
 			try {
 				LOG.debug("Calling service to update region with Id : " + regionId);
-				organizationManagementService.updateRegion(regionId, regionName, regionAddress1, regionAddress2, user);
+				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,
+						selectedUserId, assigneeEmailIds, isAdmin);
+				updateRegionInSession(region, session);
+				
 				LOG.debug("Successfully executed service to update a region");
 
 				model.addAttribute("message",
@@ -804,6 +876,30 @@ public class HierarchyManagementController {
 		}
 		LOG.info("Method to update region completed successfully");
 		return JspResolver.MESSAGE_HEADER;
+	}
+
+	/**
+	 * Method to update region in session
+	 * 
+	 * @param region
+	 * @param session
+	 * @throws NoRecordsFetchedException
+	 */
+	private void updateRegionInSession(Region region, HttpSession session) throws NoRecordsFetchedException {
+		LOG.info("Method updateRegionInSession called for region:" + region);
+		@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
+				.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+		if (regions != null && regions.containsKey(region.getRegionId())) {
+			RegionFromSearch regionInSession = regions.get(region.getRegionId());
+			regionInSession.setRegionName(region.getRegion());
+			regionInSession.setAddress1(region.getAddress1());
+			regionInSession.setAddress2(region.getAddress2());
+			regionInSession.setStatus(region.getStatus());
+		}
+		else {
+			throw new NoRecordsFetchedException("Unable to update region in session", DisplayMessageConstants.GENERAL_ERROR);
+		}
+		LOG.info("Method updateRegionInSession executed successfully");
 	}
 
 	/**
@@ -1104,6 +1200,7 @@ public class HierarchyManagementController {
 			branches = new Gson().fromJson(branchesJson, searchedBranchesList);
 
 			model.addAttribute("branches", branches);
+			model.addAttribute("regionId", regionId);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching branches in a region . Reason : " + e.getMessage(), e);
@@ -1115,7 +1212,56 @@ public class HierarchyManagementController {
 	}
 
 	/**
-	 * Method to fetch the hierarchy list for edit
+	 * Method to fetch the list of users under a branch for the hierarchy view page
+	 * 
+	 * @param model
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value = "/fetchbranchusers", method = RequestMethod.GET)
+	public String fetchHierarchyViewUsersForBranch(Model model, HttpServletRequest request) {
+		LOG.info("Method fetchHierarchyViewUsersForBranch called in Hierarchy management controller");
+		String strBranchId = request.getParameter("branchId");
+		String strRegionId = request.getParameter("regionId");
+		long branchId = 0l;
+		int start = 0;
+		int rows = -1;
+		try {
+			try {
+				branchId = Long.parseLong(strBranchId);
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("Error while parsing branchId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			SolrDocumentList usersResult = solrSearchService.searchUsersByIden(branchId, CommonConstants.BRANCHES_SOLR, false, start, rows);
+			String usersJson = JSONUtil.toJSON(usersResult);
+			LOG.debug("Solr result returned for users of branch is:" + usersJson);
+			/**
+			 * convert users to Object
+			 */
+			Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+			List<UserFromSearch> usersList = new Gson().fromJson(usersJson, searchedUsersList);
+
+			model.addAttribute("users", usersList);
+			model.addAttribute("branchId", branchId);
+			model.addAttribute("regionId", strRegionId);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while fetching users in a branch . Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+
+		LOG.info("Method fetchHierarchyViewUsersForBranch executed successfully");
+		return JspResolver.VIEW_HIERARCHY_USERS_LIST;
+
+	}
+
+	/**
+	 * Method to fetch the hierarchy list for edit fetches regions,branches and individuals directly
+	 * under the company
 	 * 
 	 * @param model
 	 * @param request
@@ -1131,32 +1277,46 @@ public class HierarchyManagementController {
 		Set<Long> branchIds = null;
 		List<RegionFromSearch> regions = null;
 		List<BranchFromSearch> branches = null;
+		List<UserFromSearch> users = null;
 		String jspToReturn = null;
+		int start = 0;
+		int rows = -1;
 		try {
 
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, 0, -1);
+				LOG.debug("fetching regions under company from solr");
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), null, start, rows);
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
+
+				LOG.debug("fetching branches under company from solr");
+				branches = organizationManagementService.getBranchesUnderCompanyFromSolr(user.getCompany(), start, rows);
+
+				LOG.debug("fetching users under company from solr");
+				users = organizationManagementService.getUsersUnderCompanyFromSolr(user.getCompany(), start, rows);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of regions for the region admin");
 				regionIds = organizationManagementService.getRegionIdsForUser(user, highestRole);
 
-				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, 0, -1);
+				String regionsJson = solrSearchService.searchRegions("*", user.getCompany(), regionIds, start, rows);
 				Type searchedRegionsList = new TypeToken<List<RegionFromSearch>>() {}.getType();
 				regions = new Gson().fromJson(regionsJson, searchedRegionsList);
 
+				LOG.debug("fetching users under region from solr");
+				users = organizationManagementService.getUsersUnderRegionFromSolr(regionIds, start, rows);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 				LOG.debug("Getting list of branches for the branch admin");
 				branchIds = organizationManagementService.getBranchIdsForUser(user, highestRole);
 
-				String branchesJson = solrSearchService.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, 0, -1);
+				String branchesJson = solrSearchService
+						.searchBranches("*", user.getCompany(), CommonConstants.BRANCH_ID_SOLR, branchIds, start, rows);
 				Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
 				branches = new Gson().fromJson(branchesJson, searchedBranchesList);
+
 				jspToReturn = JspResolver.VIEW_HIERARCHY_BRANCH_LIST;
 			}
 			else {
@@ -1164,6 +1324,7 @@ public class HierarchyManagementController {
 			}
 			model.addAttribute("regions", regions);
 			model.addAttribute("branches", branches);
+			model.addAttribute("individuals", users);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while fetching hierarchy view list main page Reason : " + e.getMessage(), e);
@@ -1181,10 +1342,39 @@ public class HierarchyManagementController {
 	 * 
 	 * @param model
 	 * @return
+	 * @throws InvalidInputException
 	 */
 	@RequestMapping(value = "/getregioneditpage", method = RequestMethod.GET)
-	public String getRegionEditPage(Model model) {
+	public String getRegionEditPage(Model model, HttpServletRequest request) throws InvalidInputException {
 		LOG.info("Method getRegionEditPage called");
+		String strRegionId = request.getParameter("regionId");
+		boolean isUpdateCall = false;
+		try {
+			if (strRegionId != null && !strRegionId.isEmpty()) {
+				HttpSession session = request.getSession();
+				Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+
+				long regionId = Long.parseLong(strRegionId);
+				RegionFromSearch regionToUpdate = null;
+				if (regions.containsKey(regionId)) {
+					regionToUpdate = regions.get(regionId);
+				}
+				else {
+					throw new NoRecordsFetchedException("Region not present in list of regions present in session. RegionId:" + regionId,
+							DisplayMessageConstants.GENERAL_ERROR);
+				}
+
+				isUpdateCall = true;
+				model.addAttribute("region", regionToUpdate);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while getting region edit Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("isUpdateCall", isUpdateCall);
+		LOG.info("Method getRegionEditPage executed succesfully");
 		return JspResolver.HIERARCHY_REGION_EDIT;
 
 	}
@@ -1196,8 +1386,44 @@ public class HierarchyManagementController {
 	 * @return
 	 */
 	@RequestMapping(value = "/getofficeeditpage", method = RequestMethod.GET)
-	public String getOfficeEditPage(Model model) {
+	public String getOfficeEditPage(Model model, HttpServletRequest request) {
 		LOG.info("Method getOfficeEditPage called");
+		String strBranchId = request.getParameter("branchId");
+		boolean isUpdateCall = false;
+		try {
+			if (strBranchId != null && !strBranchId.isEmpty()) {
+				HttpSession session = request.getSession();
+				BranchFromSearch branch = null;
+				boolean isCompanyBranch = false;
+				Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
+				long branchId = Long.parseLong(strBranchId);
+
+				if (branches.containsKey(branchId)) {
+					branch = branches.get(branchId);
+					/**
+					 * check if the branch is under default region, if yes the branch is under
+					 * company directly hence set isCompanyBranch as true
+					 */
+					if (branch.getRegionName().equals(CommonConstants.DEFAULT_REGION_NAME)) {
+						isCompanyBranch = true;
+					}
+				}
+				else {
+					throw new NoRecordsFetchedException("Branch not present in list of branches present in session. branchId:" + branchId,
+							DisplayMessageConstants.GENERAL_ERROR);
+				}
+				isUpdateCall = true;
+				model.addAttribute("branch", branch);
+				model.addAttribute("isCompanyBranch", isCompanyBranch);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while getting office edit Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
+		model.addAttribute("isUpdateCall", isUpdateCall);
+		LOG.info("Method getOfficeEditPage executed succesfully");
 		return JspResolver.HIERARCHY_OFFICE_EDIT;
 
 	}

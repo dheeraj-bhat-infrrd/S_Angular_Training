@@ -355,7 +355,7 @@ a, a:hover, a:visited{
 .pro-left-wrapper {
     text-align: right;
     font-size: 18px;
-    width: 475px;
+    width: 535px;
     line-height: 70px;
     height: 70px;
     background-color: rgba(0, 159, 224, 0.8);
@@ -367,7 +367,7 @@ a, a:hover, a:visited{
 
 .pro-right-wrapper {
     position: relative;
-    width: 660px;
+    width: 600px;
     height: 70px;
 /*    background-color: rgba(0, 159, 224, 0.8);*/
     color: #fff;
@@ -378,7 +378,7 @@ a, a:hover, a:visited{
     color: #3e3e3e;
     display: block;
     float: left;
-    width: 202px;
+    width: 192px;
     margin-right: 0;
     height: 40px;
     border: 0;
@@ -398,6 +398,10 @@ a, a:hover, a:visited{
     cursor: pointer;
     background-color: #7fba00 !important;
     font-size: 14px !important;
+}
+
+input#find-pro-submit{
+    width: 161px;
 }
 
 .pro-wrapper {
@@ -460,6 +464,7 @@ a, a:hover, a:visited{
     background: url(../images/ss-logo.png) no-repeat;
     background-size: 65%;
     background-position: left center;
+    cursor: pointer;
 }
 
 .hdr-reg-btn {
@@ -595,7 +600,8 @@ a, a:hover, a:visited{
     position: relative;
     z-index: 99;
     font-size: 13px;
-    line-height: 20px;
+    line-height: 22px;
+    width: 428px;
     padding-top: 5px;
 }
 
@@ -715,7 +721,7 @@ a, a:hover, a:visited{
 }
 
 .row.row-dash-top-adj {
-    margin-bottom: -80px;
+/*    margin-bottom: -80px;*/
 }
 
 .disclaimer {

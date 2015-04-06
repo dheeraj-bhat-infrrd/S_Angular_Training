@@ -15,4 +15,6 @@ public class UserLogoutHandler implements LogoutHandler {
 		LOG.info("Inside logout method of MyLogoutHandler");
 		request.getSession().invalidate();
 	}
+
+	
 }

@@ -40,7 +40,8 @@
     <field name="regionName" type="text" indexed="true" stored="true" />
     <field name="isDefaultBySystem" type="long" indexed="true" stored="true" />
     <field name="status" type="integer" indexed="true" stored="true" />
-    <field name="address" type="text" indexed="false" stored="true"/>
+    <field name="address1" type="text" indexed="false" stored="true"/>
+    <field name="address2" type="text" indexed="false" stored="true"/>
     <field name="_version_" type="long" indexed="true" stored="true" multiValued="false"/>
   </fields>
 

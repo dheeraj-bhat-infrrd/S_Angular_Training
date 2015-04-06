@@ -16,7 +16,10 @@ var isSmileTypeQuestion;
 var swearWords = [];
 var isAbusive;
 var autoPost;
-var autoPostScore = 3;
+var autoPostScore;
+var happyText;
+var neutralText;
+var sadText;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -71,6 +74,11 @@ function paintSurveyPage(jsonData) {
 	$("#pst-srvy-div").hide();
 	questions = jsonData.responseJSON.survey;
 	stage = jsonData.responseJSON.stage;
+	happyText = jsonData.responseJSON.happyText;
+	neutralText = jsonData.responseJSON.neutralText;
+	sadText = jsonData.responseJSON.sadText;
+	autoPost = jsonData.responseJSON.autopostEnabled;
+	autoPostScore = jsonData.responseJSON.autopostScore;
 	if (stage != undefined)
 		qno = stage;
 	paintSurveyPageFromJson();
@@ -233,7 +241,7 @@ function showFeedbackPage(mood) {
 	isSmileTypeQuestion = false;
 	switch (mood) {
 	case "happy":
-		question = "Please share your kind words about us!";
+		question = happyText;
 		$("#ques-text-textarea").html(question);
 		var currResponse = 0;
 		var counter = 0;
@@ -247,15 +255,15 @@ function showFeedbackPage(mood) {
 				}
 			}
 		}
-		if(currResponse/(counter) >= autoPostScore)
+		if((currResponse/(counter) >= autoPostScore) && (Boolean(autoPost) == true))
 			$("#pst-srvy-div").show();
 		break;
 	case "neutral":
-		question = "Please share your views to help us improve our quality!";
+		question = neutralText;
 		$("#ques-text-textarea").html(question);
 		break;
 	case "sad":
-		question = "Please let us know what went wrong so that you don't get disappointed next time!";
+		question = sadText;
 		$("#ques-text-textarea").html(question);
 		break;
 	}
