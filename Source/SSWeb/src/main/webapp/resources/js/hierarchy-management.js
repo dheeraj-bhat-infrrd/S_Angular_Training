@@ -957,6 +957,7 @@ function paintHierarchyViewBranches(data,regionId) {
 }
 
 function bindBranchListClicks(){
+	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
@@ -969,6 +970,7 @@ function bindBranchListClicks(){
 			$(this).attr('clicked','false');
 		}		
 	});
+	$(".branch-row").unbind('click');
 	$(".branch-row").click(function(e){
 		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
@@ -982,7 +984,6 @@ function bindBranchListClicks(){
             $(this).attr('clicked','false');
 		}
 	});
-	
 }
 
 function fetchHierarchyViewList() {
@@ -990,6 +991,7 @@ function fetchHierarchyViewList() {
 	callAjaxGET(url, paintHierarchyViewList, true);
 }
 function paintHierarchyViewList(data) {
+	$("#hierarchy-list-header").siblings().remove();
 	$("#hierarchy-list-header").after(data);
 	bindRegionListClicks();
     $('.v-tbl-icn').click(function(e){
@@ -1072,6 +1074,9 @@ function showBranchEditCallBack(data,branchId) {
 	var assignToOption = $("#assign-to-txt").attr('data-assignto');
 	showSelectorsByAssignToOption(assignToOption);
 	bindAssignToSelectorClick();
+	$("#btn-office-update").click(function(e){
+		updateBranch("edit-office-form", branchId);
+	});
 }
 
 function hideBranchEdit(branchId) {
@@ -1100,9 +1105,14 @@ function bindUserEditClicks() {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
 			$(".user-assignment-edit-div").html("");
-			$(".user-assignment-edit-row").slideUp();
+			$(".user-edit-row").slideUp();
 			getUserAssignments(userId);
-			$(this).next('.user-edit-row').slideDown(200);
+			$(this).parent().parent().parent().next('.user-edit-row').slideDown(200);
+			$(this).attr('clicked','true');
+	    }else {
+			$(this).parent().parent().parent().next('.user-edit-row').slideUp(200);
+			$(".user-assignment-edit-div").html("");
+			$(".user-edit-row").slideUp();
 	    }
 	});
 }
@@ -1122,16 +1132,16 @@ function updateRegionCallBack(data,regionId) {
 	fetchHierarchyViewList();
 }
 
-function updateBranch(formId,branchId,regionId) {
+function updateBranch(formId,branchId) {
 	var url = "./updatebranch.do";
 	callAjaxFormSubmit(url, function(data){
-		updateBranchCallBack(data,branchId,regionId);
+		updateBranchCallBack(data,branchId);
 	}, formId);
 }
 
-function updateBranchCallBack(data,branchId,regionId) {
+function updateBranchCallBack(data,branchId) {
 	hideOverlay();
 	displayMessage(data);
 	hideBranchEdit(branchId);
-	fetchHierarchyViewBranches(regionId);
+	fetchHierarchyViewList();
 }

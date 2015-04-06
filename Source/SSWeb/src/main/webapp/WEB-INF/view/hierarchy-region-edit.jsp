@@ -4,19 +4,19 @@
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.regionname.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" name="regionName" id="region-name-txt" value="${region.contact_details.name}">
+	         <input class="bd-frm-rt-txt" name="regionName" id="region-name-txt" value="${region.regionName}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.addressline1.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" name="regionAddress1" id="region-address1-txt" value="${region.contact_details.address1}">
+	         <input class="bd-frm-rt-txt" name="regionAddress1" id="region-address1-txt" value="${region.address1}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
 	     <div class="float-left bd-frm-left"><spring:message code="label.addressline2.key"/></div>
 	     <div class="float-left bd-frm-right">
-	         <input class="bd-frm-rt-txt" id="region-address2-txt" name="regionAddress2" value="${region.contact_details.address2}">
+	         <input class="bd-frm-rt-txt" id="region-address2-txt" name="regionAddress2" value="${region.address2}">
 	     </div>
 	 </div>
 	 <div class="bd-hr-form-item clearfix">
@@ -66,8 +66,8 @@
 	     <div class="float-left bd-frm-right">
 	     <c:choose>
 		     <c:when test="${isUpdateCall}">
-		     	 <input type="hidden" name="regionId" value="${region.iden}" class="ignore-clear"/>
-		     	 <div id="btn-region-update" data-regionid = "${region.iden}" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
+		     	 <input type="hidden" name="regionId" value="${region.regionId}" class="ignore-clear"/>
+		     	 <div id="btn-region-update" data-regionid = "${region.regionId}" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>
 		     </c:when>
 		     <c:otherwise>
 		      	 <div id="btn-region-save" class="bd-btn-save cursor-pointer"><spring:message code="label.save.key"/></div>

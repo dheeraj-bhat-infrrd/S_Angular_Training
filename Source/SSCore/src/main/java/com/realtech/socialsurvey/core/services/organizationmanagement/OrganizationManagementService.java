@@ -304,7 +304,27 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UserAssignmentException
 	 */
-	public void updateRegion(User user, long regionId, String regionName, String address1, String address2, long selectedUserId,
+	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+	/**
+	 * Method to update a branch and assign a user if specified
+	 * 
+	 * @param user
+	 * @param branchId
+	 * @param regionId
+	 * @param branchName
+	 * @param address1
+	 * @param address2
+	 * @param selectedUserId
+	 * @param emailIdsArray
+	 * @param isAdmin
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException
+	 */
+	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, long selectedUserId,
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
@@ -571,7 +591,7 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException;
-	
+
 	/**
 	 * Method to get the list of all the company ids
 	 */
