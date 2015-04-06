@@ -13,7 +13,27 @@
 		<c:forEach var="surveyQuestion" items="${surveyDetail.questions}">
 			<div class="bd-srv-tbl-row clearfix bd-srv-tbl-row-${surveyQuestion.questionId}" data-questionid="${surveyQuestion.questionId}">
 				<div class="float-left srv-tbl-num"><span>${surveyQuestion.questionOrder}</span></div>
-				<div class="float-left srv-tbl-txt">${surveyQuestion.question}</div>
+				
+				<!-- setting icon for question type-->
+				<c:choose>
+					<c:when test="${surveyQuestion.questionType == 'sb-range-smiles'}">
+						<c:set value="smiley-icn-sm" var="questionicon" scope="page" />
+					</c:when>
+					<c:when test="${surveyQuestion.questionType == 'sb-range-star'}">
+						<c:set value="rating-icn-sm" var="questionicon" scope="page" />
+					</c:when>
+					<c:when test="${surveyQuestion.questionType == 'sb-range-scale'}">
+						<c:set value="scale-icn-sm" var="questionicon" scope="page" />
+					</c:when>
+					<c:when test="${surveyQuestion.questionType == 'sb-sel-mcq'}">
+						<c:set value="mcq-icn-sm" var="questionicon" scope="page" />
+					</c:when>
+					<c:when test="${surveyQuestion.questionType == 'sb-sel-desc'}">
+						<c:set value="desc-icn-sm" var="questionicon" scope="page" />
+					</c:when>
+				</c:choose>
+				
+				<div class="float-left srv-tbl-txt ${questionicon}">${surveyQuestion.question}</div>
 				<div class="srv-tbl-btns clearfix float-right">
 					<c:choose>
 						<c:when test="${count == 1}">

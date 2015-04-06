@@ -1,14 +1,14 @@
 // Default maximum value for number of social posts, surveys sent in 30 days.
 var maxSocialPosts = 10;
 var maxSurveySent = 10;
-var startIndex = 0;
-var batchSize = 1;
-var totalReviews = 0;
-var reviewsFetchedSoFar = 0;
-var startIndexInc = 0;
-var batchSizeInc = 10;
-var totalReviewsInc = 0;
-var surveyFetchedSoFarInc = 0;
+var startIndex;
+var batchSize;
+var totalReviews;
+var reviewsFetchedSoFar;
+var startIndexInc;
+var batchSizeInc;
+var totalReviewsInc;
+var surveyFetchedSoFarInc;
 // colName and colValue contains profile level of logged in user and value for
 // colName is present in colValue.
 var colName;
@@ -53,19 +53,19 @@ $(document)
 					}
 				});
 
-$("#prnt-dsh-inc-srvey").scroll(
-		function() {
-			if ($(this)[0].scrollHeight - $(this).scrollTop() === $(this)
-					.outerHeight()) {
-				alert(1);
-			}
-		});
-
-
 function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 		regionIds, branchNames, branchIds, agent, accountType) {
-	
+
+	startIndex = 0;
+	batchSize = 1;
+	totalReviews = 0;
+	reviewsFetchedSoFar = 0;
+	startIndexInc = 0;
+	batchSizeInc = 6;
+	totalReviewsInc = 0;
+	surveyFetchedSoFarInc = 0;
 	showDisplayPic();
+	
 	var oldConW = $('.container').width();
 	var newConW = $('.container').width();
 	$(window).resize(function() {
@@ -535,6 +535,13 @@ function paintSurveyGraph(graphData) {
 		type = 'Month';
 	}
 	
+	if(format!='yearly'){
+		allTimeslots.reverse();
+		clickedSurveys.reverse();
+		sentSurveys.reverse();
+		completedSurveys.reverse();
+		socialPosts.reverse();
+	}
     var internalData = [];
     var nestedInternalData = [];
     nestedInternalData.push(type,'No. of surveys sent', 'No. of surveys clicked','No. of surveys completed', 'No. of social posts');
@@ -712,6 +719,7 @@ function showReviews(columnName, columnValue) {
 		url : "./fetchdashboardreviews.do",
 		type : "GET",
 		dataType : "JSON",
+		async : false,
 		data : payload,
 		success : function(data) {
 			if (data.errCode == undefined)
@@ -818,6 +826,7 @@ function showIncompleteSurvey(columnName, columnValue) {
 	$.ajax({
 		url : "./fetchdashboardincompletesurvey.do",
 		type : "GET",
+		async : false,
 		dataType : "JSON",
 		data : payload,
 		success : function(data) {
@@ -845,21 +854,39 @@ function paintIncompleteSurvey(result) {
 				+ '<div class="float-left dash-lp-txt">' + survey.customerFirstName+" "+survey.customerLastName
 				+ ' <span>' + survey.modifiedOn + '</span></div>'
 				+ '<div data-custname=' + survey.customerFirstName+' '+survey.customerLastName
+				+ ' data-agentid=' + survey.agentId
 				+ ' data-agentname=' + survey.agentName + ' data-custemail='
-				+ survey.customerEmail + ' data-agentId=' + survey.agentId
-				+ ' class="float-right dash-lp-rt-img"></div></div>';
+				+ survey.customerEmail
+				+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
 	});
-	$("#dsh-inc-srvey").html(divToPopulate);
+	if(startIndexInc==0)
+		$("#dsh-inc-srvey").html(divToPopulate);
+	else
+		$("#dsh-inc-srvey").append(divToPopulate);
 	$('#dsh-inc-srvey').perfectScrollbar();
+	
+	var scrollContainer = document.getElementById('dsh-inc-srvey');
+	scrollContainer.onscroll = function(){
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+			showIncompleteSurvey(colName, colValue);
+		}
+	};
+	
 
 	$('.dash-lp-rt-img').click(function() {
-		var agentId = $(this).data("agentId");
+		var agentId = $(this).data("agentid");
 		var agentName = $(this).data("agentname");
 		var customerEmail = $(this).data("custemail");
 		var customerName = $(this).data("custname");
 		sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
 	});
 }
+
+$(document).on('scroll','#dsh-inc-srvey',function(){
+	console.log($('.ps-scrollbar-y').css('top'));
+});
+
+
 
 function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName) {
 	var success = false;
@@ -880,8 +907,7 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 		},
 		complete : function(data) {
 			if (success) {
-				paintIncompleteSurvey(data.responseJSON);
-				startIndexInc += batchSizeInc;
+				$('#overlay-toast').html("Reminder Mail sent successfully to "+customerName);
 			}
 		},
 		error : function(e) {

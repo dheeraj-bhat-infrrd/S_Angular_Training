@@ -14,73 +14,64 @@ import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-
 /**
  * The persistent class for the branch database table.
- * 
  */
 @Entity
-@Table(name="BRANCH")
-@NamedQuery(name="Branch.findAll", query="SELECT b FROM Branch b")
+@Table(name = "BRANCH")
+@NamedQuery(name = "Branch.findAll", query = "SELECT b FROM Branch b")
 public class Branch implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="BRANCH_ID")
+	@Column(name = "BRANCH_ID")
 	private long branchId;
 
+	@Column(name = "BRANCH")
 	private String branch;
-	
+
+	@Column(name = "CREATED_BY")
+	private String createdBy;
+
+	@Column(name = "CREATED_ON")
+	private Timestamp createdOn;
+
+	@Column(name = "IS_DEFAULT_BY_SYSTEM")
+	private int isDefaultBySystem;
+
+	@Column(name = "PROFILE_NAME")
+	private String profileName;
+
+	@Column(name = "MODIFIED_BY")
+	private String modifiedBy;
+
+	@Column(name = "MODIFIED_ON")
+	private Timestamp modifiedOn;
+
+	@Column(name = "STATUS")
+	private int status;
+
 	@Transient
 	private String branchName;
 
-	public String getBranchName() {
-		return branchName;
-	}
-
-	public void setBranchName(String branchName) {
-		this.branchName = branchName;
-	}
-
-	@Column(name="CREATED_BY")
-	private String createdBy;
-
-	@Column(name="CREATED_ON")
-	private Timestamp createdOn;
-
-	@Column(name="IS_DEFAULT_BY_SYSTEM")
-	private int isDefaultBySystem;
-	
-	@Column(name="PROFILE_NAME")
-	private String profileName;
-
-	@Column(name="MODIFIED_BY")
-	private String modifiedBy;
-
-	@Column(name="MODIFIED_ON")
-	private Timestamp modifiedOn;
-
-	private int status;
-	
 	@Transient
 	private String address1;
-	
+
 	@Transient
 	private String address2;
 
-	//bi-directional many-to-one association to Company
+	// bi-directional many-to-one association to Company
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="COMPANY_ID")
+	@JoinColumn(name = "COMPANY_ID")
 	private Company company;
 
-	//bi-directional many-to-one association to Region
+	// bi-directional many-to-one association to Region
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="REGION_ID")
+	@JoinColumn(name = "REGION_ID")
 	private Region region;
 
-	public Branch() {
-	}
+	public Branch() {}
 
 	public long getBranchId() {
 		return this.branchId;
@@ -177,8 +168,6 @@ public class Branch implements Serializable {
 	public void setAddress2(String address2) {
 		this.address2 = address2;
 	}
-	
-	
 
 	public String getProfileName() {
 		return profileName;
@@ -188,13 +177,18 @@ public class Branch implements Serializable {
 		this.profileName = profileName;
 	}
 
+	public String getBranchName() {
+		return branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
+	}
+
 	@Override
 	public String toString() {
 		return "Branch [branchId=" + branchId + ", branch=" + branch + ", createdBy=" + createdBy + ", createdOn=" + createdOn
 				+ ", isDefaultBySystem=" + isDefaultBySystem + ", modifiedBy=" + modifiedBy + ", modifiedOn=" + modifiedOn + ", status=" + status
 				+ ", address1=" + address1 + ", address2=" + address2 + "]";
 	}
-	
-	
-
 }

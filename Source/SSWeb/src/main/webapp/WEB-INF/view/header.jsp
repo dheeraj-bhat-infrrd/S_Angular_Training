@@ -88,9 +88,6 @@
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.profilesetting.key" /></a>
 				</div>
-				<div class="header-links-item">
-					<spring:message code="label.accountsetting.key" />
-				</div>
 				<div class="header-links-item" >
 					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
 				</div>
@@ -103,7 +100,7 @@
 
 	<div class="hdr-wrapper">
 		<div class="container hdr-container clearfix">
-			<div class="float-left hdr-logo"></div>
+			<div class="float-left hdr-logo cursor-pointer"></div>
 			<div class="float-left hdr-links clearfix">
 				<div class="hdr-link-item hdr-link-active">
 					<a id="dashboard-link" href="javascript:showMainContent('./dashboard.do')"><spring:message code="label.header.dashboard.key" /></a>
@@ -137,9 +134,6 @@
 						</c:if>
 						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do')">
 							<spring:message code="label.profilesetting.key" />
-						</div>
-						<div class="initial-dd-item" id="account-setting">
-							<spring:message code="label.accountsetting.key" />
 						</div>
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do')">
 							<spring:message code="label.changepassword.key"/>

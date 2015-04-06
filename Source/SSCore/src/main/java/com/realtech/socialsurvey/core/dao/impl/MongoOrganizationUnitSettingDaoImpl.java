@@ -18,6 +18,7 @@ import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 
 /**
  * Mongo implementation of settings
@@ -34,6 +35,8 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_SURVEY_SETTINGS = "survey_settings";
 	public static final String KEY_LOCATION_ENABLED = "isLocationEnabled";
 	public static final String KEY_ACCOUNT_DISABLED = "isAccountDisabled";
+	public static final String KEY_DEFAULT_BY_SYSTEM = "isDefaultBySystem";
+	public static final String KEY_SEO_CONTENT_MODIFIED = "isSeoContentModified";
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
 	public static final String KEY_LOCK_SETTINGS = "lockSettings";
 
@@ -205,5 +208,33 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 			mongoTemplate.createCollection(AGENT_SETTINGS_COLLECTION);
 			createIndexOnIden(AGENT_SETTINGS_COLLECTION);
 		}
+	}
+
+	@Override
+	public List<ProfileUrlEntity> fetchSEOOptimizedOrganizationUnitSettings(String collectionName, int skipCount, int numOfRecords) {
+		LOG.info("Getting SEO related data for "+collectionName);
+		List<ProfileUrlEntity> profileUrls = null;
+		// only get profile name
+		// Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
+		Query query = new Query();
+		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
+		query.fields().include(KEY_PROFILE_URL).exclude("_id");
+		if(skipCount > 0){
+			query.skip(skipCount);
+		}
+		if(numOfRecords > 0){
+			query.limit(numOfRecords);
+		}
+		profileUrls = mongoTemplate.find(query, ProfileUrlEntity.class, collectionName);
+		return profileUrls;
+	}
+
+	@Override
+	public long fetchSEOOptimizedOrganizationUnitCount(String collectionName) {
+		LOG.info("Getting SEO Optimized count for collection "+collectionName);
+		Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
+		long count = mongoTemplate.count(query, collectionName);
+		LOG.info("Returning count "+count);
+		return count;
 	}
 }

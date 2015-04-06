@@ -153,19 +153,13 @@ function paintEditSection(data) {
 		});
 		return false;
 	}
-	
-	var assignToOption = $("#assign-to-txt").attr('data-assignto');
-	showSelectorsByAssignToOption(assignToOption);
-	
 	/**
 	 * bind the click events
 	 */
-	$("#selected-user-txt").click(function() {
-		getUsersList("",usersStartIndex,numOfRows);
-	});
-	$("#selected-user-txt").keydown(function(e) {
-		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
-	});
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	
+	bindUserSelector();
 	
 	$("#btn-region-save").click(function(e){
 		if(validateRegionForm()){
@@ -179,41 +173,9 @@ function paintEditSection(data) {
 		}
 	});
 
-	$("#selected-user-txt").keyup(function(e) {
-		if(e.which != 38 && e.which != 40 && e.which != 13) {
-			var text = $(this).val();
-			usersStartIndex = 0;	
-			if (text.length > 0) {
-				delay(function() {
-					getUsersList(text,usersStartIndex,numOfRows);
-				}, 500);
-			}
-			else {
-				delay(function() {
-					getUsersList("",usersStartIndex,numOfRows);
-				}, 500);
-			}
-		}
-	});
-	
 	bindAdminCheckBoxClick();
 	
-	$('.bd-cust-rad-img').click(function(e) {
-        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
-        $(this).toggleClass('bd-cust-rad-img-checked');
-        if($(this).data('type') == "single"){
-            $('#bd-single').show();
-            $('#bd-multiple').hide();
-            showAdminPrivilegesChk();
-        }else if($(this).data('type') == "multiple"){
-            $('#bd-single').hide();
-            $('#bd-multiple').show();
-            $('#selected-userid-hidden').val("");
-            hideAdminPrivilegesChk();
-        }
-        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
-    });
-	
+	bindSingleMultipleSelection();
 	bindAssignToSelectorClick();
 	
 	bindRegionSelectorEvents();
@@ -235,6 +197,49 @@ function paintEditSection(data) {
 	$("#btn-individual-save").click(function(e){
 		if(validateIndividualForm()){
 			addIndividual("edit-individual-form");
+		}
+	});
+}
+
+function bindSingleMultipleSelection() {
+	$('.bd-cust-rad-img').click(function(e) {
+        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+        $(this).toggleClass('bd-cust-rad-img-checked');
+        if($(this).data('type') == "single"){
+            $('#bd-single').show();
+            $('#bd-multiple').hide();
+            showAdminPrivilegesChk();
+        }else if($(this).data('type') == "multiple"){
+            $('#bd-single').hide();
+            $('#bd-multiple').show();
+            $('#selected-userid-hidden').val("");
+            hideAdminPrivilegesChk();
+        }
+        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
+    });
+}
+
+function bindUserSelector() {
+	$("#selected-user-txt").click(function() {
+		getUsersList("",usersStartIndex,numOfRows);
+	});
+	$("#selected-user-txt").keydown(function(e) {
+		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
+	});
+	$("#selected-user-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $(this).val();
+			usersStartIndex = 0;	
+			if (text.length > 0) {
+				delay(function() {
+					getUsersList(text,usersStartIndex,numOfRows);
+				}, 500);
+			}
+			else {
+				delay(function() {
+					getUsersList("",usersStartIndex,numOfRows);
+				}, 500);
+			}
 		}
 	});
 }
@@ -947,11 +952,12 @@ function paintHierarchyViewBranches(data,regionId) {
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").after(data);
 	$("#tr-region-"+regionId).slideDown(200);
 	$(".tr-region-edit").slideUp(200);
-	
+	bindUserEditClicks();
 	bindBranchListClicks();
 }
 
 function bindBranchListClicks(){
+	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
@@ -964,6 +970,20 @@ function bindBranchListClicks(){
 			$(this).attr('clicked','false');
 		}		
 	});
+	$(".branch-row").unbind('click');
+	$(".branch-row").click(function(e){
+		e.stopPropagation();
+		var branchId = $(this).attr("data-branchid");
+		var regionId = $(this).attr("data-regionid");
+		if($(this).attr('clicked') == "false"){
+			fetchUsersForBranch(branchId,regionId);
+			 $(this).attr('clicked','true');
+		}
+		else {
+			$('.user-row-'+branchId).html("").hide(); 
+            $(this).attr('clicked','false');
+		}
+	});
 }
 
 function fetchHierarchyViewList() {
@@ -971,12 +991,14 @@ function fetchHierarchyViewList() {
 	callAjaxGET(url, paintHierarchyViewList, true);
 }
 function paintHierarchyViewList(data) {
+	$("#hierarchy-list-header").siblings().remove();
 	$("#hierarchy-list-header").after(data);
 	bindRegionListClicks();
     $('.v-tbl-icn').click(function(e){
         e.stopPropagation();
     });
     bindBranchListClicks();
+    bindUserEditClicks();
 }
 
 function bindRegionListClicks() {
@@ -987,7 +1009,7 @@ function bindRegionListClicks() {
 			 $(this).attr('clicked','true');
 		}
 		else {
-			$('.branch-row-'+regionId).html("").hide(); 
+			$("tr[class*='sel-r"+regionId+"'").html("").hide();
             $(this).attr('clicked','false');
 		}
 	});
@@ -1006,24 +1028,38 @@ function bindRegionListClicks() {
 }
 
 function showRegionEdit(regionId) {
-	var url = "./getregioneditpage.do";
+	var url = "./getregioneditpage.do?regionId="+regionId;
 	callAjaxGET(url, function(data){
 		showRegionEditCallBack(data, regionId);
 	}, true);
 }
 function showRegionEditCallBack(data,regionId) {
+	$(".td-region-edit").html("").hide();
+	$(".tr-region-edit").hide();
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
 	$("#td-region-edit-"+regionId).html(data).slideDown(200);
+	bindSingleMultipleSelection();
+	bindUserSelector();
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	bindAssignToSelectorClick();
+	$("#btn-region-update").click(function(e) {
+		var regionId = $(this).attr("data-regionid");
+		if(validateRegionForm()){
+			updateRegion("edit-region-form",regionId);
+		}
+	});
 	
 }
 
-function hideRegionEdit(branchId) {
-	$("#td-region-edit-"+branchId).hide();
-	$("#td-region-edit-"+branchId).parent(".tr-region-edit").hide();
+function hideRegionEdit(regionId) {
+	$(".td-region-edit").html("").hide();
+	$("#td-region-edit-"+regionId).hide();
+	$(".tr-region-edit").hide();
 }
 
 function showBranchEdit(branchId) {
-	var url = "./getofficeeditpage.do";
+	var url = "./getofficeeditpage.do?branchId="+branchId;
 	callAjaxGET(url, function(data){
 		showBranchEditCallBack(data, branchId);
 	}, true);
@@ -1032,10 +1068,80 @@ function showBranchEdit(branchId) {
 function showBranchEditCallBack(data,branchId) {
 	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").slideDown(200);
 	$("#td-branch-edit-"+branchId).html(data).slideDown(200);
-	
+	bindSingleMultipleSelection();
+	bindUserSelector();
+	bindRegionSelectorEvents();
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	bindAssignToSelectorClick();
+	$("#btn-office-update").click(function(e){
+		updateBranch("edit-office-form", branchId);
+	});
 }
 
 function hideBranchEdit(branchId) {
 	$("#td-branch-edit-"+branchId).slideUp(200);
 	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").hide();
+}
+
+function fetchUsersForBranch(branchId,regionId) {
+	var url="./fetchbranchusers.do?branchId="+branchId+"&regionId="+regionId;
+	callAjaxGET(url, function(data) {
+		paintUsersFromBranch(data,branchId);
+	}, true);
+}
+
+function paintUsersFromBranch(data,branchId,regionId) {
+	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").after(data);
+	$("#tr-branch-"+branchId).slideDown(200);
+	$(".tr-branch-edit").slideUp(200);
+	bindUserEditClicks();
+}
+
+function bindUserEditClicks() {
+	$('.user-edit-icn').click(function(e){
+		e.stopPropagation();
+		if($(this).attr('clicked') == "false") {
+			// make an ajax call and fetch the details of the user
+			var userId = $(this).attr('data-userid');
+			$(".user-assignment-edit-div").html("");
+			$(".user-edit-row").slideUp();
+			getUserAssignments(userId);
+			$(this).parent().parent().parent().next('.user-edit-row').slideDown(200);
+			$(this).attr('clicked','true');
+	    }else {
+			$(this).parent().parent().parent().next('.user-edit-row').slideUp(200);
+			$(".user-assignment-edit-div").html("");
+			$(".user-edit-row").slideUp();
+	    }
+	});
+}
+
+function updateRegion(formId,regionId) {
+	var url = "./updateregion.do";
+	showOverlay();
+	callAjaxFormSubmit(url, function(data){
+		updateRegionCallBack(data, regionId);
+	}, formId);
+}
+
+function updateRegionCallBack(data,regionId) {
+	hideOverlay();
+	displayMessage(data);
+	hideRegionEdit(regionId);
+	fetchHierarchyViewList();
+}
+
+function updateBranch(formId,branchId) {
+	var url = "./updatebranch.do";
+	callAjaxFormSubmit(url, function(data){
+		updateBranchCallBack(data,branchId);
+	}, formId);
+}
+
+function updateBranchCallBack(data,branchId) {
+	hideOverlay();
+	displayMessage(data);
+	hideBranchEdit(branchId);
+	fetchHierarchyViewList();
 }

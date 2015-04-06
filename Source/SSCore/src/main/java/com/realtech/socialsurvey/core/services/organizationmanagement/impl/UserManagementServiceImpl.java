@@ -1666,6 +1666,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setProfileName(profileName);
 		user.setProfileUrl(profileUrl);
 
+		// set the seo flag to true
+		agentSettings.setSeoContentModified(true);
+		
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
 	}

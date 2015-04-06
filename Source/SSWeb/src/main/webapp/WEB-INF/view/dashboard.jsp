@@ -4,7 +4,7 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left hr-dsh-adj-lft">Dashboard</div>
-            <div class="float-right header-right clearfix hr-dsh-adj-rt">
+           <!--  <div class="float-right header-right clearfix hr-dsh-adj-rt">
                 <div class="float-left hr-txt1">View As</div>
                 <div id="hr-txt2" class="float-left hr-txt2">Agent</div>
                 <div id="hr-dd-wrapper" class="hr-dd-wrapper hide">
@@ -12,7 +12,7 @@
                     <div class="hr-dd-item">Region Admin</div>
                     <div class="hr-dd-item">Company Admin</div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -213,13 +213,13 @@
         	                <div class="float-right dash-lp-rt-img"></div>
             	        </div> -->
                     </div>
-                    <div id="dsh-inc-dwnld" class="dash-btn-sur-data">Incomplete Survery Data</div>
+                    <div id="dsh-inc-dwnld" class="dash-btn-sur-data">Incomplete Survey Data</div>
                 </div>
                 <div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
                     <div class="people-say-wrapper rt-content-main rt-content-main-adj">
                         <div class="main-con-header clearfix pad-bot-10-resp">
                             <div id="review-desc" class="float-left dash-ppl-say-lbl"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
-                            <div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd">Download Survery Data</div>
+                            <div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd">Download Survey Data</div>
                         </div>
                         <div id="review-details" class="ppl-review-item-wrapper">
 	                        <div class="ppl-review-item">

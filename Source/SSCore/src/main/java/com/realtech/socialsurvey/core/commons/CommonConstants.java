@@ -148,6 +148,10 @@ public interface CommonConstants {
 	public static final String SURVEY_CLICKED_COLUMN = "surveyClicked";
 	public static final String IS_ABUSIVE_COLUMN = "isAbusive";
 	public static final String DEFAULT_MONGO_ID_COLUMN = "_id";
+	public static final String LAST_REMINDER_FOR_INCOMPLETE_SURVEY = "lastReminderForIncompleteSurvey";
+	public static final String REMINDERS_FOR_INCOMPLETE_SURVEYS = "remindersForIncompleteSurveys";
+	public static final String LAST_REMINDER_FOR_SOCIAL_POST = "lastReminderForSocialPost";
+	public static final String REMINDERS_FOR_SOCIAL_POSTS = "remindersForSocialPosts";
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -184,15 +188,18 @@ public interface CommonConstants {
 	public static final String SUCCESS_ATTRIBUTE = "success";
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
+	public static final String USER_PROFILE_LIST = "profileList";
+	public static final String USER_PROFILE_SETTINGS = "profileSettings";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
 	public static final String EMAIL_TYPE = "emailtype";
 	public static final String EMAIL_TYPE_WORK = "work";
 	public static final String EMAIL_TYPE_PERSONAL = "personal";
-	
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
 	public static final String SOCIAL_FLOW = "socialFlow";
+	public static final String BRANCHES_IN_SESSION = "branches";
+	public static final String REGIONS_IN_SESSION = "regions";
 
 	/**
 	 * Batch Constants
@@ -275,7 +282,8 @@ public interface CommonConstants {
 	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
 	public static final String STATUS_SOLR = "status";
 	public static final String REGION_NAME_SOLR = "regionName";
-	public static final String REGION_ADDRESS_SOLR = "address";
+	public static final String ADDRESS1_SOLR = "address1";
+	public static final String ADDRESS2_SOLR = "address2";
 	public static final String BRANCH_ID_SOLR = "branchId";
 	public static final String BRANCH_NAME_SOLR = "branchName";
 	public static final String BRANCH_ADDRESS_SOLR = "address";

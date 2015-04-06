@@ -104,8 +104,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
-			throws InvalidInputException {
+	public LockSettings aggregateParentLockSettings(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
+			int profilesMaster) throws InvalidInputException {
 		LOG.info("Method aggregateParentLockSettings() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -119,7 +119,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		LockSettings parentLockSettings = null;
 		// If user is Company Admin, Lock settings would be default
-		if (user.isCompanyAdmin()) {
+		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			LOG.debug("Setting default LockSettings for Company Admin");
 			parentLockSettings = new LockSettings();
 		}
@@ -130,7 +130,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				case INDIVIDUAL:
 				case TEAM:
 					// Individual
-					if (user.isAgent()) {
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Setting company LockSettings for Agent of Individual/Team account type");
 						parentLockSettings = settings.getCompanySettings().getLockSettings();
 					}
@@ -138,13 +138,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				case COMPANY:
 					// Branch Admin
-					if (user.isBranchAdmin()) {
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Setting company LockSettings for Branch Admin of Company account type");
 						parentLockSettings = settings.getCompanySettings().getLockSettings();
 					}
 
 					// Individual
-					else if (user.isAgent()) {
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Company account type");
 						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
 					}
@@ -152,19 +152,19 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 				case ENTERPRISE:
 					// Region Admin
-					if (user.isRegionAdmin()) {
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 						LOG.debug("Setting company LockSettings for Region Admin of Enterprise account type");
 						parentLockSettings = settings.getCompanySettings().getLockSettings();
 					}
 
 					// Branch Admin
-					else if (user.isBranchAdmin()) {
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Region for Branch Admin of Enterprise account type");
 						parentLockSettings = lockSettingsTillRegion(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
 					}
 
 					// Individual
-					else if (user.isAgent()) {
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregating LockSettings till Branch for Agent of Enterprise account type");
 						parentLockSettings = lockSettingsTillBranch(settings.getCompanySettings(), settings.getRegionSettings().get(regionId),
 								settings.getBranchSettings().get(branchId));
@@ -257,8 +257,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	}
 
 	@Override
-	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId)
-			throws InvalidInputException {
+	public OrganizationUnitSettings aggregateUserProfile(User user, AccountType accountType, UserSettings settings, long branchId, long regionId,
+			int profilesMaster) throws InvalidInputException {
 		LOG.info("Method aggregateUserProfile() called from ProfileManagementService");
 		if (user == null) {
 			throw new InvalidInputException("User is not set.");
@@ -272,7 +272,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		OrganizationUnitSettings userProfile = null;
 		// If user is Company Admin, returning CompanyAdmin Profile
-		if (user.isCompanyAdmin()) {
+		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 			LOG.debug("Setting Company Profile for Company Admin");
 			userProfile = settings.getCompanySettings();
 		}
@@ -283,7 +283,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				case INDIVIDUAL:
 				case TEAM:
 					// Individual
-					if (user.isAgent()) {
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Individual/Team account type");
 						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, null, settings.getAgentSettings());
 					}
@@ -292,13 +292,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				case COMPANY:
 					LOG.info("Company account type");
 					// Branch Admin
-					if (user.isBranchAdmin()) {
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for BranchAdmin of Company account type");
 						userProfile = aggregateBranchProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId));
 					}
 
 					// Individual
-					else if (user.isAgent()) {
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Company account type");
 						userProfile = aggregateAgentProfile(settings.getCompanySettings(), null, settings.getBranchSettings().get(branchId),
 								settings.getAgentSettings());
@@ -308,20 +308,20 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				case ENTERPRISE:
 					LOG.info("Enterprise account type");
 					// Region Admin
-					if (user.isRegionAdmin()) {
+					if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for RegionAdmin of Enterprise account type");
 						userProfile = aggregateRegionProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId));
 					}
 
 					// Branch Admin
-					else if (user.isBranchAdmin()) {
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for BranchAdmin of Enterprise account type");
 						userProfile = aggregateBranchProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
 								.getBranchSettings().get(branchId));
 					}
 
 					// Individual
-					else if (user.isAgent()) {
+					else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						LOG.debug("Aggregate Profile for Agent of Enterprise account type");
 						userProfile = aggregateAgentProfile(settings.getCompanySettings(), settings.getRegionSettings().get(regionId), settings
 								.getBranchSettings().get(branchId), settings.getAgentSettings());
@@ -563,6 +563,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Updating contact detail information");
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
 				contactDetailsSettings, unitSettings, collection);
+		// Update the seo content flag to true
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, unitSettings, collection);
 		LOG.info("Contact details updated successfully");
 		return contactDetailsSettings;
 	}
@@ -576,6 +578,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Updating contact detail information");
 		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
 				contactDetailsSettings, agentSettings);
+		// Update the seo content flag to true
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, agentSettings);
 		LOG.info("Contact details updated successfully");
 		return contactDetailsSettings;
 	}
@@ -1048,7 +1052,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 		}
-		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, start, numOfRows);
+		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, true,start, numOfRows);
 
 		LOG.info("Method getProListByProfileLevel finished successfully");
 		return solrSearchResult;

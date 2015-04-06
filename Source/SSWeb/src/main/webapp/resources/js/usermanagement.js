@@ -342,6 +342,7 @@ function paintUserListInUserManagement(startIndex) {
 			$('#user-list').html(data);
 			userStartIndex = startIndex;
 			updatePaginateButtons();
+			bindEditUserClick();
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -742,6 +743,18 @@ function getUserAssignments(userId) {
 		bindRegionSelectorEvents();
 		bindAdminCheckBoxClick();
 		
+		// de-activate user profile
+        $('.tbl-switch-on').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 0);
+        });
+
+        // activate user profile
+        $('.tbl-switch-off').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 1);
+        });
+		
 		$("#btn-save-user-assignment").click(function(e){
 			if(validateIndividualForm()){
 				saveUserAssignment("user-assignment-form");
@@ -848,31 +861,46 @@ function updateUserProfile(profileId, profileStatus) {
 	});
 }
 
-$(document).on('click', '.v-icn-edit-user', function(){
-	if ($(this).hasClass('v-tbl-icn-disabled')) {
-		return;
-	}
+function bindEditUserClick(){
+	$('.edit-user').click(function(e){
+		e.stopPropagation();
+		if ($(this).hasClass('v-tbl-icn-disabled')) {
+			return;
+		}
+		// de-activate user profile
+        $('.tbl-switch-on').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 0);
+        });
 
-	if ($(this).parent().hasClass('u-tbl-row-sel')) {
-        $(this).parent().removeClass('u-tbl-row-sel');
-        $(this).parent().next('.u-tbl-row').slideUp(200);
-    } else {
-        // make an ajax call and fetch the details of the user
-        var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
-		$(".user-assignment-edit-div").html("");
-		$(".user-row").removeClass('u-tbl-row-sel');
-		$(".user-assignment-edit-row").slideUp();
+        // activate user profile
+        $('.tbl-switch-off').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 1);
+        });
 
-		getUserAssignments(userId);
+		if ($(this).parent().hasClass('u-tbl-row-sel')) {
+	        $(this).parent().removeClass('u-tbl-row-sel');
+	        $(this).parent().next('.user-assignment-edit-row').slideUp(200);
+	    } else {
+	        // make an ajax call and fetch the details of the user
+	        var userId = $(this).parent().find('.fetch-name').attr('data-user-id');
+			$(".user-assignment-edit-div").html("");
+			$(".user-row").removeClass('u-tbl-row-sel');
+			$(".user-assignment-edit-row").slideUp();
 
-        $(this).parent().next('.u-tbl-row').slideDown(200);
-        $(this).parent().addClass('u-tbl-row-sel');
-        
-		setTimeout(function() {
-			$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
-		}, 1000);
-    }
-});
+			getUserAssignments(userId);
+
+	        $(this).parent().next('.user-assignment-edit-row').slideDown(200);
+	        $(this).parent().addClass('u-tbl-row-sel');
+	        
+			setTimeout(function() {
+				$('#profile-tbl-wrapper-' + userId).perfectScrollbar();
+			}, 1000);
+	    }
+	});
+}
+
 
 $(document).on('click', '#page-previous', function(){
 	var newIndex = userStartIndex - userBatchSize;
