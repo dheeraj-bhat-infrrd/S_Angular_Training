@@ -2213,7 +2213,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 		contactSettings.setName(branch.getBranch());
 		contactSettings.setAddress1(branch.getAddress1());
-		contactSettings.setAddress2(branch.getAddress2());
+
+		if (branch.getAddress2() != null || !branch.getAddress2().equals("")) {
+			contactSettings.setAddress(branch.getAddress1() + ", " + branch.getAddress2());
+			contactSettings.setAddress2(branch.getAddress2());
+		}
+		else {
+			contactSettings.setAddress(branch.getAddress1());
+		}
 
 		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
 		return contactSettings;
@@ -2230,7 +2237,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 		contactSettings.setName(region.getRegion());
 		contactSettings.setAddress1(region.getAddress1());
-		contactSettings.setAddress2(region.getAddress2());
+
+		if (region.getAddress2() != null || !region.getAddress2().equals("")) {
+			contactSettings.setAddress(region.getAddress1() + ", " + region.getAddress2());
+			contactSettings.setAddress2(region.getAddress2());
+		}
+		else {
+			contactSettings.setAddress(region.getAddress1());
+		}
 
 		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
 		return contactSettings;
