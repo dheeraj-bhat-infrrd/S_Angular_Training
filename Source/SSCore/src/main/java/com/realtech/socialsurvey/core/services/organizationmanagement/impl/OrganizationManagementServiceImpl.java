@@ -2215,7 +2215,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactSettings.setAddress1(branch.getAddress1());
 
 		if (branch.getAddress2() != null || !branch.getAddress2().equals("")) {
-			contactSettings.setAddress(branch.getAddress1() + "," + branch.getAddress2());
+			contactSettings.setAddress(branch.getAddress1() + ", " + branch.getAddress2());
 			contactSettings.setAddress2(branch.getAddress2());
 		}
 		else {
@@ -2239,7 +2239,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactSettings.setAddress1(region.getAddress1());
 
 		if (region.getAddress2() != null || !region.getAddress2().equals("")) {
-			contactSettings.setAddress(region.getAddress1() + "," + region.getAddress2());
+			contactSettings.setAddress(region.getAddress1() + ", " + region.getAddress2());
 			contactSettings.setAddress2(region.getAddress2());
 		}
 		else {
