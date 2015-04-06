@@ -9,7 +9,7 @@
 		        <div class="v-line-brnch"></div>
 		    </td>
 		    <td class="v-tbl-name">${branch.branchName}</td>
-		    <td class="v-tbl-add"><c:if test="${not empty branch.address}">${branch.address}</c:if></td>
+		    <td class="v-tbl-add"><c:if test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if test="${not empty branch.address2}">${branch.address2}</c:if></td>
 		    <td class="v-tbl-role"></td>
 		    <td class="v-tbl-btns">
 		        <div class="clearfix v-tbl-icn-wraper">
@@ -19,8 +19,8 @@
 		    </td>
 		    <td class="v-tbl-spacer v-tbl-no-bd"></td>
 		</tr>
-		 <tr class="v-tbl-row v-tbl-row-sel tr-user-edit hide">
-	      		<td colspan="7" id="td-reg-edit-${branchUser.userId}" class="td-branch-edit">
+		 <tr class="v-tbl-row v-tbl-row-sel tr-branch-edit hide">
+	      		<td colspan="7" id="td-branch-edit-${branch.branchId}" class="td-branch-edit">
 	      			<!--edit form comes here for the user -->
 	      		</td>
 	       </tr>

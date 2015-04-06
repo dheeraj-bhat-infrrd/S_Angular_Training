@@ -342,6 +342,7 @@ function paintUserListInUserManagement(startIndex) {
 			$('#user-list').html(data);
 			userStartIndex = startIndex;
 			updatePaginateButtons();
+			bindEditUserClick();
 		},
 		error : function(e) {
 			console.error("error : " + e);
@@ -742,6 +743,18 @@ function getUserAssignments(userId) {
 		bindRegionSelectorEvents();
 		bindAdminCheckBoxClick();
 		
+		// de-activate user profile
+        $('.tbl-switch-on').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 0);
+        });
+
+        // activate user profile
+        $('.tbl-switch-off').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 1);
+        });
+		
 		$("#btn-save-user-assignment").click(function(e){
 			if(validateIndividualForm()){
 				saveUserAssignment("user-assignment-form");
@@ -847,7 +860,6 @@ function updateUserProfile(profileId, profileStatus) {
 		}
 	});
 }
-bindEditUserClick();
 
 function bindEditUserClick(){
 	$('.edit-user').click(function(e){
@@ -855,6 +867,17 @@ function bindEditUserClick(){
 		if ($(this).hasClass('v-tbl-icn-disabled')) {
 			return;
 		}
+		// de-activate user profile
+        $('.tbl-switch-on').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 0);
+        });
+
+        // activate user profile
+        $('.tbl-switch-off').click(function(){
+            var profileId = $(this).parent().data('profile-id');
+            updateUserProfile(profileId, 1);
+        });
 
 		if ($(this).parent().hasClass('u-tbl-row-sel')) {
 	        $(this).parent().removeClass('u-tbl-row-sel');

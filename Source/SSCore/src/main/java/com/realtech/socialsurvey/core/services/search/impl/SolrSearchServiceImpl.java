@@ -276,12 +276,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, branch.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, branch.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, branch.getStatus());
-
-		String address = branch.getAddress1();
-		if (address != null && branch.getAddress2() != null) {
-			address = address + " " + branch.getAddress2();
-		}
-		document.addField(CommonConstants.BRANCH_ADDRESS_SOLR, address);
+		document.addField(CommonConstants.ADDRESS1_SOLR, branch.getAddress1());
+		document.addField(CommonConstants.ADDRESS2_SOLR, branch.getAddress2());
 
 		LOG.debug("Method getSolrDocumentFromBranch finished for branch " + branch);
 		return document;
@@ -302,11 +298,8 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.COMPANY_ID_SOLR, region.getCompany().getCompanyId());
 		document.addField(CommonConstants.IS_DEFAULT_BY_SYSTEM_SOLR, region.getIsDefaultBySystem());
 		document.addField(CommonConstants.STATUS_SOLR, region.getStatus());
-		String address = region.getAddress1();
-		if (address != null && region.getAddress2() != null) {
-			address = address + " " + region.getAddress2();
-		}
-		document.addField(CommonConstants.REGION_ADDRESS_SOLR, address);
+		document.addField(CommonConstants.ADDRESS1_SOLR, region.getAddress1());
+		document.addField(CommonConstants.ADDRESS2_SOLR, region.getAddress2());
 
 		LOG.debug("Method getSolrDocumentFromRegion finished for region " + region);
 		return document;
@@ -634,7 +627,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.IS_AGENT_SOLR, user.isAgent());
 		document.addField(CommonConstants.IS_BRANCH_ADMIN_SOLR, user.isBranchAdmin());
 		document.addField(CommonConstants.IS_REGION_ADMIN_SOLR, user.isRegionAdmin());
-		
+
 		return document;
 	}
 
@@ -1012,7 +1005,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		LOG.info("Method searchUsersByBranches executed successfully");
 		return usersResult;
 	}
-	
+
 	@Override
 	public void addRegionsToSolr(List<Region> regions) throws SolrException {
 		LOG.info("Method to add regions to solr called");
@@ -1047,7 +1040,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	public void addBranchesToSolr(List<Branch> branches) throws SolrException {
 		LOG.info("Method to add branches to solr called");
 		SolrServer solrServer;
-		
+
 		try {
 			solrServer = new HttpSolrServer(solrBranchUrl);
 
@@ -1077,16 +1070,16 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	public void addUsersToSolr(List<User> users) throws SolrException {
 		LOG.info("Method to add users to solr called");
 		SolrServer solrServer;
-		
+
 		try {
 			solrServer = new HttpSolrServer(solrUserUrl);
-			
+
 			List<SolrInputDocument> documents = new ArrayList<SolrInputDocument>();
 			SolrInputDocument document;
 			for (User user : users) {
 				document = new SolrInputDocument();
 				document = getSolrInputDocumentFromUser(user, document);
-				
+
 				documents.add(document);
 			}
 
