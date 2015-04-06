@@ -69,12 +69,30 @@ function revertQuestionOverlay() {
 	currentQues = 1;
 }
 
-$(document).on('click', '.bd-q-btn-done', function(e) {
-	e.stopPropagation();
+$(document).on('click', '.bd-q-btn-done', function() {
+	var lastQuestion = currentQues - 1;
+	var count = 1;
+	var editedStatus = true;
+	while (count <= currentQues) {
+		if ($('#bs-question-' + count).attr('data-status') == 'edited') {
+			break;
+		}
+		else {
+			editedStatus = false;
+		}
+		count++;
+	}
+	if (editedStatus == false) {
+		revertQuestionOverlay();
+		setTimeout(function() {
+			loadActiveSurveyQuestions();
+		}, 2000);
+		return;
+	}
+	
 	createPopupConfirm("Unsaved changes detected", "Do you want to save your changes ?", "Save", "Cancel");
 
 	$('#overlay-continue').click(function(){
-		var lastQuestion = currentQues - 1;
 		var count = 1;
 		while (count <= lastQuestion) {
 			// submit for adding question
@@ -135,7 +153,7 @@ $(document).on('click', '.bd-q-btn-done', function(e) {
 		overlayRevert();
 		setTimeout(function() {
 			loadActiveSurveyQuestions();
-		}, 3000);
+		}, 2000);
 	});
 	$('#overlay-cancel').click(function(){
 		$('#overlay-continue').unbind('click');
