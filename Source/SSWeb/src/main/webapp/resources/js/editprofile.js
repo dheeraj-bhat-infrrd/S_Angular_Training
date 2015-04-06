@@ -464,37 +464,6 @@ $(document).on('change', '#prof-logo', function() {
 });
 
 
-// Function to populate associations container
-function showAssociationList() {
-	callAjaxGET("./fetchassociations.do", callBackShowAssociationList);
-}
-
-function callBackShowAssociationList(data) {
-	$('#association-container').html(data);
-	adjustImage();
-}
-
-// Function to populate achievement list container
-function showAchievementList() {
-	callAjaxGET("./fetchachievements.do", callBackShowAchievementList);
-}
-
-function callBackShowAchievementList(data) {
-	$('#achievement-container').html(data);
-	adjustImage();
-}
-
-// Function to populate licence list container
-function showLicenceList() {
-	callAjaxGET("./fetchlicences.do", callBackShowLicenceList);
-}
-
-function callBackShowLicenceList(data) {
-	$('#authorised-in-container').html(data);
-	adjustImage();
-}
-
-
 //Function to show social media links
 function showProfileSocialLinks() {
 	$('#social-token-text').hide();
@@ -511,15 +480,23 @@ $(document).on('focus', '.prof-edditable-sin-agent', function() {
 	$(this).addClass('prof-name-edit');
 });
 
+$(document).on('input', '.prof-edditable-sin-agent', function() {
+	$(this).attr('data-status', 'edited');
+});
+
 $(document).on('blur', '.prof-edditable-sin-agent', function() {
 	$(this).removeClass('prof-name-edit');
 });
 
-$(document).on('click', '.lp-ach-item-img', function() {
-	var type = $(this).attr('data-type');
-	$(this).prev().remove();
-	$(this).remove();
+// remove agent details
+$(document).on('click', '.lp-ach-item-img', function(e) {
+	e.stopPropagation();
+
+	$(this).prev().attr('data-status', 'removed');
+	$(this).prev().hide();
+	$(this).hide();
 	
+	var type = $(this).attr('data-type');
 	if (type == 'association') {
 		updateAssociations();
 	}
@@ -538,7 +515,8 @@ function addAnAssociation() {
 	}
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "New Associaion"
+		"placeholder" : "New Associaion",
+		"data-status" : "new"
 	});
 	$('#association-container').append(newAssociation);
 
@@ -551,7 +529,8 @@ function addAnAssociation() {
 	newAssociation.focus();
 }
 
-$(document).on('blur', '#association-container input', function() {
+$(document).on('blur', '#association-container input', function(e) {
+	e.stopPropagation();
 	delay(function() {
 		updateAssociations();
 	}, 0);
@@ -559,15 +538,24 @@ $(document).on('blur', '#association-container input', function() {
 
 function updateAssociations() {
 	var associationList = [];
+	var statusEdited = false;
+	
 	$('#association-container').children('input').each(function() {
-		if (this.value != "") {
-			var asssociation = {};
-			asssociation.name = this.value;
-			associationList.push(asssociation);
+		var status = $(this).data('status');
+		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+			var association = {};
+			association.name = this.value;
+			associationList.push(association);
+
+			statusEdited = true;
 		} else {
 			return;
 		}
 	});
+	if (!statusEdited) {
+		return;
+	}
+
 	associationList = JSON.stringify(associationList);
 	var payload = {
 		"associationList" : associationList
@@ -579,8 +567,6 @@ function callBackUpdateAssociations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-
-	showAssociationList();
 }
 
 // Function to update achievement list
@@ -590,7 +576,8 @@ function addAnAchievement() {
 	}
 	var newAchievement = $('<input>').attr({
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "New Achievement"
+		"placeholder" : "New Achievement",
+		"data-status" : "new"
 	});
 	$('#achievement-container').append(newAchievement);
 
@@ -603,7 +590,8 @@ function addAnAchievement() {
 	newAchievement.focus();
 }
 
-$(document).on('blur', '#achievement-container input', function() {
+$(document).on('blur', '#achievement-container input', function(e) {
+	e.stopPropagation();
 	delay(function() {
 		updateAchievements();
 	}, 0);
@@ -611,15 +599,24 @@ $(document).on('blur', '#achievement-container input', function() {
 
 function updateAchievements() {
 	var achievementList = [];
+	var statusEdited = false;
+
 	$('#achievement-container').children('input').each(function() {
-		if (this.value != "") {
+		var status = $(this).data('status');
+		if (this.value != "" && (status == 'edited' || status == 'saved')) {
 			var achievement = {};
 			achievement.achievement = this.value;
 			achievementList.push(achievement);
+
+			statusEdited = true;
 		} else {
 			return;
 		}
 	});
+	if (!statusEdited) {
+		return;
+	}
+
 	achievementList = JSON.stringify(achievementList);
 	var payload = {
 		"achievementList" : achievementList
@@ -632,8 +629,6 @@ function callBackUpdateAchievements(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-
-	showAchievementList();
 }
 
 // Function to update License authorizations
@@ -643,7 +638,8 @@ function addAuthorisedIn() {
 	}
 	var newAuthorisation = $('<input>').attr({
 		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "Authorized in"
+		"placeholder" : "Authorized in",
+		"data-status" : "new"
 	});
 	$('#authorised-in-container').append(newAuthorisation);
 
@@ -656,7 +652,8 @@ function addAuthorisedIn() {
 	newAuthorisation.focus();
 }
 
-$(document).on('blur', '#authorised-in-container input', function() {
+$(document).on('blur', '#authorised-in-container input', function(e) {
+	e.stopPropagation();
 	delay(function() {
 		updateLicenseAuthorizations();
 	}, 0);
@@ -664,28 +661,34 @@ $(document).on('blur', '#authorised-in-container input', function() {
 
 function updateLicenseAuthorizations() {
 	var licenceList = [];
+	var statusEdited = false;
+
 	$('#authorised-in-container').children('input').each(function() {
-		if (this.value != "") {
+		var status = $(this).data('status');
+		if (this.value != "" && (status == 'edited' || status == 'saved')) {
 			var licence = this.value;
 			licenceList.push(licence);
+			
+			statusEdited = true;
 		} else {
 			return;
 		}
 	});
+	if (!statusEdited) {
+		return;
+	}
+
 	licenceList = JSON.stringify(licenceList);
 	var payload = {
 		"licenceList" : licenceList
 	};
-	callAjaxPostWithPayloadData("./updatelicenses.do",
-			callBackUpdateLicenseAuthorizations, payload);
+	callAjaxPostWithPayloadData("./updatelicenses.do", callBackUpdateLicenseAuthorizations, payload);
 }
 
 function callBackUpdateLicenseAuthorizations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-
-	showLicenceList();
 }
 
 
@@ -1032,7 +1035,12 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
-		if (reviewCount <= 1) {
+		if (reviewCount == 0) {
+			reviewCount = 'No Reviews';
+			
+			// hiding reviews-container if 0 reviews
+			$("#reviews-container").hide();
+		} else if (reviewCount == 1) {
 			reviewCount = reviewCount + ' Review';
 		} else {
 			reviewCount = reviewCount + ' Reviews';
