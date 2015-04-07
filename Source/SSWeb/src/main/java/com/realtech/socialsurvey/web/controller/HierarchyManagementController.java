@@ -291,11 +291,14 @@ public class HierarchyManagementController {
 		try {
 			long regionId = 0l;
 			User user = sessionHelper.getCurrentUser();
+			HttpSession session = request.getSession(false);
 
 			try {
 				regionId = Long.parseLong(request.getParameter("regionId"));
 				LOG.debug("Calling service to deactivate region");
 				organizationManagementService.updateRegionStatus(user, regionId, CommonConstants.STATUS_INACTIVE);
+
+				removeRegionFromSession(regionId, session);
 				LOG.debug("Successfully executed service to deactivate region");
 			}
 			catch (NumberFormatException e) {
@@ -374,11 +377,14 @@ public class HierarchyManagementController {
 		try {
 			long branchId = 0l;
 			User user = sessionHelper.getCurrentUser();
+			HttpSession session = request.getSession(false);
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
 
 				LOG.debug("Calling service to deactivate branch");
 				organizationManagementService.updateBranchStatus(user, branchId, CommonConstants.STATUS_INACTIVE);
+
+				removeBranchFromSession(branchId, session);
 				LOG.debug("Successfully executed service to deactivate branch");
 			}
 			catch (NumberFormatException e) {
@@ -806,6 +812,38 @@ public class HierarchyManagementController {
 			throw new NoRecordsFetchedException("Unable to update branch in session", DisplayMessageConstants.GENERAL_ERROR);
 		}
 		LOG.info("Method updateBranchInSession completed successfully");
+	}
+
+	/**
+	 * Method to remove a branch from branches list in session
+	 * 
+	 * @param branchId
+	 * @param session
+	 */
+	private void removeBranchFromSession(long branchId, HttpSession session) {
+		LOG.info("Method removeBranchFromSession called for branchId:" + branchId);
+		@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
+				.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
+		if (branches != null && branches.containsKey(branchId)) {
+			branches.remove(branchId);
+		}
+		LOG.info("Method removeBranchFromSession executed successfully");
+	}
+
+	/**
+	 * Method to remove a region from regions list in session
+	 * 
+	 * @param regionId
+	 * @param session
+	 */
+	private void removeRegionFromSession(long regionId, HttpSession session) {
+		LOG.info("Method removeRegionFromSession called for regionId:" + regionId);
+		@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
+				.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+		if (regions != null && regions.containsKey(regionId)) {
+			regions.remove(regionId);
+		}
+		LOG.info("Method removeRegionFromSession executed successfully");
 	}
 
 	/**
