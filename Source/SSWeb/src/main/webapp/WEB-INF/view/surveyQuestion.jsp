@@ -297,16 +297,24 @@
 				</div>
 			</div>
 		</div>
-		<!--    temp caching of images -->
+		<!-- temp caching of images -->
 		<div class="hide">
 			<div class="float-left sq-mcq-chk hide st-mcq-chk-on hide"></div>
 			<div class="float-left sq-mcq-chk hide st-mcq-chk-off"></div>
 			<div class="sq-star sq-full-star hide"></div>
 		</div>
-		<!--    close-->
+		<!-- close -->
 	</div>
 
-<jsp:include page="scripts.jsp" />
+<script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
@@ -382,8 +390,7 @@ $(document).ready(function() {
 
 	console.log("Loading captcha");
 	try {
-		Recaptcha.create(
-				'6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
+		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
 				'recaptcha', {
 					theme : 'white',
 					callback : captchaLoaded
@@ -397,7 +404,6 @@ $(document).ready(function() {
 		var imgData = $(".recaptcha_image_cell").html();
 		console.log("Captcha image data : " + imgData);
 		$(".reg-captcha-img").html(imgData);
-
 	}
 
 	$(".reg-cap-reload").click(function() {
