@@ -117,7 +117,7 @@ public class UserManagementController {
 						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
 			}
 			long companyId = user.getCompany().getCompanyId();
-			
+
 			try {
 				long usersCount = solrSearchService.countUsersByCompany(companyId, 0, SOLR_BATCH_SIZE);
 				session.setAttribute("usersCount", usersCount);
@@ -311,13 +311,13 @@ public class UserManagementController {
 				LOG.error("NumberFormatException while searching for user id. Reason : " + e.getMessage(), e);
 				throw new NonFatalException("NumberFormatException while searching for user id", e);
 			}
-	
+
 			User admin = sessionHelper.getCurrentUser();
 			if (admin == null) {
 				LOG.error("No user found in session");
 				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
 			}
-			
+
 			// fetching admin details
 			UserFromSearch adminUser;
 			try {
@@ -333,39 +333,17 @@ public class UserManagementController {
 			// fetching users from solr
 			try {
 				String users = solrSearchService.searchUsersByCompany(admin.getCompany().getCompanyId(), startIndex, batchSize);
-				Type searchedUsersList = new TypeToken<List<UserFromSearch>>(){}.getType();
+				Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
 				List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
-				
-				// Company admin : able to edit any user
-				if (admin.getIsOwner() == 1) {
-					for (UserFromSearch user : usersList) {
-						user.setCanEdit(true);
-						if (user.getIsOwner() == 1) {
-							user.setCanEdit(false);
-						}
-					}
-				}
-				// Region admin : able to edit users only in his region 
-				else if (admin.getIsOwner() != 1 && admin.isRegionAdmin()) {
-					for (UserFromSearch user : usersList) {
-						boolean hasCommon = Collections.disjoint(adminUser.getRegions(), user.getRegions());
-						user.setCanEdit(!hasCommon);
-					}
-				}
-				// Branch admin : able to edit users only in his office
-				else if (admin.getIsOwner() != 1 && admin.isBranchAdmin()) {
-					for (UserFromSearch user : usersList) {
-						boolean hasCommon = Collections.disjoint(adminUser.getBranches(), user.getBranches());
-						user.setCanEdit(!hasCommon);
-					}
-				}
-				
+
+				usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
+
 				model.addAttribute("userslist", usersList);
 				LOG.debug("Users List: " + usersList.toString());
 			}
 			catch (MalformedURLException e) {
 				LOG.error("MalformedURLException while searching for user id. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("MalformedURLException while searching for user id.", e);
+				throw new NonFatalException("MalformedURLException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 		}
 		catch (NonFatalException nonFatalException) {
@@ -965,15 +943,18 @@ public class UserManagementController {
 			AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
 			ContactDetailsSettings contactDetails = agentSettings.getContact_details();
 			contactDetails.setName(user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
-			
-			profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, contactDetails);
+
+			profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+					contactDetails);
 			LOG.debug("Updated newly activated user {} to mongo", user.getFirstName());
 
 			LOG.debug("Modifying user detail in solr");
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf(user.getStatus()));
 			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, (user.getLastName() != null ? user.getLastName() : ""));
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, (user.getLastName() != null ? user.getLastName()
+					: ""));
+			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR,
+					user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
 			LOG.debug("Successfully modified user detail in solr");
 
 			LOG.debug("Adding newly registered user to principal session");
@@ -1059,7 +1040,7 @@ public class UserManagementController {
 		}
 		return JspResolver.CHANGE_PASSWORD;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/finduserassignments", method = RequestMethod.GET)
 	public String getUserAssignments(Model model, HttpServletRequest request) {

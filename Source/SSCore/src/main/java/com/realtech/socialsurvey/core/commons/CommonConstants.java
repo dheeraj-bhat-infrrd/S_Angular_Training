@@ -198,8 +198,8 @@ public interface CommonConstants {
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
 	public static final String SOCIAL_FLOW = "socialFlow";
-	public static final String BRANCHES_IN_SESSION = "branches";
-	public static final String REGIONS_IN_SESSION = "regions";
+	public static final String BRANCHES_IN_SESSION = "branchesInSession";
+	public static final String REGIONS_IN_SESSION = "regionsInSession";
 
 	/**
 	 * Batch Constants
