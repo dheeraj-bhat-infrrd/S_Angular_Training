@@ -129,7 +129,7 @@ public final class UploadUtils {
 				int height = reader.getHeight(0);
 
 				LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl completed successfully");
-				return ((width < maxWidth) && (height < maxHeight)) ? true : false;
+				return ((width <= maxWidth) && (height <= maxHeight)) ? true : false;
 			}
 			LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl completed successfully");
 			return false;

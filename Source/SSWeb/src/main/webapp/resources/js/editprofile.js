@@ -299,7 +299,7 @@ function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
 	createPopupConfirm(header, data);
 	
-	$(document).on('click', '#overlay-continue', function() {
+	$('#overlay-continue').click(function() {
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
 		var profAddress2 = $('#prof-address2').val();
@@ -361,6 +361,8 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
+	
+	$('#overlay-continue').unbind('click');
 
 	$('body').css('overflow','auto');
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
@@ -812,8 +814,6 @@ function callBackUpdateYelpLink(data) {
 
 	showProfileSocialLinks();
 }
-
-
 
 function isValidUrl(url){
 	var myVariable = url;
