@@ -1,5 +1,5 @@
 var imageMaxWidth = 470;
-var ratio = 1;
+var ratio;
 
 function createPopupCanvas() {
 	var canvas = '<img src="" id="target" class="hide" style="position:absoulte;"/>'
@@ -19,11 +19,14 @@ function initiateJcrop(input) {
 		var reader = new FileReader();
 		reader.onload = function(e) {
 			$('#target').attr('src', e.target.result);
-			ratio = $('#target').width() / imageMaxWidth;
+			if (typeof ratio === 'undefined') {
+				ratio = $('#target').width() / imageMaxWidth;
+			}
 			$('#target').removeClass('hide');
 			$('#target').width(imageMaxWidth);
 			
 			$('#target').Jcrop({
+				aspectRatio : 1,
 				setSelect: [ 100, 100, 50, 50 ],
 				onSelect: updatePreview,
 				onChange: updatePreview
