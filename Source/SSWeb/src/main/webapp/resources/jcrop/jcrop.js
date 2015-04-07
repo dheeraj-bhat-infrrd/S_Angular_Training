@@ -27,7 +27,7 @@ function initiateJcrop(input) {
 			
 			$('#target').Jcrop({
 				aspectRatio : 1,
-				setSelect: [ 100, 100, 50, 50 ],
+				setSelect: [ 200, 100, 100, 100 ],
 				onSelect: updatePreview,
 				onChange: updatePreview
 			});
