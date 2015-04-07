@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -866,7 +868,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Method to update a user finished for user : " + userIdToUpdate);
 	}
-	
+
 	/*
 	 * Method to update the given userprofile as active or inactive.
 	 */
@@ -877,7 +879,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (admin == null) {
 			throw new InvalidInputException("No admin user present.");
 		}
-		
+
 		LOG.info("Method to assign user to a branch called by user : " + admin.getUserId());
 		UserProfile userProfile = userProfileDao.findById(UserProfile.class, profileIdToUpdate);
 		if (userProfile == null) {
@@ -1371,7 +1373,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Override
 	public AgentSettings getAgentSettingsForUserProfiles(long userId) throws InvalidInputException {
-		LOG.info("Getting agent settings for user id: "+userId);
+		LOG.info("Getting agent settings for user id: " + userId);
 		AgentSettings agentSettings = getUserSettings(userId);
 		return agentSettings;
 	}
@@ -1668,7 +1670,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		// set the seo flag to true
 		agentSettings.setSeoContentModified(true);
-		
+
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
 	}
@@ -1701,5 +1703,45 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.info("Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName);
 		return profileName;
+	}
+
+	/**
+	 * Method to check which all users can perform edit and set the boolean as true or false in user
+	 * objects
+	 */
+	@Override
+	public List<UserFromSearch> checkUserCanEdit(User admin, UserFromSearch adminFromSearch, List<UserFromSearch> users) throws InvalidInputException {
+		LOG.info("Method checkUserCanEdit called for admin:" + admin + " and adminUser:" + adminFromSearch);
+		/**
+		 * Company admin : able to edit any user
+		 */
+		if (admin.getIsOwner() == CommonConstants.IS_OWNER) {
+			for (UserFromSearch user : users) {
+				user.setCanEdit(true);
+				if (user.getIsOwner() == 1) {
+					user.setCanEdit(false);
+				}
+			}
+		}
+		/**
+		 * Region admin : able to edit users only in his region
+		 */
+		else if (admin.getIsOwner() != CommonConstants.IS_OWNER && admin.isRegionAdmin()) {
+			for (UserFromSearch user : users) {
+				boolean hasCommon = Collections.disjoint(adminFromSearch.getRegions(), user.getRegions());
+				user.setCanEdit(!hasCommon);
+			}
+		}
+		/**
+		 * Branch admin : able to edit users only in his office
+		 */
+		else if (admin.getIsOwner() != CommonConstants.IS_OWNER && admin.isBranchAdmin()) {
+			for (UserFromSearch user : users) {
+				boolean hasCommon = Collections.disjoint(adminFromSearch.getBranches(), user.getBranches());
+				user.setCanEdit(!hasCommon);
+			}
+		}
+		LOG.info("Method checkUserCanEdit executed successfully");
+		return users;
 	}
 }
