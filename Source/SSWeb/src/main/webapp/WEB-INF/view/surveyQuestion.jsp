@@ -306,141 +306,128 @@
 		<!--    close-->
 	</div>
 
-	<jsp:include page="scripts.jsp" />
-
-	<script>
-		$(document).ready(
-				function() {
-					var survQuesNo = 1;
-					var nextQ, prevQ;
-
-					adjustMinHeight();
-					$(window).resize(adjustMinHeight);
-					function adjustMinHeight() {
-						var winH = $(window).height();
-						if ($(window).width() < 768) {
-							var minH = winH - 50 - 50 - 5 - 1;
-						} else {
-							var minH = winH - 80 - 78 - 78 - 1;
-						}
-						$('.min-height-container').css('min-height',
-								minH + 'px');
-					}
-
-					$('.sq-pts-red').hover(function() {
-						$('.pts-hover-1').show();
-					}, function() {
-						$('.pts-hover-1').hide();
-					});
-
-					$('.sq-pts-org').hover(function() {
-						$('.pts-hover-2').show();
-					}, function() {
-						$('.pts-hover-2').hide();
-					});
-
-					$('.sq-pts-lgreen').hover(function() {
-						$('.pts-hover-3').show();
-					}, function() {
-						$('.pts-hover-3').hide();
-					});
-
-					$('.sq-pts-military').hover(function() {
-						$('.pts-hover-4').show();
-					}, function() {
-						$('.pts-hover-4').hide();
-					});
-
-					$('.sq-pts-dgreen').hover(function() {
-						$('.pts-hover-5').show();
-					}, function() {
-						$('.pts-hover-5').hide();
-					});
-
-					$('.st-checkbox-on').click(function() {
-						$(this).hide();
-						$(this).parent().find('.st-checkbox-off').show();
-					});
-
-					$('.st-checkbox-off').click(function() {
-						$(this).hide();
-						$(this).parent().find('.st-checkbox-on').show();
-					});
-					$("div[data-ques-type]").hide();
-					$("div[data-ques-type='user-details']").show();
-
-					//Code for captcha validation.
-
-					var captchaText = true;
-					resizeFunc();
-					$(window).resize(resizeFunc);
-
-					function resizeFunc() {
-						var winW = $(window).width();
-						if (winW < 768) {
-							var offset = winW - 114 - 20;
-							$('.reg-cap-txt').css('max-width', offset + 'px');
-						}
-					}
-
-					console.log("Loading captcha");
-					try {
-						Recaptcha.create(
-								'6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
-								'recaptcha', {
-									theme : 'white',
-									callback : captchaLoaded
-								});
-						console.log("Captcha loaded");
-					} catch (error) {
-						console.log("Could not load captcha");
-					}
-					function captchaLoaded() {
-						var imgData = $(".recaptcha_image_cell").html();
-						console.log("Captcha image data : " + imgData);
-						$(".reg-captcha-img").html(imgData);
-
-					}
-
-					$(".reg-cap-reload").click(function() {
-						console.log("Captcha reload button clicked");
-						$("#recaptcha_reload").click();
-						console.log("Initiated the click of hidden reload");
-					});
-
-					$(".reg-cap-sound").click(function() {
-						if (captchaText == true) {
-							console.log("Captcha sound button clicked");
-							$("#recaptcha_switch_audio").click();
-							console.log("Initiated the click of hidden sound");
-							captchaText = false;
-							$(this).addClass('reg-cap-text');
-						} else {
-							console.log("Captcha text button clicked");
-							$("#recaptcha_switch_img").click();
-							console.log("Initiated the click of hidden text");
-							captchaText = true;
-							$(this).removeClass('reg-cap-text');
-						}
-
-					});
-
-					$(".reg-cap-info").click(function() {
-						console.log("Info button clicked");
-						$("#recaptcha_whatsthis").click();
-					});
-					$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
-				});
-	</script>
+<jsp:include page="scripts.jsp" />
+<script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
 <script>
-// Google analytics tracking code
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+$(document).ready(function() {
+	var survQuesNo = 1;
+	var nextQ, prevQ;
 
-ga('create', 'UA-61251431-1', 'auto');
-ga('send', 'pageview');
+	adjustMinHeight();
+	$(window).resize(adjustMinHeight);
+	function adjustMinHeight() {
+		var winH = $(window).height();
+		if ($(window).width() < 768) {
+			var minH = winH - 50 - 50 - 5 - 1;
+		} else {
+			var minH = winH - 80 - 78 - 78 - 1;
+		}
+		$('.min-height-container').css('min-height', minH + 'px');
+	}
+
+	$('.sq-pts-red').hover(function() {
+		$('.pts-hover-1').show();
+	}, function() {
+		$('.pts-hover-1').hide();
+	});
+
+	$('.sq-pts-org').hover(function() {
+		$('.pts-hover-2').show();
+	}, function() {
+		$('.pts-hover-2').hide();
+	});
+
+	$('.sq-pts-lgreen').hover(function() {
+		$('.pts-hover-3').show();
+	}, function() {
+		$('.pts-hover-3').hide();
+	});
+
+	$('.sq-pts-military').hover(function() {
+		$('.pts-hover-4').show();
+	}, function() {
+		$('.pts-hover-4').hide();
+	});
+
+	$('.sq-pts-dgreen').hover(function() {
+		$('.pts-hover-5').show();
+	}, function() {
+		$('.pts-hover-5').hide();
+	});
+
+	$('.st-checkbox-on').click(function() {
+		$(this).hide();
+		$(this).parent().find('.st-checkbox-off').show();
+	});
+
+	$('.st-checkbox-off').click(function() {
+		$(this).hide();
+		$(this).parent().find('.st-checkbox-on').show();
+	});
+	$("div[data-ques-type]").hide();
+	$("div[data-ques-type='user-details']").show();
+
+	// Code for captcha validation.
+	var captchaText = true;
+	resizeFunc();
+	$(window).resize(resizeFunc);
+
+	function resizeFunc() {
+		var winW = $(window).width();
+		if (winW < 768) {
+			var offset = winW - 114 - 20;
+			$('.reg-cap-txt').css('max-width', offset + 'px');
+		}
+	}
+
+	console.log("Loading captcha");
+	try {
+		Recaptcha.create(
+				'6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
+				'recaptcha', {
+					theme : 'white',
+					callback : captchaLoaded
+				});
+		console.log("Captcha loaded");
+	} catch (error) {
+		console.log("Could not load captcha");
+	}
+	
+	function captchaLoaded() {
+		var imgData = $(".recaptcha_image_cell").html();
+		console.log("Captcha image data : " + imgData);
+		$(".reg-captcha-img").html(imgData);
+
+	}
+
+	$(".reg-cap-reload").click(function() {
+		console.log("Captcha reload button clicked");
+		$("#recaptcha_reload").click();
+		console.log("Initiated the click of hidden reload");
+	});
+
+	$(".reg-cap-sound").click(function() {
+		if (captchaText == true) {
+			console.log("Captcha sound button clicked");
+			$("#recaptcha_switch_audio").click();
+			console.log("Initiated the click of hidden sound");
+			captchaText = false;
+			$(this).addClass('reg-cap-text');
+		} else {
+			console.log("Captcha text button clicked");
+			$("#recaptcha_switch_img").click();
+			console.log("Initiated the click of hidden text");
+			captchaText = true;
+			$(this).removeClass('reg-cap-text');
+		}
+
+	});
+
+	$(".reg-cap-info").click(function() {
+		console.log("Info button clicked");
+		$("#recaptcha_whatsthis").click();
+	});
+	$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
+});
 </script>
-
-	<jsp:include page="footer.jsp" />
+<jsp:include page="footer.jsp" />
