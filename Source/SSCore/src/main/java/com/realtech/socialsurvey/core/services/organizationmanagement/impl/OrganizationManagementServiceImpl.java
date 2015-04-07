@@ -74,6 +74,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
+	
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -388,7 +389,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companyName == null || companyName.isEmpty()) {
 			throw new InvalidInputException("Company name is null or empty while generating profile name");
 		}
-		profileName = companyName.replaceAll(" ", "-").toLowerCase();
+		//profileName = companyName.replaceAll(" ", "-").toLowerCase();
+		profileName = utils.prepareProfileName(companyName);
 
 		LOG.debug("Checking uniqueness of profile name generated : " + profileName + " by querying mongo");
 
@@ -401,7 +403,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings != null) {
 
 			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
-			profileName = profileName + "-" + iden;
+			profileName = utils.appendIdenToProfileName(profileName, iden);
 		}
 		LOG.debug("Successfully generated profile name. Returning : " + profileName);
 		return profileName;
@@ -2165,7 +2167,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Branch name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
+		// branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
+		branchProfileName = utils.prepareProfileName(branchName);
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getCompany().getCompanyId(),
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -2186,7 +2189,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (branchSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				branchProfileName = branchProfileName + "-" + branch.getBranchId();
+				//branchProfileName = branchProfileName + "-" + branch.getBranchId();
+				branchProfileName = utils.appendIdenToProfileName(branchProfileName, branch.getBranchId());
 				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 			}
 			organizationSettings.setProfileName(branchProfileName);
@@ -2215,7 +2219,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactSettings.setName(branch.getBranch());
 		contactSettings.setAddress1(branch.getAddress1());
 
-		if (branch.getAddress2() != null || !branch.getAddress2().equals("")) {
+		if (branch.getAddress2() != null && !branch.getAddress2().isEmpty()) {
 			contactSettings.setAddress(branch.getAddress1() + ", " + branch.getAddress2());
 			contactSettings.setAddress2(branch.getAddress2());
 		}
@@ -2239,7 +2243,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		contactSettings.setName(region.getRegion());
 		contactSettings.setAddress1(region.getAddress1());
 
-		if (region.getAddress2() != null || !region.getAddress2().equals("")) {
+		if (region.getAddress2() != null && !region.getAddress2().isEmpty()) {
 			contactSettings.setAddress(region.getAddress1() + ", " + region.getAddress2());
 			contactSettings.setAddress2(region.getAddress2());
 		}
@@ -2309,7 +2313,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Region name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
+		//regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
+		regionProfileName = utils.prepareProfileName(regionName);
 		LOG.debug("Checking if profileName:" + regionProfileName + " is already taken by a region in the company :" + region.getCompany());
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getCompany().getCompanyId(),
@@ -2330,7 +2335,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (regionSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				regionProfileName = regionProfileName + "-" + region.getRegionId();
+				//regionProfileName = regionProfileName + "-" + region.getRegionId();
+				regionProfileName = utils.appendIdenToProfileName(regionProfileName, region.getRegionId());
 				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 			}
 			organizationSettings.setProfileName(regionProfileName);

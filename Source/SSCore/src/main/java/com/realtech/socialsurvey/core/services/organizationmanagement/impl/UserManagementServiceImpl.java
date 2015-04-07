@@ -1657,7 +1657,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		contactSettings.setMail_ids(mail_ids);
 		agentSettings.setContact_details(contactSettings);
 
-		String profileName = generateIndividualProfileName(user.getUserId(), user.getEmailId());
+		String profileName = generateIndividualProfileName(user.getUserId(), contactSettings.getName(), user.getEmailId());
 		agentSettings.setProfileName(profileName);
 		String profileUrl = utils.generateAgentProfileUrl(profileName);
 		agentSettings.setProfileUrl(profileUrl);
@@ -1683,13 +1683,20 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private String generateIndividualProfileName(long userId, String emailId) throws InvalidInputException {
+	private String generateIndividualProfileName(long userId, String name, String emailId) throws InvalidInputException {
 		LOG.info("Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId);
 		if (emailId == null || emailId.isEmpty()) {
 			throw new InvalidInputException("emailId is null or empty while generating agent profile name");
 		}
 		String profileName = null;
-		profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+		String input = null;
+		if(name != null && !name.isEmpty()){
+			input = name;
+		}else{
+			input = emailId.trim().substring(0, emailId.indexOf("@"));
+		}
+		//profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+		profileName = utils.prepareProfileName(input);
 
 		LOG.debug("Checking uniqueness of profileName:" + profileName);
 		OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
@@ -1699,7 +1706,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		 * unique
 		 */
 		if (agentSettings != null) {
-			profileName = profileName + String.valueOf(userId);
+			profileName = utils.appendIdenToProfileName(profileName, userId);
 		}
 		LOG.info("Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName);
 		return profileName;

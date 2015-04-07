@@ -1,5 +1,7 @@
 package com.realtech.socialsurvey.core.commons;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -10,6 +12,9 @@ public class Utils {
 	private final String REGION_PROFILE_URL_PATTERN = "/region/%s/%s";
 	private final String BRANCH_PROFILE_URL_PATTERN = "/office/%s/%s";
 	private final String AGENT_PROFILE_URL_PATTERN = "/%s";
+	private static final String PROFILE_REGEX="[^\\w]{1,}";
+	private static final String PROFILE_REGEX_REPLACEMENT="-";
+	private static final Pattern PATTERN = Pattern.compile(PROFILE_REGEX);
 	private static final Logger LOG = LoggerFactory.getLogger(Utils.class);
 
 	/**
@@ -57,5 +62,40 @@ public class Utils {
 		profileUrl = String.format(AGENT_PROFILE_URL_PATTERN, agentProfileName);
 		LOG.info("Method generateAgentProfileUrl excecuted. Returning profile url:" + profileUrl);
 		return profileUrl;
+	}
+	
+	/**
+	 * Generates profile name
+	 * @param input
+	 * @return
+	 */
+	public String prepareProfileName(String input){
+		LOG.debug("Preparing profile name for "+input);
+		Matcher matcher = PATTERN.matcher(input.trim().toLowerCase());
+		String genereatedProfileName = matcher.replaceAll(PROFILE_REGEX_REPLACEMENT);
+		// clear if '-' is at the beginning or end of string
+		int hyphenIndex = genereatedProfileName.indexOf("-");
+		if(hyphenIndex == 0){
+			// remove the first hyphen
+			genereatedProfileName = genereatedProfileName.substring(1);
+		}
+		hyphenIndex = genereatedProfileName.lastIndexOf("-");
+		if(hyphenIndex == genereatedProfileName.length()){
+			// remove the last hyphen
+			genereatedProfileName = genereatedProfileName.substring(0, genereatedProfileName.length()-1);
+		}
+		LOG.debug("Generated profile name "+genereatedProfileName);
+		return genereatedProfileName;
+	}
+	
+	/**
+	 * appends profile name with iden
+	 * @param profileName
+	 * @param iden
+	 * @return
+	 */
+	public String appendIdenToProfileName(String profileName, long iden){
+		LOG.debug("Appending "+iden+" to profile name: "+profileName+" for uniqueness");
+		return profileName+"."+iden;
 	}
 }
