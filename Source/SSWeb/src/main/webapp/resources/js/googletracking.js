@@ -5,7 +5,7 @@ $(document).ready(function() {
 	// Google Analytics tracking ID
 	if (typeof gaTrackingId === 'undefined') {
 		$.ajax({
-			url : "./fetchgatrackingid.do",
+			url : window.location.origin + "/fetchgatrackingid.do",
 			type : "GET",
 			dataType : "html",
 			async : true,
