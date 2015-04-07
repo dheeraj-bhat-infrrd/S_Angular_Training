@@ -10,15 +10,18 @@
          </div>
      </div>
  </div>
+ <div id="server-message" class="hide">
+	<jsp:include page="messageheader.jsp"></jsp:include>
+</div>
  <div class="container v-hr-container">
      <div class="v-hr-header">${companyName}</div>
      <div class="v-hr-tbl-wrapper">
      <table class="v-hr-tbl">
 	    <tr class="v-tbl-header" id="hierarchy-list-header">
 	        <td class="v-tbl-line"></td>
-	        <td class="v-tbl-name">Name</td>
-	        <td class="v-tbl-add">Address</td>
-	        <td class="v-tbl-role">Role</td>
+	        <td class="v-tbl-name"><spring:message code="label.name.key"/></td>
+	        <td class="v-tbl-add"><spring:message code="label.address.key"/></td>
+	        <td class="v-tbl-role"><spring:message code="label.role.key"/></td>
 	        <td class="v-tbl-btns"></td>
 	        <td class="v-tbl-spacer"></td>
 	    </tr>
@@ -26,6 +29,7 @@
     </table>
    </div>
  </div>
+ <div id="temp-message" class="hide"></div>
  <script>
  $(document).ready(function(){
 	 fetchHierarchyViewList();

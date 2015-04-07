@@ -9,7 +9,7 @@
 	               <div class="v-line-rgn"></div>
 	           </td>
 	           <td class="v-tbl-name">${region.regionName}</td>
-	           <td class="v-tbl-add"><c:if test="${not empty region.address}">${region.address}</c:if></td>
+	           <td class="v-tbl-add"><c:if test="${not empty region.address1}">${region.address1}</c:if>&nbsp;<c:if test="${not empty region.address2}">${region.address2}</c:if></td>
 	           <td class="v-tbl-role"></td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
@@ -33,7 +33,7 @@
 	               <div class="v-line-brnch v-line-comp-brnch"></div>
 	           </td>
 	           <td class="v-tbl-name">${branch.branchName}</td>
-	           <td class="v-tbl-add"><c:if test="${not empty branch.address}">${branch.address}</c:if></td>
+	           <td class="v-tbl-add"><c:if test="${not empty branch.address1}">${branch.address1}</c:if>&nbsp;<c:if test="${not empty branch.address2}">${branch.address2}</c:if></td>
 	           <td class="v-tbl-role"></td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
@@ -67,7 +67,7 @@
 	           </td>
 	           <td class="v-tbl-spacer"></td>
 	       </tr>
-	       <tr class="v-tbl-row v-tbl-row-sel tr-user-edit user-edit-row hide">
+	       <tr id="user-edit-row-${compUser.userId}" class="v-tbl-row v-tbl-row-sel tr-user-edit user-edit-row hide">
 	      		<td id="user-details-and-assignments-${compUser.userId}" colspan="7" class="td-user-edit user-assignment-edit-div">
 	      			<!--edit form comes here for the user -->
 	      		</td>

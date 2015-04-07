@@ -88,18 +88,6 @@
             var emailId = $(this).parent().find('.fetch-email').html();
             reinviteUser(firstName, lastName, emailId);
         });
-
-        // de-activate user profile
-        $(document).on('click', '.tbl-switch-on', function(){
-            var profileId = $(this).parent().data('profile-id');
-            updateUserProfile(profileId, 0);
-        });
-
-        // activate user profile
-        $(document).on('click', '.tbl-switch-off', function(){
-            var profileId = $(this).parent().data('profile-id');
-            updateUserProfile(profileId, 1);
-        });
     });
 </script>
 
