@@ -955,9 +955,7 @@ public class ProfileManagementController {
 				return JspResolver.MESSAGE_HEADER;
 			}
 			catch (IOException e) {
-				LOG.error("IOException while uploading Profile Image. Reason :" + e.getMessage(), e);
-				model.addAttribute("message", e.getMessage());
-				return JspResolver.MESSAGE_HEADER;
+				e.printStackTrace();
 			}
 
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();

@@ -3,7 +3,7 @@ var ratio;
 
 function createPopupCanvas() {
 	var canvas = '<img src="" id="target" class="hide" style="position:absoulte;"/>'
-		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
+		+ '<canvas id="canvas" width="200" height="200" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
 	$('#overlay-text').html(canvas).css('position', 'relative');
 	$('#overlay-continue').html("Upload");

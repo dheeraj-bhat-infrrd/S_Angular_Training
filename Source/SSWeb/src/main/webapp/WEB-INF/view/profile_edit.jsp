@@ -98,7 +98,7 @@
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
 						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
 						</c:when>
 						<c:otherwise>
 							<c:choose>
@@ -112,7 +112,7 @@
 									<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 4}">
-									<c:set value="pers-default-img-big" var="defaultprofimageclass"></c:set>
+									<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
 								</c:when>
 							</c:choose>	
 							<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>						
