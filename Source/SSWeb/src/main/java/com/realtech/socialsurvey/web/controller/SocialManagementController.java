@@ -35,15 +35,18 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.api.Google2Api;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -196,17 +199,14 @@ public class SocialManagementController {
 	public String authenticateFacebookAccess(Model model, HttpServletRequest request) {
 		LOG.info("Facebook authentication url requested");
 		HttpSession session = request.getSession(false);
-		UserSettings userSettings;
 
 		try {
-			if (session == null) {
-				LOG.error("authenticateFacebookAccess : Session object is null!");
-				throw new NonFatalException("authenticateFacebookAccess : Session object is null!");
-			}
-			userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings.getAgentSettings() == null) {
-				LOG.error("authenticateFacebookAccess : agent settings not found in session!");
-				throw new NonFatalException("authenticateFacebookAccess : agent settings not found in session!");
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
 			}
 
 			// On auth error
@@ -229,17 +229,64 @@ public class SocialManagementController {
 				LOG.error("Error while creating access token " + e.getLocalizedMessage(), e);
 			}
 
-			// Storing token in agent settings
-			AgentSettings agentSettings = userSettings.getAgentSettings();
-			if (agentSettings == null) {
-				throw new InvalidInputException("No Agent settings found in current session");
+			// Storing token
+			SocialMediaTokens mediaTokens;
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = companySettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, mediaTokens);
+				companySettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				regionSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				branchSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				agentSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 			
-			SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-			mediaTokens = updateFacebookToken(accessToken, mediaTokens);
-			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
-			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.setAgentSettings(agentSettings);
+			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -288,17 +335,14 @@ public class SocialManagementController {
 	public String authenticateTwitterAccess(Model model, HttpServletRequest request) {
 		LOG.info("Twitter authentication url requested");
 		HttpSession session = request.getSession(false);
-		UserSettings userSettings;
 
 		try {
-			if (session == null) {
-				LOG.error("authenticateTwitterAccess : Session object is null!");
-				throw new NonFatalException("authenticateTwitterAccess : Session object is null!");
-			}
-			userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings.getAgentSettings() == null) {
-				LOG.error("authenticateTwitterAccess : agent settings not found in session!");
-				throw new NonFatalException("authenticateTwitterAccess : agent settings not found in session!");
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
 			}
 
 			// On auth error
@@ -329,17 +373,64 @@ public class SocialManagementController {
 				}
 			}
 
-			// Storing token in agent settings
-			AgentSettings agentSettings = userSettings.getAgentSettings();
-			if (agentSettings == null) {
-				throw new InvalidInputException("No Agent settings found in current session");
+			// Storing token
+			SocialMediaTokens mediaTokens;
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = companySettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, mediaTokens);
+				companySettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				regionSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				branchSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				agentSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 			
-			SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-			mediaTokens = updateTwitterToken(accessToken, mediaTokens);
-			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
-			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.setAgentSettings(agentSettings);
+			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -388,17 +479,14 @@ public class SocialManagementController {
 	public String authenticateLinkedInAccess(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateLinkedInAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
-		UserSettings userSettings;
 
 		try {
-			if (session == null) {
-				LOG.error("authenticateLinkedInAccess : Session object is null!");
-				throw new NonFatalException("authenticateLinkedInAccess : Session object is null!");
-			}
-			userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings.getAgentSettings() == null) {
-				LOG.error("authenticateLinkedInAccess : agent settings not found in session!");
-				throw new NonFatalException("authenticateLinkedInAccess : agent settings not found in session!");
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
 			}
 
 			// On auth error
@@ -427,21 +515,67 @@ public class SocialManagementController {
 			Map<String, Object> map = new Gson().fromJson(accessTokenStr, new TypeToken<Map<String, String>>() {}.getType());
 			String accessToken = (String) map.get("access_token");
 
-			// Storing token in agent settings
-			AgentSettings agentSettings = userSettings.getAgentSettings();
-			if (agentSettings == null) {
-				throw new InvalidInputException("No Agent settings found in current session");
+			SocialMediaTokens mediaTokens;
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = companySettings.getSocialMediaTokens();
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, mediaTokens);
+				companySettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				regionSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				branchSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				agentSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+
+				// starting async service for data update from linkedin
+				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						mediaTokens.getLinkedInToken());
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 			
-			SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-			mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
-			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
-			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.setAgentSettings(agentSettings);
-
-			// starting async service for data update from linkedin
-			socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-					mediaTokens.getLinkedInToken());
+			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			LOG.error("Exception while getting linkedin access token. Reason : " + e.getMessage(), e);
@@ -487,17 +621,14 @@ public class SocialManagementController {
 	public String authenticateGoogleAccess(Model model, HttpServletRequest request) {
 		LOG.info("Method authenticateGoogleAccess() called from SocialManagementController");
 		HttpSession session = request.getSession(false);
-		UserSettings userSettings;
 
 		try {
-			if (session == null) {
-				LOG.error("authenticateGoogleAccess : Session object is null!");
-				throw new NonFatalException("authenticateGoogleAccess : Session object is null!");
-			}
-			userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			if (userSettings.getAgentSettings() == null) {
-				LOG.error("authenticateGoogleAccess : agent settings not found in session!");
-				throw new NonFatalException("authenticateGoogleAccess : agent settings not found in session!");
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
 			}
 
 			// On auth error
@@ -515,17 +646,64 @@ public class SocialManagementController {
 			Token accessToken = service.getAccessToken(null, new Verifier(OAuthCode));
 			LOG.info("Token: " + accessToken.getToken());
 
-			// Storing token in agent settings
-			AgentSettings agentSettings = userSettings.getAgentSettings();
-			if (agentSettings == null) {
-				throw new InvalidInputException("No Agent settings found in current session");
+			// Storing access token
+			SocialMediaTokens mediaTokens;
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				mediaTokens = companySettings.getSocialMediaTokens();
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION,
+						companySettings, mediaTokens);
+				companySettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				mediaTokens = regionSettings.getSocialMediaTokens();
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION,
+						regionSettings, mediaTokens);
+				regionSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				mediaTokens = branchSettings.getSocialMediaTokens();
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION,
+						branchSettings, mediaTokens);
+				branchSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				
+				mediaTokens = agentSettings.getSocialMediaTokens();
+				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
+				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
+				agentSettings.setSocialMediaTokens(mediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
 			}
 			
-			SocialMediaTokens mediaTokens = agentSettings.getSocialMediaTokens();
-			mediaTokens = updateGoogleToken(accessToken, mediaTokens);
-			mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
-			agentSettings.setSocialMediaTokens(mediaTokens);
-			userSettings.setAgentSettings(agentSettings);
+			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
