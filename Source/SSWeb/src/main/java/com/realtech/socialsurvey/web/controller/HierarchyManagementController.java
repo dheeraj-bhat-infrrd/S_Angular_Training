@@ -1,11 +1,13 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocumentList;
 import org.noggit.JSONUtil;
 import org.slf4j.Logger;
@@ -37,6 +39,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -62,6 +65,8 @@ public class HierarchyManagementController {
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
 	@Autowired
 	private SessionHelper sessionHelper;
+	@Autowired
+	private UserManagementService userManagementService;
 
 	/**
 	 * Method to call services for showing up the build hierarchy page
@@ -286,11 +291,14 @@ public class HierarchyManagementController {
 		try {
 			long regionId = 0l;
 			User user = sessionHelper.getCurrentUser();
+			HttpSession session = request.getSession(false);
 
 			try {
 				regionId = Long.parseLong(request.getParameter("regionId"));
 				LOG.debug("Calling service to deactivate region");
 				organizationManagementService.updateRegionStatus(user, regionId, CommonConstants.STATUS_INACTIVE);
+
+				removeRegionFromSession(regionId, session);
 				LOG.debug("Successfully executed service to deactivate region");
 			}
 			catch (NumberFormatException e) {
@@ -369,11 +377,14 @@ public class HierarchyManagementController {
 		try {
 			long branchId = 0l;
 			User user = sessionHelper.getCurrentUser();
+			HttpSession session = request.getSession(false);
 			try {
 				branchId = Long.parseLong(request.getParameter("branchId"));
 
 				LOG.debug("Calling service to deactivate branch");
 				organizationManagementService.updateBranchStatus(user, branchId, CommonConstants.STATUS_INACTIVE);
+
+				removeBranchFromSession(branchId, session);
 				LOG.debug("Successfully executed service to deactivate branch");
 			}
 			catch (NumberFormatException e) {
@@ -804,6 +815,38 @@ public class HierarchyManagementController {
 	}
 
 	/**
+	 * Method to remove a branch from branches list in session
+	 * 
+	 * @param branchId
+	 * @param session
+	 */
+	private void removeBranchFromSession(long branchId, HttpSession session) {
+		LOG.info("Method removeBranchFromSession called for branchId:" + branchId);
+		@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
+				.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
+		if (branches != null && branches.containsKey(branchId)) {
+			branches.remove(branchId);
+		}
+		LOG.info("Method removeBranchFromSession executed successfully");
+	}
+
+	/**
+	 * Method to remove a region from regions list in session
+	 * 
+	 * @param regionId
+	 * @param session
+	 */
+	private void removeRegionFromSession(long regionId, HttpSession session) {
+		LOG.info("Method removeRegionFromSession called for regionId:" + regionId);
+		@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
+				.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+		if (regions != null && regions.containsKey(regionId)) {
+			regions.remove(regionId);
+		}
+		LOG.info("Method removeRegionFromSession executed successfully");
+	}
+
+	/**
 	 * Method to update a region
 	 * 
 	 * @param model
@@ -859,7 +902,7 @@ public class HierarchyManagementController {
 				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,
 						selectedUserId, assigneeEmailIds, isAdmin);
 				updateRegionInSession(region, session);
-				
+
 				LOG.debug("Successfully executed service to update a region");
 
 				model.addAttribute("message",
@@ -1186,6 +1229,8 @@ public class HierarchyManagementController {
 		String strRegionId = request.getParameter("regionId");
 		long regionId = 0l;
 		List<BranchFromSearch> branches = null;
+		int start = 0;
+		int rows = -1;
 		try {
 			try {
 				regionId = Long.parseLong(strRegionId);
@@ -1194,12 +1239,35 @@ public class HierarchyManagementController {
 				throw new InvalidInputException("Error while parsing regionId in fetchHierarchyViewBranches.Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			String branchesJson = solrSearchService.searchBranchesByRegion(regionId, CommonConstants.INITIAL_INDEX, -1);
+			String branchesJson = solrSearchService.searchBranchesByRegion(regionId, start, rows);
 			LOG.debug("Fetched branch .branches json is :" + branchesJson);
 			Type searchedBranchesList = new TypeToken<List<BranchFromSearch>>() {}.getType();
 			branches = new Gson().fromJson(branchesJson, searchedBranchesList);
 
+			Set<Long> regionIds = new HashSet<Long>();
+			regionIds.add(regionId);
+			LOG.debug("Fetching users under region:" + regionId);
+			List<UserFromSearch> users = organizationManagementService.getUsersUnderRegionFromSolr(regionIds, start, rows);
+
+			User admin = sessionHelper.getCurrentUser();
+			/**
+			 * fetching admin details
+			 */
+			UserFromSearch adminUser = null;
+			try {
+				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
+				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
+			}
+			catch (SolrServerException e) {
+				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrServerException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			users = userManagementService.checkUserCanEdit(admin, adminUser, users);
+
 			model.addAttribute("branches", branches);
+			model.addAttribute("individuals", users);
 			model.addAttribute("regionId", regionId);
 		}
 		catch (NonFatalException e) {
@@ -1244,6 +1312,23 @@ public class HierarchyManagementController {
 			Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
 			List<UserFromSearch> usersList = new Gson().fromJson(usersJson, searchedUsersList);
 
+			User admin = sessionHelper.getCurrentUser();
+			/**
+			 * fetching admin details
+			 */
+			UserFromSearch adminUser = null;
+			try {
+				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
+				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
+			}
+			catch (SolrServerException e) {
+				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrServerException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+
+			usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
+
 			model.addAttribute("users", usersList);
 			model.addAttribute("branchId", branchId);
 			model.addAttribute("regionId", strRegionId);
@@ -1282,6 +1367,20 @@ public class HierarchyManagementController {
 		int start = 0;
 		int rows = -1;
 		try {
+			User admin = sessionHelper.getCurrentUser();
+			/**
+			 * fetching admin details
+			 */
+			UserFromSearch adminUser = null;
+			try {
+				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
+				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
+			}
+			catch (SolrServerException e) {
+				LOG.error("SolrServerException while searching for user id. Reason : " + e.getMessage(), e);
+				throw new NonFatalException("SolrServerException while searching for user id.", DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
 			if (highestRole == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
 				LOG.debug("fetching regions under company from solr");
@@ -1294,6 +1393,8 @@ public class HierarchyManagementController {
 
 				LOG.debug("fetching users under company from solr");
 				users = organizationManagementService.getUsersUnderCompanyFromSolr(user.getCompany(), start, rows);
+
+				users = userManagementService.checkUserCanEdit(admin, adminUser, users);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
@@ -1306,6 +1407,8 @@ public class HierarchyManagementController {
 
 				LOG.debug("fetching users under region from solr");
 				users = organizationManagementService.getUsersUnderRegionFromSolr(regionIds, start, rows);
+
+				users = userManagementService.checkUserCanEdit(admin, adminUser, users);
 				jspToReturn = JspResolver.VIEW_HIERARCHY_REGION_LIST;
 			}
 			else if (highestRole == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
@@ -1352,7 +1455,8 @@ public class HierarchyManagementController {
 		try {
 			if (strRegionId != null && !strRegionId.isEmpty()) {
 				HttpSession session = request.getSession();
-				Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute(CommonConstants.REGIONS_IN_SESSION);
+				@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
+						.getAttribute(CommonConstants.REGIONS_IN_SESSION);
 
 				long regionId = Long.parseLong(strRegionId);
 				RegionFromSearch regionToUpdate = null;
@@ -1363,7 +1467,6 @@ public class HierarchyManagementController {
 					throw new NoRecordsFetchedException("Region not present in list of regions present in session. RegionId:" + regionId,
 							DisplayMessageConstants.GENERAL_ERROR);
 				}
-
 				isUpdateCall = true;
 				model.addAttribute("region", regionToUpdate);
 			}
@@ -1395,7 +1498,8 @@ public class HierarchyManagementController {
 				HttpSession session = request.getSession();
 				BranchFromSearch branch = null;
 				boolean isCompanyBranch = false;
-				Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
+				@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
+						.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
 				long branchId = Long.parseLong(strBranchId);
 
 				if (branches.containsKey(branchId)) {
@@ -1438,26 +1542,6 @@ public class HierarchyManagementController {
 	public String getIndividualEditPage(Model model) {
 		LOG.info("Method getIndividualEditPage called");
 		return JspResolver.HIERARCHY_INDIVIDUAL_EDIT;
-	}
-
-	/**
-	 * Method to get complete address from address lines
-	 * 
-	 * @param address1
-	 * @param address2
-	 * @return
-	 */
-	private String getCompleteAddress(String address1, String address2) {
-		LOG.debug("Getting complete address for address1 : " + address1 + " and address2 : " + address2);
-		String address = address1;
-		/**
-		 * if address line 2 is present, append it to address1 else the complete address is address1
-		 */
-		if (address1 != null && !address1.isEmpty() && address2 != null && !address2.isEmpty()) {
-			address = address1 + " " + address2;
-		}
-		LOG.debug("Returning complete address" + address);
-		return address;
 	}
 
 	/**
