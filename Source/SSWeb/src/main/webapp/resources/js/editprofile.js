@@ -695,7 +695,7 @@ function callBackUpdateLicenseAuthorizations(data) {
 
 
 // Update Social links
-$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+/*$('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -813,7 +813,7 @@ function callBackUpdateYelpLink(data) {
 	showToast();
 
 	showProfileSocialLinks();
-}
+}*/
 
 function isValidUrl(url){
 	var myVariable = url;
@@ -846,7 +846,7 @@ function adjustImage() {
 }
 
 // Function to show map on the screen
-function initializeGoogleMap() {
+/*function initializeGoogleMap() {
     var mapCanvas = document.getElementById('map-canvas');
     var geocoder = new google.maps.Geocoder();
 	var address = "Raremile technologies,HSR layout,bangalore, 560102";
@@ -873,7 +873,7 @@ function initializeGoogleMap() {
 	        });
 		}
 	});
-}
+}*/
 
 
 // Data population for Admin
