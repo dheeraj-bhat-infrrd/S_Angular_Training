@@ -289,6 +289,45 @@ public interface OrganizationManagementService {
 			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
 
 	/**
+	 * Method to update a region and assign user if specified
+	 * 
+	 * @param user
+	 * @param regionId
+	 * @param regionName
+	 * @param address1
+	 * @param address2
+	 * @param selectedUserId
+	 * @param emailIdsArray
+	 * @param isAdmin
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException
+	 */
+	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+	/**
+	 * Method to update a branch and assign a user if specified
+	 * 
+	 * @param user
+	 * @param branchId
+	 * @param regionId
+	 * @param branchName
+	 * @param address1
+	 * @param address2
+	 * @param selectedUserId
+	 * @param emailIdsArray
+	 * @param isAdmin
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 * @throws UserAssignmentException
+	 */
+	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException;
+
+	/**
 	 * Method to assign a user to a region
 	 * 
 	 * @param adminUser
@@ -303,8 +342,8 @@ public interface OrganizationManagementService {
 			NoRecordsFetchedException, SolrException;
 
 	/**
-	 * Method to add a new branch and assign the user to the newly created branch if userId or
-	 * emailId is provided
+	 * Method to add a new branch anassigneeUserd assign the user to the newly created branch if
+	 * userId or emailId is provided
 	 * 
 	 * @param user
 	 * @param branchName
@@ -498,20 +537,6 @@ public interface OrganizationManagementService {
 			throws InvalidInputException, SolrException;
 
 	/**
-	 * Method to update a region
-	 * 
-	 * @param regionId
-	 * @param regionName
-	 * @param regionAddress1
-	 * @param regionAddress2
-	 * @param user
-	 * @throws InvalidInputException
-	 * @throws SolrException
-	 */
-	public void updateRegion(long regionId, String regionName, String regionAddress1, String regionAddress2, User user) throws InvalidInputException,
-			SolrException;
-
-	/**
 	 * Method to check whether a user has privileges to build hierarchy
 	 * 
 	 * @param user
@@ -566,14 +591,14 @@ public interface OrganizationManagementService {
 	 * @throws NoRecordsFetchedException
 	 */
 	public Set<Long> getBranchIdsForUser(User user, int profileMasterId) throws InvalidInputException, NoRecordsFetchedException;
-	
+
 	/**
 	 * Method to get the list of all the company ids
 	 */
 	public Set<Company> getAllCompanies();
 
 	public Map<Long, BranchFromSearch> fetchBranchesMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
-	
+
 	public Map<Long, RegionFromSearch> fetchRegionsMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException;
 
 	/**
