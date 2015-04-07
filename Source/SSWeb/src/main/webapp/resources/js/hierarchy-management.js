@@ -984,6 +984,11 @@ function bindBranchListClicks(){
             $(this).attr('clicked','false');
 		}
 	});
+	$(".branch-del-icn").unbind('click');
+	$(".branch-del-icn").click(function(e){
+		var branchId = $(this).attr("data-branchid");
+		deleteBranchPopup(branchId);
+	});
 }
 
 function fetchHierarchyViewList() {
@@ -1024,6 +1029,11 @@ function bindRegionListClicks() {
 			hideRegionEdit(regionId);
 			$(this).attr('clicked','false');
 		}		
+	});
+	$(".region-del-icn").unbind('click');
+	$(".region-del-icn").click(function(e){
+		var regionId = $(this).attr("data-regionid");
+		deleteRegionPopup(regionId);
 	});
 }
 
@@ -1099,6 +1109,7 @@ function paintUsersFromBranch(data,branchId,regionId) {
 }
 
 function bindUserEditClicks() {
+	$(".user-edit-icn").unbind('click');
 	$('.user-edit-icn').click(function(e){
 		e.stopPropagation();
 		if($(this).attr('clicked') == "false") {
@@ -1114,6 +1125,12 @@ function bindUserEditClicks() {
 			$(".user-assignment-edit-div").html("");
 			$(".user-edit-row").slideUp();
 	    }
+	});
+	$(".user-del-icn").unbind('click');
+	$(".user-del-icn").click(function(e){
+		e.stopPropagation();
+		var userId = $(this).attr("data-userid");
+		deleteUser(userId);
 	});
 }
 
@@ -1144,4 +1161,161 @@ function updateBranchCallBack(data,branchId) {
 	displayMessage(data);
 	hideBranchEdit(branchId);
 	fetchHierarchyViewList();
+}
+
+/**
+ * Region Delete popup overlay
+ * 
+ * @param regionId
+ */
+function deleteRegionPopup(regionId) {
+	var urlCheck = "./checkbranchesinregion.do?regionId=" + regionId;
+	callAjaxPOST(urlCheck, function(response) {
+		deleteRegionCheckCallBack(response, regionId);
+	}, true);
+}
+function deleteRegionCheckCallBack(response, regionId) {
+	$('#overlay-text').html(response);
+	$('.msg-err-icn').remove();
+
+	var success = "Selected Region could be deleted";
+	var successMsg = $("#overlay-text").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Region");
+		
+		$('#overlay-continue').click(function(){
+			if ($('#overlay-continue').attr("disabled") != "disabled") {
+				if(regionId != null) {
+					overlayRevert();
+					deleteRegion(regionId);
+					regionId = null;
+				}
+				$('#overlay-continue').unbind('click');
+			}
+		});
+	} else {
+		createPopupInfo("Remove Region");
+		regionId = null;
+	}
+}
+
+
+/**
+ * Branch Delete popup overlay
+ * 
+ * @param branchId
+ */
+function deleteBranchPopup(branchId) {
+	var urlCheck = "./checkusersinbranch.do?branchId=" + branchId;
+	callAjaxPOST(urlCheck, function(response) {
+		deleteBranchCheckCallBack(response, branchId);
+	}, true);
+}
+function deleteBranchCheckCallBack(response, branchId) {
+	$("#overlay-text").html(response);
+	$('.msg-err-icn').remove();
+	var success = "Selected Office could be deleted";
+	var successMsg = $("#overlay-text").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Branch");
+		
+		$('#overlay-continue').click(function(){
+			if ($('#overlay-continue').attr("disabled") != "disabled") {
+				if(branchId != null) {
+					overlayRevert();
+					deleteBranch(branchId);
+					branchId = null;
+				}
+				$('#overlay-continue').unbind('click');
+			}
+		});
+	} else {
+		createPopupInfo("Remove Branch");
+		branchId = null;
+	}
+}
+
+//Pop-up Overlay modifications
+$('#overlay-cancel').click(function(){
+	$('#overlay-continue').unbind('click');
+	overlayRevert();
+	branchId = null;
+	regionId = null;
+});
+function createPopupConfirm(header) {
+	$('#overlay-header').html(header);
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$('#overlay-continue').removeClass("btn-disabled");
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
+
+	$('#overlay-main').show();
+}
+
+function createPopupInfo(header) {
+	$('#overlay-header').html(header);
+	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-continue').addClass("btn-disabled");
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
+	
+   	$('#overlay-main').show();
+}
+function overlayRevert() {
+	$('#overlay-main').hide();
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
+}
+
+/**
+ * Function to delete a region
+ * 
+ * @param branchId
+ */
+function deleteRegion(regionId) {
+	var url = "./deactivateregion.do?regionId=" + regionId;
+	callAjaxPOST(url, function(data){
+		deleteRegionCallBack(data,regionId);
+	}, true);
+}
+
+/**
+ * Call back function for deleting a region
+ * 
+ * @param data
+ */
+function deleteRegionCallBack(data,regionId) {
+	displayMessage(data);
+	$("#tr-region-"+regionId).hide();
+	$("#tr-region-"+regionId).next(".tr-region-edit").hide();
+}
+
+/**
+ * Function to delete a branch
+ * 
+ * @param branchId
+ */
+function deleteBranch(branchId) {
+	var url = "./deactivatebranch.do?branchId=" + branchId;
+	callAjaxPOST(url, function(data){
+		deleteBranchCallBack(data,branchId);
+	}, true);
+}
+
+/**
+ * Call back function for deleting a branch
+ * 
+ * @param data
+ */
+function deleteBranchCallBack(data,branchId) {
+	displayMessage(data);
+	$("#tr-branch-row-"+branchId).hide();
+	$("#tr-branch-row-"+branchId).next(".tr-branch-edit").hide();
 }
