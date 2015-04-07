@@ -95,9 +95,9 @@ public class CloudUploadServiceImpl implements FileUploadService {
 	private String uploadImage(File convFile, String logoName) throws InvalidInputException {
 		uploadUtils.validateFile(convFile);
 
-		StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.HYPHEN);
+		StringBuilder amazonFileName = new StringBuilder(envPrefix).append(CommonConstants.SYMBOL_HYPHEN);
 		amazonFileName.append(encryptionHelper.encryptSHA512(logoName + (System.currentTimeMillis())));
-		amazonFileName.append(logoName.substring(logoName.lastIndexOf(".")));
+		amazonFileName.append(CommonConstants.SYMBOL_FULLSTOP + CommonConstants.IMAGE_FORMAT_PNG);
 
 		try {
 			uploadFile(convFile, amazonFileName.toString());
@@ -117,9 +117,10 @@ public class CloudUploadServiceImpl implements FileUploadService {
 			throw new InvalidInputException("Either file or file name is not present");
 		}
 
-		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, file);
 		ObjectMetadata metadata = new ObjectMetadata();
 		metadata.setCacheControl(CACHE_PUBLIC);
+
+		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, fileName, file);
 		putObjectRequest.setMetadata(metadata);
 		putObjectRequest.withCannedAcl(CannedAccessControlList.PublicRead);
 
