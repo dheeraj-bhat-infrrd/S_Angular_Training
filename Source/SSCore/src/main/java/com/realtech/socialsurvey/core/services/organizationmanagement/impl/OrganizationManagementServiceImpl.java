@@ -1901,6 +1901,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO);
 		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
 
 		LOG.info("Branch list fetched for the region " + region);
