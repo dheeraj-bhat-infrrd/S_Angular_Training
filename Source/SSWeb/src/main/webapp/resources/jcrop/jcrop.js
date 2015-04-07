@@ -36,7 +36,6 @@ function initiateJcrop(input) {
 
 		$('#overlay-continue').click(function() {
 			var dataurl = canvas.toDataURL("image/png");
-			console.log(dataurl);
 			overlayRevert();
 
 			var formData = new FormData();
