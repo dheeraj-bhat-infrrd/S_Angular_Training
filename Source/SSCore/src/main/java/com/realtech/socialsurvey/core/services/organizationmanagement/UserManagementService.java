@@ -228,5 +228,20 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public List<UserFromSearch> checkUserCanEdit(User admin, UserFromSearch adminFromSearch, List<UserFromSearch> users) throws InvalidInputException;
+
+	/**
+	 * Method to update user details on completing registration
+	 * @param existingUser
+	 * @param emailId
+	 * @param companyId
+	 * @param firstName
+	 * @param lastName
+	 * @param password
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws SolrException
+	 */
+	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password) throws InvalidInputException, SolrException;
+
 }
 // JIRA SS-34 BY RM02 BOC
