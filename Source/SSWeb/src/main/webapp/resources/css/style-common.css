@@ -4572,6 +4572,9 @@ tr.v-tbl-row {
 .v-line-comp-ind {
 	left:0 !important;
 }
+.v-line-region-ind {
+	left:25% !important;
+}
 
 .td-region-edit .edit-region-form{
 	margin: 30px auto;

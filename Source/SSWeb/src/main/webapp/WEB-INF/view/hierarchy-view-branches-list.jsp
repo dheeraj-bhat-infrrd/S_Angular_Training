@@ -13,7 +13,7 @@
 		    <td class="v-tbl-role"></td>
 		    <td class="v-tbl-btns">
 		        <div class="clearfix v-tbl-icn-wraper">
-		            <div class="float-left v-tbl-icn v-icn-close" data-branchid="${branch.branchId}"></div>
+		            <div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
 		            <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
 		        </div>
 		    </td>
@@ -28,17 +28,25 @@
 </c:if>
 <c:if test ="${not empty individuals}">
 	<c:forEach var="regionUser" items="${individuals}">
-		<tr id="tr-user-${regionUser.userId}" clicked="false" class="v-tbl-row v-tbl-row-sel edit-user v-tbl-row-ind sel-r${regionId}-u${regionUser.userId}" data-userid="${regionUser.userId}">
+		<tr id="user-row-${regionUser.userId}" clicked="false" class="v-tbl-row v-tbl-row-sel edit-user v-tbl-row-ind sel-r${regionId}-u${regionUser.userId}" data-userid="${regionUser.userId}">
 	           <td class="v-tbl-line">
-	               <div class="v-line-ind v-line-comp-ind"></div>
+	               <div class="v-line-ind v-line-region-ind"></div>
 	           </td>
 	           <td class="v-tbl-name">${regionUser.displayName}</td>
 	           <td class="v-tbl-add"><c:if test="${not empty regionUser.emailId}">${regionUser.emailId}</c:if></td>
-	           <td class="v-tbl-role"></td>
+	           <td class="v-tbl-role"><c:if test="${regionUser.isRegionAdmin || regionUser.isBranchAdmin}"><spring:message code="label.admin.key"/></c:if>&nbsp;<c:if test="${regionUser.isAgent}"><spring:message code="label.user.key"/></c:if></td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
-	                   <div class="float-left v-tbl-icn v-icn-close" data-userid="${regionUser.userId}"></div>
-	                   <div class="float-left v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${regionUser.userId}"></div>
+	                    <c:choose>
+							<c:when test="${regionUser.canEdit}">
+							   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${regionUser.userId}"></div>
+			                   <div class="float-left v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${regionUser.userId}"></div>
+							</c:when>
+							<c:otherwise>
+								<div class="float-left v-tbl-icn-disabled v-icn-close"></div>
+			                    <div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
+							</c:otherwise>
+					   </c:choose>
 	               </div>
 	           </td>
 	           <td class="v-tbl-spacer"></td>
