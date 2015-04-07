@@ -98,23 +98,24 @@
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
 						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
 						</c:when>
 						<c:otherwise>
 							<c:choose>
 								<c:when test="${profilemasterid == 1}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit comp-default-img  pos-relative cursor-pointer"></div>
+									<c:set value="comp-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 2}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit region-default-img pos-relative cursor-pointer"></div>
+									<c:set value="region-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 3}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit office-default-img pos-relative cursor-pointer"></div>
+									<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 4}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit pers-default-img-big pos-relative cursor-pointer"></div>
+									<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
 								</c:when>
-							</c:choose>							
+							</c:choose>	
+							<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>						
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
