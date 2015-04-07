@@ -942,9 +942,9 @@ public class ProfileManagementController {
 				if (image == null) {
 					LOG.error("Buffered Image is null");
 				}
-
+				
 				File fileLocal = new File(CommonConstants.IMAGE_NAME);
-				ImageIO.write(image, CommonConstants.IMAGE_FORMAT, fileLocal);
+				ImageIO.write(image, CommonConstants.IMAGE_FORMAT_PNG, fileLocal);
 
 				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, imageFileName);
 				profileImageUrl = endpoint + "/" + bucket + "/" + profileImageUrl;

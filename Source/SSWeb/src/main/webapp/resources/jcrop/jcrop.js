@@ -34,17 +34,15 @@ function initiateJcrop(input) {
 		};
 		reader.readAsDataURL(input.files[0]);
 
-		$(document).on('click', '#overlay-continue', function() {
+		$('#overlay-continue').click(function() {
 			var dataurl = canvas.toDataURL("image/png");
-			$('#prof-image').attr('src', dataurl);
-			$('#overlay-main').hide();
+			console.log(dataurl);
+			overlayRevert();
 
 			var formData = new FormData();
 			formData.append("imageBase64", dataurl);
 			formData.append("imageFileName", $('#prof-image').prop("files")[0].name);
 			callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
-			
-			$('#overlay-continue').unbind('click');
 		});
 	}
 }
