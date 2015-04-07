@@ -282,7 +282,8 @@ public interface CommonConstants {
 	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
 	public static final String STATUS_SOLR = "status";
 	public static final String REGION_NAME_SOLR = "regionName";
-	public static final String REGION_ADDRESS_SOLR = "address";
+	public static final String ADDRESS1_SOLR = "address1";
+	public static final String ADDRESS2_SOLR = "address2";
 	public static final String BRANCH_ID_SOLR = "branchId";
 	public static final String BRANCH_NAME_SOLR = "branchName";
 	public static final String BRANCH_ADDRESS_SOLR = "address";

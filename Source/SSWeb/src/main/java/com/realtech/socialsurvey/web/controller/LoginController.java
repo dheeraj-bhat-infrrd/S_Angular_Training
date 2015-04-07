@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 // JIRA SS-21 : by RM-06 : BOC
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -26,8 +27,10 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -89,12 +92,12 @@ public class LoginController {
 			}
 		}
 	}
-		
+
 	@RequestMapping(value = "/login")
 	public String initLoginPage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
 		LOG.info("Inside initLoginPage() of LoginController");
 		redirectOnClickLogo(response);
-		
+
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
@@ -184,17 +187,33 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					/*
-					 * UserProfile highestUserProfile = null; UserProfile companyAdminProfile =
-					 * null; // fetch the highest user profile for user try { highestUserProfile =
-					 * userManagementService.getHighestUserProfileForUser(user); companyAdminProfile
-					 * = authenticationService.getCompanyAdminProfileForUser(user); } catch
-					 * (NoRecordsFetchedException e) {
-					 * LOG.error("No user profiles found for the user"); return
-					 * JspResolver.ERROR_PAGE; }
+					/**
+					 * Set the regions and branches in session from solr
 					 */
-
-					// Compute all conditions for user and if user is CA then check for profile
+					long companyId =user.getCompany().getCompanyId();
+					LOG.debug("Fetching regions from solr to set in session for company:"+companyId);
+					try {
+						Map<Long, RegionFromSearch> regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+						session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
+					}
+					catch (MalformedURLException e) {
+						LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
+						throw new NonFatalException("MalformedURLException while fetching regions", e);
+					}
+					
+					LOG.debug("Fetching branches from solr to set in session for company:"+companyId);
+					try {
+						Map<Long, BranchFromSearch> branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+						session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
+					}
+					catch (MalformedURLException e) {
+						LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
+						throw new NonFatalException("MalformedURLException while fetching branches", e);
+					}
+					
+					/**
+					 * Compute all conditions for user and if user is CA then check for profile
+					 */
 					// completion stage.
 					if (user.isCompanyAdmin()) {
 						UserProfile adminProfile = null;
