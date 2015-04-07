@@ -13,7 +13,7 @@
 	           <td class="v-tbl-role"></td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
-	                   <div class="float-left v-tbl-icn v-icn-close" data-regionid="${region.regionId}"></div>
+	                   <div class="float-left v-tbl-icn v-icn-close region-del-icn" data-regionid="${region.regionId}"></div>
 	                   <div class="float-left v-tbl-icn v-icn-edit region-edit-icn" clicked="false" data-regionid="${region.regionId}"></div>
 	               </div>
 	           </td>
@@ -28,7 +28,7 @@
 </c:if> 
 <c:if test ="${not empty branches}">
 	<c:forEach var="branch" items="${branches}">
-		<tr id="tr-branch-${branch.branchId}" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-b${branch.branchId}" data-branchid="${branch.branchId}">
+		<tr id="tr-branch-row-${branch.branchId}" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-brnch branch-row sel-b${branch.branchId}" data-branchid="${branch.branchId}">
 	           <td class="v-tbl-line">
 	               <div class="v-line-brnch v-line-comp-brnch"></div>
 	           </td>
@@ -37,7 +37,7 @@
 	           <td class="v-tbl-role"></td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
-	                   <div class="float-left v-tbl-icn v-icn-close" data-branchid="${branch.branchId}"></div>
+	                   <div class="float-left v-tbl-icn v-icn-close branch-del-icn" data-branchid="${branch.branchId}"></div>
 	                   <div class="float-left v-tbl-icn v-icn-edit branch-edit-icn" clicked="false" data-branchid="${branch.branchId}"></div>
 	               </div>
 	           </td>
@@ -52,17 +52,25 @@
 </c:if> 
 <c:if test ="${not empty individuals}">
 	<c:forEach var="compUser" items="${individuals}">
-		<tr id="tr-user-${compUser.userId}" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-ind sel-u${compUser.userId}" data-userid="${compUser.userId}">
+		<tr id="user-row-${compUser.userId}" clicked="false" class="v-tbl-row v-tbl-row-sel v-tbl-row-ind sel-u${compUser.userId}" data-userid="${compUser.userId}">
 	           <td class="v-tbl-line">
 	               <div class="v-line-ind v-line-comp-ind"></div>
 	           </td>
 	           <td class="v-tbl-name">${compUser.displayName}</td>
 	           <td class="v-tbl-add"><c:if test="${not empty compUser.emailId}">${compUser.emailId}</c:if></td>
-	           <td class="v-tbl-role"></td>
+	           <td class="v-tbl-role"><c:if test="${compUser.isRegionAdmin || compUser.isBranchAdmin}"><spring:message code="label.admin.key"/></c:if>&nbsp;<c:if test="${compUser.isAgent}"><spring:message code="label.user.key"/></c:if></td>
 	           <td class="v-tbl-btns">
 	               <div class="clearfix v-tbl-icn-wraper">
-	                   <div class="float-left v-tbl-icn v-icn-close" data-userid="${compUser.userId}"></div>
-	                   <div class="float-left v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${compUser.userId}"></div>
+	                   <c:choose>
+							<c:when test="${compUser.canEdit}">
+							   <div class="float-left v-tbl-icn v-icn-close user-del-icn" data-userid="${compUser.userId}"></div>
+			                   <div class="float-left v-tbl-icn v-icn-edit user-edit-icn" clicked="false" data-userid="${compUser.userId}"></div>
+							</c:when>
+							<c:otherwise>
+								<div class="float-left v-tbl-icn-disabled v-icn-close"></div>
+			                    <div class="float-left v-tbl-icn-disabled v-icn-edit"></div>
+							</c:otherwise>
+					   </c:choose>
 	               </div>
 	           </td>
 	           <td class="v-tbl-spacer"></td>

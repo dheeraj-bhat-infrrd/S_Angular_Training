@@ -7,6 +7,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -188,7 +189,7 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public AgentSettings getAgentSettingsForUserProfiles(long userId) throws InvalidInputException;
-	
+
 	/**
 	 * Method to insert basic settings for a user
 	 * 
@@ -215,5 +216,17 @@ public interface UserManagementService {
 	 */
 	public UserProfile createUserProfile(User user, Company company, String emailId, long agentId, long branchId, long regionId, int profileMasterId,
 			String profileCompletionStage, int isProfileComplete, String createdBy, String modifiedBy);
+
+	/**
+	 * Method to check which all users can perform edit and set the boolean as true or false in user
+	 * objects
+	 * 
+	 * @param admin
+	 * @param adminFromSearch
+	 * @param users
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public List<UserFromSearch> checkUserCanEdit(User admin, UserFromSearch adminFromSearch, List<UserFromSearch> users) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
