@@ -856,48 +856,25 @@ public class UserManagementController {
 			String companyIdStr = request.getParameter("companyId");
 			Map<String, String> urlParams = new HashMap<>();
 
-			// form parameters validation
-			if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
-				LOG.error("First name invalid");
-				throw new InvalidInputException("First name invalid", DisplayMessageConstants.INVALID_FIRSTNAME);
-			}
-			if (lastName != null && !lastName.isEmpty() && !lastName.matches(CommonConstants.LAST_NAME_REGEX)) {
-				LOG.error("Last name invalid");
-				throw new InvalidInputException("Last name invalid", DisplayMessageConstants.INVALID_LASTNAME);
-			}
-			if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
-				LOG.error("EmailId not valid");
-				throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
-			}
-			if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
-				LOG.error("Password passed was invalid");
-				throw new InvalidInputException("Password passed was invalid", DisplayMessageConstants.INVALID_PASSWORD);
-			}
-			if (companyIdStr == null || companyIdStr.isEmpty()) {
-				LOG.error("Company Id passed was null or empty");
-				throw new InvalidInputException("Company Id passed was null or empty", DisplayMessageConstants.INVALID_COMPANY_NAME);
-			}
-			if (confirmPassword == null || confirmPassword.isEmpty()) {
-				LOG.error("Confirm password passed was null or empty");
-				throw new InvalidInputException("Confirm password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
-			}
-			// check if password and confirm password field match
-			if (!password.equals(confirmPassword)) {
-				LOG.error("Password and confirm password fields do not match");
-				throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
-			}
+			/**
+			 * form parameters validation
+			 */
+			validateCompleteRegistrationForm(firstName, lastName, emailId, password, companyIdStr, confirmPassword);
 
-			// Decrypting URL parameters
+			/**
+			 * Decrypting URL parameters
+			 */
 			try {
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
 			}
 			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in decrypting Url. Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			// check if email ID entered matches with the one in the encrypted url
-			if (!urlParams.get("emailId").equals(emailId)) {
+			/**
+			 * check if email address entered matches with the one in the encrypted url
+			 */
+			if (!urlParams.get("emailId").equalsIgnoreCase(emailId)) {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
 			}
@@ -906,56 +883,28 @@ public class UserManagementController {
 			try {
 				companyId = Long.parseLong(companyIdStr);
 			}
-			catch (NumberFormatException exception) {
-				LOG.error("NumberFormat exception. Reason : " + exception.getStackTrace());
-				throw new InvalidInputException("NumberFormat exception. Reason : " + exception.getStackTrace());
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-
-			try {
-				// fetch user object with email Id
-				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
-				user.setFirstName(firstName);
-				user.setLastName(lastName);
-				user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
-				user.setStatus(CommonConstants.STATUS_ACTIVE);
-				user.setModifiedBy(String.valueOf(user.getUserId()));
-				user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in fetching user object. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
-			}
-
-			try {
-				// change user's password
-				authenticationService.changePassword(user, password);
-			}
-			catch (InvalidInputException e) {
-				LOG.error("Invalid Input exception in changing the user's password. Reason " + e.getMessage(), e);
-				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
-			}
-
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
 
-			// Updating Name
-			LOG.debug("Updating newly activated user {} to mongo", user.getFirstName());
-			AgentSettings agentSettings = userManagementService.getAgentSettingsForUserProfiles(user.getUserId());
-			ContactDetailsSettings contactDetails = agentSettings.getContact_details();
-			contactDetails.setName(user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
+			try {
+				/**
+				 * fetch user object with email Id
+				 */
+				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 
-			profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-					contactDetails);
-			LOG.debug("Updated newly activated user {} to mongo", user.getFirstName());
+				/**
+				 * calling service to update user details on registration
+				 */
+				user = userManagementService.updateUserOnCompleteRegistration(user, emailId, companyId, firstName, lastName, password);
 
-			LOG.debug("Modifying user detail in solr");
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf(user.getStatus()));
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR, (user.getLastName() != null ? user.getLastName()
-					: ""));
-			solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR,
-					user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : ""));
-			LOG.debug("Successfully modified user detail in solr");
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
+			}
 
 			LOG.debug("Adding newly registered user to principal session");
 			sessionHelper.loginOnRegistration(emailId, password);
@@ -992,6 +941,52 @@ public class UserManagementController {
 
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
 		return JspResolver.LINKEDIN_ACCESS;
+	}
+
+	/**
+	 * Method to validate complete registration formF
+	 * 
+	 * @param firstName
+	 * @param lastName
+	 * @param emailId
+	 * @param password
+	 * @param companyIdStr
+	 * @param confirmPassword
+	 * @throws InvalidInputException
+	 */
+	private void validateCompleteRegistrationForm(String firstName, String lastName, String emailId, String password, String companyIdStr,
+			String confirmPassword) throws InvalidInputException {
+		LOG.debug("Method validateCompleteRegistrationForm called");
+		if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
+			LOG.error("First name invalid");
+			throw new InvalidInputException("First name invalid", DisplayMessageConstants.INVALID_FIRSTNAME);
+		}
+		if (lastName != null && !lastName.isEmpty() && !lastName.matches(CommonConstants.LAST_NAME_REGEX)) {
+			LOG.error("Last name invalid");
+			throw new InvalidInputException("Last name invalid", DisplayMessageConstants.INVALID_LASTNAME);
+		}
+		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+			LOG.error("EmailId not valid");
+			throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
+		}
+		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+			LOG.error("Password passed was invalid");
+			throw new InvalidInputException("Password passed was invalid", DisplayMessageConstants.INVALID_PASSWORD);
+		}
+		if (companyIdStr == null || companyIdStr.isEmpty()) {
+			LOG.error("Company Id passed was null or empty");
+			throw new InvalidInputException("Company Id passed was null or empty", DisplayMessageConstants.INVALID_COMPANY_NAME);
+		}
+		if (confirmPassword == null || confirmPassword.isEmpty()) {
+			LOG.error("Confirm password passed was null or empty");
+			throw new InvalidInputException("Confirm password passed was null or empty", DisplayMessageConstants.INVALID_PASSWORD);
+		}
+		// check if password and confirm password field match
+		if (!password.equals(confirmPassword)) {
+			LOG.error("Password and confirm password fields do not match");
+			throw new InvalidInputException("Password and confirm password fields do not match", DisplayMessageConstants.PASSWORDS_MISMATCH);
+		}
+		LOG.debug("Method validateCompleteRegistrationForm executed successfully");
 	}
 
 	@RequestMapping(value = "/showchangepasswordpage")

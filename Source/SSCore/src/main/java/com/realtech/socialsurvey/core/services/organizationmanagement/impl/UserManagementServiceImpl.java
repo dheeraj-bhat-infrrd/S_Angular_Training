@@ -51,6 +51,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -122,6 +123,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
+
+	@Autowired
+	private ProfileManagementService profileManagementService;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -1690,12 +1694,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		String profileName = null;
 		String input = null;
-		if(name != null && !name.isEmpty()){
+		if (name != null && !name.isEmpty()) {
 			input = name;
-		}else{
+		}
+		else {
 			input = emailId.trim().substring(0, emailId.indexOf("@"));
 		}
-		//profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+		// profileName = emailId.trim().substring(0, emailId.indexOf("@"));
 		profileName = utils.prepareProfileName(input);
 
 		LOG.debug("Checking uniqueness of profileName:" + profileName);
@@ -1750,5 +1755,74 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 		LOG.info("Method checkUserCanEdit executed successfully");
 		return users;
+	}
+
+	/**
+	 * Method to update user details on completing registration
+	 */
+	@Override
+	@Transactional
+	public User updateUserOnCompleteRegistration(User user, String emailId, long companyId, String firstName, String lastName, String password)
+			throws SolrException, InvalidInputException {
+		LOG.info("Method updateUserOnCompleteRegistration called");
+		if (user == null) {
+			throw new InvalidInputException("User id null in updateUserOnCompleteRegistration");
+		}
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+		user.setStatus(CommonConstants.STATUS_ACTIVE);
+		user.setModifiedBy(String.valueOf(user.getUserId()));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+
+		/**
+		 * Set the new password
+		 */
+		String encryptedPassword = encryptionHelper.encryptSHA512(password);
+		user.setLoginPassword(encryptedPassword);
+
+		userDao.saveOrUpdate(user);
+
+		/**
+		 * Updating Name, profile name and profile url
+		 */
+		LOG.debug("Updating newly activated user {} to mongo", user.getUserId());
+		AgentSettings agentSettings = getAgentSettingsForUserProfiles(user.getUserId());
+		ContactDetailsSettings contactDetails = agentSettings.getContact_details();
+
+		String name = user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : "");
+		contactDetails.setName(name);
+
+		String profileName = generateIndividualProfileName(user.getUserId(), name, emailId);
+		String profileUrl = utils.generateAgentProfileUrl(profileName);
+		agentSettings.setProfileName(profileName);
+		agentSettings.setProfileUrl(profileUrl);
+		organizationUnitSettingsDao
+				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, agentSettings);
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileName, agentSettings);
+		profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+				contactDetails);
+		LOG.debug("Updated newly activated user {} to mongo", user.getUserId());
+
+		/**
+		 * setting new profile url and profile name in user object
+		 */
+		user.setProfileName(profileName);
+		user.setProfileUrl(profileUrl);
+
+		LOG.debug("Modifying user in solr");
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf(user.getStatus()));
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR,
+				(user.getLastName() != null ? user.getLastName() : ""));
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " "
+				+ (user.getLastName() != null ? user.getLastName() : ""));
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.PROFILE_URL_SOLR, profileUrl);
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.PROFILE_NAME_SOLR, profileName);
+		LOG.debug("Successfully modified user detail in solr");
+
+		LOG.info("Method updateUserOnCompleteRegistration executed successfully");
+
+		return user;
 	}
 }
