@@ -80,7 +80,7 @@ function paintProfilePage(result) {
             }
             if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
-            	 $("#prof-image").css("background-size","cover");
+            	 $("#prof-image").css("background-size","contain");
             }else {
             	if(profileLevel == 'COMPANY'){
             		$("#prof-image").addClass("comp-default-img");
