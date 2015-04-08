@@ -88,9 +88,6 @@
 				<div class="header-links-item">
 					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.profilesetting.key" /></a>
 				</div>
-				<div class="header-links-item">
-					<spring:message code="label.accountsetting.key" />
-				</div>
 				<div class="header-links-item" >
 					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
 				</div>
@@ -137,9 +134,6 @@
 						</c:if>
 						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do')">
 							<spring:message code="label.profilesetting.key" />
-						</div>
-						<div class="initial-dd-item" id="account-setting">
-							<spring:message code="label.accountsetting.key" />
 						</div>
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do')">
 							<spring:message code="label.changepassword.key"/>

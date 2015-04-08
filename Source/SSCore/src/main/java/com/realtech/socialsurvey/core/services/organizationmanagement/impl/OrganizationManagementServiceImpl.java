@@ -74,6 +74,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	private static final Logger LOG = LoggerFactory.getLogger(OrganizationManagementServiceImpl.class);
 	private static Map<Integer, VerticalsMaster> verticalsMastersMap = new HashMap<Integer, VerticalsMaster>();
+	
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
@@ -104,16 +105,16 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
-	
+
 	@Value("${HAPPY_TEXT}")
 	private String happyText;
-	
+
 	@Value("${NEUTRAL_TEXT}")
 	private String neutralText;
-	
+
 	@Value("${SAD_TEXT}")
 	private String sadText;
-	
+
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
 	 * profiles.
@@ -210,7 +211,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		/**
 		 * For an individual, a default agent profile is created
 		 */
-		if (accountType == AccountType.INDIVIDUAL) {
+		if (accountType == AccountType.INDIVIDUAL || accountType  == AccountType.FREE) {
 			profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 			LOG.debug("Creating user profile for agent");
@@ -358,14 +359,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setModifiedOn(System.currentTimeMillis());
 		companySettings.setModifiedBy(String.valueOf(user.getUserId()));
 		companySettings.setLockSettings(new LockSettings());
-		
+
 		// Adding default text for various flows of survey.
 		SurveySettings surveySettings = new SurveySettings();
 		surveySettings.setHappyText(happyText);
 		surveySettings.setNeutralText(neutralText);
 		surveySettings.setSadText(sadText);
 		companySettings.setSurvey_settings(surveySettings);
-		
+
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
 		LOG.debug("Inserting company settings.");
@@ -388,7 +389,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companyName == null || companyName.isEmpty()) {
 			throw new InvalidInputException("Company name is null or empty while generating profile name");
 		}
-		profileName = companyName.replaceAll(" ", "-").toLowerCase();
+		//profileName = companyName.replaceAll(" ", "-").toLowerCase();
+		profileName = utils.prepareProfileName(companyName);
 
 		LOG.debug("Checking uniqueness of profile name generated : " + profileName + " by querying mongo");
 
@@ -401,7 +403,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		if (companySettings != null) {
 
 			LOG.debug("Profile name generated is already taken by a company, appending iden to get a new and unique one");
-			profileName = profileName +"-"+ iden;
+			profileName = utils.appendIdenToProfileName(profileName, iden);
 		}
 		LOG.debug("Successfully generated profile name. Returning : " + profileName);
 		return profileName;
@@ -1901,6 +1903,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		Map<String, Object> queries = new HashMap<String, Object>();
 		queries.put(CommonConstants.REGION_COLUMN, region);
 		queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		queries.put(CommonConstants.IS_DEFAULT_BY_SYSTEM, CommonConstants.NO);
 		long branchCount = branchDao.findNumberOfRowsByKeyValue(Branch.class, queries);
 
 		LOG.info("Branch list fetched for the region " + region);
@@ -2164,7 +2167,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Branch name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
+		// branchProfileName = branchName.trim().replaceAll(" ", "-").toLowerCase();
+		branchProfileName = utils.prepareProfileName(branchName);
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getCompany().getCompanyId(),
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -2185,7 +2189,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (branchSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				branchProfileName = branchProfileName +"-"+ branch.getBranchId();
+				//branchProfileName = branchProfileName + "-" + branch.getBranchId();
+				branchProfileName = utils.appendIdenToProfileName(branchProfileName, branch.getBranchId());
 				branchProfileUrl = utils.generateBranchProfileUrl(companyProfileName, branchProfileName);
 			}
 			organizationSettings.setProfileName(branchProfileName);
@@ -2213,7 +2218,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 		contactSettings.setName(branch.getBranch());
 		contactSettings.setAddress1(branch.getAddress1());
-		contactSettings.setAddress2(branch.getAddress2());
+
+		if (branch.getAddress2() != null && !branch.getAddress2().isEmpty()) {
+			contactSettings.setAddress(branch.getAddress1() + ", " + branch.getAddress2());
+			contactSettings.setAddress2(branch.getAddress2());
+		}
+		else {
+			contactSettings.setAddress(branch.getAddress1());
+		}
 
 		LOG.debug("Method getContactDetailsSettingsFromBranch finished.Returning :" + contactSettings);
 		return contactSettings;
@@ -2230,7 +2242,14 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = new ContactDetailsSettings();
 		contactSettings.setName(region.getRegion());
 		contactSettings.setAddress1(region.getAddress1());
-		contactSettings.setAddress2(region.getAddress2());
+
+		if (region.getAddress2() != null && !region.getAddress2().isEmpty()) {
+			contactSettings.setAddress(region.getAddress1() + ", " + region.getAddress2());
+			contactSettings.setAddress2(region.getAddress2());
+		}
+		else {
+			contactSettings.setAddress(region.getAddress1());
+		}
 
 		LOG.debug("Method getContactDetailsSettingsFromRegion finished.Returning :" + contactSettings);
 		return contactSettings;
@@ -2294,7 +2313,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			throw new InvalidInputException("Region name is null or empty in generateAndSetRegionProfileNameAndUrl");
 		}
 
-		regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
+		//regionProfileName = regionName.trim().replaceAll(" ", "-").toLowerCase();
+		regionProfileName = utils.prepareProfileName(regionName);
 		LOG.debug("Checking if profileName:" + regionProfileName + " is already taken by a region in the company :" + region.getCompany());
 
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getCompany().getCompanyId(),
@@ -2315,7 +2335,8 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 			 */
 			if (regionSettings != null) {
 				LOG.debug("Profile name was not unique hence appending id to it to get a unique one");
-				regionProfileName = regionProfileName +"-"+ region.getRegionId();
+				//regionProfileName = regionProfileName + "-" + region.getRegionId();
+				regionProfileName = utils.appendIdenToProfileName(regionProfileName, region.getRegionId());
 				regionProfileUrl = utils.generateRegionProfileUrl(companyProfileName, regionProfileName);
 			}
 			organizationSettings.setProfileName(regionProfileName);
@@ -2331,110 +2352,6 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 
 		LOG.debug("Method generateAndSetRegionProfileNameAndUrl excecuted successfully");
-	}
-
-	/**
-	 * Method to update a branch
-	 * 
-	 * @throws SolrException
-	 */
-	@Override
-	@Transactional
-	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress1, String branchAddress2, User user)
-			throws InvalidInputException, SolrException {
-		if (user == null) {
-			throw new InvalidInputException("User is null in update branch");
-		}
-		if (branchName == null || branchName.isEmpty()) {
-			throw new InvalidInputException("Branch name is null in update branch");
-		}
-		if (branchAddress1 == null || branchAddress1.isEmpty()) {
-			throw new InvalidInputException("Branch address is null in update branch");
-		}
-		if (branchId <= 0l) {
-			throw new InvalidInputException("Branch id is invalid in update branch");
-		}
-
-		LOG.info("Method update branch called for branchId:" + branchId + " ,regionId:" + regionId + " branchName : " + branchName
-				+ " ,branchAddress:" + branchAddress1);
-		Branch branch = branchDao.findById(Branch.class, branchId);
-		if (branch == null) {
-			throw new InvalidInputException("No branch present for the required id in database while updating branch");
-		}
-		LOG.debug("Checking if the region of branch is changed");
-
-		/**
-		 * In case of branch attached to default region, regionId is 0 hence perform update only
-		 * when the regionId is not the default one
-		 */
-		if (regionId > 0l && regionId != branch.getRegion().getRegionId()) {
-			Region region = regionDao.findById(Region.class, regionId);
-			if (region == null) {
-				throw new InvalidInputException("No region present for the required id in database while updating branch");
-			}
-			branch.setRegion(region);
-		}
-		branch.setBranch(branchName);
-		branch.setAddress1(branchAddress1);
-		branch.setAddress2(branchAddress2);
-		branch.setModifiedBy(String.valueOf(user.getUserId()));
-		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		branchDao.update(branch);
-
-		LOG.debug("Update branch in mongo");
-		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromBranch(branch);
-		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
-				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
-				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-
-		LOG.debug("Updating branch in solr");
-		solrSearchService.addOrUpdateBranchToSolr(branch);
-		LOG.info("Method to update branch completed successfully");
-	}
-
-	/**
-	 * Method to update a region
-	 * 
-	 * @throws SolrException
-	 */
-	@Override
-	@Transactional
-	public void updateRegion(long regionId, String regionName, String regionAddress1, String regionAddress2, User user) throws InvalidInputException,
-			SolrException {
-		if (user == null) {
-			throw new InvalidInputException("User is null in update region");
-		}
-		if (regionName == null || regionName.isEmpty()) {
-			throw new InvalidInputException("Region name is null in update region");
-		}
-		if (regionAddress1 == null || regionAddress1.isEmpty()) {
-			throw new InvalidInputException("Region address is null in update region");
-		}
-		if (regionId <= 0l) {
-			throw new InvalidInputException("Region id is invalid in update region");
-		}
-		LOG.info("Method update region called for regionId:" + regionId + " branchName : " + regionName + " ,regionAddress1:" + regionAddress1);
-		Region region = regionDao.findById(Region.class, regionId);
-		if (region == null) {
-			throw new InvalidInputException("No region present for the required id in database while updating region");
-		}
-		region.setRegion(regionName);
-		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
-		region.setModifiedBy(String.valueOf(user.getUserId()));
-		region.setAddress1(regionAddress1);
-		region.setAddress2(regionAddress2);
-		regionDao.update(region);
-
-		LOG.debug("Updating region in mongo");
-		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
-		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
-				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
-				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-
-		LOG.debug("Updating region in solr");
-		solrSearchService.addOrUpdateRegionToSolr(region);
-
-		LOG.info("Method to update region completed successfully");
 	}
 
 	/**
@@ -2491,7 +2408,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setIden(region.getRegionId());
 		// set is default flag
 		boolean isDefaultFlag = false;
-		if(region.getIsDefaultBySystem() == CommonConstants.YES){
+		if (region.getIsDefaultBySystem() == CommonConstants.YES) {
 			isDefaultFlag = true;
 		}
 		organizationSettings.setDefaultBySystem(isDefaultFlag);
@@ -2526,7 +2443,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationSettings.setIden(branch.getBranchId());
 		// set is default flag
 		boolean isDefaultFlag = false;
-		if(branch.getIsDefaultBySystem() == CommonConstants.YES){
+		if (branch.getIsDefaultBySystem() == CommonConstants.YES) {
 			isDefaultFlag = true;
 		}
 		// set the seo content mdified to true, so that batch pick this record up
@@ -2635,12 +2552,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Override
 	public Set<Company> getAllCompanies() {
 		LOG.info("Method to get list of all companies, getAllCompanies() started");
-		@SuppressWarnings("unchecked")
-		Set<Company> companies = (Set<Company>) companyDao.findAllActive(Company.class);
+		@SuppressWarnings("unchecked") Set<Company> companies = (Set<Company>) companyDao.findAllActive(Company.class);
 		LOG.info("Method to get list of all companies, getAllCompanies() finished");
 		return companies;
 	}
-	
+
 	@Override
 	public Map<Long, BranchFromSearch> fetchBranchesMapByCompany(long companyId) throws InvalidInputException, SolrException, MalformedURLException {
 		String branchesResult = solrSearchService.fetchBranchesByCompany(companyId);
@@ -2749,5 +2665,240 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		return users;
 	}
 
+	/**
+	 * Method to update a region and assign user if specified
+	 */
+	@Override
+	@Transactional
+	public Region updateRegion(User user, long regionId, String regionName, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update region");
+		}
+		if (regionName == null || regionName.isEmpty()) {
+			throw new InvalidInputException("Region name is null in update region");
+		}
+		if (regionId <= 0l) {
+			throw new InvalidInputException("Region id is invalid in update region");
+		}
+		LOG.info("Method update region called for regionId:" + regionId + " regionName : " + regionName + " ,address1:" + address1);
+		Region region = regionDao.findById(Region.class, regionId);
+		if (region == null) {
+			throw new NoRecordsFetchedException("No region present for the required id in database while updating region");
+		}
+		region.setRegion(regionName);
+		region.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		region.setModifiedBy(String.valueOf(user.getUserId()));
+		region.setAddress1(address1);
+		region.setAddress2(address2);
+		regionDao.update(region);
+
+		LOG.debug("Updating region in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromRegion(region);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, regionId,
+				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+
+		LOG.debug("Updating region in solr");
+		solrSearchService.addOrUpdateRegionToSolr(region);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * updated region
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the region");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the region");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignRegionToUser(user, region.getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning region to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method to update region completed successfully");
+		return region;
+	}
+
+	/**
+	 * Method to update a branch
+	 * 
+	 * @throws SolrException
+	 */
+	@Override
+	@Transactional
+	public void updateBranch(long branchId, long regionId, String branchName, String branchAddress1, String branchAddress2, User user)
+			throws InvalidInputException, SolrException {
+		if (user == null) {
+			throw new InvalidInputException("User is null in update branch");
+		}
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null in update branch");
+		}
+		if (branchAddress1 == null || branchAddress1.isEmpty()) {
+			throw new InvalidInputException("Branch address is null in update branch");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in update branch");
+		}
+
+		LOG.info("Method update branch called for branchId:" + branchId + " ,regionId:" + regionId + " branchName : " + branchName
+				+ " ,branchAddress:" + branchAddress1);
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			throw new InvalidInputException("No branch present for the required id in database while updating branch");
+		}
+		LOG.debug("Checking if the region of branch is changed");
+
+		/**
+		 * In case of branch attached to default region, regionId is 0 hence perform update only
+		 * when the regionId is not the default one
+		 */
+		if (regionId > 0l && regionId != branch.getRegion().getRegionId()) {
+			Region region = regionDao.findById(Region.class, regionId);
+			if (region == null) {
+				throw new InvalidInputException("No region present for the required id in database while updating branch");
+			}
+			branch.setRegion(region);
+		}
+		branch.setBranch(branchName);
+		branch.setAddress1(branchAddress1);
+		branch.setAddress2(branchAddress2);
+		branch.setModifiedBy(String.valueOf(user.getUserId()));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		branchDao.update(branch);
+
+		LOG.debug("Update branch in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		LOG.debug("Updating branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+		LOG.info("Method to update branch completed successfully");
+	}
+
+	/**
+	 * Method to update a branch
+	 */
+	@Override
+	@Transactional
+	public Branch updateBranch(User user, long branchId, long regionId, String branchName, String address1, String address2, long selectedUserId,
+			String[] emailIdsArray, boolean isAdmin) throws InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException {
+		LOG.info("Method updateBranch called for branchId:" + branchId + " regionId:" + regionId + " branchName:" + branchName);
+		if (user == null) {
+			throw new InvalidInputException("User is null in update branch");
+		}
+		if (branchName == null || branchName.isEmpty()) {
+			throw new InvalidInputException("Branch name is null in update branch");
+		}
+		if (branchId <= 0l) {
+			throw new InvalidInputException("Branch id is invalid in update branch");
+		}
+		if (address1 == null || address1.isEmpty()) {
+			throw new InvalidInputException("Branch address is null in update branch");
+		}
+		Branch branch = branchDao.findById(Branch.class, branchId);
+		if (branch == null) {
+			throw new NoRecordsFetchedException("No branch present for the required id in database while updating branch");
+		}
+		LOG.debug("Checking if the region of branch is changed");
+
+		Region defaultRegion = getDefaultRegionForCompany(user.getCompany());
+		if (regionId <= 0l) {
+			regionId = defaultRegion.getRegionId();
+		}
+
+		/**
+		 * Perform update only when the regionId is not same as the previous regionId
+		 */
+		if (regionId != branch.getRegion().getRegionId()) {
+			Region region = null;
+			if (regionId == defaultRegion.getRegionId()) {
+				region = defaultRegion;
+			}
+			else {
+				region = regionDao.findById(Region.class, regionId);
+			}
+
+			if (region == null) {
+				throw new NoRecordsFetchedException("No region present for the required id in database while updating branch");
+			}
+			branch.setRegion(region);
+		}
+		branch.setBranch(branchName);
+		branch.setAddress1(address1);
+		branch.setAddress2(address2);
+		branch.setModifiedBy(String.valueOf(user.getUserId()));
+		branch.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+		branchDao.update(branch);
+
+		LOG.debug("Update branch in mongo");
+		ContactDetailsSettings contactDetailsSettings = getContactDetailsSettingsFromBranch(branch);
+		organizationUnitSettingsDao.updateKeyOrganizationUnitSettingsByCriteria(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
+				contactDetailsSettings, MongoOrganizationUnitSettingDaoImpl.KEY_IDENTIFIER, branchId,
+				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
+
+		LOG.debug("Updating branch in solr");
+		solrSearchService.addOrUpdateBranchToSolr(branch);
+
+		/**
+		 * If userId or email is provided, call the service for adding and assigning user to the
+		 * newly created branch
+		 */
+		if (selectedUserId > 0l) {
+			LOG.debug("Fetching user for selectedUserId " + selectedUserId + "to assign to the branch");
+			User assigneeUser = userDao.findById(User.class, selectedUserId);
+			if (assigneeUser == null) {
+				throw new NoRecordsFetchedException("No user found in db for selectedUserId:" + selectedUserId);
+			}
+			try {
+				assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+			}
+			catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+				LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+				throw new UserAssignmentException(e.getMessage(), e);
+			}
+		}
+		else if (emailIdsArray != null && emailIdsArray.length > 0) {
+			LOG.debug("Fetching users list to assign to the branch");
+			List<User> assigneeUsers = getUsersFromEmailIds(emailIdsArray, user);
+
+			if (assigneeUsers != null && !assigneeUsers.isEmpty()) {
+				for (User assigneeUser : assigneeUsers) {
+					try {
+						assignBranchToUser(user, branch.getBranchId(), branch.getRegion().getRegionId(), assigneeUser, isAdmin);
+					}
+					catch (InvalidInputException | NoRecordsFetchedException | SolrException e) {
+						LOG.error("Exception while assigning branch to a user. Reason:" + e.getMessage(), e);
+						throw new UserAssignmentException(e.getMessage(), e);
+					}
+				}
+			}
+		}
+		LOG.info("Method to update branch completed successfully");
+		return branch;
+	}
 }
 // JIRA: SS-27: By RM05: EOC

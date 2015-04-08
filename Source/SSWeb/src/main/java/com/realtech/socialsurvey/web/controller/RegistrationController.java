@@ -1,11 +1,5 @@
 package com.realtech.socialsurvey.web.controller;
 
-// JIRA : SS-13 by RM-06 : BOC
-
-/**
- * Registration Controller Sends an invitation to the corporate admin
- */
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +29,10 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
+//JIRA : SS-13 by RM-06 : BOC
+/**
+* Registration Controller Sends an invitation to the corporate admin
+*/
 @Controller
 public class RegistrationController {
 
@@ -126,6 +124,7 @@ public class RegistrationController {
 	@RequestMapping(value = "/showregistrationpage")
 	public String showRegistrationPage(@RequestParam("q") String encryptedUrlParams, HttpServletRequest request, Model model) {
 		LOG.info("Method showRegistrationPage of Registration Controller called with encryptedUrl : " + encryptedUrlParams);
+		
 		try {
 			LOG.debug("Calling registration service for validating registration url and extracting parameters from it");
 			Map<String, String> urlParams = null;
@@ -135,6 +134,7 @@ public class RegistrationController {
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
 			}
+			
 			if (urlParams == null || urlParams.isEmpty()) {
 				throw new InvalidInputException("Url params are null or empty in showRegistrationPage");
 			}
@@ -144,7 +144,6 @@ public class RegistrationController {
 			model.addAttribute("isDirectRegistration", false);
 
 			LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
-
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while showing registration page. Reason : " + e.getMessage(), e);

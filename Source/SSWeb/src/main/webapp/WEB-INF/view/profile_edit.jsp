@@ -80,11 +80,18 @@
 			</c:choose>
 
 			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-				<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+				<div class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');"></div>
+				<div class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');"></div>
+				<div class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');"></div>
+				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('google');"></div>
+				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('yelp');"></div>
+				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('rss');"></div>
+
+				<%-- <div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
 				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 				<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
 				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
+				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'> --%>
 			</div>
 		</div>
 	</div>
@@ -98,23 +105,24 @@
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
 						<c:when test="${not empty profileimage}">
-							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: cover;"></div>
+							<div id="prof-image-edit" class="prof-image prof-image-edit pos-relative cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
 						</c:when>
 						<c:otherwise>
 							<c:choose>
 								<c:when test="${profilemasterid == 1}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit comp-default-img  pos-relative cursor-pointer"></div>
+									<c:set value="comp-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 2}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit region-default-img pos-relative cursor-pointer"></div>
+									<c:set value="region-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 3}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit office-default-img pos-relative cursor-pointer"></div>
+									<c:set value="office-default-img" var="defaultprofimageclass"></c:set>
 								</c:when>
 								<c:when test="${profilemasterid == 4}">
-									<div id="prof-image-edit" class="prof-image prof-image-edit pers-default-img-big pos-relative cursor-pointer"></div>
+									<c:set value="pers-default-big" var="defaultprofimageclass"></c:set>
 								</c:when>
-							</c:choose>							
+							</c:choose>	
+							<div id="prof-image-edit" class="prof-image prof-image-edit ${defaultprofimageclass} pos-relative cursor-pointer"></div>						
 						</c:otherwise>
 					</c:choose>
 					<form class="form_contact_image" enctype="multipart/form-data">
@@ -280,7 +288,7 @@
 	  							</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
-								<div class="float-left lp-con-icn icn-web"></div>
+								<div class="float-left lp-con-icn icn-blog"></div>
 								<div>
 									<c:choose>
 										<c:when	test="${parentLock.isBlogAddressLocked && profilemasterid != 4}">
@@ -307,33 +315,6 @@
 	  							</div>
 							</div>
 							<div class="lp-con-row lp-row clearfix">
-								<div class="float-left lp-con-icn icn-phone"></div>
-								<div class="float-left lp-edit-wrapper clearfix float-left">
-									<c:choose>
-										<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
-											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
-											<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-										</c:when>
-										<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
-											<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
-										</c:when>
-										<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
-											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
-										</c:when>
-										<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
-											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
-										</c:when>
-										<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4}">
-											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
-											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
-										</c:when>
-									</c:choose>
-								</div>
-							</div>
-							<div class="lp-con-row lp-row clearfix">
 								<div class="float-left lp-con-icn icn-mbl"></div>
 								<div class="float-left lp-edit-wrapper clearfix float-left">
 									<c:choose>
@@ -356,6 +337,33 @@
 										<c:when	test="${not parentLock.isPersonalPhoneLocked && not lock.isPersonalPhoneLocked && profilemasterid != 4}">
 											<input id="phone-number-personal" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="personal" value="${contactNumbers.personal}" placeholder='<spring:message code="label.personal.placeholder.key"/>'>
 											<div id="phone-number-personal-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
+										</c:when>
+									</c:choose>
+								</div>
+							</div>
+							<div class="lp-con-row lp-row clearfix">
+								<div class="float-left lp-con-icn icn-phone"></div>
+								<div class="float-left lp-edit-wrapper clearfix float-left">
+									<c:choose>
+										<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid != 4}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
+											<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${parentLock.isWorkPhoneLocked && profilemasterid == 4}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>' readonly>
+											<div id="phone-number-work-lock" data-state="locked" data-control="parent" class="float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isWorkPhoneLocked && profilemasterid == 4}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="float-left"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isWorkPhoneLocked && lock.isWorkPhoneLocked && profilemasterid != 4}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left lp-edit-locks-locked"></div>
+										</c:when>
+										<c:when	test="${not parentLock.isWorkPhoneLocked && not lock.isWorkPhoneLocked && profilemasterid != 4}">
+											<input id="phone-number-work" class="float-left lp-con-row-item prof-edditable-sin" data-phone-number="work" value="${contactNumbers.work}" placeholder='<spring:message code="label.workphone.placeholder.key"/>'>
+											<div id="phone-number-work-lock" data-state="unlocked" data-control="user" class="lp-edit-locks float-left"></div>
 										</c:when>
 									</c:choose>
 								</div>
@@ -404,12 +412,14 @@
 									<c:choose>
 										<c:when test="${not empty associations}">
 											<c:forEach items="${associations}" var="association">
-												<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}">
-												<div class="float-right lp-ach-item-img" data-type="association"></div>
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="association"></div>
+												</div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
-											<div><spring:message code="label.membership.empty.key"></spring:message></div>
+											<span><spring:message code="label.membership.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -425,12 +435,14 @@
 									<c:choose>
 										<c:when test="${not empty achievements}">
 											<c:forEach items="${achievements}" var="achievement">
-												<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}">
-												<div class="float-right lp-ach-item-img" data-type="achievement"></div>
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="achievement"></div>
+												</div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
-											<div><spring:message code="label.achievement.empty.key"></spring:message></div>
+											<span><spring:message code="label.achievement.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -446,12 +458,14 @@
 									<c:choose>
 										<c:when test="${not empty authorisedInList}">
 											<c:forEach items="${authorisedInList}" var="authorisedIn">
-												<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}">
-												<div class="float-right lp-ach-item-img" data-type="license"></div>
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="license"></div>
+												</div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
-											<div><spring:message code="label.licenses.empty.key"></spring:message></div>
+											<span><spring:message code="label.licenses.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -463,22 +477,26 @@
 					</c:otherwise>
 				</c:choose>
 				</div>
-				<div class="bd-hr-left-panel">
 				<c:choose>
-					<c:when	test="${profilemasterid == 1}">
-						<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
-					</c:when>
-					<c:when	test="${profilemasterid == 2}">
-						<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
-					</c:when>
-					<c:when	test="${profilemasterid == 3}">
-						<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
+					<c:when	test="${profilemasterid != 4}">
+						<div class="bd-hr-left-panel">
+							<c:choose>
+								<c:when	test="${profilemasterid == 1}">
+									<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
+								</c:when>
+								<c:when	test="${profilemasterid == 2}">
+									<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
+								</c:when>
+								<c:when	test="${profilemasterid == 3}">
+									<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
+								</c:when>
+							</c:choose>
+							<div id ="prof-hierarchy-container" class="hide">
+								<!-- hierarchy structure comes here  -->
+							</div>
+   						</div>
 					</c:when>
 				</c:choose>
-					<div id ="prof-hierarchy-container" class="hide">
-						<!-- hierarchy structure comes here  -->
-					</div>
-   				</div>
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -627,6 +645,7 @@
 		$('#profile-sel').click(function(){
 			$('#pe-dd-wrapper-profiles').slideToggle(200);
 		});
+		
 		$('.pe-dd-item').click(function(){
 			var newProfileId = $(this).data('profile-id');
 			
@@ -636,4 +655,8 @@
 			showMainContent('./showprofilepage.do?profileId=' + newProfileId);
 		});
 	});
+	
+	function openAuthPage(socialNetwork) {
+		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	}
 </script>

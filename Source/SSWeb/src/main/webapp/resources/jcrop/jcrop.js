@@ -1,9 +1,9 @@
 var imageMaxWidth = 470;
-var ratio = 1;
+var ratio;
 
 function createPopupCanvas() {
 	var canvas = '<img src="" id="target" class="hide" style="position:absoulte;"/>'
-		+ '<canvas id="canvas" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
+		+ '<canvas id="canvas" width="200" height="200" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
 	$('#overlay-header').html("Edit image");
 	$('#overlay-text').html(canvas).css('position', 'relative');
 	$('#overlay-continue').html("Upload");
@@ -19,29 +19,29 @@ function initiateJcrop(input) {
 		var reader = new FileReader();
 		reader.onload = function(e) {
 			$('#target').attr('src', e.target.result);
-			ratio = $('#target').width() / imageMaxWidth;
+			if (typeof ratio === 'undefined') {
+				ratio = $('#target').width() / imageMaxWidth;
+			}
 			$('#target').removeClass('hide');
 			$('#target').width(imageMaxWidth);
 			
 			$('#target').Jcrop({
-				setSelect: [ 100, 100, 50, 50 ],
+				aspectRatio : 1,
+				setSelect: [ 200, 100, 200, 200 ],
 				onSelect: updatePreview,
 				onChange: updatePreview
 			});
 		};
 		reader.readAsDataURL(input.files[0]);
 
-		$(document).on('click', '#overlay-continue', function() {
+		$('#overlay-continue').click(function() {
 			var dataurl = canvas.toDataURL("image/png");
-			$('#prof-image').attr('src', dataurl);
-			$('#overlay-main').hide();
+			overlayRevert();
 
 			var formData = new FormData();
 			formData.append("imageBase64", dataurl);
 			formData.append("imageFileName", $('#prof-image').prop("files")[0].name);
 			callAjaxPOSTWithTextData("./updateprofileimage.do", callBackOnProfileImageUpload, false, formData);
-			
-			$('#overlay-continue').unbind('click');
 		});
 	}
 }
