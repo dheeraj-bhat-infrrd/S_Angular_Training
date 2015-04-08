@@ -11,7 +11,6 @@ $(document).ready(function() {
 			async : true,
 			success : function(data) {
 				gaTrackingId = data;
-				alert(gaTrackingId);
 			},
 			error : function(e) {
 				redirectErrorpage();
