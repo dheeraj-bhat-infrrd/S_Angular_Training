@@ -20,6 +20,7 @@ var autoPostScore;
 var happyText;
 var neutralText;
 var sadText;
+var rating;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -255,7 +256,8 @@ function showFeedbackPage(mood) {
 				}
 			}
 		}
-		if((currResponse/(counter) >= autoPostScore) && (Boolean(autoPost) == true))
+		rating = currResponse/(counter);
+		if((rating >= autoPostScore) && (Boolean(autoPost) == true))
 			$("#pst-srvy-div").show();
 		break;
 	case "neutral":
@@ -347,6 +349,9 @@ function showMasterQuestionPage(){
 			autoPost = $('#post-survey').is(":checked");
 		var feedback = $("#text-area").val();
 		updateCustomerResponse(feedback);
+		if(autoPost){
+			postToSocialMedia(feedback);
+		}
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#content-head').html('Survey Completed');
@@ -354,6 +359,37 @@ function showMasterQuestionPage(){
 			+ agentName+ ".\nThanks for your participation.");
 	}
 	return;
+}
+
+function postToSocialMedia(feedback){
+	var success = false;
+	var payload = {
+		"agentId" : agentId,
+		"firstName" : firstName,
+		"lastName" : lastName,
+		"agentName" : agentName,
+		"rating" : rating
+	};
+	$.ajax({
+		url : "./posttosocoialnetwork",
+		type : "GET",
+		dataType : "TEXT",
+		data : payload,
+		success : function(data) {
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				
+			}
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+
 }
 
 // Starting click events.
