@@ -498,7 +498,7 @@ $(document).on('click', '.lp-ach-item-img', function(e) {
 	$(this).prev().hide();
 	$(this).hide();
 	
-	var type = $(this).attr('data-type');
+	var type = $(this).data('type');
 	if (type == 'association') {
 		updateAssociations();
 	}
