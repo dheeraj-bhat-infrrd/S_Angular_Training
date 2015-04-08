@@ -1027,6 +1027,7 @@ function paintProfImage(imgDivClass) {
 		var imageUrl = $(this).attr('data-imageurl');
 		if(imageUrl != "" && imageUrl != undefined) {
 			$(this).css("background", "url(" + imageUrl + ") no-repeat center");
+			$(this).css("background-size", "100%");
 		}		
 	});
 }

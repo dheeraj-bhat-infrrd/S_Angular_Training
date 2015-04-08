@@ -1,13 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-
+<!-- Account masters 1=Individual, 2=Team, 3=Company,4=Enterprise,5=Free Account -->
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
+<c:set var="accountTypeId" value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}"/>
 <table class="v-um-tbl">
 	<tr class="u-tbl-header">
 		<td class="v-tbl-uname"><spring:message code="label.usermanagement.username.key" /></td>
 		<td class="v-tbl-email"><spring:message code="label.emailid.key" /></td>
-		<td class="v-tbl-rgn-adm text-center"><spring:message code="label.region.key" /><br /><spring:message code="label.admin.key" /></td>
-		<td class="v-tbl-of-adm text-center"><spring:message code="label.office.key" /><br /><spring:message code="label.admin.key" /></td>
+		<td class="v-tbl-rgn-adm text-center">
+			<c:if test="${accountTypeId == 4}">
+				<spring:message code="label.region.key" /><br /><spring:message code="label.admin.key" />
+			</c:if>
+		</td>
+		<td class="v-tbl-of-adm text-center">
+			<c:if test="${accountTypeId == 4 || accountTypeId == 3}">
+				<spring:message code="label.office.key" /><br /><spring:message code="label.admin.key" />
+			</c:if>
+		</td>
 		<td class="v-tbl-ln-of text-center"><spring:message code="label.individual.key" /></td>
 		<td class="v-tbl-mail"></td>
 		<td class="v-tbl-online"></td>
@@ -18,15 +28,19 @@
 		<c:when test="${not empty userslist}">
 			<c:forEach var="userfromsearch" items="${userslist}">
 				<!-- For Region admin -->
-				<c:set var="regionadmintickclass" value=""/>
-				<c:if test="${userfromsearch.isRegionAdmin != null && userfromsearch.isRegionAdmin}">
-					<c:set var="regionadmintickclass" value="v-icn-tick"/>
+				<c:if test="${accountTypeId == 4}">
+					<c:set var="regionadmintickclass" value=""/>
+					<c:if test="${userfromsearch.isRegionAdmin != null && userfromsearch.isRegionAdmin}">
+						<c:set var="regionadmintickclass" value="v-icn-tick"/>
+					</c:if>
 				</c:if>
 		
 				<!-- For Branch admin -->
-				<c:set var="branchadmintickclass" value=""/>
-				<c:if test="${userfromsearch.isBranchAdmin != null && userfromsearch.isBranchAdmin}">
-					<c:set var="branchadmintickclass" value="v-icn-tick"/>
+				<c:if test="${accountTypeId == 4 || accountTypeId == 3}">
+					<c:set var="branchadmintickclass" value=""/>
+					<c:if test="${userfromsearch.isBranchAdmin != null && userfromsearch.isBranchAdmin}">
+						<c:set var="branchadmintickclass" value="v-icn-tick"/>
+					</c:if>
 				</c:if>
 		
 				<!-- For Agent -->
