@@ -69,10 +69,10 @@
 					</c:choose>
 					<c:choose>
 						<c:when test="${userfromsearch.status == 2}">
-							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.active.key" />"></td>
+							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.inactive.key" />"></td>
 						</c:when>
 						<c:otherwise>
-							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.inactive.key" />"></td>
+							<td class="v-tbl-online v-tbl-icn ${userstatustickclass} v-icn-onl-off" title="<spring:message code="label.active.key" />"></td>
 						</c:otherwise>
 					</c:choose>
 					<td class="v-tbl-rem ${admincaneditclass} v-icn-rem-user" title="<spring:message code="label.remove.key" />"></td>

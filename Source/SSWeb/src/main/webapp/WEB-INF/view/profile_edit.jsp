@@ -471,22 +471,26 @@
 					</c:otherwise>
 				</c:choose>
 				</div>
-				<div class="bd-hr-left-panel">
 				<c:choose>
-					<c:when	test="${profilemasterid == 1}">
-						<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
-					</c:when>
-					<c:when	test="${profilemasterid == 2}">
-						<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
-					</c:when>
-					<c:when	test="${profilemasterid == 3}">
-						<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
+					<c:when	test="${profilemasterid != 4}">
+						<div class="bd-hr-left-panel">
+							<c:choose>
+								<c:when	test="${profilemasterid == 1}">
+									<div class="bd-hr-lp-header"><spring:message code="label.ourcompany.key"/></div>
+								</c:when>
+								<c:when	test="${profilemasterid == 2}">
+									<div class="bd-hr-lp-header"><spring:message code="label.ourregion.key"/></div>
+								</c:when>
+								<c:when	test="${profilemasterid == 3}">
+									<div class="bd-hr-lp-header"><spring:message code="label.ourbranch.key"/></div>
+								</c:when>
+							</c:choose>
+							<div id ="prof-hierarchy-container" class="hide">
+								<!-- hierarchy structure comes here  -->
+							</div>
+   						</div>
 					</c:when>
 				</c:choose>
-					<div id ="prof-hierarchy-container" class="hide">
-						<!-- hierarchy structure comes here  -->
-					</div>
-   				</div>
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">

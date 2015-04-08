@@ -181,7 +181,9 @@ function callBackOnEditAdboutMeDetails(data) {
 	}
 
 	if ($('#aboutme-status').val() == 'new') {
-		showMainContent('./showprofilepage.do');
+		callAjaxGET("./fetchaboutme.do", function(data) {
+			$('#intro-about-me').html(data);
+		}, true);
 	}
 	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
@@ -268,7 +270,6 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 			return false;
 		}
 		webAddresses = JSON.stringify(webAddresses);
-		console.log(webAddresses);
 		var payload = {
 			"webAddresses" : webAddresses
 		};
@@ -494,11 +495,11 @@ $(document).on('blur', '.prof-edditable-sin-agent', function() {
 $(document).on('click', '.lp-ach-item-img', function(e) {
 	e.stopPropagation();
 
+	var type = $(this).data('type');
 	$(this).prev().attr('data-status', 'removed');
 	$(this).prev().hide();
 	$(this).hide();
 	
-	var type = $(this).attr('data-type');
 	if (type == 'association') {
 		updateAssociations();
 	}
@@ -515,20 +516,21 @@ function addAnAssociation() {
 	if ($('#association-container > input').length <= 0) {
 		$('#association-container').empty();
 	}
+
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Associaion",
 		"data-status" : "new"
 	});
-	$('#association-container').append(newAssociation);
-
 	var newAssociationButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img",
 		"data-type" : "association"
 	});
-	$('#association-container').append(newAssociationButton);
 
+	$('#association-container').append(newAssociation);
+	$('#association-container').append(newAssociationButton);
 	newAssociation.focus();
+	newAssociationButton.addClass('float-right');
 }
 
 $(document).on('blur', '#association-container input', function(e) {
@@ -544,14 +546,14 @@ function updateAssociations() {
 	
 	$('#association-container').children('input').each(function() {
 		var status = $(this).data('status');
-		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+		if (this.value != "" && status != 'removed') {
 			var association = {};
 			association.name = this.value;
 			associationList.push(association);
 
 			statusEdited = true;
-		} else {
-			return;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		}
 	});
 	if (!statusEdited) {
@@ -569,6 +571,10 @@ function callBackUpdateAssociations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+	
+	if (! $('#association-container').find('input').length) { 
+		$('#association-container').append('<div>No association added yet</div>');
+	}
 }
 
 // Function to update achievement list
@@ -576,20 +582,21 @@ function addAnAchievement() {
 	if ($('#achievement-container > input').length <= 0) {
 		$('#achievement-container').empty();
 	}
+	
 	var newAchievement = $('<input>').attr({
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Achievement",
 		"data-status" : "new"
 	});
-	$('#achievement-container').append(newAchievement);
-
 	var newAchievementButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img",
 		"data-type" : "achievement"
 	});
-	$('#achievement-container').append(newAchievementButton);
 
+	$('#achievement-container').append(newAchievement);
+	$('#achievement-container').append(newAchievementButton);
 	newAchievement.focus();
+	newAchievementButton.addClass('float-right');
 }
 
 $(document).on('blur', '#achievement-container input', function(e) {
@@ -605,14 +612,14 @@ function updateAchievements() {
 
 	$('#achievement-container').children('input').each(function() {
 		var status = $(this).data('status');
-		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+		if (this.value != "" && status != 'removed') {
 			var achievement = {};
 			achievement.achievement = this.value;
 			achievementList.push(achievement);
 
 			statusEdited = true;
-		} else {
-			return;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		}
 	});
 	if (!statusEdited) {
@@ -623,14 +630,17 @@ function updateAchievements() {
 	var payload = {
 		"achievementList" : achievementList
 	};
-	callAjaxPostWithPayloadData("./updateachievements.do",
-			callBackUpdateAchievements, payload);
+	callAjaxPostWithPayloadData("./updateachievements.do", callBackUpdateAchievements, payload);
 }
 
 function callBackUpdateAchievements(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+
+	if (! $('#achievement-container').find('input').length) { 
+		$('#achievement-container').append('<div>No achievement added yet</div>');
+	}
 }
 
 // Function to update License authorizations
@@ -638,20 +648,21 @@ function addAuthorisedIn() {
 	if ($('#authorised-in-container > input').length <= 0) {
 		$('#authorised-in-container').empty();
 	}
+	
 	var newAuthorisation = $('<input>').attr({
 		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "Authorized in",
 		"data-status" : "new"
 	});
-	$('#authorised-in-container').append(newAuthorisation);
-
 	var newAuthorizationButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img",
 		"data-type" : "license"
 	});
-	$('#authorised-in-container').append(newAuthorizationButton);
 
+	$('#authorised-in-container').append(newAuthorisation);
+	$('#authorised-in-container').append(newAuthorizationButton);
 	newAuthorisation.focus();
+	newAuthorizationButton.addClass('float-right');
 }
 
 $(document).on('blur', '#authorised-in-container input', function(e) {
@@ -667,13 +678,13 @@ function updateLicenseAuthorizations() {
 
 	$('#authorised-in-container').children('input').each(function() {
 		var status = $(this).data('status');
-		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+		if (this.value != "" && status != 'removed') {
 			var licence = this.value;
 			licenceList.push(licence);
 			
 			statusEdited = true;
-		} else {
-			return;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		}
 	});
 	if (!statusEdited) {
@@ -691,6 +702,10 @@ function callBackUpdateLicenseAuthorizations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+
+	if (! $('#authorised-in-container').find('input').length) { 
+		$('#authorised-in-container').append('<div>No license added yet</div>');
+	}
 }
 
 
