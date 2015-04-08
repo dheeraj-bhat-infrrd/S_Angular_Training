@@ -1594,7 +1594,7 @@ public class HierarchyManagementController {
 			emailIdsArray = selectedUserEmail.split(",");
 			if (emailIdsArray != null && emailIdsArray.length > 0) {
 				for (String emailId : emailIdsArray) {
-					if (emailId == null || emailId.trim().isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+					if (emailId == null || emailId.trim().isEmpty() || !emailId.trim().matches(CommonConstants.EMAIL_REGEX)) {
 						throw new InvalidInputException("Email address" + emailId + " is invalid", DisplayMessageConstants.INVALID_EMAILID);
 					}
 					emailId = emailId.trim();
