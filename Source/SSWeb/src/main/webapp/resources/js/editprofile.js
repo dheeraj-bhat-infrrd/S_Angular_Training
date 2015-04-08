@@ -573,7 +573,7 @@ function callBackUpdateAssociations(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 	
-	if ($('#association-container').find('input').length) { 
+	if (!$('#association-container').find('input').length) { 
 		$('#association-container').append('<div>No association added yet</div>');
 	}
 }
@@ -641,7 +641,7 @@ function callBackUpdateAchievements(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
-	if ($('#achievement-container').find('input').length) { 
+	if (!$('#achievement-container').find('input').length) { 
 		$('#achievement-container').append('<div>No achievement added yet</div>');
 	}
 }
@@ -708,7 +708,7 @@ function callBackUpdateLicenseAuthorizations(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
-	if ($('#authorised-in-container').find('input').length) { 
+	if (!$('#authorised-in-container').find('input').length) { 
 		$('#authorised-in-container').append('<div>No license added yet</div>');
 	}
 }
