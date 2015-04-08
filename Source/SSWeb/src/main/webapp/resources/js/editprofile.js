@@ -545,7 +545,7 @@ function updateAssociations() {
 	
 	$('#association-container').children('input').each(function() {
 		var status = $(this).data('status');
-		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+		if (this.value != "" && status != 'removed') {
 			var association = {};
 			association.name = this.value;
 			associationList.push(association);
@@ -553,8 +553,6 @@ function updateAssociations() {
 			statusEdited = true;
 		} else if (status == 'removed') {
 			statusEdited = true;
-		} else {
-			return;
 		}
 	});
 	if (!statusEdited) {
@@ -573,7 +571,7 @@ function callBackUpdateAssociations(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 	
-	if (!$('#association-container').find('input').length) { 
+	if (! $('#association-container').find('input').length) { 
 		$('#association-container').append('<div>No association added yet</div>');
 	}
 }
@@ -613,7 +611,7 @@ function updateAchievements() {
 
 	$('#achievement-container').children('input').each(function() {
 		var status = $(this).data('status');
-		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+		if (this.value != "" && status != 'removed') {
 			var achievement = {};
 			achievement.achievement = this.value;
 			achievementList.push(achievement);
@@ -621,8 +619,6 @@ function updateAchievements() {
 			statusEdited = true;
 		} else if (status == 'removed') {
 			statusEdited = true;
-		} else {
-			return;
 		}
 	});
 	if (!statusEdited) {
@@ -641,7 +637,7 @@ function callBackUpdateAchievements(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
-	if (!$('#achievement-container').find('input').length) { 
+	if (! $('#achievement-container').find('input').length) { 
 		$('#achievement-container').append('<div>No achievement added yet</div>');
 	}
 }
@@ -681,15 +677,13 @@ function updateLicenseAuthorizations() {
 
 	$('#authorised-in-container').children('input').each(function() {
 		var status = $(this).data('status');
-		if (this.value != "" && (status == 'edited' || status == 'saved')) {
+		if (this.value != "" && status != 'removed') {
 			var licence = this.value;
 			licenceList.push(licence);
 			
 			statusEdited = true;
 		} else if (status == 'removed') {
 			statusEdited = true;
-		} else {
-			return;
 		}
 	});
 	if (!statusEdited) {
@@ -708,7 +702,7 @@ function callBackUpdateLicenseAuthorizations(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
-	if (!$('#authorised-in-container').find('input').length) { 
+	if (! $('#authorised-in-container').find('input').length) { 
 		$('#authorised-in-container').append('<div>No license added yet</div>');
 	}
 }
