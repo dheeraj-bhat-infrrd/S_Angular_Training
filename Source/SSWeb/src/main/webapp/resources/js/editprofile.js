@@ -491,15 +491,21 @@ $(document).on('blur', '.prof-edditable-sin-agent', function() {
 	$(this).removeClass('prof-name-edit');
 });
 
+$(document).on('mouseover', '.lp-dummy-row', function() {
+	$(this).children().last().removeClass('hide');
+});
+$(document).on('mouseout', '.lp-dummy-row', function() {
+	$(this).children().last().addClass('hide');
+});
+
 // remove agent details
 $(document).on('click', '.lp-ach-item-img', function(e) {
 	e.stopPropagation();
+	$(this).prev().attr('data-status', 'removed');
 
 	var type = $(this).data('type');
-	$(this).prev().attr('data-status', 'removed');
-	$(this).prev().hide();
-	$(this).hide();
-	
+	$(this).parent().hide();
+
 	if (type == 'association') {
 		updateAssociations();
 	}
@@ -513,22 +519,27 @@ $(document).on('click', '.lp-ach-item-img', function(e) {
 
 // Function to update association/membership list
 function addAnAssociation() {
-	if ($('#association-container > input').length <= 0) {
+	if ($('#association-container > div').length <= 0) {
 		$('#association-container').empty();
 	}
 
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#association-container').append(newDiv);
+	
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Associaion",
 		"data-status" : "new"
 	});
 	var newAssociationButton = $('<div>').attr({
-		"class" : "lp-ach-item-img",
+		"class" : "lp-ach-item-img hide",
 		"data-type" : "association"
 	});
 
-	$('#association-container').append(newAssociation);
-	$('#association-container').append(newAssociationButton);
+	$('#association-container').children().last().append(newAssociation);
+	$('#association-container').children().last().append(newAssociationButton);
 	newAssociation.focus();
 	newAssociationButton.addClass('float-right');
 }
@@ -544,11 +555,14 @@ function updateAssociations() {
 	var associationList = [];
 	var statusEdited = false;
 	
-	$('#association-container').children('input').each(function() {
-		var status = $(this).data('status');
-		if (this.value != "" && status != 'removed') {
+	$('#association-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		console.log(status);
+		console.log(value);
+		if (value != "" && status != 'removed') {
 			var association = {};
-			association.name = this.value;
+			association.name = value;
 			associationList.push(association);
 
 			statusEdited = true;
@@ -573,28 +587,33 @@ function callBackUpdateAssociations(data) {
 	showToast();
 	
 	if (! $('#association-container').find('input').length) { 
-		$('#association-container').append('<div>No association added yet</div>');
+		$('#association-container').append('<span>No association added yet</span>');
 	}
 }
 
 // Function to update achievement list
 function addAnAchievement() {
-	if ($('#achievement-container > input').length <= 0) {
+	if ($('#achievement-container > div').length <= 0) {
 		$('#achievement-container').empty();
 	}
 	
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#achievement-container').append(newDiv);
+
 	var newAchievement = $('<input>').attr({
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Achievement",
 		"data-status" : "new"
 	});
 	var newAchievementButton = $('<div>').attr({
-		"class" : "lp-ach-item-img",
+		"class" : "lp-ach-item-img hide",
 		"data-type" : "achievement"
 	});
 
-	$('#achievement-container').append(newAchievement);
-	$('#achievement-container').append(newAchievementButton);
+	$('#achievement-container').children().last().append(newAchievement);
+	$('#achievement-container').children().last().append(newAchievementButton);
 	newAchievement.focus();
 	newAchievementButton.addClass('float-right');
 }
@@ -610,11 +629,12 @@ function updateAchievements() {
 	var achievementList = [];
 	var statusEdited = false;
 
-	$('#achievement-container').children('input').each(function() {
-		var status = $(this).data('status');
-		if (this.value != "" && status != 'removed') {
+	$('#achievement-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
 			var achievement = {};
-			achievement.achievement = this.value;
+			achievement.achievement = value;
 			achievementList.push(achievement);
 
 			statusEdited = true;
@@ -639,28 +659,33 @@ function callBackUpdateAchievements(data) {
 	showToast();
 
 	if (! $('#achievement-container').find('input').length) { 
-		$('#achievement-container').append('<div>No achievement added yet</div>');
+		$('#achievement-container').append('<span>No achievement added yet</span>');
 	}
 }
 
 // Function to update License authorizations
 function addAuthorisedIn() {
-	if ($('#authorised-in-container > input').length <= 0) {
+	if ($('#authorised-in-container > div').length <= 0) {
 		$('#authorised-in-container').empty();
 	}
 	
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#authorised-in-container').append(newDiv);
+
 	var newAuthorisation = $('<input>').attr({
 		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "Authorized in",
 		"data-status" : "new"
 	});
 	var newAuthorizationButton = $('<div>').attr({
-		"class" : "lp-ach-item-img",
+		"class" : "lp-ach-item-img hide",
 		"data-type" : "license"
 	});
 
-	$('#authorised-in-container').append(newAuthorisation);
-	$('#authorised-in-container').append(newAuthorizationButton);
+	$('#authorised-in-container').children().last().append(newAuthorisation);
+	$('#authorised-in-container').children().last().append(newAuthorizationButton);
 	newAuthorisation.focus();
 	newAuthorizationButton.addClass('float-right');
 }
@@ -676,10 +701,11 @@ function updateLicenseAuthorizations() {
 	var licenceList = [];
 	var statusEdited = false;
 
-	$('#authorised-in-container').children('input').each(function() {
-		var status = $(this).data('status');
-		if (this.value != "" && status != 'removed') {
-			var licence = this.value;
+	$('#authorised-in-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
+			var licence = value;
 			licenceList.push(licence);
 			
 			statusEdited = true;
@@ -704,7 +730,7 @@ function callBackUpdateLicenseAuthorizations(data) {
 	showToast();
 
 	if (! $('#authorised-in-container').find('input').length) { 
-		$('#authorised-in-container').append('<div>No license added yet</div>');
+		$('#authorised-in-container').append('<span>No license added yet</span>');
 	}
 }
 
