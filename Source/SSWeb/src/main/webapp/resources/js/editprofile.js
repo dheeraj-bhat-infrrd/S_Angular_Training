@@ -515,20 +515,21 @@ function addAnAssociation() {
 	if ($('#association-container > input').length <= 0) {
 		$('#association-container').empty();
 	}
+
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Associaion",
 		"data-status" : "new"
 	});
-	$('#association-container').append(newAssociation);
-
 	var newAssociationButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img",
 		"data-type" : "association"
 	});
-	$('#association-container').append(newAssociationButton);
 
+	$('#association-container').append(newAssociation);
+	$('#association-container').append(newAssociationButton);
 	newAssociation.focus();
+	newAssociationButton.addClass('float-right');
 }
 
 $(document).on('blur', '#association-container input', function(e) {
@@ -576,20 +577,21 @@ function addAnAchievement() {
 	if ($('#achievement-container > input').length <= 0) {
 		$('#achievement-container').empty();
 	}
+	
 	var newAchievement = $('<input>').attr({
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "New Achievement",
 		"data-status" : "new"
 	});
-	$('#achievement-container').append(newAchievement);
-
 	var newAchievementButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img",
 		"data-type" : "achievement"
 	});
-	$('#achievement-container').append(newAchievementButton);
 
+	$('#achievement-container').append(newAchievement);
+	$('#achievement-container').append(newAchievementButton);
 	newAchievement.focus();
+	newAchievementButton.addClass('float-right');
 }
 
 $(document).on('blur', '#achievement-container input', function(e) {
@@ -638,20 +640,21 @@ function addAuthorisedIn() {
 	if ($('#authorised-in-container > input').length <= 0) {
 		$('#authorised-in-container').empty();
 	}
+	
 	var newAuthorisation = $('<input>').attr({
 		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
 		"placeholder" : "Authorized in",
 		"data-status" : "new"
 	});
-	$('#authorised-in-container').append(newAuthorisation);
-
 	var newAuthorizationButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img",
 		"data-type" : "license"
 	});
-	$('#authorised-in-container').append(newAuthorizationButton);
 
+	$('#authorised-in-container').append(newAuthorisation);
+	$('#authorised-in-container').append(newAuthorizationButton);
 	newAuthorisation.focus();
+	newAuthorizationButton.addClass('float-right');
 }
 
 $(document).on('blur', '#authorised-in-container input', function(e) {
