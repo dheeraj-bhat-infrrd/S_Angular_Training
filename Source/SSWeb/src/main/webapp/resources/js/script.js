@@ -250,31 +250,22 @@ function validateEmailId(elementId){
 			if (emailRegex.test($('#'+elementId).val()) == true) {
 				return true;
 			} else {
-				// $('#overlay-toast').html('Please enter a valid email id.');
-				// showToast();
 				showError('Please enter a valid Email Id');
 				return false;
 			}
 		} else {
-			// $('#overlay-toast').html('Please enter email id.');
-			// showToast();
 			showError('Please enter a valid Email Id');
 			return false;
 		}
 	} else {
     	if ($('#'+elementId).val() != "") {
 			if (emailRegex.test($('#'+elementId).val()) == true) {
-				// $('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid email id.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
 				showError('Please enter a valid Email Id');
 				return false;
 			}
 		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter email id.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
 			showError('Please enter a valid Email Id');
 			return false;
 		}
@@ -288,195 +279,96 @@ function validateFirstName(elementId){
 			if (nameRegex.test($('#'+elementId).val()) == true) {
 				return true;
 			} else {
-				// $('#overlay-toast').html('Please enter a valid first name.');
-				// showToast();
 				showError('Please enter a valid first name');
 				return false;
 			}
 		} else {
-			// $('#overlay-toast').html('Please enter first name.');
-			// showToast();
 			showError('Please enter a valid first name');
 			return false;
 		}
 	} else {
     	if ($('#'+elementId).val() != "") {
 			if (nameRegex.test($('#'+elementId).val()) == true) {
-				//$('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid first name.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
 				showError('Please enter a valid first name');
 				return false;
 			}
 		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter first name.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
 			showError('Please enter a valid first name');
 			return false;
 		}
 	}
 }
 
-//Function to validate the last name
+/**
+ * Function to validate the last name
+ */
 function validateLastName(elementId){
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				// $('#overlay-toast').html('Please enter a valid last name.');
-				// showToast();
-				showError('Please enter a valid last name');
-				return false;
-			}
-		} else {
+	if ($('#'+elementId).val() != "") {
+		if (lastNameRegEx.test($('#'+elementId).val()) == true) {
 			return true;
+		} else {
+			showErrorMobileAndWeb('Please enter a valid last name');
+			return false;
 		}
 	} else {
-    	if ($('#'+elementId).val() != "") {
-			if (lastNameRegEx.test($('#'+elementId).val()) == true) {
-				// $('#'+elementId).parent().next('.login-reg-err').hide();
-				return true;
-			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid last name.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Please enter a valid last name');
-				return false;
-			}
-		} else {
-			return true;
-		}
+		return true;
 	}
 }
 
-//function to validate a password in form
+/**
+ * Function to validate a password in form
+ * @param elementId
+ * @returns {Boolean}
+ */
 function validatePassword(elementId) {
 	var password = $('#'+elementId).val();
-	if($(window).width()<768){
-		if (password != "") {
-			//check if password length is proper
-			if (password.length < minPwdLength || password.length > maxPwdLength) {
-				// $('#overlay-toast').html('Password must be between 6-15 characters.');
-				// showToast();
-				showError('Password must be between 6-15 characters');
-				return false;
-			} else if (passwordRegex.test(password) == true) {
-				return true;
-			} else {
-				// $('#overlay-toast').html('Password must contain one special character.');
-				// showToast();
-				showError('Password must contain one special character');
-				return false;
-			}
-		} else {
-			// $('#overlay-toast').html('Please enter password.');
-			// showToast();
-			showError('Please enter password');
-			return false;
-		}
-	} else {
-		if (password != "") {
-			//check if password length is proper
-			if (password.length < minPwdLength || password.length > maxPwdLength) {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Password must be between 6-15 characters.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Password must be between 6-15 characters');
-				return false;
-			} else if (passwordRegex.test(password) == true) {
-				// $('#'+elementId).parent().next('.login-reg-err').hide();
-				return true;
-			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Password must contain one special character.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Password must contain one special character');
-				return false;
-			}
-		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter password.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
-			showError('Please enter password');
-			return false;
-		}
+	if(password.trim() == "") {
+		showErrorMobileAndWeb("Please enter password");
+		return false;
 	}
+	else if (password.length < minPwdLength || password.length > maxPwdLength) {
+		showErrorMobileAndWeb('Password must be between 6-15 characters');
+		return false;
+	}
+	return true;
 }
-//Function to match password and confirm password
+/**
+ * Function to match password and confirm password
+ * @param pwdId
+ * @param confirmPwdId
+ * @returns {Boolean}
+ */
 function validateConfirmPassword(pwdId, confirmPwdId){
-	/* === Validate passwords === */
-	if ($(window).width()<768) {
-		if ($('#'+confirmPwdId).val() != "") {
-			if ($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-				// $('#overlay-toast').html('Passwords do not match.');
-				// showToast();
-				showError('Passwords do not match');
-				return false;
-			} else {
-				return true;
-			}
-		} else {
-			// $('#overlay-toast').html('Please enter confirm password.');
-			// showToast();
-			showError('Please enter confirm password');
+	if ($('#'+confirmPwdId).val() != "") {
+		if ($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
+			showErrorMobileAndWeb('Passwords do not match');
 			return false;
+		} else {
+			return true;
 		}
 	} else {
-		if ($('#'+confirmPwdId).val() != "") {
-			if ($('#'+pwdId).val() != $('#'+confirmPwdId).val()) {
-				// $('#'+confirmPwdId).parent().next('.login-reg-err').html('Passwords do not match.');
-				// $('#'+confirmPwdId).parent().next('.login-reg-err').show();
-				showError('Passwords do not match');
-				return false;
-			} else {
-				// $('#'+confirmPwdId).parent().next('.login-reg-err').hide();
-				return true;
-			}
-		} else {
-			// $('#'+confirmPwdId).parent().next('.login-reg-err').html('Please enter confirm password.');
-			// $('#'+confirmPwdId).parent().next('.login-reg-err').show();
-			showError('Please enter confirm password');
-			return false;
-		}
+		showErrorMobileAndWeb('Please enter confirm password');
+		return false;
 	}
-		
 }
 
 
-//Function to validate company name
+/**
+ * Function to validate company name
+ */
 function validateCompany(elementId){
-	if($(window).width()<768) {
-		if ($('#'+elementId).val() != "") {
-			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				// $('#overlay-toast').html('Please enter a valid company name.');
-				// showToast();
-				showError('Please enter a valid company name');
-				return false;
-			}
+	if ($('#'+elementId).val() != "") {
+		if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+			return true;
 		} else {
-			// $('#overlay-toast').html('Please enter company name.');
-			// showToast();
-			showError('Please enter company name');
+			showErrorMobileAndWeb('Please enter a valid company name');
 			return false;
 		}
 	} else {
-    	if ($('#'+elementId).val() != "") {
-			if (companyNameRegEx.test($('#'+elementId).val()) == true) {
-				// $('#'+elementId).parent().next('.login-reg-err').hide();
-				return true;
-			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid company name.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
-				showError('Please enter a valid company name');
-				return false;
-			}
-		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter company name.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
-			showError('Please enter company name');
-			return false;
-		}
+		showErrorMobileAndWeb('Please enter company name');
+		return false;
 	}
 }
 
