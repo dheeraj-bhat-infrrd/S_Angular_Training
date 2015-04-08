@@ -95,12 +95,11 @@ function paintProfilePage(result) {
         			$("#prof-image").addClass("pers-default-big");
         		}
             }
-            
-            var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             if(contactDetails.about_me != undefined) {
+            	var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
+            	 $("#prof-company-intro").html(companyIntroHtml);
             }
-            $("#prof-company-intro").html(companyIntroHtml);
             
             var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
             $("#prof-reviews-header").html(reviewsHeaderHtml);
@@ -147,7 +146,10 @@ function paintProfilePage(result) {
             		contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item">'+contactNumbers.fax+'</div></div>';
             	}
             }
-            $("#prof-contact-information").html(contactInfoHtml);
+            if(contactInfoHtml != "") {
+            	$("#contact-info").show();
+            	$("#prof-contact-information").html(contactInfoHtml);
+            }
             $("#read-write-share-btn").click(function(e){
             	e.stopPropagation();
             	findProList(result.iden,result.contact_details.name);
@@ -212,7 +214,7 @@ function paintCompanyRegions(data) {
 				regionsHtml = regionsHtml+'</div>';
 			});
 			$("#comp-regions-content").html(regionsHtml);
-			
+			$("#comp-hierarchy").show();
 			$(".region-icon").click(function(e) {
 				e.stopPropagation();
 				var regionProfileName = $(this).data("profilename");
@@ -258,7 +260,7 @@ function paintBranchesForRegion(data) {
 				branchesHtml = branchesHtml +'	</div>';
 				branchesHtml = branchesHtml +'</div>' ;
 			});
-			
+			$("#region-hierarchy").show();
 			if($("#region-branches").length > 0) {
 				$("#region-branches").html(branchesHtml);
 			}
@@ -317,6 +319,7 @@ function paintIndividualForBranch(data) {
 					individualsHtml=  individualsHtml+'</div>';
 				}
 			});
+			$("#branch-hierarchy").show();
 			if($("#branch-individuals").length > 0) {
 				$("#branch-individuals").html(individualsHtml);
 			}
@@ -361,7 +364,7 @@ function paintIndividualsForRegion(data) {
 						individualsHtml = individualsHtml +'</div>' ;
 					}
 				});
-				
+				$("#region-hierarchy").show();
 				if($("#region-branches").length > 0) {
 					$("#region-branches").append(individualsHtml);
 				}
@@ -406,6 +409,7 @@ function paintCompanyIndividuals(data) {
 				}
 			});
 			$("#comp-regions-content").append(compIndividualsHtml);
+			$("#comp-hierarchy").show();
 			paintProfileImage("comp-individual-prof-image");
 			bindClickToFetchIndividualProfile("comp-individual");
 		}
@@ -432,7 +436,7 @@ function paintCompanyBranches(data) {
 				compBranchesHtml = compBranchesHtml +'	</div>';
 				compBranchesHtml = compBranchesHtml +'</div>' ;
 			});
-			
+			$("#comp-hierarchy").show();
 			$("#comp-regions-content").append(compBranchesHtml);
 			bindClickToFetchBranchIndividuals("comp-branch");
 		}
@@ -510,6 +514,7 @@ function paintReviews(result){
 	}else {
 		$("#prof-review-item").append(reviewsHtml);
 	}
+	 $("#prof-reviews-header").show();
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this));
 	});
@@ -558,21 +563,22 @@ function fetchReviewsCountForCompany(companyId,callBackFunction,minScore,maxScor
 	callAjaxGET(url, callBackFunction, true);
 }
 
-
 function paintAllReviewsCount(data) {
 	var responseJson = $.parseJSON(data);
 	if(responseJson != undefined) {
 		var reviewsSizeHtml = responseJson.entity;
 		$("#profile-fetch-info").attr("total-reviews",reviewsSizeHtml);
-		if(reviewsSizeHtml <= 1) {
-			reviewsSizeHtml = reviewsSizeHtml +' Review';
-		}else {
-			reviewsSizeHtml = reviewsSizeHtml +' Reviews';
+		if(reviewsSizeHtml > 0){
+			if(reviewsSizeHtml <= 1) {
+				reviewsSizeHtml = reviewsSizeHtml +' Review';
+			}else {
+				reviewsSizeHtml = reviewsSizeHtml +' Reviews';
+			}
+			$("#prof-company-review-count").html(reviewsSizeHtml);
+			$("#prof-company-review-count").click(function(){
+				$(window).scrollTop($('#reviews-container').offset().top);
+			});
 		}
-		$("#prof-company-review-count").html(reviewsSizeHtml);
-		$("#prof-company-review-count").click(function(){
-			$(window).scrollTop($('#reviews-container').offset().top);
-		});
 	}
 }
 
@@ -781,6 +787,7 @@ function fetchReviewsForAgentCallBack(data) {
 			paintReviews(result);
 		}
 		else {
+			hideReviewsHeader();
 			/**
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
