@@ -360,7 +360,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
 				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
-		Date startDate = getNdaysBackDate(noOfDays);
+		Date startDate = null;
+		/**
+		 * if days is not set, take the start date as 1 jan 1970
+		 */
+		if (noOfDays == -1) {
+			startDate = new Date(0l);
+		}
+		else {
+			startDate = getNdaysBackDate(noOfDays);
+		}
+
 		Date endDate = Calendar.getInstance().getTime();
 
 		Query query = new Query();
@@ -733,9 +743,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				break;
 		}
 		Date startDate = getNdaysBackDate(numberOfPastDaysToConsider);
-		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON)
-				.lt(endDate)), Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria
-				.where(columnName).is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
+		aggregation = new TypedAggregation<SurveyDetails>(SurveyDetails.class, Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).lt(
+				endDate)), Aggregation.match(Criteria.where(CommonConstants.CREATED_ON).gte(startDate)), Aggregation.match(Criteria.where(columnName)
+				.is(columnValue)), Aggregation.project(CommonConstants.CREATED_ON)
 				.andExpression(criteriaColumn + "(" + CommonConstants.CREATED_ON + ")").as("groupCol"), Aggregation.group("groupCol").count()
 				.as("count"));
 
@@ -1031,8 +1041,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Query query = new Query();
 		query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.COMPANY_ID_COLUMN).is(companyId),
 				Criteria.where(CommonConstants.LAST_REMINDER_FOR_SOCIAL_POST).lte(cutOffDate),
-				Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore),
-				Criteria.where("socialPostsReminder").lt(maxReminders)));
+				Criteria.where(CommonConstants.SCORE_COLUMN).gte(autopostScore), Criteria.where("socialPostsReminder").lt(maxReminders)));
 		List<SurveyDetails> surveys = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method to get list of customers who have not yet completed their survey on all the social networking sites, getIncompleteSocialPostCustomersEmail() finished.");
 		return surveys;
