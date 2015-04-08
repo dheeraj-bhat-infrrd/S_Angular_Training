@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.social;
 
+import java.util.List;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.RequestToken;
@@ -9,6 +10,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import facebook4j.Facebook;
+import facebook4j.FacebookException;
 
 /**
  * Interface with methods defined to manage social networks
@@ -41,5 +43,12 @@ public interface SocialManagementService {
 
 	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens)
 			throws InvalidInputException;
+	
+	public void updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException,
+			FacebookException;
+
+	public void tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
+	
+	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
