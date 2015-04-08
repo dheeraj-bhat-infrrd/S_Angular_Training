@@ -181,7 +181,9 @@ function callBackOnEditAdboutMeDetails(data) {
 	}
 
 	if ($('#aboutme-status').val() == 'new') {
-		showMainContent('./showprofilepage.do');
+		callAjaxGET("./fetchaboutme.do", function(data) {
+			$('#intro-about-me').html(data);
+		}, true);
 	}
 	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
