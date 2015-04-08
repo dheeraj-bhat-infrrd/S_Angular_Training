@@ -24,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
@@ -35,12 +36,14 @@ import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoIm
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.api.Google2Api;
@@ -64,6 +67,9 @@ public class SocialManagementController {
 
 	@Autowired
 	private SocialManagementService socialManagementService;
+	
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
@@ -541,6 +547,58 @@ public class SocialManagementController {
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 	
+	@ResponseBody
+	@RequestMapping(value = "/posttosocialmedia", method = RequestMethod.GET)
+	public String postToSocialMedia(HttpServletRequest request){
+		LOG.info("Method to post feedback of customer to various pages of social networking sites started.");
+		try{
+			String agentName = request.getParameter("agentName");
+			String custFirstName = request.getParameter("firstName");
+			String custLastName =  request.getParameter("lastName");
+			String agentIdStr = request.getParameter("agentId");
+			String ratingStr = request.getParameter("rating");
+			long agentId = 0;
+			double rating = 0;
+			try{
+				agentId = Long.parseLong(agentIdStr);
+				rating = Double.parseDouble(ratingStr);
+			}catch(NumberFormatException e){
+				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			String facebookMessage = rating + "-Star Survey Response from " + custFirstName +" " + custLastName + " for "
+					+ agentName + " on Social Survey \n" ;
+			String twitterMessage = rating + "-Star Survey Response from "+ custFirstName + custLastName + "for "+ agentName +" on @SocialSurvey - view at www.social-survey.com/"+agentIdStr;
+			try {
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
+				for(OrganizationUnitSettings setting : settings){
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+				}
+			}
+			catch (FacebookException e) {
+				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+				throw new NonFatalException("FacebookException caught in postToSocialMedia() while trying to post to facebook in postToSocialMedia(). Nested exception is ", e);
+			}
+			try {
+				socialManagementService.tweet(agentSettings, twitterMessage);
+				for(OrganizationUnitSettings setting : settings){
+					socialManagementService.tweet(setting, twitterMessage);
+				}
+			}
+			catch (TwitterException e) {
+				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
+				throw new NonFatalException("TwitterException caught in postToSocialMedia() while trying to tweet in postToSocialMedia(). Nested exception is ", e);
+			}
+		}catch(NonFatalException e){
+			LOG.error("Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ", e);
+			return e.getMessage();
+		}
+		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
+		return "Successfully posted to all the places in hierarchy";
+	}
+	
 	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens) {
 		LOG.debug("Method updateGoogleToken() called from SocialManagementController");
 		if (mediaTokens == null) {
@@ -554,7 +612,6 @@ public class SocialManagementController {
 				mediaTokens.setGoogleToken(new SocialProfileToken());
 			}
 		}
-
 		mediaTokens.getGoogleToken().setAccessToken(accessToken.getToken());
 		mediaTokens.getGoogleToken().setAccessTokenSecret(accessToken.getSecret());
 		mediaTokens.getGoogleToken().setAccessTokenCreatedOn(System.currentTimeMillis());

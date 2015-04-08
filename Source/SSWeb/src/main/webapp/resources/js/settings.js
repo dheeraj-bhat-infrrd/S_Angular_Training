@@ -401,15 +401,39 @@ $('#sad-text').blur(function() {
 $('#atpst-chk-box').click(function(){
 	if($('#atpst-chk-box').hasClass('bd-check-img-checked')){
 		$('#atpst-chk-box').removeClass('bd-check-img-checked');
-		$('#at-pst-cb').val("true");
+		updateAutoPostSetting(true);
 	}
 	else{
 		$('#atpst-chk-box').addClass('bd-check-img-checked');
-		$('#at-pst-cb').val("false");
+		updateAutoPostSetting(false);
 	}
-	$('#ratingcategory').val('rating-auto-post');
-	updatePostScore("rating-settings-form");
 });
+
+function updateAutoPostSetting(isautopostenabled){
+	
+	var payload = {
+		"autopost" : isautopostenabled
+	};
+	var success = false;
+	$.ajax({
+		url : "./updateautopostforsurvey.do",
+		type : "GET",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				$('#overlay-toast').html("Content added successfully!");
+			}
+		},
+		error : function() {
+			$('#overlay-toast').html(
+					"Oops! Something went wrong. Please try again later.");
+		}
+	});
+}
 
 function saveTextForMoodFlow(content, mood){
 	var payload = {

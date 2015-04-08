@@ -401,6 +401,8 @@ public interface CommonConstants {
 	 * Mongo column and collection constants
 	 */
 	public static final String SOCIAL_MEDIA_TOKEN_MONGO_KEY = "socialMediaTokens";
+	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
+	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	
 	/*

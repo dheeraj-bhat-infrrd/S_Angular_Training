@@ -202,7 +202,13 @@ public class SurveyManagementController {
 			LOG.error("Invalid agentId passed. Agent Id can not be null or empty.");
 			return "errorpage500";
 		}
-		Long agentId = Long.parseLong(agentIdStr);
+		Long agentId = 0l;
+		try{
+		agentId = Long.parseLong(agentIdStr);
+		}catch(NumberFormatException e){
+			LOG.error("Invalid agent Id passed. Error is : " + e);
+			return "errorpage500";
+		}
 		String agentName = "";
 		try {
 			agentName = solrSearchService.getUserDisplayNameById(agentId);
