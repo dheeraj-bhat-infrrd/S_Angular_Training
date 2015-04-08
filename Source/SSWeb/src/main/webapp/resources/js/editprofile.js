@@ -494,11 +494,11 @@ $(document).on('blur', '.prof-edditable-sin-agent', function() {
 $(document).on('click', '.lp-ach-item-img', function(e) {
 	e.stopPropagation();
 
+	var type = $(this).data('type');
 	$(this).prev().attr('data-status', 'removed');
 	$(this).prev().hide();
 	$(this).hide();
 	
-	var type = $(this).data('type');
 	if (type == 'association') {
 		updateAssociations();
 	}
@@ -551,6 +551,8 @@ function updateAssociations() {
 			associationList.push(association);
 
 			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		} else {
 			return;
 		}
@@ -570,6 +572,10 @@ function callBackUpdateAssociations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+	
+	if ($('#association-container').find('input').length) { 
+		$('#association-container').append('<div>No association added yet</div>');
+	}
 }
 
 // Function to update achievement list
@@ -613,6 +619,8 @@ function updateAchievements() {
 			achievementList.push(achievement);
 
 			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		} else {
 			return;
 		}
@@ -625,14 +633,17 @@ function updateAchievements() {
 	var payload = {
 		"achievementList" : achievementList
 	};
-	callAjaxPostWithPayloadData("./updateachievements.do",
-			callBackUpdateAchievements, payload);
+	callAjaxPostWithPayloadData("./updateachievements.do", callBackUpdateAchievements, payload);
 }
 
 function callBackUpdateAchievements(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+
+	if ($('#achievement-container').find('input').length) { 
+		$('#achievement-container').append('<div>No achievement added yet</div>');
+	}
 }
 
 // Function to update License authorizations
@@ -675,6 +686,8 @@ function updateLicenseAuthorizations() {
 			licenceList.push(licence);
 			
 			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		} else {
 			return;
 		}
@@ -694,6 +707,10 @@ function callBackUpdateLicenseAuthorizations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+
+	if ($('#authorised-in-container').find('input').length) { 
+		$('#authorised-in-container').append('<div>No license added yet</div>');
+	}
 }
 
 
