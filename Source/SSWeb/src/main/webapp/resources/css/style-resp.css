@@ -474,14 +474,17 @@
     .mobile-tabs{
         display: block !important;
     }
+    .lp-dummy-row {
+    	border-bottom: 1px solid #dcdcdc;
+    }
     .lp-assoc-row, .lp-exp-row, .lp-ach-row, .lp-hob-row, .lp-auth-row{
         padding-left: 15px;
-        width: 100%;
+        width: 85%;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        line-height: 55px;
-        border-bottom: 1px solid #dcdcdc;
+        /* line-height: 55px;
+        border-bottom: 1px solid #dcdcdc; */
     }
     .lp-assoc-row:last-child, .lp-exp-row:last-child, .lp-ach-row:last-child, .lp-hob-row:last-child, .lp-auth-row:last-child{
         border-bottom: 0;

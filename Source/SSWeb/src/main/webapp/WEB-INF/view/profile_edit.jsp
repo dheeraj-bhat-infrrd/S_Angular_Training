@@ -412,12 +412,14 @@
 									<c:choose>
 										<c:when test="${not empty associations}">
 											<c:forEach items="${associations}" var="association">
-												<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}" data-status="saved">
-												<div class="float-right lp-ach-item-img" data-type="association"></div>
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-assoc-row lp-row clearfix prof-edditable-sin-agent" value="${association.name}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="association"></div>
+												</div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
-											<div><spring:message code="label.membership.empty.key"></spring:message></div>
+											<span><spring:message code="label.membership.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -433,12 +435,14 @@
 									<c:choose>
 										<c:when test="${not empty achievements}">
 											<c:forEach items="${achievements}" var="achievement">
-												<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}" data-status="saved">
-												<div class="float-right lp-ach-item-img" data-type="achievement"></div>
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-ach-row lp-row clearfix prof-edditable-sin-agent" value="${achievement.achievement}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="achievement"></div>
+												</div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
-											<div><spring:message code="label.achievement.empty.key"></spring:message></div>
+											<span><spring:message code="label.achievement.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
@@ -454,12 +458,14 @@
 									<c:choose>
 										<c:when test="${not empty authorisedInList}">
 											<c:forEach items="${authorisedInList}" var="authorisedIn">
-												<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}" data-status="saved">
-												<div class="float-right lp-ach-item-img" data-type="license"></div>
+												<div class="lp-dummy-row clearfix">
+													<input class="lp-auth-row lp-row clearfix prof-edditable-sin-agent" value="${authorisedIn}" data-status="saved">
+													<div class="float-right lp-ach-item-img hide" data-type="license"></div>
+												</div>
 											</c:forEach>
 										</c:when>
 										<c:otherwise>
-											<div><spring:message code="label.licenses.empty.key"></spring:message></div>
+											<span><spring:message code="label.licenses.empty.key"></spring:message></span>
 										</c:otherwise>
 									</c:choose>
 								</div>
