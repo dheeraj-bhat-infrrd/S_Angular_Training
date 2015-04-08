@@ -29,7 +29,7 @@
 	        	</div>
 		    </c:when>
 		    <c:when test="${accountType == 'Team'}">
-		    	<input id="assign-to-txt" data-assignto="company" value='<spring:message code="label.team.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+		    	<input id="assign-to-txt" data-assignto="company" value='<spring:message code="label.team.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear hide"/>
 	        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	            	<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.team.key"/></div>
 	        	</div>
