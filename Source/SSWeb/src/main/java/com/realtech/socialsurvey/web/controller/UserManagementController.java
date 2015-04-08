@@ -807,21 +807,43 @@ public class UserManagementController {
 		LOG.info("Method showCompleteRegistrationPage() to complete registration of user started.");
 
 		try {
+			Map<String, String> urlParams = null;
 			try {
-				Map<String, String> urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
-				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
-				model.addAttribute(CommonConstants.EMAIL_ID, urlParams.get(CommonConstants.EMAIL_ID));
-				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
-				String lastName = urlParams.get(CommonConstants.LAST_NAME);
-
-				if (lastName != null && !lastName.isEmpty()) {
-					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
-				}
-
+				urlParams = urlGenerator.decryptParameters(encryptedUrlParams);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			
+			// fetching details from urlparams
+			long companyId;
+			try {
+				companyId = Long.parseLong(urlParams.get(CommonConstants.COMPANY));
+			}
+			catch (NumberFormatException e) {
+				throw new NonFatalException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
+			}
+			
+			// checking status of user
+			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
+			User newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);
+			if (newUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED) {
+				model.addAttribute(CommonConstants.COMPANY, urlParams.get(CommonConstants.COMPANY));
+				model.addAttribute(CommonConstants.FIRST_NAME, urlParams.get(CommonConstants.FIRST_NAME));
+				model.addAttribute(CommonConstants.EMAIL_ID, emailId);
+
+				String lastName = urlParams.get(CommonConstants.LAST_NAME);
+				if (lastName != null && !lastName.isEmpty()) {
+					model.addAttribute(CommonConstants.LAST_NAME, urlParams.get(CommonConstants.LAST_NAME));
+				}
+				LOG.debug("Validation of url completed. Service returning params to be prepopulated in registration page");
+			}
+			else {
+				model.addAttribute("message", "The registration url is no longer valid");
+				model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
+				LOG.debug("The registration url had been used earlier");
+				return JspResolver.LOGIN;
 			}
 			LOG.info("Method showCompleteRegistrationPage() to complete registration of user finished.");
 		}

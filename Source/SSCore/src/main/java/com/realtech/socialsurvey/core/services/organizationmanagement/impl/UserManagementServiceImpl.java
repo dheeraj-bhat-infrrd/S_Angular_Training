@@ -432,6 +432,31 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		return users.get(CommonConstants.INITIAL_INDEX);
 	}
 
+	// Method to return user with provided email and company
+	@Transactional
+	@Override
+	public User getUserByEmailAndCompany(long companyId, String emailId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getUserByEmailAndCompany() called from UserManagementService");
+
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("Email id is null or empty in getUserByEmailAndCompany()");
+		}
+		
+		Company company = companyDao.findById(Company.class, companyId);
+		
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.LOGIN_NAME, emailId);
+		queries.put(CommonConstants.COMPANY, company);
+		
+		List<User> users = userDao.findByKeyValue(User.class, queries);
+		if (users == null || users.isEmpty()) {
+			throw new NoRecordsFetchedException("No users found with the login name : {}", emailId);
+		}
+		
+		LOG.info("Method getUserByEmailAndCompany() finished from UserManagementService");
+		return users.get(CommonConstants.INITIAL_INDEX);
+	}
+
 	@Transactional
 	@Override
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException {

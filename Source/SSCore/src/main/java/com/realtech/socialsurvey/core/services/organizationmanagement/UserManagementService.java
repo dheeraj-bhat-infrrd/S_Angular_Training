@@ -73,6 +73,9 @@ public interface UserManagementService {
 	// Method to return users with provided login name
 	public User getUserByLoginName(User admin, String loginName) throws InvalidInputException, NoRecordsFetchedException;
 
+	// Method to return user with provided email and company
+	public User getUserByEmailAndCompany(long companyId, String emailId) throws InvalidInputException, NoRecordsFetchedException;
+
 	// Method to return users whose email id matches with the provided email id.
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException;
 
