@@ -421,7 +421,8 @@ function validateUserEmailTextArea(elementId) {
 	if (emailIds != "") {
 		var emailIdsArray = emailIds.split(",");
 		for(var i = 0; i < emailIdsArray.length; i++) {
-			if(emailRegex.test(emailIdsArray[i]) == true){
+			var emailId = emailIdsArray[i].trim();
+			if(emailRegex.test(emailId) == true){
 				return true;
 			}
 			else {

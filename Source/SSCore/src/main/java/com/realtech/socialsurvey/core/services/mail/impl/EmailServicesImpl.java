@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
@@ -41,6 +42,7 @@ public class EmailServicesImpl implements EmailServices {
 	@Value("${MAX_PAYMENT_RETRIES}")
 	private int maxPaymentRetries;
 
+	@Async
 	@Override
 	public void queueRegistrationInviteMail(String url, String recipientMailId, String firstName, String lastName) throws InvalidInputException {
 		LOG.info("Method for queueing registration invite mail called with url : " + url + " firstName :" + firstName + " and lastName : " + lastName);
@@ -74,6 +76,7 @@ public class EmailServicesImpl implements EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
+	@Async
 	@Override
 	public void sendRegistrationInviteMail(String url, String recipientMailId, String firstName, String lastName) throws InvalidInputException,
 			UndeliveredEmailException {
@@ -116,6 +119,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void queueResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException {
 		LOG.info("Method to queue Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
@@ -155,6 +159,7 @@ public class EmailServicesImpl implements EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
+	@Async
 	@Override
 	public void sendResetPasswordEmail(String url, String recipientMailId, String name) throws InvalidInputException, UndeliveredEmailException {
 		LOG.info("Method to send Email to reset the password link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
@@ -210,6 +215,7 @@ public class EmailServicesImpl implements EmailServices {
 		return emailEntity;
 	}
 
+	@Async
 	@Override
 	public void queueSubscriptionChargeUnsuccessfulEmail(String recipientMailId, String name, String retryDays) throws InvalidInputException {
 		LOG.info("Method to send subscription charge unsuccessful mail to : " + name);
@@ -239,6 +245,7 @@ public class EmailServicesImpl implements EmailServices {
 	 *            ,name,retryDays
 	 * @return
 	 */
+	@Async
 	@Override
 	public void sendSubscriptionChargeUnsuccessfulEmail(String recipientMailId, String name, String retryDays) throws InvalidInputException,
 			UndeliveredEmailException {
@@ -275,6 +282,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void queueEmailVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException {
 		LOG.info("Method to queue verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
@@ -309,6 +317,8 @@ public class EmailServicesImpl implements EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
+	@Async
+	@Override
 	public void sendEmailVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
 			UndeliveredEmailException {
 		LOG.info("Method to send verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
@@ -337,6 +347,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent verification mail");
 	}
 
+	@Async
 	@Override
 	public void queueVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException {
 		LOG.info("Method to queue verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
@@ -373,6 +384,8 @@ public class EmailServicesImpl implements EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
+	@Async
+	@Override
 	public void sendVerificationMail(String url, String recipientMailId, String recipientName) throws InvalidInputException,
 			UndeliveredEmailException {
 		LOG.info("Method to send verification mail called for url : " + url + " recipientMailId : " + recipientMailId);
@@ -404,6 +417,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent verification mail");
 	}
 
+	@Async
 	@Override
 	public void queueRegistrationCompletionEmail(String url, String recipientMailId, String name) throws InvalidInputException {
 		LOG.info("Method to queue Email to complete registration link with URL : " + url + "\t and Recipients Mail ID : " + recipientMailId);
@@ -445,6 +459,7 @@ public class EmailServicesImpl implements EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
+	@Async
 	@Override
 	public void sendRegistrationCompletionEmail(String url, String recipientMailId, String name) throws InvalidInputException,
 			UndeliveredEmailException {
@@ -503,6 +518,7 @@ public class EmailServicesImpl implements EmailServices {
 		return emailEntity;
 	}
 
+	@Async
 	@Override
 	public void sendFatalExceptionEmail(String recipientMailId, String stackTrace) throws InvalidInputException, UndeliveredEmailException {
 
@@ -529,6 +545,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendEmailSendingFailureMail(String recipientMailId, String destinationMailId, String displayName, String stackTrace)
 			throws InvalidInputException, UndeliveredEmailException {
@@ -571,6 +588,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void queueRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -602,6 +620,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException,
 			UndeliveredEmailException {
@@ -639,6 +658,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void queueRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -664,6 +684,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendRetryExhaustedEmail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
 
@@ -695,6 +716,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void queueAccountDisabledMail(String recipientMailId, String displayName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -718,6 +740,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Queued the account disabled mail");
 	}
 
+	@Async
 	@Override
 	public void sendAccountDisabledMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
 
@@ -749,6 +772,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void queueAccountUpgradeMail(String recipientMailId, String displayName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -774,6 +798,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendAccountUpgradeMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
 
@@ -804,6 +829,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent account upgrade mail");
 	}
 
+	@Async
 	@Override
 	public void queueSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -830,6 +856,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
 			UndeliveredEmailException {
@@ -861,6 +888,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent survey completion mail");
 	}
 
+	@Async
 	@Override
 	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -887,6 +915,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendSurveyReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
 			UndeliveredEmailException {
@@ -918,6 +947,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent survey completion mail");
 	}
 
+	@Async
 	@Override
 	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood)
 			throws InvalidInputException {
@@ -945,6 +975,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood)
 			throws InvalidInputException, UndeliveredEmailException {
@@ -977,6 +1008,7 @@ public class EmailServicesImpl implements EmailServices {
 		LOG.info("Successfully sent survey completion mail");
 	}
 	
+	@Async
 	@Override
 	public void queueSocialPostReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1003,6 +1035,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	}
 
+	@Async
 	@Override
 	public void sendSocialPostReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
 			UndeliveredEmailException {
