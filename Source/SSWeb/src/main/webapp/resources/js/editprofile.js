@@ -181,7 +181,9 @@ function callBackOnEditAdboutMeDetails(data) {
 	}
 
 	if ($('#aboutme-status').val() == 'new') {
-		showMainContent('./showprofilepage.do');
+		callAjaxGET("./fetchaboutme.do", function(data) {
+			$('#intro-about-me').html(data);
+		}, true);
 	}
 	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
@@ -268,7 +270,6 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 			return false;
 		}
 		webAddresses = JSON.stringify(webAddresses);
-		console.log(webAddresses);
 		var payload = {
 			"webAddresses" : webAddresses
 		};
@@ -299,7 +300,7 @@ function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
 	createPopupConfirm(header, data);
 	
-	$(document).on('click', '#overlay-continue', function() {
+	$('#overlay-continue').click(function() {
 		var profName = $('#prof-name').val();
 		var profAddress1 = $('#prof-address1').val();
 		var profAddress2 = $('#prof-address2').val();
@@ -361,6 +362,8 @@ function overlayRevert() {
 	$("#overlay-text").html('');
 	$('#overlay-continue').html('');
 	$('#overlay-cancel').html('');
+	
+	$('#overlay-continue').unbind('click');
 
 	$('body').css('overflow','auto');
 	$('.overlay-disable-wrapper').removeClass('pu_arrow_rt');
@@ -464,37 +467,6 @@ $(document).on('change', '#prof-logo', function() {
 });
 
 
-// Function to populate associations container
-function showAssociationList() {
-	callAjaxGET("./fetchassociations.do", callBackShowAssociationList);
-}
-
-function callBackShowAssociationList(data) {
-	$('#association-container').html(data);
-	adjustImage();
-}
-
-// Function to populate achievement list container
-function showAchievementList() {
-	callAjaxGET("./fetchachievements.do", callBackShowAchievementList);
-}
-
-function callBackShowAchievementList(data) {
-	$('#achievement-container').html(data);
-	adjustImage();
-}
-
-// Function to populate licence list container
-function showLicenceList() {
-	callAjaxGET("./fetchlicences.do", callBackShowLicenceList);
-}
-
-function callBackShowLicenceList(data) {
-	$('#authorised-in-container').html(data);
-	adjustImage();
-}
-
-
 //Function to show social media links
 function showProfileSocialLinks() {
 	$('#social-token-text').hide();
@@ -511,15 +483,29 @@ $(document).on('focus', '.prof-edditable-sin-agent', function() {
 	$(this).addClass('prof-name-edit');
 });
 
+$(document).on('input', '.prof-edditable-sin-agent', function() {
+	$(this).attr('data-status', 'edited');
+});
+
 $(document).on('blur', '.prof-edditable-sin-agent', function() {
 	$(this).removeClass('prof-name-edit');
 });
 
-$(document).on('click', '.lp-ach-item-img', function() {
-	var type = $(this).attr('data-type');
-	$(this).prev().remove();
-	$(this).remove();
-	
+$(document).on('mouseover', '.lp-dummy-row', function() {
+	$(this).children().last().removeClass('hide');
+});
+$(document).on('mouseout', '.lp-dummy-row', function() {
+	$(this).children().last().addClass('hide');
+});
+
+// remove agent details
+$(document).on('click', '.lp-ach-item-img', function(e) {
+	e.stopPropagation();
+	$(this).prev().attr('data-status', 'removed');
+
+	var type = $(this).data('type');
+	$(this).parent().hide();
+
 	if (type == 'association') {
 		updateAssociations();
 	}
@@ -533,25 +519,33 @@ $(document).on('click', '.lp-ach-item-img', function() {
 
 // Function to update association/membership list
 function addAnAssociation() {
-	if ($('#association-container > input').length <= 0) {
+	if ($('#association-container > div').length <= 0) {
 		$('#association-container').empty();
 	}
+
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#association-container').append(newDiv);
+	
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "New Associaion"
+		"placeholder" : "New Associaion",
+		"data-status" : "new"
 	});
-	$('#association-container').append(newAssociation);
-
 	var newAssociationButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img hide",
 		"data-type" : "association"
 	});
-	$('#association-container').append(newAssociationButton);
 
+	$('#association-container').children().last().append(newAssociation);
+	$('#association-container').children().last().append(newAssociationButton);
 	newAssociation.focus();
+	newAssociationButton.addClass('float-right');
 }
 
-$(document).on('blur', '#association-container input', function() {
+$(document).on('blur', '#association-container input', function(e) {
+	e.stopPropagation();
 	delay(function() {
 		updateAssociations();
 	}, 0);
@@ -559,15 +553,27 @@ $(document).on('blur', '#association-container input', function() {
 
 function updateAssociations() {
 	var associationList = [];
-	$('#association-container').children('input').each(function() {
-		if (this.value != "") {
-			var asssociation = {};
-			asssociation.name = this.value;
-			associationList.push(asssociation);
-		} else {
-			return;
+	var statusEdited = false;
+	
+	$('#association-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		console.log(status);
+		console.log(value);
+		if (value != "" && status != 'removed') {
+			var association = {};
+			association.name = value;
+			associationList.push(association);
+
+			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		}
 	});
+	if (!statusEdited) {
+		return;
+	}
+
 	associationList = JSON.stringify(associationList);
 	var payload = {
 		"associationList" : associationList
@@ -579,31 +585,41 @@ function callBackUpdateAssociations(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-
-	showAssociationList();
+	
+	if (! $('#association-container').find('input').length) { 
+		$('#association-container').append('<span>No association added yet</span>');
+	}
 }
 
 // Function to update achievement list
 function addAnAchievement() {
-	if ($('#achievement-container > input').length <= 0) {
+	if ($('#achievement-container > div').length <= 0) {
 		$('#achievement-container').empty();
 	}
+	
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#achievement-container').append(newDiv);
+
 	var newAchievement = $('<input>').attr({
 		"class" : "lp-ach-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "New Achievement"
+		"placeholder" : "New Achievement",
+		"data-status" : "new"
 	});
-	$('#achievement-container').append(newAchievement);
-
 	var newAchievementButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img hide",
 		"data-type" : "achievement"
 	});
-	$('#achievement-container').append(newAchievementButton);
 
+	$('#achievement-container').children().last().append(newAchievement);
+	$('#achievement-container').children().last().append(newAchievementButton);
 	newAchievement.focus();
+	newAchievementButton.addClass('float-right');
 }
 
-$(document).on('blur', '#achievement-container input', function() {
+$(document).on('blur', '#achievement-container input', function(e) {
+	e.stopPropagation();
 	delay(function() {
 		updateAchievements();
 	}, 0);
@@ -611,21 +627,30 @@ $(document).on('blur', '#achievement-container input', function() {
 
 function updateAchievements() {
 	var achievementList = [];
-	$('#achievement-container').children('input').each(function() {
-		if (this.value != "") {
+	var statusEdited = false;
+
+	$('#achievement-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
 			var achievement = {};
-			achievement.achievement = this.value;
+			achievement.achievement = value;
 			achievementList.push(achievement);
-		} else {
-			return;
+
+			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		}
 	});
+	if (!statusEdited) {
+		return;
+	}
+
 	achievementList = JSON.stringify(achievementList);
 	var payload = {
 		"achievementList" : achievementList
 	};
-	callAjaxPostWithPayloadData("./updateachievements.do",
-			callBackUpdateAchievements, payload);
+	callAjaxPostWithPayloadData("./updateachievements.do", callBackUpdateAchievements, payload);
 }
 
 function callBackUpdateAchievements(data) {
@@ -633,30 +658,40 @@ function callBackUpdateAchievements(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
-	showAchievementList();
+	if (! $('#achievement-container').find('input').length) { 
+		$('#achievement-container').append('<span>No achievement added yet</span>');
+	}
 }
 
 // Function to update License authorizations
 function addAuthorisedIn() {
-	if ($('#authorised-in-container > input').length <= 0) {
+	if ($('#authorised-in-container > div').length <= 0) {
 		$('#authorised-in-container').empty();
 	}
+	
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#authorised-in-container').append(newDiv);
+
 	var newAuthorisation = $('<input>').attr({
 		"class" : "lp-auth-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "Authorized in"
+		"placeholder" : "Authorized in",
+		"data-status" : "new"
 	});
-	$('#authorised-in-container').append(newAuthorisation);
-
 	var newAuthorizationButton = $('<div>').attr({
-		"class" : "float-right lp-ach-item-img",
+		"class" : "lp-ach-item-img hide",
 		"data-type" : "license"
 	});
-	$('#authorised-in-container').append(newAuthorizationButton);
 
+	$('#authorised-in-container').children().last().append(newAuthorisation);
+	$('#authorised-in-container').children().last().append(newAuthorizationButton);
 	newAuthorisation.focus();
+	newAuthorizationButton.addClass('float-right');
 }
 
-$(document).on('blur', '#authorised-in-container input', function() {
+$(document).on('blur', '#authorised-in-container input', function(e) {
+	e.stopPropagation();
 	delay(function() {
 		updateLicenseAuthorizations();
 	}, 0);
@@ -664,20 +699,29 @@ $(document).on('blur', '#authorised-in-container input', function() {
 
 function updateLicenseAuthorizations() {
 	var licenceList = [];
-	$('#authorised-in-container').children('input').each(function() {
-		if (this.value != "") {
-			var licence = this.value;
+	var statusEdited = false;
+
+	$('#authorised-in-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
+			var licence = value;
 			licenceList.push(licence);
-		} else {
-			return;
+			
+			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
 		}
 	});
+	if (!statusEdited) {
+		return;
+	}
+
 	licenceList = JSON.stringify(licenceList);
 	var payload = {
 		"licenceList" : licenceList
 	};
-	callAjaxPostWithPayloadData("./updatelicenses.do",
-			callBackUpdateLicenseAuthorizations, payload);
+	callAjaxPostWithPayloadData("./updatelicenses.do", callBackUpdateLicenseAuthorizations, payload);
 }
 
 function callBackUpdateLicenseAuthorizations(data) {
@@ -685,12 +729,14 @@ function callBackUpdateLicenseAuthorizations(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 
-	showLicenceList();
+	if (! $('#authorised-in-container').find('input').length) { 
+		$('#authorised-in-container').append('<span>No license added yet</span>');
+	}
 }
 
 
 // Update Social links
-$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+/*$('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -808,9 +854,7 @@ function callBackUpdateYelpLink(data) {
 	showToast();
 
 	showProfileSocialLinks();
-}
-
-
+}*/
 
 function isValidUrl(url){
 	var myVariable = url;
@@ -843,7 +887,7 @@ function adjustImage() {
 }
 
 // Function to show map on the screen
-function initializeGoogleMap() {
+/*function initializeGoogleMap() {
     var mapCanvas = document.getElementById('map-canvas');
     var geocoder = new google.maps.Geocoder();
 	var address = "Raremile technologies,HSR layout,bangalore, 560102";
@@ -870,7 +914,7 @@ function initializeGoogleMap() {
 	        });
 		}
 	});
-}
+}*/
 
 
 // Data population for Admin
@@ -983,6 +1027,7 @@ function paintProfImage(imgDivClass) {
 		var imageUrl = $(this).attr('data-imageurl');
 		if(imageUrl != "" && imageUrl != undefined) {
 			$(this).css("background", "url(" + imageUrl + ") no-repeat center");
+			$(this).css("background-size", "100%");
 		}		
 	});
 }
@@ -1032,7 +1077,12 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
-		if (reviewCount <= 1) {
+		if (reviewCount == 0) {
+			reviewCount = 'No Reviews';
+			
+			// hiding reviews-container if 0 reviews
+			$("#reviews-container").hide();
+		} else if (reviewCount == 1) {
 			reviewCount = reviewCount + ' Review';
 		} else {
 			reviewCount = reviewCount + ' Reviews';

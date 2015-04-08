@@ -28,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.MailContentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -37,6 +38,7 @@ import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 import com.realtech.socialsurvey.core.services.payment.exception.CreditCardException;
@@ -66,6 +68,9 @@ public class OrganizationManagementController {
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private ProfileManagementService profileManagementService;
 
 	@Autowired
 	private UserManagementService userManagementService;
@@ -337,13 +342,33 @@ public class OrganizationManagementController {
 		LOG.info("Method showCompanySettings of UserManagementController called");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
+
 		try {
 			LOG.debug("Getting company settings");
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			
 			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
 			LOG.debug("Showing company settings: " + companySettings.toString());
 
 			// setting the object in settings
 			session.setAttribute("companysettings", companySettings);
+			
+			// setting user profile in session
+			List<UserProfile> userProfiles = user.getUserProfiles();
+			UserProfile selectedProfile = null;
+			for (UserProfile profile : userProfiles) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+					selectedProfile = profile;
+				}
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			
+			// setting userprofile settings in session
+			OrganizationUnitSettings profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings,
+					selectedProfile.getBranchId(), selectedProfile.getRegionId(), selectedProfile.getProfilesMaster().getProfileId());
+			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
+			
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);

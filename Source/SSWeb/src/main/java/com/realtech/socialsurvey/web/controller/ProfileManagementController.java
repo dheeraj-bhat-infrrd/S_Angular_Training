@@ -323,27 +323,6 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_SOCIAL_LINKS;
 	}
 
-	// Only for agent
-	@RequestMapping(value = "/fetchassociations", method = RequestMethod.GET)
-	public String fetchAssociations(Model model, HttpServletRequest request) {
-		LOG.info("Fetching association list for profile");
-		return JspResolver.PROFILE_ASSOCIATIONS;
-	}
-
-	// Only for agent
-	@RequestMapping(value = "/fetchachievements", method = RequestMethod.GET)
-	public String fetchAchievements(Model model, HttpServletRequest request) {
-		LOG.info("Fetching achievement list for profile");
-		return JspResolver.PROFILE_ACHIEVEMENTS;
-	}
-
-	// Only for agent
-	@RequestMapping(value = "/fetchlicences", method = RequestMethod.GET)
-	public String fetchLicences(Model model, HttpServletRequest request) {
-		LOG.info("Fetching license details for profile");
-		return JspResolver.PROFILE_LICENSES;
-	}
-
 	/**
 	 * Method to update profile lock settings
 	 * 
@@ -963,9 +942,9 @@ public class ProfileManagementController {
 				if (image == null) {
 					LOG.error("Buffered Image is null");
 				}
-
+				
 				File fileLocal = new File(CommonConstants.IMAGE_NAME);
-				ImageIO.write(image, CommonConstants.IMAGE_FORMAT, fileLocal);
+				ImageIO.write(image, CommonConstants.IMAGE_FORMAT_PNG, fileLocal);
 
 				profileImageUrl = fileUploadService.fileUploadHandler(fileLocal, imageFileName);
 				profileImageUrl = endpoint + "/" + bucket + "/" + profileImageUrl;

@@ -3,40 +3,45 @@
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:set var="accountType" value="${user.company.licenseDetails[0].accountsMaster.accountName}" />
 <form id="edit-individual-form">
-	<div id="bd-assign-to" class="bd-hr-form-item clearfix">
-	    <div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
-	    <div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
 	    <c:choose>
 		    <c:when test="${accountType == 'Enterprise'}">
-		        <input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
-		        <div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
-		        	<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
-		            <c:if test="${highestrole == 1 || highestrole == 2}">
-		            	<div data-assign-to-option="region" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
-		            </c:if>
-		            <c:if test="${highestrole == 1}">
-		            	<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
-		            </c:if>
-		        </div>
+	    	<div id="bd-assign-to" class="bd-hr-form-item clearfix">
+    			<div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
+    			<div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
+			        <input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+			        <div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
+			        	<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
+			            <c:if test="${highestrole == 1 || highestrole == 2}">
+			            	<div data-assign-to-option="region" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
+			            </c:if>
+			            <c:if test="${highestrole == 1}">
+			            	<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+			            </c:if>
+			        </div>
+	        	</div>
+	        </div>
 	        </c:when>
 	        <c:when test="${accountType == 'Company'}">
-		    	<input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
-	        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
-	        		<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
-	            	<c:if test="${highestrole == 1}">
-	            		<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
-	            	</c:if>
-	        	</div>
+	        <div id="bd-assign-to" class="bd-hr-form-item clearfix">
+	    		<div class="float-left bd-frm-left"><spring:message code="label.assignto.key"/></div>
+		    	<div id="assign-to-selector" class="float-left bd-frm-right pos-relative">
+			    	<input id="assign-to-txt" data-assignto="office" value='<spring:message code="label.office.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+		        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
+		        		<div data-assign-to-option="office" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
+		            	<c:if test="${highestrole == 1}">
+		            		<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+		            	</c:if>
+		        	</div>
+		        </div>
+	        </div>
 		    </c:when>
 		    <c:when test="${accountType == 'Team'}">
-		    	<input id="assign-to-txt" data-assignto="company" value='<spring:message code="label.team.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear"/>
+		    	<input id="assign-to-txt" data-assignto="company" value='<spring:message code="label.team.key"/>' class="bd-frm-rt-txt bd-frm-rt-dd bd-frm-rt-dd-adj dd-com-main bd-dd-img ignore-clear hide"/>
 	        	<div id="assign-to-droplist" class="bd-frm-rt-dd-list dd-com-list hide">
 	            	<div data-assign-to-option="company" class="bd-frm-rt-dd-item dd-com-item hm-dd-hover hm-assignto-options"><spring:message code="label.team.key"/></div>
 	        	</div>
 		    </c:when>
 	   </c:choose>
-	    </div>
-	</div>
 	<div id="bd-region-selector" class="bd-hr-form-item clearfix hide">
 	    <div class="float-left bd-frm-left"><spring:message code="label.selectregion.key"/></div>
 	    <div class="float-left bd-frm-right pos-relative" id="region-selector">
