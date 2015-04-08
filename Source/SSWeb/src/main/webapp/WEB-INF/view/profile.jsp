@@ -108,7 +108,7 @@
                         <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
                     </div>
                 </div>
-                <div class="prof-left-row prof-left-info bord-bot-dc">
+                <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc hide">
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
@@ -119,7 +119,7 @@
                 
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
-                   			<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                   			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                    				<div class="left-assoc-wrapper">
                    					<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
                         			<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
@@ -129,7 +129,7 @@
               					</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty regionProfileName}">
-                   		 	<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                   		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                    				<div class="left-assoc-wrapper">
 		                   		 	<input type="hidden" id="branchid-hidden"/>
 		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
@@ -145,7 +145,7 @@
                   		 		</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty companyProfileName}">
-                  		 		<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                  		 		<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                   					<div class="left-assoc-wrapper">
 	                   		 			<input type="hidden" id="regionid-hidden"/>
 	                   		 			<input type="hidden" id="branchid-hidden"/>
@@ -188,7 +188,7 @@
                     </div>
                 </div>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
-                    <div class="main-con-header" id="prof-reviews-header"></div>
+                    <div class="main-con-header hide" id="prof-reviews-header"></div>
                     <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here --> 
                     </div>
