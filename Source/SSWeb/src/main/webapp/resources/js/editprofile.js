@@ -268,7 +268,6 @@ $(document).on('blur', '#contant-info-container input[data-web-address]', functi
 			return false;
 		}
 		webAddresses = JSON.stringify(webAddresses);
-		console.log(webAddresses);
 		var payload = {
 			"webAddresses" : webAddresses
 		};
