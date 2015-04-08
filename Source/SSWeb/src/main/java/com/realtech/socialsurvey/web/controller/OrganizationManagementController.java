@@ -523,11 +523,9 @@ public class OrganizationManagementController {
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
 		String message = "";
-		boolean isAutoPostEnabled = false;
+		
 		try {
-			if(autopost!=null && !autopost.isEmpty()){
-				isAutoPostEnabled = Boolean.parseBoolean(autopost);
-			}
+			boolean isAutopostEnabled = Boolean.parseBoolean(autopost);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 					.getCompanySettings();
 
@@ -542,7 +540,7 @@ public class OrganizationManagementController {
 				surveySettings = new SurveySettings();
 				surveySettings.setAuto_post_score((float) autopostRating);
 				if (originalSurveySettings != null) {
-					surveySettings.setAutoPostEnabled(isAutoPostEnabled);
+					surveySettings.setAutoPostEnabled(isAutopostEnabled);
 					surveySettings.setShow_survey_above_score(originalSurveySettings.getShow_survey_above_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
@@ -564,6 +562,7 @@ public class OrganizationManagementController {
 				surveySettings = new SurveySettings();
 				surveySettings.setShow_survey_above_score((float) minPostRating);
 				if (originalSurveySettings != null) {
+					surveySettings.setAutoPostEnabled(isAutopostEnabled);
 					surveySettings.setAuto_post_score(originalSurveySettings.getAuto_post_score());
 					surveySettings.setMax_number_of_survey_reminders(originalSurveySettings.getMax_number_of_survey_reminders());
 					surveySettings.setSurvey_reminder_interval_in_days(originalSurveySettings.getSurvey_reminder_interval_in_days());
@@ -584,6 +583,34 @@ public class OrganizationManagementController {
 			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
 		}
 		return message;
+	}
+	
+	@RequestMapping(value = "/updateautopostforsurvey", method = RequestMethod.POST)
+	@ResponseBody
+	public String updateAutoPostForSurvey(HttpServletRequest request){
+		LOG.info("Method to update autopost for a survey started");
+		try{
+			HttpSession session = request.getSession(false);
+			String autopost = request.getParameter("autopost");
+			boolean isAutoPostEnabled = false;
+			if(autopost!=null && !autopost.isEmpty()){
+				isAutoPostEnabled = Boolean.parseBoolean(autopost);
+				OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
+						.getCompanySettings();
+				SurveySettings surveySettings = companySettings.getSurvey_settings();
+				surveySettings.setAutoPostEnabled(isAutoPostEnabled);
+				if (organizationManagementService.updateSurveySettings(companySettings, surveySettings)) {
+					companySettings.setSurvey_settings(surveySettings);
+					LOG.info("Updated Survey Settings");
+				}
+			}
+		}catch(Exception e){
+			LOG.error("Exception occured in updateAutoPostForSurvey() while updating whether to enable autopost or not. Nested exception is ",e);
+			return e.getMessage();
+		}
+		
+		LOG.info("Method to update autopost for a survey finished");
+		return "Successfully updated autopost setting";
 	}
 
 	/**
