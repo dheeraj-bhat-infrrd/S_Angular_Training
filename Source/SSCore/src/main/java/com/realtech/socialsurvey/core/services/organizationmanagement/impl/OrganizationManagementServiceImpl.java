@@ -211,7 +211,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		/**
 		 * For an individual, a default agent profile is created
 		 */
-		if (accountType == AccountType.INDIVIDUAL) {
+		if (accountType == AccountType.INDIVIDUAL || accountType  == AccountType.FREE) {
 			profilesMaster = userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 
 			LOG.debug("Creating user profile for agent");
