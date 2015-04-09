@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -34,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -1862,5 +1865,76 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method updateUserOnCompleteRegistration executed successfully");
 
 		return user;
+	}
+	
+	@Override
+	public Map<Long, String> getProcessedUserProfile(User user, long profileId) throws NonFatalException {
+		LOG.debug("Method getUserProfile() called from UserManagementService");
+
+		// Fetch Regions and Branches from Solr
+		long companyId = user.getCompany().getCompanyId();
+		Map<Long, RegionFromSearch> regions;
+		Map<Long, BranchFromSearch> branches;
+		try {
+			regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+			branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+		}
+		catch (InvalidInputException | SolrException | MalformedURLException e) {
+			LOG.error("Exception while fetching regions and branches from solr. Reason : " + e.getMessage(), e);
+			throw new NonFatalException("Exception while fetching regions and branches from solr", e);
+		}
+
+		long branchId = 0;
+		long regionId = 0;
+		boolean agentAdded = false;
+		RegionFromSearch region = null;
+		BranchFromSearch branch = null;
+		Map<Long, String> profileNameMap = new HashMap<Long, String>();
+		for (UserProfile profile : user.getUserProfiles()) {
+			
+			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				
+				// updating display name for drop down
+				int profileMasterId = profile.getProfilesMaster().getProfileId();
+				switch (profileMasterId) {
+					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+						profileNameMap.put(profile.getUserProfileId(), user.getCompany().getCompany());
+						break;
+					
+					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+						regionId = profile.getRegionId();
+						if (regionId != 0l) {
+							region = regions.get(regionId);
+						}
+						if (region.getIsDefaultBySystem() != 1) {
+							profileNameMap.put(profile.getUserProfileId(), region.getRegionName());
+						}
+						break;
+
+					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+						branchId = profile.getBranchId();
+						if (branchId != 0l) {
+							branch = branches.get(branchId);
+						}
+						if (branch.getIsDefaultBySystem() != 1) {
+							profileNameMap.put(profile.getUserProfileId(), branch.getBranchName());
+						}
+						break;
+
+					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+						if (!agentAdded) {
+							profileNameMap.put(profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW);
+							agentAdded = true;
+						}
+						break;
+
+					default:
+						continue;
+				}
+			}
+		}
+		
+		LOG.debug("Method getUserProfile() finished from UserManagementService");
+		return profileNameMap;
 	}
 }

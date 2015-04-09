@@ -36,7 +36,6 @@ import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
-import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.DisplayMessage;
@@ -48,7 +47,6 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.MiscValues;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
-import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
@@ -67,8 +65,8 @@ import com.realtech.socialsurvey.core.exception.ProfileServiceErrorCode;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.FileUploadService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
@@ -82,7 +80,6 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class ProfileManagementController {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileManagementController.class);
-	private static final String PROFILE_AGENT_VIEW = "Myself";
 
 	// JIRA SS-97 by RM-06 : BOC
 	@Autowired
@@ -99,6 +96,9 @@ public class ProfileManagementController {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Autowired
 	private FileUploadService fileUploadService;
@@ -122,81 +122,25 @@ public class ProfileManagementController {
 		User user = sessionHelper.getCurrentUser();
 
 		try {
-			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			
-			// fetching region and branches from solr
-			long companyId = user.getCompany().getCompanyId();
-			Map<Long, RegionFromSearch> regions;
-			Map<Long, BranchFromSearch> branches;
-			try {
-				regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
-				branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
-			}
-			catch (InvalidInputException | SolrException | MalformedURLException e) {
-				LOG.error("Exception while fetching regions and branches from solr. Reason : " + e.getMessage(), e);
-				throw new NonFatalException("Exception while fetching regions and branches from solr", e);
-			}
-			
-			// Populate profile list and set in session
+			long profileId = 0l;
 			long branchId = 0;
 			long regionId = 0;
-			boolean agentAdded = false;
-			RegionFromSearch region = null;
-			BranchFromSearch branch = null;
-			List<UserProfile> userProfiles = user.getUserProfiles();
-			Map<Long, String> profileNameMap = new HashMap<Long, String>();
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+			// updating profile map
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-			for (UserProfile profile : userProfiles) {
-				
+			for (UserProfile profile : user.getUserProfiles()) {
 				if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
-					// updating profile map
 					profileMap.put(profile.getUserProfileId(), profile);
-					
-					// updating display name for drop down
-					int profileMasterId = profile.getProfilesMaster().getProfileId();
-					switch (profileMasterId) {
-						case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-							profileNameMap.put(profile.getUserProfileId(), user.getCompany().getCompany());
-							break;
-						
-						case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-							regionId = profile.getRegionId();
-							if (regionId != 0l) {
-								region = regions.get(regionId);
-							}
-							if (region.getIsDefaultBySystem() != 1) {
-								profileNameMap.put(profile.getUserProfileId(), region.getRegionName());
-							}
-							break;
-
-						case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-							branchId = profile.getBranchId();
-							if (branchId != 0l) {
-								branch = branches.get(branchId);
-							}
-							if (branch.getIsDefaultBySystem() != 1) {
-								profileNameMap.put(profile.getUserProfileId(), branch.getBranchName());
-							}
-							break;
-
-						case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-							if (!agentAdded) {
-								profileNameMap.put(profile.getUserProfileId(), PROFILE_AGENT_VIEW);
-								agentAdded = true;
-							}
-							break;
-
-						default:
-							continue;
-					}
 				}
 			}
-			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
 			
+			// profile maps
+			Map<Long, String> profileNameMap = userManagementService.getProcessedUserProfile(user, profileId);
+			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
+
 			// fetching profileId
-			long profileId = 0l;
-			UserProfile selectedProfile = null;
 			try {
 				String profileIdStr = request.getParameter("profileId");
 				if (profileIdStr != null && !profileIdStr.equals("")) {
@@ -209,19 +153,21 @@ public class ProfileManagementController {
 			catch (NumberFormatException e) {
 				LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
 			}
-			
+
 			// Selecting and Setting Profile in session
+			UserProfile selectedProfile = null;
+			List<UserProfile> userProfiles = user.getUserProfiles();
 			if (profileId == 0l) {
 				selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
 			}
 			else {
 				selectedProfile = profileMap.get(profileId);
 			}
-			
-			// current profile
-			model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
+
+			// setting session and model attributes
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			
+			model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
+
 			// fetching details from profile
 			int profilesMaster = 0;
 			if (selectedProfile != null) {
@@ -229,11 +175,11 @@ public class ProfileManagementController {
 				regionId = selectedProfile.getRegionId();
 				profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
 			}
-			
+
 			// Setting userSettings in session
 			OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
 			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-	
+
 			// Setting parentLock in session
 			LockSettings parentLock = fetchParentLockSettings(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
 			session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
