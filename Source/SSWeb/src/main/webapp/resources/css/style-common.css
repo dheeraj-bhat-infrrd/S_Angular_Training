@@ -546,9 +546,13 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 
 .hm-header-row-left {
     font-size: 16px;
-    line-height: 55px;
+    line-height: 35px;
     font-family: OpenSansBold;
 /*    font-weight: bold !important;*/
+}
+
+.padding-10{
+	padding-top: 10px;
 }
 
 .hm-header-row-right {
@@ -3916,21 +3920,21 @@ button.paypal.is-active {
 }
 .reg_header {
     text-align: center;
-    line-height: 70px;
+    line-height: 40px;
     font-weight: bold;
     font-size: 22px;
 }
 
 .reg_form_wrapper_2 {
-    width: 740px;
+    width: 760px;
     margin:  25px auto 0;
 }
 
 .rfr_lbl {
-    line-height: 40px;
+    line-height: 40px !important;
     margin-right: 30px;
     text-align: right;
-    width: 98px;
+    width: 120px;
     font-size: 14px;
 }
 
@@ -4170,6 +4174,26 @@ button.paypal.is-active {
 .pers-default-img {
  	background: url(../images/place-holder-individual.png) no-repeat center;
  	background-size: 20px;
+}
+
+.dsh-pers-default-img {
+ 	background: url(../images/place-holder-individual.png) no-repeat center;
+ 	background-size: auto !important;
+}
+
+.dsh-region-default-img {
+	background: url(../images/place-holder-Region.png) no-repeat center;
+	background-size: auto !important;
+}
+
+.dsh-office-default-img {
+	background: url(../images/place-holder-Office.png) no-repeat center;
+	background-size: auto !important;
+}
+
+.dsh-comp-default-img {
+	background: url(../images/place-holder-Company.png) no-repeat center;
+	background-size: auto !important;
 }
 
 .pers-default-big {
@@ -5065,7 +5089,7 @@ tr.u-tbl-header td {
 }
 
 .bd-svry-header {
-    margin: 20px 0;
+    margin: 15px 0;
     line-height: 32px;
 }
 
@@ -5207,6 +5231,10 @@ tr.u-tbl-header td {
     margin-bottom: 15px;
 }
 
+.bd-q-pu-header-margin-override {
+	margin-top: 0px !important; 
+}
+
 .bd-q-pu-header-rt {
     font-size: 13px;
 }
@@ -5249,7 +5277,13 @@ tr.u-tbl-header td {
 .bd-q-pu-done-wrapper {
     line-height: 40px;
     width: 120px;
-    margin: 20px auto 0;
+    margin: 10px auto 0;
+    padding-bottom: 10px;
+}
+
+.bd-q-pu-done-wrapper-override {
+	margin: 15px auto 0 !important;
+	padding-bottom: 0px !important;
 }
 
 .bd-q-btn-cancel {
