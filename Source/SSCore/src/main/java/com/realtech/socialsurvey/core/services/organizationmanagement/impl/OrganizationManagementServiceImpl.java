@@ -167,9 +167,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		createDefaultHierarchy(user, accountType);
 		LOG.debug("Successfully created default hierarchy and user profiles");
 
-		user = userDao.findById(User.class, user.getUserId());
+		user = userManagementService.getUserByUserId(user.getUserId());
 		userManagementService.setProfilesOfUser(user);
 		solrSearchService.addUserToSolr(user);
+		
 		LOG.info("Method addAccountTypeForCompany finished.");
 		return accountType;
 	}
