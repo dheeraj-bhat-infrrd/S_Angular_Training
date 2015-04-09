@@ -49,7 +49,6 @@
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/changepassword.js"></script>
 <script>
 var isChangePasswordFormValid;
 $(document).ready(function() {
@@ -89,19 +88,19 @@ $(document).ready(function() {
 	});
 
 	$('#current-pwd').blur(function() {
-		if (validateCurrentPassword(this.id)) {
+		if (validatePassword(this.id)) {
 			hideError();
 		}
 	});
 
 	$('#new-pwd').blur(function() {
-		if (validateNewPassword(this.id)) {
+		if (validatePassword(this.id)) {
 			hideError();
 		}
 	});
 
 	$('#confnw-pwd').blur(function() {
-		if (validateConfirmNewPassword('new-pwd', this.id)) {
+		if (validateConfirmPassword('new-pwd', this.id)) {
 			hideError();
 		}
 	});
@@ -114,7 +113,7 @@ $(document).ready(function() {
     	if($(window).width()<768){
     		isSmallScreen = true;
     	}
-		if (!validateCurrentPassword('current-pwd')) {
+		if (!validatePassword('current-pwd')) {
 			isChangePasswordFormValid = false;
 			if (!isFocussed) {
 				$('#current-pwd').focus();
@@ -124,7 +123,7 @@ $(document).ready(function() {
 				return isChangePasswordFormValid;
 			}
 		}
-		if (!validateNewPassword('new-pwd')) {
+		if (!validatePassword('new-pwd')) {
 			isChangePasswordFormValid = false;
 			if (!isFocussed) {
 				$('#new-pwd').focus();
@@ -134,7 +133,7 @@ $(document).ready(function() {
 				return isChangePasswordFormValid;
 			}
 		}
-		if (!validateConfirmNewPassword('new-pwd', 'confnw-pwd')) {
+		if (!validateConfirmPassword('new-pwd', 'confnw-pwd')) {
 			isChangePasswordFormValid = false;
 			if (!isFocussed) {
 				$('#confnw-pwd').focus();

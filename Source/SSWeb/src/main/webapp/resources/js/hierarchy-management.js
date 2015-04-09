@@ -153,19 +153,13 @@ function paintEditSection(data) {
 		});
 		return false;
 	}
-	
-	var assignToOption = $("#assign-to-txt").attr('data-assignto');
-	showSelectorsByAssignToOption(assignToOption);
-	
 	/**
 	 * bind the click events
 	 */
-	$("#selected-user-txt").click(function() {
-		getUsersList("",usersStartIndex,numOfRows);
-	});
-	$("#selected-user-txt").keydown(function(e) {
-		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
-	});
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	
+	bindUserSelector();
 	
 	$("#btn-region-save").click(function(e){
 		if(validateRegionForm()){
@@ -179,41 +173,9 @@ function paintEditSection(data) {
 		}
 	});
 
-	$("#selected-user-txt").keyup(function(e) {
-		if(e.which != 38 && e.which != 40 && e.which != 13) {
-			var text = $(this).val();
-			usersStartIndex = 0;	
-			if (text.length > 0) {
-				delay(function() {
-					getUsersList(text,usersStartIndex,numOfRows);
-				}, 500);
-			}
-			else {
-				delay(function() {
-					getUsersList("",usersStartIndex,numOfRows);
-				}, 500);
-			}
-		}
-	});
-	
 	bindAdminCheckBoxClick();
 	
-	$('.bd-cust-rad-img').click(function(e) {
-        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
-        $(this).toggleClass('bd-cust-rad-img-checked');
-        if($(this).data('type') == "single"){
-            $('#bd-single').show();
-            $('#bd-multiple').hide();
-            showAdminPrivilegesChk();
-        }else if($(this).data('type') == "multiple"){
-            $('#bd-single').hide();
-            $('#bd-multiple').show();
-            $('#selected-userid-hidden').val("");
-            hideAdminPrivilegesChk();
-        }
-        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
-    });
-	
+	bindSingleMultipleSelection();
 	bindAssignToSelectorClick();
 	
 	bindRegionSelectorEvents();
@@ -235,6 +197,49 @@ function paintEditSection(data) {
 	$("#btn-individual-save").click(function(e){
 		if(validateIndividualForm()){
 			addIndividual("edit-individual-form");
+		}
+	});
+}
+
+function bindSingleMultipleSelection() {
+	$('.bd-cust-rad-img').click(function(e) {
+        $('.bd-cust-rad-img').removeClass('bd-cust-rad-img-checked');
+        $(this).toggleClass('bd-cust-rad-img-checked');
+        if($(this).data('type') == "single"){
+            $('#bd-single').show();
+            $('#bd-multiple').hide();
+            showAdminPrivilegesChk();
+        }else if($(this).data('type') == "multiple"){
+            $('#bd-single').hide();
+            $('#bd-multiple').show();
+            $('#selected-userid-hidden').val("");
+            hideAdminPrivilegesChk();
+        }
+        $('#user-selection-info').attr('data-user-selection-type',$(this).data('type'));
+    });
+}
+
+function bindUserSelector() {
+	$("#selected-user-txt").click(function() {
+		getUsersList("",usersStartIndex,numOfRows);
+	});
+	$("#selected-user-txt").keydown(function(e) {
+		bindArrowKeysWithSelector(e, "selected-user-txt", "users-droplist", getUsersList, "selected-userid-hidden", "data-userid");
+	});
+	$("#selected-user-txt").keyup(function(e) {
+		if(e.which != 38 && e.which != 40 && e.which != 13) {
+			var text = $(this).val();
+			usersStartIndex = 0;	
+			if (text.length > 0) {
+				delay(function() {
+					getUsersList(text,usersStartIndex,numOfRows);
+				}, 500);
+			}
+			else {
+				delay(function() {
+					getUsersList("",usersStartIndex,numOfRows);
+				}, 500);
+			}
 		}
 	});
 }
@@ -416,7 +421,8 @@ function validateUserEmailTextArea(elementId) {
 	if (emailIds != "") {
 		var emailIdsArray = emailIds.split(",");
 		for(var i = 0; i < emailIdsArray.length; i++) {
-			if(emailRegex.test(emailIdsArray[i]) == true){
+			var emailId = emailIdsArray[i].trim();
+			if(emailRegex.test(emailId) == true){
 				return true;
 			}
 			else {
@@ -952,6 +958,7 @@ function paintHierarchyViewBranches(data,regionId) {
 }
 
 function bindBranchListClicks(){
+	$(".branch-edit-icn").unbind('click');
 	$(".branch-edit-icn").click(function(e){
 		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
@@ -964,6 +971,7 @@ function bindBranchListClicks(){
 			$(this).attr('clicked','false');
 		}		
 	});
+	$(".branch-row").unbind('click');
 	$(".branch-row").click(function(e){
 		e.stopPropagation();
 		var branchId = $(this).attr("data-branchid");
@@ -977,7 +985,11 @@ function bindBranchListClicks(){
             $(this).attr('clicked','false');
 		}
 	});
-	
+	$(".branch-del-icn").unbind('click');
+	$(".branch-del-icn").click(function(e){
+		var branchId = $(this).attr("data-branchid");
+		deleteBranchPopup(branchId);
+	});
 }
 
 function fetchHierarchyViewList() {
@@ -985,6 +997,7 @@ function fetchHierarchyViewList() {
 	callAjaxGET(url, paintHierarchyViewList, true);
 }
 function paintHierarchyViewList(data) {
+	$("#hierarchy-list-header").siblings().remove();
 	$("#hierarchy-list-header").after(data);
 	bindRegionListClicks();
     $('.v-tbl-icn').click(function(e){
@@ -1018,6 +1031,11 @@ function bindRegionListClicks() {
 			$(this).attr('clicked','false');
 		}		
 	});
+	$(".region-del-icn").unbind('click');
+	$(".region-del-icn").click(function(e){
+		var regionId = $(this).attr("data-regionid");
+		deleteRegionPopup(regionId);
+	});
 }
 
 function showRegionEdit(regionId) {
@@ -1031,12 +1049,23 @@ function showRegionEditCallBack(data,regionId) {
 	$(".tr-region-edit").hide();
 	$("#td-region-edit-"+regionId).parent(".tr-region-edit").slideDown(200);
 	$("#td-region-edit-"+regionId).html(data).slideDown(200);
+	bindSingleMultipleSelection();
+	bindUserSelector();
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	bindAssignToSelectorClick();
+	$("#btn-region-update").click(function(e) {
+		var regionId = $(this).attr("data-regionid");
+		if(validateRegionForm()){
+			updateRegion("edit-region-form",regionId);
+		}
+	});
 	
 }
 
-function hideRegionEdit(branchId) {
+function hideRegionEdit(regionId) {
 	$(".td-region-edit").html("").hide();
-	$("#td-region-edit-"+branchId).hide();
+	$("#td-region-edit-"+regionId).hide();
 	$(".tr-region-edit").hide();
 }
 
@@ -1050,6 +1079,15 @@ function showBranchEdit(branchId) {
 function showBranchEditCallBack(data,branchId) {
 	$("#td-branch-edit-"+branchId).parent(".tr-branch-edit").slideDown(200);
 	$("#td-branch-edit-"+branchId).html(data).slideDown(200);
+	bindSingleMultipleSelection();
+	bindUserSelector();
+	bindRegionSelectorEvents();
+	var assignToOption = $("#assign-to-txt").attr('data-assignto');
+	showSelectorsByAssignToOption(assignToOption);
+	bindAssignToSelectorClick();
+	$("#btn-office-update").click(function(e){
+		updateBranch("edit-office-form", branchId);
+	});
 }
 
 function hideBranchEdit(branchId) {
@@ -1072,19 +1110,213 @@ function paintUsersFromBranch(data,branchId,regionId) {
 }
 
 function bindUserEditClicks() {
+	$(".user-edit-icn").unbind('click');
 	$('.user-edit-icn').click(function(e){
 		e.stopPropagation();
 		if($(this).attr('clicked') == "false") {
 			// make an ajax call and fetch the details of the user
 			var userId = $(this).attr('data-userid');
 			$(".user-assignment-edit-div").html("");
-			$(".user-assignment-edit-row").slideUp();
+			$(".user-edit-row").slideUp();
 			getUserAssignments(userId);
-			$(this).next('.user-edit-row').slideDown(200);
+			$(this).parent().parent().parent().next('.user-edit-row').slideDown(200);
+			$(this).attr('clicked','true');
+	    }else {
+			$(this).parent().parent().parent().next('.user-edit-row').slideUp(200);
+			$(".user-assignment-edit-div").html("");
+			$(".user-edit-row").slideUp();
 	    }
+	});
+	$(".user-del-icn").unbind('click');
+	$(".user-del-icn").click(function(e){
+		e.stopPropagation();
+		var userId = $(this).attr("data-userid");
+		deleteUser(userId);
 	});
 }
 
-function showUserEdit(userId) {
+function updateRegion(formId,regionId) {
+	var url = "./updateregion.do";
+	showOverlay();
+	callAjaxFormSubmit(url, function(data){
+		updateRegionCallBack(data, regionId);
+	}, formId);
+}
+
+function updateRegionCallBack(data,regionId) {
+	hideOverlay();
+	displayMessage(data);
+	hideRegionEdit(regionId);
+	fetchHierarchyViewList();
+}
+
+function updateBranch(formId,branchId) {
+	var url = "./updatebranch.do";
+	callAjaxFormSubmit(url, function(data){
+		updateBranchCallBack(data,branchId);
+	}, formId);
+}
+
+function updateBranchCallBack(data,branchId) {
+	hideOverlay();
+	displayMessage(data);
+	hideBranchEdit(branchId);
+	fetchHierarchyViewList();
+}
+
+/**
+ * Region Delete popup overlay
+ * 
+ * @param regionId
+ */
+function deleteRegionPopup(regionId) {
+	var urlCheck = "./checkbranchesinregion.do?regionId=" + regionId;
+	callAjaxPOST(urlCheck, function(response) {
+		deleteRegionCheckCallBack(response, regionId);
+	}, true);
+}
+function deleteRegionCheckCallBack(response, regionId) {
+	$('#overlay-text').html(response);
+	$('.msg-err-icn').remove();
+
+	var success = "Selected Region could be deleted";
+	var successMsg = $("#overlay-text").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Region");
+		
+		$('#overlay-continue').click(function(){
+			if ($('#overlay-continue').attr("disabled") != "disabled") {
+				if(regionId != null) {
+					overlayRevert();
+					deleteRegion(regionId);
+					regionId = null;
+				}
+				$('#overlay-continue').unbind('click');
+			}
+		});
+	} else {
+		createPopupInfo("Remove Region");
+		regionId = null;
+	}
+}
+
+
+/**
+ * Branch Delete popup overlay
+ * 
+ * @param branchId
+ */
+function deleteBranchPopup(branchId) {
+	var urlCheck = "./checkusersinbranch.do?branchId=" + branchId;
+	callAjaxPOST(urlCheck, function(response) {
+		deleteBranchCheckCallBack(response, branchId);
+	}, true);
+}
+function deleteBranchCheckCallBack(response, branchId) {
+	$("#overlay-text").html(response);
+	$('.msg-err-icn').remove();
+	var success = "Selected Office could be deleted";
+	var successMsg = $("#overlay-text").find('.success-message').text().trim();
+	if (success == successMsg) {
+		createPopupConfirm("Remove Branch");
+		
+		$('#overlay-continue').click(function(){
+			if ($('#overlay-continue').attr("disabled") != "disabled") {
+				if(branchId != null) {
+					overlayRevert();
+					deleteBranch(branchId);
+					branchId = null;
+				}
+				$('#overlay-continue').unbind('click');
+			}
+		});
+	} else {
+		createPopupInfo("Remove Branch");
+		branchId = null;
+	}
+}
+
+//Pop-up Overlay modifications
+$('#overlay-cancel').click(function(){
+	$('#overlay-continue').unbind('click');
+	overlayRevert();
+	branchId = null;
+	regionId = null;
+});
+function createPopupConfirm(header) {
+	$('#overlay-header').html(header);
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$('#overlay-continue').removeClass("btn-disabled");
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
+
+	$('#overlay-main').show();
+}
+
+function createPopupInfo(header) {
+	$('#overlay-header').html(header);
+	$('#overlay-continue').attr("disabled", true);
+	$('#overlay-continue').addClass("btn-disabled");
+	$('#overlay-continue').html('Continue');
+	$('#overlay-cancel').html('Cancel');
 	
+   	$('#overlay-main').show();
+}
+function overlayRevert() {
+	$('#overlay-main').hide();
+	if ($('#overlay-continue').attr("disabled") == "disabled") {
+		$('#overlay-continue').removeAttr("disabled");
+	}
+	$("#overlay-header").html('');
+	$("#overlay-text").html('');
+	$('#overlay-continue').html('');
+	$('#overlay-cancel').html('');
+}
+
+/**
+ * Function to delete a region
+ * 
+ * @param branchId
+ */
+function deleteRegion(regionId) {
+	var url = "./deactivateregion.do?regionId=" + regionId;
+	callAjaxPOST(url, function(data){
+		deleteRegionCallBack(data,regionId);
+	}, true);
+}
+
+/**
+ * Call back function for deleting a region
+ * 
+ * @param data
+ */
+function deleteRegionCallBack(data,regionId) {
+	displayMessage(data);
+	$("#tr-region-"+regionId).hide();
+	$("#tr-region-"+regionId).next(".tr-region-edit").hide();
+}
+
+/**
+ * Function to delete a branch
+ * 
+ * @param branchId
+ */
+function deleteBranch(branchId) {
+	var url = "./deactivatebranch.do?branchId=" + branchId;
+	callAjaxPOST(url, function(data){
+		deleteBranchCallBack(data,branchId);
+	}, true);
+}
+
+/**
+ * Call back function for deleting a branch
+ * 
+ * @param data
+ */
+function deleteBranchCallBack(data,branchId) {
+	displayMessage(data);
+	$("#tr-branch-row-"+branchId).hide();
+	$("#tr-branch-row-"+branchId).next(".tr-branch-edit").hide();
 }

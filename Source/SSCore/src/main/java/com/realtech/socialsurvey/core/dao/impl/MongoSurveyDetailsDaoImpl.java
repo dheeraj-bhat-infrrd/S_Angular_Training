@@ -360,7 +360,17 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	public double getRatingForPastNdays(String columnName, long columnValue, int noOfDays, boolean aggregateAbusive) {
 		LOG.info("Method getRatingOfAgentForPastNdays(), to calculate rating of agent started for columnName: " + columnName + " columnValue:"
 				+ columnValue + " noOfDays:" + noOfDays + " aggregateAbusive:" + aggregateAbusive);
-		Date startDate = getNdaysBackDate(noOfDays);
+		Date startDate = null;
+		/**
+		 * if days is not set, take the start date as 1 jan 1970
+		 */
+		if (noOfDays == -1) {
+			startDate = new Date(0l);
+		}
+		else {
+			startDate = getNdaysBackDate(noOfDays);
+		}
+
 		Date endDate = Calendar.getInstance().getTime();
 
 		Query query = new Query();
