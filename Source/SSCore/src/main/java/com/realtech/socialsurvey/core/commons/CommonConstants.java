@@ -200,6 +200,7 @@ public interface CommonConstants {
 	public static final String SOCIAL_FLOW = "socialFlow";
 	public static final String BRANCHES_IN_SESSION = "branchesInSession";
 	public static final String REGIONS_IN_SESSION = "regionsInSession";
+	public static final String PROFILE_AGENT_VIEW = "Myself";
 
 	/**
 	 * Batch Constants

@@ -255,5 +255,17 @@ public interface UserManagementService {
 	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password)
 			throws InvalidInputException, SolrException;
 
+	/**
+	 * Method to user profiles data in session and return selected profile
+	 * 
+	 * @param user
+	 * @param profileId
+	 * @param profileMap
+	 * @param branchId
+	 * @param regionId
+	 * @return
+	 * @throws NonFatalException
+	 */
+	public Map<Long, String> getProcessedUserProfile(User user, long profileId) throws NonFatalException;
 }
 // JIRA SS-34 BY RM02 BOC
