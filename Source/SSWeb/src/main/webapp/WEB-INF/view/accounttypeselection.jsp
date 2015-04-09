@@ -50,7 +50,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center">
+			<div class="hm-header-row-left text-center padding-10">
 				<c:choose>
 					<c:when test="${upgrade == 1}"><spring:message code="label.upgradeplan.header.key" /></c:when>
 					<c:otherwise><spring:message code="label.accounttypeselection.header.key" /></c:otherwise>	

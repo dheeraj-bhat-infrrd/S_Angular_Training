@@ -3938,6 +3938,9 @@ button.paypal.is-active {
     font-size: 14px;
 }
 
+.rfr_lbl_width-98 {
+	width: 98px !important;
+}
 .rfr_txt_fld {
     width: 275px;
     height: 40px;
