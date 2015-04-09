@@ -121,73 +121,66 @@ public class ProfileManagementController {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
+		long profileId = 0l;
+		long branchId = 0;
+		long regionId = 0;
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+		// updating profile map
+		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+		for (UserProfile profile : user.getUserProfiles()) {
+			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				profileMap.put(profile.getUserProfileId(), profile);
+			}
+		}
+		
+		// profile maps
+		Map<Long, String> profileNameMap = (Map<Long, String>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+
+		// fetching profileId
 		try {
-			long profileId = 0l;
-			long branchId = 0;
-			long regionId = 0;
-			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-
-			// updating profile map
-			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-			for (UserProfile profile : user.getUserProfiles()) {
-				if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
-					profileMap.put(profile.getUserProfileId(), profile);
-				}
-			}
-			
-			// profile maps
-			Map<Long, String> profileNameMap = userManagementService.getProcessedUserProfile(user, profileId);
-			session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
-
-			// fetching profileId
-			try {
-				String profileIdStr = request.getParameter("profileId");
-				if (profileIdStr != null && !profileIdStr.equals("")) {
-					profileId = Long.parseLong(request.getParameter("profileId"));
-				}
-				else {
-					profileId = 0l;
-				}
-			}
-			catch (NumberFormatException e) {
-				LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
-			}
-
-			// Selecting and Setting Profile in session
-			UserProfile selectedProfile = null;
-			List<UserProfile> userProfiles = user.getUserProfiles();
-			if (profileId == 0l) {
-				selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+			String profileIdStr = request.getParameter("profileId");
+			if (profileIdStr != null && !profileIdStr.equals("")) {
+				profileId = Long.parseLong(request.getParameter("profileId"));
 			}
 			else {
-				selectedProfile = profileMap.get(profileId);
+				profileId = 0l;
 			}
-
-			// setting session and model attributes
-			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
-
-			// fetching details from profile
-			int profilesMaster = 0;
-			if (selectedProfile != null) {
-				branchId = selectedProfile.getBranchId();
-				regionId = selectedProfile.getRegionId();
-				profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
-			}
-
-			// Setting userSettings in session
-			OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
-			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-
-			// Setting parentLock in session
-			LockSettings parentLock = fetchParentLockSettings(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
-			session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
 		}
-		catch (NonFatalException nonFatalException) {
-			LOG.error("NonFatalException in while inviting new user. Reason : " + nonFatalException.getMessage(), nonFatalException);
-			model.addAttribute("message", messageUtils.getDisplayMessage(nonFatalException.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
 		}
+
+		// Selecting and Setting Profile in session
+		UserProfile selectedProfile = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (profileId == 0l) {
+			selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+		}
+		else {
+			selectedProfile = profileMap.get(profileId);
+		}
+
+		// setting session and model attributes
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
+
+		// fetching details from profile
+		int profilesMaster = 0;
+		if (selectedProfile != null) {
+			branchId = selectedProfile.getBranchId();
+			regionId = selectedProfile.getRegionId();
+			profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+		}
+
+		// Setting userSettings in session
+		OrganizationUnitSettings profileSettings = fetchUserProfile(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
+		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
+
+		// Setting parentLock in session
+		LockSettings parentLock = fetchParentLockSettings(model, user, accountType, userSettings, branchId, regionId, profilesMaster);
+		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
 
 		LOG.info("Method showProfileEditPage() finished from ProfileManagementService");
 		return JspResolver.PROFILE_EDIT;

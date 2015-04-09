@@ -1868,7 +1868,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 	
 	@Override
-	public Map<Long, String> getProcessedUserProfile(User user, long profileId) throws NonFatalException {
+	public Map<Long, String> getProcessedUserProfiles(User user) throws NonFatalException {
 		LOG.debug("Method getUserProfile() called from UserManagementService");
 
 		// Fetch Regions and Branches from Solr

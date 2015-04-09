@@ -1,5 +1,5 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!-- Setting common page variables -->
@@ -65,19 +65,17 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
-			<c:choose>
-				<c:when test="${not empty profileList && fn:length(profileList) > 1}">
-					<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
-						<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-						<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
-						<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
-							<c:forEach var="userprofile" items="${profileList}">
-								<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
-							</c:forEach>
-						</div>
+			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
+					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
+					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
+					<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
+						<c:forEach var="userprofile" items="${profileList}">
+							<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
+						</c:forEach>
 					</div>
-				</c:when>
-			</c:choose>
+				</div>
+			</c:if>
 
 			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 				<div class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');"></div>
