@@ -4701,11 +4701,11 @@ td.v-tbl-spacer {
 }
 
 .v-um-inp {
-    width: 175px;
+    width: 125px;
     border: 0;
     box-shadow: none;
     height: 32px;
-    padding: 0 50px 0 0;
+    padding: 0 25px 0 0;
     background: url(../images/search.png) no-repeat;
     background-position: right center;
 }
