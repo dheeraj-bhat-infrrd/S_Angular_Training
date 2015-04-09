@@ -235,6 +235,10 @@ public class LoginController {
 						// Set the session variables
 						sessionHelper.setSettingVariablesInSession(session);
 					}
+					
+					// updating session with aggregated user profiles
+					Map<Long, String> profileNameMap = userManagementService.getProcessedUserProfiles(user);
+					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
 				}
 				else {
 					LOG.info("No User profile present");

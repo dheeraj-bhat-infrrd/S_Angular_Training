@@ -266,6 +266,6 @@ public interface UserManagementService {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public Map<Long, String> getProcessedUserProfile(User user, long profileId) throws NonFatalException;
+	public Map<Long, String> getProcessedUserProfiles(User user) throws NonFatalException;
 }
 // JIRA SS-34 BY RM02 BOC
