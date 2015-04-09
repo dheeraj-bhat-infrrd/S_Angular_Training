@@ -593,7 +593,6 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/jcrop/jcrop.js"></script>
 <script>
 	$(document).ready(function() {
 		$(document).attr("title", "Profile Settings");
