@@ -239,6 +239,12 @@ public class LoginController {
 					// updating session with aggregated user profiles
 					Map<Long, String> profileNameMap = userManagementService.getProcessedUserProfiles(user);
 					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
+					
+					// settings current profile in session
+					UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+					session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileNameMap.get(selectedProfile.getUserProfileId()));
+					LOG.info(profileNameMap.get(selectedProfile.getUserProfileId()));
 				}
 				else {
 					LOG.info("No User profile present");

@@ -162,9 +162,9 @@ public class ProfileManagementController {
 			selectedProfile = profileMap.get(profileId);
 		}
 
-		// setting session and model attributes
+		// setting session attributes
 		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		model.addAttribute("profileName", profileNameMap.get(selectedProfile.getUserProfileId()));
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileNameMap.get(selectedProfile.getUserProfileId()));
 
 		// fetching details from profile
 		int profilesMaster = 0;
