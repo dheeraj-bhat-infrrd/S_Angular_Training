@@ -30,7 +30,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.title.forgotpassword.key" /></div>
+			<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.title.forgotpassword.key" /></div>
 		</div>
 	</div>
 </div>

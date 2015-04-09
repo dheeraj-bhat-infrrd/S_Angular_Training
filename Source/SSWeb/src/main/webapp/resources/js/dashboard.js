@@ -1,8 +1,8 @@
 // Default maximum value for number of social posts, surveys sent in 30 days.
 var maxSocialPosts = 10;
 var maxSurveySent = 10;
-var startIndex;
-var batchSize;
+var startIndexCmp;
+var batchSizeCmp;
 var totalReviews;
 var reviewsFetchedSoFar;
 var startIndexInc;
@@ -48,7 +48,7 @@ $(document)
 		.scroll(
 				function() {
 					if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
-							&& startIndex < totalReviews) {
+							&& startIndexCmp < totalReviews) {
 						showReviews(colName, colValue);
 					}
 				});
@@ -56,8 +56,8 @@ $(document)
 function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 		regionIds, branchNames, branchIds, agent, accountType) {
 
-	startIndex = 0;
-	batchSize = 1;
+	startIndexCmp = 0;
+	batchSizeCmp = 1;
 	totalReviews = 0;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
@@ -65,7 +65,7 @@ function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 	totalReviewsInc = 0;
 	surveyFetchedSoFarInc = 0;
 	showDisplayPic();
-	
+
 	var oldConW = $('.container').width();
 	var newConW = $('.container').width();
 	$(window).resize(function() {
@@ -134,7 +134,7 @@ function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 
 }
 
-function showDisplayPic(){
+function showDisplayPic() {
 	console.log('Reached Method');
 	var success = false;
 	$.ajax({
@@ -147,17 +147,27 @@ function showDisplayPic(){
 		},
 		complete : function(data) {
 			if (success) {
-				console.log("Image location : "+data.responseJSON);
+				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
-				if(imageUrl != '' && imageUrl != undefined){
-					$("#dsh-prsn-img").css("background", "url("+imageUrl+") no-repeat center");
-					$("#dsh-prsn-img").css("background-size","cover");
+				if (imageUrl != '' || imageUrl != undefined) {
+					$("#dsh-prsn-img").css("background",
+							"url(" + imageUrl + ") no-repeat center");
+					$("#dsh-prsn-img").css("background-size", "cover");
 				}
 				return data.responseJSON;
 			}
 		},
 		error : function() {
-			
+			$("#dsh-prsn-img").removeClass('person-img');
+			if (colName == 'agentId') {
+				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
+			} else if (colName == 'branchId') {
+				$("#dsh-prsn-img").addClass('office-default-img');
+			} else if (colName == 'regionId') {
+				$("#dsh-prsn-img").addClass('region-default-img');
+			} else if (colName == 'companyId') {
+				$("#dsh-prsn-img").addClass('comp-default-img');
+			}
 		}
 	});
 }
@@ -309,7 +319,7 @@ function paintList(searchColumn, results, flow) {
 	$('.dsh-res-display').click(function() {
 		if (flow == 'icons')
 			$('#dsh-sel-item').val($(this).html());
-		else if (flow == 'graph'){
+		else if (flow == 'graph') {
 			$('#dsh-grph-sel-item').val($(this).html());
 		}
 		var value = $(this).data('attr');
@@ -320,9 +330,9 @@ function paintList(searchColumn, results, flow) {
 		} else if (searchColumn == "displayName") {
 			columnName = "agentId";
 		}
-		if(flow=='icons')
+		if (flow == 'icons')
 			showSurveyStatistics(columnName, value);
-		else if(flow=='graph')
+		else if (flow == 'graph')
 			showSurveyStatisticsGraphically(columnName, value);
 		$('.dsh-res-display').hide();
 	});
@@ -406,7 +416,7 @@ function paintSurveyStatistics(data) {
 	$("#survey-sent").html(sentSurveyCount);
 	var clicked = 0;
 	clicked = parseInt(data.responseJSON.clickedSurvey);
-	if (isNaN(clicked)){
+	if (isNaN(clicked)) {
 		clicked = 0;
 	}
 	var icnForClicked = clicked * 20 / sentSurveyCount;
@@ -429,10 +439,10 @@ function paintSurveyStatistics(data) {
 	completedSurveyDiv += "<div id='survey-completed' class='float-left stat-icn-txt-rt'></div>";
 	$("#completed-surv-icn").html(completedSurveyDiv);
 	$("#survey-completed").html(completed);
-	
+
 	var socialPosts = 0;
 	socialPosts = parseInt(data.responseJSON.socialPosts);
-	if (isNaN(socialPosts)){
+	if (isNaN(socialPosts)) {
 		socialPosts = 0;
 	}
 	var icnForSocialPosts = socialPosts * 20 / sentSurveyCount;
@@ -475,126 +485,127 @@ function showSurveyGraph(columnName, columnValue, format) {
 }
 
 function paintSurveyGraph(graphData) {
-	var allTimeslots=[];
-	var timeslots=[];
-	var clickedSurveys=[];
-	var sentSurveys=[];
-	var socialPosts=[];
-	var completedSurveys=[];
+	var allTimeslots = [];
+	var timeslots = [];
+	var clickedSurveys = [];
+	var sentSurveys = [];
+	var socialPosts = [];
+	var completedSurveys = [];
 	var index = 0;
-	
-	$.each(graphData.clicked, function(key, value){
+
+	$.each(graphData.clicked, function(key, value) {
 		allTimeslots[index] = key;
 		clickedSurveys[index] = value;
 		index++;
 	});
 	index = 0;
-	if(timeslots.length>allTimeslots.length){
-		allTimeslots=timeslots;
-		timeslots=[];
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
 	}
-	$.each(graphData.sent, function(key, value){
+	$.each(graphData.sent, function(key, value) {
 		timeslots[index] = key;
 		sentSurveys[index] = value;
 		index++;
 	});
 	index = 0;
-	if(timeslots.length>allTimeslots.length){
-		allTimeslots=timeslots;
-		timeslots=[];
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
 	}
-	$.each(graphData.complete, function(key, value){
+	$.each(graphData.complete, function(key, value) {
 		timeslots[index] = key;
 		completedSurveys[index] = value;
 		index++;
 	});
 	index = 0;
-	if(timeslots.length>allTimeslots.length){
-		allTimeslots=timeslots;
-		timeslots=[];
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
 	}
-	$.each(graphData.socialposts, function(key, value){
+	$.each(graphData.socialposts, function(key, value) {
 		timeslots[index] = key;
 		socialPosts[index] = value;
 		index++;
 	});
-	if(timeslots.length>allTimeslots.length){
-		allTimeslots=timeslots;
-		timeslots=[];
+	if (timeslots.length > allTimeslots.length) {
+		allTimeslots = timeslots;
+		timeslots = [];
 	}
 	var element = document.getElementById("dsh-grph-format");
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
-	if(format=='weekly'){
+	if (format == 'weekly') {
 		type = 'Date';
-	}
-	else if(format=='monthly'){
+	} else if (format == 'monthly') {
 		type = 'Week Starting';
-	}
-	else  if(format=='yearly'){
+	} else if (format == 'yearly') {
 		type = 'Month';
 	}
-	
-	if(format!='yearly'){
+
+	if (format != 'yearly') {
 		allTimeslots.reverse();
 		clickedSurveys.reverse();
 		sentSurveys.reverse();
 		completedSurveys.reverse();
 		socialPosts.reverse();
 	}
-    var internalData = [];
-    var nestedInternalData = [];
-    nestedInternalData.push(type,'No. of surveys sent', 'No. of surveys clicked','No. of surveys completed', 'No. of social posts');
-    internalData.push(nestedInternalData);
-    for(var itr=0;itr<allTimeslots.length;itr++){
-    	nestedInternalData = [];
-    	var sentSurvey;
-    	var clickedSurvey;
-    	var completedSurvey;
-    	var socialPost;
-    	if(isNaN(parseInt(sentSurveys[itr]))){
-    		sentSurvey = 0;
-    	}else{
-    		sentSurvey = parseInt(sentSurveys[itr]);
-    	}
-    	if(isNaN(parseInt(clickedSurveys[itr]))){
-    		clickedSurvey = 0;
-    	}else{
-    		clickedSurvey = parseInt(clickedSurveys[itr]);
-    	}
-    	if(isNaN(parseInt(completedSurveys[itr]))){
-    		completedSurvey = 0;
-    	}else{
-    		completedSurvey = parseInt(completedSurveys[itr]);
-    	}
-    	if(isNaN(parseInt(socialPosts[itr]))){
-    		socialPost = 0;
-    	}else{
-    		socialPost = parseInt(socialPosts[itr]);
-    	}
-    	nestedInternalData.push(allTimeslots[itr],sentSurvey,clickedSurvey,completedSurvey,socialPost);
-    	internalData.push(nestedInternalData);
-    }
-    console.log(internalData);
-    
-    var data = google.visualization.arrayToDataTable(internalData);
-  	
-    var options = {
-  		chartArea : {
-  			width : '90%',
-  			height : '80%'
-  		},
-  		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)',
-  				'rgb(255,202,145)' ],
-  		legend : {
-  			position : 'none'
-  		}
-  	};
-    
-  	var chart = new google.visualization.LineChart(document
-		.getElementById('util-gph-item'));
-  	
-  	chart.draw(data, options);
+	var internalData = [];
+	var nestedInternalData = [];
+	nestedInternalData.push(type, 'No. of surveys sent',
+			'No. of surveys clicked', 'No. of surveys completed',
+			'No. of social posts');
+	internalData.push(nestedInternalData);
+	for (var itr = 0; itr < allTimeslots.length; itr++) {
+		nestedInternalData = [];
+		var sentSurvey;
+		var clickedSurvey;
+		var completedSurvey;
+		var socialPost;
+		if (isNaN(parseInt(sentSurveys[itr]))) {
+			sentSurvey = 0;
+		} else {
+			sentSurvey = parseInt(sentSurveys[itr]);
+		}
+		if (isNaN(parseInt(clickedSurveys[itr]))) {
+			clickedSurvey = 0;
+		} else {
+			clickedSurvey = parseInt(clickedSurveys[itr]);
+		}
+		if (isNaN(parseInt(completedSurveys[itr]))) {
+			completedSurvey = 0;
+		} else {
+			completedSurvey = parseInt(completedSurveys[itr]);
+		}
+		if (isNaN(parseInt(socialPosts[itr]))) {
+			socialPost = 0;
+		} else {
+			socialPost = parseInt(socialPosts[itr]);
+		}
+		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey,
+				completedSurvey, socialPost);
+		internalData.push(nestedInternalData);
+	}
+	console.log(internalData);
+
+	var data = google.visualization.arrayToDataTable(internalData);
+
+	var options = {
+		chartArea : {
+			width : '90%',
+			height : '80%'
+		},
+		colors : [ 'rgb(28,242,0)', 'rgb(0,174,239)', 'rgb(255,242,0)',
+				'rgb(255,202,145)' ],
+		legend : {
+			position : 'none'
+		}
+	};
+
+	var chart = new google.visualization.LineChart(document
+			.getElementById('util-gph-item'));
+
+	chart.draw(data, options);
 }
 
 function showProfileDetails(columnName, columnValue, numberOfDays) {
@@ -636,22 +647,25 @@ function paintProfileDetails(data) {
 	if (data.responseJSON.company != undefined)
 		$("#company").html(data.responseJSON.company);
 	$("#socl-post").html(data.responseJSON.socialPosts);
-	if((parseInt(data.responseJSON.socialPosts) / maxSocialPosts)>1)
+	if ((parseInt(data.responseJSON.socialPosts) / maxSocialPosts) > 1)
 		circle1.animate(1);
 	else
-		circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
+		circle1.animate(parseInt(data.responseJSON.socialPosts)
+				/ maxSocialPosts);
 	$("#srv-snt-cnt").html(data.responseJSON.surveyCount);
-	if((parseInt(data.responseJSON.surveyCount) / maxSurveySent)>1)
+	if ((parseInt(data.responseJSON.surveyCount) / maxSurveySent) > 1)
 		circle2.animate(1);
 	else
-		circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
+		circle2
+				.animate(parseInt(data.responseJSON.surveyCount)
+						/ maxSurveySent);
 	$("#srv-scr").html(data.responseJSON.socialScore + "/5");
-	if((parseInt(data.responseJSON.socialScore) / 5)>1)
+	if ((parseInt(data.responseJSON.socialScore) / 5) > 1)
 		circle3.animate(1);
 	else
 		circle3.animate(parseInt(data.responseJSON.socialScore) / 5);
 	var profileCompleted = parseInt(data.responseJSON.profileCompleteness);
-	if((profileCompleted / 100)>1)
+	if ((profileCompleted / 100) > 1)
 		circle4.animate(1);
 	else
 		circle4.animate(profileCompleted / 100);
@@ -712,8 +726,8 @@ function showReviews(columnName, columnValue) {
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
-		"startIndex" : startIndex,
-		"batchSize" : batchSize
+		"startIndex" : startIndexCmp,
+		"batchSize" : batchSizeCmp
 	};
 	$.ajax({
 		url : "./fetchdashboardreviews.do",
@@ -728,7 +742,7 @@ function showReviews(columnName, columnValue) {
 		complete : function(data) {
 			if (success) {
 				paintReviews(data.responseJSON);
-				startIndex += batchSize;
+				startIndexCmp += batchSizeCmp;
 			}
 		},
 		error : function(e) {
@@ -779,7 +793,7 @@ function paintReviews(result) {
 								+ '<div class="float-left ppl-share-icns icn-yelp"></div></div>'
 								+ '<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div></div></div>';
 					});
-	if (startIndex == 0)
+	if (startIndexCmp == 0)
 		$("#review-details").html(divToPopulate);
 	else
 		$("#review-details").append(divToPopulate);
@@ -858,44 +872,58 @@ function showIncompleteSurvey(columnName, columnValue) {
 
 function paintIncompleteSurvey(result) {
 	var divToPopulate = "";
-	$.each(result, function(i, survey) {
-		divToPopulate += '<div class="dash-lp-item clearfix">'
-				+ '<div class="float-left dash-lp-txt">' + survey.customerFirstName+" "+survey.customerLastName
-				+ ' <span>' + survey.modifiedOn + '</span></div>'
-				+ '<div data-custname=' + survey.customerFirstName+' '+survey.customerLastName
-				+ ' data-agentid=' + survey.agentId
-				+ ' data-agentname=' + survey.agentName + ' data-custemail='
-				+ survey.customerEmail
-				+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
-	});
-	if(startIndexInc==0)
+	$
+			.each(
+					result,
+					function(i, survey) {
+						divToPopulate += '<div class="dash-lp-item clearfix">'
+								+ '<div class="float-left dash-lp-txt">'
+								+ survey.customerFirstName
+								+ " "
+								+ survey.customerLastName
+								+ ' <span>'
+								+ survey.modifiedOn
+								+ '</span></div>'
+								+ '<div data-custname='
+								+ survey.customerFirstName
+								+ ' '
+								+ survey.customerLastName
+								+ ' data-agentid='
+								+ survey.agentId
+								+ ' data-agentname='
+								+ survey.agentName
+								+ ' data-custemail='
+								+ survey.customerEmail
+								+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
+					});
+	if (startIndexInc == 0)
 		$("#dsh-inc-srvey").html(divToPopulate);
 	else
 		$("#dsh-inc-srvey").append(divToPopulate);
 	$('#dsh-inc-srvey').perfectScrollbar();
-	
+
 	var scrollContainer = document.getElementById('dsh-inc-srvey');
-	scrollContainer.onscroll = function(){
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+	scrollContainer.onscroll = function() {
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+				- scrollContainer.clientHeight) {
 			showIncompleteSurvey(colName, colValue);
 		}
 	};
-	
 
-	$('.dash-lp-rt-img').click(function() {
-		var agentId = $(this).data("agentid");
-		var agentName = $(this).data("agentname");
-		var customerEmail = $(this).data("custemail");
-		var customerName = $(this).data("custname");
-		sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
-	});
+	$('.dash-lp-rt-img').click(
+			function() {
+				var agentId = $(this).data("agentid");
+				var agentName = $(this).data("agentname");
+				var customerEmail = $(this).data("custemail");
+				var customerName = $(this).data("custname");
+				sendSurveyReminderMail(agentId, agentName, customerEmail,
+						customerName);
+			});
 }
 
-$(document).on('scroll','#dsh-inc-srvey',function(){
+$(document).on('scroll', '#dsh-inc-srvey', function() {
 	console.log($('.ps-scrollbar-y').css('top'));
 });
-
-
 
 function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName) {
 	var success = false;
@@ -916,7 +944,8 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 		},
 		complete : function(data) {
 			if (success) {
-				$('#overlay-toast').html("Reminder Mail sent successfully to "+customerName);
+				$('#overlay-toast').html(
+						"Reminder Mail sent successfully to " + customerName);
 			}
 		},
 		error : function(e) {
