@@ -360,7 +360,7 @@ function validateConfirmPassword(pwdId, confirmPwdId){
  */
 function validateCompany(elementId){
 	if ($('#'+elementId).val() != "") {
-		if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+		if ($('#'+elementId).val().indexOf("\"") == -1) {
 			return true;
 		} else {
 			showErrorMobileAndWeb('Please enter a valid company name');
