@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
@@ -63,9 +64,15 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+	
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
+	
+	@Value("${MOODS_TO_SEND_MAIL}")
+	private String moodsToSendMail;
 
 	/**
 	 * Method to store question and answer format into mongo.
@@ -220,23 +227,24 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 * Method to get list of all the admins' emailIds, an agent comes under. Later on these emailIds
 	 * are used for sending emails in case of any sad review for the agent.
 	 */
+	@Transactional
 	@Override
-	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId) {
+	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId) throws InvalidInputException {
 		List<String> emailIdsOfAdmins = new ArrayList<>();
 		List<UserProfile> admins = new ArrayList<>();
 		User agent = userDao.findById(User.class, agentId);
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_COLUMN, agent);
-		queries.put("profilesMaster.profileId", CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 		List<UserProfile> agentProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
 		for (UserProfile agentProfile : agentProfiles) {
 			queries.clear();
 			queries.put(CommonConstants.BRANCH_ID_COLUMN, agentProfile.getBranchId());
-			queries.put("profilesMaster.profileId", CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+			queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID));
 			admins.addAll(userProfileDao.findByKeyValue(UserProfile.class, queries));
 			queries.clear();
 			queries.put(CommonConstants.REGION_ID_COLUMN, agentProfile.getRegionId());
-			queries.put("profilesMaster.profileId", CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+			queries.put(CommonConstants.PROFILE_MASTER_COLUMN, userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID));
 			admins.addAll(userProfileDao.findByKeyValue(UserProfile.class, queries));
 		}
 		for (UserProfile admin : admins) {
@@ -303,6 +311,11 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		incompleteSocialPostCustomers = surveyDetailsDao.getIncompleteSocialPostCustomersEmail(companyId, surveyReminderInterval, maxReminders, autopostScore);
 		LOG.info("finished.");
 		return incompleteSocialPostCustomers;
+	}
+	
+	@Override
+	public String getMoodsToSendMail(){
+		return 	moodsToSendMail;
 	}
 }
 // JIRA SS-119 by RM-05:EOC
