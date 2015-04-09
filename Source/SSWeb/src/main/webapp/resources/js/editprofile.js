@@ -421,6 +421,7 @@ function callBackOnProfileImageUpload(data) {
 	
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
+	loadDisplayPicture();
 }
 
 $(document).on('change', '#prof-image', function() {

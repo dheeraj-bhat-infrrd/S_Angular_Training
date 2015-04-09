@@ -706,8 +706,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : clickedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(clickedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
 								.toString()))
 							clickedSurveys.put(date, Long.parseLong(clickedSurvey.get("count").toString()));
 					}
@@ -797,9 +798,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : sentSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
-								.toString()))
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							sentSurveys.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 			}
@@ -888,8 +889,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : completedSurveys.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(completedSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
 								.toString()))
 							completedSurveys.put(date, Long.parseLong(completedSurvey.get("count").toString()));
 					}
@@ -980,9 +982,9 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 				}
 				if (criteriaColumn == "month")
 					for (String date : socialPosts.keySet()) {
-						calendar.setTime(new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(date));
-						if (calendar.get(Calendar.DAY_OF_MONTH) == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN)
-								.toString()))
+						String dateFormat = "MMM";
+						calendar.setTime(new SimpleDateFormat(dateFormat).parse(date));
+						if (calendar.get(Calendar.MONTH) + 1 == Integer.parseInt(sentSurvey.get(CommonConstants.DEFAULT_MONGO_ID_COLUMN).toString()))
 							socialPosts.put(date, Long.parseLong(sentSurvey.get("count").toString()));
 					}
 			}
