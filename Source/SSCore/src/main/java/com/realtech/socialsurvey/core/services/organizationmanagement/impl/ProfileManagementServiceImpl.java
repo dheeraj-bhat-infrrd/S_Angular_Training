@@ -431,11 +431,18 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LockSettings parentLock = parentProfile.getLockSettings();
 		if (parentLock != null) {
 			// Logo
-			if (parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked() && parentProfile.getLogo() != null) {
-				userProfile.setLogo(parentProfile.getLogo());
-				userLock.setLogoLocked(true);
+			if (parentProfile.getLogo() != null) {
+				if (parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked()) {
+					userProfile.setLogo(parentProfile.getLogo());
+					userLock.setLogoLocked(true);
+				}
+				if (!parentLock.getIsLogoLocked() && !userLock.getIsLogoLocked()) {
+					if (userProfile.getLogo() == null || userProfile.getLogo().equals("")) {
+						userProfile.setLogo(parentProfile.getLogo());
+					}
+				}
 			}
-			
+
 			// Basic Contact details
 			if (parentProfile.getContact_details() != null) {
 				if (parentLock.getIsDisplayNameLocked() && !userLock.getIsDisplayNameLocked() && parentProfile.getContact_details().getName() != null) {
