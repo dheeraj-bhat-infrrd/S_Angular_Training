@@ -79,9 +79,6 @@ public class SurveyManagementController {
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
-	@Value("${MOODS_TO_SEND_MAIL}")
-	private String moodsToSendMail;
-
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
@@ -143,11 +140,11 @@ public class SurveyManagementController {
 			if (solrDocument != null && !solrDocument.isEmpty()) {
 				emailIdsToSendMail.add(solrDocument.get(CommonConstants.USER_EMAIL_ID_SOLR).toString());
 			}
-
+			String moodsToSendMail = surveyHandler.getMoodsToSendMail();
 			if (!moodsToSendMail.isEmpty() && moodsToSendMail != null) {
 				List<String> moods = new ArrayList<>(Arrays.asList(moodsToSendMail.split(",")));
 				if (moods.contains(mood)) {
-					emailIdsToSendMail = surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId);
+					emailIdsToSendMail.addAll(surveyHandler.getEmailIdsOfAdminsInHierarchy(agentId));
 				}
 			}
 			// Sending email to the customer telling about successful completion of survey.

@@ -4172,6 +4172,26 @@ button.paypal.is-active {
  	background-size: 20px;
 }
 
+.dsh-pers-default-img {
+ 	background: url(../images/place-holder-individual.png) no-repeat center;
+ 	background-size: auto !important;
+}
+
+.dsh-region-default-img {
+	background: url(../images/place-holder-Region.png) no-repeat center;
+	background-size: auto !important;
+}
+
+.dsh-office-default-img {
+	background: url(../images/place-holder-Office.png) no-repeat center;
+	background-size: auto !important;
+}
+
+.dsh-comp-default-img {
+	background: url(../images/place-holder-Company.png) no-repeat center;
+	background-size: auto !important;
+}
+
 .pers-default-big {
  	background: url(../images/place-holder-individual.png) no-repeat center;
  	background-size: auto !important;
