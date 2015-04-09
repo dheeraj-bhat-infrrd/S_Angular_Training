@@ -543,46 +543,29 @@ function validateUserLastName(elementId) {
 	}
 }
 
-// Function to check if branch name entered is null or empty
+/**
+ * Function to check if branch name entered is null or empty
+ */
 function validateAssignToBranchName() {
-	if ($(window).width() < 768) {
-		if ($('#' + elementId).val() == "") {
-			$('#overlay-toast').html('Please enter a branch.');
-			showToast();
-			return false;
-		} else {
-			return true;
-		}
+	if ($('#' + elementId).val() == "") {
+		showErrorMobileAndWeb("Please enter a branch name");
+		return false;
 	} else {
-		if ($('#' + elementId).val() == "") {
-			$('#' + elementId).next('.input-error-2').html(
-					'Please enter a branch.');
-			$('#' + elementId).next('.input-error-2').show();
-			return false;
-		} else {
-			return true;
-		}
+		return true;
 	}
 }
 
 function searchUsersByNameEmailLoginId(searchKey) {
 	userStartIndex = 0;
+	var url = "./findusers.do";
 	var payload = {
 		"searchKey" : searchKey
 	};
-	$.ajax({
-		url : "./findusers.do",
-		type : "GET",
-		dataType : "HTML",
-		data : payload,
-		success : function(data) {
-			$('#user-list').html(data);
-		},
-		error : function(e) {
-			console.error("error : " + e);
-		}
-	});
+	callAjaxGetWithPayloadData(url, searchUsersByNameEmailLoginIdCallBack, payload, true);
+}
 
+function searchUsersByNameEmailLoginIdCallBack(data) {
+	$('#user-list').html(data);
 }
 
 function paintUsersList(data) {
@@ -661,7 +644,6 @@ function paintUsersList(data) {
 			$('#um-user-list').find('tbody').append("No results found");
 		}
 	}
-	// $('#um-user-list').find('tbody').html(data);
 }
 
 function paginateUsersList() {
@@ -795,70 +777,55 @@ function saveUserAssignmentCallBack(data) {
 	displayMessage(data);
 }
 
-
+/**
+ * Method to send invite link
+ */
 function reinviteUser(firstName, lastName, emailId) {
 	var payload = {
 		"firstName" : firstName,
 		"lastName" : lastName,
 		"emailId" : emailId
 	};
+	var url="./reinviteuser.do";
 	showOverlay();
-
-	$.ajax({
-		url : "./reinviteuser.do",
-		type : "GET",
-		data : payload,
-		dataType : "html",
-		success : function(data) {
-			var map =  $.parseJSON(data);
-			if (map.status == "success") {
-				showInfo(map.message);
-			} else {
-				showError(map.message);
-			}
-		},
-		complete : function() {
-			hideOverlay();
-		},
-		error : function(e) {
-			console.error("error : " + e);
-		}
-	});
+	callAjaxGetWithPayloadData(url, reinviteUserCallBack, payload, true);
 }
+
+function reinviteUserCallBack(data){
+	var map =  $.parseJSON(data);
+	if (map.status == "success") {
+		showInfo(map.message);
+	} else {
+		showError(map.message);
+	}
+ }
 
 function updateUserProfile(profileId, profileStatus) {
 	var payload = {
 		"profileId" : profileId,
 		"status" : profileStatus
 	};
+	var url = "./updateuserprofile.do";
 	showOverlay();
-	
-	$.ajax({
-		url : "./updateuserprofile.do",
-		type : "POST",
-		dataType : "html",
-		data : payload,
-		success : function(data) {
-			var map =  $.parseJSON(data);
-			if (map.status == "success") {
-				showInfo(map.message);
-				if (profileStatus == 1) {
-					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-off');
-					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-on');
-					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'Active');
-				} else if (profileStatus == 0) {
-					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
-					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
-					$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');
-				}
-			} else {
-				showError(map.message);
-			}
-		},
-		complete : function() {
-			hideOverlay();
+	callAjaxGetWithPayloadData(url, updateUserProfileCallBack, payload, true);
+}
+
+function updateUserProfileCallBack(data) {
+	var map =  $.parseJSON(data);
+	if (map.status == "success") {
+		showInfo(map.message);
+		if (profileStatus == 1) {
+			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-off');
+			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-on');
+			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'Active');
+		} else if (profileStatus == 0) {
+			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
+			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
+			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');
 		}
-	});
+	} else {
+		showError(map.message);
+	}
 }
 
 function bindEditUserClick(){

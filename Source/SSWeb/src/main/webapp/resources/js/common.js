@@ -122,13 +122,33 @@ function redirectErrorpage(){
  * @param payload
  */
 function callAjaxPostWithPayloadData(url, callBackFunction, payload,isAsync){
-	console.log("payload is --"+payload);
+	console.log("callAjaxPostWithPayloadData for payload--"+payload+" url--"+url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
 	}
 	$.ajax({
 		url : url,
 		type : "POST",
+		data : payload,
+		async : isAsync,
+		success : callBackFunction,
+		complete: function(){
+			hideOverlay();
+		},
+		error : function(e) {
+			redirectErrorpage();
+		}
+	});
+}
+
+function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
+	console.log("callAjaxGetWithPayloadData for payload--"+payload+" url--"+url);
+	if (typeof isAsync === "undefined") {
+		isAsync = true;
+	}
+	$.ajax({
+		url : url,
+		type : "GET",
 		data : payload,
 		async : isAsync,
 		success : callBackFunction,
