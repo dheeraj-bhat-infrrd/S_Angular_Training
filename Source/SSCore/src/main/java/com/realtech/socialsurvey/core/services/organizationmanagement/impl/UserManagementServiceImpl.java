@@ -445,18 +445,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (emailId == null || emailId.isEmpty()) {
 			throw new InvalidInputException("Email id is null or empty in getUserByEmailAndCompany()");
 		}
-		
+
 		Company company = companyDao.findById(Company.class, companyId);
-		
+
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.LOGIN_NAME, emailId);
 		queries.put(CommonConstants.COMPANY, company);
-		
+
 		List<User> users = userDao.findByKeyValue(User.class, queries);
 		if (users == null || users.isEmpty()) {
 			throw new NoRecordsFetchedException("No users found with the login name : {}", emailId);
 		}
-		
+
 		LOG.info("Method getUserByEmailAndCompany() finished from UserManagementService");
 		return users.get(CommonConstants.INITIAL_INDEX);
 	}
@@ -580,15 +580,26 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	}
 
-	/*
-	 * Method to return User on the basis of user id provided.
+	/**
+	 * Method to get user object for the given user id, fetches user along with profile name and
+	 * profile url
 	 */
 	@Transactional
 	@Override
-	public User getUserByUserId(long userId) {
+	public User getUserByUserId(long userId) throws InvalidInputException {
 		LOG.info("Method to find user on the basis of user id started for user id " + userId);
 		User user = null;
 		user = userDao.findById(User.class, userId);
+		if (user == null) {
+			throw new InvalidInputException("User not found for userId:" + userId);
+		}
+		OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(userId);
+		if (agentSettings == null) {
+			throw new InvalidInputException("No settings found for user :" + userId + " in getUserByUserId");
+		}
+		user.setProfileName(agentSettings.getProfileName());
+		user.setProfileUrl(agentSettings.getProfileUrl());
+
 		LOG.info("Method to find user on the basis of user id finished for user id " + userId);
 		return user;
 	}
@@ -751,7 +762,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	@Transactional
 	public void updateUserStatus(long userId, int status) throws InvalidInputException, SolrException {
 		LOG.info("Method updateUserStatus of user management services called for userId : " + userId + " and status :" + status);
-		User user = userDao.findById(User.class, userId);
+		User user = getUserByUserId(userId);
 		if (user == null) {
 			throw new InvalidInputException("No user present for the specified userId");
 		}
@@ -760,7 +771,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		userDao.update(user);
 
-		// Updating status of user into Solr.
+		/**
+		 *  Updating status of user into solr
+		 */
 		solrSearchService.addUserToSolr(user);
 		LOG.info("Successfully completed method to update user status");
 	}
@@ -776,7 +789,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("No admin user present.");
 		}
 		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
-		User user = userDao.findById(User.class, userId);
+		User user = getUserByUserId(userId);
 
 		if (user == null) {
 			throw new InvalidInputException("No user present for the specified userId");
@@ -1508,7 +1521,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("assignUserToCompany : admin parameter is null");
 		}
 		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
-		User user = userDao.findById(User.class, userId);
+		User user = getUserByUserId(userId);
 
 		if (user == null) {
 			LOG.error("No records fetched for user with id : " + userId);
@@ -1608,7 +1621,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("assignUserToRegion : admin parameter is null");
 		}
 		LOG.info("Method to assign user to a branch called for user : " + admin.getUserId());
-		User user = userDao.findById(User.class, userId);
+		User user = getUserByUserId(userId);
 
 		if (user == null) {
 			LOG.error("No records fetched for user with id : " + userId);
