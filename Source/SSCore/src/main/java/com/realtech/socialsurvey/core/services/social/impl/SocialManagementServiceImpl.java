@@ -1,5 +1,11 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -13,15 +19,21 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import facebook4j.Facebook;
+import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
+import facebook4j.auth.AccessToken;
 
 /**
  * JIRA:SS-34 BY RM02 Implementation for User management services
@@ -34,6 +46,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 	@Autowired
 	private OrganizationUnitSettingsDao organizationUnitSettingsDao;
+
+	@Autowired
+	private UserManagementService userManagementService;
+
+	@Autowired
+	private UserProfileDao userProfileDao;
 
 	// Facebook
 	@Value("${FB_CLIENT_ID}")
@@ -58,22 +76,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	 * 
 	 * @return
 	 */
-	/*@Override
-	public LinkedInRequestToken getLinkedInRequestToken() {
-		LinkedInOAuthService oauthService = getLinkedInInstance();
-		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken(linkedinRedirectUri);
-		return requestToken;
-	}
-
-	@Override
-	public LinkedInOAuthService getLinkedInInstance() {
-		return LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey, linkedInApiSecret);
-	}
-
-	// LinkedIn data update
-	public LinkedInApiClientFactory getLinkedInApiClientFactory() {
-		return LinkedInApiClientFactory.newInstance(linkedInApiKey, linkedInApiSecret);
-	}*/
+	/*
+	 * @Override public LinkedInRequestToken getLinkedInRequestToken() { LinkedInOAuthService
+	 * oauthService = getLinkedInInstance(); LinkedInRequestToken requestToken =
+	 * oauthService.getOAuthRequestToken(linkedinRedirectUri); return requestToken; }
+	 * @Override public LinkedInOAuthService getLinkedInInstance() { return
+	 * LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey,
+	 * linkedInApiSecret); } // LinkedIn data update public LinkedInApiClientFactory
+	 * getLinkedInApiClientFactory() { return LinkedInApiClientFactory.newInstance(linkedInApiKey,
+	 * linkedInApiSecret); }
+	 */
 
 	/**
 	 * Returns the Twitter request token for a particular URL
@@ -136,8 +148,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
-	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens)
-			throws InvalidInputException {
+	public SocialMediaTokens updateAgentSocialMediaTokens(AgentSettings agentSettings, SocialMediaTokens mediaTokens) throws InvalidInputException {
 		if (mediaTokens == null) {
 			throw new InvalidInputException("Social Tokens passed can not be null");
 		}
@@ -146,5 +157,58 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 				agentSettings);
 		LOG.info("Social Tokens updated successfully");
 		return mediaTokens;
+	}
+
+	@Override
+	public void updateStatusIntoFacebookPage(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, FacebookException {
+		if (agentSettings == null) {
+			throw new InvalidInputException("AgentSettings can not be null");
+		}
+		LOG.info("Updating Social Tokens information");
+		Facebook facebook = getFacebookInstance();
+		facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(), null));
+		facebook.postStatusMessage(message);
+		LOG.info("Social Tokens updated successfully");
+	}
+
+	@Override
+	public void tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException {
+		if (agentSettings == null) {
+			throw new InvalidInputException("AgentSettings can not be null");
+		}
+		LOG.info("Updating Social Tokens information");
+		Twitter twitter = getTwitterInstance();
+		twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessToken(),
+				agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret()));
+		twitter.updateStatus("Status");
+		LOG.info("Social Tokens updated successfully");
+	}
+
+	@Override
+	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException {
+		LOG.info("Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started.");
+		List<OrganizationUnitSettings> settings = new ArrayList<>();
+		Set<Long> branchIds = new HashSet<>();
+		Set<Long> regionIds = new HashSet<>();
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.USER_ID, agentId);
+		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
+				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		for (UserProfile userProfile : userProfiles) {
+			branchIds.add(userProfile.getBranchId());
+			regionIds.add(userProfile.getRegionId());
+		}
+
+		for (Long branchId : branchIds) {
+			settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId, CommonConstants.BRANCH_SETTINGS_COLLECTION));
+		}
+
+		for (Long regionId : regionIds) {
+			settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId, CommonConstants.REGION_SETTINGS_COLLECTION));
+		}
+
+		LOG.info("Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished.");
+		return settings;
 	}
 }

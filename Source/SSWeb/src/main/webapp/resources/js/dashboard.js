@@ -745,7 +745,16 @@ function paintReviews(result) {
 			.each(
 					result,
 					function(i, feedback) {
-						divToPopulate += '<div class="ppl-review-item">'
+						divToPopulate += '<div data-fname='
+								+ feedback.customerFirstName
+								+ ' '
+								+ 'data-lname='
+								+ feedback.customerLastName
+								+ 'data-agentname='
+								+ agentName
+								+ 'data-review='
+								+ feedback.review
+								+ 'class="ppl-review-item">'
 								+ '<div class="ppl-header-wrapper clearfix"><div class="float-left ppl-header-left">'
 								+ '<div class="ppl-head-1">'
 								+ feedback.customerFirstName
