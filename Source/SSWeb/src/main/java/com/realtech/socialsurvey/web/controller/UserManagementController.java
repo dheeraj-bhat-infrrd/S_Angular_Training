@@ -2,7 +2,6 @@ package com.realtech.socialsurvey.web.controller;
 
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -26,11 +25,8 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
-import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
@@ -402,12 +398,44 @@ public class UserManagementController {
 	@RequestMapping(value = "/findusers", method = RequestMethod.GET)
 	public String findUsersByEmailIdAndRedirectToPage(Model model, HttpServletRequest request) {
 		LOG.info("Finding users and redirecting to search page");
-		String users = findUserByEmail(model, request);
-		// convert users to Object
-		Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
-		List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
-		model.addAttribute("userslist", usersList);
-		LOG.debug("Users List: " + usersList.toString());
+
+		try {
+			String users = findUserByEmail(model, request);
+
+			User admin = sessionHelper.getCurrentUser();
+			if (admin == null) {
+				throw new InvalidInputException("No user found in session", DisplayMessageConstants.NO_USER_IN_SESSION);
+			}
+
+			/**
+			 * fetching admin details
+			 */
+			UserFromSearch adminUser = null;
+			try {
+				String adminUserDoc = JSONUtil.toJSON(solrSearchService.getUserByUniqueId(admin.getUserId()));
+				Type searchedUser = new TypeToken<UserFromSearch>() {}.getType();
+				adminUser = new Gson().fromJson(adminUserDoc.toString(), searchedUser);
+			}
+			catch (SolrServerException e) {
+				throw new NonFatalException("SolrServerException while searching for user id.Reason:" + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
+			List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
+			LOG.debug("Users List in findusers: " + users);
+			
+			/**
+			 * checking the edit capabilities of user
+			 */
+			usersList = userManagementService.checkUserCanEdit(admin, adminUser, usersList);
+
+			model.addAttribute("userslist", usersList);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException in findusers. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
+		}
 		return JspResolver.USER_LIST_FOR_MANAGEMENT;
 	}
 
@@ -815,7 +843,7 @@ public class UserManagementController {
 				LOG.error("Invalid Input exception in decrypting url parameters in showCompleteRegistrationPage(). Reason " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
-			
+
 			// fetching details from urlparams
 			long companyId;
 			try {
@@ -824,7 +852,7 @@ public class UserManagementController {
 			catch (NumberFormatException e) {
 				throw new NonFatalException(e.getMessage(), DisplayMessageConstants.INVALID_REGISTRATION_INVITE, e);
 			}
-			
+
 			// checking status of user
 			String emailId = urlParams.get(CommonConstants.EMAIL_ID);
 			User newUser = userManagementService.getUserByEmailAndCompany(companyId, emailId);

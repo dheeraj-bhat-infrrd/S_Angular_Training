@@ -68,7 +68,7 @@
 				</c:choose>
 
 				<tr class="u-tbl-row user-row" id="user-row-${userfromsearch.userId}" data-editable="${userfromsearch.canEdit}">
-					<td class="v-tbl-uname fetch-name" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
+					<td class="v-tbl-uname fetch-name" data-first-name="${userfromsearch.firstName}" data-last-name="${userfromsearch.lastName}" data-user-id="${userfromsearch.userId}">${userfromsearch.displayName}</td>
 					<td class="v-tbl-email fetch-email">${userfromsearch.emailId}</td>
 					<td class="v-tbl-rgn-adm ${regionadmintickclass}"></td>
 					<td class="v-tbl-of-adm ${branchadmintickclass}"></td>
