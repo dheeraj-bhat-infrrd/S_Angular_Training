@@ -198,8 +198,8 @@ public interface CommonConstants {
 	public static final String SOCIAL_AUTH_URL = "authUrl";
 	public static final String SOCIAL_REQUEST_TOKEN = "requestToken";
 	public static final String SOCIAL_FLOW = "socialFlow";
-	public static final String BRANCHES_IN_SESSION = "branches";
-	public static final String REGIONS_IN_SESSION = "regions";
+	public static final String BRANCHES_IN_SESSION = "branchesInSession";
+	public static final String REGIONS_IN_SESSION = "regionsInSession";
 
 	/**
 	 * Batch Constants
@@ -244,7 +244,7 @@ public interface CommonConstants {
 	public static final String LOGO_HOME_DIRECTORY = "LOGO_HOME_DIRECTORY";
 	public static final String LOGO_NAME = "logoName";
 	public static final String IMAGE_NAME = "image.png";
-	public static final String IMAGE_FORMAT = "png";
+	public static final String IMAGE_FORMAT_PNG = "png";
 
 	/**
 	 * Amazon Details
@@ -254,7 +254,8 @@ public interface CommonConstants {
 	public static final String AMAZON_ENDPOINT = "AMAZON_ENDPOINT";
 	public static final String AMAZON_BUCKET = "AMAZON_BUCKET";
 	public static final String AMAZON_ENV_PREFIX = "AMAZON_ENV_PREFIX";
-	public static final String HYPHEN = "-";
+	public static final String SYMBOL_HYPHEN = "-";
+	public static final String SYMBOL_FULLSTOP = ".";
 
 	// settings constants
 	public static final String CRM_INFO_SOURCE_ENCOMPASS = "encompass";
@@ -282,7 +283,8 @@ public interface CommonConstants {
 	public static final String IS_DEFAULT_BY_SYSTEM_SOLR = "isDefaultBySystem";
 	public static final String STATUS_SOLR = "status";
 	public static final String REGION_NAME_SOLR = "regionName";
-	public static final String REGION_ADDRESS_SOLR = "address";
+	public static final String ADDRESS1_SOLR = "address1";
+	public static final String ADDRESS2_SOLR = "address2";
 	public static final String BRANCH_ID_SOLR = "branchId";
 	public static final String BRANCH_NAME_SOLR = "branchName";
 	public static final String BRANCH_ADDRESS_SOLR = "address";

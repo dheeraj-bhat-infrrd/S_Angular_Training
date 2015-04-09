@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
 
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,8 +27,10 @@ import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -66,11 +73,31 @@ public class LoginController {
 	@Autowired
 	private SolrSearchService solrSearchService;
 
+	@RequestMapping(value = "/home")
+	public String initHomePage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Method initHomePage() called from LoginController");
+		redirectOnClickLogo(response);
+		return JspResolver.INDEX;
+	}
+
+	private void redirectOnClickLogo(HttpServletResponse response) {
+		LOG.debug("Checking for state of principal session");
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (!(auth instanceof AnonymousAuthenticationToken)) {
+			try {
+				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
+			}
+			catch (IOException e) {
+				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
+			}
+		}
+	}
+
 	@RequestMapping(value = "/login")
-	public String initLoginPage(Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
-		LOG.info("Information aa gayi");
-		LOG.debug("DEBUG aa gaya");
-		LOG.error("Error aa gaya");
+	public String initLoginPage(HttpServletResponse response, Model model, @RequestParam(value = STATUS_PARAM, required = false) String status) {
+		LOG.info("Inside initLoginPage() of LoginController");
+		redirectOnClickLogo(response);
+
 		if (status != null) {
 			switch (status) {
 				case AUTH_ERROR:
@@ -160,17 +187,33 @@ public class LoginController {
 			else {
 				LOG.debug("Company profile complete, check any of the user profiles is entered");
 				if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
-					/*
-					 * UserProfile highestUserProfile = null; UserProfile companyAdminProfile =
-					 * null; // fetch the highest user profile for user try { highestUserProfile =
-					 * userManagementService.getHighestUserProfileForUser(user); companyAdminProfile
-					 * = authenticationService.getCompanyAdminProfileForUser(user); } catch
-					 * (NoRecordsFetchedException e) {
-					 * LOG.error("No user profiles found for the user"); return
-					 * JspResolver.ERROR_PAGE; }
+					/**
+					 * Set the regions and branches in session from solr
 					 */
-
-					// Compute all conditions for user and if user is CA then check for profile
+					long companyId =user.getCompany().getCompanyId();
+					LOG.debug("Fetching regions from solr to set in session for company:"+companyId);
+					try {
+						Map<Long, RegionFromSearch> regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+						session.setAttribute(CommonConstants.REGIONS_IN_SESSION, regions);
+					}
+					catch (MalformedURLException e) {
+						LOG.error("MalformedURLException while fetching regions. Reason : " + e.getMessage(), e);
+						throw new NonFatalException("MalformedURLException while fetching regions", e);
+					}
+					
+					LOG.debug("Fetching branches from solr to set in session for company:"+companyId);
+					try {
+						Map<Long, BranchFromSearch> branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+						session.setAttribute(CommonConstants.BRANCHES_IN_SESSION, branches);
+					}
+					catch (MalformedURLException e) {
+						LOG.error("MalformedURLException while fetching branches. Reason : " + e.getMessage(), e);
+						throw new NonFatalException("MalformedURLException while fetching branches", e);
+					}
+					
+					/**
+					 * Compute all conditions for user and if user is CA then check for profile
+					 */
 					// completion stage.
 					if (user.isCompanyAdmin()) {
 						UserProfile adminProfile = null;

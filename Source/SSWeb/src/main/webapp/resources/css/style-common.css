@@ -3171,8 +3171,8 @@ button.paypal.is-active {
 
 .lp-ach-item-img{
 	cursor: pointer;
-	width: 46px;
-	height: 46px;
+	width: 34px;
+	height: 34px;
 	background: url(../images/icnRemove.png) no-repeat center;
 }
 
@@ -4572,14 +4572,17 @@ tr.v-tbl-row {
 .v-line-comp-ind {
 	left:0 !important;
 }
+.v-line-region-ind {
+	left:25% !important;
+}
 
 .td-region-edit .edit-region-form{
 	margin: 30px auto;
-	width: 500px;
+	width: 630px;
 }
 .td-branch-edit .edit-office-form{
 	margin: 30px auto;
-	width: 500px;
+	width: 630px;
 }
 
 .v-line-ind{

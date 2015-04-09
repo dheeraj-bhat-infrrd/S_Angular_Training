@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -49,6 +51,7 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
@@ -120,6 +123,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
+
+	@Autowired
+	private ProfileManagementService profileManagementService;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -427,6 +433,31 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new NoRecordsFetchedException("No users found with the login name : {}", loginName);
 		}
 		LOG.info("Method to fetch list of users on the basis of email id is finished.");
+		return users.get(CommonConstants.INITIAL_INDEX);
+	}
+
+	// Method to return user with provided email and company
+	@Transactional
+	@Override
+	public User getUserByEmailAndCompany(long companyId, String emailId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getUserByEmailAndCompany() called from UserManagementService");
+
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("Email id is null or empty in getUserByEmailAndCompany()");
+		}
+		
+		Company company = companyDao.findById(Company.class, companyId);
+		
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.LOGIN_NAME, emailId);
+		queries.put(CommonConstants.COMPANY, company);
+		
+		List<User> users = userDao.findByKeyValue(User.class, queries);
+		if (users == null || users.isEmpty()) {
+			throw new NoRecordsFetchedException("No users found with the login name : {}", emailId);
+		}
+		
+		LOG.info("Method getUserByEmailAndCompany() finished from UserManagementService");
 		return users.get(CommonConstants.INITIAL_INDEX);
 	}
 
@@ -866,7 +897,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Method to update a user finished for user : " + userIdToUpdate);
 	}
-	
+
 	/*
 	 * Method to update the given userprofile as active or inactive.
 	 */
@@ -877,7 +908,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		if (admin == null) {
 			throw new InvalidInputException("No admin user present.");
 		}
-		
+
 		LOG.info("Method to assign user to a branch called by user : " + admin.getUserId());
 		UserProfile userProfile = userProfileDao.findById(UserProfile.class, profileIdToUpdate);
 		if (userProfile == null) {
@@ -1371,7 +1402,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Override
 	public AgentSettings getAgentSettingsForUserProfiles(long userId) throws InvalidInputException {
-		LOG.info("Getting agent settings for user id: "+userId);
+		LOG.info("Getting agent settings for user id: " + userId);
 		AgentSettings agentSettings = getUserSettings(userId);
 		return agentSettings;
 	}
@@ -1655,7 +1686,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		contactSettings.setMail_ids(mail_ids);
 		agentSettings.setContact_details(contactSettings);
 
-		String profileName = generateIndividualProfileName(user.getUserId(), user.getEmailId());
+		String profileName = generateIndividualProfileName(user.getUserId(), contactSettings.getName(), user.getEmailId());
 		agentSettings.setProfileName(profileName);
 		String profileUrl = utils.generateAgentProfileUrl(profileName);
 		agentSettings.setProfileUrl(profileUrl);
@@ -1668,7 +1699,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		// set the seo flag to true
 		agentSettings.setSeoContentModified(true);
-		
+
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
 	}
@@ -1681,13 +1712,21 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	private String generateIndividualProfileName(long userId, String emailId) throws InvalidInputException {
+	private String generateIndividualProfileName(long userId, String name, String emailId) throws InvalidInputException {
 		LOG.info("Method generateIndividualProfileName called for userId:" + userId + " and emailId:" + emailId);
 		if (emailId == null || emailId.isEmpty()) {
 			throw new InvalidInputException("emailId is null or empty while generating agent profile name");
 		}
 		String profileName = null;
-		profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+		String input = null;
+		if (name != null && !name.isEmpty()) {
+			input = name;
+		}
+		else {
+			input = emailId.trim().substring(0, emailId.indexOf("@"));
+		}
+		// profileName = emailId.trim().substring(0, emailId.indexOf("@"));
+		profileName = utils.prepareProfileName(input);
 
 		LOG.debug("Checking uniqueness of profileName:" + profileName);
 		OrganizationUnitSettings agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
@@ -1697,9 +1736,118 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		 * unique
 		 */
 		if (agentSettings != null) {
-			profileName = profileName + String.valueOf(userId);
+			profileName = utils.appendIdenToProfileName(profileName, userId);
 		}
 		LOG.info("Method generateIndividualProfileName finished successfully.Returning profileName: " + profileName);
 		return profileName;
+	}
+
+	/**
+	 * Method to check which all users can perform edit and set the boolean as true or false in user
+	 * objects
+	 */
+	@Override
+	public List<UserFromSearch> checkUserCanEdit(User admin, UserFromSearch adminFromSearch, List<UserFromSearch> users) throws InvalidInputException {
+		LOG.info("Method checkUserCanEdit called for admin:" + admin + " and adminUser:" + adminFromSearch);
+		/**
+		 * Company admin : able to edit any user
+		 */
+		if (admin.getIsOwner() == CommonConstants.IS_OWNER) {
+			for (UserFromSearch user : users) {
+				user.setCanEdit(true);
+				if (user.getIsOwner() == 1) {
+					user.setCanEdit(false);
+				}
+			}
+		}
+		/**
+		 * Region admin : able to edit users only in his region
+		 */
+		else if (admin.getIsOwner() != CommonConstants.IS_OWNER && admin.isRegionAdmin()) {
+			for (UserFromSearch user : users) {
+				boolean hasCommon = Collections.disjoint(adminFromSearch.getRegions(), user.getRegions());
+				user.setCanEdit(!hasCommon);
+			}
+		}
+		/**
+		 * Branch admin : able to edit users only in his office
+		 */
+		else if (admin.getIsOwner() != CommonConstants.IS_OWNER && admin.isBranchAdmin()) {
+			for (UserFromSearch user : users) {
+				boolean hasCommon = Collections.disjoint(adminFromSearch.getBranches(), user.getBranches());
+				user.setCanEdit(!hasCommon);
+			}
+		}
+		LOG.info("Method checkUserCanEdit executed successfully");
+		return users;
+	}
+
+	/**
+	 * Method to update user details on completing registration
+	 */
+	@Override
+	@Transactional
+	public User updateUserOnCompleteRegistration(User user, String emailId, long companyId, String firstName, String lastName, String password)
+			throws SolrException, InvalidInputException {
+		LOG.info("Method updateUserOnCompleteRegistration called");
+		if (user == null) {
+			throw new InvalidInputException("User id null in updateUserOnCompleteRegistration");
+		}
+		user.setFirstName(firstName);
+		user.setLastName(lastName);
+		user.setIsAtleastOneUserprofileComplete(CommonConstants.STATUS_ACTIVE);
+		user.setStatus(CommonConstants.STATUS_ACTIVE);
+		user.setModifiedBy(String.valueOf(user.getUserId()));
+		user.setModifiedOn(new Timestamp(System.currentTimeMillis()));
+
+		/**
+		 * Set the new password
+		 */
+		String encryptedPassword = encryptionHelper.encryptSHA512(password);
+		user.setLoginPassword(encryptedPassword);
+
+		userDao.saveOrUpdate(user);
+
+		/**
+		 * Updating Name, profile name and profile url
+		 */
+		LOG.debug("Updating newly activated user {} to mongo", user.getUserId());
+		AgentSettings agentSettings = getAgentSettingsForUserProfiles(user.getUserId());
+		ContactDetailsSettings contactDetails = agentSettings.getContact_details();
+
+		String name = user.getFirstName() + " " + (user.getLastName() != null ? user.getLastName() : "");
+		contactDetails.setName(name);
+
+		String profileName = generateIndividualProfileName(user.getUserId(), name, emailId);
+		String profileUrl = utils.generateAgentProfileUrl(profileName);
+		agentSettings.setProfileName(profileName);
+		agentSettings.setProfileUrl(profileUrl);
+		organizationUnitSettingsDao
+				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, agentSettings);
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileName, agentSettings);
+		profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+				contactDetails);
+		LOG.debug("Updated newly activated user {} to mongo", user.getUserId());
+
+		/**
+		 * setting new profile url and profile name in user object
+		 */
+		user.setProfileName(profileName);
+		user.setProfileUrl(profileUrl);
+
+		LOG.debug("Modifying user in solr");
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.STATUS_SOLR, String.valueOf(user.getStatus()));
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_FIRST_NAME_SOLR, user.getFirstName());
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_LAST_NAME_SOLR,
+				(user.getLastName() != null ? user.getLastName() : ""));
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.USER_DISPLAY_NAME_SOLR, user.getFirstName() + " "
+				+ (user.getLastName() != null ? user.getLastName() : ""));
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.PROFILE_URL_SOLR, profileUrl);
+		solrSearchService.editUserInSolr(user.getUserId(), CommonConstants.PROFILE_NAME_SOLR, profileName);
+		LOG.debug("Successfully modified user detail in solr");
+
+		LOG.info("Method updateUserOnCompleteRegistration executed successfully");
+
+		return user;
 	}
 }

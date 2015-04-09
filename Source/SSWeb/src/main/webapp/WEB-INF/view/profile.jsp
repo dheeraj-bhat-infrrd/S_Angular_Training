@@ -108,7 +108,7 @@
                         <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
                     </div>
                 </div>
-                <div class="prof-left-row prof-left-info bord-bot-dc">
+                <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc hide">
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
@@ -119,7 +119,7 @@
                 
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
-                   			<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                   			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                    				<div class="left-assoc-wrapper">
                    					<div class="left-panel-header"><spring:message code="label.ourbranch.key"/></div>
                         			<div class="left-panel-content left-panel-content-adj" id="branch-individuals">
@@ -129,7 +129,7 @@
               					</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty regionProfileName}">
-                   		 	<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                   		 	<div id="region-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                    				<div class="left-assoc-wrapper">
 		                   		 	<input type="hidden" id="branchid-hidden"/>
 		                   		 		<div class="left-panel-header"><spring:message code="label.ourregion.key"/></div>
@@ -145,7 +145,7 @@
                   		 		</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty companyProfileName}">
-                  		 		<div class="prof-left-row prof-left-assoc bord-bot-dc">
+                  		 		<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                   					<div class="left-assoc-wrapper">
 	                   		 			<input type="hidden" id="regionid-hidden"/>
 	                   		 			<input type="hidden" id="branchid-hidden"/>
@@ -188,7 +188,7 @@
                     </div>
                 </div>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
-                    <div class="main-con-header" id="prof-reviews-header"></div>
+                    <div class="main-con-header hide" id="prof-reviews-header"></div>
                     <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here --> 
                     </div>
@@ -215,17 +215,17 @@
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
 <script>
     $(document).ready(function(){
         adjustImage();
-        /**
-        	If region profile name is mentioned, fetch the region profile 
-        	since this would be a call to fetch region profile page 
-        */
-        
         var gaLabel;
         var gaName;
         
+        /**
+	    	If region profile name is mentioned, fetch the region profile 
+    		since this would be a call to fetch region profile page 
+	    */
         var regionProfileName = $("#region-profile-name").val();
         var branchProfileName = $("#branch-profile-name").val();
         var agentProfileName = $("#agent-profile-name").val();
@@ -326,17 +326,5 @@
     	});
     });
 </script>
-
-<script>
-// Google analytics tracking code
-(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-
-ga('create', 'UA-61251431-1', 'auto');
-ga('send', 'pageview');
-</script>
-
 </body>
 </html>
