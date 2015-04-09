@@ -83,8 +83,15 @@ public interface UserManagementService {
 	// exhausted.
 	public boolean isUserAdditionAllowed(User user) throws NoRecordsFetchedException;
 
-	// Method to get User object for the given user id.
-	public User getUserByUserId(long userId);
+	/**
+	 * Method to get user object for the given user id, fetches user along with profile name and
+	 * profile url
+	 * 
+	 * @param userId
+	 * @return
+	 * @throws InvalidInputException
+	 */
+	public User getUserByUserId(long userId) throws InvalidInputException;
 
 	// Method to get list of the branches assigned to the given user.
 	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException;
@@ -234,6 +241,7 @@ public interface UserManagementService {
 
 	/**
 	 * Method to update user details on completing registration
+	 * 
 	 * @param existingUser
 	 * @param emailId
 	 * @param companyId
@@ -244,7 +252,8 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password) throws InvalidInputException, SolrException;
+	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password)
+			throws InvalidInputException, SolrException;
 
 }
 // JIRA SS-34 BY RM02 BOC
