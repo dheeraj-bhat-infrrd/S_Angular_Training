@@ -53,11 +53,13 @@ public interface SurveyHandler {
 
 	public void updateReminderCount(long agentId, String customerEmail);
 
-	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId);
+	public List<String> getEmailIdsOfAdminsInHierarchy(long agentId) throws InvalidInputException;
 
 	public List<SurveyDetails> getIncompleteSurveyCustomersEmail(long companyId);
 
 	public void updateReminderCount(List<Long> agents, List<String> customers);
 
 	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId);
+
+	public String getMoodsToSendMail();
 }
