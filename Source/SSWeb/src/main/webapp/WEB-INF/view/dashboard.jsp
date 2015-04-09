@@ -316,7 +316,8 @@ $(document).ready(function() {
 	var agent = $('#prof-container').attr("data-agent");
 	var accountType = $('#prof-container').attr("data-accountType");
 
-	paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames, regionIds, branchNames, branchIds, agent, accountType);
+	paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
+			regionIds, branchNames, branchIds, agent, accountType);
 	// $('#dsh-inc-srvey').perfectScrollbar('update');
 });
 
