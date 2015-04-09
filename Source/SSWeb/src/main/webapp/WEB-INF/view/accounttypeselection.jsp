@@ -119,7 +119,7 @@
 				<c:otherwise>
 					<c:if test="${ empty paidUpgrade }">
                      <div class="acc-type-item text-center" onclick="selectAccountType(5, 'Free')">
-						<div class="act-header" id="account-type-1"><spring:message code="label.accounttype.freeaccount.key"/></div>
+						<div class="act-header" id="account-type-0"><spring:message code="label.accounttype.freeaccount.key"/></div>
 						<div class="act-price">
 							<spring:message code="label.free.key"/>
 						</div>
