@@ -60,20 +60,20 @@
     	<c:when test="${ paymentChange == 1 }">
     		  <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.paymentupgrade.key"/></div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.cardnumber.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${cardNumber}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardnumber.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${cardNumber}'</div>
 	          </div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.cardholder.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${cardHolderName}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardholder.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${cardHolderName}'</div>
 	          </div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.cardtype.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${cardType}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardtype.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${cardType}'</div>
 	          </div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.issuingbank.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${issuingBank}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.issuingbank.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${issuingBank}'</div>
 	          </div>
 	          <br>
 	          <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.newpaymentdetails.key"/></div>
@@ -96,8 +96,14 @@
 	    </c:choose>
 	          <div id="payment-details-form" class="payment-details-form">
 	          		<c:choose>
-	          		<c:when test="${ paymentChange == 1 }"><form id="checkout"></c:when>
-	          		<c:when test="${ paidUpgrade == 1 }"><form id="checkout"></c:when>
+	          		<c:when test="${ paymentChange == 1 }">
+	          			<form id="checkout" method="POST">
+	          			<div id="dropin" class="payment-dropin"></div>	          			
+	          		</c:when>
+	          		<c:when test="${ paidUpgrade == 1 }">
+	          			<form id="checkout" method="POST">
+	          			<div id="dropin" class="payment-dropin"></div>	          			
+	          		</c:when>
 	          		<c:otherwise>
 	          			<form id="checkout" method="POST" action="./subscribe.do">
 	          			<div id="dropin" class="payment-dropin"></div>	          			
@@ -106,34 +112,10 @@
 				            <div class="clearfix">
 				            	<c:choose>
 						        <c:when test="${ paymentChange == 1 }">
-						        	<div class="clearfix">
-						        		<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="16" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
-						        	</div>
-						        	<div id="card-num-err" class="card-err-txt"></div>
-						        	<div class="clearfix">
-						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-month" data-non-empty="true" placeholder='<spring:message code="label.expmonth.key"/>'>
-						        	</div>
-						        	<div id="exp-month-err" class="card-err-txt"></div>
-						        	<div class="clearfix">
-						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
-						        	</div>
-						        	<div id="exp-year-err" class="card-err-txt"></div>
-						        	<input type="button" onclick="updateCardDetails();" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
+						        	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.update.key"/>' />
 						        </c:when>
 						        <c:when test="${ paidUpgrade == 1 }">
-						        	<div class="clearfix">
-						        		<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="16" id="card-number" data-non-empty="true" placeholder='<spring:message code="label.cardnumberentry.key"/>'>
-						        	</div>
-						        	<div id="card-num-err" class="card-err-txt"></div>
-						        	<div class="clearfix">
-						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-month" data-non-empty="true" placeholder='<spring:message code="label.expmonth.key"/>'>
-						        	</div>
-						        	<div id="exp-month-err" class="card-err-txt"></div>
-						        	<div class="clearfix">
-						        	<input class="float-left login-wrapper-txt update-card-details-txt" maxlength="2" id="exp-year" data-non-empty="true" placeholder='<spring:message code="label.expyear.key"/>'>
-						        	</div>
-						        	<div id="exp-year-err" class="card-err-txt"></div>
-						        	<input type="button" onclick="makePaymentForUpgrade();" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
+						        	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
 						        </c:when>
 						        <c:otherwise>
 					            	<input type="submit" class="btn-payment float-left" value='<spring:message code="label.makepayment.key"/>' />
@@ -159,18 +141,43 @@
     </div>
     </c:if>
     <script type="text/javascript">
-       
+           
 	   $(document).ready(function() {
+		   console.log("pageInitialized : " + pageInitialized);
+		   if(pageInitialized){
+			   console.log("Not executing ready function!");
+			   return;
+		   }
 		   console.log("Loading braintree");
 		   var paymentChangeStatus = '<c:out value="${paymentChange}"/>';
            var paidUpgrade = '<c:out value="${paidUpgrade}"/>';
-		   if(paymentChangeStatus != 1 && paidUpgrade!=1 ){
+		   if(paymentChangeStatus == 1 && paidUpgrade!=1 ){
+			   console.log("Setting up the payment form for payment change");
+				braintree.setup('${clienttoken}', 'dropin', {
+					container : 'dropin',
+					paymentMethodNonceReceived : makeAjaxCallToUpgrade
+				});
+			   console.log("Braintree loaded");
+		   }else if(paymentChangeStatus != 1 && paidUpgrade==1 ){
+			   console.log("Setting up the payment form upgrading to paid plan");
+				braintree.setup('${clienttoken}', 'dropin', {
+					container : 'dropin',
+					paymentMethodNonceReceived : makeAjaxCallToPlanUpgrade
+				});
+			   console.log("Braintree loaded");
+		   }
+		   else if(paymentChangeStatus != 1 && paidUpgrade!=1 ){
 			   console.log("Setting up the payment form");
 				braintree.setup('${clienttoken}', 'dropin', {
 					container : 'dropin'
 				});
 			   console.log("Braintree loaded");
 		   }
+		   else{
+			   console.log("Payment status flags not properly set!");
+		   }
+		   
+		   pageInitialized = true;
 	   });
 	   
 	   $("#cancel-payment").click(function() {
@@ -178,6 +185,7 @@
 	   		$('#st-settings-payment-off').show();
 	   		$('#st-settings-payment-on').hide();
 		   	hidePayment();
+		   	pageInitialized=false;
 	   });
 	   
 	   $('input').keypress(function(e){       	
@@ -188,52 +196,11 @@
 	       	}
 		});
 	   
-	   function updateCardDetails(){
-		   console.log("checking if form is valid");
-		   if(validateCardForm()){
-			   console.log("Submitting the form");
-			   showOverlay();
-			   cardNumber = $("#card-number").val();
-			   expMonth = $("#exp-month").val();
-			   expYear = $("#exp-year").val();
-			   console.log("Fetched values");
-			   var client = new braintree.api.Client({clientToken: '${clienttoken}'});
-			   client.tokenizeCard({number: cardNumber, expirationDate: expMonth + "/" + expYear }, function (err, nonce) {
-				   if( err == null){
-					   makeAjaxCallToUpgrade(nonce);
-				   }
-				   else{
-					   displayError(err);
-				   }
-				 });			   
-		   }		   		   
-	   }
-	   
-	   function makePaymentForUpgrade(){
-		   console.log("checking if form is valid");
-		   if(validateCardForm()){
-			   console.log("Submitting the form");
-			   showOverlay();
-			   cardNumber = $("#card-number").val();
-			   expMonth = $("#exp-month").val();
-			   expYear = $("#exp-year").val();
-			   console.log("Fetched values");
-			   var client = new braintree.api.Client({clientToken: '${clienttoken}'});
-			   client.tokenizeCard({number: cardNumber, expirationDate: expMonth + "/" + expYear }, function (err, nonce) {
-				   if( err == null){
-					   makeAjaxCallToPlanUpgrade(nonce);
-				   }
-				   else{
-					   displayError(err);
-				   }
-				 });			   
-		   }	
-	   }
-	   
-	   function makeAjaxCallToPlanUpgrade(nonce){
+	   function makeAjaxCallToPlanUpgrade(event,nonce){
 		   hidePayment();
 		   showOverlay();
-		   console.log("making ajax call with nonce: " + nonce)
+		   console.log("making ajax call with nonce: " + nonce);
+		   console.log(event);
 		   var data = "payment_method_nonce=" + nonce+"&accounttype=" + $('#account-type').val();
 		   console.log(data);
 
@@ -271,8 +238,10 @@
        	}
        }
 	   
-	   function makeAjaxCallToUpgrade(nonce){
-		   console.log("making ajax call with nonce: " + nonce)
+	   function makeAjaxCallToUpgrade(event,nonce){
+		   console.log("making ajax call with nonce: " + nonce);
+		   console.log(event);
+		   showOverlay();
 		   var data = "payment_method_nonce=" + nonce;
 		   var url = "./paymentupgrade.do";
 		   $.ajax({
@@ -289,6 +258,7 @@
 	   function displayToast(data){
 		    hidePayment();
 			hideOverlay();
+			pageInitialized=false;
 		   	console.log("Message recieved. Hiding Payment popup");
 			console.log("Removing no-scroll class from body");
 	   		$('body').removeClass('body-no-scroll');
@@ -298,172 +268,7 @@
 	   		console.log("Added toast message. Showing it now");
 	   		showToast();
 	   		console.log("Finished showing the toast");
-	   }
-	   
-	   function displayError(err){
-		   	$('body').removeClass('body-no-scroll');
-	   		$('#st-settings-payment-off').show();
-	   		$('#st-settings-payment-on').hide();
-		   	hidePayment();
-		   	hideOverlay();
-		   	console.log("Error occured. Hiding Overlay");
-			console.log("Removing no-scroll class from body");
-    		$('body').removeClass('body-no-scroll');
-    		$('#overlay-toast').html("Oops! We seem to be having a technical fault. Please try in some time.");
-    		console.log("Added toast message. Showing it now");
-    		showToast();
-    		console.log("Finished showing the toast");
-	   }
-	   
-	   function validateCardForm(){
-		    console.log("Form validation called");
-	       	isLoginFormValid=true;
-	       	var isFocussed = false;
-	       	var isSmallScreen = false;
-	       	if($(window).width()<768){
-	       		isSmallScreen = true;
-	       	}
-	       	if(!validateCreditCard()){
-	       		isLoginFormValid=false;
-	       		if(!isFocussed){
-	       			console.log("Focussing on card");
-	       			$("#card-number").focus();
-	       			isFocussed=true;
-	       		}
-	       		if(isSmallScreen){
-	       			return isLoginFormValid;
-	       		}
-	       	}
-	       	if(!validateMonth()){
-	       		isLoginFormValid = false;
-	       		if(!isFocussed){
-	       			console.log("Focussing on month");
-	       			$("#exp-month").focus();
-	       			isFocussed=true;
-	       		}
-	       		if(isSmallScreen){
-	       			return isLoginFormValid;
-	       		}
-	       	}
-	       	if(!validateYear()){
-	       		isLoginFormValid = false;
-	       		if(!isFocussed){
-	       			console.log("Focussing on year");
-	       			$("#exp-year").focus();
-	       			isFocussed=true;
-	       		}
-	       		if(isSmallScreen){
-	       			return isLoginFormValid;
-	       		}
-	       		return isLoginFormValid;
-	       	}
-	       	if(!validateExp()){
-	       		isLoginFormValid = false;
-	       		if(!isFocussed){
-	       			$("#exp-month").focus();
-	       			isFocussed=true;
-	       		}
-	       		if(isSmallScreen){
-	       			return isLoginFormValid;
-	       		}
-	       	}
-	       	return isLoginFormValid;
-       }
-	   
-	   function validateCreditCard(){
-		   console.log("Card validation called");
-		   var pattern = /^\d{16}$/;
-		   cardNumber = String($("#card-number").val());
-		   if(cardNumber.match(pattern)){
-			   console.log("Valid card");
-			   $("#card-num-err").html("");
-			   return true;
-		   }
-		   else{
-			   console.log("Not a valid card");
-			   $("#card-num-err").html("Please enter valid card number");
-			   return false;
-		   }
-	   }
-	   
-	   function validateMonth(){
-		   console.log("Month validation called");
-		   expMonth = $("#exp-month").val();
-		   monthPattern = /^[1-9]?\d$/;
-		   
-		   if(!(String(expMonth).match(monthPattern)) || !(parseInt(String(expMonth))<=12) ){
-			   console.log("Not a valid month");
-			   $("#exp-month-err").html("Please enter valid month");
-			   return false;
-		   }
-		   else{
-			   console.log("Valid  month");
-			   $("#exp-month-err").html("");
-			   return true;
-		   }
-	   }
-	   
-	   function validateYear(){
-		   console.log("Year validation called");
-		   expYear = $("#exp-year").val();
-		   yearPattern = /^\d{1,2}$/;
-		   
-		   var year = parseInt(String(expYear));
-		   var curYear = new Date().getFullYear();
-		   curYear = parseInt(curYear.toString().substr(2,2));
-		   
-		   if(!(String(expYear).match(yearPattern)) || !(year >= curYear && year < curYear+10)){
-			   $("#exp-year-err").html("Please enter valid year");
-			   return false;
-		   }
-		   else{
-			   $("#exp-year-err").html("");
-			   return true;
-		   }			
-	   }
-	   
-	   function validateExp(){
-		   console.log("Expiration validation called");
-		   expYear = $("#exp-year").val();
-		   expMonth = $("#exp-month").val();
-		   
-		   var year = parseInt(String(expYear));
-		   var month = parseInt(String(expMonth));
-		   var curYear = new Date().getFullYear();
-		   curYear = parseInt(curYear.toString().substr(2,2));
-		   curMonth = parseInt(new Date().getMonth())+1;
-		   
-		   
-		   if(year == curYear){
-			   console.log( month);
-			   console.log( curMonth);
-			   if( month < curMonth ){
-				   console.log("Not a valid exp date");
-				   $("#exp-month-err").html("");
-				   $("#exp-year-err").html("");
-				   $("#exp-year-err").html("Please enter valid expiration date");
-				   return false;
-			   }
-		   }
-		   console.log("Valid exp date");
-		   $("#exp-year-err").html("");
-		   $("#exp-month-err").html("");
-		   return true;
-	   }
-	   
-	   $('#card-number').blur(function() {
-		   console.log("On blur card called");
-		   validateCreditCard();
-       });
-	   $('#exp-month').blur(function(){
-		   console.log("On blur month called");
-    	   validateMonth();
-       });
-       $('#exp-year').blur(function(){
-		   console.log("On blur year called");
-    	   validateYear();
-       });
-	   
+	   }	
 	</script>
    
    <c:choose>

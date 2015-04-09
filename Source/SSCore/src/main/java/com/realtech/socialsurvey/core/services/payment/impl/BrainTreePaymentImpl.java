@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.ClientTokenRequest;
 import com.braintreegateway.CreditCard;
@@ -30,6 +32,8 @@ import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
 import com.braintreegateway.ValidationError;
 import com.braintreegateway.ValidationErrors;
+import com.braintreegateway.exceptions.BraintreeException;
+import com.braintreegateway.exceptions.DownForMaintenanceException;
 import com.braintreegateway.exceptions.NotFoundException;
 import com.braintreegateway.exceptions.UnexpectedException;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -148,9 +152,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new NoRecordsFetchedException("Subscription with id : " + subscriptionId + " not found in the vault.");
 
 		}
-		catch (UnexpectedException e) {
+		catch (UnexpectedException | DownForMaintenanceException e) {
 			LOG.error("Unexpected Exception occured when cancelling subscription with id : " + subscriptionId);
 			throw new PaymentException("Unexpected Exception occured when cancelling subscription with id : " + subscriptionId);
+		}
+		catch (BraintreeException e) {
+			LOG.error("BraintreeException occured when cancelling subscription with id : " + subscriptionId + " message : " + e.getMessage());
+			throw new PaymentException("BraintreeException occured when cancelling subscription with id : " + subscriptionId,e);
 		}
 
 		if (result.isSuccess()) {
@@ -270,11 +278,17 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			result = gateway.customer().create(request);
 
 		}
-		catch (UnexpectedException e) {
+		catch (UnexpectedException | DownForMaintenanceException e) {
 			LOG.error("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
-					+ " to the vault");
+					+ " to the vault. Message : " + e.getMessage());
 			throw new PaymentException("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
 					+ " to the vault");
+		}
+		catch (BraintreeException e) {
+			LOG.error("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
+					+ " to the vault. Message : " + e.getMessage());
+			throw new PaymentException("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
+					+ " to the vault.",e);
 		}
 
 		LOG.debug("addCustomerWithPayment : adding user " + Long.toString(company.getCompanyId()) + " : Status : " + result.isSuccess()
@@ -334,10 +348,15 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		catch (NotFoundException e) {
 			LOG.error("Customer " + customerId + " Not Found!");
 		}
-		catch (UnexpectedException e) {
-			LOG.error("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId);
+		catch (UnexpectedException | DownForMaintenanceException e) {
+			LOG.error("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId + " Message : " + e.getMessage());
 			throw new PaymentException("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId);
 		}
+		catch (BraintreeException e) {
+			LOG.error("containsCustomer() : BraintreeException has occured while searching for customer with id " + customerId + " Message : " + e.getMessage());
+			throw new PaymentException("containsCustomer() : BraintreeException has occured while searching for customer with id " + customerId);
+		}
+		
 
 		return customer;
 
@@ -390,8 +409,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				result = gateway.subscription().create(request);
 			}
 			catch (UnexpectedException e) {
-				LOG.error("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId);
+				LOG.error("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId + " Message : " + e.getMessage());
 				throw new PaymentException("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId);
+			}
+			catch (BraintreeException e) {
+				LOG.error("subscribeCustomer(): BraintreeException occured while subscribing customer with id : " + customerId + " Message : " + e.getMessage());
+				throw new PaymentException("subscribeCustomer(): BraintreeException occured while subscribing customer with id : " + customerId);
 			}
 
 			LOG.debug("subscribeCustomer : customerId : " + customerId + " for planId : " + planId + " Status : " + result.isSuccess()
@@ -848,9 +871,14 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("Subscription details not found in the Braintree vault for id :" + subscriptionId);
 			throw new NoRecordsFetchedException("Subscription details not found in the Braintree vault for id :" + subscriptionId);
 		}
-		catch (UnexpectedException e) {
+		catch (UnexpectedException | DownForMaintenanceException e) {
 			LOG.error("getDisableDate(): Unexpected Exception occured while fetching disable date for subscription id : " + subscriptionId);
 			throw new PaymentException("getDisableDate(): Unexpected Exception occured while fetching disable date for subscription id : "
+					+ subscriptionId);
+		}
+		catch (BraintreeException e) {
+			LOG.error("getDisableDate(): BraintreeException occured while fetching disable date for subscription id : " + subscriptionId);
+			throw new PaymentException("getDisableDate(): BraintreeException occured while fetching disable date for subscription id : "
 					+ subscriptionId);
 		}
 
@@ -878,7 +906,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("subscriptionId parameter given to unsubscribe is null or empty");
 		}
 		LOG.info("Cancelling the subscription with id : " + subscriptionId);
-
+		
 		Result<Subscription> result = gateway.subscription().cancel(subscriptionId);
 
 		if (result.isSuccess()) {
@@ -932,9 +960,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("upgradeSubscription : NotFoundException has occured");
 			throw new NoRecordsFetchedException("upgradeSubscription : NotFoundException has occured");
 		}
-		catch (UnexpectedException e) {
+		catch (UnexpectedException | DownForMaintenanceException e) {
 			LOG.error("upgradeSubscription : UexpectedException has occured");
 			throw new PaymentException("upgradeSubscription : UexpectedException has occured", DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+		}
+		catch (BraintreeException e) {
+			LOG.error("upgradeSubscription : BraintreeException has occured. Message : " + e.getMessage(),e);
+			throw new PaymentException("upgradeSubscription : BraintreeException has occured", DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 
 		if (result.isSuccess()) {
@@ -1222,11 +1254,16 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.debug("Payment details map built");
 
 		}
-		catch (UnexpectedException e) {
+		catch (UnexpectedException | DownForMaintenanceException e) {
 			LOG.error("UnexpectedException caught : message : " + e.getMessage());
 			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
-
+		catch (BraintreeException e) {
+			LOG.error("BraintreeException caught : message : " + e.getMessage());
+			throw new PaymentException("BraintreeException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+		}
+		
+		
 		LOG.info("Returning the payment method details");
 		return paymentDetailsMap;
 	}
@@ -1305,9 +1342,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 
 		}
-		catch (UnexpectedException e) {
+		catch (UnexpectedException | DownForMaintenanceException e ) {
 			LOG.error("UnexpectedException caught : message : " + e.getMessage());
 			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+		}
+		catch (BraintreeException e ) {
+			LOG.error("BraintreeException caught : message : " + e.getMessage());
+			throw new PaymentException("BraintreeException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 
 		LOG.info("Card details changed successfully!");
