@@ -10,10 +10,10 @@
             <c:if test="${not empty profileList && fn:length(profileList) > 1}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
-					<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
+					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
+					<div id="da-dd-wrapper-profiles" class="hr-dd-wrapper hide">
 						<c:forEach var="userprofile" items="${profileList}">
-							<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
+							<div class="da-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
 						</c:forEach>
 					</div>
 				</div>
@@ -28,6 +28,7 @@
         data-branchAdmin="${branchAdmin}" data-regionNames="${regionNames}" data-regionIds="${regionIds}" 
         data-branchNames="${branchNames}" data-branchIds="${branchIds}" data-agent="${agent}" data-accountType="${accountType}"
         class="dash-top-info">
+        	
             <div class="row row-dash-top-adj">
                 <div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="dsh-graph-wrapper">
@@ -62,6 +63,7 @@
                         </div>
                     </div>
                 </div>
+                
                 <div class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
                     <div class="dash-left-txt-wrapper">
                         <div class="dsh-name-wrapper">
@@ -110,6 +112,7 @@
 					</select>
 				</div>
 			</div>
+			
 			<div class="float-left stats-right">
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">No. of surveys sent</div>
@@ -134,8 +137,7 @@
 						class="float-left stat-icns-item clearfix">
 					</div>
 				</div>
-				<!--
-                <div class="clearfix stat-icns-wrapper">
+				<!--<div class="clearfix stat-icns-wrapper">
                     <div class="float-left stat-icn-lbl">No. of social posts</div>
                     <div class="float-left stat-icns-item clearfix">
                         <div class="progress">
@@ -145,8 +147,7 @@
                         </div>
                         <div class="float-left stat-icn-txt-rt">80%</div>
                     </div>
-                </div>
--->
+                </div>-->
 			</div>
 		</div>
 
@@ -155,15 +156,13 @@
                 <div class="dash-sub-head">Utilization over time</div>
                 <div id="graph-sel-div" class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Choose</div>
-                    <select id="graph-sel-list" class="float-left dash-sel-item">
-                    </select>
+                    <select id="graph-sel-list" class="float-left dash-sel-item"></select>
                 </div>
                 
                 <div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text"
-							placeholder="Start typing..."
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..."
 							onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
 						<div id="dsh-grph-srch-res" class="dsh-sb-dd"></div>
 					</div>
@@ -265,11 +264,9 @@
                 </div>
             </div>
         </div>
-        
     </div>
 </div>
 
-<%-- <jsp:include page="scripts.jsp"/> --%>
 <style>
 .dsh-dd-wrapper {
 	width: 300px;
@@ -301,39 +298,39 @@
     padding: 0 10px;
     cursor: pointer;
 }
-
 </style>
+
 <script>
-	window.onload = function onLoad() {
-	};
+window.onload = function onLoad() {
+};
 
-	$(document)
-			.ready(
-					function() {
-						$(document).attr("title", "Dashboard");
-						var companyAdmin = $('#prof-container').attr(
-								"data-companyAdmin");
-						var regionAdmin = $('#prof-container').attr(
-								"data-regionAdmin");
-						var branchAdmin = $('#prof-container').attr(
-								"data-branchAdmin");
-						var regionNames = $('#prof-container').attr(
-								"data-regionNames");
-						var regionIds = $('#prof-container').attr(
-								"data-regionIds");
-						var branchNames = $('#prof-container').attr(
-								"data-branchNames");
-						var branchIds = $('#prof-container').attr(
-								"data-branchIds");
-						var agent = $('#prof-container').attr("data-agent");
-						var accountType = $('#prof-container').attr(
-								"data-accountType");
+$(document).ready(function() {
+	$(document).attr("title", "Dashboard");
+	var companyAdmin = $('#prof-container').attr("data-companyAdmin");
+	var regionAdmin = $('#prof-container').attr("data-regionAdmin");
+	var branchAdmin = $('#prof-container').attr("data-branchAdmin");
+	var regionNames = $('#prof-container').attr("data-regionNames");
+	var regionIds = $('#prof-container').attr("data-regionIds");
+	var branchNames = $('#prof-container').attr("data-branchNames");
+	var branchIds = $('#prof-container').attr("data-branchIds");
+	var agent = $('#prof-container').attr("data-agent");
+	var accountType = $('#prof-container').attr("data-accountType");
 
-						paintDashboard(companyAdmin, regionAdmin, branchAdmin,
-								regionNames, regionIds, branchNames, branchIds,
-								agent, accountType);
+	paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames, regionIds, branchNames, branchIds, agent, accountType);
+	// $('#dsh-inc-srvey').perfectScrollbar('update');
+});
 
-						// 		$('#dsh-inc-srvey').perfectScrollbar('update');
-					});
+// Dashboard View as
+$('#dashboard-sel').click(function(){
+	$('#da-dd-wrapper-profiles').slideToggle(200);
+});
+
+$('.da-dd-item').click(function(){
+	var newProfileId = $(this).data('profile-id');
+	
+	$('#dashboard-sel').html($(this).html());
+	$('#da-dd-wrapper-profiles').slideToggle(200);
+	
+	// showMainContent('./showprofilepage.do?profileId=' + newProfileId);
+});
 </script>
-
