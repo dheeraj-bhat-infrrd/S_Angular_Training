@@ -551,6 +551,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
 /*    font-weight: bold !important;*/
 }
 
+.padding-10{
+	padding-top: 10px;
+}
+
 .hm-header-row-right {
     width: 185px;
     height: 40px;
@@ -3916,21 +3920,21 @@ button.paypal.is-active {
 }
 .reg_header {
     text-align: center;
-    line-height: 70px;
+    line-height: 40px;
     font-weight: bold;
     font-size: 22px;
 }
 
 .reg_form_wrapper_2 {
-    width: 740px;
+    width: 760px;
     margin:  25px auto 0;
 }
 
 .rfr_lbl {
-    line-height: 40px;
+    line-height: 40px !important;
     margin-right: 30px;
     text-align: right;
-    width: 98px;
+    width: 120px;
     font-size: 14px;
 }
 
