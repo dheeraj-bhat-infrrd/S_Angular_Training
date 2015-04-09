@@ -66,7 +66,7 @@
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
 			<c:choose>
-				<c:when test="${not empty profileList}">
+				<c:when test="${not empty profileList && fn:length(profileList) > 1}">
 					<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 						<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 						<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
