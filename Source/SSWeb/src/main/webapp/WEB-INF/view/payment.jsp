@@ -60,20 +60,20 @@
     	<c:when test="${ paymentChange == 1 }">
     		  <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.paymentupgrade.key"/></div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.cardnumber.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${cardNumber}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardnumber.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${cardNumber}'</div>
 	          </div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.cardholder.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${cardHolderName}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardholder.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${cardHolderName}'</div>
 	          </div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.cardtype.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${cardType}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.cardtype.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${cardType}'</div>
 	          </div>
 	          <div class="clearfix pu-acc-type-sel">
-	          	  <div class="pu-acc-type-txt float-left" id="pu-acc-type-txt"><spring:message code="label.issuingbank.key"/></div>
-	              <div class="pu-acc-type-val float-right" id="pu-acc-type-val">'${issuingBank}'</div>
+	          	  <div class="pu-acc-type-txt float-left"><spring:message code="label.issuingbank.key"/></div>
+	              <div class="pu-acc-type-val float-right">'${issuingBank}'</div>
 	          </div>
 	          <br>
 	          <div class="login-txt text-center font-24 margin-bot-20"><spring:message code="label.newpaymentdetails.key"/></div>
