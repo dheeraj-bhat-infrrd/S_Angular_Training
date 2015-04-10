@@ -21,6 +21,8 @@ var happyText;
 var neutralText;
 var sadText;
 var rating;
+var firstName;
+var lastName;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -101,7 +103,7 @@ function paintSurveyPageFromJson() {
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
-	question.replace(/[name]/gi, agentName);
+	question.replace(/[agentname]/gi, agentName);
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (questionType == "sb-range-star") {
@@ -209,6 +211,7 @@ function storeCustomerAnswer(customerResponse) {
 }
 
 function updateCustomerResponse(feedback) {
+	var success = false;
 	isAbusive = false;
 	var feedbackArr = feedback.split(" ");
 	for (var i = 0; i < feedbackArr.length; i++) {
@@ -227,7 +230,20 @@ function updateCustomerResponse(feedback) {
 	$.ajax({
 		url : "./../data/storeFeedback",
 		type : "GET",
-		data : payload
+		data : payload,
+		dataType : "TEXT",
+		success : function(data) {
+			if (data != undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				console.log(data);
+			}
+		},
+		error : function(e) {
+			console.error("error : "+e);
+		}
 	});
 }
 
@@ -348,10 +364,10 @@ function showMasterQuestionPage(){
 		if ($('#pst-srvy-div').is(':visible'))
 			autoPost = $('#post-survey').is(":checked");
 		var feedback = $("#text-area").val();
-		updateCustomerResponse(feedback);
 		if(autoPost){
 			postToSocialMedia(feedback);
 		}
+		updateCustomerResponse(feedback);
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#content-head').html('Survey Completed');
@@ -371,7 +387,7 @@ function postToSocialMedia(feedback){
 		"rating" : rating
 	};
 	$.ajax({
-		url : "./posttosocoialnetwork",
+		url : "./../posttosocialnetwork",
 		type : "GET",
 		dataType : "TEXT",
 		data : payload,
@@ -619,8 +635,8 @@ $('.sq-sad-smile').click(function() {
 });
 
 $('#start-btn').click(function() {
-	var firstName = $('#firstName').val().trim();
-	var lastName = $('#lastName').val().trim();
+	firstName = $('#firstName').val().trim();
+	lastName = $('#lastName').val().trim();
 	var email = $('#email').val().trim();
 	var captchaResponse = $('#captcha-text').val();
 	var recaptcha_challenge_field = $('#recaptcha_challenge_field').val();
