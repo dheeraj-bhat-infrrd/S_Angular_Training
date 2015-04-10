@@ -1019,7 +1019,7 @@ public class UserManagementController {
 			LOG.error("EmailId not valid");
 			throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (password == null || password.isEmpty() || password.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Password passed was invalid");
 			throw new InvalidInputException("Password passed was invalid", DisplayMessageConstants.INVALID_PASSWORD);
 		}
@@ -1305,11 +1305,11 @@ public class UserManagementController {
 	// verify change password parameters
 	private void validateChangePasswordFormParameters(String oldPassword, String newPassword, String confirmNewPassword) throws InvalidInputException {
 		LOG.debug("Validating change password form paramters");
-		if (oldPassword == null || oldPassword.isEmpty() || !oldPassword.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (oldPassword == null || oldPassword.isEmpty() || oldPassword.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid old password");
 			throw new InvalidInputException("Invalid old password", DisplayMessageConstants.INVALID_CURRENT_PASSWORD);
 		}
-		if (newPassword == null || newPassword.isEmpty() || !newPassword.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (newPassword == null || newPassword.isEmpty() || newPassword.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid new password");
 			throw new InvalidInputException("Invalid new password", DisplayMessageConstants.INVALID_NEW_PASSWORD);
 		}
