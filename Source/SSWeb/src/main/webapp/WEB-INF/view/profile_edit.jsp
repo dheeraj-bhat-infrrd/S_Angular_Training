@@ -71,7 +71,7 @@
 					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
 					<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
 						<c:forEach var="userprofile" items="${profileList}">
-							<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
+							<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value.userProfileName}</div>
 						</c:forEach>
 					</div>
 				</div>

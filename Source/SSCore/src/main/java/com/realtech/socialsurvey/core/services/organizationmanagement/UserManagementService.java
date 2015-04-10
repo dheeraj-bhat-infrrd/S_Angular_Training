@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpSession;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -259,13 +260,10 @@ public interface UserManagementService {
 	 * Method to user profiles data in session and return selected profile
 	 * 
 	 * @param user
-	 * @param profileId
-	 * @param profileMap
-	 * @param branchId
-	 * @param regionId
+	 * @param session
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public Map<Long, String> getProcessedUserProfiles(User user) throws NonFatalException;
+	public void processedUserProfiles(User user, HttpSession session) throws NonFatalException;
 }
 // JIRA SS-34 BY RM02 BOC

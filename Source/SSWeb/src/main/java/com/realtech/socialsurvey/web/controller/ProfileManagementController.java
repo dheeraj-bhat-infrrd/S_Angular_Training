@@ -52,6 +52,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
@@ -121,22 +122,15 @@ public class ProfileManagementController {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
-		long profileId = 0l;
+		long profileId = 0;
 		long branchId = 0;
 		long regionId = 0;
+
+		// getting session variables
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-
-		// updating profile map
-		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-		for (UserProfile profile : user.getUserProfiles()) {
-			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
-				profileMap.put(profile.getUserProfileId(), profile);
-			}
-		}
-		
-		// profile maps
-		Map<Long, String> profileNameMap = (Map<Long, String>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
 
 		// fetching profileId
 		try {
@@ -164,7 +158,7 @@ public class ProfileManagementController {
 
 		// setting session attributes
 		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileNameMap.get(selectedProfile.getUserProfileId()));
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 
 		// fetching details from profile
 		int profilesMaster = 0;

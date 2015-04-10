@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -42,6 +43,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -1868,7 +1870,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 	
 	@Override
-	public Map<Long, String> getProcessedUserProfiles(User user) throws NonFatalException {
+	public void processedUserProfiles(User user, HttpSession session) throws NonFatalException {
 		LOG.debug("Method getUserProfile() called from UserManagementService");
 
 		// Fetch Regions and Branches from Solr
@@ -1889,16 +1891,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		boolean agentAdded = false;
 		RegionFromSearch region = null;
 		BranchFromSearch branch = null;
-		Map<Long, String> profileNameMap = new HashMap<Long, String>();
+		Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
+		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+		
+		UserProfileSmall profileSmall = null;
 		for (UserProfile profile : user.getUserProfiles()) {
-			
 			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
 				
+				profileMap.put(profile.getUserProfileId(), profile);
+
 				// updating display name for drop down
 				int profileMasterId = profile.getProfilesMaster().getProfileId();
 				switch (profileMasterId) {
 					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-						profileNameMap.put(profile.getUserProfileId(), user.getCompany().getCompany());
+						profileSmall = getSmallUserProfile(profile.getUserProfileId(), user.getCompany().getCompany(), user.getCompany()
+								.getCompanyId(), CommonConstants.COMPANY_ID_COLUMN, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+						profileSmallMap.put(profile.getUserProfileId(), profileSmall);
 						break;
 					
 					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
@@ -1907,7 +1915,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							region = regions.get(regionId);
 						}
 						if (region.getIsDefaultBySystem() != 1) {
-							profileNameMap.put(profile.getUserProfileId(), region.getRegionName());
+							profileSmall = getSmallUserProfile(profile.getUserProfileId(), region.getRegionName(), regionId,
+									CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
 						}
 						break;
 
@@ -1917,13 +1927,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							branch = branches.get(branchId);
 						}
 						if (branch.getIsDefaultBySystem() != 1) {
-							profileNameMap.put(profile.getUserProfileId(), branch.getBranchName());
+							profileSmall = getSmallUserProfile(profile.getUserProfileId(), branch.getBranchName(), branchId,
+									CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
 						}
 						break;
 
 					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
 						if (!agentAdded) {
-							profileNameMap.put(profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW);
+							profileSmall = getSmallUserProfile(profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW, regionId,
+									CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
 							agentAdded = true;
 						}
 						break;
@@ -1933,8 +1947,25 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				}
 			}
 		}
+		session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+		session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 		
+		// settings current profile in session
+		UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+
 		LOG.debug("Method getUserProfile() finished from UserManagementService");
-		return profileNameMap;
+	}
+
+	private UserProfileSmall getSmallUserProfile(long userProfileId, String userProfileName, long profileId, String profileType, int profileMasterId) {
+		UserProfileSmall profileSmall = new UserProfileSmall();
+		profileSmall.setUserProfileId(userProfileId);
+		profileSmall.setUserProfileName(userProfileName);
+		profileSmall.setProfileName(profileType);
+		profileSmall.setProfileValue(profileId);
+		profileSmall.setProfilesMasterId(profileMasterId);
+		
+		return profileSmall;
 	}
 }
