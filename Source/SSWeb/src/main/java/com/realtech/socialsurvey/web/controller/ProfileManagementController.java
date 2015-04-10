@@ -116,6 +116,7 @@ public class ProfileManagementController {
 	@Value("${AMAZON_BUCKET}")
 	private String bucket;
 
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfileEditPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showProfileEditPage() called from ProfileManagementService");
