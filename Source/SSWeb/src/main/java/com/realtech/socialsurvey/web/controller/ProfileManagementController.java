@@ -52,7 +52,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
@@ -116,50 +115,21 @@ public class ProfileManagementController {
 	@Value("${AMAZON_BUCKET}")
 	private String bucket;
 
-	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfileEditPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showProfileEditPage() called from ProfileManagementService");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
-		long profileId = 0;
 		long branchId = 0;
 		long regionId = 0;
 
 		// getting session variables
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
-
-		// fetching profileId
-		try {
-			String profileIdStr = request.getParameter("profileId");
-			if (profileIdStr != null && !profileIdStr.equals("")) {
-				profileId = Long.parseLong(request.getParameter("profileId"));
-			}
-			else {
-				profileId = 0l;
-			}
-		}
-		catch (NumberFormatException e) {
-			LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
-		}
-
-		// Selecting and Setting Profile in session
-		UserProfile selectedProfile = null;
-		List<UserProfile> userProfiles = user.getUserProfiles();
-		if (profileId == 0l) {
-			selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-		}
-		else {
-			selectedProfile = profileMap.get(profileId);
-		}
-
-		// setting session attributes
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+		
+		// fetching selected profile
+		UserProfile selectedProfile = userManagementService.updateSelectedProfile(request, session, user);
 
 		// fetching details from profile
 		int profilesMaster = 0;

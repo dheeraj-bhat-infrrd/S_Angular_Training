@@ -329,7 +329,7 @@ $('.da-dd-item').click(function(){
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
 	// update selected profile in session
-	var newProfileId = $(this).attr('data-profile-master-id');
+	var newProfileId = $(this).attr('data-profile-id');
 	updateCurrentProfile(newProfileId);
 
 	var newProfileMasterId = $(this).attr('data-profile-master-id');
@@ -346,7 +346,8 @@ $('.da-dd-item').click(function(){
 });
 
 $('.dsh-btn-complete').click(function() {
-	var newProfileId = $(this).attr('data-profile-id');
-	showMainContent('./showprofilepage.do?profileId' + newProfileId);
+	var newProfileId = $('#prof-container').attr('data-profile-id');
+	// showMainContent('./showprofilepage.do?profileId=' + newProfileId);
+	showMainContent('./showprofilepage.do');
 });
 </script>

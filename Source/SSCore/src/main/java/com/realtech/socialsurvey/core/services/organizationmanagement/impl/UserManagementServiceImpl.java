@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1967,5 +1968,46 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		profileSmall.setProfilesMasterId(profileMasterId);
 		
 		return profileSmall;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public UserProfile updateSelectedProfile(HttpServletRequest request, HttpSession session, User user) {
+		// getting session variables
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+
+		long profileId = 0;
+		try {
+			String profileIdStr = request.getParameter("profileId");
+			if (profileIdStr != null && !profileIdStr.equals("")) {
+				profileId = Long.parseLong(request.getParameter("profileId"));
+			}
+			else {
+				profileId = 0l;
+			}
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
+		}
+
+		// Selecting and Setting Profile in session
+		UserProfile selectedProfile = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (profileId == 0l) {
+			selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+		}
+		else {
+			selectedProfile = profileMap.get(profileId);
+		}
+
+		LOG.info(profileSmallMap.keySet().toString());
+		LOG.info(profileSmallMap.get(selectedProfile.getUserProfileId())+"");
+		
+		// setting session attributes
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+		
+		return selectedProfile;
 	}
 }
