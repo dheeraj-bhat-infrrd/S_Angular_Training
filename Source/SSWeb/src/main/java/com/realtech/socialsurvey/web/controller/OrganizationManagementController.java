@@ -227,7 +227,7 @@ public class OrganizationManagementController {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
-		if (companyName == null || companyName.isEmpty() || !companyName.matches(CommonConstants.COMPANY_NAME_REGEX)) {
+		if (companyName == null || companyName.isEmpty() || companyName.contains("\"")) {
 			throw new InvalidInputException("Company name is null or empty while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_NAME);
 		}
@@ -563,7 +563,7 @@ public class OrganizationManagementController {
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
 		String message = "";
-		
+
 		try {
 			boolean isAutopostEnabled = Boolean.parseBoolean(autopost);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
@@ -624,16 +624,16 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
-	
+
 	@RequestMapping(value = "/updateautopostforsurvey", method = RequestMethod.POST)
 	@ResponseBody
-	public String updateAutoPostForSurvey(HttpServletRequest request){
+	public String updateAutoPostForSurvey(HttpServletRequest request) {
 		LOG.info("Method to update autopost for a survey started");
-		try{
+		try {
 			HttpSession session = request.getSession(false);
 			String autopost = request.getParameter("autopost");
 			boolean isAutoPostEnabled = false;
-			if(autopost!=null && !autopost.isEmpty()){
+			if (autopost != null && !autopost.isEmpty()) {
 				isAutoPostEnabled = Boolean.parseBoolean(autopost);
 				OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 						.getCompanySettings();
@@ -644,11 +644,12 @@ public class OrganizationManagementController {
 					LOG.info("Updated Survey Settings");
 				}
 			}
-		}catch(Exception e){
-			LOG.error("Exception occured in updateAutoPostForSurvey() while updating whether to enable autopost or not. Nested exception is ",e);
+		}
+		catch (Exception e) {
+			LOG.error("Exception occured in updateAutoPostForSurvey() while updating whether to enable autopost or not. Nested exception is ", e);
 			return e.getMessage();
 		}
-		
+
 		LOG.info("Method to update autopost for a survey finished");
 		return "Successfully updated autopost setting";
 	}
