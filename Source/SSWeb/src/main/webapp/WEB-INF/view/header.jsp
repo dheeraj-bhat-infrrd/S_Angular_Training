@@ -126,7 +126,7 @@
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<div id="hdr-usr-img" class="float-left user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
-					<div class="initial-dd-wrapper hide blue-arrow-bot">
+					<div class="initial-dd-wrapper hide blue-arrow-bot text-normal">
 						<c:if test="${highestrole == 1}">
 							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do')">
 								<spring:message code="label.settings.company.key" />
