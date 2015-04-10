@@ -50,5 +50,7 @@ public interface SocialManagementService {
 	public void tweet(OrganizationUnitSettings agentSettings, String message) throws InvalidInputException, TwitterException;
 	
 	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException;
+	
+	public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser(long userId);
 }
 // JIRA SS-34 BY RM02 BOC

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
@@ -21,11 +22,13 @@ import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
@@ -52,6 +55,9 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 	@Autowired
 	private UserProfileDao userProfileDao;
+	
+	@Autowired
+	private UserDao userDao;
 
 	// Facebook
 	@Value("${FB_CLIENT_ID}")
@@ -185,13 +191,14 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	}
 
 	@Override
+	@Transactional
 	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException {
 		LOG.info("Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() started.");
 		List<OrganizationUnitSettings> settings = new ArrayList<>();
 		Set<Long> branchIds = new HashSet<>();
 		Set<Long> regionIds = new HashSet<>();
 		Map<String, Object> queries = new HashMap<>();
-		queries.put(CommonConstants.USER_ID, agentId);
+		queries.put(CommonConstants.USER_COLUMN, userDao.findById(User.class, agentId));
 		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
 				userManagementService.getProfilesMasterById(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID));
 		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
@@ -210,5 +217,37 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 		LOG.info("Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished.");
 		return settings;
+	}
+	
+	/*
+	 * Method to get settings of branches, regions and company current user is admin of.
+	 */
+	@Override
+	@Transactional
+	public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser(long userId){
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.USER_COLUMN, userDao.findById(User.class, userId));
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queries);
+		List<OrganizationUnitSettings> settings = new ArrayList<>();
+		for(UserProfile profile : userProfiles){
+			switch(profile.getProfilesMaster().getProfileId()){
+				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID :
+					settings.add(organizationUnitSettingsDao.fetchAgentSettingsById(userId));
+					break;
+				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID :
+					settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(profile.getBranchId(), CommonConstants.BRANCH_SETTINGS_COLLECTION));
+					break;
+					
+				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID :
+					settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(profile.getRegionId(), CommonConstants.REGION_NAME_COLUMN));
+					break;
+					
+				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID :
+					settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(profile.getCompany().getCompanyId(), CommonConstants.REGION_NAME_COLUMN));
+					break;
+			}
+		}
+		return settings;
+		
 	}
 }

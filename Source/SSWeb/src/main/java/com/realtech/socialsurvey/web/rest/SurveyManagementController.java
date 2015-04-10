@@ -17,9 +17,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import twitter4j.TwitterException;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
@@ -35,12 +38,14 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
+import facebook4j.FacebookException;
 
 // JIRA SS-119 by RM-05 : BOC
 @Controller
@@ -69,6 +74,9 @@ public class SurveyManagementController {
 
 	@Autowired
 	private EmailServices emailServices;
+
+	@Autowired
+	private SocialManagementService socialManagementService;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
@@ -100,8 +108,9 @@ public class SurveyManagementController {
 	/*
 	 * Method to store final feedback of the survey from customer.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/data/storeFeedback")
-	public void storeFeedback(HttpServletRequest request) {
+	public String storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
 		// To store final feedback provided by customer in mongoDB.
 		try {
@@ -178,9 +187,10 @@ public class SurveyManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
-			return;
+			return e.getMessage();
 		}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
+		return "Survey stored successfully";
 	}
 
 	@ResponseBody
@@ -200,9 +210,10 @@ public class SurveyManagementController {
 			return "errorpage500";
 		}
 		Long agentId = 0l;
-		try{
-		agentId = Long.parseLong(agentIdStr);
-		}catch(NumberFormatException e){
+		try {
+			agentId = Long.parseLong(agentIdStr);
+		}
+		catch (NumberFormatException e) {
 			LOG.error("Invalid agent Id passed. Error is : " + e);
 			return "errorpage500";
 		}
@@ -308,6 +319,69 @@ public class SurveyManagementController {
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 		return new Gson().toJson(surveyAndStage);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/posttosocialnetwork", method = RequestMethod.GET)
+	public String postToSocialMedia(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer to various pages of social networking sites started.");
+		try {
+			String agentName = request.getParameter("agentName");
+			String custFirstName = request.getParameter("firstName");
+			String custLastName = request.getParameter("lastName");
+			String agentIdStr = request.getParameter("agentId");
+			String ratingStr = request.getParameter("rating");
+			long agentId = 0;
+			double rating = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+				rating = Double.parseDouble(ratingStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+					+ " on Social Survey \n";
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+			try {
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
+			}
+			catch (FacebookException e) {
+				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+			}
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+				}
+				catch (FacebookException e) {
+					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+				}
+			}
+			try {
+				socialManagementService.tweet(agentSettings, twitterMessage);
+			}
+			catch (TwitterException e) {
+				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
+			}
+				for (OrganizationUnitSettings setting : settings) {
+					try {
+						socialManagementService.tweet(setting, twitterMessage);
+					}
+					catch (TwitterException e) {
+						LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
+					}
+				}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ", e);
+			return e.getMessage();
+		}
+		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
+		return "Successfully posted to all the places in hierarchy";
 	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
