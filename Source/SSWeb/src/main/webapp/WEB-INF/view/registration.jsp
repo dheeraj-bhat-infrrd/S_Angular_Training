@@ -30,7 +30,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center"><spring:message code="label.signupstartjourney.key" /></div>
+			<div class="hm-header-row-left text-center padding-10"><spring:message code="label.signupstartjourney.key" /></div>
 		</div>
 	</div>
 </div>
