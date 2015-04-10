@@ -335,18 +335,18 @@ $(document).ready(function(){
 	paintTextForMood($('#hm-main-content-wrapper').attr("data-hpy"), 
 		$('#hm-main-content-wrapper').attr("data-nutl"),
 		$('#hm-main-content-wrapper').attr("data-sad"));
-});
 
-$('#setting-sel').click(function(){
-	$('#se-dd-wrapper-profiles').slideToggle(200);
-});
+	$('#setting-sel').click(function(){
+		$('#se-dd-wrapper-profiles').slideToggle(200);
+	});
 
-$('.se-dd-item').click(function(){
-	var newProfileId = $(this).data('profile-id');
-	
-	$('#setting-sel').html($(this).html());
-	$('#se-dd-wrapper-profiles').slideToggle(200);
-	
-	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+	$('.se-dd-item').click(function(){
+		var newProfileId = $(this).data('profile-id');
+		
+		$('#setting-sel').html($(this).html());
+		$('#se-dd-wrapper-profiles').slideToggle(200);
+		
+		showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+	});
 });
 </script>

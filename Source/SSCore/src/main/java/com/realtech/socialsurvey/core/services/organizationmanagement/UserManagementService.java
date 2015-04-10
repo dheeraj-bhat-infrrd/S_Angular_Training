@@ -264,8 +264,7 @@ public interface UserManagementService {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public void processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfileSmall> profileSmallMap,
-			Map<Long, UserProfile> profileMap) throws NonFatalException;
+	public Map<Long, UserProfileSmall> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException;
 
 	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
 			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr);
