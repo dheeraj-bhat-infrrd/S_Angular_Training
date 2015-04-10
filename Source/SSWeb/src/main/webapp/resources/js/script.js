@@ -331,8 +331,8 @@ function validatePassword(elementId) {
 		showErrorMobileAndWeb("Please enter password");
 		return false;
 	}
-	else if (password.length < minPwdLength || password.length > maxPwdLength) {
-		showErrorMobileAndWeb('Password must be between 6-15 characters');
+	else if (password.length < minPwdLength) {
+		showErrorMobileAndWeb('Password must be at least 6 characters');
 		return false;
 	}
 	return true;
