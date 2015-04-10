@@ -94,16 +94,18 @@
 	        </div>
 	    </div>
 	</div>
-	<div class="bd-hr-form-item clearfix" id="admin-privilege-div">
-	    <div class="float-left bd-frm-left"></div>
-	    <div class="float-left bd-frm-right">
-	        <div class="bd-frm-check-wrapper clearfix">
-	            <div class="float-left bd-check-img"></div>
-	            <input type="hidden" name="isAdmin" value="true" id="is-admin-chk" class="ignore-clear">
-	            <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
-	        </div>
-	    </div>
-	</div>
+	 <c:if test="${accountType == 'Company' || accountType == 'Enterprise'}">
+		<div class="bd-hr-form-item clearfix" id="admin-privilege-div">
+		    <div class="float-left bd-frm-left"></div>
+		    <div class="float-left bd-frm-right">
+		        <div class="bd-frm-check-wrapper clearfix">
+		            <div class="float-left bd-check-img"></div>
+		            <input type="hidden" name="isAdmin" value="true" id="is-admin-chk" class="ignore-clear">
+		            <div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
+		        </div>
+		    </div>
+		</div>
+	</c:if>
 	<div class="bd-hr-form-item clearfix">
 	    <div class="float-left bd-frm-left"></div>
 	    <div class="float-left bd-frm-right">
