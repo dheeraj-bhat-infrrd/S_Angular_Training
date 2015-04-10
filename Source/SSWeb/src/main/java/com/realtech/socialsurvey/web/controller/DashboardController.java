@@ -28,13 +28,13 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -51,6 +51,9 @@ public class DashboardController {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Autowired
 	private SolrSearchService solrSearchService;
@@ -72,46 +75,16 @@ public class DashboardController {
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
 	// setting selected profile in session
-	@SuppressWarnings("unchecked")
 	@ResponseBody
 	@RequestMapping(value = "/updatecurrentprofile")
 	public String updateSelectedProfile(Model model, HttpServletRequest request) {
-		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started.");
+		LOG.info("Method updateSelectedProfile() started.");
+		
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
-
-		// getting session variables
-		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
-
-		long profileId = 0;
-		try {
-			String profileIdStr = request.getParameter("profileId");
-			if (profileIdStr != null && !profileIdStr.equals("")) {
-				profileId = Long.parseLong(request.getParameter("profileId"));
-			}
-			else {
-				profileId = 0l;
-			}
-		}
-		catch (NumberFormatException e) {
-			LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
-		}
-
-		// Selecting and Setting Profile in session
-		UserProfile selectedProfile = null;
-		List<UserProfile> userProfiles = user.getUserProfiles();
-		if (profileId == 0l) {
-			selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-		}
-		else {
-			selectedProfile = profileMap.get(profileId);
-		}
-
-		// setting session attributes
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
+		userManagementService.updateSelectedProfile(request, session, user);
+		
+		LOG.info("Method updateSelectedProfile() finished.");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 

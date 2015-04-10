@@ -922,7 +922,7 @@ function changeRatingPattern(rating, ratingParent) {
 }
 
 function updateCurrentProfile(profileId) {
-	var url = "./updatecurrentprofile.do?profileId" + profileId;
+	var url = "./updatecurrentprofile.do?profileId=" + profileId;
 	callAjaxGET(url, function(data) {}, true);
 }
 
