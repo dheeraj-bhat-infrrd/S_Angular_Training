@@ -580,68 +580,68 @@
 
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
-	$(document).ready(function() {
-		$(document).attr("title", "Profile Settings");
+$(document).ready(function() {
+	$(document).attr("title", "Profile Settings");
+	adjustImage();
+	$(window).resize(adjustImage);
+	
+	if ($('#aboutme-status').val() != 'new') {
+		$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
+	}
+	paintForProfile();
+	
+	$('.ppl-share-wrapper .icn-plus-open').click(function() {
+		$(this).hide();
+		$(this).parent().find('.ppl-share-social,.icn-remove').show();
+	});
+
+	$('.ppl-share-wrapper .icn-remove').click(function() {
+		$(this).hide();
+		$(this).parent().find('.ppl-share-social').hide();
+		$(this).parent().find('.icn-plus-open').show();
+	});
+
+	$('.icn-person').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+		$('.prof-left-panel-wrapper').show();
+		$('.prof-right-panel-wrapper').hide();
 		adjustImage();
-		$(window).resize(adjustImage);
-		
-		if ($('#aboutme-status').val() != 'new') {
-			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
-		}
-		paintForProfile();
-		
-		$('.ppl-share-wrapper .icn-plus-open').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social,.icn-remove').show();
-		});
+	});
 
-		$('.ppl-share-wrapper .icn-remove').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social').hide();
-			$(this).parent().find('.icn-plus-open').show();
-		});
+	$('.icn-ppl').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+		$('.prof-left-panel-wrapper').hide();
+		$('.prof-right-panel-wrapper').show();
+	});
 
-		$('.icn-person').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-			$('.prof-left-panel-wrapper').show();
-			$('.prof-right-panel-wrapper').hide();
-			adjustImage();
-		});
+	$('.icn-star-smile').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+	});
 
-		$('.icn-ppl').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-			$('.prof-left-panel-wrapper').hide();
-			$('.prof-right-panel-wrapper').show();
-		});
-
-		$('.icn-star-smile').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-		});
-
-		$('.inc-more').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-		});
-		
-		// Profile View as
-		$('#profile-sel').click(function(){
-			$('#pe-dd-wrapper-profiles').slideToggle(200);
-		});
-		
-		$('.pe-dd-item').click(function(){
-			var newProfileId = $(this).data('profile-id');
-			
-			$('#profile-sel').html($(this).html());
-			$('#pe-dd-wrapper-profiles').slideToggle(200);
-			
-			showMainContent('./showprofilepage.do?profileId=' + newProfileId);
-		});
+	$('.inc-more').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
 	});
 	
-	function openAuthPage(socialNetwork) {
-		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
-	}
+	// Profile View as
+	$('#profile-sel').click(function(){
+		$('#pe-dd-wrapper-profiles').slideToggle(200);
+	});
+	
+	$('.pe-dd-item').click(function(){
+		var newProfileId = $(this).data('profile-id');
+		
+		$('#profile-sel').html($(this).html());
+		$('#pe-dd-wrapper-profiles').slideToggle(200);
+		
+		showMainContent('./showprofilepage.do?profileId=' + newProfileId);
+	});
+});
+
+function openAuthPage(socialNetwork) {
+	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+}
 </script>

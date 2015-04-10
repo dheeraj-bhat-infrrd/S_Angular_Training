@@ -333,4 +333,17 @@ $(document).ready(function(){
 		$('#hm-main-content-wrapper').attr("data-nutl"),
 		$('#hm-main-content-wrapper').attr("data-sad"));
 });
+
+$('#settings-sel').click(function(){
+	$('#se-dd-wrapper-profiles').slideToggle(200);
+});
+
+$('.se-dd-item').click(function(){
+	var newProfileId = $(this).data('profile-id');
+	
+	$('#settings-sel').html($(this).html());
+	$('#se-dd-wrapper-profiles').slideToggle(200);
+	
+	showMainContent('./showsettings.do?profileId=' + newProfileId);
+});
 </script>
