@@ -75,9 +75,11 @@
 						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
-				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editcompany.key" /></a>
-				</div>
+				<c:if test="${highestrole == 1}">
+					<div class="header-links-item">
+						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editcompany.key" /></a>
+					</div>
+				</c:if>
 				<c:if test="${user.company.licenseDetails[0].accountsMaster.accountsMasterId < 4}">
 					<div class="header-links-item">
 						<a href="javascript:showMainContent('./upgradepage.do')"><spring:message code="label.header.upgrade.key" /></a>
@@ -123,9 +125,11 @@
 				<div id="hdr-usr-img" class="float-left user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot">
-						<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do')">
-							<spring:message code="label.editcompany.key" />
-						</div>
+						<c:if test="${highestrole == 1}">
+							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do')">
+								<spring:message code="label.editcompany.key" />
+							</div>
+						</c:if>
 						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do')">
 							<spring:message code="label.editprofile.key" />
 						</div>
