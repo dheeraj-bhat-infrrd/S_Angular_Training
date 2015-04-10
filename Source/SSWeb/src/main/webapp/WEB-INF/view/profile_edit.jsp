@@ -571,6 +571,7 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 
+<script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 $(document).ready(function() {
@@ -617,20 +618,6 @@ $(document).ready(function() {
 	$('.inc-more').click(function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
-	});
-	
-	// Profile View as
-	$('#profile-sel').click(function(){
-		$('#pe-dd-wrapper-profiles').slideToggle(200);
-	});
-
-	$('.pe-dd-item').click(function(){
-		var newProfileId = $(this).data('profile-id');
-		
-		$('#profile-sel').html($(this).html());
-		$('#pe-dd-wrapper-profiles').slideToggle(200);
-		
-		showMainContent('./showprofilepage.do?profileId=' + newProfileId);
 	});
 });
 </script>
