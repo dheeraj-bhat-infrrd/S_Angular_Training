@@ -527,6 +527,10 @@ html.is-modern.card-root.js.no-touch.csstransitions.svg.inlinesvg.placeholder{
     font-weight: bold !important;
 }
 
+.text-normal {
+	text-transform: none;
+}
+
 .footer-main-wrapper {
     height: 55px;
     background-color: #F9F9FB;

@@ -1035,17 +1035,19 @@ function paintHierarchy(data) {
 	$("#prof-hierarchy-container").html(data);
 	$("#prof-hierarchy-container").show();
 	
-	// Click on region
-	$(document).on('click', '.comp-region', function(){
-		if($(this).attr("data-openstatus") == "closed") {
-			fetchRegionHierarchyOnClick($(this).attr('data-regionid'));
-			$(this).attr("data-openstatus", "open");
-		} else {
-			$('#comp-region-branches-' + $(this).attr('data-regionid')).slideUp(200);
-			$(this).attr("data-openstatus", "closed");
-		}
-	});
-	
+	/**
+	 * Click on region
+	 */
+	 $('.comp-region').unbind('click');
+	 $('.comp-region').click(function(e) {
+		 if($(this).attr("data-openstatus") == "closed") {
+				fetchRegionHierarchyOnClick($(this).attr('data-regionid'));
+				$(this).attr("data-openstatus", "open");
+			} else {
+				$('#comp-region-branches-' + $(this).attr('data-regionid')).slideUp(200);
+				$(this).attr("data-openstatus", "closed");
+			}
+	 });
 	// Click on branch
 	bindClickBranchForIndividuals("comp-region-branch");
 	bindClickBranchForIndividuals("comp-branch");
@@ -1065,6 +1067,7 @@ function fetchRegionHierarchyOnClick(regionId) {
 }
 
 function bindClickBranchForIndividuals(bindingClass) {
+	$("." + bindingClass).unbind('click');
 	$("." + bindingClass).click(function(e){
 		e.stopPropagation();
 		if($(this).attr("data-openstatus") == "closed") {
@@ -1205,6 +1208,7 @@ function callBackOnUpdateMailIds(data) {
 }
 
 function bindClickForIndividuals(elementClass) {
+	$("." + bindingClass).unbind('click');
 	$("."+elementClass).click(function(e){
 		e.stopPropagation();
 	});

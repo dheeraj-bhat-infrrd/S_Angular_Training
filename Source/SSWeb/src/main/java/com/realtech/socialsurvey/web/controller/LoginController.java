@@ -533,7 +533,7 @@ public class LoginController {
 			LOG.error("Invalid email id passed");
 			throw new InvalidInputException("Invalid email id passed", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (password == null || password.isEmpty() || password.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid password");
 			throw new InvalidInputException("Invalid password", DisplayMessageConstants.INVALID_PASSWORD);
 		}

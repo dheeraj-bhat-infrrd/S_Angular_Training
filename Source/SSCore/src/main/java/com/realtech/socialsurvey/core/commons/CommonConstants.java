@@ -269,7 +269,8 @@ public interface CommonConstants {
 	public static final String SURVEY_REMINDER_MAIL_BODY_CATEGORY = "SURVEY_REMINDER_MAIL_BODY_CATEGORY";
 
 	// regular expressions
-	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,15}$";
+	public static final String PASSWORD_REG_EX = "^(?=.*[a-zA-Z0-9])(?=.*[!@#$%&*()_+=|<>?{}~-]).{6,}$";
+	public static final int PASSWORD_LENGTH = 6;
 	public static final String PHONENUMBER_REGEX = "^((\\+)|(00)|(\\*)|())[0-9]{3,14}((\\#)|())$";
 	public static final String ZIPCODE_REGEX = "\\d{5}(-\\d{4})?";
 	public static final String COMPANY_NAME_REGEX = "^[a-zA-Z0-9 ]+$";
