@@ -27,13 +27,8 @@
 
 <div class="dash-wrapper-main">
     <div class="dash-container container">
-		<div id="prof-container" data-companyAdmin="${companyAdmin}"
-			data-regionAdmin="${regionAdmin}" data-branchAdmin="${branchAdmin}"
-			data-regionNames="${regionNames}" data-regionIds="${regionIds}"
-			data-branchNames="${branchNames}" data-branchIds="${branchIds}"
-			data-agent="${agent}" data-accountType="${accountType}"
-			data-column-name="${columnName}" data-column-value="${columnValue}"
-			data-profile-master-id="${profileMasterId}" class="dash-top-info">
+		<div id="prof-container" data-profile-master-id="${profileMasterId}"
+			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
 
 			<div class="row row-dash-top-adj">
 				<div
@@ -323,6 +318,7 @@ $(document).ready(function() {
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue);
+	updateCircles();
 });
 
 // Dashboard View as
@@ -334,10 +330,13 @@ $('.da-dd-item').click(function(){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
-	var profileMasterId = $(this).attr('data-profile-master-id');
+	var newProfileId = $(this).attr('data-profile-master-id');
+	updateCurrentProfile(newProfileId);
+
+	var newProfileMasterId = $(this).attr('data-profile-master-id');
 	var newProfileName = $(this).attr('data-column-name');
 	var newProfileValue = $(this).attr('data-column-value');
-
-	paintDashboard(profileMasterId, newProfileName, newProfileValue);
+	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
+	updateCircles();
 });
-</script>data-column-
+</script>

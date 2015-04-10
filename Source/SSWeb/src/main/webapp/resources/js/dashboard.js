@@ -13,7 +13,6 @@ var surveyFetchedSoFarInc;
 // colName is present in colValue.
 var colName;
 var colValue;
-var viewProfieId;
 var searchColumn;
 
 var circle1;
@@ -72,35 +71,6 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue) {
 		}
 	});
 	
-	circle1 = new ProgressBar.Circle('#dg-img-1', {
-		color : '#7AB400',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle2 = new ProgressBar.Circle('#dg-img-2', {
-		color : '#E97F30',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle3 = new ProgressBar.Circle('#dg-img-3', {
-		color : '#5CC7EF',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle4 = new ProgressBar.Circle('#dg-img-4', {
-		color : '#7AB400',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-
 	if (profileMasterId == 1) {
 		showCompanyAdminFlow(newProfileName, newProfileValue);
 	} else if (profileMasterId == 2) {
@@ -137,8 +107,7 @@ function showDisplayPic() {
 				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
 				if (imageUrl != '' || imageUrl != undefined) {
-					$("#dsh-prsn-img").css("background",
-							"url(" + imageUrl + ") no-repeat center");
+					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
 				}
 				return data.responseJSON;
@@ -160,7 +129,6 @@ function showDisplayPic() {
 }
 
 function showCompanyAdminFlow(newProfileName, newProfileValue) {
-	// TODO change session profile
 	showProfileDetails(newProfileName, 0, 30);
 	colName = newProfileName;
 	colValue = newProfileValue;
@@ -949,5 +917,47 @@ function changeRatingPattern(rating, ratingParent) {
 			}
 		}
 		counter++;
+	});
+}
+
+// TODO
+function updateCurrentProfile(profileId) {
+	$.ajax({
+		url : "./updatecurrentprofile.do?profileId" + profileId,
+		type : "GET",
+		dataType : "JSON",
+		data : payload,
+		success : function(data) {}
+	});
+}
+
+function updateCircles() {
+	circle1 = new ProgressBar.Circle('#dg-img-1', {
+		color : '#7AB400',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	circle2 = new ProgressBar.Circle('#dg-img-2', {
+		color : '#E97F30',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	circle3 = new ProgressBar.Circle('#dg-img-3', {
+		color : '#5CC7EF',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	circle4 = new ProgressBar.Circle('#dg-img-4', {
+		color : '#7AB400',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
 	});
 }
