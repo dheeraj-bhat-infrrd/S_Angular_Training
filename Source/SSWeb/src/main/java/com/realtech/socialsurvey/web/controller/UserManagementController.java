@@ -423,7 +423,7 @@ public class UserManagementController {
 			Type searchedUsersList = new TypeToken<List<UserFromSearch>>() {}.getType();
 			List<UserFromSearch> usersList = new Gson().fromJson(users, searchedUsersList);
 			LOG.debug("Users List in findusers: " + users);
-			
+
 			/**
 			 * checking the edit capabilities of user
 			 */
@@ -510,7 +510,7 @@ public class UserManagementController {
 			}
 			if (userIdStr == null || userIdStr.isEmpty()) {
 				LOG.error("Invalid user id passed in method assignUserToBranch().");
-				throw new InvalidInputException("Invalid user id passed in method assignUserToBranch().");
+				throw new InvalidInputException("Invalid user id passed in method assiguserIdnUserToBranch().");
 			}
 			if (branchIdStr == null || branchIdStr.isEmpty()) {
 				LOG.error("Invalid branch id passed in method assignUserToBranch().");
@@ -1019,7 +1019,7 @@ public class UserManagementController {
 			LOG.error("EmailId not valid");
 			throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
 		}
-		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (password == null || password.isEmpty() || password.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Password passed was invalid");
 			throw new InvalidInputException("Password passed was invalid", DisplayMessageConstants.INVALID_PASSWORD);
 		}
@@ -1093,8 +1093,22 @@ public class UserManagementController {
 		HttpSession session = request.getSession();
 
 		try {
-			long userId = Long.parseLong(request.getParameter("userId"));
-			User user = userManagementService.getUserByUserId(userId);
+			long userId = 0l;
+			try {
+				userId = Long.parseLong(request.getParameter("userId"));
+			}
+			catch (NumberFormatException e) {
+				throw new InvalidInputException("NumberFormatException while parsing userId.Reason: " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
+			User user = null;
+			try {
+				user = userManagementService.getUserByUserId(userId);
+			}
+			catch (InvalidInputException e) {
+				throw new InvalidInputException("InvalidInputException while getting user.Reason: " + e.getMessage(),
+						DisplayMessageConstants.GENERAL_ERROR, e);
+			}
 
 			Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session.getAttribute(CommonConstants.REGIONS_IN_SESSION);
 			Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
@@ -1105,7 +1119,6 @@ public class UserManagementController {
 				if (userProfile.getIsProfileComplete() != CommonConstants.PROCESS_COMPLETE) {
 					continue;
 				}
-
 				UserAssignment assignment = new UserAssignment();
 				assignment.setUserId(user.getUserId());
 				assignment.setProfileId(userProfile.getUserProfileId());
@@ -1202,9 +1215,10 @@ public class UserManagementController {
 			Collections.reverse(userAssignments);
 			model.addAttribute("profiles", userAssignments);
 		}
-		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException while parsing userId. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getMessage(), DisplayMessageType.ERROR_MESSAGE));
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while finding user assignments Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.MESSAGE_HEADER;
 		}
 
 		LOG.info("Method getUserAssignments() finished from UserManagementController");
@@ -1266,6 +1280,9 @@ public class UserManagementController {
 				LOG.warn("First Name is not present to resend invitation");
 				throw new InvalidInputException("Invalid first name.", DisplayMessageConstants.INVALID_FIRSTNAME);
 			}
+			if( lastName == null || lastName.isEmpty()){
+				lastName = " ";
+			}
 
 			LOG.debug("Sending invitation...");
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
@@ -1288,11 +1305,11 @@ public class UserManagementController {
 	// verify change password parameters
 	private void validateChangePasswordFormParameters(String oldPassword, String newPassword, String confirmNewPassword) throws InvalidInputException {
 		LOG.debug("Validating change password form paramters");
-		if (oldPassword == null || oldPassword.isEmpty() || !oldPassword.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (oldPassword == null || oldPassword.isEmpty() || oldPassword.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid old password");
 			throw new InvalidInputException("Invalid old password", DisplayMessageConstants.INVALID_CURRENT_PASSWORD);
 		}
-		if (newPassword == null || newPassword.isEmpty() || !newPassword.matches(CommonConstants.PASSWORD_REG_EX)) {
+		if (newPassword == null || newPassword.isEmpty() || newPassword.length()<CommonConstants.PASSWORD_LENGTH) {
 			LOG.error("Invalid new password");
 			throw new InvalidInputException("Invalid new password", DisplayMessageConstants.INVALID_NEW_PASSWORD);
 		}

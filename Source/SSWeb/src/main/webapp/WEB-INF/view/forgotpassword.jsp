@@ -30,7 +30,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.title.forgotpassword.key" /></div>
+			<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.title.forgotpassword.key" /></div>
 		</div>
 	</div>
 </div>
@@ -42,7 +42,7 @@
 		<form id="forgot-pwd-form" method="POST" action="./sendresetpasswordlink.do">
 			<div id="forgot-pwd-div" class="reg_form_wrapper_1">
 				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.emailid.key"/></div>
+					<div class="float-left rfr_lbl rfr_lbl_width-98"><spring:message code="label.emailid.key"/></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-mail"></div>
 						<input class="rfr_txt_fld" id="login-user-id" data-non-empty="true" data-email=""

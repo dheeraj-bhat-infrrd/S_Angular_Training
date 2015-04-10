@@ -3,7 +3,7 @@
 <div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.changepassword.key" /></div>
+			<div class="hm-header-row-left text-center"><spring:message code="label.changepassword.key" /></div>
 		</div>
 	</div>
 </div>
@@ -48,7 +48,6 @@
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
 var isChangePasswordFormValid;
 $(document).ready(function() {
