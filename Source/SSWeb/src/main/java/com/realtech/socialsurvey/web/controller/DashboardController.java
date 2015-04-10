@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -70,6 +72,47 @@ public class DashboardController {
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
+	// TODO setting selected profile in session
+	@RequestMapping(value = "/updatecurrentprofile")
+	public void upadteSelectedProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started.");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+
+		// getting session variables
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+
+		long profileId = 0;
+		try {
+			String profileIdStr = request.getParameter("profileId");
+			if (profileIdStr != null && !profileIdStr.equals("")) {
+				profileId = Long.parseLong(request.getParameter("profileId"));
+			}
+			else {
+				profileId = 0l;
+			}
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
+		}
+
+		// Selecting and Setting Profile in session
+		UserProfile selectedProfile = null;
+		List<UserProfile> userProfiles = user.getUserProfiles();
+		if (profileId == 0l) {
+			selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
+		}
+		else {
+			selectedProfile = profileMap.get(profileId);
+		}
+
+		// setting session attributes
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
+	}
+
 	@ResponseBody
 	@RequestMapping(value = "/surveycount")
 	public String getSurveyCount(Model model, HttpServletRequest request) {
@@ -107,10 +150,6 @@ public class DashboardController {
 		surveyCount.put("completedSurvey", dashboardService.getCompletedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
 		surveyCount.put("clickedSurvey", dashboardService.getClickedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
 		surveyCount.put("socialPosts", dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays));
-
-		/*
-		 * } catch (NonFatalException e) { }
-		 */
 
 		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
 		return new Gson().toJson(surveyCount);
@@ -167,9 +206,6 @@ public class DashboardController {
 		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
 		Map<String, Object> profileDetails = new HashMap<>();
 		User user = sessionHelper.getCurrentUser();
-		
-		// TODO setting selected profile in session
-		
 		
 		String columnName = request.getParameter("columnName");
 		long columnValue = 0;
