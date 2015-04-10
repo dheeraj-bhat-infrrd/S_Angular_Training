@@ -647,22 +647,12 @@ function loadDisplayPicture(){
 	});
 }
 
-/*function upgradePlan(){
-	console.log("upgrade plan button clicked");
-	var url = "./upgradepage.do";
-
-	$.ajax({
-		url: url,
-		type: "GET",
-		success: function(data){
-			$('.overlay-payment').html(data);
-			$('.overlay-payment').show();
-		},
-		error : function(e) {
-			console.log(e);
-		}
-	});
-}*/
+/**
+ * Method to redirect to error page
+ */
+function redirectTo404ErrorPage(){
+	location.href =  window.location.origin + "/error";
+}
 
 // Header buttons
 $(document).on('click', '.hdr-log-btn', function() {
