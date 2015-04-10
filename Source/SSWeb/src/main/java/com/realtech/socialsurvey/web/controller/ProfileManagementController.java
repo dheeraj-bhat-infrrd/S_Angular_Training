@@ -52,6 +52,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
@@ -115,6 +116,7 @@ public class ProfileManagementController {
 	@Value("${AMAZON_BUCKET}")
 	private String bucket;
 
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/showprofilepage", method = RequestMethod.GET)
 	public String showProfileEditPage(Model model, HttpServletRequest request) {
 		LOG.info("Method showProfileEditPage() called from ProfileManagementService");
@@ -132,7 +134,13 @@ public class ProfileManagementController {
 			selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 		}
 		if (selectedProfile == null) {
-			selectedProfile = userManagementService.updateSelectedProfile(request, session, user);
+			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+			Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+
+			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+			
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		}
 		
 		// fetching details from profile

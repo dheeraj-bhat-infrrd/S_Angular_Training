@@ -78,18 +78,11 @@
 			</c:if>
 
 			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-				<div class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');"></div>
-				<div class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');"></div>
-				<div class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('google');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('yelp');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('rss');"></div>
-
-				<%-- <div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+				<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
 				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 				<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
 				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'> --%>
+				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 			</div>
 		</div>
 	</div>
@@ -640,8 +633,4 @@ $(document).ready(function() {
 		showMainContent('./showprofilepage.do?profileId=' + newProfileId);
 	});
 });
-
-function openAuthPage(socialNetwork) {
-	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
-}
 </script>

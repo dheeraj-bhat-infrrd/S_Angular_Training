@@ -159,7 +159,10 @@
 		</c:if>
 		
 		<!-- Starting code for Social Authentication -->
-		<div class="um-top-container">
+		<c:if test="${profilemasterid == 1}">
+			<c:set var="containerclass" value="um-top-container"/>
+		</c:if>
+		<div class="${containerclass}">
 			<div class="um-header margin-top-25"><spring:message code="label.socialconnect.key" /></div>
 			<div class="clearfix st-score-wrapper">
 				<div class="float-left st-score-txt">Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle Lorem ipsum doret it emle </div>
@@ -334,14 +337,14 @@ $(document).ready(function(){
 		$('#hm-main-content-wrapper').attr("data-sad"));
 });
 
-$('#settings-sel').click(function(){
+$('#setting-sel').click(function(){
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 });
 
 $('.se-dd-item').click(function(){
 	var newProfileId = $(this).data('profile-id');
 	
-	$('#settings-sel').html($(this).html());
+	$('#setting-sel').html($(this).html());
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 	
 	showMainContent('./showsettings.do?profileId=' + newProfileId);

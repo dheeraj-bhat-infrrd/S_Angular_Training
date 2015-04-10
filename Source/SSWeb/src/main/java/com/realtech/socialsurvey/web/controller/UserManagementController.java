@@ -33,6 +33,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAssignment;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -982,6 +983,19 @@ public class UserManagementController {
 			else {
 				// TODO: add logic for what happens when no user profile present
 			}
+			
+			// updating session with aggregated user profiles
+			Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
+			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+			userManagementService.processedUserProfiles(user, accountType, profileSmallMap, profileMap);
+			
+			if (profileSmallMap.size() > 0) {
+				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);
