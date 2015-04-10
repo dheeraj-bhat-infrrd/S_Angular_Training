@@ -285,7 +285,6 @@ public class LoginController {
 				AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 				Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 				UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				LOG.info("Size of profiles: " + user.getUserProfiles().size());
 				for (UserProfile profile : user.getUserProfiles()) {
 					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						selectedProfile = profile;
@@ -517,10 +516,21 @@ public class LoginController {
 	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
 		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 		String imageUrl = "";
 		
 		try {
+			user = userManagementService.getUserByUserId(user.getUserId());
 			UserProfile currentProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (currentProfile == null) {
+				currentProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						currentProfile = profile;
+						break;
+					}
+				}
+			}
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			if (userSettings == null || currentProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
