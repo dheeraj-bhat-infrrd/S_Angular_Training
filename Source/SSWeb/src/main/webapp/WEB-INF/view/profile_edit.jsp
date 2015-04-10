@@ -46,15 +46,15 @@
 				<input type="hidden" id="company-profile-name" value="${profileSettings.profileName}">
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
-				<input type="hidden" id="prof-region-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-region-id" value="${profile.regionId}">
 				<%-- <input type="hidden" id="prof-region-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 3}">
-				<input type="hidden" id="prof-branch-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-branch-id" value="${profile.branchId}">
 				<%-- <input type="hidden" id="prof-branch-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 4}">
-				<input type="hidden" id="prof-agent-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-agent-id" value="${profile.agentId}">
 				<%-- <input type="hidden" id="prof-agent-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 		</c:choose>
@@ -623,7 +623,7 @@ $(document).ready(function() {
 	$('#profile-sel').click(function(){
 		$('#pe-dd-wrapper-profiles').slideToggle(200);
 	});
-	
+
 	$('.pe-dd-item').click(function(){
 		var newProfileId = $(this).data('profile-id');
 		
