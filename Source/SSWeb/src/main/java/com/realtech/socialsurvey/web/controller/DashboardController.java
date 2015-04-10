@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-137 : by RM-05 : BOC
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -72,10 +71,11 @@ public class DashboardController {
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
-	// TODO setting selected profile in session
+	// setting selected profile in session
 	@SuppressWarnings("unchecked")
+	@ResponseBody
 	@RequestMapping(value = "/updatecurrentprofile")
-	public void updateSelectedProfile(Model model, HttpServletRequest request) {
+	public String updateSelectedProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started.");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
@@ -112,6 +112,7 @@ public class DashboardController {
 		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 
 	@ResponseBody
