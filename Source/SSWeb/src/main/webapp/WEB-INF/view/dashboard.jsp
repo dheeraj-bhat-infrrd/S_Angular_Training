@@ -184,36 +184,16 @@
         <div class="dash-panels-wrapper">
             <div class="row">
                 <div id="prnt-dsh-inc-srvey" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="dash-lp-header">Incomplete Surveys</div>
+                    <div class="dash-lp-header" id="incomplete-survey-header">Incomplete Surveys</div>
                     <div id="dsh-inc-srvey" class="dash-lp-item-grp">
-                    	<!-- <div class="dash-lp-item clearfix">
-                    	    <div class="float-left dash-lp-txt">Divina Couture <span>12th Dec</span></div>
-                    	    <div class="float-right dash-lp-rt-img"></div>
-               		     </div>
-                	    <div class="dash-lp-item clearfix">
-                    	    <div class="float-left dash-lp-txt">tam Fedrick <span>12th Dec</span></div>
-                        	<div class="float-right dash-lp-rt-img"></div>
-	                    </div>
-	                    <div class="dash-lp-item clearfix">
-	                        <div class="float-left dash-lp-txt">Jerome Mickelson <span>12th Dec</span></div>
-    	                    <div class="float-right dash-lp-rt-img"></div>
-        	            </div>
-            	        <div class="dash-lp-item clearfix">
-                	        <div class="float-left dash-lp-txt">Lisbeth Barkan <span>12th Dec</span></div>
-                    	    <div class="float-right dash-lp-rt-img"></div>
-	                    </div>
-	                    <div class="dash-lp-item clearfix">
-    	                    <div class="float-left dash-lp-txt">Al Chowdhury <span>12th Dec</span></div>
-        	                <div class="float-right dash-lp-rt-img"></div>
-            	        </div> -->
                     </div>
-                    <div id="dsh-inc-dwnld" class="dash-btn-sur-data">Incomplete Survey Data</div>
+                    <div id="dsh-inc-dwnld" class="dash-btn-sur-data hide">Incomplete Survey Data</div>
                 </div>
                 <div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
                     <div class="people-say-wrapper rt-content-main rt-content-main-adj">
                         <div class="main-con-header clearfix pad-bot-10-resp">
                             <div id="review-desc" class="float-left dash-ppl-say-lbl"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
-                            <div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd">Download Survey Data</div>
+                            <div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">Download Survey Data</div>
                         </div>
                         <div id="review-details" class="ppl-review-item-wrapper">
 	                        <div class="ppl-review-item">
