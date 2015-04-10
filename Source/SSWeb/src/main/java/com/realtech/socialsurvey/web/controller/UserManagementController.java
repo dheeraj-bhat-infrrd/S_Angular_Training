@@ -1280,6 +1280,9 @@ public class UserManagementController {
 				LOG.warn("First Name is not present to resend invitation");
 				throw new InvalidInputException("Invalid first name.", DisplayMessageConstants.INVALID_FIRSTNAME);
 			}
+			if( lastName == null || lastName.isEmpty()){
+				lastName = " ";
+			}
 
 			LOG.debug("Sending invitation...");
 			userManagementService.sendRegistrationCompletionLink(emailId, firstName, lastName, user.getCompany().getCompanyId());
