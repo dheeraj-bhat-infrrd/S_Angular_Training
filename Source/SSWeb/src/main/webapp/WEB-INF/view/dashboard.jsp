@@ -27,7 +27,7 @@
 
 <div class="dash-wrapper-main">
     <div class="dash-container container">
-		<div id="prof-container" data-profile-master-id="${profileMasterId}"
+		<div id="prof-container" data-profile-master-id="${profileMasterId}" data-profile-id="${profileId}"
 			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
 
 			<div class="row row-dash-top-adj">
@@ -87,9 +87,7 @@
 							<div class="float-left dsh-star-item no-star"></div>
 							<div id="profile-completed" class="float-right dsh-rating-item">3/5</div>
 						</div>
-						<div class="dsh-btn-complete"
-							onclick="showMainContent('./showprofilepage.do')">Complete
-							Your Profile</div>
+						<div class="dsh-btn-complete">Complete Your Profile</div>
 					</div>
 				</div>
 			</div>
@@ -339,5 +337,16 @@ $('.da-dd-item').click(function(){
 	var newProfileValue = $(this).attr('data-column-value');
 	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
 	updateCircles();
+	
+	// updating data
+	$('#prof-container').attr('data-profile-id', newProfileId);
+	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
+	$('#prof-container').attr('data-column-name', newProfileName);
+	$('#prof-container').attr('data-column-value', newProfileValue);
+});
+
+$('.dsh-btn-complete').click(function() {
+	var newProfileId = $(this).attr('data-profile-id');
+	showMainContent('./showprofilepage.do?profileId' + newProfileId);
 });
 </script>

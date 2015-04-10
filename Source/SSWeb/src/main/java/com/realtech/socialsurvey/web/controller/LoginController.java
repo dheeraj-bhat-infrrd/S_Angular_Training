@@ -587,6 +587,7 @@ public class LoginController {
 
 		model.addAttribute("userId", user.getUserId());
 		model.addAttribute("emailId", user.getEmailId());
+		model.addAttribute("profileId", selectedProfile.getUserProfileId());
 		model.addAttribute("profileMasterId", profileMasterId);
 
 		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
