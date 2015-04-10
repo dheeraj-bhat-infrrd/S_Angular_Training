@@ -4,10 +4,15 @@
 <c:choose>
 	<c:when test="${not empty reviewItems}">
 		<c:forEach var="reviewItem" items="${reviewItems}">
-			<div class="ppl-review-item">
+			<div data-firstname="${reviewItem.customerFirstName}"
+			data-lastname="${reviewItem.customerLastName}"
+			data-review="${reviewItem.review}"
+			data-score="${reviewItem.score}"
+			data-agentname="${reviewItem.agentName}"
+			 class="ppl-review-item">
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
-						<div class="ppl-head-1">${reviewItem.customerFirstName}+' '+${reviewItem.customerLastName}</div>
+						<div class="ppl-head-1">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</div>
 						<div class="ppl-head-2">
 							<fmt:formatDate type="date" pattern="dd MMM, yyyy" value="${reviewItem.modifiedOn}" />
 						</div>
@@ -27,10 +32,10 @@
 					<div class="float-left blue-text ppl-share-shr-txt"><spring:message code="label.share.key"/></div>
 					<div class="float-left icn-share icn-plus-open"></div>
 					<div class="float-left clearfix ppl-share-social hide">
-						<div class="float-left ppl-share-icns icn-fb"></div>
-						<div class="float-left ppl-share-icns icn-twit"></div>
-						<div class="float-left ppl-share-icns icn-lin"></div>
-						<div class="float-left ppl-share-icns icn-yelp"></div>
+						<div class="float-left ppl-share-icns icn-fb fb-shr"></div>
+						<div class="float-left ppl-share-icns icn-twit twt-shr"></div>
+						<div class="float-left ppl-share-icns icn-lin lnkdn-shr"></div>
+						<div class="float-left ppl-share-icns icn-yelp yelp-shr"></div>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>

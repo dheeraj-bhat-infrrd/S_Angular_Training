@@ -759,16 +759,12 @@ function paintReviews(result) {
 			.each(
 					result,
 					function(i, feedback) {
-						divToPopulate += '<div data-fname='
-								+ feedback.customerFirstName
-								+ ' '
-								+ 'data-lname='
-								+ feedback.customerLastName
-								+ 'data-agentname='
-								+ agentName
-								+ 'data-review='
-								+ feedback.review
-								+ 'class="ppl-review-item">'
+						divToPopulate += '<div data-firstname=' + feedback.customerFirstName
+								+ ' data-lastname=' + feedback.customerLastName
+								+ ' data-agentname=' + feedback.agentName
+								+ ' data-review=' + feedback.review
+								+ ' data-score=' + feedback.score
+								+ ' class="ppl-review-item">'
 								+ '<div class="ppl-header-wrapper clearfix"><div class="float-left ppl-header-left">'
 								+ '<div class="ppl-head-1">'
 								+ feedback.customerFirstName
@@ -799,6 +795,42 @@ function paintReviews(result) {
 		$("#review-details").append(divToPopulate);
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this));
+	});
+	
+	$(".icn-fb").click(function() {
+		var firstName = $(this).parent().parent().parent().attr('data-firstname');
+		var lastName = $(this).parent().parent().parent().attr('data-lastname');
+		var agentName = $(this).parent().parent().parent().attr('data-agentname');
+		var review = $(this).parent().parent().parent().attr('data-review');
+		var score = $(this).parent().parent().parent().attr('data-score');
+		shareOnFacebook(firstName, lastName, agentName, review, score);
+	});
+	
+	$(".icn-twit").click(function() {
+		var firstName = $(this).parent().parent().parent().attr('data-firstname');
+		var lastName = $(this).parent().parent().parent().attr('data-lastname');
+		var agentName = $(this).parent().parent().parent().attr('data-agentname');
+		var review = $(this).parent().parent().parent().attr('data-review');
+		var score = $(this).parent().parent().parent().attr('data-score');
+		shareOnTwitter(firstName, lastName, agentName, review, score);
+	});
+	
+	$(".icn-lin").click(function() {
+		var firstName = $(this).parent().parent().parent().attr('data-firstname');
+		var lastName = $(this).parent().parent().parent().attr('data-lastname');
+		var agentName = $(this).parent().parent().parent().attr('data-agentname');
+		var review = $(this).parent().parent().parent().attr('data-review');
+		var score = $(this).parent().parent().parent().attr('data-score');
+		shareOnLinkedin(firstName, lastName, agentName, review, score);
+	});
+	
+	$(".icn-yelp").click(function() {
+		var firstName = $(this).parent().parent().parent().attr('data-firstname');
+		var lastName = $(this).parent().parent().parent().attr('data-lastname');
+		var agentName = $(this).parent().parent().parent().attr('data-agentname');
+		var review = $(this).parent().parent().parent().attr('data-review');
+		var score = $(this).parent().parent().parent().attr('data-score');
+		shareOnYelp(firstName, lastName, agentName, review, score);
 	});
 }
 
