@@ -73,8 +73,9 @@ public class DashboardController {
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
 	// TODO setting selected profile in session
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/updatecurrentprofile")
-	public void upadteSelectedProfile(Model model, HttpServletRequest request) {
+	public void updateSelectedProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started.");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();

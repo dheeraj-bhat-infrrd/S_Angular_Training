@@ -920,15 +920,9 @@ function changeRatingPattern(rating, ratingParent) {
 	});
 }
 
-// TODO
 function updateCurrentProfile(profileId) {
-	$.ajax({
-		url : "./updatecurrentprofile.do?profileId" + profileId,
-		type : "GET",
-		dataType : "JSON",
-		data : payload,
-		success : function(data) {}
-	});
+	var url = "./updatecurrentprofile.do?profileId" + profileId;
+	callAjaxGET(url, function(data) {}, true);
 }
 
 function updateCircles() {

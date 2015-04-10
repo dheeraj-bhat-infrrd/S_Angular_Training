@@ -331,7 +331,7 @@ $('.da-dd-item').click(function(){
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
 	var newProfileId = $(this).attr('data-profile-master-id');
-	updateCurrentProfile(newProfileId);
+	// updateCurrentProfile(newProfileId);
 
 	var newProfileMasterId = $(this).attr('data-profile-master-id');
 	var newProfileName = $(this).attr('data-column-name');
