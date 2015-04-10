@@ -392,7 +392,7 @@ public class RegistrationController {
 		 */
 		validateFormParameters(firstName, lastName, emailId);
 
-		if (password == null || password.isEmpty() || !password.matches(CommonConstants.PASSWORD_REG_EX) || confirmPassword == null
+		if (password == null || password.isEmpty() || password.length()<CommonConstants.PASSWORD_LENGTH || confirmPassword == null
 				|| confirmPassword.isEmpty()) {
 			throw new InvalidInputException("Password is not valid in registration", DisplayMessageConstants.INVALID_PASSWORD);
 		}
