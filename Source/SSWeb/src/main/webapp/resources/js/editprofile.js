@@ -622,7 +622,7 @@ function addAnAssociation() {
 	
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "New Associaion",
+		"placeholder" : "New Association",
 		"data-status" : "new"
 	});
 	var newAssociationButton = $('<div>').attr({
@@ -828,7 +828,7 @@ function callBackUpdateLicenseAuthorizations(data) {
 
 
 // Update Social links
-/*$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+$('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -946,7 +946,7 @@ function callBackUpdateYelpLink(data) {
 	showToast();
 
 	showProfileSocialLinks();
-}*/
+}
 
 function isValidUrl(url){
 	var myVariable = url;

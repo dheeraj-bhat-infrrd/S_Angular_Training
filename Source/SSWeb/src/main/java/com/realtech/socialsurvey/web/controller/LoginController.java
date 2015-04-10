@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 // JIRA SS-21 : by RM-06 : BOC
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -115,8 +117,32 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/landing")
-	public String initLandingPage() {
+	public String initLandingPage(Model model, HttpServletRequest request) {
 		LOG.info("Login Page started");
+		
+		User user = sessionHelper.getCurrentUser();
+		HttpSession session = request.getSession(true);
+
+		// updating session with aggregated user profiles
+		try {
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
+			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+			userManagementService.processedUserProfiles(user, accountType, profileSmallMap, profileMap);
+			
+			if (profileSmallMap.size() > 0) {
+				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.LOGIN;
+		}
+
 		return JspResolver.LANDING;
 	}
 
@@ -231,7 +257,17 @@ public class LoginController {
 					}
 					
 					// updating session with aggregated user profiles
-					userManagementService.processedUserProfiles(user, session);
+					Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
+					Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+					UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+					userManagementService.processedUserProfiles(user, accountType, profileSmallMap, profileMap);
+					
+					if (profileSmallMap.size() > 0) {
+						session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+					}
+					session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+					session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 				}
 				else {
 					LOG.info("No User profile present");

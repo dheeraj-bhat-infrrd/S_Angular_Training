@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1871,10 +1869,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 	
 	@Override
-	public void processedUserProfiles(User user, HttpSession session) throws NonFatalException {
+	public void processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfileSmall> profileSmallMap,
+			Map<Long, UserProfile> profileMap) throws NonFatalException {
 		LOG.debug("Method getUserProfile() called from UserManagementService");
-
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 
 		// Fetch Regions and Branches from Solr
 		long companyId = user.getCompany().getCompanyId();
@@ -1894,8 +1891,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		boolean agentAdded = false;
 		RegionFromSearch region = null;
 		BranchFromSearch branch = null;
-		Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
-		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+		Map<Long, UserProfileSmall> profileSmallMapNew = new HashMap<Long, UserProfileSmall>();
 		
 		UserProfileSmall profileSmall = null;
 		for (UserProfile profile : user.getUserProfiles()) {
@@ -1909,7 +1905,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
 						profileSmall = getSmallUserProfile(profile.getUserProfileId(), user.getCompany().getCompany(), user.getCompany()
 								.getCompanyId(), CommonConstants.COMPANY_ID_COLUMN, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-						profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+						profileSmallMapNew.put(profile.getUserProfileId(), profileSmall);
 						break;
 					
 					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
@@ -1920,7 +1916,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 						if (region.getIsDefaultBySystem() != 1) {
 							profileSmall = getSmallUserProfile(profile.getUserProfileId(), region.getRegionName(), regionId,
 									CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							profileSmallMapNew.put(profile.getUserProfileId(), profileSmall);
 						}
 						break;
 
@@ -1932,7 +1928,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 						if (branch.getIsDefaultBySystem() != 1) {
 							profileSmall = getSmallUserProfile(profile.getUserProfileId(), branch.getBranchName(), branchId,
 									CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							profileSmallMapNew.put(profile.getUserProfileId(), profileSmall);
 						}
 						break;
 
@@ -1940,7 +1936,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 						if (!agentAdded) {
 							profileSmall = getSmallUserProfile(profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW, regionId,
 									CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							profileSmallMapNew.put(profile.getUserProfileId(), profileSmall);
 							agentAdded = true;
 						}
 						break;
@@ -1951,25 +1947,19 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			}
 		}
 		switch (accountType) {
+			case FREE:
 			case INDIVIDUAL:
 			case TEAM:
 				break;
 
 			case COMPANY:
 			case ENTERPRISE:
-				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+				profileSmallMap = profileSmallMapNew;
 				break;
 			
 			default:
-				break;
 		}
-		session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 		
-		// settings current profile in session
-		UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-
 		LOG.debug("Method getUserProfile() finished from UserManagementService");
 	}
 
@@ -1985,18 +1975,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public UserProfile updateSelectedProfile(HttpServletRequest request, HttpSession session, User user) {
-		// getting session variables
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
-
+	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr) {
 		long profileId = 0;
 		try {
-			String profileIdStr = request.getParameter("profileId");
 			if (profileIdStr != null && !profileIdStr.equals("")) {
-				profileId = Long.parseLong(request.getParameter("profileId"));
+				profileId = Long.parseLong(profileIdStr);
 			}
 			else {
 				profileId = 0l;
@@ -2010,6 +1994,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		UserProfile selectedProfile = null;
 		List<UserProfile> userProfiles = user.getUserProfiles();
 		switch (accountType) {
+			case FREE:
 			case INDIVIDUAL:
 			case TEAM:
 				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
@@ -2027,12 +2012,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			
 			default:
 				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				break;
 		}
-
-		// setting session attributes
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		
 		return selectedProfile;
 	}
