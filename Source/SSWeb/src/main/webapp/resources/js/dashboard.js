@@ -44,18 +44,13 @@ $('body').click(function() {
 	$('#hr-dd-wrapper').slideUp(200);
 });
 
-$(document)
-		.scroll(
-				function() {
-					if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight)
-							&& startIndexCmp < totalReviews) {
-						showReviews(colName, colValue);
-					}
-				});
+$(document).scroll(function() {
+	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
+		showReviews(colName, colValue);
+	}
+});
 
-function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
-		regionIds, branchNames, branchIds, agent, accountType) {
-
+function paintDashboard(profileMasterId, newProfileName, newProfileValue) {
 	startIndexCmp = 0;
 	batchSizeCmp = 1;
 	totalReviews = 0;
@@ -76,66 +71,28 @@ function paintDashboard(companyAdmin, regionAdmin, branchAdmin, regionNames,
 		}
 	});
 	
-	circle1 = new ProgressBar.Circle('#dg-img-1', {
-		color : '#7AB400',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-
-	circle2 = new ProgressBar.Circle('#dg-img-2', {
-		color : '#E97F30',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle3 = new ProgressBar.Circle('#dg-img-3', {
-		color : '#5CC7EF',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-
-	circle4 = new ProgressBar.Circle('#dg-img-4', {
-		color : '#7AB400',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-
-	if (companyAdmin) {
-		showCompanyAdminFlow(regionNames, regionIds, branchNames, branchIds,
-				accountType);
-	} else if (regionAdmin) {
-		showRegionAdminFlow(accountType, regionIds[1]);
-	} else if (branchAdmin) {
-		showBranchAdminFlow(accountType, branchIds[1]);
-	} else if (agent) {
-		showAgentFlow();
+	if (profileMasterId == 1) {
+		showCompanyAdminFlow(newProfileName, newProfileValue);
+	} else if (profileMasterId == 2) {
+		showRegionAdminFlow(newProfileName, newProfileValue);
+	} else if (profileMasterId == 3) {
+		showBranchAdminFlow(newProfileName, newProfileValue);
+	} else if (profileMasterId == 4) {
+		showAgentFlow(newProfileName, newProfileValue);
 	}
 
-	$('#dsh-inc-dwnld')
-			.click(
-					function() {
-						window.location.href = "./downloaddashboardincompletesurvey.do?columnName="
-								+ colName + "&columnValue=" + colValue;
-					});
+	$('#dsh-inc-dwnld').click(function() {
+		window.location.href = "./downloaddashboardincompletesurvey.do?columnName="
+				+ colName + "&columnValue=" + colValue;
+	});
 
-	$('#dsh-cmp-dwnld')
-			.click(
-					function() {
-						window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
-								+ colName + "&columnValue=" + colValue;
-					});
-
+	$('#dsh-cmp-dwnld').click(function() {
+		window.location.href = "./downloaddashboardcompletesurvey.do?columnName="
+				+ colName + "&columnValue=" + colValue;
+	});
 }
 
 function showDisplayPic() {
-	console.log('Reached Method');
 	var success = false;
 	$.ajax({
 		url : "./getdisplaypiclocation.do",
@@ -150,8 +107,7 @@ function showDisplayPic() {
 				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
 				if (imageUrl != '' || imageUrl != undefined) {
-					$("#dsh-prsn-img").css("background",
-							"url(" + imageUrl + ") no-repeat center");
+					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
 					$("#dsh-prsn-img").css("background-size", "cover");
 				}
 				return data.responseJSON;
@@ -172,11 +128,10 @@ function showDisplayPic() {
 	});
 }
 
-function showCompanyAdminFlow(accountType) {
-
-	showProfileDetails("companyId", 0, 30);
-	colName = "companyId";
-	colValue = 0;
+function showCompanyAdminFlow(newProfileName, newProfileValue) {
+	showProfileDetails(newProfileName, 0, 30);
+	colName = newProfileName;
+	colValue = newProfileValue;
 	getReviewsCountAndShowReviews(colName, colValue);
 	showIncompleteSurvey(colName, colValue);
 
@@ -184,16 +139,15 @@ function showCompanyAdminFlow(accountType) {
 	$("#graph-sel-div").hide();
 	bindSelectButtons();
 
-	populateSurveyStatisticsList("companyId");
-	showSurveyStatistics("companyId", 0);
-	showSurveyStatisticsGraphically("companyId", 0);
+	populateSurveyStatisticsList(newProfileName);
+	showSurveyStatistics(newProfileName, 0);
+	showSurveyStatisticsGraphically(newProfileName, 0);
 }
 
-function showRegionAdminFlow(accountType, regionId) {
-
-	showProfileDetails("regionId", regionId, 30);
-	colName = "regionId";
-	colValue = regionId;
+function showRegionAdminFlow(newProfileName, newProfileValue) {
+	showProfileDetails(newProfileName, newProfileValue, 30);
+	colName = newProfileName;
+	colValue = newProfileValue;
 	getReviewsCountAndShowReviews(colName, colValue);
 	showIncompleteSurvey(colName, colValue);
 
@@ -201,16 +155,15 @@ function showRegionAdminFlow(accountType, regionId) {
 	$("#graph-sel-div").hide();
 	bindSelectButtons();
 
-	populateSurveyStatisticsList("regionId");
-	showSurveyStatistics("regionId", regionId);
-	showSurveyStatisticsGraphically("regionId", regionId);
+	populateSurveyStatisticsList(newProfileName);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
-function showBranchAdminFlow(accountType, branchId) {
-
-	showProfileDetails("branchId", branchId, 30);
-	colName = "branchId";
-	colValue = branchId;
+function showBranchAdminFlow(newProfileName, newProfileValue) {
+	showProfileDetails(newProfileName, newProfileValue, 30);
+	colName = newProfileName;
+	colValue = newProfileValue;
 	getReviewsCountAndShowReviews(colName, colValue);
 	showIncompleteSurvey(colName, colValue);
 
@@ -220,25 +173,24 @@ function showBranchAdminFlow(accountType, branchId) {
 	$("#dsh-grph-srch-survey-div").hide();
 	bindSelectButtons();
 
-	populateSurveyStatisticsList("branchId");
-	showSurveyStatistics("branchId", branchId);
-	showSurveyStatisticsGraphically("branchId", branchId);
+	populateSurveyStatisticsList(newProfileName);
+	showSurveyStatistics(newProfileName, newProfileValue);
+	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 }
 
-function showAgentFlow() {
-
-	colName = "agentId";
-	colValue = 0;
-	showProfileDetails("agentId", 0, 30);
-	getReviewsCountAndShowReviews("agentId", 0);
+function showAgentFlow(newProfileName, newProfileValue) {
+	colName = newProfileName;
+	colValue = newProfileValue;
+	showProfileDetails(newProfileName, 0, 30);
+	getReviewsCountAndShowReviews(newProfileName, 0);
 	showIncompleteSurvey(colName, colValue);
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
-	showSurveyCount("agentId", 0, 30);
-	showSurveyStatisticsGraphically("agentId", 0);
+	showSurveyCount(newProfileName, 0, 30);
+	showSurveyStatisticsGraphically(newProfileName, 0);
 }
 
 function populateSurveyStatisticsList(columnName) {
@@ -254,8 +206,7 @@ function populateSurveyStatisticsList(columnName) {
 		options += "<option value=branchName>Branch</option>";
 		optionsForGraph += "<option value=branchName>Branch</option>";
 	}
-	if (columnName == "companyId" || columnName == "regionId"
-			|| columnName == "branchId") {
+	if (columnName == "companyId" || columnName == "regionId" || columnName == "branchId") {
 		options += "<option value=displayName>Individual</option>";
 		optionsForGraph += "<option value=displayName>Individual</option>";
 	}
@@ -289,15 +240,11 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 			if (success) {
 				paintList(searchColumn, data.responseJSON, flow);
 			}
-		},
-		error : function() {
-
 		}
 	});
 }
 
 function paintList(searchColumn, results, flow) {
-
 	var divToPopulate = "";
 	$.each(results, function(i, result) {
 		if (searchColumn == "regionName") {
@@ -311,6 +258,7 @@ function paintList(searchColumn, results, flow) {
 					+ result.userId + '">' + result.displayName + '</div>';
 		}
 	});
+	
 	if (flow == 'icons')
 		$('#dsh-srch-res').html(divToPopulate);
 	else if (flow == 'graph')
@@ -322,6 +270,7 @@ function paintList(searchColumn, results, flow) {
 		else if (flow == 'graph') {
 			$('#dsh-grph-sel-item').val($(this).html());
 		}
+		
 		var value = $(this).data('attr');
 		if (searchColumn == "regionName") {
 			columnName = "regionId";
@@ -330,6 +279,7 @@ function paintList(searchColumn, results, flow) {
 		} else if (searchColumn == "displayName") {
 			columnName = "agentId";
 		}
+		
 		if (flow == 'icons')
 			showSurveyStatistics(columnName, value);
 		else if (flow == 'graph')
@@ -339,7 +289,6 @@ function paintList(searchColumn, results, flow) {
 }
 
 function bindSelectButtons() {
-
 	$("#selection-list").change(function() {
 		$('#dsh-sel-item').val('');
 		$('.dsh-res-display').hide();
@@ -398,7 +347,6 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 }
 
 function paintSurveyStatistics(data) {
-
 	var sentSurveyDiv = "";
 	var clickedSurveyDiv = "";
 	var completedSurveyDiv = "";
@@ -414,11 +362,12 @@ function paintSurveyStatistics(data) {
 	sentSurveyDiv += " <div id='survey-sent' class='float-left stat-icn-txt-rt'></div>";
 	$('#all-surv-icn').html(sentSurveyDiv);
 	$("#survey-sent").html(sentSurveyCount);
-	var clicked = 0;
-	clicked = parseInt(data.responseJSON.clickedSurvey);
+	
+	var clicked = parseInt(data.responseJSON.clickedSurvey);
 	if (isNaN(clicked)) {
 		clicked = 0;
 	}
+	
 	var icnForClicked = clicked * 20 / sentSurveyCount;
 	icnForClicked = Math.round(icnForClicked);
 	for (var i = 0; i < parseInt(icnForClicked); i++) {
@@ -431,6 +380,7 @@ function paintSurveyStatistics(data) {
 	var completed = parseInt(data.responseJSON.completedSurvey);
 	if (isNaN(completed))
 		completed = 0;
+	
 	var icnForCompleted = completed * 20 / sentSurveyCount;
 	icnForCompleted = Math.round(icnForCompleted);
 	for (var i = 0; i < parseInt(icnForCompleted); i++) {
@@ -440,11 +390,11 @@ function paintSurveyStatistics(data) {
 	$("#completed-surv-icn").html(completedSurveyDiv);
 	$("#survey-completed").html(completed);
 
-	var socialPosts = 0;
-	socialPosts = parseInt(data.responseJSON.socialPosts);
+	var socialPosts = parseInt(data.responseJSON.socialPosts);
 	if (isNaN(socialPosts)) {
 		socialPosts = 0;
 	}
+	
 	var icnForSocialPosts = socialPosts * 20 / sentSurveyCount;
 	icnForSocialPosts = Math.round(icnForSocialPosts);
 	for (var i = 0; i < parseInt(icnForSocialPosts); i++) {
@@ -498,6 +448,7 @@ function paintSurveyGraph(graphData) {
 		clickedSurveys[index] = value;
 		index++;
 	});
+	
 	index = 0;
 	if (timeslots.length > allTimeslots.length) {
 		allTimeslots = timeslots;
@@ -508,6 +459,7 @@ function paintSurveyGraph(graphData) {
 		sentSurveys[index] = value;
 		index++;
 	});
+	
 	index = 0;
 	if (timeslots.length > allTimeslots.length) {
 		allTimeslots = timeslots;
@@ -518,6 +470,7 @@ function paintSurveyGraph(graphData) {
 		completedSurveys[index] = value;
 		index++;
 	});
+	
 	index = 0;
 	if (timeslots.length > allTimeslots.length) {
 		allTimeslots = timeslots;
@@ -528,6 +481,7 @@ function paintSurveyGraph(graphData) {
 		socialPosts[index] = value;
 		index++;
 	});
+	
 	if (timeslots.length > allTimeslots.length) {
 		allTimeslots = timeslots;
 		timeslots = [];
@@ -562,28 +516,31 @@ function paintSurveyGraph(graphData) {
 		var clickedSurvey;
 		var completedSurvey;
 		var socialPost;
+		
 		if (isNaN(parseInt(sentSurveys[itr]))) {
 			sentSurvey = 0;
 		} else {
 			sentSurvey = parseInt(sentSurveys[itr]);
 		}
+		
 		if (isNaN(parseInt(clickedSurveys[itr]))) {
 			clickedSurvey = 0;
 		} else {
 			clickedSurvey = parseInt(clickedSurveys[itr]);
 		}
+		
 		if (isNaN(parseInt(completedSurveys[itr]))) {
 			completedSurvey = 0;
 		} else {
 			completedSurvey = parseInt(completedSurveys[itr]);
 		}
+		
 		if (isNaN(parseInt(socialPosts[itr]))) {
 			socialPost = 0;
 		} else {
 			socialPost = parseInt(socialPosts[itr]);
 		}
-		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey,
-				completedSurvey, socialPost);
+		nestedInternalData.push(allTimeslots[itr], sentSurvey, clickedSurvey, completedSurvey, socialPost);
 		internalData.push(nestedInternalData);
 	}
 	console.log(internalData);
@@ -602,8 +559,7 @@ function paintSurveyGraph(graphData) {
 		}
 	};
 
-	var chart = new google.visualization.LineChart(document
-			.getElementById('util-gph-item'));
+	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 
 	chart.draw(data, options);
 }
@@ -641,7 +597,8 @@ function paintProfileDetails(data) {
 	$("#badges").removeClass(".dsg-g-rbn-1");
 	$("#badges").removeClass(".dsg-g-rbn-2");
 	$("#badges").removeClass(".dsg-g-rbn-3");
-	$("#name").html(data.responseJSON.name);
+	if (data.responseJSON.name != undefined)
+		$("#name").html(data.responseJSON.name);
 	if (data.responseJSON.title != undefined)
 		$("#designation").html(data.responseJSON.title);
 	if (data.responseJSON.company != undefined)
@@ -650,15 +607,12 @@ function paintProfileDetails(data) {
 	if ((parseInt(data.responseJSON.socialPosts) / maxSocialPosts) > 1)
 		circle1.animate(1);
 	else
-		circle1.animate(parseInt(data.responseJSON.socialPosts)
-				/ maxSocialPosts);
+		circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
 	$("#srv-snt-cnt").html(data.responseJSON.surveyCount);
 	if ((parseInt(data.responseJSON.surveyCount) / maxSurveySent) > 1)
 		circle2.animate(1);
 	else
-		circle2
-				.animate(parseInt(data.responseJSON.surveyCount)
-						/ maxSurveySent);
+		circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
 	$("#srv-scr").html(data.responseJSON.socialScore + "/5");
 	if ((parseInt(data.responseJSON.socialScore) / 5) > 1)
 		circle3.animate(1);
@@ -755,44 +709,46 @@ function showReviews(columnName, columnValue) {
 
 function paintReviews(result) {
 	var divToPopulate = "";
-	$
-			.each(
-					result,
-					function(i, feedback) {
-						divToPopulate += '<div data-firstname=' + feedback.customerFirstName
-								+ ' data-lastname=' + feedback.customerLastName
-								+ ' data-agentname=' + feedback.agentName
-								+ ' data-review=' + feedback.review
-								+ ' data-score=' + feedback.score
-								+ ' class="ppl-review-item">'
-								+ '<div class="ppl-header-wrapper clearfix"><div class="float-left ppl-header-left">'
-								+ '<div class="ppl-head-1">'
-								+ feedback.customerFirstName
-								+ ' '
-								+ feedback.customerLastName
-								+ '</div>'
-								+ '<div class="ppl-head-2">'
-								+ feedback.modifiedOn
-								+ '</div></div><div class="float-right ppl-header-right">'
-								+ '<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'
-								+ feedback.score
-								+ '"><div class="rating-star icn-full-star"></div>'
-								+ '<div class="rating-star icn-full-star"></div><div class="rating-star icn-half-star"></div>'
-								+ '<div class="rating-star icn-no-star"></div><div class="rating-star icn-no-star"></div></div></div></div>'
-								+ '<div class="ppl-content">'
-								+ feedback.review
-								+ '</div><div class="ppl-share-wrapper clearfix">'
-								+ '<div class="float-left blue-text ppl-share-shr-txt">Share</div>'
-								+ '<div class="float-left icn-share icn-plus-open" style="display: block;"></div>'
-								+ '<div class="float-left clearfix ppl-share-social hide" style="display: none;"><div class="float-left ppl-share-icns icn-fb">'
-								+ '</div><div class="float-left ppl-share-icns icn-twit"></div><div class="float-left ppl-share-icns icn-lin"></div>'
-								+ '<div class="float-left ppl-share-icns icn-yelp"></div></div>'
-								+ '<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div></div></div>';
-					});
+	$.each(result, function(i, feedback) {
+		divToPopulate += '<div data-fname='
+			+ feedback.customerFirstName
+			+ ' '
+			+ 'data-lname='
+			+ feedback.customerLastName
+			+ 'data-agentname='
+			+ agentName
+			+ 'data-review='
+			+ feedback.review
+			+ 'class="ppl-review-item">'
+			+ '<div class="ppl-header-wrapper clearfix"><div class="float-left ppl-header-left">'
+			+ '<div class="ppl-head-1">'
+			+ feedback.customerFirstName
+			+ ' '
+			+ feedback.customerLastName
+			+ '</div>'
+			+ '<div class="ppl-head-2">'
+			+ feedback.modifiedOn
+			+ '</div></div><div class="float-right ppl-header-right">'
+			+ '<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'
+			+ feedback.score
+			+ '"><div class="rating-star icn-full-star"></div>'
+			+ '<div class="rating-star icn-full-star"></div><div class="rating-star icn-half-star"></div>'
+			+ '<div class="rating-star icn-no-star"></div><div class="rating-star icn-no-star"></div></div></div></div>'
+			+ '<div class="ppl-content">'
+			+ feedback.review
+			+ '</div><div class="ppl-share-wrapper clearfix">'
+			+ '<div class="float-left blue-text ppl-share-shr-txt">Share</div>'
+			+ '<div class="float-left icn-share icn-plus-open" style="display: block;"></div>'
+			+ '<div class="float-left clearfix ppl-share-social hide" style="display: none;"><div class="float-left ppl-share-icns icn-fb">'
+			+ '</div><div class="float-left ppl-share-icns icn-twit"></div><div class="float-left ppl-share-icns icn-lin"></div>'
+			+ '<div class="float-left ppl-share-icns icn-yelp"></div></div>'
+			+ '<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div></div></div>';
+	});
 	if (startIndexCmp == 0)
 		$("#review-details").html(divToPopulate);
 	else
 		$("#review-details").append(divToPopulate);
+	
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this));
 	});
@@ -852,13 +808,10 @@ function paintName(columnName, columnValue) {
 		complete : function(data) {
 			if (success) {
 				if (totalReviews == 0)
-					$("#review-desc").html(
-							"No review found for " + data.responseText);
+					$("#review-desc").html("No review found for " + data.responseText);
 				else
-					$("#review-desc").html(
-							"What people say about "
-									+ data.responseText.substring(1,
-											data.responseText.length - 1));
+					$("#review-desc").html("What people say about " + data.responseText.substring(1,
+						data.responseText.length - 1));
 			}
 		},
 		error : function(e) {
@@ -867,7 +820,6 @@ function paintName(columnName, columnValue) {
 			showToast();
 		}
 	});
-
 }
 
 function showIncompleteSurvey(columnName, columnValue) {
@@ -904,30 +856,28 @@ function showIncompleteSurvey(columnName, columnValue) {
 
 function paintIncompleteSurvey(result) {
 	var divToPopulate = "";
-	$
-			.each(
-					result,
-					function(i, survey) {
-						divToPopulate += '<div class="dash-lp-item clearfix">'
-								+ '<div class="float-left dash-lp-txt">'
-								+ survey.customerFirstName
-								+ " "
-								+ survey.customerLastName
-								+ ' <span>'
-								+ survey.modifiedOn
-								+ '</span></div>'
-								+ '<div data-custname='
-								+ survey.customerFirstName
-								+ ' '
-								+ survey.customerLastName
-								+ ' data-agentid='
-								+ survey.agentId
-								+ ' data-agentname='
-								+ survey.agentName
-								+ ' data-custemail='
-								+ survey.customerEmail
-								+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
-					});
+	$.each(result, function(i, survey) {
+		divToPopulate += '<div class="dash-lp-item clearfix">'
+			+ '<div class="float-left dash-lp-txt">'
+			+ survey.customerFirstName
+			+ " "
+			+ survey.customerLastName
+			+ ' <span>'
+			+ survey.modifiedOn
+			+ '</span></div>'
+			+ '<div data-custname='
+			+ survey.customerFirstName
+			+ ' '
+			+ survey.customerLastName
+			+ ' data-agentid='
+			+ survey.agentId
+			+ ' data-agentname='
+			+ survey.agentName
+			+ ' data-custemail='
+			+ survey.customerEmail
+			+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
+	});
+	
 	if (startIndexInc == 0)
 		$("#dsh-inc-srvey").html(divToPopulate);
 	else
@@ -936,21 +886,19 @@ function paintIncompleteSurvey(result) {
 
 	var scrollContainer = document.getElementById('dsh-inc-srvey');
 	scrollContainer.onscroll = function() {
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-				- scrollContainer.clientHeight) {
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
 			showIncompleteSurvey(colName, colValue);
 		}
 	};
 
-	$('.dash-lp-rt-img').click(
-			function() {
-				var agentId = $(this).data("agentid");
-				var agentName = $(this).data("agentname");
-				var customerEmail = $(this).data("custemail");
-				var customerName = $(this).data("custname");
-				sendSurveyReminderMail(agentId, agentName, customerEmail,
-						customerName);
-			});
+	$('.dash-lp-rt-img').click(function() {
+		var agentId = $(this).data("agentid");
+		var agentName = $(this).data("agentname");
+		var customerEmail = $(this).data("custemail");
+		var customerName = $(this).data("custname");
+		sendSurveyReminderMail(agentId, agentName, customerEmail,
+				customerName);
+	});
 }
 
 $(document).on('scroll', '#dsh-inc-srvey', function() {
@@ -1005,5 +953,46 @@ function changeRatingPattern(rating, ratingParent) {
 			}
 		}
 		counter++;
+	});
+}
+
+function updateCurrentProfile(profileId) {
+	var url = "./updatecurrentprofile.do?profileId=" + profileId;
+	callAjaxGET(url, function(data) {}, true);
+}
+
+function updateCircles() {
+	$('#dg-img-1').find('svg').remove();
+	$('#dg-img-2').find('svg').remove();
+	$('#dg-img-3').find('svg').remove();
+	$('#dg-img-4').find('svg').remove();
+
+	circle1 = new ProgressBar.Circle('#dg-img-1', {
+		color : '#7AB400',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	circle2 = new ProgressBar.Circle('#dg-img-2', {
+		color : '#E97F30',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	circle3 = new ProgressBar.Circle('#dg-img-3', {
+		color : '#5CC7EF',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
+	});
+	circle4 = new ProgressBar.Circle('#dg-img-4', {
+		color : '#7AB400',
+		fill : "rgba(249,249,251, 1)",
+		duration : 1500,
+		strokeWidth : 4,
+		easing : 'easeInOut'
 	});
 }

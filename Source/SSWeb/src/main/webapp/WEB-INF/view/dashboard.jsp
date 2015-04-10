@@ -1,97 +1,102 @@
-<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left hr-dsh-adj-lft">Dashboard</div>
-           <!--  <div class="float-right header-right clearfix hr-dsh-adj-rt">
-                <div class="float-left hr-txt1">View As</div>
-                <div id="hr-txt2" class="float-left hr-txt2">Agent</div>
-                <div id="hr-dd-wrapper" class="hr-dd-wrapper hide">
-                    <div class="hr-dd-item">Branch Admin</div>
-                    <div class="hr-dd-item">Region Admin</div>
-                    <div class="hr-dd-item">Company Admin</div>
-                </div>
-            </div> -->
+            
+			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
+					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
+					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
+					<div id="da-dd-wrapper-profiles" class="hr-dd-wrapper hide">
+						<c:forEach var="userprofile" items="${profileList}">
+							<div class="da-dd-item" data-profile-id="${userprofile.key}"
+								data-column-name="${userprofile.value.profileName}"
+								data-column-value="${userprofile.value.profileValue}"
+								data-profile-master-id="${userprofile.value.profilesMasterId}">${userprofile.value.userProfileName}</div>
+						</c:forEach>
+					</div>
+				</div>
+			</c:if>
         </div>
     </div>
 </div>
 
 <div class="dash-wrapper-main">
     <div class="dash-container container">
-        <div id="prof-container" data-companyAdmin="${companyAdmin}" data-regionAdmin="${regionAdmin}" 
-        data-branchAdmin="${branchAdmin}" data-regionNames="${regionNames}" data-regionIds="${regionIds}" 
-        data-branchNames="${branchNames}" data-branchIds="${branchIds}" data-agent="${agent}" data-accountType="${accountType}"
-        class="dash-top-info">
-            <div class="row row-dash-top-adj">
-                <div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="dsh-graph-wrapper">
-                        <div class="dsh-g-wrap dsh-g-wrap-1">
-                            <div class="dsh-graph-item dsh-graph-item-1">
-                                <div id="dg-img-1" class="dsh-graph-img"></div>
-                                <div id="socl-post" class="dsh-graph-num">400</div>
-                                <div id="" class="dsh-graph-txt dsh-graph-txt-1">Social Post In Last 30 Days</div>
-                            </div>
-                        </div>
-                        <div class="dsh-g-wrap dsh-g-wrap-2">
-                            <div class="dsh-graph-item dsh-graph-item-1">
-                                <div id="dg-img-2" class="dsh-graph-img"></div>
-                                <div id="srv-snt-cnt" class="dsh-graph-num">3000</div>
-                                <div id="" class="dsh-graph-txt dsh-graph-txt-2">Total Surveys Sent</div>
-                            </div>
-                        </div>
-                        <div class="dsh-g-wrap dsh-g-wrap-3">
-                            <div class="dsh-graph-item dsh-graph-item-1">
-                                <div id="dg-img-3" class="dsh-graph-img"></div>
-                                <div id="srv-scr" class="dsh-graph-num">4/5</div>
-                                <div id="" class="dsh-graph-txt dsh-graph-txt-3">Survey Score Over Last 30 Days</div>
-                            </div>
-                        </div>
-                        <div class="dsh-g-wrap dsh-g-wrap-4">
-                            <div class="dsh-graph-item dsh-graph-item-1">
-                                <div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>
-                                <div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
-                                <div id="" class="dsh-graph-txt dsh-graph-txt-4">Profile Completed</div>
-                                <div id="badges" class="dsg-g-rbn"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
-                    <div class="dash-left-txt-wrapper">
-                        <div class="dsh-name-wrapper">
-                            <div id="name" class="dsh-txt-1"></div>
-                            <div id="designation" class="dsh-txt-2"></div>
-                            <div id="company" class="dsh-txt-3"></div>
-                        </div>
-                        <div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div class="float-left dsh-star-item no-star"></div>
-                            <div id="profile-completed" class="float-right dsh-rating-item">3/5</div>
-                        </div>
-                        <div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')">Complete Your Profile</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<div id="prof-container" data-profile-master-id="${profileMasterId}" data-profile-id="${profileId}"
+			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
+
+			<div class="row row-dash-top-adj">
+				<div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
+					<div class="dsh-graph-wrapper">
+						<div class="dsh-g-wrap dsh-g-wrap-1">
+							<div class="dsh-graph-item dsh-graph-item-1">
+								<div id="dg-img-1" class="dsh-graph-img"></div>
+								<div id="socl-post" class="dsh-graph-num">400</div>
+								<div class="dsh-graph-txt dsh-graph-txt-1">Social Post In Last 30 Days</div>
+							</div>
+						</div>
+						<div class="dsh-g-wrap dsh-g-wrap-2">
+							<div class="dsh-graph-item dsh-graph-item-1">
+								<div id="dg-img-2" class="dsh-graph-img"></div>
+								<div id="srv-snt-cnt" class="dsh-graph-num">3000</div>
+								<div class="dsh-graph-txt dsh-graph-txt-2">Total Surveys Sent</div>
+							</div>
+						</div>
+						<div class="dsh-g-wrap dsh-g-wrap-3">
+							<div class="dsh-graph-item dsh-graph-item-1">
+								<div id="dg-img-3" class="dsh-graph-img"></div>
+								<div id="srv-scr" class="dsh-graph-num">4/5</div>
+								<div class="dsh-graph-txt dsh-graph-txt-3">Survey Score Over Last 30 Days</div>
+							</div>
+						</div>
+						<div class="dsh-g-wrap dsh-g-wrap-4">
+							<div class="dsh-graph-item dsh-graph-item-1">
+								<div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>
+								<div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
+								<div class="dsh-graph-txt dsh-graph-txt-4">Profile Completed</div>
+								<div id="badges" class="dsg-g-rbn"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
+					<div class="dash-left-txt-wrapper">
+						<div class="dsh-name-wrapper">
+							<div id="name" class="dsh-txt-1"></div>
+							<div id="designation" class="dsh-txt-2"></div>
+							<div id="company" class="dsh-txt-3"></div>
+						</div>
+						<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
+							<div class="float-left dsh-star-item no-star"></div>
+							<div class="float-left dsh-star-item no-star"></div>
+							<div class="float-left dsh-star-item no-star"></div>
+							<div class="float-left dsh-star-item no-star"></div>
+							<div class="float-left dsh-star-item no-star"></div>
+							<div id="profile-completed" class="float-right dsh-rating-item">3/5</div>
+						</div>
+						<div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')">Complete Your Profile</div>
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="float-left stats-left clearfix">
 				<div class="dash-sub-head">Survey Status</div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
-					<select id="selection-list" class="float-left dash-sel-item">
-					</select>
+					<select id="selection-list" class="float-left dash-sel-item"></select>
 				</div>
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-sel-item" class="dash-sel-item" type="text"
-							placeholder="Start typing..."
-							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
+						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..." onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
 						<div id="dsh-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
@@ -105,32 +110,25 @@
 					</select>
 				</div>
 			</div>
+			
 			<div class="float-left stats-right">
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">No. of surveys sent</div>
-					<div id="all-surv-icn" class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="all-surv-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Surveys clicked</div>
-					<div id="clicked-surv-icn"
-						class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Surveys completed</div>
-					<div id="completed-surv-icn"
-						class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="completed-surv-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Social posts</div>
-					<div id="social-post-icn"
-						class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="social-post-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
-				<!--
-                <div class="clearfix stat-icns-wrapper">
+				<!--<div class="clearfix stat-icns-wrapper">
                     <div class="float-left stat-icn-lbl">No. of social posts</div>
                     <div class="float-left stat-icns-item clearfix">
                         <div class="progress">
@@ -140,8 +138,7 @@
                         </div>
                         <div class="float-left stat-icn-txt-rt">80%</div>
                     </div>
-                </div>
--->
+                </div>-->
 			</div>
 		</div>
 
@@ -150,16 +147,13 @@
                 <div class="dash-sub-head">Utilization over time</div>
                 <div id="graph-sel-div" class="clearfix dash-sel-wrapper">
                     <div class="float-left dash-sel-lbl">Choose</div>
-                    <select id="graph-sel-list" class="float-left dash-sel-item">
-                    </select>
+                    <select id="graph-sel-list" class="float-left dash-sel-item"></select>
                 </div>
                 
                 <div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text"
-							placeholder="Start typing..."
-							onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..." onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
 						<div id="dsh-grph-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
@@ -260,11 +254,9 @@
                 </div>
             </div>
         </div>
-        
     </div>
 </div>
 
-<%-- <jsp:include page="scripts.jsp"/> --%>
 <style>
 .dsh-dd-wrapper {
 	width: 300px;
@@ -296,39 +288,42 @@
     padding: 0 10px;
     cursor: pointer;
 }
-
 </style>
+
 <script>
-	window.onload = function onLoad() {
-	};
+$(document).ready(function() {
+	$(document).attr("title", "Dashboard");
+	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
+	var currentProfileName = $('#prof-container').attr('data-column-name');
+	var currentProfileValue = $('#prof-container').attr('data-column-value');
 
-	$(document)
-			.ready(
-					function() {
-						$(document).attr("title", "Dashboard");
-						var companyAdmin = $('#prof-container').attr(
-								"data-companyAdmin");
-						var regionAdmin = $('#prof-container').attr(
-								"data-regionAdmin");
-						var branchAdmin = $('#prof-container').attr(
-								"data-branchAdmin");
-						var regionNames = $('#prof-container').attr(
-								"data-regionNames");
-						var regionIds = $('#prof-container').attr(
-								"data-regionIds");
-						var branchNames = $('#prof-container').attr(
-								"data-branchNames");
-						var branchIds = $('#prof-container').attr(
-								"data-branchIds");
-						var agent = $('#prof-container').attr("data-agent");
-						var accountType = $('#prof-container').attr(
-								"data-accountType");
+	paintDashboard(profileMasterId, currentProfileName, currentProfileValue);
+	updateCircles();
+});
 
-						paintDashboard(companyAdmin, regionAdmin, branchAdmin,
-								regionNames, regionIds, branchNames, branchIds,
-								agent, accountType);
+// Dashboard View as
+$('#dashboard-sel').click(function(){
+	$('#da-dd-wrapper-profiles').slideToggle(200);
+});
 
-						// 		$('#dsh-inc-srvey').perfectScrollbar('update');
-					});
+$('.da-dd-item').click(function(){
+	$('#dashboard-sel').html($(this).html());
+	$('#da-dd-wrapper-profiles').slideToggle(200);
+	
+	// update selected profile in session
+	var newProfileId = $(this).attr('data-profile-id');
+	updateCurrentProfile(newProfileId);
+
+	var newProfileMasterId = $(this).attr('data-profile-master-id');
+	var newProfileName = $(this).attr('data-column-name');
+	var newProfileValue = $(this).attr('data-column-value');
+	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
+	updateCircles();
+	
+	// updating data
+	$('#prof-container').attr('data-profile-id', newProfileId);
+	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
+	$('#prof-container').attr('data-column-name', newProfileName);
+	$('#prof-container').attr('data-column-value', newProfileValue);
+});
 </script>
-

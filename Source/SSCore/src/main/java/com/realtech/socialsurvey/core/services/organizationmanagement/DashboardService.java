@@ -8,7 +8,6 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 
-
 // JIRA SS-137 BY RM05:BOC
 /**
  * Interface with methods declared to show dash board of user.
@@ -26,13 +25,13 @@ public interface DashboardService {
 	public double getSurveyScore(String columnName, long columnValue, int numberOfDays);
 
 	public int getProfileCompletionPercentage(User user, String columnName, long columnValue, UserSettings userSettings);
-	
+
 	public int getBadges(int surveyScore, int surveyCount, int socialPosts, int profileCompleteness);
-	
+
 	public void downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
 
 	public void downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
-	
+
 	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException;
 
 }

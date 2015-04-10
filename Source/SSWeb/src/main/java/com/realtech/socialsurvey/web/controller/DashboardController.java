@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-137 : by RM-05 : BOC
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -50,6 +51,9 @@ public class DashboardController {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+
+	@Autowired
+	private UserManagementService userManagementService;
 
 	@Autowired
 	private SolrSearchService solrSearchService;
@@ -69,6 +73,20 @@ public class DashboardController {
 	private final String EXCEL_FORMAT = "application/vnd.ms-excel";
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
+
+	// setting selected profile in session
+	@ResponseBody
+	@RequestMapping(value = "/updatecurrentprofile")
+	public String updateSelectedProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method updateSelectedProfile() started.");
+		
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		userManagementService.updateSelectedProfile(request, session, user);
+		
+		LOG.info("Method updateSelectedProfile() finished.");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
 
 	@ResponseBody
 	@RequestMapping(value = "/surveycount")
@@ -107,10 +125,6 @@ public class DashboardController {
 		surveyCount.put("completedSurvey", dashboardService.getCompletedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
 		surveyCount.put("clickedSurvey", dashboardService.getClickedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
 		surveyCount.put("socialPosts", dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays));
-
-		/*
-		 * } catch (NonFatalException e) { }
-		 */
 
 		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
 		return new Gson().toJson(surveyCount);
@@ -167,6 +181,7 @@ public class DashboardController {
 		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
 		Map<String, Object> profileDetails = new HashMap<>();
 		User user = sessionHelper.getCurrentUser();
+		
 		String columnName = request.getParameter("columnName");
 		long columnValue = 0;
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
