@@ -471,7 +471,7 @@ public class HierarchyManagementController {
 			}
 
 			String isAdminStr = request.getParameter("isAdmin");
-
+			HttpSession session = request.getSession(false);
 			long selectedUserId = 0l;
 			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
 				try {
@@ -494,8 +494,10 @@ public class HierarchyManagementController {
 			LOG.debug("Calling service to add a new region and assigning user to it if specified");
 			try {
 
-				organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO, regionAddress1,
-						regionAddress2, selectedUserId, assigneeEmailIds, isAdmin);
+				Region region = organizationManagementService.addNewRegionWithUser(loggedInUser, regionName.trim(), CommonConstants.NO,
+						regionAddress1, regionAddress2, selectedUserId, assigneeEmailIds, isAdmin);
+
+				addOrUpdateRegionInSession(region, session);
 
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.REGION_ADDTION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -539,7 +541,7 @@ public class HierarchyManagementController {
 			}
 
 			String isAdminStr = request.getParameter("isAdmin");
-
+			HttpSession session = request.getSession(false);
 			long selectedUserId = 0l;
 			if (selectedUserIdStr != null && !selectedUserIdStr.isEmpty()) {
 				try {
@@ -576,9 +578,11 @@ public class HierarchyManagementController {
 
 			try {
 				LOG.debug("Calling service to add a new branch");
-				organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO, branchAddress1,
-						branchAddress2, selectedUserId, assigneeEmailIds, isAdmin);
+				Branch branch = organizationManagementService.addNewBranchWithUser(user, branchName.trim(), regionId, CommonConstants.NO,
+						branchAddress1, branchAddress2, selectedUserId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add a new branch");
+
+				addOrUpdateBranchInSession(branch, session);
 
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.BRANCH_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
@@ -768,7 +772,7 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to update branch with Id : " + branchId);
 				Branch branch = organizationManagementService.updateBranch(user, branchId, regionId, branchName, branchAddress1, branchAddress2,
 						selectedUserId, assigneeEmailIds, isAdmin);
-				updateBranchInSession(branch, session);
+				addOrUpdateBranchInSession(branch, session);
 
 				LOG.debug("Successfully executed service to update a branch");
 
@@ -789,17 +793,18 @@ public class HierarchyManagementController {
 	}
 
 	/**
-	 * method to update the branch in sessionF
+	 * Method to update the branch in session
 	 * 
 	 * @param branch
 	 * @param session
 	 * @throws NoRecordsFetchedException
 	 */
-	private void updateBranchInSession(Branch branch, HttpSession session) throws NoRecordsFetchedException {
-		LOG.info("Method updateBranchInSession called for branch:" + branch);
+	private void addOrUpdateBranchInSession(Branch branch, HttpSession session) throws NoRecordsFetchedException {
+		LOG.info("Method addOrUpdateBranchInSession called for branch:" + branch);
 		@SuppressWarnings("unchecked") Map<Long, BranchFromSearch> branches = (Map<Long, BranchFromSearch>) session
 				.getAttribute(CommonConstants.BRANCHES_IN_SESSION);
 		if (branches != null && branches.containsKey(branch.getBranchId())) {
+			LOG.debug("Updating branch in session");
 			BranchFromSearch branchInSession = branches.get(branch.getBranchId());
 			branchInSession.setBranchName(branch.getBranchName());
 			branchInSession.setAddress1(branch.getAddress1());
@@ -809,9 +814,20 @@ public class HierarchyManagementController {
 			branchInSession.setStatus(branch.getStatus());
 		}
 		else {
-			throw new NoRecordsFetchedException("Unable to update branch in session", DisplayMessageConstants.GENERAL_ERROR);
+			LOG.debug("Adding newly created branch to session");
+			BranchFromSearch branchInSession = new BranchFromSearch();
+			branchInSession.setBranchId(branch.getBranchId());
+			branchInSession.setCompanyId(branch.getCompany().getCompanyId());
+			branchInSession.setIsDefaultBySystem(branch.getIsDefaultBySystem());
+			branchInSession.setBranchName(branch.getBranchName());
+			branchInSession.setAddress1(branch.getAddress1());
+			branchInSession.setBranchName(branch.getAddress2());
+			branchInSession.setRegionId(branch.getRegion().getRegionId());
+			branchInSession.setRegionName(branch.getRegion().getRegion());
+			branchInSession.setStatus(branch.getStatus());
+			branches.put(branch.getBranchId(), branchInSession);
 		}
-		LOG.info("Method updateBranchInSession completed successfully");
+		LOG.info("Method addOrUpdateBranchInSession completed successfully");
 	}
 
 	/**
@@ -901,7 +917,7 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to update region with Id : " + regionId);
 				Region region = organizationManagementService.updateRegion(user, regionId, regionName, regionAddress1, regionAddress2,
 						selectedUserId, assigneeEmailIds, isAdmin);
-				updateRegionInSession(region, session);
+				addOrUpdateRegionInSession(region, session);
 
 				LOG.debug("Successfully executed service to update a region");
 
@@ -928,11 +944,12 @@ public class HierarchyManagementController {
 	 * @param session
 	 * @throws NoRecordsFetchedException
 	 */
-	private void updateRegionInSession(Region region, HttpSession session) throws NoRecordsFetchedException {
-		LOG.info("Method updateRegionInSession called for region:" + region);
+	private void addOrUpdateRegionInSession(Region region, HttpSession session) throws NoRecordsFetchedException {
+		LOG.info("Method addOrUpdateRegionInSession called for region:" + region);
 		@SuppressWarnings("unchecked") Map<Long, RegionFromSearch> regions = (Map<Long, RegionFromSearch>) session
 				.getAttribute(CommonConstants.REGIONS_IN_SESSION);
 		if (regions != null && regions.containsKey(region.getRegionId())) {
+			LOG.debug("Updating region in session");
 			RegionFromSearch regionInSession = regions.get(region.getRegionId());
 			regionInSession.setRegionName(region.getRegion());
 			regionInSession.setAddress1(region.getAddress1());
@@ -940,9 +957,18 @@ public class HierarchyManagementController {
 			regionInSession.setStatus(region.getStatus());
 		}
 		else {
-			throw new NoRecordsFetchedException("Unable to update region in session", DisplayMessageConstants.GENERAL_ERROR);
+			LOG.debug("Adding region in session");
+			RegionFromSearch regionInSession = new RegionFromSearch();
+			regionInSession.setIsDefaultBySystem(region.getIsDefaultBySystem());
+			regionInSession.setRegionId(region.getRegionId());
+			regionInSession.setCompanyId(region.getCompany().getCompanyId());
+			regionInSession.setRegionName(region.getRegion());
+			regionInSession.setAddress1(region.getAddress1());
+			regionInSession.setAddress2(region.getAddress2());
+			regionInSession.setStatus(region.getStatus());
+			regions.put(region.getRegionId(), regionInSession);
 		}
-		LOG.info("Method updateRegionInSession executed successfully");
+		LOG.info("Method addOrUpdateRegionInSession executed successfully");
 	}
 
 	/**

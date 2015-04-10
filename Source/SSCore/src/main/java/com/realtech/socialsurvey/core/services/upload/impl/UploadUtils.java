@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.exception.FatalException;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -117,6 +118,9 @@ public final class UploadUtils {
 		LOG.debug("Validation imageDimension method inside ImageUploadServiceImpl called");
 		ImageInputStream imageStream = null;
 		ImageReader reader = null;
+		if(maxWidth == -1 && maxHeight == -1) {
+			return true;
+		}
 		try {
 			imageStream = ImageIO.createImageInputStream(logo);
 			Iterator<ImageReader> readers = ImageIO.getImageReaders(imageStream);
