@@ -3522,6 +3522,14 @@ button.paypal.is-active {
     border-bottom: 1px solid #dcdcdc;
 }
 
+.se-dd-item {
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 5px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
 .pe-dd-item: last-child {
     border-bottom: 0;
 }

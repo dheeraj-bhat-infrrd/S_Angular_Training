@@ -55,7 +55,6 @@ import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 // JIRA: SS-24 BY RM02 BOC
-
 /**
  * Controller to manage the organizational settings and information provided by the user.
  */
@@ -337,45 +336,40 @@ public class OrganizationManagementController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
-	public String showCompanySettings(Model model, HttpServletRequest request) {
-		LOG.info("Method showCompanySettings of UserManagementController called");
+	@RequestMapping(value = "/showsettings", method = RequestMethod.GET)
+	public String showSettings(Model model, HttpServletRequest request) {
+		LOG.info("Method showSettings of UserManagementController called");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
-		try {
-			LOG.debug("Getting company settings");
-			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
-			LOG.debug("Showing company settings: " + companySettings.toString());
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		
+		UserProfile selectedProfile = null;
+		String profileIdStr = request.getParameter("profileId");
+		if (profileIdStr == null) {
+			selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		}
+		if (selectedProfile == null) {
+			selectedProfile = userManagementService.updateSelectedProfile(request, session, user);
+		}
+		
+		OrganizationUnitSettings unitSettings = null;
+		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			unitSettings = userSettings.getCompanySettings();
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			unitSettings = userSettings.getRegionSettings().get(selectedProfile.getRegionId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			unitSettings = userSettings.getBranchSettings().get(selectedProfile.getBranchId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			unitSettings = userSettings.getAgentSettings();
+		}
+		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 
-			// setting the object in settings
-			session.setAttribute("companysettings", companySettings);
-			
-			// setting user profile in session
-			List<UserProfile> userProfiles = user.getUserProfiles();
-			UserProfile selectedProfile = null;
-			for (UserProfile profile : userProfiles) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-					selectedProfile = profile;
-				}
-			}
-			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			
-			// setting userprofile settings in session
-			OrganizationUnitSettings profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings,
-					selectedProfile.getBranchId(), selectedProfile.getRegionId(), selectedProfile.getProfilesMaster().getProfileId());
-			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-			
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-		return JspResolver.COMPANY_SETTINGS;
+		return JspResolver.EDIT_SETTINGS;
 	}
 
 	/**
