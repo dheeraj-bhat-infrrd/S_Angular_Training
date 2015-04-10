@@ -926,6 +926,11 @@ function updateCurrentProfile(profileId) {
 }
 
 function updateCircles() {
+	$('#dg-img-1').find('svg').remove();
+	$('#dg-img-2').find('svg').remove();
+	$('#dg-img-3').find('svg').remove();
+	$('#dg-img-4').find('svg').remove();
+
 	circle1 = new ProgressBar.Circle('#dg-img-1', {
 		color : '#7AB400',
 		fill : "rgba(249,249,251, 1)",

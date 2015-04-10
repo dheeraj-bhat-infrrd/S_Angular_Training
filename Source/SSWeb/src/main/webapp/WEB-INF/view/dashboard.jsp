@@ -330,8 +330,9 @@ $('.da-dd-item').click(function(){
 	$('#dashboard-sel').html($(this).html());
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 	
+	// update selected profile in session
 	var newProfileId = $(this).attr('data-profile-master-id');
-	// updateCurrentProfile(newProfileId);
+	updateCurrentProfile(newProfileId);
 
 	var newProfileMasterId = $(this).attr('data-profile-master-id');
 	var newProfileName = $(this).attr('data-column-name');
