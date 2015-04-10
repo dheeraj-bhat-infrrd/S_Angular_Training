@@ -851,14 +851,14 @@ function paintName(columnName, columnValue) {
 		},
 		complete : function(data) {
 			if (success) {
-				if (totalReviews == 0)
-					$("#review-desc").html(
-							"No review found for " + data.responseText);
-				else
-					$("#review-desc").html(
-							"What people say about "
-									+ data.responseText.substring(1,
-											data.responseText.length - 1));
+				if (totalReviews == 0){
+					$("#review-desc").html("No review found for " + data.responseText);
+					return;
+				}
+				else{
+					$("#review-desc").html("What people say about "+ data.responseText.substring(1,data.responseText.length - 1));
+					$("#dsh-cmp-dwnld").show();
+				}				
 			}
 		},
 		error : function(e) {
@@ -904,32 +904,35 @@ function showIncompleteSurvey(columnName, columnValue) {
 
 function paintIncompleteSurvey(result) {
 	var divToPopulate = "";
-	$
-			.each(
-					result,
-					function(i, survey) {
-						divToPopulate += '<div class="dash-lp-item clearfix">'
-								+ '<div class="float-left dash-lp-txt">'
-								+ survey.customerFirstName
-								+ " "
-								+ survey.customerLastName
-								+ ' <span>'
-								+ survey.modifiedOn
-								+ '</span></div>'
-								+ '<div data-custname='
-								+ survey.customerFirstName
-								+ ' '
-								+ survey.customerLastName
-								+ ' data-agentid='
-								+ survey.agentId
-								+ ' data-agentname='
-								+ survey.agentName
-								+ ' data-custemail='
-								+ survey.customerEmail
-								+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
-					});
-	if (startIndexInc == 0)
+	$.each(result,function(i, survey) {
+		divToPopulate += '<div class="dash-lp-item clearfix">'
+				+ '<div class="float-left dash-lp-txt">'
+				+ survey.customerFirstName
+				+ " "
+				+ survey.customerLastName
+				+ ' <span>'
+				+ survey.modifiedOn
+				+ '</span></div>'
+				+ '<div data-custname='
+				+ survey.customerFirstName
+				+ ' '
+				+ survey.customerLastName
+				+ ' data-agentid='
+				+ survey.agentId
+				+ ' data-agentname='
+				+ survey.agentName
+				+ ' data-custemail='
+				+ survey.customerEmail
+				+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
+		});
+	if (startIndexInc == 0){
+		if(divToPopulate == ""){
+			$("#incomplete-survey-header").html("No incomplete surveys found");
+			return;
+		}
 		$("#dsh-inc-srvey").html(divToPopulate);
+		$("#dsh-inc-dwnld").show();
+	}
 	else
 		$("#dsh-inc-srvey").append(divToPopulate);
 	$('#dsh-inc-srvey').perfectScrollbar();
