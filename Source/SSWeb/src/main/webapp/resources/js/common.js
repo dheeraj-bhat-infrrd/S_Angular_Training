@@ -191,3 +191,127 @@ var delay = (function() {
 		timer = setTimeout(callback, ms);
 	};
 })();
+
+function shareOnFacebook(firstName, lastName, agentName, review, score){
+	var success= false;
+	var payload = {
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review,
+			"score" : score
+		};
+		$.ajax({
+			url : "./postonfacebook.do",
+			type : "GET",
+			dataType : "html",
+			data : payload,
+			success : function(data) {
+				if (data.errCode == undefined)
+					success = true;
+			},
+			complete : function(data) {
+				if (success) {
+					showToast(data);
+				}
+			},
+			error : function(e) {
+				console.error("error : " + e.responseText);
+				$('#overlay-toast').html(e.responseText);
+				showToast(e.responseText);
+			}
+		});
+}
+
+function shareOnTwitter(firstName, lastName, agentName, review, score){
+	var success= false;
+	var payload = {
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review,
+			"score" : score
+		};
+		$.ajax({
+			url : "./postontwitter.do",
+			type : "GET",
+			dataType : "html",
+			data : payload,
+			success : function(data) {
+				if (data.errCode == undefined)
+					success = true;
+			},
+			complete : function(data) {
+				if (success) {
+					showToast(data);
+				}
+			},
+			error : function(e) {
+				console.error("error : " + e.responseText);
+				$('#overlay-toast').html(e.responseText);
+				showToast(e.responseText);
+			}
+		});
+}
+
+function shareOnLinkedin(firstName, lastName, agentName, review, score){
+	var success= false;
+	var payload = {
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review,
+			"score" : score
+		};
+		$.ajax({
+			url : "./postonlinkedin.do",
+			type : "GET",
+			dataType : "html",
+			data : payload,
+			success : function(data) {
+				if (data.errCode == undefined)
+					success = true;
+			},
+			complete : function(data) {
+				if (success) {
+					showToast(data);
+				}
+			},
+			error : function(e) {
+				console.error("error : " + e.responseText);
+				$('#overlay-toast').html(e.responseText);
+				showToast(e.responseText);
+			}
+		});
+}
+
+function shareOnYelp(firstName, lastName, agentName, review, score){
+	var success= false;
+	var payload = {
+			"firstName" : firstName,
+			"lastName" : lastName,
+			"agentName" : agentName,
+			"review" : review,
+			"score" : score
+		};
+		$.ajax({
+			url : "./postonyelp.do",
+			type : "GET",
+			dataType : "html",
+			data : payload,
+			success : function(data) {
+				if (data.errCode == undefined)
+					success = true;
+			},
+			complete : function(data) {
+				if (success) {
+					showToast(data);
+				}
+			},
+			error : function(e) {
+				console.error("error : " + e.responseText);
+				$('#overlay-toast').html(e.responseText);
+				showToast(e.responseText);
+			}
+		});
+}

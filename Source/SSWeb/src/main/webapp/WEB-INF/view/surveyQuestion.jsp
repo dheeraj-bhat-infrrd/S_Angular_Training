@@ -66,12 +66,12 @@
 		</div>
 	</div>
 
-	<div id="prof-container" data-agentId="${agentId}" data-agentName="${agentName}" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
+	<div id="prof-container" data-agentid="${agentId}" data-agentName="${agentName}" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 		<div class="container">
 			<div class="sq-ques-wrapper">
-
+				<div id="agnt-img" class="sq-top-img"></div>
 				<div data-ques-type="user-details" class="sq-quest-item">
-					<div class="sq-top-img"></div>
+					<!-- <div id="agnt-img" class="sq-top-img"></div> -->
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">Please fill in your details to take survey</span></i>
@@ -129,7 +129,7 @@
 				</div>
 
 				<div data-ques-type="stars" class="sq-quest-item">
-					<div class="sq-top-img"></div>
+					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt">Survey Question</div>
 					<div class="sq-ques">
 						<i><span id="ques-text" class="sq-ques-txt"></span></i>
@@ -150,7 +150,7 @@
 					</div>
 				</div>
 				<div data-ques-type="smiley" class="sq-quest-item hide">
-					<div class="sq-top-img"></div>
+					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
 					<div class="sq-ques">
 						<i><span id="ques-text-smiley" class="sq-ques-txt"></span></i>
@@ -173,7 +173,7 @@
 
 				<!-- Div for rating questions of  scale  -->
 				<div data-ques-type="scale" class="sq-quest-item hide">
-					<div class="sq-top-img"></div>
+					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
 					<div id="ques-text-scale" class="sq-ques">
 						<i><span class="sq-ques-txt"></span></i>
@@ -203,7 +203,7 @@
 
 				<!-- For text area -->
 				<div data-ques-type="smiley-text-final" class="sq-quest-item hide">
-					<div class="sq-top-img"></div>
+					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
 					<div class="sq-ques">
 						<i><span id="ques-text-textarea" class="sq-ques-txt"></span></i>
@@ -231,7 +231,7 @@
 
 				<!-- Div for MC type questions -->
 				<div data-ques-type="mcq" class="sq-quest-item hide">
-					<div class="sq-top-img"></div>
+					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
 					<div class="sq-ques">
 						<i><span id="mcq-ques-text" class="sq-ques-txt">lorem
@@ -251,7 +251,7 @@
 				
 				<!-- Div for Error Messages -->
 				<div data-ques-type="error" class="sq-quest-item hide">
-					<div class="sq-top-img"></div>
+					<!-- <div class="sq-top-img"></div> -->
 					<div id="content-head" class="sq-main-txt">Error</div>
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>
@@ -290,6 +290,10 @@
 <script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
+	
+	var agentId = $('#prof-container').attr("data-agentid");
+	loadAgentPic(agentId);
+	
 	var survQuesNo = 1;
 	var nextQ, prevQ;
 
