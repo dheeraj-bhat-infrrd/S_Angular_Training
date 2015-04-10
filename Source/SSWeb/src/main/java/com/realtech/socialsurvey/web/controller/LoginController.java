@@ -237,14 +237,7 @@ public class LoginController {
 					}
 					
 					// updating session with aggregated user profiles
-					Map<Long, String> profileNameMap = userManagementService.getProcessedUserProfiles(user);
-					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileNameMap);
-					
-					// settings current profile in session
-					UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-					session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileNameMap.get(selectedProfile.getUserProfileId()));
-					LOG.info(profileNameMap.get(selectedProfile.getUserProfileId()));
+					userManagementService.processedUserProfiles(user, session);
 				}
 				else {
 					LOG.info("No User profile present");
@@ -291,7 +284,7 @@ public class LoginController {
 		HttpSession session = request.getSession(false);
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		try {
-			setUserInModel(model, sessionHelper.getCurrentUser(), accountType);
+			setUserInModel(model, sessionHelper.getCurrentUser(), accountType, session);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
@@ -611,12 +604,33 @@ public class LoginController {
 	}
 
 	@SuppressWarnings("unchecked")
-	private Model setUserInModel(Model model, User user, AccountType accountType) throws InvalidInputException, SolrException {
+	private Model setUserInModel(Model model, User user, AccountType accountType, HttpSession session) throws InvalidInputException, SolrException {
 		model.addAttribute("userId", user.getUserId());
 		model.addAttribute("emailId", user.getEmailId());
 		model.addAttribute("accountType", accountType);
 		List<Long> regionIds = new ArrayList<>();
 		List<Long> branchIds = new ArrayList<>();
+		
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+		model.addAttribute("profileMasterId", profileMasterId);
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+			model.addAttribute("columnValue", user.getCompany().getCompanyId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getRegionId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getBranchId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getAgentId());
+		}
+		
 		for (UserProfile userProfile : user.getUserProfiles()) {
 			switch (userProfile.getProfilesMaster().getProfileId()) {
 				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
@@ -646,6 +660,7 @@ public class LoginController {
 						model.addAttribute("branchIds", branchIds);
 					}
 					return model;
+					
 				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
 					model.addAttribute("regionAdmin", true);
 					// Add list of region Ids, user is admin of. Currently adding only 1st region
@@ -667,7 +682,6 @@ public class LoginController {
 					break;
 
 				default:
-
 			}
 		}
 		return model;

@@ -167,6 +167,10 @@ public class DashboardController {
 		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
 		Map<String, Object> profileDetails = new HashMap<>();
 		User user = sessionHelper.getCurrentUser();
+		
+		// TODO setting selected profile in session
+		
+		
 		String columnName = request.getParameter("columnName");
 		long columnValue = 0;
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {

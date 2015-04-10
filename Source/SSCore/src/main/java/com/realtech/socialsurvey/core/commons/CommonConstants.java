@@ -189,6 +189,7 @@ public interface CommonConstants {
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
 	public static final String USER_PROFILE_LIST = "profileList";
+	public static final String USER_PROFILE_MAP = "profileMap";
 	public static final String USER_PROFILE_SETTINGS = "profileSettings";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
