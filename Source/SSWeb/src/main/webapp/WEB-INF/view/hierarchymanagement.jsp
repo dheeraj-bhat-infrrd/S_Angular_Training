@@ -5,7 +5,7 @@
     <div class="container">
         <div class="hm-header-row clearfix">
             <div class="float-left hm-header-row-left"><spring:message code="label.buildcompanyhierarchy.key"/></div>
-            <a class="float-right hm-header-row-right hm-rt-btn-lnk" href="javascript:showMainContent('./showsettings.do')">
+            <a class="float-right hm-header-row-right hm-rt-btn-lnk" href="javascript:showMainContent('./showcompanysettings.do')">
             	<spring:message code="label.editcompany.key"/>
             </a>
         </div>

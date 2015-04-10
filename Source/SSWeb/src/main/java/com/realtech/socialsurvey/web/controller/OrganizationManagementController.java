@@ -338,9 +338,9 @@ public class OrganizationManagementController {
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/showsettings", method = RequestMethod.GET)
-	public String showSettings(Model model, HttpServletRequest request) {
-		LOG.info("Method showSettings of UserManagementController called");
+	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
+	public String showCompanySettings(Model model, HttpServletRequest request) {
+		LOG.info("Method showCompanySettings of UserManagementController called");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 

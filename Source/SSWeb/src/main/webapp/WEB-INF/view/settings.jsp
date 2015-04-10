@@ -347,6 +347,6 @@ $('.se-dd-item').click(function(){
 	$('#setting-sel').html($(this).html());
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 	
-	showMainContent('./showsettings.do?profileId=' + newProfileId);
+	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
 });
 </script>
