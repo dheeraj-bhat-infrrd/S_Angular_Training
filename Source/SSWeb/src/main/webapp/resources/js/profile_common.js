@@ -14,6 +14,7 @@ function initSurveyReview(userId) {
 			type : "GET",
 			data : payload,
 			datatype : "html",
+			async : false,
 			success : function(data) {
 				if (data.errCode == undefined)
 					success = true;
