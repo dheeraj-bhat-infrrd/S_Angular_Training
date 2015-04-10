@@ -117,33 +117,8 @@ public class LoginController {
 	}
 
 	@RequestMapping(value = "/landing")
-	public String initLandingPage(Model model, HttpServletRequest request) {
+	public String initLandingPage() {
 		LOG.info("Login Page started");
-		
-		User user = sessionHelper.getCurrentUser();
-		HttpSession session = request.getSession(true);
-
-		// updating session with aggregated user profiles
-		try {
-			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
-			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-			userManagementService.processedUserProfiles(user, accountType, profileSmallMap, profileMap);
-			
-			if (profileSmallMap.size() > 0) {
-				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
-				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-			}
-			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
-			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		}
-		catch (NonFatalException e) {
-			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.LOGIN;
-		}
-
 		return JspResolver.LANDING;
 	}
 
@@ -256,19 +231,6 @@ public class LoginController {
 						// Set the session variables
 						sessionHelper.setSettingVariablesInSession(session);
 					}
-					
-					// updating session with aggregated user profiles
-					Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
-					Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-					UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-					userManagementService.processedUserProfiles(user, accountType, profileSmallMap, profileMap);
-					
-					if (profileSmallMap.size() > 0) {
-						session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
-						session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-					}
-					session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
-					session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 				}
 				else {
 					LOG.info("No User profile present");
@@ -313,7 +275,40 @@ public class LoginController {
 	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
 		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser(); 
+
 		try {
+			// updating session with aggregated user profiles
+			try {
+				user = userManagementService.getUserByUserId(user.getUserId());
+				
+				AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+				Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+				UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				LOG.info("Size of profiles: " + user.getUserProfiles().size());
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						selectedProfile = profile;
+						break;
+					}
+				}
+				session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+
+				Map<Long, UserProfileSmall> profileSmallMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+				if (profileSmallMap.size() > 0) {
+					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+				}
+				session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+				
+				LOG.info("Profile Size" + user.getUserProfiles().size());
+			}
+			catch (NonFatalException e) {
+				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.LOGIN;
+			}
+
 			setUserInModel(model, sessionHelper.getCurrentUser(), session);
 		}
 		catch (InvalidInputException e) {
