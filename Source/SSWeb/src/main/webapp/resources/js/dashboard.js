@@ -597,7 +597,8 @@ function paintProfileDetails(data) {
 	$("#badges").removeClass(".dsg-g-rbn-1");
 	$("#badges").removeClass(".dsg-g-rbn-2");
 	$("#badges").removeClass(".dsg-g-rbn-3");
-	$("#name").html(data.responseJSON.name);
+	if (data.responseJSON.name != undefined)
+		$("#name").html(data.responseJSON.name);
 	if (data.responseJSON.title != undefined)
 		$("#designation").html(data.responseJSON.title);
 	if (data.responseJSON.company != undefined)
