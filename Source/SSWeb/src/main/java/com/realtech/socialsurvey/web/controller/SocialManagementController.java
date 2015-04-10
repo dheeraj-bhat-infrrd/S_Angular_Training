@@ -40,6 +40,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
+import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -63,13 +64,13 @@ public class SocialManagementController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
-	
+
 	@Autowired
 	private SocialAsyncService socialAsyncService;
 
 	@Autowired
 	private SocialManagementService socialManagementService;
-	
+
 	@Autowired
 	private UserManagementService userManagementService;
 
@@ -89,7 +90,7 @@ public class SocialManagementController {
 	private String linkedinAuthUri;
 	@Value("${LINKED_IN_ACCESS_URI}")
 	private String linkedinAccessUri;
-	
+
 	// Google
 	@Value("${GOOGLE_API_KEY}")
 	private String googleApiKey;
@@ -120,7 +121,7 @@ public class SocialManagementController {
 		String socialFlow = request.getParameter("flow");
 		switch (socialNetwork) {
 
-			// Building facebook authUrl
+		// Building facebook authUrl
 			case "facebook":
 				Facebook facebook = socialManagementService.getFacebookInstance();
 
@@ -155,12 +156,12 @@ public class SocialManagementController {
 				if (socialFlow != null && !socialFlow.isEmpty()) {
 					session.setAttribute(CommonConstants.SOCIAL_FLOW, socialFlow);
 				}
-				
+
 				StringBuilder linkedInAuth = new StringBuilder(linkedinAuthUri).append("?response_type=").append("code");
 				linkedInAuth.append("&client_id=").append(linkedInApiKey);
 				linkedInAuth.append("&redirect_uri=").append(linkedinRedirectUri);
 				linkedInAuth.append("&state=").append("SOCIALSURVEY");
-				
+
 				model.addAttribute(CommonConstants.SOCIAL_AUTH_URL, linkedInAuth.toString());
 
 				LOG.info("Returning the linkedin authorizationurl : " + linkedInAuth.toString());
@@ -280,7 +281,7 @@ public class SocialManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				
+
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens = updateFacebookToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
@@ -288,9 +289,10 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
@@ -306,7 +308,7 @@ public class SocialManagementController {
 		LOG.info("Facebook Access tokens obtained and added to mongo successfully!");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
-	
+
 	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens) {
 		LOG.debug("Method updateFacebookToken() called from SocialManagementController");
 		if (mediaTokens == null) {
@@ -424,7 +426,7 @@ public class SocialManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				
+
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens = updateTwitterToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
@@ -432,9 +434,10 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
@@ -472,7 +475,7 @@ public class SocialManagementController {
 		LOG.debug("Method updateTwitterToken() finished from SocialManagementController");
 		return mediaTokens;
 	}
-	
+
 	/**
 	 * The url that LinkedIn send request to with the oauth verification code
 	 * 
@@ -565,7 +568,7 @@ public class SocialManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				
+
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens = updateLinkedInToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
@@ -577,9 +580,10 @@ public class SocialManagementController {
 						mediaTokens.getLinkedInToken());
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
@@ -614,7 +618,7 @@ public class SocialManagementController {
 		LOG.debug("Method updateLinkedInToken() finished from SocialManagementController");
 		return mediaTokens;
 	}
-	
+
 	/**
 	 * The url that Google send request to with the oauth verification code
 	 * 
@@ -697,7 +701,7 @@ public class SocialManagementController {
 				if (agentSettings == null) {
 					throw new InvalidInputException("No Agent settings found in current session");
 				}
-				
+
 				mediaTokens = agentSettings.getSocialMediaTokens();
 				mediaTokens = updateGoogleToken(accessToken, mediaTokens);
 				mediaTokens = socialManagementService.updateAgentSocialMediaTokens(agentSettings, mediaTokens);
@@ -705,9 +709,10 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.", DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
+						DisplayMessageConstants.GENERAL_ERROR);
 			}
-			
+
 			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
@@ -723,59 +728,94 @@ public class SocialManagementController {
 		LOG.info("Method authenticateGoogleAccess() finished from SocialManagementController");
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
-	
+
 	@ResponseBody
-	@RequestMapping(value = "/posttosocialmedia", method = RequestMethod.GET)
-	public String postToSocialMedia(HttpServletRequest request){
-		LOG.info("Method to post feedback of customer to various pages of social networking sites started.");
-		try{
-			String agentName = request.getParameter("agentName");
-			String custFirstName = request.getParameter("firstName");
-			String custLastName =  request.getParameter("lastName");
-			String agentIdStr = request.getParameter("agentId");
-			String ratingStr = request.getParameter("rating");
-			long agentId = 0;
-			double rating = 0;
-			try{
-				agentId = Long.parseLong(agentIdStr);
-				rating = Double.parseDouble(ratingStr);
-			}catch(NumberFormatException e){
-				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
-				return e.getMessage();
-			}
-			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
-			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String facebookMessage = rating + "-Star Survey Response from " + custFirstName +" " + custLastName + " for "
-					+ agentName + " on Social Survey \n" ;
-			String twitterMessage = rating + "-Star Survey Response from "+ custFirstName + custLastName + "for "+ agentName +" on @SocialSurvey - view at www.social-survey.com/"+agentIdStr;
-			try {
-				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
-				for(OrganizationUnitSettings setting : settings){
-					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
-				}
-			}
-			catch (FacebookException e) {
-				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
-				throw new NonFatalException("FacebookException caught in postToSocialMedia() while trying to post to facebook in postToSocialMedia(). Nested exception is ", e);
-			}
-			try {
-				socialManagementService.tweet(agentSettings, twitterMessage);
-				for(OrganizationUnitSettings setting : settings){
-					socialManagementService.tweet(setting, twitterMessage);
-				}
-			}
-			catch (TwitterException e) {
-				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
-				throw new NonFatalException("TwitterException caught in postToSocialMedia() while trying to tweet in postToSocialMedia(). Nested exception is ", e);
-			}
-		}catch(NonFatalException e){
-			LOG.error("Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ", e);
+	@RequestMapping(value = "/postonfacebook", method = RequestMethod.GET)
+	public String postToFacebook(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer to facebook started.");
+		String agentName = request.getParameter("agentName");
+		String custFirstName = request.getParameter("firstName");
+		String custLastName = request.getParameter("lastName");
+		String ratingStr = request.getParameter("score");
+		String review = request.getParameter("review");
+		double rating = 0;
+		try {
+			rating = Double.parseDouble(ratingStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception caught in postToFacebook() while trying to convert agent Id. Nested exception is ", e);
 			return e.getMessage();
 		}
-		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
-		return "Successfully posted to all the places in hierarchy";
+
+		User user = sessionHelper.getCurrentUser();
+		long userId = user.getUserId();
+
+		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
+
+		String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+				+ " on Social Survey \n" + review;
+		for (OrganizationUnitSettings setting : settings) {
+			try {
+				if(setting!=null)
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+			}
+			catch (FacebookException | InvalidInputException e) {
+				LOG.error("FacebookException/InvalidInputException caught in postToFacebook() while trying to post to facebook. Nested excption is ",
+						e);
+			}
+		}
+		LOG.info("Method to post feedback of customer to facebook finished.");
+		return "Successfully posted to all the your facebook profiles";
 	}
-	
+
+	@ResponseBody
+	@RequestMapping(value = "/postontwitter", method = RequestMethod.GET)
+	public String postToTwitter(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer on twitter started.");
+		try {
+			String agentName = request.getParameter("agentName");
+			String custFirstName = request.getParameter("firstName");
+			String custLastName = request.getParameter("lastName");
+			String ratingStr = request.getParameter("rating");
+			String agentIdStr = request.getParameter("agentId");
+			double rating = 0;
+			try {
+				rating = Double.parseDouble(ratingStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToTwitter() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+
+			User user = sessionHelper.getCurrentUser();
+			long userId = user.getUserId();
+
+			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
+
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					if(setting!=null)
+						socialManagementService.tweet(setting, twitterMessage);
+				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
+					throw new NonFatalException(
+							"TwitterException caught in postToTwitter() while trying to post to twitter in postToTwitter(). Nested exception is ", e);
+				}
+			}
+
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal Exception caught in postToTwitter() while trying to post to social networking sites. Nested excption is ", e);
+			return e.getMessage();
+		}
+		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
+		return "Successfully posted to all the your twitter profiles";
+	}
+
 	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens) {
 		LOG.debug("Method updateGoogleToken() called from SocialManagementController");
 		if (mediaTokens == null) {
