@@ -299,8 +299,6 @@ public class LoginController {
 					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 				}
 				session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
-				
-				LOG.info("Profile Size" + user.getUserProfiles().size());
 			}
 			catch (NonFatalException e) {
 				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
