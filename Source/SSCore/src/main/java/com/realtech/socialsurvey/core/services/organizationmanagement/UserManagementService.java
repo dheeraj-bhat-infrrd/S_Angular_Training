@@ -2,6 +2,8 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -255,5 +257,16 @@ public interface UserManagementService {
 	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password)
 			throws InvalidInputException, SolrException;
 
+	/**
+	 * Method to user profiles data in session and return selected profile
+	 * 
+	 * @param user
+	 * @param session
+	 * @return
+	 * @throws NonFatalException
+	 */
+	public void processedUserProfiles(User user, HttpSession session) throws NonFatalException;
+
+	public UserProfile updateSelectedProfile(HttpServletRequest request, HttpSession session, User user);
 }
 // JIRA SS-34 BY RM02 BOC

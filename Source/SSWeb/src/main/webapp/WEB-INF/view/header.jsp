@@ -68,9 +68,9 @@
 						<a href="javascript:showMainContent('./showbuildhierarchypage.do')"><spring:message code="label.header.buildhierarchy.key" /></a>
 					</div>
 				</c:if>
-				<c:if test="${highestrole == 1 && accountMasterId != 5}">
+				<c:if test="${accountMasterId != 5}">
 					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
+						<a href="javascript:showMainContent('./showsettings.do')"><spring:message code="label.editcompany.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId <5 && highestrole != 4}">
@@ -80,7 +80,7 @@
 				</c:if>
 				<c:if test="${highestrole == 1}">
 					<div class="header-links-item">
-						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.settings.company.key" /></a>
+						<a href="javascript:showMainContent('./showcompanysettings.do')"><spring:message code="label.editcompany.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId < 4}">
@@ -89,7 +89,7 @@
 					</div>
 				</c:if>
 				<div class="header-links-item">
-					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.profilesetting.key" /></a>
+					<a href="javascript:showMainContent('./showprofilepage.do')"><spring:message code="label.editprofile.key" /></a>
 				</div>
 				<div class="header-links-item" >
 					<a href="javascript:showMainContent('./showchangepasswordpage.do')"><spring:message code="label.changepassword.key"/></a>
@@ -115,14 +115,12 @@
 				</c:if>
 				<c:if test="${highestrole == 1 && accountMasterId != 5}">
 					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message
-								code="label.header.buildsurvey.key" /></a>
+						<a href="javascript:showMainContent('./showbuildsurveypage.do')"><spring:message code="label.header.buildsurvey.key" /></a>
 					</div>
 				</c:if>
 				<c:if test="${accountMasterId > 1 && accountMasterId < 5 && highestrole != 4 }">
 					<div class="hdr-link-item">
-						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message
-								code="label.header.usermanagement.key" /></a>
+						<a href="javascript:showMainContent('./showusermangementpage.do')"><spring:message code="label.header.usermanagement.key" /></a>
 					</div>
 				</c:if>
 			</div>
@@ -130,13 +128,13 @@
 				<div id="hdr-usr-img" class="float-left user-info-initial">
 					<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
 					<div class="initial-dd-wrapper hide blue-arrow-bot text-normal">
-						<c:if test="${highestrole == 1 && accountMasterId != 5}">
-							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showcompanysettings.do')">
-								<spring:message code="label.settings.company.key" />
+						<c:if test="${accountMasterId != 5}">
+							<div class="initial-dd-item" id="company-setting" onclick="showMainContent('./showsettings.do')">
+								<spring:message code="label.editcompany.key" />
 							</div>
 						</c:if>
 						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do')">
-							<spring:message code="label.profilesetting.key" />
+							<spring:message code="label.editprofile.key" />
 						</div>
 						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do')">
 							<spring:message code="label.changepassword.key"/>
