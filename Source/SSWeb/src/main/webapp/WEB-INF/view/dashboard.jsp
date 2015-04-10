@@ -31,48 +31,41 @@
 			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
 
 			<div class="row row-dash-top-adj">
-				<div
-					class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
 					<div class="dsh-graph-wrapper">
 						<div class="dsh-g-wrap dsh-g-wrap-1">
 							<div class="dsh-graph-item dsh-graph-item-1">
 								<div id="dg-img-1" class="dsh-graph-img"></div>
 								<div id="socl-post" class="dsh-graph-num">400</div>
-								<div id="" class="dsh-graph-txt dsh-graph-txt-1">Social
-									Post In Last 30 Days</div>
+								<div class="dsh-graph-txt dsh-graph-txt-1">Social Post In Last 30 Days</div>
 							</div>
 						</div>
 						<div class="dsh-g-wrap dsh-g-wrap-2">
 							<div class="dsh-graph-item dsh-graph-item-1">
 								<div id="dg-img-2" class="dsh-graph-img"></div>
 								<div id="srv-snt-cnt" class="dsh-graph-num">3000</div>
-								<div id="" class="dsh-graph-txt dsh-graph-txt-2">Total
-									Surveys Sent</div>
+								<div class="dsh-graph-txt dsh-graph-txt-2">Total Surveys Sent</div>
 							</div>
 						</div>
 						<div class="dsh-g-wrap dsh-g-wrap-3">
 							<div class="dsh-graph-item dsh-graph-item-1">
 								<div id="dg-img-3" class="dsh-graph-img"></div>
 								<div id="srv-scr" class="dsh-graph-num">4/5</div>
-								<div id="" class="dsh-graph-txt dsh-graph-txt-3">Survey
-									Score Over Last 30 Days</div>
+								<div class="dsh-graph-txt dsh-graph-txt-3">Survey Score Over Last 30 Days</div>
 							</div>
 						</div>
 						<div class="dsh-g-wrap dsh-g-wrap-4">
 							<div class="dsh-graph-item dsh-graph-item-1">
 								<div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>
-								<div id="dsh-prsn-img"
-									class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
-								<div id="" class="dsh-graph-txt dsh-graph-txt-4">Profile
-									Completed</div>
+								<div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
+								<div class="dsh-graph-txt dsh-graph-txt-4">Profile Completed</div>
 								<div id="badges" class="dsg-g-rbn"></div>
 							</div>
 						</div>
 					</div>
 				</div>
 
-				<div
-					class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
+				<div class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
 					<div class="dash-left-txt-wrapper">
 						<div class="dsh-name-wrapper">
 							<div id="name" class="dsh-txt-1"></div>
@@ -87,7 +80,7 @@
 							<div class="float-left dsh-star-item no-star"></div>
 							<div id="profile-completed" class="float-right dsh-rating-item">3/5</div>
 						</div>
-						<div class="dsh-btn-complete">Complete Your Profile</div>
+						<div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')">Complete Your Profile</div>
 					</div>
 				</div>
 			</div>
@@ -98,15 +91,12 @@
 				<div class="dash-sub-head">Survey Status</div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
-					<select id="selection-list" class="float-left dash-sel-item">
-					</select>
+					<select id="selection-list" class="float-left dash-sel-item"></select>
 				</div>
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-sel-item" class="dash-sel-item" type="text"
-							placeholder="Start typing..."
-							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
+						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..." onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
 						<div id="dsh-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
@@ -124,26 +114,19 @@
 			<div class="float-left stats-right">
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">No. of surveys sent</div>
-					<div id="all-surv-icn" class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="all-surv-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Surveys clicked</div>
-					<div id="clicked-surv-icn"
-						class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Surveys completed</div>
-					<div id="completed-surv-icn"
-						class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="completed-surv-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<div class="clearfix stat-icns-wrapper">
 					<div class="float-left stat-icn-lbl">Social posts</div>
-					<div id="social-post-icn"
-						class="float-left stat-icns-item clearfix">
-					</div>
+					<div id="social-post-icn" class="float-left stat-icns-item clearfix"></div>
 				</div>
 				<!--<div class="clearfix stat-icns-wrapper">
                     <div class="float-left stat-icn-lbl">No. of social posts</div>
@@ -170,8 +153,7 @@
                 <div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl">Choose</div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..."
-							onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..." onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
 						<div id="dsh-grph-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
@@ -343,11 +325,5 @@ $('.da-dd-item').click(function(){
 	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
 	$('#prof-container').attr('data-column-name', newProfileName);
 	$('#prof-container').attr('data-column-value', newProfileValue);
-});
-
-$('.dsh-btn-complete').click(function() {
-	var newProfileId = $('#prof-container').attr('data-profile-id');
-	// showMainContent('./showprofilepage.do?profileId=' + newProfileId);
-	showMainContent('./showprofilepage.do');
 });
 </script>
