@@ -2001,9 +2001,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			selectedProfile = profileMap.get(profileId);
 		}
 
-		LOG.info(profileSmallMap.keySet().toString());
-		LOG.info(profileSmallMap.get(selectedProfile.getUserProfileId())+"");
-		
 		// setting session attributes
 		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());

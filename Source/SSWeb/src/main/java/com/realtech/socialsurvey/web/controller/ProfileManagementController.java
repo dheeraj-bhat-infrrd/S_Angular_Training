@@ -121,17 +121,23 @@ public class ProfileManagementController {
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
-		long branchId = 0;
-		long regionId = 0;
-
 		// getting session variables
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 		
-		// fetching selected profile
-		UserProfile selectedProfile = userManagementService.updateSelectedProfile(request, session, user);
-
+		// fetching selected profile if not in session
+		UserProfile selectedProfile = null;
+		String profileIdStr = request.getParameter("profileId");
+		if (profileIdStr == null) {
+			selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		}
+		if (selectedProfile == null) {
+			selectedProfile = userManagementService.updateSelectedProfile(request, session, user);
+		}
+		
 		// fetching details from profile
+		long branchId = 0;
+		long regionId = 0;
 		int profilesMaster = 0;
 		if (selectedProfile != null) {
 			branchId = selectedProfile.getBranchId();
