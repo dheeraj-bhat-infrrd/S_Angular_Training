@@ -189,6 +189,7 @@ public interface CommonConstants {
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
 	public static final String USER_PROFILE_LIST = "profileList";
+	public static final String USER_PROFILE_MAP = "profileMap";
 	public static final String USER_PROFILE_SETTINGS = "profileSettings";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
@@ -200,6 +201,7 @@ public interface CommonConstants {
 	public static final String SOCIAL_FLOW = "socialFlow";
 	public static final String BRANCHES_IN_SESSION = "branchesInSession";
 	public static final String REGIONS_IN_SESSION = "regionsInSession";
+	public static final String PROFILE_AGENT_VIEW = "Myself";
 
 	/**
 	 * Batch Constants
