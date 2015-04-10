@@ -133,10 +133,11 @@ public class LoginController {
 			
 			if (profileSmallMap.size() > 0) {
 				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 			}
 			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());		}
+		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
@@ -264,10 +265,10 @@ public class LoginController {
 					
 					if (profileSmallMap.size() > 0) {
 						session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+						session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 					}
 					session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 					session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 				}
 				else {
 					LOG.info("No User profile present");
