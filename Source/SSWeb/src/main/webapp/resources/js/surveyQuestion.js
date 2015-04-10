@@ -73,6 +73,35 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 	});
 }
 
+function loadAgentPic(agentId){
+	var imageUrl;
+	var success = false;
+	var payload = {
+		"agentId" : agentId
+	};
+	$.ajax({
+		url : "./../displaypiclocationofagent",
+		type : "GET",
+		dataType : "text",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				imageUrl = data.responseText;
+				if(imageUrl!='' && imageUrl!=null)
+					$("#agnt-img").css("background", "url("+imageUrl+") no-repeat center");
+					$("#agnt-img").css("background-size", "contain");
+			}
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+		}
+	});
+}
+
 function paintSurveyPage(jsonData) {
 	$("#pst-srvy-div").hide();
 	questions = jsonData.responseJSON.survey;
@@ -103,7 +132,7 @@ function paintSurveyPageFromJson() {
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
-	question.replace(/[agentname]/gi, agentName);
+	question.replace(/[name]/gi, agentName);
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (questionType == "sb-range-star") {
