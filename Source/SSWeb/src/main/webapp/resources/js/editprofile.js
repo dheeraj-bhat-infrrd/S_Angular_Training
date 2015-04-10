@@ -45,6 +45,33 @@ $(document).on('blur', '.prof-edditable-sin', function() {
 	}
 });
 
+$(document).on('click', '.fb-shr', function() {
+	var firstName = $(this).parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().attr('data-agentname');
+	var review = $(this).parent().parent().parent().attr('data-review');
+	var score = $(this).parent().parent().parent().attr('data-score');
+	shareOnFacebook(firstName, lastName, agentName, review, score);
+});
+
+$(document).on('click', '.twt-shr', function() {
+	var firstName = $(this).parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().attr('data-agentname');
+	var review = $(this).parent().parent().parent().attr('data-review');
+	var score = $(this).parent().parent().parent().attr('data-score');
+	shareOnTwitter(firstName, lastName, agentName, review, score);
+});
+
+$(document).on('click', '.lnkdn-shr', function() {
+	var firstName = $(this).parent().parent().parent().attr('data-firstname');
+	var lastName = $(this).parent().parent().parent().attr('data-lastname');
+	var agentName = $(this).parent().parent().parent().attr('data-agentname');
+	var review = $(this).parent().parent().parent().attr('data-review');
+	var score = $(this).parent().parent().parent().attr('data-score');
+	shareOnLinkedin(firstName, lastName, agentName, review, score);
+});
+
 // On hover for lock icons
 $(document).on('mouseover', '#prof-logo-container', function(e) {
 	$(this).find('.prof-img-lock:first').show();
