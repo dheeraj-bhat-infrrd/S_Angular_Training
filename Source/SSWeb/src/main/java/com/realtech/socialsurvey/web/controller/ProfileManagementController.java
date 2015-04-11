@@ -50,6 +50,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -2843,5 +2844,56 @@ public class ProfileManagementController {
 		}
 		LOG.info("Method to verify email finished");
 		return JspResolver.LOGIN;
+	}
+	
+	/*
+	 * Method to store status of the user.
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/savestatus")
+	public String saveStatus(HttpServletRequest request, Model model) {
+		LOG.info("Method to store status of the user started");
+		String text = request.getParameter("text");
+		User user = sessionHelper.getCurrentUser();
+		String postedBy = user.getFirstName()+" "+user.getLastName();
+		profileManagementService.addPostToUserProfile(user.getUserId(), text, postedBy, "profile", System.currentTimeMillis());
+		LOG.info("Method to store status of the user finished");
+		return "Added the status successfully";
+	}
+	
+	/*
+	 * Method to fetch posts for the logged in user.
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/postsforuser")
+	public String getPostsForUser(HttpServletRequest request, Model model) {
+		LOG.info("Method to get posts for the user, getPostsForUser() started");
+		String startIndexStr = request.getParameter("startIndex");
+		String batchSizeStr = request.getParameter("batchSize");
+		if(startIndexStr == null || batchSizeStr == null){
+			LOG.error("Null value found for startIndex or batch size.");
+			return "Null value found for startIndex or batch size.";
+		}
+		
+		int startIndex = Integer.parseInt(startIndexStr);
+		int batchSize = Integer.parseInt(batchSizeStr);
+		
+		User user = sessionHelper.getCurrentUser();
+		List<SocialPost> posts = profileManagementService.getPostsForUser(user.getUserId(), startIndex, batchSize);
+		LOG.info("Method to get posts for the user, getPostsForUser() finished");
+		return new Gson().toJson(posts);
+	}
+	
+	/*
+	 * Method to fetch count of posts for the logged in user.
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/postscountforuser")
+	public String getPostsCountForUser(HttpServletRequest request, Model model) {
+		LOG.info("Method to get posts for the user, getPostsCountForUser() started");
+		User user = sessionHelper.getCurrentUser();
+		long count = profileManagementService.getPostsCountForUser(user.getUserId());
+		LOG.info("Method to get posts for the user, getPostsCountForUser() finished");
+		return count+"";
 	}
 }

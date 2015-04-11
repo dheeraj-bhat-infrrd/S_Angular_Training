@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -326,5 +327,12 @@ public interface ProfileManagementService {
 	 */
 	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
 			throws InvalidInputException;
+
+	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time);
+
+	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize);
+
+	public long getPostsCountForUser(long userId);
+
 
 }

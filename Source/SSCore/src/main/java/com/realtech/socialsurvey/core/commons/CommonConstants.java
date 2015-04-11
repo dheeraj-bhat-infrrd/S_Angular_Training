@@ -407,6 +407,7 @@ public interface CommonConstants {
 	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
 	
 	/*
 	 * Constants related to Dash board profile.
