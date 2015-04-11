@@ -4,7 +4,7 @@ var numOfRows = 3;
 var minScore = 0;
 var attrName = null;
 var attrVal = null;
-var webAddressRegEx = /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+var webAddressRegEx = /((http(s?):\/\/)?)(www.)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w.?=&_]+)?/;
 var timer = 0;
 var profileId;
 var proPostBatchSize = 2;
@@ -498,7 +498,7 @@ function callBackShowProfileLogo(data) {
 			"class" : "float-left user-info-logo"
 		}).css({
 			"background" : logoImageUrl + " no-repeat center",
-			"background-size" : "100% auto"
+			"background-size" : "contain"
 		});
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
 	} else {
@@ -677,7 +677,7 @@ function addAnAssociation() {
 
 	var newAssociation = $('<input>').attr({
 		"class" : "lp-assoc-row lp-row clearfix prof-edditable-sin-agent",
-		"placeholder" : "New Associaion",
+		"placeholder" : "New Association",
 		"data-status" : "new"
 	});
 	var newAssociationButton = $('<div>').attr({
@@ -889,79 +889,130 @@ function callBackUpdateLicenseAuthorizations(data) {
 }
 
 // Update Social links
-/*
- * $('body').on('click','#prof-edit-social-link .icn-fb',function(){
- * $('#social-token-text').show(); var link = $(this).attr("data-link");
- * $('#social-token-text').attr({ "placeholder" : "Add facebook link", "value" :
- * link, "onblur" :
- * "updateFacebookLink(this.value);$('#social-token-text').hide();" }); });
- * 
- * $('body').on('click','#prof-edit-social-link .icn-twit',function(){
- * $('#social-token-text').show(); var link = $(this).attr("data-link");
- * $('#social-token-text').attr({ "placeholder" : "Add Twitter link", "value" :
- * link, "onblur" :
- * "updateTwitterLink(this.value);$('#social-token-text').hide();" }); });
- * 
- * $('body').on('click','#prof-edit-social-link .icn-lin',function(){
- * $('#social-token-text').show(); var link = $(this).attr("data-link");
- * $('#social-token-text').attr({ "placeholder" : "Add LinkedIn link", "value" :
- * link, "onblur" :
- * "updateLinkedInLink(this.value);$('#social-token-text').hide();" }); });
- * 
- * $('body').on('click','#prof-edit-social-link .icn-yelp',function(){
- * $('#social-token-text').show(); var link = $(this).attr("data-link");
- * $('#social-token-text').attr({ "placeholder" : "Add Yelp link", "value" :
- * link, "onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
- * }); });
- * 
- * function updateFacebookLink(link) { var payload = { "fblink" : link };
- * if(isValidUrl(link)){ callAjaxPostWithPayloadData("./updatefacebooklink.do",
- * callBackUpdateFacebookLink, payload); }else{ $('#overlay-toast').html("Enter
- * a valid url"); showToast(); } }
- * 
- * function callBackUpdateFacebookLink(data) {
- * $('#prof-message-header').html(data);
- * $('#overlay-toast').html($('#display-msg-div').text().trim()); showToast();
- * 
- * showProfileSocialLinks(); }
- * 
- * function updateTwitterLink(link) { var payload = { "twitterlink" : link };
- * if(isValidUrl(link)){ callAjaxPostWithPayloadData("./updatetwitterlink.do",
- * callBackUpdateTwitterLink, payload); }else{ $('#overlay-toast').html("Enter a
- * valid url"); showToast(); } }
- * 
- * function callBackUpdateTwitterLink(data) {
- * $('#prof-message-header').html(data);
- * $('#overlay-toast').html($('#display-msg-div').text().trim()); showToast();
- * 
- * showProfileSocialLinks(); }
- * 
- * function updateLinkedInLink(link) { var payload = { "linkedinlink" : link };
- * if(isValidUrl(link)){ callAjaxPostWithPayloadData("./updatelinkedinlink.do",
- * callBackUpdateLinkedInLink, payload); }else{ $('#overlay-toast').html("Enter
- * a valid url"); showToast(); } }
- * 
- * function callBackUpdateLinkedInLink(data) {
- * $('#prof-message-header').html(data);
- * $('#overlay-toast').html($('#display-msg-div').text().trim()); showToast();
- * 
- * showProfileSocialLinks(); }
- * 
- * function updateYelpLink(link) { var payload = { "yelplink" : link };
- * if(isValidUrl(link)){ callAjaxPostWithPayloadData("./updateyelplink.do",
- * callBackUpdateYelpLink, payload); }else{ $('#overlay-toast').html("Enter a
- * valid url"); showToast(); } }
- * 
- * function callBackUpdateYelpLink(data) { $('#prof-message-header').html(data);
- * $('#overlay-toast').html($('#display-msg-div').text().trim()); showToast();
- * 
- * showProfileSocialLinks(); }
- */
 
-function isValidUrl(url) {
+$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add facebook link",
+		"value" : link,
+		"onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();"
+	});
+});
+
+$('body').on('click','#prof-edit-social-link .icn-twit',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Twitter link",
+		"value" : link,
+		"onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();"
+	});
+});
+
+$('body').on('click','#prof-edit-social-link .icn-lin',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add LinkedIn link",
+		"value" : link,
+		"onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();"
+	});
+});
+
+$('body').on('click','#prof-edit-social-link .icn-yelp',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Yelp link",
+		"value" : link,
+		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
+	});
+});
+
+function updateFacebookLink(link) {
+	var payload = {
+		"fblink" : link	
+	};
+	if(isValidUrl(link)){
+        callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateFacebookLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+function callBackUpdateFacebookLink(data) {
+	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showProfileSocialLinks();
+}
+
+function updateTwitterLink(link) {
+	var payload = {
+		"twitterlink" : link	
+	};
+	if(isValidUrl(link)){
+        	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateTwitterLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+function callBackUpdateTwitterLink(data) {
+	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showProfileSocialLinks();
+}
+
+function updateLinkedInLink(link) {
+	var payload = {
+		"linkedinlink" : link	
+	};
+	if(isValidUrl(link)){
+		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateLinkedInLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+function callBackUpdateLinkedInLink(data) {
+	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showProfileSocialLinks();
+}
+
+function updateYelpLink(link) {
+	var payload = {
+		"yelplink" : link	
+	};
+	if(isValidUrl(link)){
+		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateYelpLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+function callBackUpdateYelpLink(data) {
+	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	showProfileSocialLinks();
+}
+
+function isValidUrl(url){
 	var myVariable = url;
-	if (/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i
-			.test(myVariable)) {
+	if(webAddressRegEx.test(myVariable)) {
 		return true;
 	} else {
 		return false;
@@ -1183,13 +1234,16 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
 		if (reviewCount == 0) {
-			reviewCount = 'No Reviews';
-
-			// hiding reviews-container if 0 reviews
+			/**
+			 * hiding reviews-container if 0 reviews
+			 */ 
+			$("#prof-company-review-count").hide();
 			$("#reviews-container").hide();
-		} else if (reviewCount == 1) {
+		} 
+		else if (reviewCount == 1) {
 			reviewCount = reviewCount + ' Review';
-		} else {
+		} 
+		else {
 			reviewCount = reviewCount + ' Reviews';
 		}
 

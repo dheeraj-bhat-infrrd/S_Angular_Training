@@ -29,6 +29,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -55,7 +56,6 @@ import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
 
 // JIRA: SS-24 BY RM02 BOC
-
 /**
  * Controller to manage the organizational settings and information provided by the user.
  */
@@ -227,7 +227,7 @@ public class OrganizationManagementController {
 		LOG.debug("Method validateCompanyInfoParams called  for companyName : " + companyName + " address : " + address + " zipCode : " + zipCode
 				+ " companyContactNo : " + companyContactNo);
 
-		if (companyName == null || companyName.isEmpty() || !companyName.matches(CommonConstants.COMPANY_NAME_REGEX)) {
+		if (companyName == null || companyName.isEmpty() || companyName.contains("\"")) {
 			throw new InvalidInputException("Company name is null or empty while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_NAME);
 		}
@@ -337,45 +337,60 @@ public class OrganizationManagementController {
 	 * @param request
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/showcompanysettings", method = RequestMethod.GET)
 	public String showCompanySettings(Model model, HttpServletRequest request) {
 		LOG.info("Method showCompanySettings of UserManagementController called");
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
 
-		try {
-			LOG.debug("Getting company settings");
-			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user);
-			LOG.debug("Showing company settings: " + companySettings.toString());
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		
+		UserProfile selectedProfile = null;
+		String profileIdStr = request.getParameter("profileId");
+		if (profileIdStr == null) {
+			selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		}
+		if (selectedProfile == null) {
+			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+			Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
 
-			// setting the object in settings
-			session.setAttribute("companysettings", companySettings);
+			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
 			
-			// setting user profile in session
-			List<UserProfile> userProfiles = user.getUserProfiles();
-			UserProfile selectedProfile = null;
-			for (UserProfile profile : userProfiles) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-					selectedProfile = profile;
-				}
-			}
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			
-			// setting userprofile settings in session
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+		}
+		
+		OrganizationUnitSettings unitSettings = null;
+		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			unitSettings = userSettings.getCompanySettings();
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			unitSettings = userSettings.getRegionSettings().get(selectedProfile.getRegionId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			unitSettings = userSettings.getBranchSettings().get(selectedProfile.getBranchId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			unitSettings = userSettings.getAgentSettings();
+		}
+		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
+
+		// setting userprofile settings in session
+		try {
 			OrganizationUnitSettings profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings,
 					selectedProfile.getBranchId(), selectedProfile.getRegionId(), selectedProfile.getProfilesMaster().getProfileId());
 			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-			
 		}
-		catch (NonFatalException e) {
+		catch (InvalidInputException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.MESSAGE_HEADER;
 		}
-		return JspResolver.COMPANY_SETTINGS;
+					
+		return JspResolver.EDIT_SETTINGS;
 	}
 
 	/**
@@ -548,7 +563,7 @@ public class OrganizationManagementController {
 		SurveySettings originalSurveySettings = null;
 		SurveySettings surveySettings = null;
 		String message = "";
-		
+
 		try {
 			boolean isAutopostEnabled = Boolean.parseBoolean(autopost);
 			OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
@@ -609,16 +624,16 @@ public class OrganizationManagementController {
 		}
 		return message;
 	}
-	
+
 	@RequestMapping(value = "/updateautopostforsurvey", method = RequestMethod.POST)
 	@ResponseBody
-	public String updateAutoPostForSurvey(HttpServletRequest request){
+	public String updateAutoPostForSurvey(HttpServletRequest request) {
 		LOG.info("Method to update autopost for a survey started");
-		try{
+		try {
 			HttpSession session = request.getSession(false);
 			String autopost = request.getParameter("autopost");
 			boolean isAutoPostEnabled = false;
-			if(autopost!=null && !autopost.isEmpty()){
+			if (autopost != null && !autopost.isEmpty()) {
 				isAutoPostEnabled = Boolean.parseBoolean(autopost);
 				OrganizationUnitSettings companySettings = ((UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION))
 						.getCompanySettings();
@@ -629,11 +644,12 @@ public class OrganizationManagementController {
 					LOG.info("Updated Survey Settings");
 				}
 			}
-		}catch(Exception e){
-			LOG.error("Exception occured in updateAutoPostForSurvey() while updating whether to enable autopost or not. Nested exception is ",e);
+		}
+		catch (Exception e) {
+			LOG.error("Exception occured in updateAutoPostForSurvey() while updating whether to enable autopost or not. Nested exception is ", e);
 			return e.getMessage();
 		}
-		
+
 		LOG.info("Method to update autopost for a survey finished");
 		return "Successfully updated autopost setting";
 	}

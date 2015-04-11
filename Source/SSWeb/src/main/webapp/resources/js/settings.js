@@ -469,5 +469,16 @@ function paintTextForMood(happyText, neutralText, sadText){
 	$('#sad-text').html(sadText);
 }
 
+// Settings View as
+$('#setting-sel').click(function(){
+	$('#se-dd-wrapper-profiles').slideToggle(200);
+});
 
-
+$('.se-dd-item').click(function(){
+	var newProfileId = $(this).data('profile-id');
+	
+	$('#setting-sel').html($(this).html());
+	$('#se-dd-wrapper-profiles').slideToggle(200);
+	
+	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+});
