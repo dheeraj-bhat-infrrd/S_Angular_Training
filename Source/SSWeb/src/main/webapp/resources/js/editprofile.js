@@ -4,7 +4,7 @@ var numOfRows = 3;
 var minScore = 0;
 var attrName = null;
 var attrVal = null;
-var webAddressRegEx = /[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/;
+var webAddressRegEx = /((http(s?):\/\/)?)(www.)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w.?=&_]+)?/;
 var timer = 0;
 var profileId;
 var delay = (function() {
@@ -447,7 +447,7 @@ function callBackShowProfileLogo(data) {
 			"class" : "float-left user-info-logo"
 		}).css({
 			"background" : logoImageUrl + " no-repeat center",
-			"background-size" : "100% auto"
+			"background-size" : "contain"
 		});
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
 	} else {
@@ -950,7 +950,7 @@ function callBackUpdateYelpLink(data) {
 
 function isValidUrl(url){
 	var myVariable = url;
-	if(/^(http|https|ftp):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$/i.test(myVariable)) {
+	if(webAddressRegEx.test(myVariable)) {
 		return true;
 	} else {
 		return false;

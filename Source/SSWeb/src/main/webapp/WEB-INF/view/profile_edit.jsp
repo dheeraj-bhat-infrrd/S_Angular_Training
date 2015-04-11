@@ -185,7 +185,7 @@
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) center; 50% 50% no-repeat; background-size: 100% auto;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center; 50% 50% no-repeat; background-size: contain;"></div>
 							<c:choose>
 								<c:when	test="${parentLock.isLogoLocked && profilemasterid != 4}">
 									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
@@ -208,10 +208,12 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
-							<form class="form_contact_image" enctype="multipart/form-data">
-								<input type="file" id="prof-logo" class="con_img_inp_file">
-							</form>
+							<c:if test="${profilemasterid != 4}">
+								<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+								<form class="form_contact_image" enctype="multipart/form-data">
+									<input type="file" id="prof-logo" class="con_img_inp_file">
+								</form>
+							</c:if>
 						</c:otherwise>
 					</c:choose>
 				</div>
