@@ -41,9 +41,9 @@
 					</div>
 				</div>
 				
-				<c:set var="ratingclass" scope = "page" value=""/>
+				<c:set var="ratingclass" scope="page" value=""/>
 				<c:if test="${questionType != 'sb-range-smiles' && questionType != 'sb-range-star' && questionType != 'sb-range-scale'}">
-					<c:set var="ratingclass" scope = "page" value="hide"/>
+					<c:set var="ratingclass" scope="page" value="hide"/>
 				</c:if>
 				<div class="bd-ans-type-rating bd-ans-type-item ${ratingclass}">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answer.key" /></div>
@@ -51,7 +51,7 @@
 						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div data-id="sb-range-smiles" class="bd-ans-img-wrapper">
 								<c:choose>
-									<c:when test="${questionType == 'sb-range-smiles'}">
+									<c:when test="${questionType != 'sb-range-smiles'}">
 										<div class="bd-ans-img bd-ans-smiley bd-img-sel"></div>
 										<div class="bd-ans-img-txt"><spring:message code="label.smiles.key" /></div>
 									</c:when>
@@ -65,7 +65,7 @@
 						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div data-id="sb-range-star" class="bd-ans-img-wrapper">
 								<c:choose>
-									<c:when test="${questionType == 'sb-range-star'}">
+									<c:when test="${questionType != 'sb-range-star'}">
 										<div class="bd-ans-img bd-ans-star bd-img-sel"></div>
 										<div class="bd-ans-img-txt"><spring:message code="label.star.key" /></div>
 									</c:when>
@@ -79,7 +79,7 @@
 						<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
 							<div data-id="sb-range-scale" class="bd-ans-img-wrapper">
 								<c:choose>
-									<c:when test="${questionType == 'sb-range-scale'}">
+									<c:when test="${questionType != 'sb-range-scale'}">
 										<div class="bd-ans-img bd-ans-scale bd-img-sel"></div>
 										<div class="bd-ans-img-txt"><spring:message code="label.scale.key" /></div>
 									</c:when>
@@ -93,9 +93,9 @@
 					</div>
 				</div>
 				
-				<c:set var="mcqclass" scope = "page" value=""/>
+				<c:set var="mcqclass" scope="page" value=""/>
 				<c:if test="${questionType != 'sb-sel-mcq'}">
-					<c:set var="mcqclass" scope = "page" value="hide"/>
+					<c:set var="mcqclass" scope="page" value="hide"/>
 				</c:if>
 				<div class="bd-ans-type-mcq bd-ans-type-item ${mcqclass}">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>
@@ -125,9 +125,9 @@
 						</c:choose>
 					</div>
 				</div>
-				<c:set var="comclass" scope = "page" value=""/>
+				<c:set var="comclass" scope="page" value=""/>
 				<c:if test="${questionType != 'sb-sel-desc'}">
-					<c:set var="comclass" scope = "page" value="hide"/>
+					<c:set var="comclass" scope="page" value="hide"/>
 				</c:if>
 				<div class="bd-ans-type-com bd-ans-type-item ${comclass}">
 					<div class="clearfix bd-com-wrapper">
