@@ -7,7 +7,7 @@
 </c:if>
 <c:choose>
 	<c:when test="${not empty profilelogo}">
-		<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) center; 50% 50% no-repeat; background-size: cover;"></div>
+		<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center; 50% 50% no-repeat; background-size: contain;"></div>
 		<c:choose>
 			<c:when	test="${parentLock.isLogoLocked && profilemasterid != 4}">
 				<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
