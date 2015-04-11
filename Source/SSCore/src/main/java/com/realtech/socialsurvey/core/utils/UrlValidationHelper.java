@@ -22,12 +22,12 @@ public class UrlValidationHelper {
 	    }
 		
 		URL connectUrl = null;
-		HttpURLConnection huc;
+		HttpURLConnection httpURLConnection;
 		try {
 			connectUrl = new URL(tempUrl);
-			huc = (HttpURLConnection) connectUrl.openConnection();
-			huc.setRequestMethod("GET"); // OR huc.setRequestMethod ("HEAD");
-			huc.connect();
+			httpURLConnection = (HttpURLConnection) connectUrl.openConnection();
+			httpURLConnection.setRequestMethod("GET"); // OR huc.setRequestMethod ("HEAD");
+			httpURLConnection.connect();
 		}
 		catch (IOException e) {
 			LOG.info("Url-{} does not support https", url);
@@ -39,9 +39,9 @@ public class UrlValidationHelper {
 		    }
 
 			connectUrl = new URL(tempUrl);
-			huc = (HttpURLConnection) connectUrl.openConnection();
-			huc.setRequestMethod("GET"); // OR huc.setRequestMethod ("HEAD");
-			huc.connect();
+			httpURLConnection = (HttpURLConnection) connectUrl.openConnection();
+			httpURLConnection.setRequestMethod("GET"); // OR huc.setRequestMethod ("HEAD");
+			httpURLConnection.connect();
 		}
 		LOG.info("Url-{} validated successfully", url);
 	}
