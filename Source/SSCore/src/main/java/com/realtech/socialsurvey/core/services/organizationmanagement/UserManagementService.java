@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -255,5 +256,17 @@ public interface UserManagementService {
 	public User updateUserOnCompleteRegistration(User existingUser, String emailId, long companyId, String firstName, String lastName, String password)
 			throws InvalidInputException, SolrException;
 
+	/**
+	 * Method to user profiles data in session and return selected profile
+	 * 
+	 * @param user
+	 * @param session
+	 * @return
+	 * @throws NonFatalException
+	 */
+	public Map<Long, UserProfileSmall> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException;
+
+	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr);
 }
 // JIRA SS-34 BY RM02 BOC

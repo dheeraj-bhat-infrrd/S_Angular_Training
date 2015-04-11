@@ -2445,7 +2445,7 @@ button.paypal.is-active {
 .sq-top-img {
     height: 70px;
     margin-bottom: 20px;
-    background: url(../images/place-holder-individual.png) no-repeat center;
+    background: url(../images/chat.png) no-repeat center;
 }
 
 .sq-bord-bot-sm {
@@ -3212,7 +3212,6 @@ button.paypal.is-active {
     border: 1px solid #dcdcdc;
     font-size: 12px;
 }
-}
 
 .lp-edit-locks-locked {
 	background-position: 10px center;
@@ -3508,6 +3507,22 @@ button.paypal.is-active {
 }
 
 .pe-dd-item {
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 5px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.da-dd-item {
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 30px;
+    padding: 0 5px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.se-dd-item {
     cursor: pointer;
     font-size: 14px;
     line-height: 30px;
@@ -5661,19 +5676,4 @@ tr.u-tbl-header td {
   width: 500px;
   padding: 10px;
   height: 100px;
-}
-
-.fb-shr {
-}
-
-.twt-shr{
-}
-
-.lnkdn-shr{
-}
-
-.ggl-shr{
-}
-
-.yelp-shr{
 }

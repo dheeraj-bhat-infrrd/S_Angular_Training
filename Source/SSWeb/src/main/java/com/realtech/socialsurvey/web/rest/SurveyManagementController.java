@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.web.rest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
@@ -138,7 +140,7 @@ public class SurveyManagementController {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
 			}
-			List<String> emailIdsToSendMail = new ArrayList<>();
+			Set<String> emailIdsToSendMail = new HashSet<>();
 			SolrDocument solrDocument = null;
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);

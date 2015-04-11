@@ -1,11 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-137 : by RM-05 : BOC
-
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +11,8 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,12 +28,15 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 
@@ -52,6 +55,9 @@ public class DashboardController {
 	private ProfileManagementService profileManagementService;
 
 	@Autowired
+	private UserManagementService userManagementService;
+
+	@Autowired
 	private SolrSearchService solrSearchService;
 
 	@Autowired
@@ -63,12 +69,33 @@ public class DashboardController {
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
-	@Value("${TEMP_FILE_LOCATION}")
-	private String tempFileLocation;
-
 	private final String EXCEL_FORMAT = "application/vnd.ms-excel";
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
+
+	// setting selected profile in session
+	@ResponseBody
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/updatecurrentprofile")
+	public String updateSelectedProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method updateSelectedProfile() started.");
+		
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		String profileIdStr = request.getParameter("profileId");
+
+		UserProfile selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+		
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+
+		LOG.info("Method updateSelectedProfile() finished.");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
+	}
 
 	@ResponseBody
 	@RequestMapping(value = "/surveycount")
@@ -107,10 +134,6 @@ public class DashboardController {
 		surveyCount.put("completedSurvey", dashboardService.getCompletedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
 		surveyCount.put("clickedSurvey", dashboardService.getClickedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
 		surveyCount.put("socialPosts", dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays));
-
-		/*
-		 * } catch (NonFatalException e) { }
-		 */
 
 		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
 		return new Gson().toJson(surveyCount);
@@ -167,6 +190,7 @@ public class DashboardController {
 		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
 		Map<String, Object> profileDetails = new HashMap<>();
 		User user = sessionHelper.getCurrentUser();
+		
 		String columnName = request.getParameter("columnName");
 		long columnValue = 0;
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
@@ -576,14 +600,27 @@ public class DashboardController {
 			}
 			try {
 				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true);
-				String fileLocation = tempFileLocation + "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
-				dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
+				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+				XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
 				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
 				response.setHeader(headerKey, headerValue);
-				InputStream is = new FileInputStream(new File(fileLocation));
-				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+				// write into file
+				OutputStream responseStream = null;
+				try{
+					responseStream = response.getOutputStream();
+					workbook.write(responseStream);
+				}catch (IOException e) {
+					e.printStackTrace();
+				}finally{
+					try {
+						responseStream.close();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				response.flushBuffer();
 			}
 			catch (InvalidInputException e) {
@@ -637,14 +674,27 @@ public class DashboardController {
 			}
 			try {
 				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel);
-				String fileLocation = tempFileLocation + "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
-				dashboardService.downloadIncompleteSurveyData(surveyDetails, fileLocation);
+				String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook =dashboardService.downloadIncompleteSurveyData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
 				response.setHeader(headerKey, headerValue);
-				InputStream is = new FileInputStream(new File(fileLocation));
-				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+				// write into file
+				OutputStream responseStream = null;
+				try{
+					responseStream = response.getOutputStream();
+					workbook.write(responseStream);
+				}catch (IOException e) {
+					e.printStackTrace();
+				}finally{
+					try {
+						responseStream.close();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				response.flushBuffer();
 			}
 			catch (InvalidInputException e) {
