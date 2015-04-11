@@ -26,6 +26,7 @@ import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.DisplayMessage;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
@@ -676,9 +677,16 @@ public class HierarchyManagementController {
 				LOG.debug("Calling service to add/assign invidual(s)");
 				organizationManagementService.addIndividual(user, selectedUserId, branchId, regionId, assigneeEmailIds, isAdmin);
 				LOG.debug("Successfully executed service to add/assign an invidual(s)");
-
-				model.addAttribute("message",
-						messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+				DisplayMessage message = null;
+				if (selectedUserId > 0l) {
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_ADDITION_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE);
+				}
+				else {
+					message = messageUtils.getDisplayMessage(DisplayMessageConstants.INDIVIDUAL_MULTIPLE_ADDITION_SUCCESSFUL,
+							DisplayMessageType.SUCCESS_MESSAGE);
+				}
+				model.addAttribute("message", message);
 			}
 			catch (UserAssignmentException e) {
 				throw new UserAssignmentException(e.getMessage(), DisplayMessageConstants.BRANCH_USER_ASSIGNMENT_ERROR, e);
