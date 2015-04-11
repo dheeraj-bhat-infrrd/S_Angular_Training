@@ -1543,6 +1543,7 @@ button.paypal.is-active {
 
 .tweet-panel-left {
     padding-right: 15px;
+    height: 200ox;
 /*    border-right: 1px solid #dcdcdc;*/
 }
 
@@ -3210,7 +3211,6 @@ button.paypal.is-active {
     box-shadow: none;
     border: 1px solid #dcdcdc;
     font-size: 12px;
-}
 }
 
 .lp-edit-locks-locked {

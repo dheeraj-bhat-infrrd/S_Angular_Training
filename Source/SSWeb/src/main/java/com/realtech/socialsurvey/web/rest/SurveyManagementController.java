@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.web.rest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
@@ -138,7 +140,7 @@ public class SurveyManagementController {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
 			}
-			List<String> emailIdsToSendMail = new ArrayList<>();
+			Set<String> emailIdsToSendMail = new HashSet<>();
 			SolrDocument solrDocument = null;
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
@@ -367,14 +369,14 @@ public class SurveyManagementController {
 			catch (TwitterException e) {
 				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 			}
-				for (OrganizationUnitSettings setting : settings) {
-					try {
-						socialManagementService.tweet(setting, twitterMessage);
-					}
-					catch (TwitterException e) {
-						LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
-					}
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					socialManagementService.tweet(setting, twitterMessage);
 				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
+				}
+			}
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ", e);
@@ -382,6 +384,44 @@ public class SurveyManagementController {
 		}
 		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
 		return "Successfully posted to all the places in hierarchy";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/displaypiclocationofagent", method = RequestMethod.GET)
+	public String getDisplayPicLocationOfAgent(HttpServletRequest request) {
+		LOG.info("Method to get location of agent's image started.");
+		String picLocation = "";
+		String agentIdStr = request.getParameter("agentId");
+		long agentId = 0;
+
+		if (agentIdStr == null || agentIdStr.isEmpty()) {
+			LOG.error("Null value found for agent Id in request param.");
+			return "Null value found for agent Id in request param.";
+		}
+
+		try {
+			agentId = Long.parseLong(agentIdStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException caught in getDisplayPicLocationOfAgent() while getting agent id");
+			return e.getMessage();
+		}
+		
+		try {
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			if(agentSettings!=null){
+				if(agentSettings.getProfileImageUrl()!=null && !agentSettings.getProfileImageUrl().isEmpty()){
+					picLocation = agentSettings.getProfileImageUrl();
+				}
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in getDisplayPicLocationOfAgent() while fetching image for agent.");
+			return e.getMessage();
+		}
+		
+		LOG.info("Method to get location of agent's image finished.");
+		return picLocation;
 	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
