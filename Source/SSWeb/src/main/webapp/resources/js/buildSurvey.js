@@ -75,6 +75,7 @@ $(document).on('click', '.bd-q-btn-done', function() {
 	var editedStatus = true;
 	while (count <= currentQues) {
 		if ($('#bs-question-' + count).attr('data-status') == 'edited') {
+			editedStatus = true;
 			break;
 		}
 		else {
@@ -171,7 +172,8 @@ $(document).on('click', '.bd-q-pu-close', function() {
 
 $(document).keyup(function(e) {
 	if (e.keyCode == 27) {
-		$('.bd-q-btn-done').trigger('click');
+		if ($('#bd-srv-pu').is(":visible"))
+			$('.bd-q-btn-done').trigger('click');
 	}
 });
 
