@@ -132,7 +132,8 @@ function paintSurveyPageFromJson() {
 	}
 	questionDetails = questions[qno];
 	var question = questionDetails.question;
-	question.replace(/[name]/gi, agentName);
+	
+	question = question.replace(/\[name\]/gi, agentName);
 	var questionType = questionDetails.questionType;
 	var isRatingQuestion = questionDetails.isRatingQuestion;
 	if (questionType == "sb-range-star") {
