@@ -132,6 +132,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// If user is not Company Admin, Lock settings need to be aggregated
 		else {
 			switch (accountType) {
+				case FREE:
 				case INDIVIDUAL:
 				case TEAM:
 					// Individual
@@ -285,6 +286,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// If user is not Company Admin, Profile need to be aggregated
 		else {
 			switch (accountType) {
+				case FREE:
 				case INDIVIDUAL:
 				case TEAM:
 					// Individual

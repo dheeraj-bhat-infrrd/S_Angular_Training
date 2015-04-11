@@ -211,8 +211,8 @@ public class SocialManagementController {
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 			if (userSettings == null || profileSettings == null || selectedProfile == null) {
-				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
+				LOG.error("authenticateFacebookAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateFacebookAccess : userSettings not found in session!");
 			}
 
 			// On auth error
@@ -348,8 +348,8 @@ public class SocialManagementController {
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 			if (userSettings == null || profileSettings == null || selectedProfile == null) {
-				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
+				LOG.error("authenticateTwitterAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateTwitterAccess : userSettings not found in session!");
 			}
 
 			// On auth error
@@ -493,8 +493,8 @@ public class SocialManagementController {
 			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 			if (userSettings == null || profileSettings == null || selectedProfile == null) {
-				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
-				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
+				LOG.error("authenticateLinkedInAccess : userSettings not found in session!");
+				throw new NonFatalException("authenticateLinkedInAccess : userSettings not found in session!");
 			}
 
 			// On auth error
