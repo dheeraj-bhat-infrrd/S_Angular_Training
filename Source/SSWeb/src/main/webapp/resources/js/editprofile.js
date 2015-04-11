@@ -1173,13 +1173,16 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
 		if (reviewCount == 0) {
-			reviewCount = 'No Reviews';
-			
-			// hiding reviews-container if 0 reviews
+			/**
+			 * hiding reviews-container if 0 reviews
+			 */ 
+			$("#prof-company-review-count").hide();
 			$("#reviews-container").hide();
-		} else if (reviewCount == 1) {
+		} 
+		else if (reviewCount == 1) {
 			reviewCount = reviewCount + ' Review';
-		} else {
+		} 
+		else {
 			reviewCount = reviewCount + ' Reviews';
 		}
 		
