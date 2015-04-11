@@ -1131,7 +1131,7 @@ function bindUserEditClicks() {
 	$(".user-del-icn").click(function(e){
 		e.stopPropagation();
 		var userId = $(this).attr("data-userid");
-		deleteUser(userId);
+		confirmDeleteUser(userId);
 	});
 }
 

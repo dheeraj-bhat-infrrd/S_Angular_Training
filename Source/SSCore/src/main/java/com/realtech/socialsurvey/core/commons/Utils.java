@@ -96,6 +96,6 @@ public class Utils {
 	 */
 	public String appendIdenToProfileName(String profileName, long iden){
 		LOG.debug("Appending "+iden+" to profile name: "+profileName+" for uniqueness");
-		return profileName+"."+iden;
+		return profileName+"-"+iden;
 	}
 }
