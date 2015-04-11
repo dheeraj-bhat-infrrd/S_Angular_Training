@@ -80,7 +80,7 @@ public class Utils {
 			genereatedProfileName = genereatedProfileName.substring(1);
 		}
 		hyphenIndex = genereatedProfileName.lastIndexOf("-");
-		if(hyphenIndex == genereatedProfileName.length()){
+		if(hyphenIndex == genereatedProfileName.length()-1){
 			// remove the last hyphen
 			genereatedProfileName = genereatedProfileName.substring(0, genereatedProfileName.length()-1);
 		}
