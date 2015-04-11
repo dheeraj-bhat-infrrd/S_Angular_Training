@@ -47,6 +47,7 @@ import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
 import facebook4j.FacebookException;
 
 // JIRA SS-119 by RM-05 : BOC
@@ -230,7 +231,7 @@ public class SurveyManagementController {
 		model.addAttribute("agentId", agentId);
 		model.addAttribute("agentName", agentName);
 		LOG.info("Method to start survey initiateSurvey() finished.");
-		return "surveyQuestion";
+		return JspResolver.SHOW_SURVEY_QUESTIONS;
 	}
 
 	/*
