@@ -101,12 +101,14 @@ function paintProfilePage(result) {
             	 $("#prof-company-intro").html(companyIntroHtml);
             }
             
-            var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
+            var reviewsHeaderHtml = '<div class="float-left"><span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name+'</div>';
+            reviewsHeaderHtml = reviewsHeaderHtml+'<div class="prof-sort-by float-right">Sort By';
+            reviewsHeaderHtml = reviewsHeaderHtml+'<span class="prof-sort-option">Feature</span>';
+            reviewsHeaderHtml = reviewsHeaderHtml+'<span class="prof-sort-option">Date</span></div><div class="clearfix"></div>';
             $("#prof-reviews-header").html(reviewsHeaderHtml);
             
             var contactInfoHtml = "";
             var mailIds = contactDetails.mail_ids;
-            
             if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
