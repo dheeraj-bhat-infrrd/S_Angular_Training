@@ -106,7 +106,6 @@ function paintProfilePage(result) {
             
             var contactInfoHtml = "";
             var mailIds = contactDetails.mail_ids;
-            
             if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
