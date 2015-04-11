@@ -3,6 +3,7 @@ package com.realtech.socialsurvey.web.controller;
 // JIRA SS-21 : by RM-06 : BOC
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +28,7 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -229,9 +231,6 @@ public class LoginController {
 						// Set the session variables
 						sessionHelper.setSettingVariablesInSession(session);
 					}
-					
-					// updating session with aggregated user profiles
-					userManagementService.processedUserProfiles(user, session);
 				}
 				else {
 					LOG.info("No User profile present");
@@ -276,7 +275,37 @@ public class LoginController {
 	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
 		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser(); 
+
 		try {
+			// updating session with aggregated user profiles
+			try {
+				user = userManagementService.getUserByUserId(user.getUserId());
+				
+				AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+				Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+				UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						selectedProfile = profile;
+						break;
+					}
+				}
+				session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+
+				Map<Long, UserProfileSmall> profileSmallMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+				if (profileSmallMap.size() > 0) {
+					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+				}
+				session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			}
+			catch (NonFatalException e) {
+				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.LOGIN;
+			}
+
 			setUserInModel(model, sessionHelper.getCurrentUser(), session);
 		}
 		catch (InvalidInputException e) {
@@ -485,10 +514,21 @@ public class LoginController {
 	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
 		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 		String imageUrl = "";
 		
 		try {
+			user = userManagementService.getUserByUserId(user.getUserId());
 			UserProfile currentProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (currentProfile == null) {
+				currentProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						currentProfile = profile;
+						break;
+					}
+				}
+			}
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 			if (userSettings == null || currentProfile == null) {
 				throw new InvalidInputException("No user settings found in session");
