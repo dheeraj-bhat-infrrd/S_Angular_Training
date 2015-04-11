@@ -447,7 +447,7 @@ function callBackShowProfileLogo(data) {
 			"class" : "float-left user-info-logo"
 		}).css({
 			"background" : logoImageUrl + " no-repeat center",
-			"background-size" : "100% auto"
+			"background-size" : "contain"
 		});
 		$('#header-user-info').append(userInfoDivider).append(userInfoLogo);
 	} else {
