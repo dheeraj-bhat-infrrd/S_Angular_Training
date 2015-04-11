@@ -75,6 +75,7 @@ $(document).on('click', '.bd-q-btn-done', function() {
 	var editedStatus = true;
 	while (count <= currentQues) {
 		if ($('#bs-question-' + count).attr('data-status') == 'edited') {
+			editedStatus = true;
 			break;
 		}
 		else {
@@ -169,6 +170,13 @@ $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
 });
 
+$(document).keyup(function(e) {
+	if (e.keyCode == 27) {
+		if ($('#bd-srv-pu').is(":visible"))
+			$('.bd-q-btn-done').trigger('click');
+	}
+});
+
 // Question edit
 $(document).on('click', '.srv-tbl-edit', function() {
 	var questionId = $(this).parent().parent().data('questionid');
@@ -180,6 +188,12 @@ $(document).on('click', '.srv-tbl-edit', function() {
 		$('.bd-srv-tbl-row-' + questionId).after(response);
 		revertQuestionOverlay();
 	}, true);
+});
+
+$(document).on('input', '.bd-q-pu-txt-edit', function() {
+	var quesNum = $(this).closest('form').data('quesnum');
+	$('#bs-question-' + quesNum).attr('data-status', 'edited');
+	showStatus('#bs-question-' + quesNum, 'Edited');
 });
 
 $(document).on('click', '.bd-q-btn-done-edit', function() {
