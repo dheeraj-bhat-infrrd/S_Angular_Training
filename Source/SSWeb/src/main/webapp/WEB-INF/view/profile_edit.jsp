@@ -532,12 +532,12 @@
 				<div class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.sspost.key"/></div>
-						<textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
-						<div class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
+						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit"></textarea>
+						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
-					<div class="float-left panel-tweet-wrapper">
+					<div id="prof-posts-ps" class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
-						<div class="tweet-panel tweet-panel-left">
+						<div id="prof-posts" class="tweet-panel tweet-panel-left">
 							<div class="tweet-panel-item bord-bot-dc clearfix">
 								<div class="tweet-icn icn-tweet float-left"></div>
 								<div class="tweet-txt float-left">
@@ -583,6 +583,7 @@
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 	$(document).ready(function() {
+		countPosts();
 		$(document).attr("title", "Profile Settings");
 		adjustImage();
 		$(window).resize(adjustImage);
@@ -595,6 +596,24 @@
 		$('.ppl-share-wrapper .icn-plus-open').click(function() {
 			$(this).hide();
 			$(this).parent().find('.ppl-share-social,.icn-remove').show();
+		});
+		
+		$('#prof-post-btn').unbind('click');
+		$('#prof-post-btn').click(function() {
+			var textContent = $('#status-body-text-edit').val().trim();
+			$('#status-body-text-edit').val(textContent);
+			$('#status-body-text-edit').show();
+			$('#status-body-text-edit').focus();
+			var payload = {
+				"text" : textContent
+			};
+			$.ajax({
+				url : "./savestatus.do",
+				type : "POST",
+				dataType : "text",
+				async : false,
+				data : payload
+			});
 		});
 
 		$('.ppl-share-wrapper .icn-remove').click(function() {
@@ -639,7 +658,8 @@
 			$('#profile-sel').html($(this).html());
 			$('#pe-dd-wrapper-profiles').slideToggle(200);
 			
-			showMainContent('./showprofilepage.do?profileId=' + newProfileId);
+			
+			callBackUpdateLock(newProfileId);
 		});
 	});
 	
