@@ -28,7 +28,9 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
+import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -76,14 +78,24 @@ public class DashboardController {
 
 	// setting selected profile in session
 	@ResponseBody
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/updatecurrentprofile")
 	public String updateSelectedProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method updateSelectedProfile() started.");
 		
 		HttpSession session = request.getSession(false);
 		User user = sessionHelper.getCurrentUser();
-		userManagementService.updateSelectedProfile(request, session, user);
 		
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		String profileIdStr = request.getParameter("profileId");
+
+		UserProfile selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+		
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+
 		LOG.info("Method updateSelectedProfile() finished.");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}

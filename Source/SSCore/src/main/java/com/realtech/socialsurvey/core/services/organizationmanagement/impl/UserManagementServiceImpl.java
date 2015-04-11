@@ -8,8 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -1871,10 +1869,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 	
 	@Override
-	public void processedUserProfiles(User user, HttpSession session) throws NonFatalException {
+	public Map<Long, UserProfileSmall> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException {
 		LOG.debug("Method getUserProfile() called from UserManagementService");
-
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 
 		// Fetch Regions and Branches from Solr
 		long companyId = user.getCompany().getCompanyId();
@@ -1895,7 +1891,6 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		RegionFromSearch region = null;
 		BranchFromSearch branch = null;
 		Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
-		Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 		
 		UserProfileSmall profileSmall = null;
 		for (UserProfile profile : user.getUserProfiles()) {
@@ -1951,26 +1946,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			}
 		}
 		switch (accountType) {
-			case INDIVIDUAL:
-			case TEAM:
-				break;
-
 			case COMPANY:
 			case ENTERPRISE:
-				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
-				break;
+				return profileSmallMap;
 			
 			default:
-				break;
 		}
-		session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 		
-		// settings current profile in session
-		UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-
 		LOG.debug("Method getUserProfile() finished from UserManagementService");
+		return new HashMap<Long, UserProfileSmall>();
 	}
 
 	private UserProfileSmall getSmallUserProfile(long userProfileId, String userProfileName, long profileId, String profileType, int profileMasterId) {
@@ -1985,18 +1969,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
-	public UserProfile updateSelectedProfile(HttpServletRequest request, HttpSession session, User user) {
-		// getting session variables
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
-
+	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr) {
 		long profileId = 0;
 		try {
-			String profileIdStr = request.getParameter("profileId");
 			if (profileIdStr != null && !profileIdStr.equals("")) {
-				profileId = Long.parseLong(request.getParameter("profileId"));
+				profileId = Long.parseLong(profileIdStr);
 			}
 			else {
 				profileId = 0l;
@@ -2008,31 +1986,23 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		// Selecting and Setting Profile in session
 		UserProfile selectedProfile = null;
-		List<UserProfile> userProfiles = user.getUserProfiles();
 		switch (accountType) {
-			case INDIVIDUAL:
-			case TEAM:
-				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				break;
-
 			case COMPANY:
 			case ENTERPRISE:
-				if (profileId == 0l) {
-					selectedProfile = userProfiles.get(CommonConstants.INITIAL_INDEX);
-				}
-				else {
+				if (profileId != 0l) {
 					selectedProfile = profileMap.get(profileId);
 				}
 				break;
 			
 			default:
 				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				break;
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						selectedProfile = profile;
+						break;
+					}
+				}
 		}
-
-		// setting session attributes
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		
 		return selectedProfile;
 	}

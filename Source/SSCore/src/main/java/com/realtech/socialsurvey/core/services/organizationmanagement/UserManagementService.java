@@ -2,8 +2,6 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
@@ -11,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -265,8 +264,9 @@ public interface UserManagementService {
 	 * @return
 	 * @throws NonFatalException
 	 */
-	public void processedUserProfiles(User user, HttpSession session) throws NonFatalException;
+	public Map<Long, UserProfileSmall> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException;
 
-	public UserProfile updateSelectedProfile(HttpServletRequest request, HttpSession session, User user);
+	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr);
 }
 // JIRA SS-34 BY RM02 BOC

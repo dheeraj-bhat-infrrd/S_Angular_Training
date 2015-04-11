@@ -46,15 +46,15 @@
 				<input type="hidden" id="company-profile-name" value="${profileSettings.profileName}">
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
-				<input type="hidden" id="prof-region-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-region-id" value="${profile.regionId}">
 				<%-- <input type="hidden" id="prof-region-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 3}">
-				<input type="hidden" id="prof-branch-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-branch-id" value="${profile.branchId}">
 				<%-- <input type="hidden" id="prof-branch-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 4}">
-				<input type="hidden" id="prof-agent-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-agent-id" value="${profile.agentId}">
 				<%-- <input type="hidden" id="prof-agent-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 		</c:choose>
@@ -78,18 +78,11 @@
 			</c:if>
 
 			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-				<div class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');"></div>
-				<div class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');"></div>
-				<div class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('google');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('yelp');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('rss');"></div>
-
-				<%-- <div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+				<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
 				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 				<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
 				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'> --%>
+				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 			</div>
 		</div>
 	</div>
@@ -578,70 +571,53 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 
+<script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
-	$(document).ready(function() {
-		$(document).attr("title", "Profile Settings");
-		adjustImage();
-		$(window).resize(adjustImage);
-		
-		if ($('#aboutme-status').val() != 'new') {
-			$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
-		}
-		paintForProfile();
-		
-		$('.ppl-share-wrapper .icn-plus-open').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social,.icn-remove').show();
-		});
-
-		$('.ppl-share-wrapper .icn-remove').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social').hide();
-			$(this).parent().find('.icn-plus-open').show();
-		});
-
-		$('.icn-person').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-			$('.prof-left-panel-wrapper').show();
-			$('.prof-right-panel-wrapper').hide();
-			adjustImage();
-		});
-
-		$('.icn-ppl').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-			$('.prof-left-panel-wrapper').hide();
-			$('.prof-right-panel-wrapper').show();
-		});
-
-		$('.icn-star-smile').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-		});
-
-		$('.inc-more').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-		});
-		
-		// Profile View as
-		$('#profile-sel').click(function(){
-			$('#pe-dd-wrapper-profiles').slideToggle(200);
-		});
-		
-		$('.pe-dd-item').click(function(){
-			var newProfileId = $(this).data('profile-id');
-			
-			$('#profile-sel').html($(this).html());
-			$('#pe-dd-wrapper-profiles').slideToggle(200);
-			
-			showMainContent('./showprofilepage.do?profileId=' + newProfileId);
-		});
-	});
+$(document).ready(function() {
+	$(document).attr("title", "Profile Settings");
+	adjustImage();
+	$(window).resize(adjustImage);
 	
-	function openAuthPage(socialNetwork) {
-		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+	if ($('#aboutme-status').val() != 'new') {
+		$('#intro-body-text').text($('#intro-body-text-edit').val().trim());
 	}
+	paintForProfile();
+	
+	$('.ppl-share-wrapper .icn-plus-open').click(function() {
+		$(this).hide();
+		$(this).parent().find('.ppl-share-social,.icn-remove').show();
+	});
+
+	$('.ppl-share-wrapper .icn-remove').click(function() {
+		$(this).hide();
+		$(this).parent().find('.ppl-share-social').hide();
+		$(this).parent().find('.icn-plus-open').show();
+	});
+
+	$('.icn-person').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+		$('.prof-left-panel-wrapper').show();
+		$('.prof-right-panel-wrapper').hide();
+		adjustImage();
+	});
+
+	$('.icn-ppl').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+		$('.prof-left-panel-wrapper').hide();
+		$('.prof-right-panel-wrapper').show();
+	});
+
+	$('.icn-star-smile').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+	});
+
+	$('.inc-more').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+	});
+});
 </script>
