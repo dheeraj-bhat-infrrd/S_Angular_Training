@@ -383,11 +383,22 @@ $(document).on('blur', '.bd-mcq-txt', function(){
 				+ '<div class="float-left bd-mcq-close"></div>'
 			+ '</div>';
 		$(this).parent().after(htmlData);
+		
+		// enable remove button
+		if ($(this).parent().parent().children().length > 2) {
+			$('.bd-mcq-close').removeClass('hide');
+		}
 	}
 });
 
 $(document).on('click', '.bd-mcq-close', function(){
+	var parentDiv = $(this).parent().parent();
 	$(this).parent().remove();
+
+	// disable remove button
+	if (parentDiv.children().length <= 2) {
+		$('.bd-mcq-close').addClass('hide');
+	}
 	
 	// changing status to edited
 	var name = $(this).attr('name');
