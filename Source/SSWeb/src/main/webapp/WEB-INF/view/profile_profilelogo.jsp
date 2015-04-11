@@ -30,9 +30,11 @@
 		</c:choose>
 	</c:when>
 	<c:otherwise>
-		<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
-		<form class="form_contact_image" enctype="multipart/form-data">
-			<input type="file" id="prof-logo" class="con_img_inp_file">
-		</form>
+		<c:if test="${profilemasterid != 4}">
+			<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+			<form class="form_contact_image" enctype="multipart/form-data">
+				<input type="file" id="prof-logo" class="con_img_inp_file">
+			</form>
+		</c:if>
 	</c:otherwise>
 </c:choose>
