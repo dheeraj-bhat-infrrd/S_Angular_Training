@@ -1007,7 +1007,7 @@ public class UserManagementController {
 	private void validateCompleteRegistrationForm(String firstName, String lastName, String emailId, String password, String companyIdStr,
 			String confirmPassword) throws InvalidInputException {
 		LOG.debug("Method validateCompleteRegistrationForm called");
-		if (firstName == null || firstName.isEmpty() || !firstName.matches(CommonConstants.FIRST_NAME_REGEX)) {
+		if (firstName == null || firstName.isEmpty() || !firstName.trim().matches(CommonConstants.FIRST_NAME_REGEX)) {
 			LOG.error("First name invalid");
 			throw new InvalidInputException("First name invalid", DisplayMessageConstants.INVALID_FIRSTNAME);
 		}
@@ -1015,7 +1015,7 @@ public class UserManagementController {
 			LOG.error("Last name invalid");
 			throw new InvalidInputException("Last name invalid", DisplayMessageConstants.INVALID_LASTNAME);
 		}
-		if (emailId == null || emailId.isEmpty() || !emailId.matches(CommonConstants.EMAIL_REGEX)) {
+		if (emailId == null || emailId.isEmpty() || !emailId.trim().matches(CommonConstants.EMAIL_REGEX)) {
 			LOG.error("EmailId not valid");
 			throw new InvalidInputException("EmailId not valid", DisplayMessageConstants.INVALID_EMAILID);
 		}
