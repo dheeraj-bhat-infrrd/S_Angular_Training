@@ -100,13 +100,16 @@
 				<div class="bd-ans-type-mcq bd-ans-type-item ${mcqclass}">
 					<div class="bd-and-tier2"><spring:message code="label.customer.answerfrom.key" /></div>
 					<div class="clearfix bd-ans-type bd-ans-type-mcq-adj">
+						<c:if test="${fn:length(surveyQuestion.answers) <= 2}">
+							<c:set value="hide" var="closebuttonclass" />
+						</c:if>
 						<c:choose>
-							<c:when test="${questionType == 'sb-sel-mcq' && fn:length(surveyQuestion.answers) > 0}">
+							<c:when test="${questionType == 'sb-sel-mcq'}">
 								<c:forEach var="answer" items="${surveyQuestion.answers}">
 									<div class="bd-mcq-row clearfix">
 										<div class="float-left bd-mcq-lbl"><spring:message code="label.option.key" /></div>
 										<input name="sb-answers-${surveyQuestion.questionId}[]" class="float-left bd-mcq-txt" value="${answer.answerText}">
-										<div class="float-left bd-mcq-close"></div>
+										<div class="float-left bd-mcq-close ${closebuttonclass}"></div>
 									</div>
 								</c:forEach>
 							</c:when>
