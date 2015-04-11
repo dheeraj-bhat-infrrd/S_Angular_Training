@@ -132,7 +132,9 @@
 								</div>
 							</div>
 						</div>
-						<div id="recaptcha" class="hide"></div>
+						<div id="outer_captcha" style="display: none;">
+							<div id="recaptcha"></div>
+						</div>
 						<div class="clearfix reg-item">
 							<input id="reg-submit"  type="submit" class="reg-inp reg-btn" value="Join Now">
 						</div>

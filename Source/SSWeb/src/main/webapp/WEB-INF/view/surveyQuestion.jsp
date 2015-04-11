@@ -120,7 +120,9 @@
 									</div>
 								</div>
 							</div>
-							<div id="recaptcha" class="hide"></div>
+							<div id="outer_captcha" style="display: none;">
+								<div id="recaptcha"></div>
+							</div>
 							<div class="sq-btn-wrapper">
 								<div id="start-btn" class="sq-btn-continue">Start</div>
 							</div>

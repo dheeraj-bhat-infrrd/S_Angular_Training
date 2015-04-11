@@ -30,19 +30,19 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center lgn-adj"><spring:message code="label.logintodosurvey.key"/></div>
+			<div class="hm-header-row-left text-center lgn-adj padding-10"><spring:message code="label.logintodosurvey.key"/></div>
 		</div>
 	</div>
 </div>
 
-<div class="prof-main-content-wrapper margin-top-10 margin-bottom-25">
+<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<div class="container reg_panel_container">
 		<div class="reg_header"><spring:message code="label.logintodosurvey.key"/></div>
 		
 		<form id="frm-login" method="POST" action="j_spring_security_check">
 			<div id="login-form" class="reg_form_wrapper_1">
 				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.username.key"/></div>
+					<div class="float-left rfr_lbl rfr_lbl_width-98"><spring:message code="label.username.key"/></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-fname"></div>
 						<input class="rfr_txt_fld" id="login-user-id" data-non-empty="true"
@@ -50,7 +50,7 @@
 					</div>
 				</div>
 				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.password.key" /></div>
+					<div class="float-left rfr_lbl rfr_lbl_width-98"><spring:message code="label.password.key" /></div>
 					<div class="float-left rfr_txt">
 						<div class="rfr_icn icn-password"></div>
 						<input type="password" class="rfr_txt_fld" id="login-pwd" data-non-empty="true"

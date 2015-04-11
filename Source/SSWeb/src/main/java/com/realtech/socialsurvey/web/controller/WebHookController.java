@@ -2,8 +2,11 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA: SS-15: By RM03
 
+import java.util.HashMap;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +17,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.WebhookNotification;
 import com.realtech.socialsurvey.core.commons.CoreCommon;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -32,7 +37,7 @@ public class WebHookController {
 
 	@Autowired
 	private Payment gateway;
-
+	
 	@Autowired
 	private MessageUtils messageUtils;
 	
@@ -72,12 +77,51 @@ public class WebHookController {
 	Object getSubscriptionNotifications(Model model, HttpServletRequest request, HttpServletResponse response) {
 
 		LOG.info("Subscription notification recieved!");
+		
+		String testingFlag = request.getParameter("testing");
+		WebhookNotification webhookNotification = null;
+		
+		if(testingFlag == null || testingFlag.equals("0")){
+			webhookNotification = gateway.getGatewayInstance().webhookNotification()
+					.parse(request.getParameter("bt_signature"), request.getParameter("bt_payload"));
 
-		WebhookNotification webhookNotification = gateway.getGatewayInstance().webhookNotification()
-				.parse(request.getParameter("bt_signature"), request.getParameter("bt_payload"));
+			LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
+					+ " | Subscription: " + webhookNotification.getSubscription().getId());
+		}
+		else {
+			
+			String kind = request.getParameter("kind");
+			String subscriptionId = request.getParameter("subscription_id");
+			
+			LOG.info("kind : " + kind);
+			LOG.info("subscription id : " + subscriptionId);
+			
+			if(kind == null || kind.isEmpty()){
+				return "kind flag is empty";
+			}
+			
+			if(subscriptionId == null || subscriptionId.isEmpty()){
+				return "subscription id is empty";
+			}
+			
+			if(kind.equals(WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE.toString())){
+				HashMap<String, String> sampleNotification = gateway.getGatewayInstance().webhookTesting().sampleNotification(
+					    WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE, subscriptionId
+					);
 
-		LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
-				+ " | Subscription: " + webhookNotification.getSubscription().getId());
+				webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
+					    sampleNotification.get("bt_signature"),
+					    sampleNotification.get("bt_payload")
+					);
+				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
+						+ " | Subscription: " + webhookNotification.getSubscription().getId());
+			}
+			else{
+				return "Kind not known!";
+			}
+			
+		}
+		
 
 		try {
 
@@ -89,26 +133,26 @@ public class WebHookController {
 		catch (InvalidInputException e) {
 			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInputException thrown : " + e.getMessage());
 			commonServices.sendFailureMail(e);
-			return null;
+			return "WebHookController getSubscriptionNotifications() : InvalidInputException thrown : " + e.getMessage();
 		}
 		catch (UndeliveredEmailException e) {
 			LOG.error("WebHookController getSubscriptionNotifications() : UndeliveredEmailException thrown : " + e.getMessage());
 			commonServices.sendFailureMail(e);
-			return null;
+			return "WebHookController getSubscriptionNotifications() : UndeliveredEmailException thrown : " + e.getMessage();
 		}
 		catch (NoRecordsFetchedException e) {
 			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage());
 			commonServices.sendFailureMail(e);
-			return null;
+			return "WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage();
 		}
 		catch (DatabaseException e) {
 			LOG.error("WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage());
 			commonServices.sendFailureMail(e);
-			return null;
+			return "WebHookController getSubscriptionNotifications() : NoRecordsFetchedException thrown : " + e.getMessage();
 		}
 
 		LOG.info("Subscription Notification handled!");
-		return new ResponseEntity<String>("Notification recieved!", HttpStatus.OK);
+		return new ResponseEntity<String>("Notification recieved and processed!", HttpStatus.OK);
 
 	}
 

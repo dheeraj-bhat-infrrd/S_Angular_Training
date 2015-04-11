@@ -30,7 +30,7 @@
 <div class="hm-header-main-wrapper">
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="float-left hm-header-row-left text-center"><spring:message code="label.signupstartjourney.key" /></div>
+			<div class="hm-header-row-left text-center padding-10"><spring:message code="label.signupstartjourney.key" /></div>
 		</div>
 	</div>
 </div>
@@ -53,8 +53,8 @@
 					<div class="float-left rfr_lbl"><spring:message code="label.logo.key"/></div>
 					<div class="float-left rfr_txt">
 						<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-						<input type="text" class="rfr_txt_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.key"/>'>
-						<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo" placeholder='<spring:message code="label.logo.key"/>'>
+						<input type="text" class="rfr_txt_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'>
+						<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo">
 						<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
 					</div>
 				</div>

@@ -16,6 +16,9 @@ var maxPwdLength = 15;
 var firstNamePatternRegex = /^[a-zA-Z]{2,}$/;
 var lastNamePatternRegEx = /^[a-zA-Z]{2,}$/;
 
+var pageInitialized = false;
+
+
 function buildMessageDiv(){
 	if($('.err-nw-wrapper').length == 0){
         var errorDiv = $("<div id='err-nw-wrapper' class='err-nw-wrapper'>");
@@ -328,8 +331,8 @@ function validatePassword(elementId) {
 		showErrorMobileAndWeb("Please enter password");
 		return false;
 	}
-	else if (password.length < minPwdLength || password.length > maxPwdLength) {
-		showErrorMobileAndWeb('Password must be between 6-15 characters');
+	else if (password.length < minPwdLength) {
+		showErrorMobileAndWeb('Password must be at least 6 characters');
 		return false;
 	}
 	return true;
@@ -360,7 +363,7 @@ function validateConfirmPassword(pwdId, confirmPwdId){
  */
 function validateCompany(elementId){
 	if ($('#'+elementId).val() != "") {
-		if (companyNameRegEx.test($('#'+elementId).val()) == true) {
+		if ($('#'+elementId).val().indexOf("\"") == -1) {
 			return true;
 		} else {
 			showErrorMobileAndWeb('Please enter a valid company name');
@@ -644,22 +647,12 @@ function loadDisplayPicture(){
 	});
 }
 
-/*function upgradePlan(){
-	console.log("upgrade plan button clicked");
-	var url = "./upgradepage.do";
-
-	$.ajax({
-		url: url,
-		type: "GET",
-		success: function(data){
-			$('.overlay-payment').html(data);
-			$('.overlay-payment').show();
-		},
-		error : function(e) {
-			console.log(e);
-		}
-	});
-}*/
+/**
+ * Method to redirect to error page
+ */
+function redirectTo404ErrorPage(){
+	location.href =  window.location.origin + "/error";
+}
 
 // Header buttons
 $(document).on('click', '.hdr-log-btn', function() {
