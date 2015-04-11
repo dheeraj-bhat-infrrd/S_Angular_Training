@@ -177,7 +177,7 @@
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 						</div>
-						<div class="float-left review-count-left" id="prof-company-review-count"></div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
 					</div>
 				</div>
 			</div>
