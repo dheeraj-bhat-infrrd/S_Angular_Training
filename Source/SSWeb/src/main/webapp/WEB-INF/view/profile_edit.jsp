@@ -4,6 +4,8 @@
 
 <!-- Setting common page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
+<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
+
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
@@ -77,13 +79,15 @@
 				</div>
 			</c:if>
 
-			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-				<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
-				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
-				<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
-				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
-			</div>
+			<c:if test="${accountMasterId != 5}">
+				<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+					<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+					<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
+					<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
+					<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+					<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
+				</div>
+			</c:if>
 		</div>
 	</div>
 </div>
