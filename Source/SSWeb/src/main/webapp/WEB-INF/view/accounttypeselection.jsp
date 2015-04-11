@@ -2,7 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
-
+<c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <c:choose>
 	<c:when test="${upgrade == 1}"></c:when>
 	<c:when test="${ paidUpgrade == 1 }">
@@ -39,10 +39,16 @@
 				<div class="container hdr-container clearfix">
 					<div class="float-left hdr-logo"></div>
 					<div class="float-right clearfix hdr-btns-wrapper">
-						<div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
-						<div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
+						<div id="header-user-info" class="header-user-info float-right clearfix">
+					<div class="float-left user-info-initial">
+						<span id="usr-initl">${fn:substring(user.firstName, 0, 1)}</span>
+					</div>
+	                <div class="float-left user-info-sing-out">
+	                    <a class="" href="j_spring_security_logout"><spring:message code="label.logout.key" /></a>
+	                </div>
 					</div>
 				</div>
+			</div>
 			</div>
 	</c:otherwise>
 </c:choose>
