@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -170,7 +168,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 	 * Method to create excel file from all the completed survey data.
 	 */
 	@Override
-	public void downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
+	public XSSFWorkbook downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
 		// Blank workbook
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -232,7 +230,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 					cell.setCellValue((Integer) obj);
 			}
 		}
-		try {
+		/** try {
 			// Write the workbook in file system
 			FileOutputStream out = new FileOutputStream(new File(fileLocation));
 			workbook.write(out);
@@ -241,14 +239,15 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		catch (IOException e) {
 			LOG.error("IOException caught in downloadCompleteSurveyData() while trying to create excel file at " + fileLocation);
 			throw e;
-		}
+		}*/
+		return workbook;
 	}
 
 	/*
 	 * Method to create excel file from all the incomplete survey data.
 	 */
 	@Override
-	public void downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
+	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException {
 		// Blank workbook
 		XSSFWorkbook workbook = new XSSFWorkbook();
 
@@ -300,7 +299,7 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 					cell.setCellValue((Integer) obj);
 			}
 		}
-		try {
+		/**try {
 			// Write the workbook in file system
 			File file = new File(fileLocation);
 			file.createNewFile();
@@ -311,7 +310,8 @@ public class DashboardServiceImpl implements DashboardService, InitializingBean 
 		catch (IOException e) {
 			LOG.error("IOException caught in downloadCompleteSurveyData() while trying to create excel file at " + fileLocation);
 			throw e;
-		}
+		}*/
+		return workbook;
 	}
 	
 	@Override

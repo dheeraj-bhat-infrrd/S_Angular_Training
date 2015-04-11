@@ -2,9 +2,8 @@ package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-137 : by RM-05 : BOC
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,9 +68,6 @@ public class DashboardController {
 
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
-
-	@Value("${TEMP_FILE_LOCATION}")
-	private String tempFileLocation;
 
 	private final String EXCEL_FORMAT = "application/vnd.ms-excel";
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
@@ -603,14 +600,27 @@ public class DashboardController {
 			}
 			try {
 				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true);
-				String fileLocation = tempFileLocation + "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
-				dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
+				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
+				XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
 				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
 				response.setHeader(headerKey, headerValue);
-				InputStream is = new FileInputStream(new File(fileLocation));
-				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+				// write into file
+				OutputStream responseStream = null;
+				try{
+					responseStream = response.getOutputStream();
+					workbook.write(responseStream);
+				}catch (IOException e) {
+					e.printStackTrace();
+				}finally{
+					try {
+						responseStream.close();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				response.flushBuffer();
 			}
 			catch (InvalidInputException e) {
@@ -664,14 +674,27 @@ public class DashboardController {
 			}
 			try {
 				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel);
-				String fileLocation = tempFileLocation + "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
-				dashboardService.downloadIncompleteSurveyData(surveyDetails, fileLocation);
+				String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
+				XSSFWorkbook workbook =dashboardService.downloadIncompleteSurveyData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
 				String headerKey = CONTENT_DISPOSITION_HEADER;
-				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileLocation).getName());
+				String headerValue = String.format("attachment; filename=\"%s\"", new File(fileName).getName());
 				response.setHeader(headerKey, headerValue);
-				InputStream is = new FileInputStream(new File(fileLocation));
-				org.apache.commons.io.IOUtils.copy(is, response.getOutputStream());
+				// write into file
+				OutputStream responseStream = null;
+				try{
+					responseStream = response.getOutputStream();
+					workbook.write(responseStream);
+				}catch (IOException e) {
+					e.printStackTrace();
+				}finally{
+					try {
+						responseStream.close();
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
 				response.flushBuffer();
 			}
 			catch (InvalidInputException e) {

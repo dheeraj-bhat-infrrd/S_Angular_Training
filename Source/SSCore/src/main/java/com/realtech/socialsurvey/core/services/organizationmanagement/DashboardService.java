@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -28,9 +29,9 @@ public interface DashboardService {
 
 	public int getBadges(int surveyScore, int surveyCount, int socialPosts, int profileCompleteness);
 
-	public void downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
+	public XSSFWorkbook downloadCompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
 
-	public void downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
+	public XSSFWorkbook downloadIncompleteSurveyData(List<SurveyDetails> surveyDetails, String fileLocation) throws IOException;
 
 	public Map<String, Map<String, Long>> getSurveyDetailsForGraph(String columnName, long columnValue, String reportType) throws ParseException;
 
