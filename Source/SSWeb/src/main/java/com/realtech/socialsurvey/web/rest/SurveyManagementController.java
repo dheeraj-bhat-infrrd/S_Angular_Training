@@ -30,6 +30,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -270,11 +271,15 @@ public class SurveyManagementController {
 			}
 			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+				//throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE).getMessage();
+				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
+				
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
 				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
+				
 				surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 				if (survey != null) {
 					stage = survey.getStage();
@@ -291,7 +296,7 @@ public class SurveyManagementController {
 				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
 				ErrorResponse errorResponse = new ErrorResponse();
 				errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-				errorResponse.setErrMessage("Agent not found.");
+				errorResponse.setErrMessage(e.getMessage());
 				String errorMessage = JSONUtil.toJSON(errorResponse);
 				return errorMessage;
 			}
@@ -316,7 +321,7 @@ public class SurveyManagementController {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
 			ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage("No survey found!");
+			errorResponse.setErrMessage(e.getMessage());
 			String errorMessage = new Gson().toJson(errorResponse);
 			return errorMessage;
 		}
