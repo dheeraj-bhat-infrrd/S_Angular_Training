@@ -181,7 +181,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
+			<div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
@@ -528,8 +528,7 @@
 				
 				<div class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
-						<div class="main-con-header"><spring:message code="label.sspost.key"/></div>
-						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit"></textarea>
+						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit" placeholder="<spring:message code="label.sspost.key"/>"></textarea>
 						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
 					<div id="prof-posts-ps" class="float-left panel-tweet-wrapper">
