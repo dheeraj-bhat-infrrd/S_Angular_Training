@@ -207,8 +207,7 @@ $(document).on('click', '.bd-q-btn-done-edit', function() {
 		showProgress('#bs-question-' + questionId);
 		callAjaxFormSubmit(url, function(data) {
 			var map =  $.parseJSON(data);
-			$("#overlay-toast").html(map.message);
-			showToast();
+			showInfo(map.message);
 			
 			if (map.status == "success") {
 				$('.bd-srv-tbl-row-' + questionId).next().remove();

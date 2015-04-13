@@ -561,6 +561,10 @@ input#find-pro-submit{
 	border-radius: 3px;
     margin-left: 0;
 }
+.pro-list-default-img {
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	background-size: contain;
+}
 
 .ctnt-list-item-txt-wrap{
 	height: 72px;

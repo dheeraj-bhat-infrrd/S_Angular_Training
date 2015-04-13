@@ -1424,7 +1424,7 @@ button.paypal.is-active {
 }
 
 .prof-name {
-	font-size: 22px;
+	font-size: 20px;
 	color: #666;
 }
 
@@ -1447,26 +1447,43 @@ button.paypal.is-active {
 .prof-btn-survey {
 	background-color: #7AB400;
 	font-size: 15px;
-	height: 40px;
-	line-height: 40px;
-	width: 250px;
+	height: 35px;
+	line-height: 35px;
+	width: 150px;
+	text-align: center;
+	cursor: pointer;
+	border-radius: 3px;
+	color: #fff;
+	margin-left: 15px;
+}
+.prof-btn-contact {
+	background-color: #009FE0;
+	font-size: 15px;
+	height: 35px;
+	line-height: 35px;
+	width: 150px;
 	text-align: center;
 	cursor: pointer;
 	border-radius: 3px;
 	color: #fff;
 }
+
 /*
 .prof-btn-survey:hover{
     background-color: #7AB400;
-}
-*/
+}*/
+
 .prof-wrapper {
 	height: 200px;
 }
 
 .prof-addline2 {
-	font-size: 16px;
+	font-size: 14px;
 	font-family: opensanslight;
+	margin-top: 5px;
+}
+.prof-addline3 {
+	font-family: 'OpenSanslight';
 }
 
 .prof-btn-wrapper {
@@ -1478,6 +1495,9 @@ button.paypal.is-active {
 
 .prof-rating-mobile-wrapper {
 	height: 50px;
+}
+.prof-rating {
+	margin-top: 15px;
 }
 
 .prof-hidden-review-link {
@@ -2015,10 +2035,9 @@ button.paypal.is-active {
 .sb-txtarea {
 	padding: 10px;
 	width: 100%;
-	height: 150px;
+	height: 60px;
 	border: 1px solid #e3e3e3;
 	border-radius: 3px;
-	box-shadow: 0px 2px 2px 0px #e3e3e3;
 }
 
 .sb-dd-wrapper {
@@ -2905,10 +2924,10 @@ button.paypal.is-active {
 }
 
 .review-count-left {
-	line-height: 60px;
+	line-height: 40px;
 	height: 50px;
-	font-size: 12px;
-	color: #5CC8EF;
+	font-size: 14px;
+	color: #009FE0;
 	margin-left: 15px;
 }
 
@@ -3158,6 +3177,14 @@ button.paypal.is-active {
 
 .prog-img-container {
 	position: relative;
+	width: 200 !important;
+}
+.prof-img-wrapper {
+	width: 200 !important;
+}
+
+.prof-name-container {
+	margin: 0 0 0 15px;
 }
 
 .form_contact_image {
@@ -3846,10 +3873,10 @@ button.paypal.is-active {
 }
 
 .dsh-graph-num-4 {
-	width: 184px;
-	height: 184px;
-	left: 6px;
-	top: 6px;
+	width: 182px;
+	height: 182px;
+	left: 7px;
+	top: 7px;
 }
 
 .dsh-graph-txt-4 {
@@ -4185,17 +4212,17 @@ button.paypal.is-active {
 
 .pe-btn-post {
 	background-color: #009FE0;
-	height: 40px;
-	line-height: 40px;
-	width: 200px;
+	height: 30px;
+	line-height: 30px;
+	width: 110px;
 	text-align: center;
 	color: #fff;
 	border-radius: 3px;
-	margin: 10px auto;
-	font-size: 16px;
-	font-family: 'opensanslight';
-	text-transform: uppercase;
+	margin: 10px 0 0 0;
+	font-size: 12px;
+	font-family: 'opensans';
 	cursor: pointer;
+	float: right;
 }
 
 .pe-btn-post:hover {
