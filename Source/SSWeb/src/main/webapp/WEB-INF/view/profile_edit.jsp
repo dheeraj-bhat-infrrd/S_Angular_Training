@@ -532,7 +532,7 @@
 						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit"></textarea>
 						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
-					<div id="prof-posts-ps" class="float-left panel-tweet-wrapper">
+					<div class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
 						<div id="prof-posts" class="tweet-panel tweet-panel-left">
 							<div class="tweet-panel-item bord-bot-dc clearfix">
@@ -599,9 +599,7 @@
 		$('#prof-post-btn').unbind('click');
 		$('#prof-post-btn').click(function() {
 			var textContent = $('#status-body-text-edit').val().trim();
-			$('#status-body-text-edit').val(textContent);
-			$('#status-body-text-edit').show();
-			$('#status-body-text-edit').focus();
+			$('#status-body-text-edit').val('');
 			var payload = {
 				"text" : textContent
 			};
@@ -610,7 +608,16 @@
 				type : "POST",
 				dataType : "text",
 				async : false,
-				data : payload
+				data : payload,
+				success : function(data) {
+					if (data.errCode == undefined)
+						success = true;
+				},
+				complete : function(data) {
+					if (success) {
+						showPosts(true);
+					}
+				}
 			});
 		});
 
