@@ -1078,6 +1078,7 @@ public class EmailServicesImpl implements EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
+	@Async
 	@Override
 	public void sendContactUsMail(String recipientEmailId, String displayName,
 			String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException {
