@@ -306,11 +306,41 @@
             $('body').removeClass('body-no-scroll-y');
         });
         
-        $(document).on('click','.bd-q-btn-done-pu',function(){
-            // perform deault functions
-            $('#contact-us-pu-wrapper').hide();
-            $('body').removeClass('body-no-scroll-y');
-        }); 
+        $(document).on('click', '.bd-q-btn-done-pu', function() {
+			// perform deault functions
+			url = window.location.origin + "/pages/profile/sendmail.do";
+			data = "";
+			if($("#agent-profile-name").val() != ""){
+				data += "profilename=" + $("#agent-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			else if($("#company-profile-name").val() != ""){
+				data += "profilename=" + $("#company-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			else if($("#region-profile-name").val() != ""){
+				data += "profilename=" + $("#region-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			else if($("#branch-profile-name").val() != ""){
+				data += "profilename=" + $("#branch-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			
+			data += "&email=blah@blahblah.com";
+			data += "&message="+ $('.bd-q-pu-txtarea').val();
+			showOverlay();
+			callAjaxPostWithPayloadData(url,function(message){
+				$('#contact-us-pu-wrapper').hide();
+				$('body').removeClass('body-no-scroll-y');
+				$('#overlay-toast').html(message);
+	    		console.log("Added toast message : " + message);
+	    		showToast();
+	    		console.log("Finished showing the toast");
+
+			},data,true);
+		});
+        
         $(document).on('click','.vcard-download', function(){
         	var agentName = $("#agent-profile-name").val();
         	downloadVCard(agentName);
