@@ -184,7 +184,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	showProfileDetails(newProfileName, 0, 30);
 	getReviewsCountAndShowReviews(newProfileName, 0);
 	showIncompleteSurvey(colName, colValue);
-
+	bindSelectButtons();
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
