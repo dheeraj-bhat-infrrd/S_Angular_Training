@@ -75,6 +75,7 @@ $(document).on('click', '.bd-q-btn-done', function() {
 	var editedStatus = true;
 	while (count <= currentQues) {
 		if ($('#bs-question-' + count).attr('data-status') == 'edited') {
+			editedStatus = true;
 			break;
 		}
 		else {
@@ -169,6 +170,13 @@ $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
 });
 
+$(document).keyup(function(e) {
+	if (e.keyCode == 27) {
+		if ($('#bd-srv-pu').is(":visible"))
+			$('.bd-q-btn-done').trigger('click');
+	}
+});
+
 // Question edit
 $(document).on('click', '.srv-tbl-edit', function() {
 	var questionId = $(this).parent().parent().data('questionid');
@@ -180,6 +188,12 @@ $(document).on('click', '.srv-tbl-edit', function() {
 		$('.bd-srv-tbl-row-' + questionId).after(response);
 		revertQuestionOverlay();
 	}, true);
+});
+
+$(document).on('input', '.bd-q-pu-txt-edit', function() {
+	var quesNum = $(this).closest('form').data('quesnum');
+	$('#bs-question-' + quesNum).attr('data-status', 'edited');
+	showStatus('#bs-question-' + quesNum, 'Edited');
 });
 
 $(document).on('click', '.bd-q-btn-done-edit', function() {
@@ -369,11 +383,22 @@ $(document).on('blur', '.bd-mcq-txt', function(){
 				+ '<div class="float-left bd-mcq-close"></div>'
 			+ '</div>';
 		$(this).parent().after(htmlData);
+		
+		// enable remove button
+		if ($(this).parent().parent().children().length > 2) {
+			$('.bd-mcq-close').removeClass('hide');
+		}
 	}
 });
 
 $(document).on('click', '.bd-mcq-close', function(){
+	var parentDiv = $(this).parent().parent();
 	$(this).parent().remove();
+
+	// disable remove button
+	if (parentDiv.children().length <= 2) {
+		$('.bd-mcq-close').addClass('hide');
+	}
 	
 	// changing status to edited
 	var name = $(this).attr('name');

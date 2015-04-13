@@ -1,9 +1,11 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <!-- Setting common page variables -->
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
+<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
+
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
@@ -46,15 +48,15 @@
 				<input type="hidden" id="company-profile-name" value="${profileSettings.profileName}">
 			</c:when>
 			<c:when test="${profilemasterid == 2}">
-				<input type="hidden" id="prof-region-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-region-id" value="${profile.regionId}">
 				<%-- <input type="hidden" id="prof-region-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 3}">
-				<input type="hidden" id="prof-branch-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-branch-id" value="${profile.branchId}">
 				<%-- <input type="hidden" id="prof-branch-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 			<c:when test="${profilemasterid == 4}">
-				<input type="hidden" id="prof-agent-id" value="${profileSettings.iden}">
+				<input type="hidden" id="prof-agent-id" value="${profile.agentId}">
 				<%-- <input type="hidden" id="prof-agent-name" value="${profileSettings.profileName}"> --%>
 			</c:when>
 		</c:choose>
@@ -65,34 +67,27 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
-			<c:choose>
-				<c:when test="${not empty profileList && fn:length(profileList) > 1}">
-					<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
-						<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
-						<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
-						<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
-							<c:forEach var="userprofile" items="${profileList}">
-								<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value}</div>
-							</c:forEach>
-						</div>
+			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
+				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
+					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
+					<div id="profile-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
+					<div id="pe-dd-wrapper-profiles" class="hr-dd-wrapper hide">
+						<c:forEach var="userprofile" items="${profileList}">
+							<div class="pe-dd-item" data-profile-id="${userprofile.key}">${userprofile.value.userProfileName}</div>
+						</c:forEach>
 					</div>
-				</c:when>
-			</c:choose>
+				</div>
+			</c:if>
 
-			<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-				<div class="float-left social-item-icon icn-fb" onclick="openAuthPage('facebook');"></div>
-				<div class="float-left social-item-icon icn-twit" onclick="openAuthPage('twitter');"></div>
-				<div class="float-left social-item-icon icn-lin" onclick="openAuthPage('linkedin');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('google');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('yelp');"></div>
-				<div class="float-left social-item-icon icn-yelp" onclick="openAuthPage('rss');"></div>
-
-				<%-- <div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
-				<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
-				<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
-				<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-				<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'> --%>
-			</div>
+			<c:if test="${accountMasterId != 5}">
+				<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+					<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+					<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
+					<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
+					<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+					<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
+				</div>
+			</c:if>
 		</div>
 	</div>
 </div>
@@ -182,7 +177,7 @@
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 						</div>
-						<div class="float-left review-count-left" id="prof-company-review-count"></div>
+						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
 					</div>
 				</div>
 			</div>
@@ -190,7 +185,7 @@
 				<div id="prof-logo-container" class="lp-prog-img-container" style="position: relative;">
 					<c:choose>
 						<c:when test="${not empty profilelogo}">
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) center; 50% 50% no-repeat; background-size: 100% auto;"></div>
+							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background: url(${profilelogo}) no-repeat center; 50% 50% no-repeat; background-size: contain;"></div>
 							<c:choose>
 								<c:when	test="${parentLock.isLogoLocked && profilemasterid != 4}">
 									<div id="prof-logo-lock" data-state="locked" data-control="parent" class="prof-img-lock-item prof-img-lock prof-img-lock-locked"></div>
@@ -213,10 +208,12 @@
 							</c:choose>
 						</c:when>
 						<c:otherwise>
-							<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
-							<form class="form_contact_image" enctype="multipart/form-data">
-								<input type="file" id="prof-logo" class="con_img_inp_file">
-							</form>
+							<c:if test="${profilemasterid != 4}">
+								<div id="prof-logo-edit" class="prof-image-rp prof-image-edit pos-relative cursor-pointer" style="background-image:initial; 50% 50% no-repeat; background: no-repeat center; background-size: cover;"></div>
+								<form class="form_contact_image" enctype="multipart/form-data">
+									<input type="file" id="prof-logo" class="con_img_inp_file">
+								</form>
+							</c:if>
 						</c:otherwise>
 					</c:choose>
 				</div>
@@ -532,12 +529,12 @@
 				<div class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.sspost.key"/></div>
-						<textarea class="pe-whitespace sb-txtarea" id="intro-body-text-edit"></textarea>
-						<div class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
+						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit"></textarea>
+						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
 					</div>
-					<div class="float-left panel-tweet-wrapper">
+					<div id="prof-posts-ps" class="float-left panel-tweet-wrapper">
 						<div class="main-con-header"><spring:message code="label.latestposts.key"/></div>
-						<div class="tweet-panel tweet-panel-left">
+						<div id="prof-posts" class="tweet-panel tweet-panel-left">
 							<div class="tweet-panel-item bord-bot-dc clearfix">
 								<div class="tweet-icn icn-tweet float-left"></div>
 								<div class="tweet-txt float-left">
@@ -580,9 +577,11 @@
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 
+<script src="${pageContext.request.contextPath}/resources/js/editprofiledropdown.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 	$(document).ready(function() {
+		countPosts();
 		$(document).attr("title", "Profile Settings");
 		adjustImage();
 		$(window).resize(adjustImage);
@@ -596,54 +595,54 @@
 			$(this).hide();
 			$(this).parent().find('.ppl-share-social,.icn-remove').show();
 		});
-
-		$('.ppl-share-wrapper .icn-remove').click(function() {
-			$(this).hide();
-			$(this).parent().find('.ppl-share-social').hide();
-			$(this).parent().find('.icn-plus-open').show();
-		});
-
-		$('.icn-person').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-			$('.prof-left-panel-wrapper').show();
-			$('.prof-right-panel-wrapper').hide();
-			adjustImage();
-		});
-
-		$('.icn-ppl').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-			$('.prof-left-panel-wrapper').hide();
-			$('.prof-right-panel-wrapper').show();
-		});
-
-		$('.icn-star-smile').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-		});
-
-		$('.inc-more').click(function() {
-			$('.mob-icn').removeClass('mob-icn-active');
-			$(this).addClass('mob-icn-active');
-		});
 		
-		// Profile View as
-		$('#profile-sel').click(function(){
-			$('#pe-dd-wrapper-profiles').slideToggle(200);
+		$('#prof-post-btn').unbind('click');
+		$('#prof-post-btn').click(function() {
+			var textContent = $('#status-body-text-edit').val().trim();
+			$('#status-body-text-edit').val(textContent);
+			$('#status-body-text-edit').show();
+			$('#status-body-text-edit').focus();
+			var payload = {
+				"text" : textContent
+			};
+			$.ajax({
+				url : "./savestatus.do",
+				type : "POST",
+				dataType : "text",
+				async : false,
+				data : payload
+			});
 		});
-		
-		$('.pe-dd-item').click(function(){
-			var newProfileId = $(this).data('profile-id');
-			
-			$('#profile-sel').html($(this).html());
-			$('#pe-dd-wrapper-profiles').slideToggle(200);
-			
-			showMainContent('./showprofilepage.do?profileId=' + newProfileId);
-		});
+
+	$('.ppl-share-wrapper .icn-remove').click(function() {
+		$(this).hide();
+		$(this).parent().find('.ppl-share-social').hide();
+		$(this).parent().find('.icn-plus-open').show();
 	});
-	
-	function openAuthPage(socialNetwork) {
-		window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
-	}
+
+	$('.icn-person').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+		$('.prof-left-panel-wrapper').show();
+		$('.prof-right-panel-wrapper').hide();
+		adjustImage();
+	});
+
+	$('.icn-ppl').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+		$('.prof-left-panel-wrapper').hide();
+		$('.prof-right-panel-wrapper').show();
+	});
+
+	$('.icn-star-smile').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+	});
+
+	$('.inc-more').click(function() {
+		$('.mob-icn').removeClass('mob-icn-active');
+		$(this).addClass('mob-icn-active');
+	});
+});
 </script>

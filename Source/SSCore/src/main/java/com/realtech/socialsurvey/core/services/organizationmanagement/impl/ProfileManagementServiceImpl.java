@@ -20,6 +20,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.Achievement;
@@ -35,6 +36,7 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
@@ -78,6 +80,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private SurveyDetailsDao surveyDetailsDao;
+	
+	@Autowired
+	private SocialPostDao socialPostDao;
 
 	@Autowired
 	private Utils utils;
@@ -129,6 +134,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// If user is not Company Admin, Lock settings need to be aggregated
 		else {
 			switch (accountType) {
+				case FREE:
 				case INDIVIDUAL:
 				case TEAM:
 					// Individual
@@ -282,6 +288,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		// If user is not Company Admin, Profile need to be aggregated
 		else {
 			switch (accountType) {
+				case FREE:
 				case INDIVIDUAL:
 				case TEAM:
 					// Individual
@@ -1256,7 +1263,44 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			LOG.error("No records found for agent settings of profile name : " + profileName + " in mongo");
 			throw new NoRecordsFetchedException("No records found for agent settings of profile name : " + profileName + " in mongo");
 		}
+	}
 		
 		
+	/*
+	 * Method to store status of a user into the mongo.
+	 */
+	@Override
+	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time){
+		LOG.info("Method to add post to a user's profile started.");
+		SocialPost socialPost = new SocialPost();
+		socialPost.setUserId(userId);
+		socialPost.setPostedBy(postedBy);
+		socialPost.setPostText(postText);
+		socialPost.setSource("SocialSurvey");
+		socialPost.setTimeInMillis(System.currentTimeMillis());
+		socialPostDao.addPostToUserProfile(socialPost);
+		LOG.info("Method to add post to a user's profile finished.");
+	}
+	
+	/*
+	 * Method to fetch social posts for a particular user.
+	 */
+	@Override
+	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize){
+		LOG.info("Method to fetch social posts for a particular user, getPostsForUser() started.");
+		List<SocialPost> posts = socialPostDao.getPostsByUserId(userId, startIndex, batchSize);
+		LOG.info("Method to fetch social posts for a particular user, getPostsForUser() finished.");
+		return posts;
+	}
+	
+	/*
+	 * Method to fetch social posts for a particular user.
+	 */
+	@Override
+	public long getPostsCountForUser(long userId){
+		LOG.info("Method to fetch count of social posts for a particular user, getPostsCountForUser() started.");
+		long postsCount = socialPostDao.getPostsCountByUserId(userId);
+		LOG.info("Method to fetch count of social posts for a particular user, getPostsCountForUser() finished.");
+		return postsCount;
 	}
 }

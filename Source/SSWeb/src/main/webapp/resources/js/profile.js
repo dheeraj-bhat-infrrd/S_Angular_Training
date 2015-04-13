@@ -14,7 +14,7 @@ function fetchCompanyProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		if(response.entity == "" || response.status == 500) {
-			showErrorMobileAndWeb("We could not find profile for this company");
+			redirectTo404ErrorPage();
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
@@ -106,7 +106,6 @@ function paintProfilePage(result) {
             
             var contactInfoHtml = "";
             var mailIds = contactDetails.mail_ids;
-            
             if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
@@ -620,7 +619,7 @@ function fetchRegionProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		if(response.entity == "" || response.status == 500) {
-			showErrorMobileAndWeb("We could not find profile for this region");
+			redirectTo404ErrorPage();
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
@@ -736,7 +735,7 @@ function fetchBranchProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		if(response.entity == "" || response.status == 500) {
-			showErrorMobileAndWeb("We could not find profile for this office");
+			redirectTo404ErrorPage();
 			return false;
 		}
 		var result = $.parseJSON(response.entity);
@@ -858,7 +857,7 @@ function fetchAgentProfileCallBack(data) {
 	var response= $.parseJSON(data);
 	if(response != undefined) {
 		if(response.entity == "" || response.status == 500) {
-			showErrorMobileAndWeb("We could not find profile for this individual");
+			redirectTo404ErrorPage();
 			return false;
 		}
 		var result = $.parseJSON(response.entity);

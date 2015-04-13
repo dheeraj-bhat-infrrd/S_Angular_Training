@@ -80,7 +80,7 @@ public class Utils {
 			genereatedProfileName = genereatedProfileName.substring(1);
 		}
 		hyphenIndex = genereatedProfileName.lastIndexOf("-");
-		if(hyphenIndex == genereatedProfileName.length()){
+		if(hyphenIndex == genereatedProfileName.length()-1){
 			// remove the last hyphen
 			genereatedProfileName = genereatedProfileName.substring(0, genereatedProfileName.length()-1);
 		}
@@ -96,6 +96,6 @@ public class Utils {
 	 */
 	public String appendIdenToProfileName(String profileName, long iden){
 		LOG.debug("Appending "+iden+" to profile name: "+profileName+" for uniqueness");
-		return profileName+"."+iden;
+		return profileName+"-"+iden;
 	}
 }
