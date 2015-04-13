@@ -327,6 +327,18 @@ public interface ProfileManagementService {
 	 */
 	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
 			throws InvalidInputException;
+	
+	/**
+	 * Method that mails the contact us message to the respective individual,branch,region,company
+	 * @param agentProfileName
+	 * @param message
+	 * @param senderMailId
+	 * @param profileType
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws UndeliveredEmailException
+	 */
+	public void findProfileMailIdAndSendMail(String agentProfileName,String message,String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
 	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time);
 

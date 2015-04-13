@@ -135,6 +135,7 @@ public class SurveyManagementController {
 			}
 			boolean isAbusive = Boolean.parseBoolean(request.getParameter("isAbusive"));
 			surveyHandler.updateGatewayQuestionResponseAndScore(agentId, customerEmail, mood, feedback, isAbusive);
+			surveyHandler.increaseSurveyCountForAgent(agentId);
 
 			// TODO Search Engine Optimisation
 
