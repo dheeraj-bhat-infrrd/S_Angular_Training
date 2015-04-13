@@ -58,8 +58,9 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
             headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
-            headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper">';
-            headContentHtml = headContentHtml +'		<div class="prof-btn-survey" id="read-write-share-btn">Read Write and Share Reviews</div>';
+            headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper clearfix">';
+            headContentHtml = headContentHtml +'		<div class="prof-btn-contact float-left" id="">Contact '+contactDetails.name+'</div>';
+            headContentHtml = headContentHtml +'		<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>';
             headContentHtml = headContentHtml +'	</div>';            
             $("#prof-company-head-content").html(headContentHtml);
             

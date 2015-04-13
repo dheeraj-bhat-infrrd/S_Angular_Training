@@ -118,11 +118,11 @@ function showDisplayPic() {
 			if (colName == 'agentId') {
 				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
 			} else if (colName == 'branchId') {
-				$("#dsh-prsn-img").addClass('office-default-img');
+				$("#dsh-prsn-img").addClass('dsh-office-default-img');
 			} else if (colName == 'regionId') {
-				$("#dsh-prsn-img").addClass('region-default-img');
+				$("#dsh-prsn-img").addClass('dsh-region-default-img');
 			} else if (colName == 'companyId') {
-				$("#dsh-prsn-img").addClass('comp-default-img');
+				$("#dsh-prsn-img").addClass('dsh-comp-default-img');
 			}
 		}
 	});
