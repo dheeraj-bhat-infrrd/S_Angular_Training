@@ -36,7 +36,7 @@ public interface JspResolver {
 	public static final String EXISTING_ENTERPRISE_REGIONS = "existingenterpriseregions";
 	public static final String EXISTING_ENTERPRISE_BRANCHES = "existingenterprisebranches";
 	public static final String REGIONS_AUTOCOMPLETE = "regionsautocomplete";
-	public static final String COMPANY_SETTINGS = "settings";
+	public static final String EDIT_SETTINGS = "settings";
 	public static final String PAYMENT_ALREADY_MADE = "paymentalreadymade";
 	public static final String CHANGE_PASSWORD = "changepassword";
 	public static final String INDEX = "index";
@@ -65,4 +65,5 @@ public interface JspResolver {
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String SOCIAL_AUTH_MESSAGE = "socialauthmessage";
 	public static final String VIEW_HIERARCHY_USERS_LIST = "hierarchy-view-users-list";
+	public static final String SHOW_SURVEY_QUESTIONS = "surveyQuestion";
 }

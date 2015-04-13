@@ -189,7 +189,9 @@ public interface CommonConstants {
 	public static final String PARENT_LOCK = "parentLock";
 	public static final String USER_PROFILE = "profile";
 	public static final String USER_PROFILE_LIST = "profileList";
+	public static final String USER_PROFILE_MAP = "profileMap";
 	public static final String USER_PROFILE_SETTINGS = "profileSettings";
+	public static final String USER_ACCOUNT_SETTINGS = "accountSettings";
 	public static final String ERROR = "error";
 	public static final String MESSAGE = "message";
 	public static final String EMAIL_TYPE = "emailtype";
@@ -200,6 +202,7 @@ public interface CommonConstants {
 	public static final String SOCIAL_FLOW = "socialFlow";
 	public static final String BRANCHES_IN_SESSION = "branchesInSession";
 	public static final String REGIONS_IN_SESSION = "regionsInSession";
+	public static final String PROFILE_AGENT_VIEW = "Myself";
 
 	/**
 	 * Batch Constants
@@ -407,6 +410,7 @@ public interface CommonConstants {
 	public static final String REGION_SETTINGS_COLLECTION = "REGION_SETTINGS";
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
+	public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
 	
 	/*
 	 * Constants related to Dash board profile.

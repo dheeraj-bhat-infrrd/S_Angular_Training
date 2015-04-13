@@ -1,10 +1,9 @@
 package com.realtech.socialsurvey.web.controller;
 
 // JIRA SS-21 : by RM-06 : BOC
-
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -23,16 +22,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.entities.AgentSettings;
-import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
-import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -279,9 +275,38 @@ public class LoginController {
 	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
 		HttpSession session = request.getSession(false);
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		User user = sessionHelper.getCurrentUser(); 
+
 		try {
-			setUserInModel(model, sessionHelper.getCurrentUser(), accountType);
+			// updating session with aggregated user profiles
+			try {
+				user = userManagementService.getUserByUserId(user.getUserId());
+				
+				AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+				Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+				UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						selectedProfile = profile;
+						break;
+					}
+				}
+				session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+
+				Map<Long, UserProfileSmall> profileSmallMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+				if (profileSmallMap.size() > 0) {
+					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+				}
+				session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+			}
+			catch (NonFatalException e) {
+				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+				return JspResolver.LOGIN;
+			}
+
+			setUserInModel(model, sessionHelper.getCurrentUser(), session);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
@@ -488,47 +513,43 @@ public class LoginController {
 	@RequestMapping(value = "/getdisplaypiclocation")
 	public String getDisplayPictureLocation(Model model, HttpServletRequest request, HttpServletResponse response) {
 		LOG.info("fetching display picture");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
 		String imageUrl = "";
+		
 		try {
-			User user = sessionHelper.getCurrentUser();
-			if (user == null) {
-				LOG.error("No user found in current session.");
-				throw new InvalidInputException("No user found in current session.");
-			}
-			if (user.isCompanyAdmin()) {
-				imageUrl = organizationManagementService.getCompanySettings(user).getProfileImageUrl();
-			}
-			else if (user.isRegionAdmin()) {
-				long regionId = 0;
+			user = userManagementService.getUserByUserId(user.getUserId());
+			UserProfile currentProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (currentProfile == null) {
+				currentProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 				for (UserProfile profile : user.getUserProfiles()) {
-					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-						regionId = profile.getRegionId();
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						currentProfile = profile;
 						break;
 					}
 				}
+			}
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			if (userSettings == null || currentProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+			
+			int profileMasterId = currentProfile.getProfilesMaster().getProfileId();
+			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				imageUrl = userSettings.getCompanySettings().getProfileImageUrl();
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = currentProfile.getRegionId();
 				if (regionId != 0)
-					imageUrl = organizationManagementService.getRegionSettings(regionId).getProfileImageUrl();
+					imageUrl = userSettings.getRegionSettings().get(regionId).getProfileImageUrl();
 			}
-			else if (user.isBranchAdmin()) {
-				long branchId = 0;
-				for (UserProfile profile : user.getUserProfiles()) {
-					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-						branchId = profile.getBranchId();
-						break;
-					}
-				}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = currentProfile.getBranchId();
 				if (branchId != 0)
-					imageUrl = organizationManagementService.getBranchSettings(branchId).getOrganizationUnitSettings().getProfileImageUrl();
+					imageUrl = userSettings.getBranchSettings().get(branchId).getProfileImageUrl();
 			}
-			else if (user.isAgent()) {
-				sessionHelper.getCanonicalSettings(request.getSession());
-				UserSettings userSettings = (UserSettings) request.getSession().getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-				if (userSettings != null) {
-					AgentSettings agentSettings = userSettings.getAgentSettings();
-					if (agentSettings != null) {
-						imageUrl = agentSettings.getProfileImageUrl();
-					}
-				}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				imageUrl = userSettings.getAgentSettings().getProfileImageUrl();
 			}
 		}
 		catch (NonFatalException e) {
@@ -600,13 +621,35 @@ public class LoginController {
 		return redirectTo;
 	}
 
-	@SuppressWarnings("unchecked")
-	private Model setUserInModel(Model model, User user, AccountType accountType) throws InvalidInputException, SolrException {
+	private Model setUserInModel(Model model, User user, HttpSession session) throws InvalidInputException, SolrException {
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+
 		model.addAttribute("userId", user.getUserId());
 		model.addAttribute("emailId", user.getEmailId());
-		model.addAttribute("accountType", accountType);
-		List<Long> regionIds = new ArrayList<>();
+		model.addAttribute("profileId", selectedProfile.getUserProfileId());
+		model.addAttribute("profileMasterId", profileMasterId);
+
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+			model.addAttribute("columnValue", user.getCompany().getCompanyId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getRegionId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getBranchId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getAgentId());
+		}
+		
+		/*List<Long> regionIds = new ArrayList<>();
 		List<Long> branchIds = new ArrayList<>();
+		model.addAttribute("accountType", accountType);
 		for (UserProfile userProfile : user.getUserProfiles()) {
 			switch (userProfile.getProfilesMaster().getProfileId()) {
 				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
@@ -636,6 +679,7 @@ public class LoginController {
 						model.addAttribute("branchIds", branchIds);
 					}
 					return model;
+					
 				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
 					model.addAttribute("regionAdmin", true);
 					// Add list of region Ids, user is admin of. Currently adding only 1st region
@@ -657,9 +701,8 @@ public class LoginController {
 					break;
 
 				default:
-
 			}
-		}
+		}*/
 		return model;
 	}
 

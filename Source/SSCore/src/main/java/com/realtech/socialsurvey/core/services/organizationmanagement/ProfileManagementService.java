@@ -13,6 +13,7 @@ import com.realtech.socialsurvey.core.entities.Licenses;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserSettings;
@@ -338,5 +339,12 @@ public interface ProfileManagementService {
 	 * @throws UndeliveredEmailException
 	 */
 	public void findProfileMailIdAndSendMail(String agentProfileName,String message,String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+
+	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time);
+
+	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize);
+
+	public long getPostsCountForUser(long userId);
+
 
 }

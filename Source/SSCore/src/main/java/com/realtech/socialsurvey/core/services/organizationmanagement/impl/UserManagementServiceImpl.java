@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
+import java.net.MalformedURLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,7 @@ import com.realtech.socialsurvey.core.dao.UserProfileDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.BranchSettings;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
@@ -34,11 +36,13 @@ import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.RemovedUser;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -1862,5 +1866,144 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method updateUserOnCompleteRegistration executed successfully");
 
 		return user;
+	}
+	
+	@Override
+	public Map<Long, UserProfileSmall> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException {
+		LOG.debug("Method getUserProfile() called from UserManagementService");
+
+		// Fetch Regions and Branches from Solr
+		long companyId = user.getCompany().getCompanyId();
+		Map<Long, RegionFromSearch> regions;
+		Map<Long, BranchFromSearch> branches;
+		try {
+			regions = organizationManagementService.fetchRegionsMapByCompany(companyId);
+			branches = organizationManagementService.fetchBranchesMapByCompany(companyId);
+		}
+		catch (InvalidInputException | SolrException | MalformedURLException e) {
+			LOG.error("Exception while fetching regions and branches from solr. Reason : " + e.getMessage(), e);
+			throw new NonFatalException("Exception while fetching regions and branches from solr", e);
+		}
+
+		long branchId = 0;
+		long regionId = 0;
+		boolean agentAdded = false;
+		RegionFromSearch region = null;
+		BranchFromSearch branch = null;
+		Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
+		
+		UserProfileSmall profileSmall = null;
+		for (UserProfile profile : user.getUserProfiles()) {
+			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				
+				profileMap.put(profile.getUserProfileId(), profile);
+
+				// updating display name for drop down
+				int profileMasterId = profile.getProfilesMaster().getProfileId();
+				switch (profileMasterId) {
+					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
+						profileSmall = getSmallUserProfile(profile.getUserProfileId(), user.getCompany().getCompany(), user.getCompany()
+								.getCompanyId(), CommonConstants.COMPANY_ID_COLUMN, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+						profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+						break;
+					
+					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
+						regionId = profile.getRegionId();
+						if (regionId != 0l) {
+							region = regions.get(regionId);
+						}
+						if (region.getIsDefaultBySystem() != 1) {
+							profileSmall = getSmallUserProfile(profile.getUserProfileId(), region.getRegionName(), regionId,
+									CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+						}
+						break;
+
+					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
+						branchId = profile.getBranchId();
+						if (branchId != 0l) {
+							branch = branches.get(branchId);
+						}
+						if (branch.getIsDefaultBySystem() != 1) {
+							profileSmall = getSmallUserProfile(profile.getUserProfileId(), branch.getBranchName(), branchId,
+									CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+						}
+						break;
+
+					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
+						if (!agentAdded) {
+							profileSmall = getSmallUserProfile(profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW, regionId,
+									CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							agentAdded = true;
+						}
+						break;
+
+					default:
+						continue;
+				}
+			}
+		}
+		switch (accountType) {
+			case COMPANY:
+			case ENTERPRISE:
+				return profileSmallMap;
+			
+			default:
+		}
+		
+		LOG.debug("Method getUserProfile() finished from UserManagementService");
+		return new HashMap<Long, UserProfileSmall>();
+	}
+
+	private UserProfileSmall getSmallUserProfile(long userProfileId, String userProfileName, long profileId, String profileType, int profileMasterId) {
+		UserProfileSmall profileSmall = new UserProfileSmall();
+		profileSmall.setUserProfileId(userProfileId);
+		profileSmall.setUserProfileName(userProfileName);
+		profileSmall.setProfileName(profileType);
+		profileSmall.setProfileValue(profileId);
+		profileSmall.setProfilesMasterId(profileMasterId);
+		
+		return profileSmall;
+	}
+
+	@Override
+	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
+			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr) {
+		long profileId = 0;
+		try {
+			if (profileIdStr != null && !profileIdStr.equals("")) {
+				profileId = Long.parseLong(profileIdStr);
+			}
+			else {
+				profileId = 0l;
+			}
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception occurred while parsing the profile id. Reason :" + e.getMessage(), e);
+		}
+
+		// Selecting and Setting Profile in session
+		UserProfile selectedProfile = null;
+		switch (accountType) {
+			case COMPANY:
+			case ENTERPRISE:
+				if (profileId != 0l) {
+					selectedProfile = profileMap.get(profileId);
+				}
+				break;
+			
+			default:
+				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						selectedProfile = profile;
+						break;
+					}
+				}
+		}
+		
+		return selectedProfile;
 	}
 }

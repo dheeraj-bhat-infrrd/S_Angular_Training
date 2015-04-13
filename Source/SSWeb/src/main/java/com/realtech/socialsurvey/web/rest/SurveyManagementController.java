@@ -3,8 +3,10 @@ package com.realtech.socialsurvey.web.rest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
@@ -17,14 +19,18 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import twitter4j.TwitterException;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.SurveyQuestionDetails;
 import com.realtech.socialsurvey.core.entities.SurveyResponse;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
@@ -35,12 +41,15 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyBuilder;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.ErrorCodes;
 import com.realtech.socialsurvey.web.common.ErrorResponse;
+import com.realtech.socialsurvey.web.common.JspResolver;
+import facebook4j.FacebookException;
 
 // JIRA SS-119 by RM-05 : BOC
 @Controller
@@ -69,6 +78,9 @@ public class SurveyManagementController {
 
 	@Autowired
 	private EmailServices emailServices;
+
+	@Autowired
+	private SocialManagementService socialManagementService;
 
 	@Autowired
 	private OrganizationManagementService organizationManagementService;
@@ -100,8 +112,9 @@ public class SurveyManagementController {
 	/*
 	 * Method to store final feedback of the survey from customer.
 	 */
+	@ResponseBody
 	@RequestMapping(value = "/data/storeFeedback")
-	public void storeFeedback(HttpServletRequest request) {
+	public String storeFeedback(HttpServletRequest request) {
 		LOG.info("Method storeFeedback() started to store response of customer.");
 		// To store final feedback provided by customer in mongoDB.
 		try {
@@ -129,7 +142,7 @@ public class SurveyManagementController {
 				LOG.error("Null/empty value found for mood in storeFeedback().");
 				throw new InvalidInputException("Null/empty value found for mood in storeFeedback().");
 			}
-			List<String> emailIdsToSendMail = new ArrayList<>();
+			Set<String> emailIdsToSendMail = new HashSet<>();
 			SolrDocument solrDocument = null;
 			try {
 				solrDocument = solrSearchService.getUserByUniqueId(agentId);
@@ -178,9 +191,10 @@ public class SurveyManagementController {
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in storeFeedback(). Nested exception is ", e);
-			return;
+			return e.getMessage();
 		}
 		LOG.info("Method storeFeedback() finished to store response of customer.");
+		return "Survey stored successfully";
 	}
 
 	@ResponseBody
@@ -200,9 +214,10 @@ public class SurveyManagementController {
 			return "errorpage500";
 		}
 		Long agentId = 0l;
-		try{
-		agentId = Long.parseLong(agentIdStr);
-		}catch(NumberFormatException e){
+		try {
+			agentId = Long.parseLong(agentIdStr);
+		}
+		catch (NumberFormatException e) {
 			LOG.error("Invalid agent Id passed. Error is : " + e);
 			return "errorpage500";
 		}
@@ -217,7 +232,7 @@ public class SurveyManagementController {
 		model.addAttribute("agentId", agentId);
 		model.addAttribute("agentName", agentName);
 		LOG.info("Method to start survey initiateSurvey() finished.");
-		return "surveyQuestion";
+		return JspResolver.SHOW_SURVEY_QUESTIONS;
 	}
 
 	/*
@@ -256,11 +271,15 @@ public class SurveyManagementController {
 			}
 			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+				//throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
+				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE).getMessage();
+				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
+				
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
 				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
+				
 				surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 				if (survey != null) {
 					stage = survey.getStage();
@@ -277,7 +296,7 @@ public class SurveyManagementController {
 				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
 				ErrorResponse errorResponse = new ErrorResponse();
 				errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-				errorResponse.setErrMessage("Agent not found.");
+				errorResponse.setErrMessage(e.getMessage());
 				String errorMessage = JSONUtil.toJSON(errorResponse);
 				return errorMessage;
 			}
@@ -302,12 +321,113 @@ public class SurveyManagementController {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
 			ErrorResponse errorResponse = new ErrorResponse();
 			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-			errorResponse.setErrMessage("No survey found!");
+			errorResponse.setErrMessage(e.getMessage());
 			String errorMessage = new Gson().toJson(errorResponse);
 			return errorMessage;
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
 		return new Gson().toJson(surveyAndStage);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/posttosocialnetwork", method = RequestMethod.GET)
+	public String postToSocialMedia(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer to various pages of social networking sites started.");
+		try {
+			String agentName = request.getParameter("agentName");
+			String custFirstName = request.getParameter("firstName");
+			String custLastName = request.getParameter("lastName");
+			String agentIdStr = request.getParameter("agentId");
+			String ratingStr = request.getParameter("rating");
+			long agentId = 0;
+			double rating = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+				rating = Double.parseDouble(ratingStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+					+ " on Social Survey \n";
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+			try {
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
+			}
+			catch (FacebookException e) {
+				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+			}
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+				}
+				catch (FacebookException e) {
+					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+				}
+			}
+			try {
+				socialManagementService.tweet(agentSettings, twitterMessage);
+			}
+			catch (TwitterException e) {
+				LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
+			}
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					socialManagementService.tweet(setting, twitterMessage);
+				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
+				}
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Non fatal Exception caught in postToSocialMedia() while trying to post to social networking sites. Nested excption is ", e);
+			return e.getMessage();
+		}
+		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
+		return "Successfully posted to all the places in hierarchy";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/displaypiclocationofagent", method = RequestMethod.GET)
+	public String getDisplayPicLocationOfAgent(HttpServletRequest request) {
+		LOG.info("Method to get location of agent's image started.");
+		String picLocation = "";
+		String agentIdStr = request.getParameter("agentId");
+		long agentId = 0;
+
+		if (agentIdStr == null || agentIdStr.isEmpty()) {
+			LOG.error("Null value found for agent Id in request param.");
+			return "Null value found for agent Id in request param.";
+		}
+
+		try {
+			agentId = Long.parseLong(agentIdStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException caught in getDisplayPicLocationOfAgent() while getting agent id");
+			return e.getMessage();
+		}
+		
+		try {
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			if(agentSettings!=null){
+				if(agentSettings.getProfileImageUrl()!=null && !agentSettings.getProfileImageUrl().isEmpty()){
+					picLocation = agentSettings.getProfileImageUrl();
+				}
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in getDisplayPicLocationOfAgent() while fetching image for agent.");
+			return e.getMessage();
+		}
+		
+		LOG.info("Method to get location of agent's image finished.");
+		return picLocation;
 	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
