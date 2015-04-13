@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -1177,5 +1179,84 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		LOG.info("Method getIndividualsByRegionIds executed successfully");
 		return users;
+	}
+	
+	/**
+	 * Method that mails the contact us message to the respective individual,branch,region,company
+	 * @param agentProfileName
+	 * @param message
+	 * @param senderMailId
+	 * @param profileType
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws UndeliveredEmailException
+	 */
+	@Override
+	public void findProfileMailIdAndSendMail(String profileName, String message,
+			String senderMailId,String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
+		
+		if(profileName == null || profileName.isEmpty()){
+			LOG.error("contactAgent : profile name parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : profile name parameter is empty or null!");
+		}
+		
+		if(message == null || message.isEmpty()){
+			LOG.error("contactAgent : message parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : message parameter is empty or null!");
+		}
+		
+		if(senderMailId == null || senderMailId.isEmpty()){
+			LOG.error("contactAgent : senderMailId parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : senderMailId parameter is empty or null!");
+		}
+		
+		if(profileType == null || profileType.isEmpty()){
+			LOG.error("contactAgent : profileType parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : profileType parameter is empty or null!");
+		}
+		
+		OrganizationUnitSettings settings = null;
+		
+		if(profileType.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)){
+			LOG.debug("Fetching the agent settings from mongo for the agent with profile name : " + profileName);
+			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+					CommonConstants.AGENT_SETTINGS_COLLECTION);
+			LOG.debug("Settings fetched from mongo!");
+		}
+		else if (profileType.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
+			LOG.debug("Fetching the company settings from mongo for the company with profile name : " + profileName);
+			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+					CommonConstants.COMPANY_SETTINGS_COLLECTION);
+			LOG.debug("Settings fetched from mongo!");
+		}
+		else if (profileType.equals(CommonConstants.PROFILE_LEVEL_REGION)) {
+			LOG.debug("Fetching the region settings from mongo for the region with profile name : " + profileName);
+			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+					CommonConstants.REGION_SETTINGS_COLLECTION);
+			LOG.debug("Settings fetched from mongo!");
+		}
+		else if (profileType.equals(CommonConstants.PROFILE_LEVEL_BRANCH)) {
+			LOG.debug("Fetching the branch settings from mongo for the branch with profile name : " + profileName);
+			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
+					CommonConstants.BRANCH_SETTINGS_COLLECTION);
+			LOG.debug("Settings fetched from mongo!");
+		}
+		else {
+			LOG.error("Profile level not known!");
+			throw new InvalidInputException("Profile level not known!");
+		}
+
+		if (settings != null) {
+			LOG.debug("Sending the contact us mail to the agent");
+			emailServices.sendContactUsMail(settings.getContact_details().getMail_ids().getWork(), settings.getContact_details().getName(),
+					senderMailId, message);
+			LOG.debug("Contact us mail sent!");
+		}
+		else {
+			LOG.error("No records found for agent settings of profile name : " + profileName + " in mongo");
+			throw new NoRecordsFetchedException("No records found for agent settings of profile name : " + profileName + " in mongo");
+		}
+		
+		
 	}
 }

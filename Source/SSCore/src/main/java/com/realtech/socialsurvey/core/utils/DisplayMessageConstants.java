@@ -94,6 +94,7 @@ public final class DisplayMessageConstants {
 	public static final String ACHIEVEMENT_UPDATE_UNSUCCESSFUL = "ACHIEVEMENT_UPDATE_UNSUCCESSFUL";
 	public static final String LICENSES_UPDATE_UNSUCCESSFUL = "LICENSES_UPDATE_UNSUCCESSFUL";
 	public static final String HIERARCHY_EDIT_NOT_AUTHORIZED = "HIERARCHY_EDIT_NOT_AUTHORIZED";
+	public static final String CONTACT_US_MESSAGE_UNSUCCESSFUL = "CONTACT_US_MESSAGE_UNSUCCESSFUL";
 
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
@@ -161,5 +162,6 @@ public final class DisplayMessageConstants {
 	public static final String ASSOCIATION_UPDATE_SUCCESSFUL = "ASSOCIATION_UPDATE_SUCCESSFUL";
 	public static final String ACHIEVEMENT_UPDATE_SUCCESSFUL = "ACHIEVEMENT_UPDATE_SUCCESSFUL";
 	public static final String LICENSES_UPDATE_SUCCESSFUL = "LICENSES_UPDATE_SUCCESSFUL";
+	public static final String CONTACT_US_MESSAGE_SENT = "CONTACT_US_MESSAGE_SENT";
 
 }
