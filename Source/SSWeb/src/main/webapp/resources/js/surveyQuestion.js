@@ -55,9 +55,13 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 			if (data.errCode == undefined)
 				success = true;
 			else {
-				$("div[data-ques-type]").hide();
+				/*$("div[data-ques-type]").hide();
 				$("div[data-ques-type='error']").show();
-				$('#content').html(data.errMessage);
+				$('#content').html(data.errMessage);*/
+				
+				$('#overlay-toast').html(data.errMessage);
+				$("#recaptcha_reload").click();
+				showToast();
 			}
 		},
 		complete : function(data) {
@@ -681,6 +685,13 @@ $('#start-btn').click(function() {
 		showToast();
 		return;
 	}
+	
+	/*if (!validateUserEmailId('email')) {
+		$('#overlay-toast').html('Please enter valid Email Id!');
+		showToast();
+		return;
+	}*/
+	
 	
 	var agentId = $('#prof-container').attr("data-agentId");
 	var agentName = $('#prof-container').attr("data-agentName");

@@ -601,6 +601,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 		document.addField(CommonConstants.USER_EMAIL_ID_SOLR, user.getEmailId());
 		document.addField(CommonConstants.USER_LOGIN_NAME_COLUMN, user.getEmailId());
 		document.addField(CommonConstants.USER_IS_OWNER_SOLR, user.getIsOwner());
+		document.addField(CommonConstants.REVIEW_COUNT_SOLR, 0);
 
 		String displayName = user.getFirstName();
 		if (user.getLastName() != null) {
@@ -1033,7 +1034,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				// fetch RegionSettings from mongo
 				OrganizationUnitSettings regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(region.getRegionId(),
 						MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
-				
+
 				// update address
 				if (regionSettings.getContact_details() != null && regionSettings.getContact_details().getAddress1() != null) {
 					document.addField(CommonConstants.ADDRESS1_SOLR, regionSettings.getContact_details().getAddress1());
@@ -1041,7 +1042,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				if (regionSettings.getContact_details() != null && regionSettings.getContact_details().getAddress2() != null) {
 					document.addField(CommonConstants.ADDRESS2_SOLR, regionSettings.getContact_details().getAddress2());
 				}
-				
+
 				documents.add(document);
 			}
 
@@ -1072,11 +1073,11 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			SolrInputDocument document;
 			for (Branch branch : branches) {
 				document = getSolrDocumentFromBranch(branch);
-				
+
 				// fetch BranchSettings from mongo
 				OrganizationUnitSettings branchSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branch.getBranchId(),
 						MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
-				
+
 				// update address
 				if (branchSettings.getContact_details() != null && branchSettings.getContact_details().getAddress1() != null) {
 					document.addField(CommonConstants.ADDRESS1_SOLR, branchSettings.getContact_details().getAddress1());
@@ -1084,7 +1085,7 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 				if (branchSettings.getContact_details() != null && branchSettings.getContact_details().getAddress2() != null) {
 					document.addField(CommonConstants.ADDRESS2_SOLR, branchSettings.getContact_details().getAddress2());
 				}
-				
+
 				documents.add(document);
 			}
 
@@ -1116,13 +1117,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			for (User user : users) {
 				// update profiles of user
 				userManagementService.setProfilesOfUser(user);
-				
+
 				document = new SolrInputDocument();
 				document = getSolrInputDocumentFromUser(user, document);
-				
+
 				// fetch AgentSettings from mongo
 				AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(user.getUserId());
-				
+
 				// update profileUrl
 				if (agentSettings.getContact_details() != null && agentSettings.getContact_details().getAbout_me() != null) {
 					document.addField(CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details().getAbout_me());
@@ -1156,5 +1157,41 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			throw new SolrException("Exception while adding users to solr. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method to add users to solr finshed");
+	}
+
+	@Override
+	public void updateCompletedSurveyCountForUserInSolr(long agentId) throws SolrException {
+		LOG.info("Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished.");
+		SolrServer solrServer;
+		solrServer = new HttpSolrServer(solrUserUrl);
+		SolrQuery solrQuery = new SolrQuery();
+		solrQuery.setQuery(CommonConstants.USER_ID_SOLR + ":" + agentId);
+		LOG.debug("Querying solr for searching user");
+		QueryResponse response;
+		try {
+			response = solrServer.query(solrQuery);
+			if (response.getResults() != null) {
+				response.getResults().get(CommonConstants.INITIAL_INDEX);
+			}
+			SolrDocumentList results = response.getResults();
+			SolrDocument document = results.get(CommonConstants.INITIAL_INDEX);
+			Long value = Long.parseLong(document.getFieldValue(CommonConstants.REVIEW_COUNT_SOLR).toString()) + 1;
+
+			Map<String, Long> editKeyValues = new HashMap<String, Long>();
+			editKeyValues.put(SOLR_EDIT_REPLACE, value);
+
+			// Adding fields to be updated
+			SolrInputDocument inputDoc = new SolrInputDocument();
+			inputDoc.setField(CommonConstants.USER_ID_SOLR, agentId);
+			inputDoc.setField(CommonConstants.REVIEW_COUNT_SOLR, editKeyValues);
+
+			solrServer.add(inputDoc);
+			solrServer.commit();
+		}
+		catch (SolrServerException | IOException e) {
+			LOG.error("Exception while editing user in solr. Reason : " + e.getMessage(), e);
+			throw new SolrException("Exception while adding regions to solr. Reason : " + e.getMessage(), e);
+		}
+		LOG.info("Method to increase completed survey count updateCompletedSurveyCountForUserInSolr() finished.");
 	}
 }

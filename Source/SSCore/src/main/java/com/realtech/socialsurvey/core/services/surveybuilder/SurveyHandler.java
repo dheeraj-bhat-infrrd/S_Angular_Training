@@ -62,4 +62,6 @@ public interface SurveyHandler {
 	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId);
 
 	public String getMoodsToSendMail();
+
+	public void increaseSurveyCountForAgent(long agentId) throws SolrException;
 }

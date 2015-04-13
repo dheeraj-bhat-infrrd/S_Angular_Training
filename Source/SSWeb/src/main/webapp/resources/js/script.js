@@ -248,59 +248,33 @@ $('.login-wrapper-txt').focus(function(){
 
 //Function to validate email id in a form
 function validateEmailId(elementId){
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-			if (emailRegex.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid Email Id');
-				return false;
-			}
+	var emailId = $('#'+elementId).val();
+	if (emailId != "") {
+		emailId = emailId.trim();
+		if (emailRegex.test(emailId) == true) {
+			return true;
 		} else {
-			showError('Please enter a valid Email Id');
+			showErrorMobileAndWeb('Please enter a valid Email Id');
 			return false;
 		}
 	} else {
-    	if ($('#'+elementId).val() != "") {
-			if (emailRegex.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid Email Id');
-				return false;
-			}
-		} else {
-			showError('Please enter a valid Email Id');
-			return false;
-		}
+		showErrorMobileAndWeb('Please enter a valid Email Id');
+		return false;
 	}
 }
 
 //Function to validate the first name
 function validateFirstName(elementId){
-	if($(window).width()<768){
-		if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid first name');
-				return false;
-			}
+	if ($('#'+elementId).val() != "") {
+		if (nameRegex.test($('#'+elementId).val()) == true) {
+			return true;
 		} else {
-			showError('Please enter a valid first name');
+			showErrorMobileAndWeb('Please enter a valid first name');
 			return false;
 		}
 	} else {
-    	if ($('#'+elementId).val() != "") {
-			if (nameRegex.test($('#'+elementId).val()) == true) {
-				return true;
-			} else {
-				showError('Please enter a valid first name');
-				return false;
-			}
-		} else {
-			showError('Please enter a valid first name');
-			return false;
-		}
+		showErrorMobileAndWeb('Please enter a valid first name');
+		return false;
 	}
 }
 
