@@ -227,5 +227,7 @@ public interface SolrSearchService {
 	 * @throws SolrException
 	 */
 	public void addUsersToSolr(List<User> users) throws SolrException;
+
+	public void updateCompletedSurveyCountForUserInSolr(long agentId) throws SolrException;
 }
 // JIRA:SS-62 BY RM 02 EOC
