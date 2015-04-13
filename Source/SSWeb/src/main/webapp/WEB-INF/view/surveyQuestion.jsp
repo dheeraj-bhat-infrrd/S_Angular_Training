@@ -17,6 +17,7 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
+	
 </head>
 
 <body>
@@ -272,6 +273,7 @@
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
+<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <script src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
@@ -282,9 +284,6 @@
 <script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
-
-<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
-
 <script src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
