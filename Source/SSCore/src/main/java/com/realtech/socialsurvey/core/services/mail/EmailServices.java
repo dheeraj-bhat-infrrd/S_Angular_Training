@@ -162,4 +162,16 @@ public interface EmailServices {
 
 	public void sendSocialPostReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
 			UndeliveredEmailException;
+	
+	/**
+	 * Sends the message from the contact us page as a mail to the respective admin or agent
+	 * @param recipientEmailId
+	 * @param displayName
+	 * @param senderEmailId
+	 * @param message
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendContactUsMail(String recipientEmailId,String displayName,String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException;
+
 }
