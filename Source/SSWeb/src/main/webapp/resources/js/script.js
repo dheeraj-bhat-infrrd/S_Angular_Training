@@ -638,3 +638,14 @@ $(document).on('click', '.hdr-reg-btn', function() {
 $(document).on('click', '.hdr-logo', function() {
 	window.location = "/home.do";
 });
+
+// ESC functionality
+$(document).keyup(function(e) {
+	if (e.keyCode == 27) {
+		if ($('#overlay-main').is(":visible"))
+			overlayRevert();
+		
+		else if ($('#bd-srv-pu').is(":visible"))
+			$('.bd-q-btn-done').trigger('click');
+	}
+});

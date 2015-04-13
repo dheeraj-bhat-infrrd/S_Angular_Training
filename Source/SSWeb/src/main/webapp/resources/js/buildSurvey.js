@@ -170,13 +170,6 @@ $(document).on('click', '.bd-q-pu-close', function() {
 	$(this).parent().parent().remove();
 });
 
-$(document).keyup(function(e) {
-	if (e.keyCode == 27) {
-		if ($('#bd-srv-pu').is(":visible"))
-			$('.bd-q-btn-done').trigger('click');
-	}
-});
-
 // Question edit
 $(document).on('click', '.srv-tbl-edit', function() {
 	var questionId = $(this).parent().parent().data('questionid');
