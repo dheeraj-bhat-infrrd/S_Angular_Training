@@ -174,17 +174,10 @@ function updateLockSettings(id, state) {
 				callBackUpdateLock, payload);
 	}, 0);
 }
+function callBackUpdateLock () {
+	showMainContent('./showprofilepage.do');
+}
 
-function callBackUpdateLock(profileId) {
-	var url = './showprofilepage.do';
-	if(profileId != undefined) {
-		url = url +"?profileId="+profileId;
-	}
-	callAjaxGET(url, showProfileEditPage, true);
-}
-function showProfileEditPage(data){
-	$("#main-content").html(data);	
-}
 // Update AboutMe details
 function callBackShowAboutMe(data) {
 	$('#intro-about-me').html(data);
