@@ -636,6 +636,7 @@ $(document).on('click', '.hdr-reg-btn', function() {
 	window.location = "/";
 });
 $(document).on('click', '.hdr-logo', function() {
+	showOverlay();
 	window.location = "/home.do";
 });
 
