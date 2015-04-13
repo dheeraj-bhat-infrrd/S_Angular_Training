@@ -1571,6 +1571,7 @@ button.paypal.is-active {
 .tweet-panel-left {
     padding-right: 15px;
     height: 200px;
+    position: relative;
 /*    border-right: 1px solid #dcdcdc;*/
 
 }

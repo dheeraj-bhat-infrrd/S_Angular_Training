@@ -1716,6 +1716,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		// set the seo flag to true
 		agentSettings.setSeoContentModified(true);
+		agentSettings.setReviewCount(0);
 
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");

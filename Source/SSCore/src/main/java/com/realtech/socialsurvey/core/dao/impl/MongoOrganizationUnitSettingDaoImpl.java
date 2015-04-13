@@ -15,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
 import com.mongodb.BasicDBObject;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -236,5 +237,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		long count = mongoTemplate.count(query, collectionName);
 		LOG.info("Returning count "+count);
 		return count;
+	}
+	
+	@Override
+	public void updateCompletedSurveyCountForAgent(long agentId){
+		LOG.info("Method to update completed survey count for agent started.");
+		Query query = new Query(Criteria.where("iden").is(agentId));
+		Update update = new Update();
+		update.inc(CommonConstants.REVIEW_COUNT_MONGO, 1);
+		mongoTemplate.updateFirst(query, update, AgentSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION);
+		LOG.info("Method to update completed survey count for agent finished.");
 	}
 }

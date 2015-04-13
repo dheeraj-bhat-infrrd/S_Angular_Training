@@ -67,7 +67,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	
 	@Autowired
 	private UserManagementService userManagementService;
-
+	
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
 	
@@ -316,6 +316,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Override
 	public String getMoodsToSendMail(){
 		return 	moodsToSendMail;
+	}
+	
+	@Override
+	public void increaseSurveyCountForAgent(long agentId) throws SolrException{
+		LOG.info("Method to increase survey count for agent started.");
+		organizationUnitSettingsDao.updateCompletedSurveyCountForAgent(agentId);
+		solrSearchService.updateCompletedSurveyCountForUserInSolr(agentId);
+		LOG.info("Method to increase survey count for agent finished.");
 	}
 }
 // JIRA SS-119 by RM-05:EOC
