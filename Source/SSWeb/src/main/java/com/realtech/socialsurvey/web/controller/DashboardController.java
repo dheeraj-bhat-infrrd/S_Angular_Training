@@ -331,25 +331,26 @@ public class DashboardController {
 		}
 	}
 
-	@ResponseBody
 	@RequestMapping(value = "/fetchdashboardreviews")
 	public String getReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
+		User user = sessionHelper.getCurrentUser();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		
 		try {
-			String columnName = request.getParameter("columnName");
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
 			int startIndex = Integer.parseInt(startIndexStr);
 			int batchSize = Integer.parseInt(batchSizeStr);
+			
+			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
 			String profileLevel = getProfileLevel(columnName);
+			
 			long iden = 0;
-
-			User user = sessionHelper.getCurrentUser();
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			}
@@ -368,6 +369,7 @@ public class DashboardController {
 					}
 				}
 			}
+			
 			try {
 				surveyDetails = profileManagementService.getReviews(iden, -1, -1, startIndex, batchSize, profileLevel, true);
 			}
@@ -375,20 +377,24 @@ public class DashboardController {
 				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
 				throw e;
 			}
+			model.addAttribute("reviews", surveyDetails);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e);
-			return new Gson().toJson(e.getMessage());
+			model.addAttribute("message", e.getMessage());
 		}
+		
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() finished.");
-		return new Gson().toJson(surveyDetails);
+		return JspResolver.DASHBOARD_REVIEWS;
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/fetchdashboardreviewCount")
 	public String getReviewCount(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews count getReviewCount() started.");
+		User user = sessionHelper.getCurrentUser();
 		long reviewCount = 0;
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
@@ -396,9 +402,8 @@ public class DashboardController {
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
 			String profileLevel = getProfileLevel(columnName);
+			
 			long iden = 0;
-
-			User user = sessionHelper.getCurrentUser();
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			}
@@ -411,6 +416,7 @@ public class DashboardController {
 					LOG.error("Null or empty value passed for Region/BranchId. Please pass valid value.");
 					throw new InvalidInputException("Null or empty value passed for Region/BranchId. Please pass valid value.");
 				}
+
 				try {
 					iden = Long.parseLong(columnValue);
 				}
@@ -418,8 +424,8 @@ public class DashboardController {
 					LOG.error("NumberFormatException caught while parsing columnValue in getReviews(). Nested exception is ", e);
 					throw e;
 				}
-
 			}
+			
 			// Calling service method to count number of reviews stored in database.
 			reviewCount = profileManagementService.getReviewsCount(iden, -1, -1, profileLevel, true);
 		}
@@ -428,22 +434,24 @@ public class DashboardController {
 			return new Gson().toJson(e.getMessage());
 		}
 		LOG.info("Method to get reviews count getReviewCount() finished.");
-		return new Gson().toJson(reviewCount);
+		return String.valueOf(reviewCount);
 	}
 
 	@ResponseBody
 	@RequestMapping(value = "/fetchName")
 	public String getName(Model model, HttpServletRequest request) {
 		LOG.info("Method to get name to display in review section getName() started.");
+		User user = sessionHelper.getCurrentUser();
 		String name = "";
+		
 		try {
 			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
+			
 			long id = 0;
-			User user = sessionHelper.getCurrentUser();
 			if (columnName.equals(CommonConstants.COMPANY_ID_COLUMN)) {
 				return new Gson().toJson(user.getCompany().getCompany());
 			}
@@ -461,6 +469,7 @@ public class DashboardController {
 						throw e;
 					}
 				}
+				
 				if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN))
 					name = solrSearchService.searchBranchNameById(id);
 				else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN))
@@ -471,6 +480,7 @@ public class DashboardController {
 			LOG.error("Non fatal exception caught in getReviewCount() while fetching reviews count. Nested exception is ", e);
 			return new Gson().toJson(e.getMessage());
 		}
+		
 		LOG.info("Method to get name to display in review section getName() finished.");
 		return name;
 	}
