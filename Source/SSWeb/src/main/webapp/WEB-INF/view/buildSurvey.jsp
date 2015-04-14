@@ -131,6 +131,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/buildSurvey.js"></script>
 <script>
 $(document).ready(function() {
+	hideOverlay();
 	$(document).attr("title", "Build Survey");
 	
 	$('#bs-ques-wrapper').html('');

@@ -188,11 +188,17 @@
 		   	pageInitialized=false;
 	   });
 	   
-	   $('input').keypress(function(e){       	
+	   $('input').keypress(function(e){
 	       	// detect enter
-	       	if (e.which==13){
+	       	if (e.which == 13){
 	       		e.preventDefault();
 	       		updateCardDetails();
+	       	}
+		});
+	   
+	   $(document).keyup(function(e) {
+	       	if (e.which == 27){
+				$("#cancel-payment").trigger('click');
 	       	}
 		});
 	   
