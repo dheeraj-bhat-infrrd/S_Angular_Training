@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.web.controller;
 // JIRA SS-21 : by RM-06 : BOC
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +27,6 @@ import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -40,7 +38,6 @@ import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
-import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -268,60 +265,6 @@ public class LoginController {
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
 	}
 
-	/**
-	 * Start the dashboard page
-	 */
-	@RequestMapping(value = "/dashboard")
-	public String initDashboardPage(Model model, HttpServletRequest request) {
-		LOG.info("Dashboard Page started");
-		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser(); 
-
-		try {
-			// updating session with aggregated user profiles
-			try {
-				user = userManagementService.getUserByUserId(user.getUserId());
-				
-				AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-				Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-				UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				for (UserProfile profile : user.getUserProfiles()) {
-					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-						selectedProfile = profile;
-						break;
-					}
-				}
-				session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-
-				Map<Long, UserProfileSmall> profileSmallMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
-				if (profileSmallMap.size() > 0) {
-					session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
-					session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-				}
-				session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
-			}
-			catch (NonFatalException e) {
-				LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
-				model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-				return JspResolver.LOGIN;
-			}
-
-			setUserInModel(model, sessionHelper.getCurrentUser(), session);
-		}
-		catch (InvalidInputException e) {
-			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
-			model.addAttribute("message", "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
-					+ e.getMessage());
-			return "errorpage500";
-		}
-		catch (SolrException e) {
-			LOG.error("SolrException caught in initDashboardPage while setting details about user. Nested exception is ", e);
-			model.addAttribute("message",
-					"SolrException caught in initDashboardPage while setting details about user. Nested exception is " + e.getMessage());
-			return "errorpage500";
-		}
-		return JspResolver.DASHBOARD;
-	}
 
 	/**
 	 * Controller method to send reset password link to the user email ID
@@ -620,130 +563,5 @@ public class LoginController {
 		LOG.debug("Method getRedirectionFromProfileCompletionStage finished. Returning : " + redirectTo);
 		return redirectTo;
 	}
-
-	private Model setUserInModel(Model model, User user, HttpSession session) throws InvalidInputException, SolrException {
-		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-
-		model.addAttribute("userId", user.getUserId());
-		model.addAttribute("emailId", user.getEmailId());
-		model.addAttribute("profileId", selectedProfile.getUserProfileId());
-		model.addAttribute("profileMasterId", profileMasterId);
-
-		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
-			model.addAttribute("columnValue", user.getCompany().getCompanyId());
-		}
-		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
-			model.addAttribute("columnValue", selectedProfile.getRegionId());
-		}
-		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
-			model.addAttribute("columnValue", selectedProfile.getBranchId());
-		}
-		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-			model.addAttribute("columnValue", selectedProfile.getAgentId());
-		}
-		
-		/*List<Long> regionIds = new ArrayList<>();
-		List<Long> branchIds = new ArrayList<>();
-		model.addAttribute("accountType", accountType);
-		for (UserProfile userProfile : user.getUserProfiles()) {
-			switch (userProfile.getProfilesMaster().getProfileId()) {
-				case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-					model.addAttribute("companyAdmin", true);
-					if (accountType == AccountType.ENTERPRISE) {
-						String regionsJson = solrSearchService.searchRegions("", user.getCompany(), null, 0, -1);
-						List<Region> regions = new ArrayList<>();
-						List<String> regionNames = new ArrayList<>();
-						regions.addAll((List<Region>) new Gson().fromJson(regionsJson, new TypeToken<List<Region>>() {}.getType()));
-						for (Region region : regions) {
-							regionIds.add(region.getRegionId());
-							regionNames.add(region.getRegionName());
-						}
-						model.addAttribute("regionNames", regionNames);
-						model.addAttribute("regionIds", regionIds);
-					}
-					else if (accountType == AccountType.COMPANY) {
-						String branchesJson = solrSearchService.searchBranches("", user.getCompany(), null, null, 0, -1);
-						List<Branch> branches = new ArrayList<>();
-						List<String> branchNames = new ArrayList<>();
-						branches.addAll((List<Branch>) new Gson().fromJson(branchesJson, new TypeToken<List<Branch>>() {}.getType()));
-						for (Branch branch : branches) {
-							branchIds.add(branch.getBranchId());
-							branchNames.add(branch.getBranchName());
-						}
-						model.addAttribute("branchNames", branchNames);
-						model.addAttribute("branchIds", branchIds);
-					}
-					return model;
-					
-				case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
-					model.addAttribute("regionAdmin", true);
-					// Add list of region Ids, user is admin of. Currently adding only 1st region
-					// id.
-					regionIds.add(userProfile.getRegionId());
-					model.addAttribute("regionIds", regionIds);
-					break;
-
-				case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
-					model.addAttribute("branchAdmin", true);
-					// Add list of branch Ids, user is admin of. Currently adding only 1st branch
-					// id.
-					branchIds.add(userProfile.getBranchId());
-					model.addAttribute("branchIds", branchIds);
-					break;
-
-				case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
-					model.addAttribute("agent", true);
-					break;
-
-				default:
-			}
-		}*/
-		return model;
-	}
-
-	/*
-	 * private void setSettingVariablesInSession(HttpSession session) {
-	 * LOG.info("Settings related session values being set."); if
-	 * (session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION) != null) { //
-	 * setting the logo name UserSettings userSettings = (UserSettings)
-	 * session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION); // check if company
-	 * has a logo if (userSettings.getCompanySettings().getLogo() != null) {
-	 * LOG.debug("Settings logo image from company settings");
-	 * session.setAttribute(CommonConstants.LOGO_DISPLAY_IN_SESSION,
-	 * userSettings.getCompanySettings().getLogo()); } else {
-	 * LOG.debug("Could not find logo settings in company. Checking in lower heirarchy."); // TODO:
-	 * Check the lower level hierarchy for logo } // check for the mail content String body = null;
-	 * FileContentReplacements replacements = new FileContentReplacements();
-	 * replacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER +
-	 * EmailTemplateConstants.SURVEY_PARTICIPATION_MAIL_BODY); if
-	 * (userSettings.getCompanySettings().getMail_content() == null) {
-	 * LOG.debug("Setting default survey participation mail body."); // set the mail contents try {
-	 * body = fileOperations.replaceFileContents(replacements);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
-	 * body); } catch (InvalidInputException e) {
-	 * LOG.warn("Could not set mail content for survey participation"); } } else {
-	 * LOG.debug("Company already has mail body settings. Hence, setting the same"); if
-	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_mail() != null) {
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION,
-	 * userSettings.getCompanySettings() .getMail_content().getTake_survey_mail().getMail_body()); }
-	 * else { try { body = fileOperations.replaceFileContents(replacements);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_MAIL_BODY_IN_SESSION, body); }
-	 * catch (InvalidInputException e) {
-	 * LOG.warn("Could not set mail content for survey participation"); } } if
-	 * (userSettings.getCompanySettings().getMail_content().getTake_survey_reminder_mail() != null)
-	 * { session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
-	 * userSettings.getCompanySettings()
-	 * .getMail_content().getTake_survey_reminder_mail().getMail_body()); } else { try { body =
-	 * fileOperations.replaceFileContents(replacements);
-	 * session.setAttribute(CommonConstants.SURVEY_PARTICIPATION_REMINDER_MAIL_BODY_IN_SESSION,
-	 * body); } catch (InvalidInputException e) {
-	 * LOG.warn("Could not set mail content for survey participation reminder"); } } } } }
-	 */
 }
 // JIRA SS-21 : by RM-06 : EOC

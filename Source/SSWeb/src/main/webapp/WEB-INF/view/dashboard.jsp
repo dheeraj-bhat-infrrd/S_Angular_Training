@@ -5,7 +5,7 @@
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
     <div class="container">
         <div class="hm-header-row clearfix">
-            <div class="float-left hm-header-row-left hr-dsh-adj-lft">Dashboard</div>
+            <div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
             
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
@@ -30,59 +30,8 @@
 		<div id="prof-container" data-profile-master-id="${profileMasterId}" data-profile-id="${profileId}"
 			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
 
-			<div class="row row-dash-top-adj">
-				<div class="float-right dash-main-right col-lg-6 col-md-6 col-sm-6 col-xs-12">
-					<div class="dsh-graph-wrapper">
-						<div class="dsh-g-wrap dsh-g-wrap-1">
-							<div class="dsh-graph-item dsh-graph-item-1">
-								<div id="dg-img-1" class="dsh-graph-img"></div>
-								<div id="socl-post" class="dsh-graph-num">400</div>
-								<div class="dsh-graph-txt dsh-graph-txt-1">Social Post In Last 30 Days</div>
-							</div>
-						</div>
-						<div class="dsh-g-wrap dsh-g-wrap-2">
-							<div class="dsh-graph-item dsh-graph-item-1">
-								<div id="dg-img-2" class="dsh-graph-img"></div>
-								<div id="srv-snt-cnt" class="dsh-graph-num">3000</div>
-								<div class="dsh-graph-txt dsh-graph-txt-2">Total Surveys Sent</div>
-							</div>
-						</div>
-						<div class="dsh-g-wrap dsh-g-wrap-3">
-							<div class="dsh-graph-item dsh-graph-item-1">
-								<div id="dg-img-3" class="dsh-graph-img"></div>
-								<div id="srv-scr" class="dsh-graph-num">4/5</div>
-								<div class="dsh-graph-txt dsh-graph-txt-3">Survey Score Over Last 30 Days</div>
-							</div>
-						</div>
-						<div class="dsh-g-wrap dsh-g-wrap-4">
-							<div class="dsh-graph-item dsh-graph-item-1">
-								<div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>
-								<div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
-								<div class="dsh-graph-txt dsh-graph-txt-4">Profile Completed</div>
-								<div id="badges" class="dsg-g-rbn"></div>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<div class="float-left dash-main-left col-lg-6 col-md-6 col-sm-6 col-xs-12">
-					<div class="dash-left-txt-wrapper">
-						<div class="dsh-name-wrapper">
-							<div id="name" class="dsh-txt-1"></div>
-							<div id="designation" class="dsh-txt-2"></div>
-							<div id="company" class="dsh-txt-3"></div>
-						</div>
-						<div id="pro-cmplt-stars" class="dsh-star-wrapper clearfix">
-							<div class="float-left dsh-star-item no-star"></div>
-							<div class="float-left dsh-star-item no-star"></div>
-							<div class="float-left dsh-star-item no-star"></div>
-							<div class="float-left dsh-star-item no-star"></div>
-							<div class="float-left dsh-star-item no-star"></div>
-							<div id="profile-completed" class="float-right dsh-rating-item">3/5</div>
-						</div>
-						<div class="dsh-btn-complete" onclick="showMainContent('./showprofilepage.do')">Complete Your Profile</div>
-					</div>
-				</div>
+			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
+				<!-- Filled by profile detail -->
 			</div>
 		</div>
 
@@ -270,6 +219,7 @@
 }
 </style>
 
+<script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
 <script>
 $(document).ready(function() {
 	$(document).attr("title", "Dashboard");
@@ -278,32 +228,5 @@ $(document).ready(function() {
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
 
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue);
-	updateCircles();
-});
-
-// Dashboard View as
-$('#dashboard-sel').click(function(){
-	$('#da-dd-wrapper-profiles').slideToggle(200);
-});
-
-$('.da-dd-item').click(function(){
-	$('#dashboard-sel').html($(this).html());
-	$('#da-dd-wrapper-profiles').slideToggle(200);
-	
-	// update selected profile in session
-	var newProfileId = $(this).attr('data-profile-id');
-	updateCurrentProfile(newProfileId);
-
-	var newProfileMasterId = $(this).attr('data-profile-master-id');
-	var newProfileName = $(this).attr('data-column-name');
-	var newProfileValue = $(this).attr('data-column-value');
-	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
-	updateCircles();
-	
-	// updating data
-	$('#prof-container').attr('data-profile-id', newProfileId);
-	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
-	$('#prof-container').attr('data-column-name', newProfileName);
-	$('#prof-container').attr('data-column-value', newProfileValue);
 });
 </script>
