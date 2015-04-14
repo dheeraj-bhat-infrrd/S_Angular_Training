@@ -1,81 +1,77 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 
 <div class="float-left stats-right">
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveyssent.key" /></div>
-		<div id="all-surv-icn" class="float-left stat-icns-item clearfix"></div>
+		<div id="all-surv-icn" class="float-left stat-icns-item clearfix">
+			<c:choose>
+				<c:when test="${not empty allSurveySent && allSurveySent != 0}">
+					<c:forEach begin="1" end="20" var="countone">
+						<div class='float-left stat-icn-img stat-icn-img-green'></div>
+					</c:forEach>
+					<div id='survey-sent' class='float-left stat-icn-txt-rt'>${allSurveySent}</div>
+				</c:when>
+				<c:otherwise>
+					<div id='survey-sent' class='float-left stat-icn-txt-rt'>0</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
 	</div>
+	
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveysclicked.key" /></div>
-		<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix"></div>
+		<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix">
+			<c:choose>
+				<c:when test="${not empty clickedSurvey && clickedSurvey != 0}">
+					<fmt:formatNumber type="number" var="clickedSurveyCount" value="${clickedSurvey * 20 / allSurveySent}" maxFractionDigits="0"/>
+					<c:forEach begin="1" end="${clickedSurveyCount}" var="counttwo">
+						<div class='float-left stat-icn-img stat-icn-img-blue'></div>
+					</c:forEach>
+					<div id='survey-clicked' class='float-left stat-icn-txt-rt'>${clickedSurvey}</div>
+				</c:when>
+				<c:otherwise>
+					<div id='survey-clicked' class='float-left stat-icn-txt-rt'>0</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
 	</div>
+	
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.surveyscompleted.key" /></div>
-		<div id="completed-surv-icn" class="float-left stat-icns-item clearfix"></div>
+		<div id="completed-surv-icn" class="float-left stat-icns-item clearfix">
+			<c:choose>
+				<c:when test="${not empty completedSurvey && completedSurvey != 0}">
+					<fmt:formatNumber type="number" var="completedSurveyCount" value="${completedSurvey * 20 / allSurveySent}" maxFractionDigits="0"/>
+					<c:forEach begin="1" end="${completedSurveyCount}" var="counttwo">
+						<div class="float-left stat-icn-img stat-icn-img-yellow"></div>
+					</c:forEach>
+					<div id='survey-completed' class='float-left stat-icn-txt-rt'>${completedSurvey}</div>
+				</c:when>
+				<c:otherwise>
+					<div id='survey-completed' class='float-left stat-icn-txt-rt'>0</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
 	</div>
+	
 	<div class="clearfix stat-icns-wrapper">
 		<div class="float-left stat-icn-lbl"><spring:message code="label.socialposts.key" /></div>
-		<div id="social-post-icn" class="float-left stat-icns-item clearfix"></div>
+		<div id="social-post-icn" class="float-left stat-icns-item clearfix">
+			<c:choose>
+				<c:when test="${not empty socialPosts && socialPosts != 0}">
+					<fmt:formatNumber type="number" var="socialPostsCount" value="${socialPosts * 20 / allSurveySent}" maxFractionDigits="0"/>
+					<c:forEach begin="1" end="${socialPostsCount}" var="counttwo">
+						<div class="float-left stat-icn-img stat-icn-img-red"></div>
+					</c:forEach>
+					<div id="social-posts" class="float-left stat-icn-txt-rt">${socialPosts}</div>
+				</c:when>
+				<c:otherwise>
+					<div id="social-posts" class="float-left stat-icn-txt-rt">0</div>
+				</c:otherwise>
+			</c:choose>
+		</div>
 	</div>
 </div>
-
-<script>
-$(document).ready(function() {
-	// Surveys sent
-	var sentSurveyCount = parseInt("${allSurveySent}");
-	var sentSurveyDiv = "";
-	if (sentSurveyCount > 0) {
-		for (var i = 0; i < 20; i++) {
-			sentSurveyDiv += "<div class='float-left stat-icn-img stat-icn-img-green'></div>";
-		}
-	}
-	sentSurveyDiv += " <div id='survey-sent' class='float-left stat-icn-txt-rt'></div>";
-	$('#all-surv-icn').html(sentSurveyDiv);
-	$("#survey-sent").html(sentSurveyCount);
-	
-	// Surveys clicked
-	var clicked = parseInt("${clickedSurvey}");
-	if (isNaN(clicked)) {
-		clicked = 0;
-	}
-	var icnForClicked = clicked * 20 / sentSurveyCount;
-	icnForClicked = Math.round(icnForClicked);
-	var clickedSurveyDiv = "";
-	for (var i = 0; i < parseInt(icnForClicked); i++) {
-		clickedSurveyDiv += "<div class='float-left stat-icn-img stat-icn-img-blue'></div>";
-	}
-	clickedSurveyDiv += "<div id='survey-clicked' class='float-left stat-icn-txt-rt'></div>";
-	$("#clicked-surv-icn").html(clickedSurveyDiv);
-	$("#survey-clicked").html(clicked);
-
-	// Surveys completed
-	var completed = parseInt("${completedSurvey}");
-	if (isNaN(completed)) {
-		completed = 0;
-	}
-	var icnForCompleted = completed * 20 / sentSurveyCount;
-	icnForCompleted = Math.round(icnForCompleted);
-	var completedSurveyDiv = "";
-	for (var i = 0; i < parseInt(icnForCompleted); i++) {
-		completedSurveyDiv += '<div class="float-left stat-icn-img stat-icn-img-yellow"></div>';
-	}
-	completedSurveyDiv += "<div id='survey-completed' class='float-left stat-icn-txt-rt'></div>";
-	$("#completed-surv-icn").html(completedSurveyDiv);
-	$("#survey-completed").html(completed);
-
-	// Social Posts
-	var socialPosts = parseInt("${socialPosts}");
-	if (isNaN(socialPosts)) {
-		socialPosts = 0;
-	}
-	var icnForSocialPosts = socialPosts * 20 / sentSurveyCount;
-	icnForSocialPosts = Math.round(icnForSocialPosts);
-	var socialPostsDiv = "";
-	for (var i = 0; i < parseInt(icnForSocialPosts); i++) {
-		socialPostsDiv += '<div class="float-left stat-icn-img stat-icn-img-red"></div>';
-	}
-	socialPostsDiv += '<div id="social-posts" class="float-left stat-icn-txt-rt"></div>';
-	$("#social-post-icn").html(socialPostsDiv);
-	$("#social-posts").html(socialPosts);
-});
-</script>

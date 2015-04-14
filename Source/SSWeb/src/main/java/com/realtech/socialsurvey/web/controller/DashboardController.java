@@ -80,6 +80,9 @@ public class DashboardController {
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
+	/*
+	 * Method to initiate dashboard
+	 */
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
@@ -156,6 +159,9 @@ public class DashboardController {
 		return model;
 	}
 	
+	/*
+	 * Method to get profile details for displaying
+	 */
 	@RequestMapping(value = "/profiledetails")
 	public String getProfileDetails(Model model, HttpServletRequest request) {
 		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() started");
@@ -230,6 +236,9 @@ public class DashboardController {
 		return JspResolver.DASHBOARD_PROFILEDETAIL;
 	}
 	
+	/*
+	 * Method to get survey details for showing details
+	 */
 	@RequestMapping(value = "/surveycount")
 	public String getSurveyCount(Model model, HttpServletRequest request) {
 		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started");
@@ -280,23 +289,26 @@ public class DashboardController {
 	@RequestMapping(value = "/surveydetailsforgraph")
 	public String getSurveyDetailsForGraph(Model model, HttpServletRequest request) {
 		LOG.info("Method to get survey details for generating graph, getGraphDetailsForWeek() started.");
+		User user = sessionHelper.getCurrentUser();
+		
 		try {
-			User user = sessionHelper.getCurrentUser();
 			String columnName = request.getParameter("columnName");
 			String reportType = request.getParameter("reportType");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Null/Empty value found for field columnName.");
 				throw new NonFatalException("Null/Empty value found for field columnName.");
 			}
-			String columnValueStr = request.getParameter("columnValue");
+			
 			long columnValue = 0;
 			try {
+				String columnValueStr = request.getParameter("columnValue");
 				columnValue = Long.parseLong(columnValueStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
 				throw e;
 			}
+			
 			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				columnValue = user.getCompany().getCompanyId();
 			}
@@ -304,6 +316,7 @@ public class DashboardController {
 				columnValue = user.getUserId();
 			}
 			LOG.info("Method to get details for generating graph, getGraphDetailsForWeek() finished.");
+			
 			try {
 				return new Gson().toJson(dashboardService.getSurveyDetailsForGraph(columnName, columnValue, reportType));
 			}
