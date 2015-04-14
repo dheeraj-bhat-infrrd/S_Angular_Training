@@ -56,6 +56,7 @@
 
 <script>
 $(document).ready(function() {
+	hideOverlay();
 	$(document).attr("title", "Build Hierarchy");
 	checkUserAuthorization();
 	fetchCompleteHierarchy();

@@ -314,6 +314,7 @@ function openAuthPage(socialNetwork) {
 }
 
 $(document).ready(function(){
+	hideOverlay();
 	$(document).attr("title", "Edit Settings");
 	
 	$('#survey-participation-mailcontent').ckeditor();

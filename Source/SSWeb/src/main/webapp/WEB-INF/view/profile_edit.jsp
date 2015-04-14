@@ -580,6 +580,7 @@
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
 	$(document).ready(function() {
+		hideOverlay();
 		countPosts();
 		$(document).attr("title", "Profile Settings");
 		adjustImage();
