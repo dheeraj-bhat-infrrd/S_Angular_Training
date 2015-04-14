@@ -29,65 +29,38 @@
     <div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}" data-profile-id="${profileId}"
 			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
-
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
-				<!-- Filled by profile detail -->
+				<!-- Populated by profile detail -->
 			</div>
 		</div>
 
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
 			<div class="float-left stats-left clearfix">
-				<div class="dash-sub-head">Survey Status</div>
+				<div class="dash-sub-head"><spring:message code="label.surveystatus.key" /></div>
 				<div id="region-div" class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl">Choose</div>
+					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<select id="selection-list" class="float-left dash-sel-item"></select>
 				</div>
 				<div id="dsh-srch-survey-div" class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl">Choose</div>
+					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..." onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
+						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
+							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
 						<div id="dsh-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
 				<div class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl">Duration</div>
+					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
 					<select id="survey-count-days" class="float-left dash-sel-item">
-						<option value="30">30 Days</option>
-						<option value="60">60 Days</option>
-						<option value="90">90 Days</option>
-						<option value="365">1 Year</option>
+						<option value="30"><spring:message code="label.durationone.key" /></option>
+						<option value="60"><spring:message code="label.durationtwo.key" /></option>
+						<option value="90"><spring:message code="label.durationthree.key" /></option>
+						<option value="365"><spring:message code="label.durationfour.key" /></option>
 					</select>
 				</div>
 			</div>
-			
-			<div class="float-left stats-right">
-				<div class="clearfix stat-icns-wrapper">
-					<div class="float-left stat-icn-lbl">No. of surveys sent</div>
-					<div id="all-surv-icn" class="float-left stat-icns-item clearfix"></div>
-				</div>
-				<div class="clearfix stat-icns-wrapper">
-					<div class="float-left stat-icn-lbl">Surveys clicked</div>
-					<div id="clicked-surv-icn" class="float-left stat-icns-item clearfix"></div>
-				</div>
-				<div class="clearfix stat-icns-wrapper">
-					<div class="float-left stat-icn-lbl">Surveys completed</div>
-					<div id="completed-surv-icn" class="float-left stat-icns-item clearfix"></div>
-				</div>
-				<div class="clearfix stat-icns-wrapper">
-					<div class="float-left stat-icn-lbl">Social posts</div>
-					<div id="social-post-icn" class="float-left stat-icns-item clearfix"></div>
-				</div>
-				<!--<div class="clearfix stat-icns-wrapper">
-                    <div class="float-left stat-icn-lbl">No. of social posts</div>
-                    <div class="float-left stat-icns-item clearfix">
-                        <div class="progress">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                <span class="sr-only">40% Complete (success)</span>
-                            </div>
-                        </div>
-                        <div class="float-left stat-icn-txt-rt">80%</div>
-                    </div>
-                </div>-->
+			<div id="dash-survey-status" >
+				<!-- Populated by survey status -->
 			</div>
 		</div>
 
@@ -224,6 +197,7 @@
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
+	
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
