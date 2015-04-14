@@ -114,17 +114,23 @@
 		<div class="dash-panels-wrapper">
 			<div class="row">
 				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
-					<!-- Populated with incomplete surveys -->
+					<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.incompletesurveys.key" /></div>
+					<div id="dsh-inc-srvey" class="dash-lp-item-grp">
+						<spring:message code="label.noincompletesurveys.key" />
+						<!-- Populated with incomplete surveys -->
+					</div>
+					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div>
 				</div>
 				
 				<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
 					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
 						<div class="main-con-header clearfix pad-bot-10-resp">
-							<div id="review-desc" class="float-left dash-ppl-say-lbl"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
-							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">Download Survey Data</div>
+							<div id="review-desc" class="float-left dash-ppl-say-lbl">
+								<spring:message code="label.peoplesayabout.key" />${profileName}</div>
+							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide"><spring:message code="label.downloadsurveydata.key" /></div>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">
-							<div class="ppl-review-item"></div>
+							<!-- Populated with reviews -->
 						</div>
 					</div>
 				</div>
