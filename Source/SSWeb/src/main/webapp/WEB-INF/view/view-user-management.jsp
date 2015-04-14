@@ -41,11 +41,11 @@
 <script src="${pageContext.request.contextPath}/resources/perfect-scrollbar/js/perfect-scrollbar.jquery.js"></script>
 <script src="${pageContext.request.contextPath}/resources/perfect-scrollbar/js/perfect-scrollbar.js"></script>
 <script>
-
     $(document).ready(function() {
-    	hideOverlay();
+		hideOverlay();
         $(document).attr("title", "User Management");
         initUserManagementPage();		
+
         doStopAjaxRequestForUsersList = false;
         if($('#server-message>div').hasClass("error-message")){
             isUserManagementAuthorized = false;

@@ -128,19 +128,19 @@
 								<spring:message code="label.editsettings.key" />
 							</div>
 						</c:if>
-						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay()">
+						<div class="initial-dd-item" id="profile-setting" onclick="showMainContent('./showprofilepage.do'); showOverlay();">
 							<spring:message code="label.editprofile.key" />
 						</div>
-						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do'); showOverlay()">
+						<div class="initial-dd-item" id="change-password" onclick="showMainContent('./showchangepasswordpage.do'); showOverlay();">
 							<spring:message code="label.changepassword.key"/>
 						</div>
 						<c:if test="${accountMasterId < 4}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do'); showOverlay()">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradepage.do')">
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
 						<c:if test="${accountMasterId == 5}">
-							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradetopaidplanpage.do'); showOverlay()">
+							<div class="initial-dd-item" id="upgrade-plan" onclick="showMainContent('./upgradetopaidplanpage.do')">
 								<spring:message	code="label.header.upgrade.key" />
 							</div>
 						</c:if>
