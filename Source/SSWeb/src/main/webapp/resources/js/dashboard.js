@@ -175,6 +175,11 @@ function showProfileDetails(columnName, columnValue, numberOfDays) {
 }
 
 function bindSelectButtons() {
+	$("#selection-list").unbind('change');
+	$("#graph-sel-list").unbind('change');
+	$("#dsh-grph-format").unbind('change');
+	$("#survey-count-days").unbind('change');
+
 	$("#selection-list").change(function() {
 		$('#dsh-sel-item').val('');
 		$('.dsh-res-display').hide();
@@ -678,4 +683,7 @@ $('.da-dd-item').click(function(){
 	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
 	$('#prof-container').attr('data-column-name', newProfileName);
 	$('#prof-container').attr('data-column-value', newProfileValue);
+	
+	colName = newProfileName;
+	colValue = newProfileValue;
 });
