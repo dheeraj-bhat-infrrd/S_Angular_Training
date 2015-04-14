@@ -400,6 +400,7 @@ function showMasterQuestionPage(){
 		var feedback = $("#text-area").val();
 		if(autoPost){
 			postToSocialMedia(feedback);
+			$('#social-post-lnk').show();
 		}
 		updateCustomerResponse(feedback);
 		$("div[data-ques-type]").hide();
@@ -418,7 +419,8 @@ function postToSocialMedia(feedback){
 		"firstName" : firstName,
 		"lastName" : lastName,
 		"agentName" : agentName,
-		"rating" : rating
+		"rating" : rating,
+		"customerEmail" : customerEmail
 	};
 	$.ajax({
 		url : "./../posttosocialnetwork",
@@ -439,7 +441,34 @@ function postToSocialMedia(feedback){
 			showToast();
 		}
 	});
+}
 
+function updateSharedOn(socialSite, agentId, customerEmail){
+	var success = false;
+	var payload = {
+		"agentId" : agentId,
+		"customerEmail" : customerEmail,
+		"socialSite" : socialSite
+	};
+	$.ajax({
+		url : "./../updatesharedon",
+		type : "GET",
+		dataType : "TEXT",
+		data : payload,
+		success : function(data) {
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				
+			}
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
 }
 
 // Starting click events.
@@ -768,4 +797,14 @@ $('.sq-pts-dgreen').click(function() {
 	var answer = $('.sq-pts-dgreen').html();
 	storeCustomerAnswer(answer);
 	$("#next-scale").removeClass("btn-com-disabled");
+});
+
+$('#ylp-btn').click(function() {
+	shareOnYelp(agentId);
+	updateSharedOn("yelp", agentId, customerEmail);
+});
+
+$('#ggl-btn').click(function() {
+	shareOnGooglePlus(agentId);
+	updateSharedOn("google", agentId, customerEmail);
 });
