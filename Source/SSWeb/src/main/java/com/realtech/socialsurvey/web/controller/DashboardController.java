@@ -93,7 +93,6 @@ public class DashboardController {
 			model.addAttribute("emailId", user.getEmailId());
 
 			// updating session with selected user profile
-			int profileMasterId = 0;
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 			for (UserProfile profile : user.getUserProfiles()) {
@@ -102,27 +101,8 @@ public class DashboardController {
 					break;
 				}
 			}
-			profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
-			
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			model.addAttribute("profileId", selectedProfile.getUserProfileId());
-			model.addAttribute("profileMasterId", profileMasterId);
-			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
-				model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
-				model.addAttribute("columnValue", user.getCompany().getCompanyId());
-			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
-				model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
-				model.addAttribute("columnValue", selectedProfile.getRegionId());
-			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
-				model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
-				model.addAttribute("columnValue", selectedProfile.getBranchId());
-			}
-			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
-				model.addAttribute("columnValue", selectedProfile.getAgentId());
-			}
+			model = setSelectedProfileAttributes(model, user, selectedProfile);
 			
 			// updating session with aggregated user profiles
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
@@ -151,10 +131,34 @@ public class DashboardController {
 		}
 		return JspResolver.DASHBOARD;
 	}
+
+	private Model setSelectedProfileAttributes(Model model, User user, UserProfile selectedProfile) {
+		int profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+		
+		model.addAttribute("profileId", selectedProfile.getUserProfileId());
+		model.addAttribute("profileMasterId", profileMasterId);
+		if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+			model.addAttribute("columnValue", user.getCompany().getCompanyId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getRegionId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getBranchId());
+		}
+		else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+			model.addAttribute("columnValue", selectedProfile.getAgentId());
+		}
+		return model;
+	}
 	
 	@RequestMapping(value = "/profiledetails")
 	public String getProfileDetails(Model model, HttpServletRequest request) {
-		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
+		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() started");
 		User user = sessionHelper.getCurrentUser();
 		UserSettings userSettings = (UserSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 		
@@ -221,56 +225,34 @@ public class DashboardController {
 		model.addAttribute("socialPosts", socialPostsCount);
 		model.addAttribute("profileCompleteness", profileCompleteness);
 		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
-		
-		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() finished.");
+
+		LOG.info("Method to get profile of company/region/branch/agent getProfileDetails() finished");
 		return JspResolver.DASHBOARD_PROFILEDETAIL;
 	}
 	
-	@ResponseBody
-	@SuppressWarnings("unchecked")
-	@RequestMapping(value = "/updatecurrentprofile")
-	public String updateSelectedProfile(Model model, HttpServletRequest request) {
-		LOG.info("Method updateSelectedProfile() started.");
-		
-		HttpSession session = request.getSession(false);
-		User user = sessionHelper.getCurrentUser();
-		
-		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
-		String profileIdStr = request.getParameter("profileId");
-
-		UserProfile selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
-		
-		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
-
-		LOG.info("Method updateSelectedProfile() finished.");
-		return CommonConstants.SUCCESS_ATTRIBUTE;
-	}
-
-	@ResponseBody
 	@RequestMapping(value = "/surveycount")
 	public String getSurveyCount(Model model, HttpServletRequest request) {
-		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started.");
-		Map<String, Object> surveyCount = new HashMap<String, Object>();
+		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() started");
 		User user = sessionHelper.getCurrentUser();
+		
 		String columnName = request.getParameter("columnName");
-		String columnValueStr = request.getParameter("columnValue");
 		long columnValue = 0;
 		try {
+			String columnValueStr = request.getParameter("columnValue");
 			columnValue = Long.parseLong(columnValueStr);
 		}
 		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting columnValue for regionId/branchId/agentId.");
+			LOG.error("NumberFormatException caught in getSurveyCount() while converting columnValue for regionId/branchId/agentId.");
 			throw e;
 		}
+		
 		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 			columnValue = user.getCompany().getCompanyId();
 		}
 		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN) && columnValue == 0) {
 			columnValue = user.getUserId();
 		}
+		
 		int numberOfDays = -1;
 		try {
 			if (request.getParameter("numberOfDays") != null) {
@@ -278,17 +260,17 @@ public class DashboardController {
 			}
 		}
 		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException caught in getSurveyCountForCompany() while converting numberOfDays.");
+			LOG.error("NumberFormatException caught in getSurveyCount() while converting numberOfDays.");
 			throw e;
 		}
-		long allSurveyCount = dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
-		surveyCount.put("allSurveySent", allSurveyCount);
-		surveyCount.put("completedSurvey", dashboardService.getCompletedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
-		surveyCount.put("clickedSurvey", dashboardService.getClickedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
-		surveyCount.put("socialPosts", dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays));
+		
+		model.addAttribute("allSurveySent", dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
+		model.addAttribute("completedSurvey", dashboardService.getCompletedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
+		model.addAttribute("clickedSurvey", dashboardService.getClickedSurveyCountForPastNdays(columnName, columnValue, numberOfDays));
+		model.addAttribute("socialPosts", dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays));
 
-		LOG.info("Method to get count of surveys sent in entire company, getSurveyCountForCompany() finished.");
-		return new Gson().toJson(surveyCount);
+		LOG.info("Method to get count of all, completed and clicked surveys, getSurveyCount() finished");
+		return JspResolver.DASHBOARD_SURVEYSTATUS;
 	}
 
 	/*
@@ -864,6 +846,29 @@ public class DashboardController {
 		}
 		LOG.debug("Method to return profile level based upon column to be quried finished.");
 		return profileLevel;
+	}
+	
+	@ResponseBody
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value = "/updatecurrentprofile")
+	public String updateSelectedProfile(Model model, HttpServletRequest request) {
+		LOG.info("Method updateSelectedProfile() started.");
+		
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser();
+		
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
+		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		String profileIdStr = request.getParameter("profileId");
+
+		UserProfile selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+		
+		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+
+		LOG.info("Method updateSelectedProfile() finished.");
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 }
 // JIRA SS-137 : by RM-05 : EOC

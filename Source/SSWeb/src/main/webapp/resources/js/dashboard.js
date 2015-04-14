@@ -9,6 +9,7 @@ var startIndexInc;
 var batchSizeInc;
 var totalReviewsInc;
 var surveyFetchedSoFarInc;
+
 // colName and colValue contains profile level of logged in user and value for
 // colName is present in colValue.
 var colName;
@@ -87,46 +88,12 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue) {
 	});
 }
 
-function showDisplayPic() {
-	var success = false;
-	$.ajax({
-		url : "./getdisplaypiclocation.do",
-		type : "GET",
-		dataType : "JSON",
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				console.log("Image location : " + data.responseJSON);
-				var imageUrl = data.responseJSON;
-				if (imageUrl != '' || imageUrl != undefined) {
-					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
-					$("#dsh-prsn-img").css("background-size", "cover");
-				}
-				return data.responseJSON;
-			}
-		},
-		error : function() {
-			$("#dsh-prsn-img").removeClass('person-img');
-			if (colName == 'agentId') {
-				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
-			} else if (colName == 'branchId') {
-				$("#dsh-prsn-img").addClass('dsh-office-default-img');
-			} else if (colName == 'regionId') {
-				$("#dsh-prsn-img").addClass('dsh-region-default-img');
-			} else if (colName == 'companyId') {
-				$("#dsh-prsn-img").addClass('dsh-comp-default-img');
-			}
-		}
-	});
-}
-
 function showCompanyAdminFlow(newProfileName, newProfileValue) {
-	showProfileDetails(newProfileName, 0, 30);
 	colName = newProfileName;
 	colValue = newProfileValue;
+
+	showProfileDetails(newProfileName, 0, 30);
+
 	getReviewsCountAndShowReviews(colName, colValue);
 	showIncompleteSurvey(colName, colValue);
 
@@ -186,6 +153,42 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	$("#dsh-grph-srch-survey-div").hide();
 	showSurveyCount(newProfileName, 0, 30);
 	showSurveyStatisticsGraphically(newProfileName, 0);
+}
+
+function showProfileDetails(columnName, columnValue, numberOfDays) {
+	var payload = {
+		"columnName" : columnName,
+		"columnValue" : columnValue,
+		"numberOfDays" : numberOfDays
+	};
+	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
+		console.log(data);
+		$('#dash-profile-detail-circles').html(data);
+	}, payload, false);
+}
+
+function showSurveyStatistics(columnName, columnValue) {
+	var element = document.getElementById("survey-count-days");
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showSurveyCount(columnName, columnValue, numberOfDays);
+}
+
+function showSurveyStatisticsGraphically(columnName, columnValue) {
+	var element = document.getElementById("dsh-grph-format");
+	var format = element.options[element.selectedIndex].value;
+	showSurveyGraph(columnName, columnValue, format);
+}
+
+function showSurveyCount(columnName, columnValue, numberOfDays) {
+	var payload = {
+		"columnName" : columnName,
+		"columnValue" : columnValue,
+		"numberOfDays" : numberOfDays
+	};
+	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
+		console.log(data);
+		$('#dash-survey-status').html(data);
+	}, payload, false);
 }
 
 function populateSurveyStatisticsList(columnName) {
@@ -298,106 +301,6 @@ function bindSelectButtons() {
 	$("#survey-count-days").change(function() {
 		showSurveyStatistics(colName, colValue);
 	});
-}
-
-function showSurveyStatistics(columnName, columnValue) {
-	var element = document.getElementById("survey-count-days");
-	var numberOfDays = element.options[element.selectedIndex].value;
-	showSurveyCount(columnName, columnValue, numberOfDays);
-}
-
-function showSurveyStatisticsGraphically(columnName, columnValue) {
-	var element = document.getElementById("dsh-grph-format");
-	var format = element.options[element.selectedIndex].value;
-	showSurveyGraph(columnName, columnValue, format);
-}
-
-function showSurveyCount(columnName, columnValue, numberOfDays) {
-	var success = false;
-	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue,
-		"numberOfDays" : numberOfDays
-	};
-	$.ajax({
-		url : "./surveycount.do",
-		type : "GET",
-		dataType : "JSON",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				paintSurveyStatistics(data);
-			}
-		},
-		error : function(e) {
-			console.error("error : " + e.responseText);
-			$('#overlay-toast').html(e.responseText);
-			showToast();
-		}
-	});
-}
-
-function paintSurveyStatistics(data) {
-	var sentSurveyDiv = "";
-	var clickedSurveyDiv = "";
-	var completedSurveyDiv = "";
-	var socialPostsDiv = "";
-
-	var sentSurveyCount = parseInt(data.responseJSON.allSurveySent);
-	if (sentSurveyCount > 0) {
-		for (var i = 0; i < 20; i++) {
-			sentSurveyDiv += "<div class='float-left stat-icn-img stat-icn-img-green'></div>";
-		}
-	}
-
-	sentSurveyDiv += " <div id='survey-sent' class='float-left stat-icn-txt-rt'></div>";
-	$('#all-surv-icn').html(sentSurveyDiv);
-	$("#survey-sent").html(sentSurveyCount);
-	
-	var clicked = parseInt(data.responseJSON.clickedSurvey);
-	if (isNaN(clicked)) {
-		clicked = 0;
-	}
-	
-	var icnForClicked = clicked * 20 / sentSurveyCount;
-	icnForClicked = Math.round(icnForClicked);
-	for (var i = 0; i < parseInt(icnForClicked); i++) {
-		clickedSurveyDiv += "<div class='float-left stat-icn-img stat-icn-img-blue'></div>";
-	}
-	clickedSurveyDiv += "<div id='survey-clicked' class='float-left stat-icn-txt-rt'></div>";
-	$("#clicked-surv-icn").html(clickedSurveyDiv);
-	$("#survey-clicked").html(clicked);
-
-	var completed = parseInt(data.responseJSON.completedSurvey);
-	if (isNaN(completed))
-		completed = 0;
-	
-	var icnForCompleted = completed * 20 / sentSurveyCount;
-	icnForCompleted = Math.round(icnForCompleted);
-	for (var i = 0; i < parseInt(icnForCompleted); i++) {
-		completedSurveyDiv += '<div class="float-left stat-icn-img stat-icn-img-yellow"></div>';
-	}
-	completedSurveyDiv += "<div id='survey-completed' class='float-left stat-icn-txt-rt'></div>";
-	$("#completed-surv-icn").html(completedSurveyDiv);
-	$("#survey-completed").html(completed);
-
-	var socialPosts = parseInt(data.responseJSON.socialPosts);
-	if (isNaN(socialPosts)) {
-		socialPosts = 0;
-	}
-	
-	var icnForSocialPosts = socialPosts * 20 / sentSurveyCount;
-	icnForSocialPosts = Math.round(icnForSocialPosts);
-	for (var i = 0; i < parseInt(icnForSocialPosts); i++) {
-		socialPostsDiv += '<div class="float-left stat-icn-img stat-icn-img-red"></div>';
-	}
-	socialPostsDiv += '<div id="social-posts" class="float-left stat-icn-txt-rt"></div>';
-	$("#social-post-icn").html(socialPostsDiv);
-	$("#social-posts").html(socialPosts);
 }
 
 function showSurveyGraph(columnName, columnValue, format) {
@@ -557,17 +460,6 @@ function paintSurveyGraph(graphData) {
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 
 	chart.draw(data, options);
-}
-
-function showProfileDetails(columnName, columnValue, numberOfDays) {
-	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue,
-		"numberOfDays" : numberOfDays
-	};
-	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
-		$('#dash-profile-detail-circles').html(data);
-	}, payload, false);
 }
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
@@ -889,6 +781,42 @@ function changeRatingPattern(rating, ratingParent) {
 			}
 		}
 		counter++;
+	});
+}
+
+function showDisplayPic() {
+	var success = false;
+	$.ajax({
+		url : "./getdisplaypiclocation.do",
+		type : "GET",
+		dataType : "JSON",
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				console.log("Image location : " + data.responseJSON);
+				var imageUrl = data.responseJSON;
+				if (imageUrl != '' || imageUrl != undefined) {
+					$("#dsh-prsn-img").css("background", "url(" + imageUrl + ") no-repeat center");
+					$("#dsh-prsn-img").css("background-size", "cover");
+				}
+				return data.responseJSON;
+			}
+		},
+		error : function() {
+			$("#dsh-prsn-img").removeClass('person-img');
+			if (colName == 'agentId') {
+				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
+			} else if (colName == 'branchId') {
+				$("#dsh-prsn-img").addClass('dsh-office-default-img');
+			} else if (colName == 'regionId') {
+				$("#dsh-prsn-img").addClass('dsh-region-default-img');
+			} else if (colName == 'companyId') {
+				$("#dsh-prsn-img").addClass('dsh-comp-default-img');
+			}
+		}
 	});
 }
 
