@@ -8,7 +8,7 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
-	<script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
+	
 </head>
 
 <body class="index-body">
@@ -175,6 +175,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
+<script type="text/javascript" src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 <script>
 $(document).ready(function(){
 	var captchaText=true;

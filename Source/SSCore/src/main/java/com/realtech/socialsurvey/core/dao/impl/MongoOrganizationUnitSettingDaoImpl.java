@@ -18,6 +18,7 @@ import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
+import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
 
@@ -247,5 +248,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		update.inc(CommonConstants.REVIEW_COUNT_MONGO, 1);
 		mongoTemplate.updateFirst(query, update, AgentSettings.class, CommonConstants.AGENT_SETTINGS_COLLECTION);
 		LOG.info("Method to update completed survey count for agent finished.");
+	}
+
+	@Override
+	public List<FeedIngestionEntity> fetchSocialMediaTokens(String collectionName, int skipCount, int numOfRecords) {
+		LOG.info("Fetching social media tokens from "+collectionName);
+		List<FeedIngestionEntity> tokens = null;
+		Query query = new Query();
+		query.addCriteria(Criteria.where(KEY_SOCIAL_MEDIA_TOKENS).exists(true));
+		query.fields().include(KEY_SOCIAL_MEDIA_TOKENS).include(KEY_IDENTIFIER).exclude("_id");
+		if(skipCount > 0){
+			query.skip(skipCount);
+		}
+		if(numOfRecords > 0){
+			query.limit(numOfRecords);
+		}
+		tokens = mongoTemplate.find(query, FeedIngestionEntity.class, collectionName);
+		LOG.info("Fetched "+(tokens != null?tokens.size():"none") +" items with social media tokens from "+collectionName);
+		return tokens;
 	}
 }
