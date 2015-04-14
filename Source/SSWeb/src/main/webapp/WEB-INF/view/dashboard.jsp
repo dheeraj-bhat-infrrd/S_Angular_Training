@@ -222,6 +222,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
 <script>
 $(document).ready(function() {
+	hideOverlay();
 	$(document).attr("title", "Dashboard");
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');
