@@ -2,7 +2,6 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
-
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
     <div class="container">
         <div class="hm-header-row clearfix">
@@ -272,13 +271,13 @@
 </style>
 
 <script>
-
 $(document).ready(function() {
 	hideOverlay();
 	$(document).attr("title", "Dashboard");
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
+
 	paintDashboard(profileMasterId, currentProfileName, currentProfileValue);
 	updateCircles();
 });
