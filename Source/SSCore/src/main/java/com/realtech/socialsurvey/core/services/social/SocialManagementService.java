@@ -9,6 +9,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.NonFatalException;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 
@@ -52,5 +53,8 @@ public interface SocialManagementService {
 	public List<OrganizationUnitSettings> getSettingsForBranchesAndRegionsInHierarchy(long agentId) throws InvalidInputException;
 	
 	public List<OrganizationUnitSettings> getBranchAndRegionSettingsForUser(long userId);
+	
+	public void updateLinkedin(OrganizationUnitSettings agentSettings, String message) throws NonFatalException;
+
 }
 // JIRA SS-34 BY RM02 BOC
