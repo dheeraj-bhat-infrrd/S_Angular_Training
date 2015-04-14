@@ -76,15 +76,6 @@
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
                 <div class="prog-img-container">
                     <div id="prof-image" class="prof-image pos-relative"></div>
-                    <!-- <div class="prof-rating-mobile-wrapper hide">
-                        <div class="st-rating-wrapper maring-0 clearfix">
-                            <div class="rating-star icn-full-star"></div>
-                            <div class="rating-star icn-full-star"></div>
-                            <div class="rating-star icn-half-star"></div>
-                            <div class="rating-star icn-no-star"></div>
-                            <div class="rating-star icn-no-star"></div>
-                        </div>
-                    </div> -->
                 </div>
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
@@ -92,7 +83,7 @@
                     <!-- name comes here -->
                 </div>
             </div>
-            <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper">
+            <div class="col-lg-4 col-md-4 col-sm-4 prof-wrapper prof-map-wrapper float-right">
                 <div class="prof-user-logo" id="prof-company-logo"></div>
                 <div class="prof-user-address" id="prof-company-address">
                     <!-- address comes here -->
@@ -284,7 +275,6 @@
                 var imgW = $('#prof-image').width();
                 $('#prof-image').height(imgW * 0.7);
                 var h2 = $('.prog-img-container').height() - 11;
-//                $('.prof-name-container').height(h2);
                 var rowW = $('.lp-con-row').width() - 55 - 10;
                 $('.lp-con-row-item').width(rowW+'px');
                 $('.footer-main-wrapper').hide();
@@ -306,11 +296,41 @@
             $('body').removeClass('body-no-scroll-y');
         });
         
-        $(document).on('click','.bd-q-btn-done-pu',function(){
-            // perform deault functions
-            $('#contact-us-pu-wrapper').hide();
-            $('body').removeClass('body-no-scroll-y');
-        }); 
+        $(document).on('click', '.bd-q-btn-done-pu', function() {
+			// perform deault functions
+			url = window.location.origin + "/pages/profile/sendmail.do";
+			data = "";
+			if($("#agent-profile-name").val() != ""){
+				data += "profilename=" + $("#agent-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			else if($("#company-profile-name").val() != ""){
+				data += "profilename=" + $("#company-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			else if($("#region-profile-name").val() != ""){
+				data += "profilename=" + $("#region-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			else if($("#branch-profile-name").val() != ""){
+				data += "profilename=" + $("#branch-profile-name").val();
+				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+			}
+			
+			data += "&email=blah@blahblah.com";
+			data += "&message="+ $('.bd-q-pu-txtarea').val();
+			showOverlay();
+			callAjaxPostWithPayloadData(url,function(message){
+				$('#contact-us-pu-wrapper').hide();
+				$('body').removeClass('body-no-scroll-y');
+				$('#overlay-toast').html(message);
+	    		console.log("Added toast message : " + message);
+	    		showToast();
+	    		console.log("Finished showing the toast");
+
+			},data,true);
+		});
+        
         $(document).on('click','.vcard-download', function(){
         	var agentName = $("#agent-profile-name").val();
         	downloadVCard(agentName);

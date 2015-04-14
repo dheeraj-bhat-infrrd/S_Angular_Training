@@ -24,42 +24,47 @@
 					<input type="hidden" name="selectedUserId" id="selected-userid-hidden" value='${userId}'/>
 				</div>
 			</div>
-			<div class="v-edit-row clearfix">
-				<div class="float-left v-ed-lbl"><spring:message code="label.assignto.key"/></div>
-				<div id="assign-to-selector" class="float-left v-ed-txt pos-relative">
-					<c:choose>
-					    <c:when test="${accountType == 'Enterprise'}">
-							<input id="assign-to-txt" data-assignto="office" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.office.key"/>'>
-							<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
-									<div data-assign-to-option="office" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
-								<c:if test="${highestrole == 1 || highestrole == 2}">
-									<div data-assign-to-option="region" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
-								</c:if>
-								<c:if test="${highestrole == 1}">
-									<div data-assign-to-option="company" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
-								</c:if>
-							</div>
-						</c:when>
-						<c:when test="${accountType == 'Company'}">
-							<input id="assign-to-txt" data-assignto="office" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.office.key"/>'>
-							<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
-									<div data-assign-to-option="office" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
-								<c:if test="${highestrole == 1}">
-									<div data-assign-to-option="company" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
-								</c:if>
-							</div>
-						</c:when>
-						<c:when test="${accountType == 'Team'}">
-							<input id="assign-to-txt" data-assignto="company" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.team.key"/>'>
-							<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
-								<c:if test="${highestrole == 1}">
-									<div data-assign-to-option="company" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.team.key"/></div>
-								</c:if>
-							</div>
-						</c:when>
-					</c:choose>
+			<c:choose>
+			    <c:when test="${accountType == 'Enterprise'}">
+			    <div class="v-edit-row clearfix">
+					<div class="float-left v-ed-lbl"><spring:message code="label.assignto.key"/></div>
+					<div id="assign-to-selector" class="float-left v-ed-txt pos-relative">
+					<input id="assign-to-txt" data-assignto="office" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.office.key"/>'>
+					<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
+							<div data-assign-to-option="office" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
+						<c:if test="${highestrole == 1 || highestrole == 2}">
+							<div data-assign-to-option="region" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.region.key"/></div>
+						</c:if>
+						<c:if test="${highestrole == 1}">
+							<div data-assign-to-option="company" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+						</c:if>
+					</div>
+					</div>
 				</div>
-			</div>
+				</c:when>
+				<c:when test="${accountType == 'Company'}">
+				<div class="v-edit-row clearfix">
+					<div class="float-left v-ed-lbl"><spring:message code="label.assignto.key"/></div>
+					<div id="assign-to-selector" class="float-left v-ed-txt pos-relative">
+					<input id="assign-to-txt" data-assignto="office" class="v-ed-txt-item v-ed-txt-dd ignore-clear" value='<spring:message code="label.office.key"/>'>
+					<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
+							<div data-assign-to-option="office" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.office.key"/></div>
+						<c:if test="${highestrole == 1}">
+							<div data-assign-to-option="company" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.company.key"/></div>
+						</c:if>
+					</div>
+					</div>
+				</div>
+				</c:when>
+				<c:when test="${accountType == 'Team'}">
+					<input id="assign-to-txt" data-assignto="company" class="v-ed-txt-item v-ed-txt-dd hide ignore-clear" value='<spring:message code="label.team.key"/>'>
+					<div id="assign-to-droplist" class="clearfix hide v-ed-dd-wrapper dd-droplist">
+						<c:if test="${highestrole == 1}">
+							<div data-assign-to-option="company" class="clearfix v-ed-dd-item hm-dd-hover hm-assignto-options"><spring:message code="label.team.key"/></div>
+						</c:if>
+					</div>
+				</c:when>
+			</c:choose>
 			<div id="bd-region-selector" class="v-edit-row clearfix hide">
 				<div class="float-left v-ed-lbl"><spring:message code="label.selectregion.key"/></div>
 				<div class="float-left v-ed-txt pos-relative" id="region-selector">
@@ -80,16 +85,18 @@
 					</div>
 				</div>
 			</div>
-			<div class="v-edit-row clearfix" id="admin-privilege-div">
-				<div class="float-left v-ed-lbl" style="color: transparent;">'</div>
-				<div class="float-left v-ed-txt pos-relative">
-					<div class="bd-frm-check-wrapper clearfix">
-						<div class="float-left bd-check-img"></div>
-						<input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
-		            	<div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
+			<c:if test="${accountType == 'Company' || accountType == 'Enterprise'}">
+				<div class="v-edit-row clearfix" id="admin-privilege-div">
+					<div class="float-left v-ed-lbl" style="color: transparent;">'</div>
+					<div class="float-left v-ed-txt pos-relative">
+						<div class="bd-frm-check-wrapper clearfix">
+							<div class="float-left bd-check-img"></div>
+							<input type="hidden" name="isAdmin" value="true" id="is-admin-chk">
+			            	<div class="float-left bd-check-txt"><spring:message code="label.grantadminprivileges.key"/></div>
+						</div>
 					</div>
 				</div>
-			</div>
+			</c:if>
 		</form>
 	</div>
 	

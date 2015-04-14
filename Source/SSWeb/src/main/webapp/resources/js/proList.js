@@ -108,7 +108,11 @@ function paintProList(usersList) {
 			$.each(usersList,function(i,user){
 				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
 				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '">';
-				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
+				if (user.profileImageUrl != undefined) {
+					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
+				} else {
+					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
+				}
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
 				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name" data-profilename="' + user.profileName + '">' + user.displayName + '</div>';
 				if(user.title != undefined){

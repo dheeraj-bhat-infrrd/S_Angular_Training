@@ -7,7 +7,7 @@ var attrVal = null;
 var webAddressRegEx = /((http(s?):\/\/)?)(www.)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w.?=&_]+)?/;
 var timer = 0;
 var profileId;
-var proPostBatchSize = 2;
+var proPostBatchSize = 3;
 var proPostStartIndex = 0;
 var proPostCount = 0;
 var delay = (function() {
@@ -174,17 +174,10 @@ function updateLockSettings(id, state) {
 				callBackUpdateLock, payload);
 	}, 0);
 }
+function callBackUpdateLock () {
+	showMainContent('./showprofilepage.do');
+}
 
-function callBackUpdateLock(profileId) {
-	var url = './showprofilepage.do';
-	if(profileId != undefined) {
-		url = url +"?profileId="+profileId;
-	}
-	callAjaxGET(url, showProfileEditPage, true);
-}
-function showProfileEditPage(data){
-	$("#main-content").html(data);	
-}
 // Update AboutMe details
 function callBackShowAboutMe(data) {
 	$('#intro-about-me').html(data);
@@ -1234,17 +1227,11 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
 		if (reviewCount == 0) {
-			/**
-			 * hiding reviews-container if 0 reviews
-			 */ 
+			// hiding reviews-container if no reviews present
 			$("#prof-company-review-count").hide();
 			$("#reviews-container").hide();
-		} 
-		else if (reviewCount == 1) {
-			reviewCount = reviewCount + ' Review';
-		} 
-		else {
-			reviewCount = reviewCount + ' Reviews';
+		} else {
+			reviewCount = reviewCount + ' Review(s)';
 		}
 
 		$("#prof-company-review-count").html(reviewCount);
@@ -1336,7 +1323,11 @@ function countPosts() {
 	});
 }
 
-function showPosts() {
+function showPosts(fromStart) {
+	if(fromStart){
+		proPostStartIndex = 0;
+		proPostCount++;
+	}
 	var success = false;
 	var payload = {
 		"batchSize" : proPostBatchSize,
@@ -1376,20 +1367,22 @@ function paintPosts(posts) {
 				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
 				+ '	</div>' + '</div>';
 	});
-	$('#prof-posts').html(divToPopulate);
 
-	if (proPostStartIndex == 0)
+	if (proPostStartIndex == 0){
 		$('#prof-posts').html(divToPopulate);
-	else
+		$('#prof-posts').perfectScrollbar();
+	}
+	else{
 		$('#prof-posts').append(divToPopulate);
-	$('#prof-posts-ps').perfectScrollbar();
+		$('#prof-posts').perfectScrollbar('update');
+	}
 
-	/*var scrollContainer = document.getElementById('prof-posts');
-	scrollContainer.onscroll = function() {
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
 		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
-				- scrollContainer.clientHeight) {
-			if (proPostStartIndex < proPostBatchSize)
-				showPosts();
+					- scrollContainer.clientHeight) {
+				if (proPostStartIndex < proPostCount)
+					showPosts();
 		}
-	};*/
+	});
 }
