@@ -62,7 +62,7 @@
 					<a href="./forgotpassword.do"><spring:message code="label.forgotpassword.key"/></a>
 				</div>
 				<div class="reg_form_row clearfix">
-					<div class="reg_btn" id="login-submit" onclick="showOverlay();"><spring:message code="label.login.button.key"/></div>
+					<div class="reg_btn" id="login-submit"><spring:message code="label.login.button.key"/></div>
 				</div>
 			</div>
 			<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
