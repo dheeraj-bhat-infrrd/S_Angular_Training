@@ -855,12 +855,13 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 	 * @throws SolrException
 	 */
 	@Override
-	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
-			SolrException {
+	public List<SolrDocument> searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id)
+			throws InvalidInputException, SolrException {
 		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company started");
-		String result = null;
+		List<SolrDocument> results = new ArrayList<SolrDocument>();
 		QueryResponse response = null;
 		searchKey = searchKey + "*";
+		
 		try {
 			SolrServer solrServer;
 			switch (searchColumn) {
@@ -891,16 +892,18 @@ public class SolrSearchServiceImpl implements SolrSearchService {
 			LOG.debug("Querying solr for searching " + searchColumn);
 			response = solrServer.query(query);
 			SolrDocumentList documentList = response.getResults();
-			result = JSONUtil.toJSON(documentList);
+			for (SolrDocument doc : documentList) {
+				results.add(doc);
+			}
 
-			LOG.debug("Results obtained from solr :" + result);
+			LOG.debug("Results obtained from solr :" + results);
 		}
 		catch (SolrServerException e) {
 			LOG.error("SolrServerException while performing region, branch or agent search");
 			throw new SolrException("Exception while performing search. Reason : " + e.getMessage(), e);
 		}
 		LOG.info("Method searchBranchRegionOrAgentByNameAndCompany() to search regions, branches, agent in a company finished");
-		return result;
+		return results;
 	}
 
 	@Override

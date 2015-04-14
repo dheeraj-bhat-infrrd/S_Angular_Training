@@ -94,6 +94,8 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
+	$("#dsh-srch-survey-div").show();
+	$("#dsh-grph-srch-survey-div").show();
 
 	showProfileDetails(newProfileName, 0, 30);
 	bindSelectButtons();
@@ -111,6 +113,8 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
+	$("#dsh-srch-survey-div").show();
+	$("#dsh-grph-srch-survey-div").show();
 
 	showProfileDetails(newProfileName, newProfileValue, 30);
 	bindSelectButtons();
@@ -128,8 +132,8 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-	$("#dsh-srch-survey-div").hide();
-	$("#dsh-grph-srch-survey-div").hide();
+	$("#dsh-srch-survey-div").show();
+	$("#dsh-grph-srch-survey-div").show();
 
 	showProfileDetails(newProfileName, newProfileValue, 30);
 	bindSelectButtons();
@@ -527,66 +531,36 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 		"searchColumn" : searchColumn,
 		"searchKey" : searchKeyword
 	};
-	var success = false;
-	$.ajax({
-		url : "./findregionbranchorindividual.do",
-		type : "GET",
-		dataType : "JSON",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				paintList(searchColumn, data.responseJSON, flow);
-			}
-		}
-	});
-}
-
-function paintList(searchColumn, results, flow) {
-	var divToPopulate = "";
-	$.each(results, function(i, result) {
-		if (searchColumn == "regionName") {
-			divToPopulate += '<div class="dsh-res-display" data-attr="'
-					+ result.regionId + '">' + result.regionName + '</div>';
-		} else if (searchColumn == "branchName") {
-			divToPopulate += '<div class="dsh-res-display" data-attr="'
-					+ result.branchId + '">' + result.branchName + '</div>';
-		} else if (searchColumn == "displayName") {
-			divToPopulate += '<div class="dsh-res-display" data-attr="'
-					+ result.userId + '">' + result.displayName + '</div>';
-		}
-	});
 	
-	if (flow == 'icons')
-		$('#dsh-srch-res').html(divToPopulate);
-	else if (flow == 'graph')
-		$('#dsh-grph-srch-res').html(divToPopulate);
-
-	$('.dsh-res-display').click(function() {
+	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
 		if (flow == 'icons')
-			$('#dsh-sel-item').val($(this).html());
-		else if (flow == 'graph') {
-			$('#dsh-grph-sel-item').val($(this).html());
-		}
-		
-		var value = $(this).data('attr');
-		if (searchColumn == "regionName") {
-			columnName = "regionId";
-		} else if (searchColumn == "branchName") {
-			columnName = "branchId";
-		} else if (searchColumn == "displayName") {
-			columnName = "agentId";
-		}
-		
-		if (flow == 'icons')
-			showSurveyStatistics(columnName, value);
+			$('#dsh-srch-res').html(data);
 		else if (flow == 'graph')
-			showSurveyStatisticsGraphically(columnName, value);
-		$('.dsh-res-display').hide();
-	});
+			$('#dsh-grph-srch-res').html(data);
+
+		$('.dsh-res-display').click(function() {
+			if (flow == 'icons')
+				$('#dsh-sel-item').val($(this).html());
+			else if (flow == 'graph') {
+				$('#dsh-grph-sel-item').val($(this).html());
+			}
+			
+			var value = $(this).data('attr');
+			if (searchColumn == "regionName") {
+				columnName = "regionId";
+			} else if (searchColumn == "branchName") {
+				columnName = "branchId";
+			} else if (searchColumn == "displayName") {
+				columnName = "agentId";
+			}
+			
+			if (flow == 'icons')
+				showSurveyStatistics(columnName, value);
+			else if (flow == 'graph')
+				showSurveyStatisticsGraphically(columnName, value);
+			$('.dsh-res-display').hide();
+		});
+	}, payload, false);
 }
 
 function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName) {

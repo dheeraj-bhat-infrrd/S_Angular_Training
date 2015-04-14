@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.solr.common.SolrDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -568,35 +569,38 @@ public class DashboardController {
 		return surveyDetails;
 	}
 
-	@ResponseBody
 	@RequestMapping(value = "/findregionbranchorindividual")
 	public String getRegionBranchOrAgent(Model model, HttpServletRequest request) {
 		LOG.info("Method to get list of regions, branches, agents getRegionBranchOrAgent() started.");
-		String result = "";
+		User user = sessionHelper.getCurrentUser();
 		long regionOrBranchId = 0;
+		List<SolrDocument> result = null;
+		
 		try {
 			String searchColumn = request.getParameter("searchColumn");
-			String searchKey = request.getParameter("searchKey");
-			String columnName = request.getParameter("columnName");
-			String columnValueStr = request.getParameter("columnValue");
 			if (searchColumn == null || searchColumn.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for search criteria.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for search criteria.");
 			}
+			model.addAttribute("searchColumn", searchColumn);
+
+			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
+			
+			String columnValueStr = request.getParameter("columnValue");
 			if (columnValueStr == null || columnValueStr.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for Region/branch Id.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for Region/branch Id.");
 			}
 
+			String searchKey = request.getParameter("searchKey");
 			if (searchKey == null) {
 				searchKey = "";
 			}
 
-			User user = sessionHelper.getCurrentUser();
 			if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
 				try {
 					result = solrSearchService.searchBranchRegionOrAgentByName(searchColumn, searchKey, columnName, user.getCompany().getCompanyId());
@@ -629,13 +633,14 @@ public class DashboardController {
 					throw e;
 				}
 			}
+			model.addAttribute("results", result);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e);
-			return new Gson().toJson(e.getMessage());
+			model.addAttribute("message", e.getMessage());
 		}
 		LOG.info("Method to get list of regions, branches, agents getRegionBranchOrAgent() finished.");
-		return result;
+		return JspResolver.DASHBOARD_SEARCHRESULTS;
 	}
 
 	/*
