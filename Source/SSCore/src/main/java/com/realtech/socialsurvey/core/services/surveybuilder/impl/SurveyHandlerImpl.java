@@ -73,6 +73,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	
 	@Value("${MOODS_TO_SEND_MAIL}")
 	private String moodsToSendMail;
+	
+	@Value("${GOOGLE_SHARE_URI}")
+	private String googleShareUri;
 
 	/**
 	 * Method to store question and answer format into mongo.
@@ -319,11 +322,23 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	}
 	
 	@Override
+	public String getGoogleShareUri(){
+		return 	googleShareUri;
+	}
+	
+	@Override
 	public void increaseSurveyCountForAgent(long agentId) throws SolrException{
 		LOG.info("Method to increase survey count for agent started.");
 		organizationUnitSettingsDao.updateCompletedSurveyCountForAgent(agentId);
 		solrSearchService.updateCompletedSurveyCountForUserInSolr(agentId);
 		LOG.info("Method to increase survey count for agent finished.");
+	}
+
+	@Override
+	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail) {
+		LOG.info("Method to update sharedOn in SurveyDetails collection, updateSharedOn() started.");
+		surveyDetailsDao.updateSharedOn(socialSites, agentId, customerEmail);
+		LOG.info("Method to update sharedOn in SurveyDetails collection, updateSharedOn() finished.");
 	}
 }
 // JIRA SS-119 by RM-05:EOC

@@ -67,4 +67,6 @@ public interface SurveyDetailsDao {
 
 	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId, int surveyReminderInterval, int maxReminders, float autopostScore);
 
+	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail);
+
 }
