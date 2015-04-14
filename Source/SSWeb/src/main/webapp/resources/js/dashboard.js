@@ -15,11 +15,6 @@ var colName;
 var colValue;
 var searchColumn;
 
-var circle1;
-var circle2;
-var circle3;
-var circle4;
-
 $(document).on('click', '.icn-plus-open', function() {
 	$(this).hide();
 	$(this).parent().find('.ppl-share-social,.icn-remove').show();
@@ -565,82 +560,14 @@ function paintSurveyGraph(graphData) {
 }
 
 function showProfileDetails(columnName, columnValue, numberOfDays) {
-	var success = false;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
 		"numberOfDays" : numberOfDays
 	};
-	$.ajax({
-		url : "./profiledetails.do",
-		type : "GET",
-		dataType : "JSON",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				paintProfileDetails(data);
-			}
-		},
-		error : function(e) {
-			console.error("error : " + e.responseText);
-			$('#overlay-toast').html(e.responseText);
-			showToast();
-		}
-	});
-}
-
-function paintProfileDetails(data) {
-	$("#badges").removeClass(".dsg-g-rbn-1");
-	$("#badges").removeClass(".dsg-g-rbn-2");
-	$("#badges").removeClass(".dsg-g-rbn-3");
-	if (data.responseJSON.name != undefined)
-		$("#name").html(data.responseJSON.name);
-	if (data.responseJSON.title != undefined)
-		$("#designation").html(data.responseJSON.title);
-	if (data.responseJSON.company != undefined)
-		$("#company").html(data.responseJSON.company);
-	$("#socl-post").html(data.responseJSON.socialPosts);
-	if ((parseInt(data.responseJSON.socialPosts) / maxSocialPosts) > 1)
-		circle1.animate(1);
-	else
-		circle1.animate(parseInt(data.responseJSON.socialPosts) / maxSocialPosts);
-	$("#srv-snt-cnt").html(data.responseJSON.surveyCount);
-	if ((parseInt(data.responseJSON.surveyCount) / maxSurveySent) > 1)
-		circle2.animate(1);
-	else
-		circle2.animate(parseInt(data.responseJSON.surveyCount) / maxSurveySent);
-	$("#srv-scr").html(data.responseJSON.socialScore + "/5");
-	if ((parseInt(data.responseJSON.socialScore) / 5) > 1)
-		circle3.animate(1);
-	else
-		circle3.animate(parseInt(data.responseJSON.socialScore) / 5);
-	var profileCompleted = parseInt(data.responseJSON.profileCompleteness);
-	if ((profileCompleted / 100) > 1)
-		circle4.animate(1);
-	else
-		circle4.animate(profileCompleted / 100);
-
-	$("#pro-cmplt-stars").find('.dsh-star-item').removeClass('sq-full-star');
-	var starVal = profileCompleted * 5 / 100;
-	$("#pro-cmplt-stars").find('.dsh-star-item').each(function(index) {
-		if (index < starVal) {
-			$(this).removeClass('no-star');
-			$(this).addClass('sq-full-star');
-		}
-	});
-
-	$("#profile-completed").html(starVal + "/5");
-	var badges = parseInt(data.responseJSON.badges);
-	if (badges == 1)
-		$("#badges").addClass("dsg-g-rbn-1");
-	else if (badges == 2)
-		$("#badges").addClass("dsg-g-rbn-2");
-	else if (badges == 3)
-		$("#badges").addClass("dsg-g-rbn-3");
+	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
+		$('#dash-profile-detail-circles').html(data);
+	}, payload, false);
 }
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
@@ -970,38 +897,27 @@ function updateCurrentProfile(profileId) {
 	callAjaxGET(url, function(data) {}, true);
 }
 
-function updateCircles() {
-	$('#dg-img-1').find('svg').remove();
-	$('#dg-img-2').find('svg').remove();
-	$('#dg-img-3').find('svg').remove();
-	$('#dg-img-4').find('svg').remove();
+// Dashboard View as
+$('#dashboard-sel').click(function(){
+	$('#da-dd-wrapper-profiles').slideToggle(200);
+});
 
-	circle1 = new ProgressBar.Circle('#dg-img-1', {
-		color : '#7AB400',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle2 = new ProgressBar.Circle('#dg-img-2', {
-		color : '#E97F30',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle3 = new ProgressBar.Circle('#dg-img-3', {
-		color : '#5CC7EF',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-	circle4 = new ProgressBar.Circle('#dg-img-4', {
-		color : '#7AB400',
-		fill : "rgba(249,249,251, 1)",
-		duration : 1500,
-		strokeWidth : 4,
-		easing : 'easeInOut'
-	});
-}
+$('.da-dd-item').click(function(){
+	$('#dashboard-sel').html($(this).html());
+	$('#da-dd-wrapper-profiles').slideToggle(200);
+	
+	// update selected profile in session
+	var newProfileId = $(this).attr('data-profile-id');
+	updateCurrentProfile(newProfileId);
+
+	var newProfileMasterId = $(this).attr('data-profile-master-id');
+	var newProfileName = $(this).attr('data-column-name');
+	var newProfileValue = $(this).attr('data-column-value');
+	paintDashboard(newProfileMasterId, newProfileName, newProfileValue);
+	
+	// updating data
+	$('#prof-container').attr('data-profile-id', newProfileId);
+	$('#prof-container').attr('data-profile-master-id', newProfileMasterId);
+	$('#prof-container').attr('data-column-name', newProfileName);
+	$('#prof-container').attr('data-column-value', newProfileValue);
+});

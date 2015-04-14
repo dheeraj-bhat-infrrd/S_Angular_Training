@@ -31,6 +31,7 @@ import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserProfileSmall;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -38,7 +39,10 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.DashboardS
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.surveybuilder.SurveyHandler;
+import com.realtech.socialsurvey.core.utils.MessageUtils;
+import com.realtech.socialsurvey.web.common.JspResolver;
 
 @Controller
 public class DashboardController {
@@ -47,6 +51,9 @@ public class DashboardController {
 
 	@Autowired
 	private SessionHelper sessionHelper;
+
+	@Autowired
+	private MessageUtils messageUtils;
 
 	@Autowired
 	private DashboardService dashboardService;
@@ -73,7 +80,152 @@ public class DashboardController {
 	private final String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
 	private final String EXCEL_FILE_EXTENSION = ".xlsx";
 
-	// setting selected profile in session
+	@RequestMapping(value = "/dashboard")
+	public String initDashboardPage(Model model, HttpServletRequest request) {
+		LOG.info("Dashboard Page started");
+		HttpSession session = request.getSession(false);
+		User user = sessionHelper.getCurrentUser(); 
+
+		try {
+			// fetching user with updated user profiles
+			user = userManagementService.getUserByUserId(user.getUserId());
+			model.addAttribute("userId", user.getUserId());
+			model.addAttribute("emailId", user.getEmailId());
+
+			// updating session with selected user profile
+			int profileMasterId = 0;
+			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+			for (UserProfile profile : user.getUserProfiles()) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					selectedProfile = profile;
+					break;
+				}
+			}
+			profileMasterId = selectedProfile.getProfilesMaster().getProfileId();
+			
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			model.addAttribute("profileId", selectedProfile.getUserProfileId());
+			model.addAttribute("profileMasterId", profileMasterId);
+			if (profileMasterId == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.COMPANY_ID_COLUMN);
+				model.addAttribute("columnValue", user.getCompany().getCompanyId());
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.REGION_ID_COLUMN);
+				model.addAttribute("columnValue", selectedProfile.getRegionId());
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.BRANCH_ID_COLUMN);
+				model.addAttribute("columnValue", selectedProfile.getBranchId());
+			}
+			else if (profileMasterId == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
+				model.addAttribute("columnValue", selectedProfile.getAgentId());
+			}
+			
+			// updating session with aggregated user profiles
+			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+			Map<Long, UserProfileSmall> profileSmallMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			if (profileSmallMap.size() > 0) {
+				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
+				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
+			model.addAttribute("message", "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
+					+ e.getMessage());
+			return "errorpage500";
+		}
+		catch (SolrException e) {
+			LOG.error("SolrException caught in initDashboardPage while setting details about user. Nested exception is ", e);
+			model.addAttribute("message", "SolrException caught in initDashboardPage while setting details about user. Nested exception is " + e.getMessage());
+			return "errorpage500";
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+			return JspResolver.LOGIN;
+		}
+		return JspResolver.DASHBOARD;
+	}
+	
+	@RequestMapping(value = "/profiledetails")
+	public String getProfileDetails(Model model, HttpServletRequest request) {
+		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
+		User user = sessionHelper.getCurrentUser();
+		UserSettings userSettings = (UserSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		
+		// settings profile details
+		String columnName = request.getParameter("columnName");
+		long columnValue = 0;
+		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
+			columnValue = user.getCompany().getCompanyId();
+			model.addAttribute("name", user.getCompany().getCompany());
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
+		}
+		else if (columnName.equalsIgnoreCase(CommonConstants.REGION_ID_COLUMN)) {
+			try {
+				columnValue = Long.parseLong(request.getParameter("columnValue"));
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
+				throw e;
+			}
+
+			model.addAttribute("name", userSettings.getRegionSettings().get(columnValue).getContact_details().getName());
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
+			model.addAttribute("company", user.getCompany().getCompany());
+		}
+		else if (columnName.equalsIgnoreCase(CommonConstants.BRANCH_ID_COLUMN)) {
+			try {
+				columnValue = Long.parseLong(request.getParameter("columnValue"));
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
+				throw e;
+			}
+
+			model.addAttribute("name", userSettings.getBranchSettings().get(columnValue).getContact_details().getName());
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
+			model.addAttribute("company", user.getCompany().getCompany());
+		}
+		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
+			columnValue = user.getUserId();
+			model.addAttribute("name", user.getFirstName() + " " + user.getLastName());
+			model.addAttribute("title", getTitle(request, columnName, columnValue, user));
+			model.addAttribute("company", user.getCompany().getCompany());
+		}
+		
+		// calculating details for circles
+		int numberOfDays = 30;
+		try {
+			if (request.getParameter("numberOfDays") != null) {
+				numberOfDays = Integer.parseInt(request.getParameter("numberOfDays"));
+			}
+		}
+		catch (NumberFormatException e) {
+			LOG.error("NumberFormatException caught in getProfileDetails() while converting numberOfDays.");
+			throw e;
+		}
+		
+		int surveyScore = (int) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays));
+		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
+		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
+		int profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, userSettings);
+
+		model.addAttribute("socialScore", surveyScore);
+		model.addAttribute("surveyCount", sentSurveyCount);
+		model.addAttribute("socialPosts", socialPostsCount);
+		model.addAttribute("profileCompleteness", profileCompleteness);
+		model.addAttribute("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
+		
+		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() finished.");
+		return JspResolver.DASHBOARD_PROFILEDETAIL;
+	}
+	
 	@ResponseBody
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/updatecurrentprofile")
@@ -182,64 +334,6 @@ public class DashboardController {
 			LOG.error("Non fatal EXception caught in getSurveyDetailsForGraph() while getting details of surveys for graph. Nested exception is ", e);
 			return e.getMessage();
 		}
-	}
-
-	@ResponseBody
-	@RequestMapping(value = "/profiledetails")
-	public String getProfileDetails(Model model, HttpServletRequest request) {
-		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() started.");
-		Map<String, Object> profileDetails = new HashMap<>();
-		User user = sessionHelper.getCurrentUser();
-		
-		String columnName = request.getParameter("columnName");
-		long columnValue = 0;
-		if (columnName.equalsIgnoreCase(CommonConstants.COMPANY_ID_COLUMN)) {
-			columnValue = user.getCompany().getCompanyId();
-			profileDetails.put("name", user.getCompany().getCompany());
-			profileDetails.put("title", getTitle(request, columnName, columnValue, user));
-		}
-		else if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
-			columnValue = user.getUserId();
-			profileDetails.put("name", user.getFirstName() + " " + user.getLastName());
-			profileDetails.put("company", user.getCompany().getCompany());
-		}
-		else {
-			try {
-				columnValue = Long.parseLong(request.getParameter("columnValue"));
-			}
-			catch (NumberFormatException e) {
-				LOG.error("NumberFormatException caught in getProfileDetails() while converting columnValue for regionId/branchId/agentId.");
-				throw e;
-			}
-		}
-		int numberOfDays = 30;
-		try {
-			if (request.getParameter("numberOfDays") != null) {
-				numberOfDays = Integer.parseInt(request.getParameter("numberOfDays"));
-			}
-		}
-		catch (NumberFormatException e) {
-			LOG.error("NumberFormatException caught in getProfileDetails() while converting numberOfDays.");
-			throw e;
-		}
-		if (columnName.equalsIgnoreCase(CommonConstants.AGENT_ID_COLUMN)) {
-			// columnValue contains branchId, the agent belongs to.(Here only)
-			profileDetails.put("title", getTitle(request, columnName, columnValue, user));
-		}
-
-		int surveyScore = (int) Math.round(dashboardService.getSurveyScore(columnName, columnValue, numberOfDays));
-		int sentSurveyCount = (int) dashboardService.getAllSurveyCountForPastNdays(columnName, columnValue, numberOfDays);
-		int socialPostsCount = (int) dashboardService.getSocialPostsForPastNdays(columnName, columnValue, numberOfDays);
-		UserSettings userSettings = (UserSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-		int profileCompleteness = dashboardService.getProfileCompletionPercentage(user, columnName, columnValue, userSettings);
-
-		profileDetails.put("socialScore", surveyScore);
-		profileDetails.put("surveyCount", sentSurveyCount);
-		profileDetails.put("socialPosts", socialPostsCount);
-		profileDetails.put("profileCompleteness", profileCompleteness);
-		profileDetails.put("badges", dashboardService.getBadges(surveyScore, sentSurveyCount, socialPostsCount, profileCompleteness));
-		LOG.info("Method to get profile of company, region, branch, agent getProfileDetails() finished.");
-		return new Gson().toJson(profileDetails);
 	}
 
 	@ResponseBody
