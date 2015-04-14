@@ -475,25 +475,26 @@ public class DashboardController {
 		return name;
 	}
 
-	@ResponseBody
 	@RequestMapping(value = "/fetchdashboardincompletesurvey")
 	public String getIncompleteSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
+		User user = sessionHelper.getCurrentUser();
+		
 		try {
-			String columnName = request.getParameter("columnName");
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
 			int startIndex = Integer.parseInt(startIndexStr);
 			int batchSize = Integer.parseInt(batchSizeStr);
+
+			String columnName = request.getParameter("columnName");
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
 			String profileLevel = getProfileLevel(columnName);
+			
 			long iden = 0;
-
-			User user = sessionHelper.getCurrentUser();
 			if (profileLevel.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
 				iden = user.getCompany().getCompanyId();
 			}
@@ -512,6 +513,7 @@ public class DashboardController {
 					}
 				}
 			}
+			
 			try {
 				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, startIndex, batchSize, profileLevel);
 			}
@@ -519,13 +521,15 @@ public class DashboardController {
 				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
 				throw e;
 			}
+			model.addAttribute("incompleteSurveys", surveyDetails);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Non fatal exception caught in getReviews() while fetching reviews. Nested exception is ", e);
-			return new Gson().toJson(e.getMessage());
+			model.addAttribute("message", e.getMessage());
 		}
+		
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() finished.");
-		return new Gson().toJson(surveyDetails);
+		return JspResolver.DASHBOARD_INCOMPLETESURVEYS;
 	}
 
 	@ResponseBody

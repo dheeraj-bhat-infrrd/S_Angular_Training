@@ -27,8 +27,9 @@
 
 <div class="dash-wrapper-main">
 	<div class="dash-container container">
-		<div id="prof-container" data-profile-master-id="${profileMasterId}" data-profile-id="${profileId}"
-			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
+		<div id="prof-container" data-profile-master-id="${profileMasterId}"
+			data-profile-id="${profileId}" data-column-name="${columnName}"
+			data-column-value="${columnValue}" class="dash-top-info">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
 				<!-- Populated by profile detail -->
 			</div>
@@ -112,11 +113,10 @@
 		
 		<div class="dash-panels-wrapper">
 			<div class="row">
-				<div id="prnt-dsh-inc-srvey" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
-					<div class="dash-lp-header" id="incomplete-survey-header">Incomplete Surveys</div>
-					<div id="dsh-inc-srvey" class="dash-lp-item-grp"></div>
-					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide">Incomplete Survey Data</div>
+				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
+					<!-- Populated with incomplete surveys -->
 				</div>
+				
 				<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
 					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
 						<div class="main-con-header clearfix pad-bot-10-resp">
@@ -124,40 +124,8 @@
 							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">Download Survey Data</div>
 						</div>
 						<div id="review-details" class="ppl-review-item-wrapper">
-							<div class="ppl-review-item">
-							   <!--  <div class="ppl-header-wrapper clearfix">
-									<div class="float-left ppl-header-left">
-										<div class="ppl-head-1">Matt &amp; Gina Conelly - Lehi, UT</div>
-										<div class="ppl-head-2">12<sup>th</sup> Sept 2014</div>
-									</div>
-									<div class="float-right ppl-header-right">
-										<div class="st-rating-wrapper maring-0 clearfix">
-											<div class="rating-star icn-full-star"></div>
-											<div class="rating-star icn-full-star"></div>
-											<div class="rating-star icn-half-star"></div>
-											<div class="rating-star icn-no-star"></div>
-											<div class="rating-star icn-no-star"></div>
-										</div>
-									</div>
-								</div>
-								<div class="ppl-content">Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las.</div>
-								<div class="ppl-share-wrapper clearfix">
-									<div class="float-left blue-text ppl-share-shr-txt">Share</div>
-									<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
-									<div class="float-left clearfix ppl-share-social hide" style="display: none;">
-										<div class="float-left ppl-share-icns icn-fb"></div>
-										<div class="float-left ppl-share-icns icn-twit"></div>
-										<div class="float-left ppl-share-icns icn-lin"></div>
-										<div class="float-left ppl-share-icns icn-yelp"></div>
-										<div class="view-survey-lnk">View Survey</div>
-									</div>
-									<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
-								</div> -->
-							</div>
+							<div class="ppl-review-item"></div>
 						</div>
-						<!-- <div class="profile-addl-links clearfix">
-							<span class="p-a-l-item">100 additional reviews not recommended</span>
-						</div> -->
 					</div>
 				</div>
 			</div>
