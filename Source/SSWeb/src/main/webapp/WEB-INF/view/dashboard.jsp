@@ -116,7 +116,6 @@
 				<div id="dash-survey-incomplete" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
 					<div class="dash-lp-header" id="incomplete-survey-header"><spring:message code="label.incompletesurveys.key" /></div>
 					<div id="dsh-inc-srvey" class="dash-lp-item-grp">
-						<spring:message code="label.noincompletesurveys.key" />
 						<!-- Populated with incomplete surveys -->
 					</div>
 					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide"><spring:message code="label.incompletesurveydata.key" /></div>

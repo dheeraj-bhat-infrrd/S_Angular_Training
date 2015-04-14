@@ -232,33 +232,39 @@ function showIncompleteSurvey(columnName, columnValue) {
 		"startIndex" : startIndexInc,
 		"batchSize" : batchSizeInc
 	};
-	callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
-		if (startIndexInc == 0 && data != null) {
-			$('#dsh-inc-srvey').html(data);
-			$("#dsh-inc-dwnld").show();
+	callAjaxGetWithPayloadData("./fetchdashboardincompletesurveycount.do", function(totalIncompleteReviews) {
+		if (totalIncompleteReviews == 0) {
+			$("#incomplete-survey-header").html("No incomplete surveys found");
+			return;
 		}
-		else {
-			$('#dsh-inc-srvey').append(data);
-		}
-		$('#dsh-inc-srvey').perfectScrollbar();
 
-		var scrollContainer = document.getElementById('dsh-inc-srvey');
-		scrollContainer.onscroll = function() {
-			if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
-				showIncompleteSurvey(colName, colValue);
+		callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
+			if (startIndexInc == 0) {
+				$('#dsh-inc-srvey').html(data);
+				$("#dsh-inc-dwnld").show();
 			}
-		};
-
-		$('.dash-lp-rt-img').click(function() {
-			var agentId = $(this).data("agentid");
-			var agentName = $(this).data("agentname");
-			var customerEmail = $(this).data("custemail");
-			var customerName = $(this).data("custname");
-			sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
-		});
-		
-		startIndexInc += batchSizeInc;
-	}, payload, false);
+			else {
+				$('#dsh-inc-srvey').append(data);
+			}
+			$('#dsh-inc-srvey').perfectScrollbar();
+	
+			var scrollContainer = document.getElementById('dsh-inc-srvey');
+			scrollContainer.onscroll = function() {
+				if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+					showIncompleteSurvey(colName, colValue);
+				}
+			};
+	
+			$('.dash-lp-rt-img').click(function() {
+				var agentId = $(this).data("agentid");
+				var agentName = $(this).data("agentname");
+				var customerEmail = $(this).data("custemail");
+				var customerName = $(this).data("custname");
+				sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
+			});
+			
+			startIndexInc += batchSizeInc;
+	}, payload, false);}, payload, false);
 }
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
@@ -269,9 +275,8 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 	callAjaxGetWithPayloadData("./fetchdashboardreviewCount.do", function(totalReviews) {
 		
 		callAjaxGetWithPayloadData("./fetchName.do", function(name) {
-			console.log(totalReviews);
 			if (totalReviews == 0) {
-				$("#review-desc").html("No review found for " + name);
+				$("#review-desc").html("No reviews found for " + name);
 				return;
 			} else {
 				$("#review-desc").html("What people say about " + name.substring(1, name.length - 1));
