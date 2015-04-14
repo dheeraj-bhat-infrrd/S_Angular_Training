@@ -3,10 +3,10 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <div class="hm-header-main-wrapper hm-hdr-bord-bot">
-    <div class="container">
-        <div class="hm-header-row clearfix">
-            <div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
-            
+	<div class="container">
+		<div class="hm-header-row clearfix">
+			<div class="float-left hm-header-row-left hr-dsh-adj-lft"><spring:message code="label.header.dashboard.key" /></div>
+			
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
@@ -21,12 +21,12 @@
 					</div>
 				</div>
 			</c:if>
-        </div>
-    </div>
+		</div>
+	</div>
 </div>
 
 <div class="dash-wrapper-main">
-    <div class="dash-container container">
+	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}" data-profile-id="${profileId}"
 			data-column-name="${columnName}" data-column-value="${columnValue}" class="dash-top-info">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
@@ -52,10 +52,10 @@
 				<div class="clearfix dash-sel-wrapper">
 					<div class="float-left dash-sel-lbl"><spring:message code="label.duration.key" /></div>
 					<select id="survey-count-days" class="float-left dash-sel-item">
-						<option value="30"><spring:message code="label.durationone.key" /></option>
-						<option value="60"><spring:message code="label.durationtwo.key" /></option>
-						<option value="90"><spring:message code="label.durationthree.key" /></option>
-						<option value="365"><spring:message code="label.durationfour.key" /></option>
+						<option value="30"><spring:message code="label.duration.one.key" /></option>
+						<option value="60"><spring:message code="label.duration.two.key" /></option>
+						<option value="90"><spring:message code="label.duration.three.key" /></option>
+						<option value="365"><spring:message code="label.duration.four.key" /></option>
 					</select>
 				</div>
 			</div>
@@ -65,98 +65,104 @@
 		</div>
 
 		<div class="dash-stats-wrapper bord-bot-dc clearfix">
-            <div class="float-left stats-left clearfix">
-                <div class="dash-sub-head">Utilization over time</div>
-                <div id="graph-sel-div" class="clearfix dash-sel-wrapper">
-                    <div class="float-left dash-sel-lbl">Choose</div>
-                    <select id="graph-sel-list" class="float-left dash-sel-item"></select>
-                </div>
-                
-                <div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
-					<div class="float-left dash-sel-lbl">Choose</div>
+			<div class="float-left stats-left clearfix">
+				<div class="dash-sub-head"><spring:message code="label.utilization.key" /></div>
+				<div id="graph-sel-div" class="clearfix dash-sel-wrapper">
+					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
+					<select id="graph-sel-list" class="float-left dash-sel-item"></select>
+				</div>
+				<div id="dsh-grph-srch-survey-div" class="clearfix dash-sel-wrapper">
+					<div class="float-left dash-sel-lbl"><spring:message code="label.choose.key" /></div>
 					<div class="dsh-inp-wrapper">
-						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="Start typing..." onkeyup="searchBranchRegionOrAgent(this.value,'graph')">
+						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
+							onkeyup="searchBranchRegionOrAgent(this.value, 'graph')">
 						<div id="dsh-grph-srch-res" class="dsh-sb-dd"></div>
 					</div>
 				</div>
-                
-                <div class="clearfix dash-sel-wrapper">
-                    <div class="float-left dash-sel-lbl">Format</div>
-                    <select id="dsh-grph-format" class="float-left dash-sel-item">
-                        <option value="weekly">Weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="yearly">Yearly</option>
-                    </select>
-                </div>
-            </div>
-            <div class="float-left stats-right stats-right-adj">
-                <div class="util-graph-wrapper">
-                    <div id="util-gph-item" class="util-gph-item">
-                    </div>
-                    <div class="util-gph-legend clearfix">
-                        <div class="util-gph-legend-item">No of surveys sent<span class="lgn-col-item lgn-col-grn"></span></div>
-                        <div class="util-gph-legend-item">No of surveys clicked<span class="lgn-col-item lgn-col-blue"></span></div>
-                        <div class="util-gph-legend-item">No of surveys completed<span class="lgn-col-item lgn-col-yel"></span></div>
-                        <div class="util-gph-legend-item">No of social posts<span class="lgn-col-item lgn-col-red"></span></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="dash-panels-wrapper">
-            <div class="row">
-                <div id="prnt-dsh-inc-srvey" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
-                    <div class="dash-lp-header" id="incomplete-survey-header">Incomplete Surveys</div>
-                    <div id="dsh-inc-srvey" class="dash-lp-item-grp">
-                    </div>
-                    <div id="dsh-inc-dwnld" class="dash-btn-sur-data hide">Incomplete Survey Data</div>
-                </div>
-                <div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
-                    <div class="people-say-wrapper rt-content-main rt-content-main-adj">
-                        <div class="main-con-header clearfix pad-bot-10-resp">
-                            <div id="review-desc" class="float-left dash-ppl-say-lbl"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
-                            <div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">Download Survey Data</div>
-                        </div>
-                        <div id="review-details" class="ppl-review-item-wrapper">
-	                        <div class="ppl-review-item">
-	                           <!--  <div class="ppl-header-wrapper clearfix">
-	                                <div class="float-left ppl-header-left">
-	                                    <div class="ppl-head-1">Matt &amp; Gina Conelly - Lehi, UT</div>
-	                                    <div class="ppl-head-2">12<sup>th</sup> Sept 2014</div>
-	                                </div>
-	                                <div class="float-right ppl-header-right">
-	                                    <div class="st-rating-wrapper maring-0 clearfix">
-	                                        <div class="rating-star icn-full-star"></div>
-	                                        <div class="rating-star icn-full-star"></div>
-	                                        <div class="rating-star icn-half-star"></div>
-	                                        <div class="rating-star icn-no-star"></div>
-	                                        <div class="rating-star icn-no-star"></div>
-	                                    </div>
-	                                </div>
-	                            </div>
-	                            <div class="ppl-content">Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las.</div>
-	                            <div class="ppl-share-wrapper clearfix">
-	                                <div class="float-left blue-text ppl-share-shr-txt">Share</div>
-	                                <div class="float-left icn-share icn-plus-open" style="display: block;"></div>
-	                                <div class="float-left clearfix ppl-share-social hide" style="display: none;">
-	                                    <div class="float-left ppl-share-icns icn-fb"></div>
-	                                    <div class="float-left ppl-share-icns icn-twit"></div>
-	                                    <div class="float-left ppl-share-icns icn-lin"></div>
-	                                    <div class="float-left ppl-share-icns icn-yelp"></div>
-	                                    <div class="view-survey-lnk">View Survey</div>
-	                                </div>
-	                                <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
-	                            </div> -->
-	                        </div>
-                        </div>
-                        <!-- <div class="profile-addl-links clearfix">
-                            <span class="p-a-l-item">100 additional reviews not recommended</span>
-                        </div> -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+				
+				<div class="clearfix dash-sel-wrapper">
+					<div class="float-left dash-sel-lbl"><spring:message code="label.format.key" /></div>
+					<select id="dsh-grph-format" class="float-left dash-sel-item">
+						<option value="weekly"><spring:message code="label.format.one.key" /></option>
+						<option value="monthly"><spring:message code="label.format.two.key" /></option>
+						<option value="yearly"><spring:message code="label.format.three.key" /></option>
+					</select>
+				</div>
+			</div>
+			<div class="float-left stats-right stats-right-adj">
+				<div class="util-graph-wrapper">
+					<div id="util-gph-item" class="util-gph-item"></div>
+					<div class="util-gph-legend clearfix">
+						<div class="util-gph-legend-item">
+							<spring:message code="label.surveyssent.key" /><span class="lgn-col-item lgn-col-grn"></span>
+						</div>
+						<div class="util-gph-legend-item">
+							<spring:message code="label.surveysclicked.key" /><span class="lgn-col-item lgn-col-blue"></span>
+						</div>
+						<div class="util-gph-legend-item">
+							<spring:message code="label.surveyscompleted.key" /><span class="lgn-col-item lgn-col-yel"></span>
+						</div>
+						<div class="util-gph-legend-item">
+							<spring:message code="label.socialposts.key" /><span class="lgn-col-item lgn-col-red"></span>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="dash-panels-wrapper">
+			<div class="row">
+				<div id="prnt-dsh-inc-srvey" class="dash-panel-left col-lg-4 col-md-4 col-sm-4 col-xs-12">
+					<div class="dash-lp-header" id="incomplete-survey-header">Incomplete Surveys</div>
+					<div id="dsh-inc-srvey" class="dash-lp-item-grp"></div>
+					<div id="dsh-inc-dwnld" class="dash-btn-sur-data hide">Incomplete Survey Data</div>
+				</div>
+				<div class="dash-panel-right col-lg-8 col-md-8 col-sm-8 col-xs-12 resp-adj">
+					<div class="people-say-wrapper rt-content-main rt-content-main-adj">
+						<div class="main-con-header clearfix pad-bot-10-resp">
+							<div id="review-desc" class="float-left dash-ppl-say-lbl"><span class="ppl-say-txt-st">What people say</span> about Anna Thomas</div>
+							<div id="dsh-cmp-dwnld" class="float-right dash-btn-dl-sd hide">Download Survey Data</div>
+						</div>
+						<div id="review-details" class="ppl-review-item-wrapper">
+							<div class="ppl-review-item">
+							   <!--  <div class="ppl-header-wrapper clearfix">
+									<div class="float-left ppl-header-left">
+										<div class="ppl-head-1">Matt &amp; Gina Conelly - Lehi, UT</div>
+										<div class="ppl-head-2">12<sup>th</sup> Sept 2014</div>
+									</div>
+									<div class="float-right ppl-header-right">
+										<div class="st-rating-wrapper maring-0 clearfix">
+											<div class="rating-star icn-full-star"></div>
+											<div class="rating-star icn-full-star"></div>
+											<div class="rating-star icn-half-star"></div>
+											<div class="rating-star icn-no-star"></div>
+											<div class="rating-star icn-no-star"></div>
+										</div>
+									</div>
+								</div>
+								<div class="ppl-content">Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las. Anna is a managing broker at Sntiner lorenm ipsim dore et ie las.</div>
+								<div class="ppl-share-wrapper clearfix">
+									<div class="float-left blue-text ppl-share-shr-txt">Share</div>
+									<div class="float-left icn-share icn-plus-open" style="display: block;"></div>
+									<div class="float-left clearfix ppl-share-social hide" style="display: none;">
+										<div class="float-left ppl-share-icns icn-fb"></div>
+										<div class="float-left ppl-share-icns icn-twit"></div>
+										<div class="float-left ppl-share-icns icn-lin"></div>
+										<div class="float-left ppl-share-icns icn-yelp"></div>
+										<div class="view-survey-lnk">View Survey</div>
+									</div>
+									<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
+								</div> -->
+							</div>
+						</div>
+						<!-- <div class="profile-addl-links clearfix">
+							<span class="p-a-l-item">100 additional reviews not recommended</span>
+						</div> -->
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 <style>
@@ -187,8 +193,8 @@
 }
 
 .dsh-res-display {
-    padding: 0 10px;
-    cursor: pointer;
+	padding: 0 10px;
+	cursor: pointer;
 }
 </style>
 

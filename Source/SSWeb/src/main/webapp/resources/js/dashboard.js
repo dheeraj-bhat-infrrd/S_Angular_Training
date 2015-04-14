@@ -92,67 +92,71 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 	colName = newProfileName;
 	colValue = newProfileValue;
 
-	showProfileDetails(newProfileName, 0, 30);
-
-	getReviewsCountAndShowReviews(colName, colValue);
-	showIncompleteSurvey(colName, colValue);
-
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-	bindSelectButtons();
 
+	showProfileDetails(newProfileName, 0, 30);
+	bindSelectButtons();
 	populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, 0);
 	showSurveyStatisticsGraphically(newProfileName, 0);
+
+	getReviewsCountAndShowReviews(colName, colValue);
+	showIncompleteSurvey(colName, colValue);
 }
 
 function showRegionAdminFlow(newProfileName, newProfileValue) {
-	showProfileDetails(newProfileName, newProfileValue, 30);
 	colName = newProfileName;
 	colValue = newProfileValue;
-	getReviewsCountAndShowReviews(colName, colValue);
-	showIncompleteSurvey(colName, colValue);
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
-	bindSelectButtons();
 
+	showProfileDetails(newProfileName, newProfileValue, 30);
+	bindSelectButtons();
 	populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
+
+	getReviewsCountAndShowReviews(colName, colValue);
+	showIncompleteSurvey(colName, colValue);
 }
 
 function showBranchAdminFlow(newProfileName, newProfileValue) {
-	showProfileDetails(newProfileName, newProfileValue, 30);
 	colName = newProfileName;
 	colValue = newProfileValue;
-	getReviewsCountAndShowReviews(colName, colValue);
-	showIncompleteSurvey(colName, colValue);
 
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
-	bindSelectButtons();
 
+	showProfileDetails(newProfileName, newProfileValue, 30);
+	bindSelectButtons();
 	populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
+
+	getReviewsCountAndShowReviews(colName, colValue);
+	showIncompleteSurvey(colName, colValue);
 }
 
 function showAgentFlow(newProfileName, newProfileValue) {
 	colName = newProfileName;
 	colValue = newProfileValue;
-	showProfileDetails(newProfileName, 0, 30);
-	getReviewsCountAndShowReviews(newProfileName, 0);
-	showIncompleteSurvey(colName, colValue);
-	bindSelectButtons();
+	
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
 	$("#dsh-grph-srch-survey-div").hide();
+
+	showProfileDetails(newProfileName, 0, 30);
+	bindSelectButtons();
 	showSurveyCount(newProfileName, 0, 30);
 	showSurveyStatisticsGraphically(newProfileName, 0);
+
+	getReviewsCountAndShowReviews(newProfileName, 0);
+	showIncompleteSurvey(colName, colValue);
 }
 
 function showProfileDetails(columnName, columnValue, numberOfDays) {
@@ -162,33 +166,25 @@ function showProfileDetails(columnName, columnValue, numberOfDays) {
 		"numberOfDays" : numberOfDays
 	};
 	callAjaxGetWithPayloadData("./profiledetails.do", function(data) {
-		console.log(data);
 		$('#dash-profile-detail-circles').html(data);
 	}, payload, false);
 }
 
-function showSurveyStatistics(columnName, columnValue) {
-	var element = document.getElementById("survey-count-days");
-	var numberOfDays = element.options[element.selectedIndex].value;
-	showSurveyCount(columnName, columnValue, numberOfDays);
-}
-
-function showSurveyStatisticsGraphically(columnName, columnValue) {
-	var element = document.getElementById("dsh-grph-format");
-	var format = element.options[element.selectedIndex].value;
-	showSurveyGraph(columnName, columnValue, format);
-}
-
-function showSurveyCount(columnName, columnValue, numberOfDays) {
-	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue,
-		"numberOfDays" : numberOfDays
-	};
-	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
-		console.log(data);
-		$('#dash-survey-status').html(data);
-	}, payload, false);
+function bindSelectButtons() {
+	$("#selection-list").change(function() {
+		$('#dsh-sel-item').val('');
+		$('.dsh-res-display').hide();
+	});
+	$("#graph-sel-list").change(function() {
+		$('#dsh-grph-sel-item').val('');
+		$('.dsh-res-display').hide();
+	});
+	$("#dsh-grph-format").change(function() {
+		showSurveyStatisticsGraphically(colName, colValue);
+	});
+	$("#survey-count-days").change(function() {
+		showSurveyStatistics(colName, colValue);
+	});
 }
 
 function populateSurveyStatisticsList(columnName) {
@@ -212,95 +208,27 @@ function populateSurveyStatisticsList(columnName) {
 	$("#graph-sel-list").html(options);
 }
 
-// Being called from dashboard.jsp on key up event.
-function searchBranchRegionOrAgent(searchKeyword, flow) {
-	var e = document.getElementById("selection-list");
-	if (flow == 'graph')
-		e = document.getElementById("graph-sel-list");
-	searchColumn = e.options[e.selectedIndex].value;
+function showSurveyStatistics(columnName, columnValue) {
+	var element = document.getElementById("survey-count-days");
+	var numberOfDays = element.options[element.selectedIndex].value;
+	showSurveyCount(columnName, columnValue, numberOfDays);
+}
+
+function showSurveyCount(columnName, columnValue, numberOfDays) {
 	var payload = {
-		"columnName" : colName,
-		"columnValue" : colValue,
-		"searchColumn" : searchColumn,
-		"searchKey" : searchKeyword
+		"columnName" : columnName,
+		"columnValue" : columnValue,
+		"numberOfDays" : numberOfDays
 	};
-	var success = false;
-	$.ajax({
-		url : "./findregionbranchorindividual.do",
-		type : "GET",
-		dataType : "JSON",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				paintList(searchColumn, data.responseJSON, flow);
-			}
-		}
-	});
+	callAjaxGetWithPayloadData("./surveycount.do", function(data) {
+		$('#dash-survey-status').html(data);
+	}, payload, false);
 }
 
-function paintList(searchColumn, results, flow) {
-	var divToPopulate = "";
-	$.each(results, function(i, result) {
-		if (searchColumn == "regionName") {
-			divToPopulate += '<div class="dsh-res-display" data-attr="'
-					+ result.regionId + '">' + result.regionName + '</div>';
-		} else if (searchColumn == "branchName") {
-			divToPopulate += '<div class="dsh-res-display" data-attr="'
-					+ result.branchId + '">' + result.branchName + '</div>';
-		} else if (searchColumn == "displayName") {
-			divToPopulate += '<div class="dsh-res-display" data-attr="'
-					+ result.userId + '">' + result.displayName + '</div>';
-		}
-	});
-	
-	if (flow == 'icons')
-		$('#dsh-srch-res').html(divToPopulate);
-	else if (flow == 'graph')
-		$('#dsh-grph-srch-res').html(divToPopulate);
-
-	$('.dsh-res-display').click(function() {
-		if (flow == 'icons')
-			$('#dsh-sel-item').val($(this).html());
-		else if (flow == 'graph') {
-			$('#dsh-grph-sel-item').val($(this).html());
-		}
-		
-		var value = $(this).data('attr');
-		if (searchColumn == "regionName") {
-			columnName = "regionId";
-		} else if (searchColumn == "branchName") {
-			columnName = "branchId";
-		} else if (searchColumn == "displayName") {
-			columnName = "agentId";
-		}
-		
-		if (flow == 'icons')
-			showSurveyStatistics(columnName, value);
-		else if (flow == 'graph')
-			showSurveyStatisticsGraphically(columnName, value);
-		$('.dsh-res-display').hide();
-	});
-}
-
-function bindSelectButtons() {
-	$("#selection-list").change(function() {
-		$('#dsh-sel-item').val('');
-		$('.dsh-res-display').hide();
-	});
-	$("#graph-sel-list").change(function() {
-		$('#dsh-grph-sel-item').val('');
-		$('.dsh-res-display').hide();
-	});
-	$("#dsh-grph-format").change(function() {
-		showSurveyStatisticsGraphically(colName, colValue);
-	});
-	$("#survey-count-days").change(function() {
-		showSurveyStatistics(colName, colValue);
-	});
+function showSurveyStatisticsGraphically(columnName, columnValue) {
+	var element = document.getElementById("dsh-grph-format");
+	var format = element.options[element.selectedIndex].value;
+	showSurveyGraph(columnName, columnValue, format);
 }
 
 function showSurveyGraph(columnName, columnValue, format) {
@@ -460,6 +388,80 @@ function paintSurveyGraph(graphData) {
 	var chart = new google.visualization.LineChart(document.getElementById('util-gph-item'));
 
 	chart.draw(data, options);
+}
+
+// Being called from dashboard.jsp on key up event.
+function searchBranchRegionOrAgent(searchKeyword, flow) {
+	var e = document.getElementById("selection-list");
+	if (flow == 'graph')
+		e = document.getElementById("graph-sel-list");
+	searchColumn = e.options[e.selectedIndex].value;
+	var payload = {
+		"columnName" : colName,
+		"columnValue" : colValue,
+		"searchColumn" : searchColumn,
+		"searchKey" : searchKeyword
+	};
+	var success = false;
+	$.ajax({
+		url : "./findregionbranchorindividual.do",
+		type : "GET",
+		dataType : "JSON",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				paintList(searchColumn, data.responseJSON, flow);
+			}
+		}
+	});
+}
+
+function paintList(searchColumn, results, flow) {
+	var divToPopulate = "";
+	$.each(results, function(i, result) {
+		if (searchColumn == "regionName") {
+			divToPopulate += '<div class="dsh-res-display" data-attr="'
+					+ result.regionId + '">' + result.regionName + '</div>';
+		} else if (searchColumn == "branchName") {
+			divToPopulate += '<div class="dsh-res-display" data-attr="'
+					+ result.branchId + '">' + result.branchName + '</div>';
+		} else if (searchColumn == "displayName") {
+			divToPopulate += '<div class="dsh-res-display" data-attr="'
+					+ result.userId + '">' + result.displayName + '</div>';
+		}
+	});
+	
+	if (flow == 'icons')
+		$('#dsh-srch-res').html(divToPopulate);
+	else if (flow == 'graph')
+		$('#dsh-grph-srch-res').html(divToPopulate);
+
+	$('.dsh-res-display').click(function() {
+		if (flow == 'icons')
+			$('#dsh-sel-item').val($(this).html());
+		else if (flow == 'graph') {
+			$('#dsh-grph-sel-item').val($(this).html());
+		}
+		
+		var value = $(this).data('attr');
+		if (searchColumn == "regionName") {
+			columnName = "regionId";
+		} else if (searchColumn == "branchName") {
+			columnName = "branchId";
+		} else if (searchColumn == "displayName") {
+			columnName = "agentId";
+		}
+		
+		if (flow == 'icons')
+			showSurveyStatistics(columnName, value);
+		else if (flow == 'graph')
+			showSurveyStatisticsGraphically(columnName, value);
+		$('.dsh-res-display').hide();
+	});
 }
 
 function getReviewsCountAndShowReviews(columnName, columnValue) {
