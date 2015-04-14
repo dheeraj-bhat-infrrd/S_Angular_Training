@@ -225,6 +225,48 @@ function showSurveyCount(columnName, columnValue, numberOfDays) {
 	}, payload, false);
 }
 
+function showIncompleteSurvey(columnName, columnValue) {
+	var payload = {
+		"columnName" : columnName,
+		"columnValue" : columnValue,
+		"startIndex" : startIndexInc,
+		"batchSize" : batchSizeInc
+	};
+	callAjaxGetWithPayloadData("./fetchdashboardincompletesurvey.do", function(data) {
+		$('#dash-survey-incomplete').html(data);
+		
+		if (startIndexInc == 0) {
+			if (divToPopulate == "") {
+				$("#incomplete-survey-header").html("No incomplete surveys found");
+				return;
+			}
+			$("#dsh-inc-srvey").html(divToPopulate);
+			$("#dsh-inc-dwnld").show();
+		}
+		else {
+			$("#dsh-inc-srvey").append(divToPopulate);
+		}
+		$('#dsh-inc-srvey').perfectScrollbar();
+
+		var scrollContainer = document.getElementById('dsh-inc-srvey');
+		scrollContainer.onscroll = function() {
+			if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
+				showIncompleteSurvey(colName, colValue);
+			}
+		};
+
+		$('.dash-lp-rt-img').click(function() {
+			var agentId = $(this).data("agentid");
+			var agentName = $(this).data("agentname");
+			var customerEmail = $(this).data("custemail");
+			var customerName = $(this).data("custname");
+			sendSurveyReminderMail(agentId, agentName, customerEmail, customerName);
+		});
+		
+		startIndexInc += batchSizeInc;
+	}, payload, false);
+}
+
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
 	var format = element.options[element.selectedIndex].value;
@@ -643,91 +685,6 @@ function paintName(columnName, columnValue) {
 			$('#overlay-toast').html(e.responseText);
 			showToast();
 		}
-	});
-}
-
-function showIncompleteSurvey(columnName, columnValue) {
-	var success = false;
-	var payload = {
-		"columnName" : columnName,
-		"columnValue" : columnValue,
-		"startIndex" : startIndexInc,
-		"batchSize" : batchSizeInc
-	};
-	$.ajax({
-		url : "./fetchdashboardincompletesurvey.do",
-		type : "GET",
-		async : false,
-		dataType : "JSON",
-		data : payload,
-		success : function(data) {
-			if (data.errCode == undefined)
-				success = true;
-		},
-		complete : function(data) {
-			if (success) {
-				paintIncompleteSurvey(data.responseJSON);
-				startIndexInc += batchSizeInc;
-			}
-		},
-		error : function(e) {
-			console.error("error : " + e.responseText);
-			$('#overlay-toast').html(e.responseText);
-			showToast();
-		}
-	});
-}
-
-function paintIncompleteSurvey(result) {
-	var divToPopulate = "";
-	$.each(result,function(i, survey) {
-		divToPopulate += '<div class="dash-lp-item clearfix">'
-				+ '<div class="float-left dash-lp-txt">'
-				+ survey.customerFirstName
-				+ " "
-				+ survey.customerLastName
-				+ ' <span>'
-				+ survey.modifiedOn
-				+ '</span></div>'
-				+ '<div data-custname='
-				+ survey.customerFirstName
-				+ ' '
-				+ survey.customerLastName
-				+ ' data-agentid='
-				+ survey.agentId
-				+ ' data-agentname='
-				+ survey.agentName
-				+ ' data-custemail='
-				+ survey.customerEmail
-				+ ' class="float-right dash-lp-rt-img cursor-pointer"></div></div>';
-		});
-	if (startIndexInc == 0){
-		if(divToPopulate == ""){
-			$("#incomplete-survey-header").html("No incomplete surveys found");
-			return;
-		}
-		$("#dsh-inc-srvey").html(divToPopulate);
-		$("#dsh-inc-dwnld").show();
-	}
-	else{
-		$("#dsh-inc-srvey").append(divToPopulate);
-	}
-	$('#dsh-inc-srvey').perfectScrollbar();
-
-	var scrollContainer = document.getElementById('dsh-inc-srvey');
-	scrollContainer.onscroll = function() {
-		if (scrollContainer.scrollTop === scrollContainer.scrollHeight - scrollContainer.clientHeight) {
-			showIncompleteSurvey(colName, colValue);
-		}
-	};
-
-	$('.dash-lp-rt-img').click(function() {
-		var agentId = $(this).data("agentid");
-		var agentName = $(this).data("agentname");
-		var customerEmail = $(this).data("custemail");
-		var customerName = $(this).data("custname");
-		sendSurveyReminderMail(agentId, agentName, customerEmail,
-				customerName);
 	});
 }
 
