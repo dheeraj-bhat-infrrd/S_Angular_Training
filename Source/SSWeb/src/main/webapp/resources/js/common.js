@@ -285,33 +285,59 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score){
 		});
 }
 
-function shareOnYelp(firstName, lastName, agentName, review, score){
+function shareOnYelp(agentId){
 	var success= false;
 	var payload = {
-			"firstName" : firstName,
-			"lastName" : lastName,
-			"agentName" : agentName,
-			"review" : review,
-			"score" : score
-		};
-		$.ajax({
-			url : "./postonyelp.do",
-			type : "GET",
-			dataType : "html",
-			data : payload,
-			success : function(data) {
-				if (data.errCode == undefined)
-					success = true;
-			},
-			complete : function(data) {
-				if (success) {
-					showToast(data);
-				}
-			},
-			error : function(e) {
-				console.error("error : " + e.responseText);
-				$('#overlay-toast').html(e.responseText);
-				showToast(e.responseText);
+			"agentId" : agentId
+	};
+	$.ajax({
+		url : "./../getyelplinkrest",
+		type : "GET",
+		dataType : "json",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			data = data.responseJSON;
+			if (success) {
+				window.open(data.relativePath);
 			}
-		});
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast(e.responseText);
+		}
+	});
+}
+
+function shareOnGooglePlus(agentId){
+	var success= false;
+	var payload = {
+			"agentId" : agentId
+	};
+	$.ajax({
+		url : "./../getgooglepluslinkrest",
+		type : "GET",
+		dataType : "json",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+		},
+		complete : function(data) {
+			if (success) {
+				data = data.responseJSON;
+				window.open(data.host + data.profileServer
+						+ data.relativePath);
+			}
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast(e.responseText);
+		}
+	});
 }

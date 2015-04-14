@@ -74,11 +74,13 @@
 					<!-- <div id="agnt-img" class="sq-top-img"></div> -->
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
-						<i><span class="sq-ques-txt">Please fill in your details to take survey</span></i>
+						<i><span class="sq-ques-txt">Please fill in your
+								details to take survey</span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
-						<div class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
+						<div
+							class="sq-star-wrapper sq-i-container clearfix ques-wrapper-adj">
 							<div class="clearfix sq-info-wrapper">
 								<div class="sq-i-lbl float-left">First Name</div>
 								<div class="sq-i-txt float-left">
@@ -110,8 +112,9 @@
 								<div class="reg-cap-nw-adj-container">
 									<div class="reg-captcha-img"></div>
 									<div class="reg-captcha-btns clearfix">
-										<input id="captcha-text" class="float-left reg-cap-txt" name="captchaResponse"
-											placeholder="Type the above text" autocomplete="off" autocorrect="off" autocapitalize="off">
+										<input id="captcha-text" class="float-left reg-cap-txt"
+											name="captchaResponse" placeholder="Type the above text"
+											autocomplete="off" autocorrect="off" autocapitalize="off">
 										<div class="clearfix reg-btns-wrapper float-right">
 											<div class="float-left reg-cap-img reg-cap-reload"></div>
 											<div class="float-left reg-cap-img reg-cap-sound"></div>
@@ -147,13 +150,16 @@
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-star" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-star" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-star"
+							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-star"
+							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 				<div data-ques-type="smiley" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
-					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
+					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema
+						ipsum</div>
 					<div class="sq-ques">
 						<i><span id="ques-text-smiley" class="sq-ques-txt"></span></i>
 					</div>
@@ -168,8 +174,10 @@
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-smile" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-smile" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-smile"
+							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-smile"
+							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 
@@ -184,9 +192,11 @@
 					<div class="sq-rat-wrapper mgn-bot-40">
 						<div class="sq-slider-wrapper pts-wrap-adj clearfix">
 							<div class="sq-pts-item-hover pts-hover-1 pts-arr-bot">Poor</div>
-							<div class="sq-pts-item-hover pts-hover-2 pts-arr-bot">Not Bad</div>
+							<div class="sq-pts-item-hover pts-hover-2 pts-arr-bot">Not
+								Bad</div>
 							<div class="sq-pts-item-hover pts-hover-3 pts-arr-bot">Good</div>
-							<div class="sq-pts-item-hover pts-hover-4 pts-arr-bot">V Good</div>
+							<div class="sq-pts-item-hover pts-hover-4 pts-arr-bot">V
+								Good</div>
 							<div class="sq-pts-item-hover pts-hover-5 pts-arr-bot">Excellent</div>
 						</div>
 						<div class="sq-slider-wrapper clearfix">
@@ -198,8 +208,10 @@
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-scale" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-scale" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-scale"
+							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-scale"
+							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
 
@@ -214,16 +226,22 @@
 					<div class="sq-rat-wrapper">
 						<textarea id="text-area" class="sq-txt-area"></textarea>
 						<div id="smiles-final" class="sq-happy-wrapper clearfix">
-							<div id="happy-smile" star-no="1" class="sq-smile-icn-wrapper sq-happy-smile"></div>
-							<div id="neutral-smile" star-no="2" class="sq-smile-icn-wrapper sq-neutral-smile"></div>
-							<div id="sad-smile" star-no="3" class="sq-smile-icn-wrapper sq-sad-smile"></div>
+							<div id="happy-smile" star-no="1"
+								class="sq-smile-icn-wrapper sq-happy-smile"></div>
+							<div id="neutral-smile" star-no="2"
+								class="sq-smile-icn-wrapper sq-neutral-smile"></div>
+							<div id="sad-smile" star-no="3"
+								class="sq-smile-icn-wrapper sq-sad-smile"></div>
 						</div>
 						<div id="pst-srvy-div">
-							<input id="post-survey" type="CHECKBOX" checked>I want to share my survey
+							<input id="post-survey" type="CHECKBOX" checked>I want to
+							share my survey
 						</div>
 						<div class="sq-np-wrapper clearfix">
-							<div id="prev-textarea-smiley" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-							<div id="next-textarea-smiley" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+							<div id="prev-textarea-smiley"
+								class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+							<div id="next-textarea-smiley"
+								class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 						</div>
 						<!-- <div class="sq-btn-wrapper">
 							<div id="submit" class="sq-btn-continue hide">Submit</div>
@@ -234,7 +252,8 @@
 				<!-- Div for MC type questions -->
 				<div data-ques-type="mcq" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
-					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema ipsum</div>
+					<div class="sq-main-txt">lorema ipsum lorema ipsum lorema
+						ipsum</div>
 					<div class="sq-ques">
 						<i><span id="mcq-ques-text" class="sq-ques-txt">lorem
 								ipsum dore it ler. lorem ipsum dore it ler. lorem ipsum dore it
@@ -246,11 +265,13 @@
 						<div id="answer-options" class="sq-mcq-wrapper"></div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
-						<div id="prev-mcq" class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
-						<div id="next-mcq" class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
+						<div id="prev-mcq"
+							class="float-left sq-np-item sq-np-item-prev btn-com">Previous</div>
+						<div id="next-mcq"
+							class="float-left sq-np-item sq-np-item-next btn-com">Next</div>
 					</div>
 				</div>
-				
+
 				<!-- Div for Error Messages -->
 				<div data-ques-type="error" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
@@ -258,11 +279,19 @@
 					<div class="sq-ques">
 						<i><span id="content" class="sq-ques-txt"></span></i>
 					</div>
-					<div class="sq-bord-bot-sm"></div>
+					<div id="social-post-lnk" class="clearfix hide">
+						<div class="sq-bord-bot-sm"></div>
+						<div class="sq-btn-social-wrapper float-left">
+							<div id="ylp-btn" class="sq-btn-continue sq-btn-post-social float-right">Yelp</div>
+						</div>
+						<div class="sq-btn-social-wrapper float-left">
+							<div id="ggl-btn" class="sq-btn-continue sq-btn-post-social float-left">Google+</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
-		
+
 		<!-- temp caching of images -->
 		<div class="hide">
 			<div class="float-left sq-mcq-chk hide st-mcq-chk-on hide"></div>
