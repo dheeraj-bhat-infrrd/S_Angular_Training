@@ -2,6 +2,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set var="user" value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 <!-- in highest roles comparison, 1 = companyAdmin, 2 = regionAdmin, 3 = branchAdmin, 4 = agent, 5 = no profile  -->
+
 <div id="hm-header-main-wrapper" class="hm-header-main-wrapper">
     <div class="container">
     	<div class="hm-header-row hm-header-row-main clearfix">
@@ -55,11 +56,12 @@
 <input class="ignore-clear" type="hidden" id="highest-role" value="${highestrole}"/>
 
 <script>
+
 $(document).ready(function() {
+	hideOverlay();
 	$(document).attr("title", "Build Hierarchy");
 	checkUserAuthorization();
 	fetchCompleteHierarchy();
-	
 	/**
 	*	display the form according to account type and highest role
 	*/

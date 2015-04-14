@@ -12,6 +12,7 @@
 </head>
 
 <body class="index-body">
+<div class="overlay-loader hide"></div>
 	<div class="body-wrapper">
 		<div class="container">
 			
@@ -211,6 +212,7 @@ $(document).ready(function(){
   	// Login form
 	$('#login-submit').click(function(){
 		loginUser();
+		showOverlay();
 	});
    
 	/* $('#login-form input').keypress(function(e){

@@ -51,6 +51,7 @@
 <script>
 var isChangePasswordFormValid;
 $(document).ready(function() {
+	hideOverlay();
 	isChangePasswordFormValid = false;
 
 	if ($('#message').val() != "") {
