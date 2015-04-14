@@ -152,6 +152,7 @@ public interface CommonConstants {
 	public static final String REMINDERS_FOR_INCOMPLETE_SURVEYS = "remindersForIncompleteSurveys";
 	public static final String LAST_REMINDER_FOR_SOCIAL_POST = "lastReminderForSocialPost";
 	public static final String REMINDERS_FOR_SOCIAL_POSTS = "remindersForSocialPosts";
+	public static final String REVIEW_COUNT_MONGO = "reviewCount";
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
@@ -312,6 +313,7 @@ public interface CommonConstants {
 	public static final String PROFILE_NAME_SOLR = "profileName";
 	public static final String PROFILE_URL_SOLR = "profileUrl";
 	public static final String PROFILE_IMAGE_URL_SOLR = "profileImageUrl";
+	public static final String REVIEW_COUNT_SOLR = "reviewCount";
 	public static final String TITLE_SOLR = "title";
 
 	/*

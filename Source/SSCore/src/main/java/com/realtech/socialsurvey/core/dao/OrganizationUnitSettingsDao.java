@@ -111,5 +111,7 @@ public interface OrganizationUnitSettingsDao {
 	 * @return
 	 */
 	public long fetchSEOOptimizedOrganizationUnitCount(String collectionName);
+
+	public void updateCompletedSurveyCountForAgent(long agentId);
 	
 }

@@ -118,11 +118,11 @@ function showDisplayPic() {
 			if (colName == 'agentId') {
 				$("#dsh-prsn-img").addClass('dsh-pers-default-img');
 			} else if (colName == 'branchId') {
-				$("#dsh-prsn-img").addClass('office-default-img');
+				$("#dsh-prsn-img").addClass('dsh-office-default-img');
 			} else if (colName == 'regionId') {
-				$("#dsh-prsn-img").addClass('region-default-img');
+				$("#dsh-prsn-img").addClass('dsh-region-default-img');
 			} else if (colName == 'companyId') {
-				$("#dsh-prsn-img").addClass('comp-default-img');
+				$("#dsh-prsn-img").addClass('dsh-comp-default-img');
 			}
 		}
 	});
@@ -184,7 +184,7 @@ function showAgentFlow(newProfileName, newProfileValue) {
 	showProfileDetails(newProfileName, 0, 30);
 	getReviewsCountAndShowReviews(newProfileName, 0);
 	showIncompleteSurvey(colName, colValue);
-
+	bindSelectButtons();
 	$("#region-div").hide();
 	$("#graph-sel-div").hide();
 	$("#dsh-srch-survey-div").hide();
@@ -710,39 +710,39 @@ function showReviews(columnName, columnValue) {
 function paintReviews(result) {
 	var divToPopulate = "";
 	$.each(result, function(i, feedback) {
-		divToPopulate += '<div data-fname='
+		divToPopulate += '<div data-fname="'
 			+ feedback.customerFirstName
-			+ ' '
-			+ 'data-lname='
+			+ '" '
+			+ ' data-lname="'
 			+ feedback.customerLastName
-			+ 'data-agentname='
+			+ '" data-agentname='
 			+ agentName
-			+ 'data-review='
+			+ ' data-review="'
 			+ feedback.review
-			+ 'class="ppl-review-item">'
-			+ '<div class="ppl-header-wrapper clearfix"><div class="float-left ppl-header-left">'
-			+ '<div class="ppl-head-1">'
+			+ '" class="ppl-review-item">'
+			+ ' <div class="ppl-header-wrapper clearfix"><div class="float-left ppl-header-left">'
+			+ ' <div class="ppl-head-1">'
 			+ feedback.customerFirstName
 			+ ' '
 			+ feedback.customerLastName
-			+ '</div>'
-			+ '<div class="ppl-head-2">'
+			+ ' </div>'
+			+ ' <div class="ppl-head-2">'
 			+ feedback.modifiedOn
-			+ '</div></div><div class="float-right ppl-header-right">'
-			+ '<div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'
+			+ ' </div></div><div class="float-right ppl-header-right">'
+			+ ' <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating='
 			+ feedback.score
-			+ '"><div class="rating-star icn-full-star"></div>'
-			+ '<div class="rating-star icn-full-star"></div><div class="rating-star icn-half-star"></div>'
-			+ '<div class="rating-star icn-no-star"></div><div class="rating-star icn-no-star"></div></div></div></div>'
-			+ '<div class="ppl-content">'
+			+ '><div class="rating-star icn-full-star"></div>'
+			+ ' <div class="rating-star icn-full-star"></div><div class="rating-star icn-half-star"></div>'
+			+ ' <div class="rating-star icn-no-star"></div><div class="rating-star icn-no-star"></div></div></div></div>'
+			+ ' <div class="ppl-content">'
 			+ feedback.review
-			+ '</div><div class="ppl-share-wrapper clearfix">'
-			+ '<div class="float-left blue-text ppl-share-shr-txt">Share</div>'
-			+ '<div class="float-left icn-share icn-plus-open" style="display: block;"></div>'
-			+ '<div class="float-left clearfix ppl-share-social hide" style="display: none;"><div class="float-left ppl-share-icns icn-fb">'
-			+ '</div><div class="float-left ppl-share-icns icn-twit"></div><div class="float-left ppl-share-icns icn-lin"></div>'
-			+ '<div class="float-left ppl-share-icns icn-yelp"></div></div>'
-			+ '<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div></div></div>';
+			+ ' </div><div class="ppl-share-wrapper clearfix">'
+			+ ' <div class="float-left blue-text ppl-share-shr-txt">Share</div>'
+			+ ' <div class="float-left icn-share icn-plus-open" style="display: block;"></div>'
+			+ ' <div class="float-left clearfix ppl-share-social hide" style="display: none;"><div class="float-left ppl-share-icns icn-fb">'
+			+ ' </div><div class="float-left ppl-share-icns icn-twit"></div><div class="float-left ppl-share-icns icn-lin"></div>'
+			+ ' <div class="float-left ppl-share-icns icn-yelp"></div></div>'
+			+ ' <div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div></div></div>';
 	});
 	if (startIndexCmp == 0)
 		$("#review-details").html(divToPopulate);
