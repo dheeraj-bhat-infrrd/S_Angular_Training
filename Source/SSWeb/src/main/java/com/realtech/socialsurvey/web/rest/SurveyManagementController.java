@@ -91,6 +91,9 @@ public class SurveyManagementController {
 	@Value("${ENABLE_KAFKA}")
 	private String enableKafka;
 
+	@Value("${YELP_REDIRECT_URI}")
+	private String yelpRedirectUri;
+
 	/*
 	 * Method to store answer to the current question of the survey.
 	 */
@@ -272,15 +275,17 @@ public class SurveyManagementController {
 			}
 			if (!captchaValidation.isCaptchaValid(request.getRemoteAddr(), challengeField, captchaResponse)) {
 				LOG.error("Captcha Validation failed!");
-				//throw new InvalidInputException("Captcha Validation failed!", DisplayMessageConstants.INVALID_CAPTCHA);
-				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE).getMessage();
+				// throw new InvalidInputException("Captcha Validation failed!",
+				// DisplayMessageConstants.INVALID_CAPTCHA);
+				String errorMsg = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.ERROR_MESSAGE)
+						.getMessage();
 				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
-				
+
 			}
 			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
 			try {
 				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
-				
+
 				surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
 				if (survey != null) {
 					stage = survey.getStage();
@@ -310,7 +315,7 @@ public class SurveyManagementController {
 					surveyAndStage.put("happyText", surveySettings.getHappyText());
 					surveyAndStage.put("neutralText", surveySettings.getNeutralText());
 					surveyAndStage.put("sadText", surveySettings.getSadText());
-					surveyAndStage.put("autopostScore", surveySettings.getAuto_post_score());
+					surveyAndStage.put("autopostScore", surveySettings.getShow_survey_above_score());
 					surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
 				}
 			}
@@ -340,6 +345,7 @@ public class SurveyManagementController {
 			String custLastName = request.getParameter("lastName");
 			String agentIdStr = request.getParameter("agentId");
 			String ratingStr = request.getParameter("rating");
+			String customerEmail = request.getParameter("customerEmail");
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -358,6 +364,11 @@ public class SurveyManagementController {
 					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
+				List<String> socialSites = new ArrayList<>();
+				socialSites.add("facebook");
+				socialSites.add("twitter");
+				socialSites.add("linkedin");
+				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
 			}
 			catch (FacebookException e) {
 				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
@@ -383,6 +394,11 @@ public class SurveyManagementController {
 				catch (TwitterException e) {
 					LOG.error("TwitterException caught in postToSocialMedia() while trying to post to twitter. Nested excption is ", e);
 				}
+			}
+
+			socialManagementService.updateLinkedin(agentSettings, twitterMessage);
+			for (OrganizationUnitSettings setting : settings) {
+				socialManagementService.updateLinkedin(setting, twitterMessage);
 			}
 		}
 		catch (NonFatalException e) {
@@ -413,11 +429,11 @@ public class SurveyManagementController {
 			LOG.error("NumberFormatException caught in getDisplayPicLocationOfAgent() while getting agent id");
 			return e.getMessage();
 		}
-		
+
 		try {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			if(agentSettings!=null){
-				if(agentSettings.getProfileImageUrl()!=null && !agentSettings.getProfileImageUrl().isEmpty()){
+			if (agentSettings != null) {
+				if (agentSettings.getProfileImageUrl() != null && !agentSettings.getProfileImageUrl().isEmpty()) {
 					picLocation = agentSettings.getProfileImageUrl();
 				}
 			}
@@ -426,10 +442,125 @@ public class SurveyManagementController {
 			LOG.error("InvalidInputException caught in getDisplayPicLocationOfAgent() while fetching image for agent.");
 			return e.getMessage();
 		}
-		
+
 		LOG.info("Method to get location of agent's image finished.");
 		return picLocation;
 	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getyelplinkrest", method = RequestMethod.GET)
+	public String getYelpLinkRest(HttpServletRequest request) {
+		LOG.info("Method to get Yelp details, getYelpLink() started.");
+		Map<String, String> yelpUrl = new HashMap<String, String>();
+		try {
+			String agentIdStr = request.getParameter("agentId");
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
+			}
+
+			long agentId = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
+				throw e;
+			}
+
+			OrganizationUnitSettings settings = userManagementService.getUserSettings(agentId);
+
+			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null) {
+				yelpUrl.put("host", yelpRedirectUri);
+				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception occured in getYelpLink() while trying to post into Yelp.");
+			ErrorResponse response = new ErrorResponse();
+			response.setErrCode("Error while trying to post on Yelp.");
+			response.setErrMessage(e.getMessage());
+			return new Gson().toJson(response);
+		}
+		LOG.info("Method to get Yelp details, getYelpLink() finished.");
+		return new Gson().toJson(yelpUrl);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getgooglepluslinkrest", method = RequestMethod.GET)
+	public String getGooglePlusLinkRest(HttpServletRequest request) {
+		LOG.info("Method to get Google details, getGooglePlusLink() started.");
+		Map<String, String> googleUrl = new HashMap<String, String>();
+		try {
+			String agentIdStr = request.getParameter("agentId");
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
+			}
+
+			long agentId = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
+				throw e;
+			}
+
+			OrganizationUnitSettings settings = userManagementService.getUserSettings(agentId);
+
+			if (settings.getProfileUrl() != null) {
+				googleUrl.put("host", surveyHandler.getGoogleShareUri());
+				googleUrl.put("profileServer", surveyHandler.getApplicationBaseUrl()+"pages/");
+				googleUrl.put("relativePath", settings.getProfileUrl());
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception occured in getGooglePlusLink() while trying to post into Google.");
+			ErrorResponse response = new ErrorResponse();
+			response.setErrCode("Error while trying to post on Google.");
+			response.setErrMessage(e.getMessage());
+			return new Gson().toJson(response);
+		}
+		LOG.info("Method to get Google details, getGooglePlusLink() finished.");
+		return new Gson().toJson(googleUrl);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/updatesharedon", method = RequestMethod.GET)
+	public String updateSharedOn(HttpServletRequest request) {
+		LOG.info("Method to get update shared on social sites details, updateSharedOn() started.");
+		
+		try {
+			String agentIdStr = request.getParameter("agentId");
+			String customerEmail = request.getParameter("customerEmail");
+			String socialSite = request.getParameter("socialSite");
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("InvalidInputException caught in getYelpLinkRest(). Agent Id cannot be null or empty.");
+			}
+
+			long agentId = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("NumberFormatException caught while trying to convert agentId in getYelpLink(). Nested exception is ", e);
+				throw e;
+			}
+			List<String> socialSites = new ArrayList<>();
+			socialSites.add(socialSite);
+			surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+			
+		}
+		catch (NonFatalException e) {
+			LOG.error("Exception occured in updateSharedOn() while trying to post into Google.");
+			ErrorResponse response = new ErrorResponse();
+			response.setErrCode("");
+			response.setErrMessage(e.getMessage());
+			return new Gson().toJson(response);
+		}
+		LOG.info("Method to get Google details, updateSharedOn() finished.");
+		return new Gson().toJson("Success");
+	}
+	
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
 			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
