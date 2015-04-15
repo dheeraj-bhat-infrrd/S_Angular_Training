@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.web.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
@@ -44,12 +45,14 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 import com.realtech.socialsurvey.core.services.social.SocialManagementService;
 import com.realtech.socialsurvey.core.services.social.api.Google2Api;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
+import com.realtech.socialsurvey.web.common.ErrorResponse;
 import com.realtech.socialsurvey.web.common.JspResolver;
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
@@ -100,6 +103,12 @@ public class SocialManagementController {
 	private String googleApiRedirectUri;
 	@Value("${GOOGLE_API_SCOPE}")
 	private String googleApiScope;
+
+	@Value("${YELP_REDIRECT_URI}")
+	private String yelpRedirectUri;
+	
+	@Value("${GOOGLE_SHARE_URI}")
+	private String googleShareUri;
 
 	/**
 	 * Returns the social authorization page
@@ -756,7 +765,7 @@ public class SocialManagementController {
 				+ " on Social Survey \n" + review;
 		for (OrganizationUnitSettings setting : settings) {
 			try {
-				if(setting!=null)
+				if (setting != null)
 					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
 			}
 			catch (FacebookException | InvalidInputException e) {
@@ -797,7 +806,7 @@ public class SocialManagementController {
 
 			for (OrganizationUnitSettings setting : settings) {
 				try {
-					if(setting!=null)
+					if (setting != null)
 						socialManagementService.tweet(setting, twitterMessage);
 				}
 				catch (TwitterException e) {
@@ -814,6 +823,100 @@ public class SocialManagementController {
 		}
 		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
 		return "Successfully posted to all the your twitter profiles";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/postonlinkedin", method = RequestMethod.GET)
+	public String postToLinkedin(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer on twitter started.");
+		String agentName = request.getParameter("agentName");
+		String custFirstName = request.getParameter("firstName");
+		String custLastName = request.getParameter("lastName");
+		String ratingStr = request.getParameter("rating");
+		String agentIdStr = request.getParameter("agentId");
+		double rating = 0;
+		try {
+			rating = Double.parseDouble(ratingStr);
+		}
+		catch (NumberFormatException e) {
+			LOG.error("Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ", e);
+			return e.getMessage();
+		}
+
+		User user = sessionHelper.getCurrentUser();
+		long userId = user.getUserId();
+
+		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
+
+		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+				+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+
+		for (OrganizationUnitSettings setting : settings) {
+			try {
+				if (setting != null)
+					socialManagementService.updateLinkedin(setting, message);
+			}
+			catch (NonFatalException e) {
+				LOG.error("NonFatalException caught in postToLinkedin() while trying to post to twitter. Nested excption is ", e);
+			}
+		}
+
+		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
+		return "Successfully posted to all the your twitter profiles";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/getyelplink", method = RequestMethod.GET)
+	public String getYelpLink(HttpServletRequest request) {
+		LOG.info("Method to get Yelp details, getYelpLink() started.");
+		Map<String, String> yelpUrl = new HashMap<String, String>();
+
+		try {
+			sessionHelper.getCanonicalSettings(request.getSession(false));
+			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
+					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null){
+				yelpUrl.put("host", yelpRedirectUri);
+				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
+			}
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("Exception occured in getYelpLink() while trying to post into Yelp.");
+			ErrorResponse response = new ErrorResponse();
+			response.setErrCode("Error while trying to post on Yelp.");
+			response.setErrMessage(e.getMessage());
+			return new Gson().toJson(response);
+		}
+		LOG.info("Method to get Yelp details, getYelpLink() finished.");
+		return new Gson().toJson(yelpUrl);
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/getgooglepluslink", method = RequestMethod.GET)
+	public String getGooglePlusLink(HttpServletRequest request) {
+		LOG.info("Method to get Google details, getGooglePlusLink() started.");
+		Map<String, String> googleUrl = new HashMap<String, String>();
+
+		try {
+			sessionHelper.getCanonicalSettings(request.getSession(false));
+			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
+					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+
+			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getGoogleToken() != null){
+				googleUrl.put("host", googleShareUri);
+				googleUrl.put("relativePath", settings.getSocialMediaTokens().getGoogleToken().getProfileLink());
+			}
+		}
+		catch (InvalidInputException | NoRecordsFetchedException e) {
+			LOG.error("Exception occured in getGooglePlusLink() while trying to post into Google.");
+			ErrorResponse response = new ErrorResponse();
+			response.setErrCode("Error while trying to post on Google.");
+			response.setErrMessage(e.getMessage());
+			return new Gson().toJson(response);
+		}
+		LOG.info("Method to get Google details, getGooglePlusLink() finished.");
+		return new Gson().toJson(googleUrl);
 	}
 
 	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens) {

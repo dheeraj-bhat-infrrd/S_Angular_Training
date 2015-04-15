@@ -5756,3 +5756,12 @@ tr.u-tbl-header td {
 .prof-sort-option {
 	
 }
+
+.sq-btn-social-wrapper {
+  width: 50%;
+}
+
+.sq-btn-post-social {
+  display: inline-block;
+  margin: 0px 30px;
+}

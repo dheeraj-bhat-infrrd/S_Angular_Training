@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.starter;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,15 +25,11 @@ public class IncompleteSocialPostReminderSender {
 				.getBean("organizationManagementService");
 		for (Company company : organizationManagementService.getAllCompanies()) {
 			List<SurveyDetails> incompleteSurveyCustomers = surveyHandler.getIncompleteSocialPostCustomersEmail(company.getCompanyId());
-			List<Long> agents = new ArrayList<>();
-			List<String> customers = new ArrayList<>();
 			for (SurveyDetails survey : incompleteSurveyCustomers) {
-				// Send email to complete survey to each customer.
+				// Send email to complete social post for survey to each customer.
 				try {
 					emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(),
 							survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName());
-					agents.add(survey.getAgentId());
-					customers.add(survey.getCustomerEmail());
 				}
 				catch (InvalidInputException | UndeliveredEmailException e) {
 					LOG.error(
@@ -42,7 +37,6 @@ public class IncompleteSocialPostReminderSender {
 									+ survey.getCustomerFirstName() + " for completion of survey. Nested exception is ", e);
 				}
 			}
-			surveyHandler.updateReminderCount(agents, customers);
 		}
 	}
 
