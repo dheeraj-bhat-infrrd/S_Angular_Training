@@ -41,6 +41,11 @@ function paintProfilePage(result) {
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		$("#profile-main-content").show();
 		if(contactDetails != undefined){
+			
+			$('#social-connect-txt').text("Contact with "+contactDetails.name+":");
+			$('#prof-header-url').text(location.href);
+			$('#prof-contact-hdr').text("Contact "+contactDetails.name)
+			
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
 				headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
@@ -50,12 +55,12 @@ function paintProfilePage(result) {
             }
             headContentHtml = headContentHtml +' </div>';
             headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
-            headContentHtml = headContentHtml + '	<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">';
-            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
+            headContentHtml = headContentHtml + '	<div class="prof-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>';
+            /*headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-full-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-half-star"></div>';
             headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>';
-            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';
+            headContentHtml = headContentHtml +  '  	<div class="rating-star icn-no-star"></div>	</div>';*/
             headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
             headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper clearfix">';
@@ -116,6 +121,10 @@ function paintProfilePage(result) {
             var webAddresses = contactDetails.web_addresses;
             if(webAddresses != undefined) {
             	if(webAddresses.work != undefined) {
+            		
+            		$('#web-addr-header').show();
+            		$('#web-address-txt').text(webAddresses.work);
+            		
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
                     contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
                     contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'">Our Website</a></div></div>';		            
@@ -173,7 +182,7 @@ function paintAverageRatings(data) {
 }
 
 function changeRatingPattern(rating, ratingParent) {
-	var counter = 0;
+	/*var counter = 0;
 	ratingParent.children().each(function() {
 		$(this).addClass("icn-no-star");
 		$(this).removeClass("icn-half-star");
@@ -189,7 +198,20 @@ function changeRatingPattern(rating, ratingParent) {
 			}
 		}
 		counter++;
-	});
+	});*/
+	
+	var ratingIntVal = parseInt(rating) + 1;
+	
+	var roundedFloatingVal = parseFloat(rating).toFixed(2);
+	
+	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>"
+	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>"
+	
+	$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
+	
+	$('#rating-avg-comp').html('');
+	
+	$('#rating-avg-comp').append(ratingImgHtml).append(ratingValHtml);
 }
 
 
@@ -569,11 +591,7 @@ function paintAllReviewsCount(data) {
 		var reviewsSizeHtml = responseJson.entity;
 		$("#profile-fetch-info").attr("total-reviews",reviewsSizeHtml);
 		if(reviewsSizeHtml > 0){
-			if(reviewsSizeHtml <= 1) {
-				reviewsSizeHtml = reviewsSizeHtml +' Review';
-			}else {
-				reviewsSizeHtml = reviewsSizeHtml +' Reviews';
-			}
+			reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
 			$("#prof-company-review-count").html(reviewsSizeHtml);
 			$("#prof-company-review-count").click(function(){
 				$(window).scrollTop($('#reviews-container').offset().top);
@@ -803,7 +821,7 @@ function paintIndividualDetails(result){
 	if(result.associations != undefined && result.associations.length > 0){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Association</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Membership</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		$.each(result.associations,function(i,associations){
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+associations.name+'</div>';
