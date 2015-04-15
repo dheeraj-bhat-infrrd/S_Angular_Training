@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
@@ -28,9 +26,11 @@ import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
@@ -1302,5 +1302,39 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		long postsCount = socialPostDao.getPostsCountByUserId(userId);
 		LOG.info("Method to fetch count of social posts for a particular user, getPostsCountForUser() finished.");
 		return postsCount;
+	}
+
+	@Override
+	public void updateLinkedInProfileData(String collectionName, OrganizationUnitSettings organizationUnitSettings,
+			LinkedInProfileData linkedInProfileData) throws InvalidInputException {
+		LOG.info("Updating linked in profile data into "+collectionName);
+		if (linkedInProfileData == null) {
+			throw new InvalidInputException("LinkedInProfile details passed can not be null");
+		}
+		LOG.info("Updating linkedin profile detail information");
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_PROFILEDATA,
+				linkedInProfileData, organizationUnitSettings, collectionName);
+		LOG.info("Updated the linkedin profile data.");
+		
+	}
+
+	@Override
+	public void updateAgentExpertise(AgentSettings agentSettings, List<String> expertise) throws InvalidInputException {
+		if(expertise == null || expertise.isEmpty()){
+			throw new InvalidInputException("Expertise list is not proper");
+		}
+		LOG.info("Updating agent expertise");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_EXPERTISE, expertise, agentSettings);
+		LOG.info("Updated agent expertise.");
+	}
+
+	@Override
+	public void updateAgentCompanyPositions(AgentSettings agentSettings, List<CompanyPositions> companyPositions) throws InvalidInputException {
+		if(companyPositions == null || companyPositions.isEmpty()){
+			throw new InvalidInputException("Company positions passed are not proper");
+		}
+		LOG.info("Updating company positions");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_COMPANY_POSITIONS, companyPositions, agentSettings);
+		LOG.info("Updated company positions.");
 	}
 }

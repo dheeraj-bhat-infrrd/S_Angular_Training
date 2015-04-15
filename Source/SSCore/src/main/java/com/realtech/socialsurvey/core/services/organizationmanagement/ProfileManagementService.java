@@ -8,8 +8,10 @@ import org.apache.solr.common.SolrDocumentList;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
+import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
+import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LockSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
@@ -345,6 +347,31 @@ public interface ProfileManagementService {
 	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize);
 
 	public long getPostsCountForUser(long userId);
+	
+	/**
+	 * Updates linkedin profile data to collection
+	 * @param collectionName
+	 * @param organizationUnitSettings
+	 * @param linkedInProfileData
+	 * @throws InvalidInputException
+	 */
+	public void updateLinkedInProfileData(String collectionName, OrganizationUnitSettings organizationUnitSettings, LinkedInProfileData linkedInProfileData) throws InvalidInputException;
+	
+	/**
+	 * Updates the expertise for agent
+	 * @param agentSettings
+	 * @param expertise
+	 * @throws InvalidInputException
+	 */
+	public void updateAgentExpertise(AgentSettings agentSettings, List<String> expertise) throws InvalidInputException;
+	
+	/**
+	 * Updates the company positions for an agent
+	 * @param agentSettings
+	 * @param companyPositions
+	 * @throws InvalidInputException
+	 */
+	public void updateAgentCompanyPositions(AgentSettings agentSettings, List<CompanyPositions> companyPositions) throws InvalidInputException;
 
 
 }

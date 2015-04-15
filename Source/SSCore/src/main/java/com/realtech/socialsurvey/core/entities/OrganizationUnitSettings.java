@@ -32,6 +32,7 @@ public class OrganizationUnitSettings {
 	private SurveySettings survey_settings;
 	private SocialMediaTokens socialMediaTokens;
 	private LockSettings lockSettings;
+	private LinkedInProfileData linkedInProfileData;
 	private String createdBy;
 	private String modifiedBy;
 	private long createdOn;
@@ -60,7 +61,7 @@ public class OrganizationUnitSettings {
 	public void setProfile_completion(float profile_completion) {
 		this.profile_completion = profile_completion;
 	}
-	
+
 	public String getProfileName() {
 		return profileName;
 	}
@@ -68,7 +69,7 @@ public class OrganizationUnitSettings {
 	public void setProfileName(String profileName) {
 		this.profileName = profileName;
 	}
-	
+
 	public String getProfileUrl() {
 		return profileUrl;
 	}
@@ -192,7 +193,7 @@ public class OrganizationUnitSettings {
 	public SocialMediaTokens getSocialMediaTokens() {
 		return socialMediaTokens;
 	}
-	
+
 	public LockSettings getLockSettings() {
 		return lockSettings;
 	}
@@ -203,6 +204,14 @@ public class OrganizationUnitSettings {
 
 	public void setSocialMediaTokens(SocialMediaTokens socialMediaTokens) {
 		this.socialMediaTokens = socialMediaTokens;
+	}
+
+	public LinkedInProfileData getLinkedInProfileData() {
+		return linkedInProfileData;
+	}
+
+	public void setLinkedInProfileData(LinkedInProfileData linkedInProfileData) {
+		this.linkedInProfileData = linkedInProfileData;
 	}
 
 	public String getCreatedBy() {

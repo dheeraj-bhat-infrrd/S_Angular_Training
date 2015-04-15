@@ -6,12 +6,16 @@ package com.realtech.socialsurvey.core.entities;
 public class ContactDetailsSettings {
 
 	private String name;
+	private String firstName;
+	private String lastName;
 	private String address;
 	private String address1;
 	private String address2;
 	private String country;
 	private String countryCode;
 	private String zipcode;
+	private String location;
+	private String industry;
 	private String about_me;
 	private String title;
 	private MailIdSettings mail_ids;
@@ -25,6 +29,22 @@ public class ContactDetailsSettings {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getAddress() {
@@ -41,6 +61,22 @@ public class ContactDetailsSettings {
 
 	public void setZipcode(String zipcode) {
 		this.zipcode = zipcode;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getIndustry() {
+		return industry;
+	}
+
+	public void setIndustry(String industry) {
+		this.industry = industry;
 	}
 
 	public String getAbout_me() {
@@ -126,8 +162,8 @@ public class ContactDetailsSettings {
 	@Override
 	public String toString() {
 		return "ContactDetailsSettings [name=" + name + ", address=" + address + ", address1=" + address1 + ", address2=" + address2 + ", country="
-				+ country + ", countryCode=" + countryCode + ", zipcode=" + zipcode + ", about_me=" + about_me + ", title=" + title + ", mail_ids=" + mail_ids
-				+ ", contact_numbers=" + contact_numbers + ", social_links=" + social_links + "]";
+				+ country + ", countryCode=" + countryCode + ", zipcode=" + zipcode + ", about_me=" + about_me + ", title=" + title + ", mail_ids="
+				+ mail_ids + ", contact_numbers=" + contact_numbers + ", social_links=" + social_links + "]";
 	}
 
 }
