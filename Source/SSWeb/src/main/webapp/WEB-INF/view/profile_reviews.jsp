@@ -4,12 +4,9 @@
 <c:choose>
 	<c:when test="${not empty reviewItems}">
 		<c:forEach var="reviewItem" items="${reviewItems}">
-			<div data-firstname="${reviewItem.customerFirstName}"
-			data-lastname="${reviewItem.customerLastName}"
-			data-review="${reviewItem.review}"
-			data-score="${reviewItem.score}"
-			data-agentname="${reviewItem.agentName}"
-			 class="ppl-review-item">
+			<div data-firstname="${reviewItem.customerFirstName}" data-lastname="${reviewItem.customerLastName}"
+				data-review="${reviewItem.review}" data-score="${reviewItem.score}"
+				data-agentname="${reviewItem.agentName}" class="ppl-review-item">
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</div>

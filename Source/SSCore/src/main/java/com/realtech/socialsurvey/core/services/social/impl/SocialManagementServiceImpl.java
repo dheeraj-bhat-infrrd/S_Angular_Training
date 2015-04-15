@@ -25,10 +25,6 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
-import com.google.code.linkedinapi.client.LinkedInApiClientFactory;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthService;
-import com.google.code.linkedinapi.client.oauth.LinkedInOAuthServiceFactory;
-import com.google.code.linkedinapi.client.oauth.LinkedInRequestToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
@@ -104,7 +100,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	 * @return
 	 */
 
-	public LinkedInRequestToken getLinkedInRequestToken() {
+	/*public LinkedInRequestToken getLinkedInRequestToken() {
 		LinkedInOAuthService oauthService = getLinkedInInstance();
 		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken();
 		requestToken = oauthService.getOAuthRequestToken();
@@ -117,7 +113,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 	public LinkedInApiClientFactory getLinkedInApiClientFactory() {
 		return LinkedInApiClientFactory.newInstance(linkedInApiKey, linkedInApiSecret);
-	}
+	}*/
 
 	/**
 	 * Returns the Twitter request token for a particular URL

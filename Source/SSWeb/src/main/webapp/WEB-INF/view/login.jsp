@@ -18,6 +18,7 @@
 </head>
 
 <body>
+<div class="overlay-loader hide"></div>
 <div class="hdr-wrapper">
 	<div class="container hdr-container clearfix">
 		<div class="float-left hdr-logo"></div>
