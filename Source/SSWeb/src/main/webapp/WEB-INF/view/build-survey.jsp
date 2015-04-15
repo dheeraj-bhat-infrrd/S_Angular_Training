@@ -221,7 +221,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
 <script>
     $(document).ready(function() {
-        
+        hideOverlay();
         $(document).on('click','.bd-srv-tbl-row',function(){
             if($(window).width() < 768){
                 if($(this).find('.srv-tbl-rem').css('display') == 'none'){

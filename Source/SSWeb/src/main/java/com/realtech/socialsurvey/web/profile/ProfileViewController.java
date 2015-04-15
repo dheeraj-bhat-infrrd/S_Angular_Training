@@ -3,16 +3,24 @@
  */
 package com.realtech.socialsurvey.web.profile;
 
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 import com.realtech.socialsurvey.core.utils.MessageUtils;
 import com.realtech.socialsurvey.web.common.JspResolver;
@@ -24,6 +32,9 @@ public class ProfileViewController {
 	
 	@Autowired
 	private MessageUtils messageUtils;
+	
+	@Autowired
+	private ProfileManagementService profileManagementService;
 	
 	
 	/**
@@ -133,6 +144,53 @@ public class ProfileViewController {
 		model.addAttribute("profileLevel", CommonConstants.PROFILE_LEVEL_INDIVIDUAL);
 		LOG.info("Service to initiate agent profile page executed successfully");
 		return JspResolver.PROFILE_PAGE;
+	}
+	
+	/**
+	 * Method called on click of the contact us link on all profile pages
+	 * @param request
+	 * @return
+	 */
+	@RequestMapping(value="/profile/sendmail",method=RequestMethod.POST)
+	public @ResponseBody String sendEmail(HttpServletRequest request){
+		
+		LOG.info("Contact us mail controller called!");
+		
+		String profileType = request.getParameter("profiletype");
+		String returnMessage = null;
+
+		try {
+			
+			if( profileType == null || profileType.isEmpty()){
+				LOG.error("Profile type not mentioned!");
+				throw new InvalidInputException("Profile type not mentioned!");
+			}
+			
+			String profileName = request.getParameter("profilename"); 				
+			String senderMailId = request.getParameter("email");
+			String message = request.getParameter("message");
+			
+			LOG.debug("Sending mail to :  "  + profileName + " from : " + senderMailId);
+				
+			profileManagementService.findProfileMailIdAndSendMail(profileName, message,
+					senderMailId,profileType);
+			LOG.debug("Mail sent!");
+			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_SENT, DisplayMessageType.SUCCESS_MESSAGE).toString();
+		} catch (InvalidInputException e) {
+			LOG.error("InvalidInputException : message : " + e.getMessage(),e);
+			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+		} catch (NoRecordsFetchedException e) {
+			LOG.error("NoRecordsFetchedException : message : " + e.getMessage(),e);
+			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+		} catch (UndeliveredEmailException e) {
+			LOG.error("UndeliveredEmailException : message : " + e.getMessage(),e);
+			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+		} catch (Exception e) {
+			LOG.error("Exception : message : " + e.getMessage(),e);			
+			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+		}
+		
+		return returnMessage;
 	}
 
 }
