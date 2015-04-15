@@ -29,7 +29,13 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	}
 
 	@Override
-	public void updateLastProcessedTimestamp(long iden, String organizationUnit) throws NonFatalException {
+	public void postProcess(long iden, String organizationUnit) throws NonFatalException {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void preProcess(long iden, String organizationUnit, TwitterToken token) {
 		// TODO Auto-generated method stub
 		
 	}

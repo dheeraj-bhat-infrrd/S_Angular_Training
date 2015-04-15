@@ -8,6 +8,14 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
  *
  */
 public interface SocialNetworkDataProcessor<K, V> {
+	
+	/**
+	 * Pre processor hook
+	 * @param iden
+	 * @param organizationUnit
+	 * @param token
+	 */
+	public void preProcess(long iden, String organizationUnit, V token);
 
 	/**
 	 * Fetches feed for the provided identifier. The identifier could be company, region, branch or agent id
@@ -28,10 +36,10 @@ public interface SocialNetworkDataProcessor<K, V> {
 	public void processFeed(List<K> feed, String organizationUnit) throws NonFatalException;
 	
 	/**
-	 * Updates the last process time
+	 * Post processor hook
 	 * @param iden
 	 * @param organizationUnit
 	 * @throws NonFatalException
 	 */
-	public void updateLastProcessedTimestamp(long iden, String organizationUnit) throws NonFatalException;
+	public void postProcess(long iden, String organizationUnit) throws NonFatalException;
 }

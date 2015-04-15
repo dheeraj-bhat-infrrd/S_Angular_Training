@@ -40,8 +40,10 @@ public class TwitterFeedIngester implements Runnable {
 	public void run() {
 		LOG.info("Starting the ingestion thread for twitter for " + collectionName + " with iden: " + iden);
 		try {
+			processor.preProcess(iden, collectionName, token);
 			List<Status> statuses = processor.fetchFeed(iden, collectionName, token);
 			processor.processFeed(statuses, collectionName);
+			processor.postProcess(iden, collectionName);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught while processesing tweets for " + collectionName + " with iden: " + iden, e);
