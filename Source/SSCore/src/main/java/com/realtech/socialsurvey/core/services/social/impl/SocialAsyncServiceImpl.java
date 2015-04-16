@@ -43,7 +43,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 		LOG.info("Method linkedInDataUpdate() called from SocialAsyncServiceImpl");
 
 		StringBuilder linkedInFetch = new StringBuilder(linkedInRestApiUri)
-				.append("(id,first-name,last-name,headline,picture-url,industry,summary,specialties,positions:(id,title,summary,start-date,end-date,is-current,company:(id,name,type,size,industry,ticker)),associations,interests,skills:(id,skill:(name)))");
+				.append("(id,first-name,last-name,headline,picture-url,industry,summary,specialties,location,picture-urls::(original),positions:(id,title,summary,start-date,end-date,is-current,company:(id,name,type,size,industry,ticker)),associations,interests,skills:(id,skill:(name)))");
 		linkedInFetch.append("?oauth2_access_token=").append(linkedInToken.getLinkedInAccessToken());
 		linkedInFetch.append("&format=json");
 		LOG.debug("URL to be posted to linked in: " + linkedInFetch.toString());
@@ -129,9 +129,9 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 
 		if (unitSettings.getProfileImageUrl() == null || unitSettings.getProfileImageUrl().isEmpty()) {
 			try {
-				if (linkedInProfileData.getPictureUrl() != null) {
-					unitSettings.setProfileImageUrl(linkedInProfileData.getPictureUrl());
-					profileManagementService.updateProfileImage(collection, unitSettings, linkedInProfileData.getPictureUrl());
+				if(linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().getValues() != null && !linkedInProfileData.getPictureUrls().getValues().isEmpty()){
+					unitSettings.setProfileImageUrl(linkedInProfileData.getPictureUrls().getValues().get(0));
+					profileManagementService.updateProfileImage(collection, unitSettings, unitSettings.getProfileImageUrl());
 				}
 			}
 			catch (InvalidInputException e) {
