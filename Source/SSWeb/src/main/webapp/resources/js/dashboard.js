@@ -199,6 +199,7 @@ function bindSelectButtons() {
 function populateSurveyStatisticsList(columnName) {
 	$("#region-div").show();
 	$("#graph-sel-div").show();
+	
 	var options = "";
 	var optionsForGraph = "";
 	if (columnName == "companyId") {
@@ -213,6 +214,7 @@ function populateSurveyStatisticsList(columnName) {
 		options += "<option value=displayName>Individual</option>";
 		optionsForGraph += "<option value=displayName>Individual</option>";
 	}
+	
 	$("#selection-list").html(options);
 	$("#graph-sel-list").html(options);
 }
@@ -587,8 +589,7 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 		},
 		complete : function(data) {
 			if (success) {
-				$('#overlay-toast').html(
-						"Reminder Mail sent successfully to " + customerName);
+				$('#overlay-toast').html("Reminder Mail sent successfully to " + customerName);
 			}
 		},
 		error : function(e) {
