@@ -32,7 +32,7 @@ public class IncompleteSurveyReminderSender {
 				// Send email to complete survey to each customer.
 				try {
 					emailServices.sendSurveyReminderMail(survey.getCustomerEmail(),
-							survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName());
+							survey.getCustomerFirstName() + " " + survey.getCustomerLastName(), survey.getAgentName(), survey.getUrl());
 					agents.add(survey.getAgentId());
 					customers.add(survey.getCustomerEmail());
 				}

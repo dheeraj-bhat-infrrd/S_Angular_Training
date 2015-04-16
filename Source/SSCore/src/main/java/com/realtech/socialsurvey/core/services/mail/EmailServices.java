@@ -149,9 +149,9 @@ public interface EmailServices {
 	public void sendSurveyCompletionMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
 			UndeliveredEmailException;
 
-	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException;
+	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException;
 
-	public void sendSurveyReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException, UndeliveredEmailException;
+	public void sendSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException, UndeliveredEmailException;
 
 	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood) throws InvalidInputException;
 

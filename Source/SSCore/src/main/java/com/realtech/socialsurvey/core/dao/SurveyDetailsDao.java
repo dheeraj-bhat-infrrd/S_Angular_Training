@@ -69,4 +69,6 @@ public interface SurveyDetailsDao {
 
 	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail);
 
+	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
+
 }

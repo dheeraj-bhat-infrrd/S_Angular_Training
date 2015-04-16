@@ -10,7 +10,6 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.common.SolrDocument;
-import org.noggit.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -239,6 +238,14 @@ public class SurveyManagementController {
 		return JspResolver.SHOW_SURVEY_QUESTIONS;
 	}
 
+	@RequestMapping(value = "/showsurveypageforurl")
+	public String initiateSurveyWithUrl(Model model, HttpServletRequest request) {
+		LOG.info("Method to start survey initiateSurveyWithUrl() started.");
+		String param = request.getParameter("q");
+		model.addAttribute("q", param);
+		LOG.info("Method to start survey initiateSurveyWithUrl() finished.");
+		return JspResolver.SHOW_SURVEY_QUESTIONS;
+	}
 	/*
 	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
@@ -247,7 +254,6 @@ public class SurveyManagementController {
 	@RequestMapping(value = "/triggersurvey")
 	public String triggerSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
-		Integer stage = null;
 		Map<String, Object> surveyAndStage = new HashMap<>();
 		try {
 			long agentId = 0;
@@ -267,7 +273,7 @@ public class SurveyManagementController {
 				captchaResponse = request.getParameter("captchaResponse");
 				challengeField = request.getParameter("recaptcha_challenge_field");
 				custRelationWithAgent = request.getParameter("relationship");
-				url = getApplicationBaseUrl() + "rest/survey/showsurveypage/" + agentId;
+				url = getApplicationBaseUrl() + "rest/survey/showsurveypageforurl";
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught in triggerSurvey(). Details are " + e);
@@ -282,46 +288,7 @@ public class SurveyManagementController {
 				throw new InvalidInputException(errorMsg, DisplayMessageConstants.INVALID_CAPTCHA);
 
 			}
-			List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
-			try {
-				SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
-
-				surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
-				if (survey != null) {
-					stage = survey.getStage();
-					for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
-						for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
-							if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
-								surveyDetails.setCustomerResponse(surveyResponse.getAnswer());
-							}
-						}
-					}
-				}
-			}
-			catch (SolrServerException e) {
-				LOG.error("SolrServerException caught in triggerSurvey(). Details are " + e);
-				ErrorResponse errorResponse = new ErrorResponse();
-				errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
-				errorResponse.setErrMessage(e.getMessage());
-				String errorMessage = JSONUtil.toJSON(errorResponse);
-				return errorMessage;
-			}
-
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService
-					.getUserByUserId(agentId));
-			if (companySettings != null) {
-				SurveySettings surveySettings = companySettings.getSurvey_settings();
-				if (surveySettings != null) {
-					surveyAndStage.put("happyText", surveySettings.getHappyText());
-					surveyAndStage.put("neutralText", surveySettings.getNeutralText());
-					surveyAndStage.put("sadText", surveySettings.getSadText());
-					surveyAndStage.put("autopostScore", surveySettings.getShow_survey_above_score());
-					surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
-				}
-			}
-			surveyAndStage.put("stage", stage);
-			surveyAndStage.put("survey", surveyQuestionDetails);
-
+			surveyAndStage = getSurvey(agentId, customerEmail, firstName, lastName, 0, custRelationWithAgent, url);
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception caught in getSurvey() method of SurveyManagementController.");
@@ -332,6 +299,31 @@ public class SurveyManagementController {
 			return errorMessage;
 		}
 		LOG.info("Method to store initial details of customer and agent and to get questions of survey, triggerSurvey() started.");
+		return new Gson().toJson(surveyAndStage);
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/triggersurveywithurl", method = RequestMethod.GET)
+	public String triggerSurveyWithUrl(HttpServletRequest request) {
+		LOG.info("Method to start survey when URL is given, triggerSurveyWithUrl() started.");
+		Map<String, Object> surveyAndStage = new HashMap<>();
+		try {
+			String url = request.getParameter("q");
+			Map<String, String> urlParams = urlGenerator.decryptParameters(url);
+			if (urlParams != null) {
+				long agentId = Long.parseLong(urlParams.get(CommonConstants.AGENT_ID_COLUMN));
+				surveyAndStage = getSurvey(agentId, urlParams.get(CommonConstants.CUSTOMER_EMAIL_COLUMN), null, null, 0, null, url);
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in triggerSurveyWithUrl().");
+			ErrorResponse errorResponse = new ErrorResponse();
+			errorResponse.setErrCode(ErrorCodes.REQUEST_FAILED);
+			errorResponse.setErrMessage(e.getMessage());
+			String errorMessage = new Gson().toJson(errorResponse);
+			return errorMessage;
+		}
+		LOG.info("Method to start survey when URL is given, triggerSurveyWithUrl() finished.");
 		return new Gson().toJson(surveyAndStage);
 	}
 
@@ -509,7 +501,7 @@ public class SurveyManagementController {
 
 			if (settings.getProfileUrl() != null) {
 				googleUrl.put("host", surveyHandler.getGoogleShareUri());
-				googleUrl.put("profileServer", surveyHandler.getApplicationBaseUrl()+"pages/");
+				googleUrl.put("profileServer", surveyHandler.getApplicationBaseUrl() + "pages/");
 				googleUrl.put("relativePath", settings.getProfileUrl());
 			}
 		}
@@ -523,12 +515,12 @@ public class SurveyManagementController {
 		LOG.info("Method to get Google details, getGooglePlusLink() finished.");
 		return new Gson().toJson(googleUrl);
 	}
-	
+
 	@ResponseBody
 	@RequestMapping(value = "/updatesharedon", method = RequestMethod.GET)
 	public String updateSharedOn(HttpServletRequest request) {
 		LOG.info("Method to get update shared on social sites details, updateSharedOn() started.");
-		
+
 		try {
 			String agentIdStr = request.getParameter("agentId");
 			String customerEmail = request.getParameter("customerEmail");
@@ -548,7 +540,7 @@ public class SurveyManagementController {
 			List<String> socialSites = new ArrayList<>();
 			socialSites.add(socialSite);
 			surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
-			
+
 		}
 		catch (NonFatalException e) {
 			LOG.error("Exception occured in updateSharedOn() while trying to post into Google.");
@@ -561,14 +553,75 @@ public class SurveyManagementController {
 		return new Gson().toJson("Success");
 	}
 	
+	@ResponseBody
+	@RequestMapping(value="/makesurveyeditable")
+	public void makeSurveyEditable(HttpServletRequest request){
+		String agentIdStr = request.getParameter("agentId");
+		String customerEmail = request.getParameter("customerEmail");
+		try{if(agentIdStr==null || agentIdStr.isEmpty()){
+			throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+		}
+		long agentId = Long.parseLong(agentIdStr);
+		surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
+		}catch(NonFatalException e){
+			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ",e);
+		}
+	}
 
 	private SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException, SolrServerException {
+			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException {
 		return surveyHandler.storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
 	}
 
 	private String getApplicationBaseUrl() {
 		return surveyHandler.getApplicationBaseUrl();
 	}
+
+	private Map<String, Object> getSurvey(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
+			String custRelationWithAgent, String url) throws InvalidInputException, SolrException, NoRecordsFetchedException {
+		Integer stage = null;
+		Map<String, Object> surveyAndStage = new HashMap<>();
+		List<SurveyQuestionDetails> surveyQuestionDetails = surveyBuilder.getSurveyByAgenId(agentId);
+		boolean editable = false;
+		try {
+			SurveyDetails survey = storeInitialSurveyDetails(agentId, customerEmail, firstName, lastName, reminderCount, custRelationWithAgent, url);
+			surveyHandler.updateSurveyAsClicked(agentId, customerEmail);
+			if (survey != null) {
+				stage = survey.getStage();
+				editable = survey.getEditable();
+				surveyAndStage.put("agentName", survey.getAgentName());
+				surveyAndStage.put("customerEmail", customerEmail);
+				for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
+					for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
+						if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
+							surveyDetails.setCustomerResponse(surveyResponse.getAnswer());
+						}
+					}
+				}
+			}
+		}
+		catch (SolrException e) {
+			LOG.error("SolrException caught in triggerSurvey(). Details are " + e);
+			throw e;
+		}
+
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(userManagementService.getUserByUserId(agentId));
+		if (companySettings != null) {
+			SurveySettings surveySettings = companySettings.getSurvey_settings();
+			if (surveySettings != null) {
+				surveyAndStage.put("happyText", surveySettings.getHappyText());
+				surveyAndStage.put("neutralText", surveySettings.getNeutralText());
+				surveyAndStage.put("sadText", surveySettings.getSadText());
+				surveyAndStage.put("autopostScore", surveySettings.getShow_survey_above_score());
+				surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
+			}
+		}
+		surveyAndStage.put("stage", stage);
+		surveyAndStage.put("survey", surveyQuestionDetails);
+		surveyAndStage.put("agentId", agentId);
+		surveyAndStage.put("editable", editable);
+		return surveyAndStage;
+	}
+
 }
 // JIRA SS-119 by RM-05 : EOC

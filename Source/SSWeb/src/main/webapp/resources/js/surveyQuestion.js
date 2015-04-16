@@ -23,6 +23,8 @@ var sadText;
 var rating;
 var firstName;
 var lastName;
+var surveyUrl = "/rest/survey/";
+var editable;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -47,7 +49,7 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 		"relationship" : relationship
 	};
 	$.ajax({
-		url : "./../triggersurvey",
+		url : window.location.origin + surveyUrl + "triggersurvey",
 		type : "GET",
 		dataType : "JSON",
 		data : payload,
@@ -77,6 +79,43 @@ function initSurvey(firstName, lastName, email, agentId, agentName,
 	});
 }
 
+function initSurveyWithUrl(q) {
+	console.log(window.location.origin);
+	var success = false;
+	var payload = {
+		"q" : q
+	};
+	$.ajax({
+		url : window.location.origin + surveyUrl + "triggersurveywithurl",
+		type : "GET",
+		dataType : "JSON",
+		data : payload,
+		success : function(data) {
+			if (data.errCode == undefined)
+				success = true;
+			else {
+				$('#overlay-toast').html(data.errMessage);
+				$("#recaptcha_reload").click();
+				showToast();
+			}
+		},
+		complete : function(data) {
+			if (success) {
+				agentId = data.responseJSON.agentId;
+				loadAgentPic(agentId);
+				agentName = data.responseJSON.agentName;
+				customerEmail = data.responseJSON.customerEmail;
+				paintSurveyPage(data);
+			}
+		},
+		error : function(e) {
+			console.error("error : " + e.responseText);
+			$('#overlay-toast').html(e.responseText);
+			showToast();
+		}
+	});
+}
+
 function loadAgentPic(agentId){
 	var imageUrl;
 	var success = false;
@@ -84,7 +123,7 @@ function loadAgentPic(agentId){
 		"agentId" : agentId
 	};
 	$.ajax({
-		url : "./../displaypiclocationofagent",
+		url : window.location.origin + surveyUrl + "displaypiclocationofagent",
 		type : "GET",
 		dataType : "text",
 		data : payload,
@@ -110,6 +149,7 @@ function paintSurveyPage(jsonData) {
 	$("#pst-srvy-div").hide();
 	questions = jsonData.responseJSON.survey;
 	stage = jsonData.responseJSON.stage;
+	editable = Boolean(jsonData.responseJSON.editable);
 	happyText = jsonData.responseJSON.happyText;
 	neutralText = jsonData.responseJSON.neutralText;
 	sadText = jsonData.responseJSON.sadText;
@@ -127,7 +167,7 @@ function paintSurveyPage(jsonData) {
  */
 function paintSurveyPageFromJson() {
 	$("div[data-ques-type]").hide();
-	if (qno == -1) {
+	if (qno == -1 && editable == false) {
 		$("div[data-ques-type]").hide();
 		$("div[data-ques-type='error']").show();
 		$('#content-head').html('Survey');
@@ -220,7 +260,7 @@ function storeCustomerAnswer(customerResponse) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		url : "./../data/storeAnswer",
+		url : window.location.origin + surveyUrl + "data/storeAnswer",
 		type : "GET",
 		data : payload,
 		dataType : "JSON",
@@ -262,7 +302,7 @@ function updateCustomerResponse(feedback) {
 	};
 	questionDetails.customerResponse = customerResponse;
 	$.ajax({
-		url : "./../data/storeFeedback",
+		url : window.location.origin + surveyUrl + "data/storeFeedback",
 		type : "GET",
 		data : payload,
 		dataType : "TEXT",
@@ -423,7 +463,7 @@ function postToSocialMedia(feedback){
 		"customerEmail" : customerEmail
 	};
 	$.ajax({
-		url : "./../posttosocialnetwork",
+		url : window.location.origin + surveyUrl + "posttosocialnetwork",
 		type : "GET",
 		dataType : "TEXT",
 		data : payload,
@@ -451,7 +491,7 @@ function updateSharedOn(socialSite, agentId, customerEmail){
 		"socialSite" : socialSite
 	};
 	$.ajax({
-		url : "./../updatesharedon",
+		url : window.location.origin + surveyUrl + "updatesharedon",
 		type : "GET",
 		dataType : "TEXT",
 		data : payload,
@@ -800,11 +840,11 @@ $('.sq-pts-dgreen').click(function() {
 });
 
 $('#ylp-btn').click(function() {
-	shareOnYelp(agentId);
+	shareOnYelp(agentId, window.location.origin+"/rest/survey/");
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
 $('#ggl-btn').click(function() {
-	shareOnGooglePlus(agentId);
+	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
 	updateSharedOn("google", agentId, customerEmail);
 });
