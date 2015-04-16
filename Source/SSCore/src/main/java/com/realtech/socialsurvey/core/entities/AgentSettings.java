@@ -7,6 +7,7 @@ public class AgentSettings extends OrganizationUnitSettings {
 	private List<String> expertise;
 	private List<String> hobbies;
 	private long reviewCount;
+	private List<CompanyPositions> positions;
 
 	public List<String> getExpertise() {
 		return expertise;
@@ -23,13 +24,21 @@ public class AgentSettings extends OrganizationUnitSettings {
 	public void setHobbies(List<String> hobbies) {
 		this.hobbies = hobbies;
 	}
-	
+
 	public long getReviewCount() {
 		return reviewCount;
 	}
 
 	public void setReviewCount(long reviewCount) {
 		this.reviewCount = reviewCount;
+	}
+
+	public List<CompanyPositions> getPositions() {
+		return positions;
+	}
+
+	public void setPositions(List<CompanyPositions> positions) {
+		this.positions = positions;
 	}
 
 	@Override
