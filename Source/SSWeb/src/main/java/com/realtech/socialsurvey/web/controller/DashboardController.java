@@ -29,7 +29,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
@@ -110,10 +110,10 @@ public class DashboardController {
 			
 			// updating session with aggregated user profiles
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			Map<Long, UserProfileSmall> profileSmallMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
-			if (profileSmallMap.size() > 0) {
-				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileSmallMap);
-				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			if (profileAbridgedMap.size() > 0) {
+				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
+				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 			}
 			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 		}
@@ -923,13 +923,13 @@ public class DashboardController {
 		
 		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
 		Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-		Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+		Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
 		String profileIdStr = request.getParameter("profileId");
 
-		UserProfile selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+		UserProfile selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileIdStr);
 		
 		session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+		session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 
 		LOG.info("Method updateSelectedProfile() finished.");
 		return CommonConstants.SUCCESS_ATTRIBUTE;
