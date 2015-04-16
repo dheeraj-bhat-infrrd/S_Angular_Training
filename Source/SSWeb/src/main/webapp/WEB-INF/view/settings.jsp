@@ -317,24 +317,27 @@ $(document).ready(function(){
 	hideOverlay();
 	$(document).attr("title", "Edit Settings");
 	
-	$('#survey-participation-mailcontent').ckeditor();
-	$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
-	
-	$('#survey-participation-reminder-mailcontent').ckeditor();
-	$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
-	
-	autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
-	changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
-	$('#rating-min-post').click(function(){
-		$('#st-dd-wrapper-min-post').slideToggle(200);
-	});
-	
-	autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
-	autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
-	autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
-	autoSetReminderIntervalStatus();
-	paintTextForMood($('#hm-main-content-wrapper').attr("data-hpy"), 
-		$('#hm-main-content-wrapper').attr("data-nutl"),
-		$('#hm-main-content-wrapper').attr("data-sad"));
+	var profileMasterId = "${profilemasterid}";
+	if (profileMasterId == 1) {
+		$('#survey-participation-mailcontent').ckeditor();
+		$('#survey-participation-mailcontent').ckeditorGet().config.readOnly = true;
+		
+		$('#survey-participation-reminder-mailcontent').ckeditor();
+		$('#survey-participation-reminder-mailcontent').ckeditorGet().config.readOnly = true;
+		
+		autoAppendRatingDropdown('#st-dd-wrapper-min-post', "st-dd-item st-dd-item-min-post");
+		changeRatingPattern($('#rating-min-post').val(), $('#rating-min-post-parent'));
+		$('#rating-min-post').click(function(){
+			$('#st-dd-wrapper-min-post').slideToggle(200);
+		});
+		
+		autoSetCheckboxStatus('#st-settings-location-on', '#st-settings-location-off', '#other-location');
+		autoSetCheckboxStatus('#st-settings-account-on', '#st-settings-account-off', '#other-account');
+		autoSetCheckboxStatus('#st-reminder-on', '#st-reminder-off', '#reminder-needed-hidden');
+		autoSetReminderIntervalStatus();
+		paintTextForMood($('#hm-main-content-wrapper').attr("data-hpy"), 
+			$('#hm-main-content-wrapper').attr("data-nutl"),
+			$('#hm-main-content-wrapper').attr("data-sad"));
+	}
 });
 </script>
