@@ -43,6 +43,15 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Value("${MAX_PAYMENT_RETRIES}")
 	private int maxPaymentRetries;
+	
+	@Value("${SENDGRID_SENDER_USERNAME}")
+	private String sendgridSenderUsername;
+	
+	@Value("${SENDGRID_SENDER_PASSWORD}")
+	private String sendgridSenderPassword;
+	
+	@Value("${SENDGRID_SENDER_NAME}")
+	private String sendgridSenderName;
 
 	@Async
 	@Override
@@ -208,9 +217,9 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderEmailId(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_USERNAME));
-		emailEntity.setSenderPassword(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_PASSWORD));
-		emailEntity.setSenderName(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_NAME));
+		emailEntity.setSenderEmailId(sendgridSenderUsername);
+		emailEntity.setSenderPassword(sendgridSenderPassword);
+		emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for registrationInvite");
