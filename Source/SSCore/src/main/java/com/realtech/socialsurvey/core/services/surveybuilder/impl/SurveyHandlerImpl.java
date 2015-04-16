@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.apache.solr.client.solrj.SolrServerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -87,7 +86,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	@Override
 	@Transactional
 	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException {
+			String custRelationWithAgent, String baseUrl) throws SolrException, NoRecordsFetchedException, InvalidInputException {
 
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() started.");
 
@@ -120,7 +119,8 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyDetails.setModifiedOn(new Date());
 		surveyDetails.setSurveyResponse(new ArrayList<SurveyResponse>());
 		surveyDetails.setCustRelationWithAgent(custRelationWithAgent);
-		surveyDetails.setUrl(url);
+		surveyDetails.setUrl(getSurveyUrl(agentId, customerEmail, baseUrl));
+		surveyDetails.setEditable(true);
 		SurveyDetails survey = surveyDetailsDao.getSurveyByAgentIdAndCustomerEmail(agentId, customerEmail);
 		LOG.info("Method to store initial details of survey, storeInitialSurveyAnswers() finished.");
 		if (survey == null) {
@@ -130,6 +130,14 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		else {
 			return survey;
 		}
+	}
+
+	@Override
+	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException {
+		Map<String, String> urlParam = new HashMap<>();
+		urlParam.put(CommonConstants.AGENT_ID_COLUMN, agentId+"");
+		urlParam.put(CommonConstants.CUSTOMER_EMAIL_COLUMN, customerEmail);
+		return urlGenerator.generateUrl(urlParam, baseUrl);
 	}
 
 	/*
@@ -339,6 +347,13 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.info("Method to update sharedOn in SurveyDetails collection, updateSharedOn() started.");
 		surveyDetailsDao.updateSharedOn(socialSites, agentId, customerEmail);
 		LOG.info("Method to update sharedOn in SurveyDetails collection, updateSharedOn() finished.");
+	}
+
+	@Override
+	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable) {
+		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started.");
+		surveyDetailsDao.changeStatusOfSurvey(agentId, customerEmail, editable);
+		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished.");
 	}
 }
 // JIRA SS-119 by RM-05:EOC

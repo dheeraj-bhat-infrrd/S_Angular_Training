@@ -65,11 +65,11 @@
 		</div>
 	</div>
 
-	<div id="prof-container" data-agentid="${agentId}" data-agentName="${agentName}" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
+	<div id="prof-container" data-q="${q}" data-agentid="${agentId}" data-agentName="${agentName}" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
 		<div class="container">
 			<div class="sq-ques-wrapper">
 				<div id="agnt-img" class="sq-top-img"></div>
-				<div data-ques-type="user-details" class="sq-quest-item">
+				<div data-ques-type="user-details" class="sq-quest-item hide">
 					<!-- <div id="agnt-img" class="sq-top-img"></div> -->
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
@@ -321,10 +321,70 @@
 <script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
 <script>
 $(document).ready(function() {
+	debugger;
+	$("div[data-ques-type]").hide();
 	
-	var agentId = $('#prof-container').attr("data-agentid");
-	loadAgentPic(agentId);
+	var q = $('#prof-container').attr("data-q");
+	console.log(q);
+	console.log("Loading captcha");
+	try {
+		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
+				'recaptcha', {
+					theme : 'white',
+					callback : captchaLoaded
+				});
+		console.log("Captcha loaded");
+	} catch (error) {
+		console.log("Could not load captcha");
+	}
 	
+	function captchaLoaded() {
+		var imgData = $(".recaptcha_image_cell").html();
+		console.log("Captcha image data : " + imgData);
+		$(".reg-captcha-img").html(imgData);
+	}
+
+	$(".reg-cap-reload").click(function() {
+		console.log("Captcha reload button clicked");
+		$("#recaptcha_reload").click();
+		console.log("Initiated the click of hidden reload");
+	});
+
+	$(".reg-cap-sound").click(function() {
+		if (captchaText == true) {
+			console.log("Captcha sound button clicked");
+			$("#recaptcha_switch_audio").click();
+			console.log("Initiated the click of hidden sound");
+			captchaText = false;
+			$(this).addClass('reg-cap-text');
+		} else {
+			console.log("Captcha text button clicked");
+			$("#recaptcha_switch_img").click();
+			console.log("Initiated the click of hidden text");
+			captchaText = true;
+			$(this).removeClass('reg-cap-text');
+		}
+	});
+
+	$(".reg-cap-info").click(function() {
+		console.log("Info button clicked");
+		$("#recaptcha_whatsthis").click();
+	});
+	// Code for captcha validation.
+	var captchaText = true;
+	resizeFunc();
+	$(window).resize(resizeFunc);
+	
+	if(q != undefined && q!=""){
+		initSurveyWithUrl(q);
+	}
+	else{
+		var agentId = $('#prof-container').attr("data-agentid");
+		$("div[data-ques-type='user-details']").show();
+		loadAgentPic(agentId);
+		
+		$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
+	}
 	var survQuesNo = 1;
 	var nextQ, prevQ;
 
@@ -379,13 +439,6 @@ $(document).ready(function() {
 		$(this).hide();
 		$(this).parent().find('.st-checkbox-on').show();
 	});
-	$("div[data-ques-type]").hide();
-	$("div[data-ques-type='user-details']").show();
-
-	// Code for captcha validation.
-	var captchaText = true;
-	resizeFunc();
-	$(window).resize(resizeFunc);
 
 	function resizeFunc() {
 		var winW = $(window).width();
@@ -394,52 +447,6 @@ $(document).ready(function() {
 			$('.reg-cap-txt').css('max-width', offset + 'px');
 		}
 	}
-
-	console.log("Loading captcha");
-	try {
-		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
-				'recaptcha', {
-					theme : 'white',
-					callback : captchaLoaded
-				});
-		console.log("Captcha loaded");
-	} catch (error) {
-		console.log("Could not load captcha");
-	}
-	
-	function captchaLoaded() {
-		var imgData = $(".recaptcha_image_cell").html();
-		console.log("Captcha image data : " + imgData);
-		$(".reg-captcha-img").html(imgData);
-	}
-
-	$(".reg-cap-reload").click(function() {
-		console.log("Captcha reload button clicked");
-		$("#recaptcha_reload").click();
-		console.log("Initiated the click of hidden reload");
-	});
-
-	$(".reg-cap-sound").click(function() {
-		if (captchaText == true) {
-			console.log("Captcha sound button clicked");
-			$("#recaptcha_switch_audio").click();
-			console.log("Initiated the click of hidden sound");
-			captchaText = false;
-			$(this).addClass('reg-cap-text');
-		} else {
-			console.log("Captcha text button clicked");
-			$("#recaptcha_switch_img").click();
-			console.log("Initiated the click of hidden text");
-			captchaText = true;
-			$(this).removeClass('reg-cap-text');
-		}
-	});
-
-	$(".reg-cap-info").click(function() {
-		console.log("Info button clicked");
-		$("#recaptcha_whatsthis").click();
-	});
-	$("#cust-agnt-rel").html(paintListOptions($('#prof-container').attr("data-agentName")));
 });
 </script>
 <jsp:include page="footer.jsp" />

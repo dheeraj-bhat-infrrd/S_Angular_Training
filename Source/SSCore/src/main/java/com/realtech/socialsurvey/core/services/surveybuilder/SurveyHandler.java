@@ -41,7 +41,7 @@ public interface SurveyHandler {
 	public void updateGatewayQuestionResponseAndScore(long agentId, String customerEmail, String mood, String review, boolean isAbusive);
 
 	public SurveyDetails storeInitialSurveyDetails(long agentId, String customerEmail, String firstName, String lastName, int reminderCount,
-			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, SolrServerException, InvalidInputException;
+			String custRelationWithAgent, String url) throws SolrException, NoRecordsFetchedException, InvalidInputException;
 
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail);
 
@@ -67,5 +67,9 @@ public interface SurveyHandler {
 
 	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail);
 
-	String getGoogleShareUri();
+	public String getGoogleShareUri();
+
+	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException;
+
+	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable);
 }

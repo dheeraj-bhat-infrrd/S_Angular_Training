@@ -680,18 +680,23 @@ public class DashboardController {
 					throw new InvalidInputException("Invalid value (null/empty) passed for agentIdStr.");
 				}
 				agentId = Long.parseLong(agentIdStr);
-			}
+			} 
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ", e);
 				throw e;
 			}
+			String surveyLink = "";
+			SurveyDetails survey = surveyHandler.getSurveyDetails(agentId, customerEmail);
+			if(survey!=null){
+				surveyLink = survey.getUrl();
+			}
 			
 			try {
 				if (enableKafka.equals(CommonConstants.YES)) {
-					emailServices.queueSurveyReminderMail(customerEmail, customerName, agentName);
+					emailServices.queueSurveyReminderMail(customerEmail, customerName, agentName, surveyLink);
 				}
 				else {
-					emailServices.sendSurveyReminderMail(customerEmail, customerName, agentName);
+					emailServices.sendSurveyReminderMail(customerEmail, customerName, agentName, surveyLink);
 				}
 			}
 			catch (InvalidInputException e) {
