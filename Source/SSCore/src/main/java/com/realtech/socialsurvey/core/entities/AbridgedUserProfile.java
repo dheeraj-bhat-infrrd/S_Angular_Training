@@ -1,6 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
-public class UserProfileSmall {
+public class AbridgedUserProfile {
 
 	private long userProfileId;
 	private String userProfileName;

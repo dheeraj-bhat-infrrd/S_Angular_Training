@@ -285,13 +285,13 @@ function shareOnLinkedin(firstName, lastName, agentName, review, score){
 		});
 }
 
-function shareOnYelp(agentId){
+function shareOnYelp(agentId, location){
 	var success= false;
 	var payload = {
 			"agentId" : agentId
 	};
 	$.ajax({
-		url : "./../getyelplinkrest",
+		url : location + "getyelplinkrest",
 		type : "GET",
 		dataType : "json",
 		data : payload,
@@ -313,13 +313,13 @@ function shareOnYelp(agentId){
 	});
 }
 
-function shareOnGooglePlus(agentId){
+function shareOnGooglePlus(agentId, location){
 	var success= false;
 	var payload = {
 			"agentId" : agentId
 	};
 	$.ajax({
-		url : "./../getgooglepluslinkrest",
+		url : location + "getgooglepluslinkrest",
 		type : "GET",
 		dataType : "json",
 		data : payload,
