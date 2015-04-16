@@ -378,18 +378,6 @@ public class OrganizationManagementController {
 		}
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 
-		// setting userprofile settings in session
-		try {
-			OrganizationUnitSettings profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings,
-					selectedProfile.getBranchId(), selectedProfile.getRegionId(), selectedProfile.getProfilesMaster().getProfileId());
-			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-		}
-		catch (InvalidInputException e) {
-			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-					
 		return JspResolver.EDIT_SETTINGS;
 	}
 
