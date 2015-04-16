@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.starter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -17,15 +20,19 @@ public class IncompleteSocialPostReminderSender {
 
 	public static final Logger LOG = LoggerFactory.getLogger(IncompleteSocialPostReminderSender.class);
 
+	private static List<String> socialSites = new ArrayList<>();
+	
 	public static void main(String[] args) {
 		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
 		SurveyHandler surveyHandler = (SurveyHandler) context.getBean("surveyHandler");
 		EmailServices emailServices = (EmailServices) context.getBean("emailServices");
+		populateSocialSites();
 		OrganizationManagementService organizationManagementService = (OrganizationManagementService) context
 				.getBean("organizationManagementService");
 		for (Company company : organizationManagementService.getAllCompanies()) {
-			List<SurveyDetails> incompleteSurveyCustomers = surveyHandler.getIncompleteSocialPostCustomersEmail(company.getCompanyId());
-			for (SurveyDetails survey : incompleteSurveyCustomers) {
+			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostCustomersEmail(company.getCompanyId());
+			for (SurveyDetails survey : incompleteSocialPostCustomers) {
+				getRemainingSites(new HashSet<String>(survey.getSharedOn()));
 				// Send email to complete social post for survey to each customer.
 				try {
 					emailServices.sendSocialPostReminderMail(survey.getCustomerEmail(),
@@ -38,6 +45,20 @@ public class IncompleteSocialPostReminderSender {
 				}
 			}
 		}
+	}
+	
+	private static void populateSocialSites(){
+		socialSites.add("facebook");
+		socialSites.add("twitter");
+		socialSites.add("yelp");
+		socialSites.add("google");
+		socialSites.add("linkedin");
+	}
+
+	private static List<String> getRemainingSites(Set<String> sharedOn) {
+		List<String> allElems = new ArrayList<String>(socialSites);
+		allElems.removeAll(sharedOn);
+		return allElems;
 	}
 
 }

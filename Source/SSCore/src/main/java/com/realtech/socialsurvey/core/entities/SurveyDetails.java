@@ -30,6 +30,7 @@ public class SurveyDetails {
 	private List<Date> remindersForSocialPosts;
 	private String url;
 	private List<SurveyResponse> surveyResponse;
+	private boolean editable;
 	
 	public long getAgentId() {
 		return agentId;
@@ -180,5 +181,11 @@ public class SurveyDetails {
 	}
 	public void setUrl(String url) {
 		this.url = url;
+	}
+	public boolean getEditable() {
+		return editable;
+	}
+	public void setEditable(boolean editable) {
+		this.editable = editable;
 	}
 }

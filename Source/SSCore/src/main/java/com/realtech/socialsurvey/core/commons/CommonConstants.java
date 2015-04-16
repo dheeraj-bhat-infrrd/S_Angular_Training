@@ -153,6 +153,7 @@ public interface CommonConstants {
 	public static final String LAST_REMINDER_FOR_SOCIAL_POST = "lastReminderForSocialPost";
 	public static final String REMINDERS_FOR_SOCIAL_POSTS = "remindersForSocialPosts";
 	public static final String REVIEW_COUNT_MONGO = "reviewCount";
+	public static final String EDITABLE_SURVEY_COLUMN = "editable";
 	
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
