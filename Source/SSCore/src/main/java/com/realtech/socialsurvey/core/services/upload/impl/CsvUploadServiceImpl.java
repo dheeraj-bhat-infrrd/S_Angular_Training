@@ -1,0 +1,530 @@
+package com.realtech.socialsurvey.core.services.upload.impl;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.dao.GenericDao;
+import com.realtech.socialsurvey.core.dao.UserDao;
+import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.BranchUploadVO;
+import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.RegionUploadVO;
+import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserUploadVO;
+import com.realtech.socialsurvey.core.enums.AccountType;
+import com.realtech.socialsurvey.core.exception.BranchAdditionException;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.exception.RegionAdditionException;
+import com.realtech.socialsurvey.core.exception.UserAdditionException;
+import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
+import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
+
+@Component
+public class CsvUploadServiceImpl implements CsvUploadService {
+
+	@Autowired
+	private OrganizationManagementService organizationManagementService;
+
+	@Autowired
+	private UserDao userDao;
+
+	@Autowired
+	private GenericDao<Branch, Long> branchDao;
+
+	@Autowired
+	private GenericDao<Region, Long> regionDao;
+
+	private static Logger LOG = LoggerFactory.getLogger(CsvUploadServiceImpl.class);
+	
+	/**
+	 * Parses a csv and returns a map of lists of users,branches and regions
+	 * @param fileName
+	 * @return
+	 */
+	@Transactional
+	@Override
+	public Map<String, List<Object>> parseCsv(String fileName) {
+
+		Map<String, List<Object>> uploadObjects = new HashMap<String, List<Object>>();
+
+//		UserUploadVO userUploadVO = new UserUploadVO();
+//		userUploadVO.setEmailId("karthik.srivatsa+31@raremile.com");
+//		//userUploadVO.setBelongsToCompany(true);
+//		userUploadVO.setAssignedBranchName("Blah2");
+//		userUploadVO.setBranchAdmin(false);
+//		// userUploadVO.setAssignedRegionName("Blah Region 2");
+//		// userUploadVO.setRegionAdmin(true);
+//		
+		UserUploadVO userUploadVO2 = new UserUploadVO();
+		userUploadVO2.setEmailId("karthik.srivatsa+34@raremile.com");
+		//userUploadVO.setBelongsToCompany(true);
+		userUploadVO2.setAssignedBranchName("Blah2");
+		userUploadVO2.setBranchAdmin(true);
+//		userUploadVO2.setAssignedRegionName("Blah Region 2");
+//		userUploadVO2.setRegionAdmin(true);
+//		
+//		UserUploadVO userUploadVO3 = new UserUploadVO();
+//		userUploadVO3.setEmailId("karthik.srivatsa+32@raremile.com");
+//		//userUploadVO.setBelongsToCompany(true);
+//		// userUploadVO.setAssignedBranchName("Blah2");
+//		// userUploadVO.setBranchAdmin(false);
+//		userUploadVO3.setAssignedRegionName("Blah Region 2");
+//		userUploadVO3.setRegionAdmin(true);
+
+//		BranchUploadVO branchUploadVO = new BranchUploadVO();
+//		//branchUploadVO.setAssignToCompany(true);
+//		branchUploadVO.setBranchName("Blah2");
+//		branchUploadVO.setBranchAddress1("Blah address1");
+//		branchUploadVO.setBranchAddress2("Blah address2");
+//		branchUploadVO.setAssignedRegionName("Blah Region 2");
+		
+//		BranchUploadVO branchUploadVO2 = new BranchUploadVO();
+//		// branchUploadVO.setAssignToCompany(true);
+//		branchUploadVO2.setBranchName("Blah3");
+//		branchUploadVO2.setBranchAddress1("Blah address1");
+//		branchUploadVO2.setBranchAddress2("Blah address2");
+//		branchUploadVO2.setAssignedRegionName("Blah Region");
+//		
+//		BranchUploadVO branchUploadVO3 = new BranchUploadVO();
+//		branchUploadVO.setAssignToCompany(true);
+//		branchUploadVO3.setBranchName("Blah4");
+//		branchUploadVO3.setBranchAddress1("Blah address1");
+//		branchUploadVO3.setBranchAddress2("Blah address2");
+//		// branchUploadVO.setAssignedRegionName("Blah Region");
+		
+//
+//		RegionUploadVO regionUploadVO = new RegionUploadVO();
+//		regionUploadVO.setRegionName("Blah Region 2");
+//		regionUploadVO.setRegionAddress1("Blah region address 1");
+//		regionUploadVO.setRegionAddress2("Blah region address 2");
+
+//		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO,(Object)userUploadVO2,(Object)userUploadVO3));
+//		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO,(Object) branchUploadVO2,(Object) branchUploadVO3));
+//		uploadObjects.put(CommonConstants.REGIONS_MAP_KEY, Arrays.asList((Object) regionUploadVO));
+//		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO));
+//		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO2));
+
+
+
+		return uploadObjects;
+	}
+
+	private boolean validateUser(String emailId, Company company) {
+		boolean status = false;
+		try {
+			userDao.getActiveUser(emailId);
+		}
+		catch (NoRecordsFetchedException e) {
+			status = true;
+		}
+		return status;
+	}
+
+	private boolean validateBranch(BranchUploadVO branchUploadVO, Company company) throws InvalidInputException, NoRecordsFetchedException, BranchAdditionException {
+		boolean status = false;
+
+		if (branchUploadVO.isAssignToCompany()) {
+			Region defaultRegion = organizationManagementService.getDefaultRegionForCompany(company);
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.BRANCH_NAME_COLUMN, branchUploadVO.getBranchName());
+			queries.put(CommonConstants.REGION_COLUMN, defaultRegion);
+			queries.put(CommonConstants.COMPANY_COLUMN, company);
+			List<Branch> existingBranches = branchDao.findByKeyValue(Branch.class, queries);
+			if (existingBranches == null || existingBranches.isEmpty()) {
+				status = true;
+			}
+		}
+		else if (branchUploadVO.getAssignedRegionName()!= null && !branchUploadVO.getAssignedRegionName().isEmpty()) {
+			List<Region> regions = regionDao.findByColumn(Region.class, CommonConstants.REGION_NAME_COLUMN, branchUploadVO.getAssignedRegionName());
+			if(regions == null || regions.isEmpty()){
+				LOG.error("Invalid region name given!");
+				throw new BranchAdditionException("Invalid region name given!");
+			}
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.BRANCH_NAME_COLUMN, branchUploadVO.getBranchName());
+			queries.put(CommonConstants.REGION_COLUMN, regions.get(CommonConstants.INITIAL_INDEX));
+			queries.put(CommonConstants.COMPANY_COLUMN, company);
+			List<Branch> existingBranches = branchDao.findByKeyValue(Branch.class, queries);
+			if (existingBranches == null || existingBranches.isEmpty()) {
+				status = true;
+			}
+		}
+		else {
+			LOG.error("Please specify where the branch belongs");
+			throw new BranchAdditionException("Please specify where the branch belongs");
+		}
+		return status;
+	}
+	
+	private boolean validateRegion(RegionUploadVO regionUploadVO,Company company){
+		
+		List<Region> regions = null;
+		boolean status = false;
+		
+		Map<String, Object> queries = new HashMap<String, Object>();
+		queries.put(CommonConstants.REGION_NAME_COLUMN, regionUploadVO.getRegionName());
+		queries.put(CommonConstants.COMPANY_COLUMN, company);
+		regions = regionDao.findByKeyValue(Region.class,queries);
+		
+		if (regions == null || regions.isEmpty()) {
+			status = true;			
+		}
+		
+		return status;
+	}
+
+	private Company getCompany(User user) throws InvalidInputException {
+		Company company = user.getCompany();
+		if (company == null) {
+			LOG.error("Company property not found in admin user object!");
+			throw new InvalidInputException("Company property not found in admin user object!");
+
+		}
+		return company;
+	}
+
+	private LicenseDetail getLicenseDetail(Company company) throws InvalidInputException {
+		LicenseDetail companyLicenseDetail = null;
+		if (company.getLicenseDetails() != null && !company.getLicenseDetails().isEmpty()) {
+			companyLicenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+		}
+		else {
+			LOG.error("License Detail property not found in admin user's company object!");
+			throw new InvalidInputException("License Detail property not found in admin user's company object!");
+		}
+		return companyLicenseDetail;
+	}
+
+	private void addUser(UserUploadVO user, User adminUser) throws InvalidInputException, NoRecordsFetchedException, SolrException,
+			UserAssignmentException, UserAdditionException {
+
+		if (user.isBelongsToCompany()) {
+			// He belongs to the company
+			LOG.debug("Adding user : " + user.getEmailId() + " belongs to company");
+			organizationManagementService.addIndividual(adminUser, 0, 0, 0, new String[] { user.getEmailId() }, false);
+		}
+		else if (user.getAssignedBranchName() != null) {
+			// He belongs to a branch
+			LOG.debug("Adding user : " + user.getEmailId() + " belongs to branch : " + user.getAssignedBranchName());
+			List<Branch> branches = branchDao.findByColumn(Branch.class, CommonConstants.BRANCH_NAME_COLUMN, user.getAssignedBranchName());
+			if (branches == null || branches.isEmpty()) {
+				LOG.error("Branch name is invalid!");
+				throw new UserAdditionException("Branch name is invalid!");
+			}
+			if(branches.size() > 1){
+				LOG.error("Ambuigity in assigning to branch. More than one braches of the name found");
+				throw new UserAdditionException("Ambuigity in assigning to branch. More than one braches of the name found");
+			}
+			else {
+				Branch branch = branches.get(CommonConstants.INITIAL_INDEX);
+				if (user.isBranchAdmin()) {
+					LOG.debug("User is the branch admin");
+					organizationManagementService.addIndividual(adminUser, 0, branch.getBranchId(), branch.getRegion().getRegionId(),
+							new String[] { user.getEmailId() }, true);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+				else {
+					LOG.debug("User is not the branch admin");
+					organizationManagementService.addIndividual(adminUser, 0, branch.getBranchId(), branch.getRegion().getRegionId(),
+							new String[] { user.getEmailId() }, false);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+			}
+		}
+		else if (user.getAssignedRegionName() != null) {
+			// He belongs to the region
+			LOG.debug("Adding user : " + user.getEmailId() + " belongs to region : " + user.getAssignedRegionName());
+			List<Region> regions = regionDao.findByColumn(Region.class, CommonConstants.REGION_NAME_COLUMN, user.getAssignedRegionName());
+			if (regions == null || regions.isEmpty()) {
+				LOG.error("Region name is invalid!");
+				throw new UserAdditionException("Region name is invalid!");
+			}
+			else {
+				Region region = regions.get(CommonConstants.INITIAL_INDEX);
+				if (user.isRegionAdmin()) {
+					LOG.debug("User is the region admin.");
+					organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, true);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+				else {
+					LOG.debug("User is not the admin of the region");
+					organizationManagementService.addIndividual(adminUser, 0, 0, region.getRegionId(), new String[] { user.getEmailId() }, false);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+			}
+		}
+		else {
+			LOG.error("Please specifiy where the user belongs!");
+			throw new UserAdditionException("Please specifiy where the user belongs!");
+		}
+
+	}
+	
+	/**
+	 * Creates a user and assigns him under the appropriate branch or region else company.
+	 * @param adminUser
+	 * @param user
+	 * @throws InvalidInputException
+	 * @throws UserAdditionException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 * @throws UserAssignmentException
+	 */
+	@Transactional
+	@Override
+	public void createUser(User adminUser, UserUploadVO user) throws InvalidInputException, UserAdditionException, NoRecordsFetchedException,
+			SolrException, UserAssignmentException {
+
+		if (adminUser == null) {
+			LOG.error("admin user parameter is null!");
+			throw new InvalidInputException("admin user parameter is null!");
+		}
+		if (user == null) {
+			LOG.error("user parameter is null!");
+			throw new InvalidInputException("user parameter is null!");
+		}
+
+		LOG.info("createUser called to create user : " + user.getEmailId());
+		Company company = getCompany(adminUser);
+		LicenseDetail companyLicenseDetail = getLicenseDetail(company);
+
+		if (userDao.getUsersCountForCompany(company) >= companyLicenseDetail.getAccountsMaster().getMaxUsersAllowed()) {
+			LOG.error("Max number of users added! Cannot add more users.");
+			throw new UserAdditionException("Max number of users added! Cannot add more users.");
+		}
+		else {
+			if (!user.getEmailId().matches(CommonConstants.EMAIL_REGEX)) {
+				LOG.error("Email id for the user is invalid!");
+				throw new UserAdditionException("Email id for the user is invalid!");
+			}
+		}
+
+		if (validateUser(user.getEmailId(), company)) {
+			LOG.debug("Validations complete, adding user!");
+			addUser(user, adminUser);
+			LOG.debug("User added!");
+		}
+		else {
+			LOG.error("User with the email id already exists!");
+			throw new UserAdditionException("User with the email id already exists!");
+		}
+	}
+	
+	/**
+	 * Creates a branch and assigns it under the appropriate region or company
+	 * @param adminUser
+	 * @param branch
+	 * @throws InvalidInputException
+	 * @throws BranchAdditionException
+	 * @throws SolrException
+	 * @throws NoRecordsFetchedException
+	 */
+	@Transactional
+	@Override
+	public void createBranch(User adminUser, BranchUploadVO branch) throws InvalidInputException, BranchAdditionException, SolrException, NoRecordsFetchedException {
+		if (adminUser == null) {
+			LOG.error("admin user parameter is null!");
+			throw new InvalidInputException("admin user parameter is null!");
+		}
+		if (branch == null) {
+			LOG.error("branch parameter is null!");
+			throw new InvalidInputException("branch parameter is null!");
+		}
+
+		LOG.info("createBranch called to create branch :  " + branch.getBranchName());
+		Company company = getCompany(adminUser);
+		LicenseDetail companyLicenseDetail = getLicenseDetail(company);
+
+		if (organizationManagementService.isBranchAdditionAllowed(adminUser,
+				AccountType.getAccountType(companyLicenseDetail.getAccountsMaster().getAccountsMasterId()))) {
+			
+			if(!validateBranch(branch, company)){
+				LOG.error("Branch with the name already exists!");
+				throw new BranchAdditionException("Branch with the name already exists!");
+			}
+
+			if (branch.getAssignedRegionName() != null) {
+				// He belongs to the region
+				LOG.debug("Adding branch : " + branch.getBranchName() + " belongs to region : " + branch.getAssignedRegionName());
+				List<Region> regions = regionDao.findByColumn(Region.class, CommonConstants.REGION_NAME_COLUMN, branch.getAssignedRegionName());
+				if (regions == null || regions.isEmpty()) {
+					LOG.error("Region name is invalid!");
+					throw new BranchAdditionException("Region name is invalid!");
+				}
+				else {
+					Region region = regions.get(CommonConstants.INITIAL_INDEX);
+					organizationManagementService.addNewBranch(adminUser, region.getRegionId(), CommonConstants.NO, branch.getBranchName(),
+							branch.getBranchAddress1(), branch.getBranchAddress2());
+					LOG.debug("Branch added!");
+				}
+			}
+			else if (branch.isAssignToCompany()) {
+				LOG.debug("adding branch : " + branch.getBranchName() + " under the company!");
+				organizationManagementService.addNewBranch(adminUser, 0l, CommonConstants.NO, branch.getBranchName(), branch.getBranchAddress1(),
+						branch.getBranchAddress2());
+				LOG.debug("Branch added!");
+			}
+			else {
+				LOG.error("Please specifiy where the branch belongs!");
+				throw new BranchAdditionException("Please specifiy where the branch belongs!");
+			}
+		}
+		else {
+			LOG.error("admin user : " + adminUser.getEmailId() + " is not authorized to add branches! Accounttype : "
+					+ companyLicenseDetail.getAccountsMaster().getAccountName());
+			throw new BranchAdditionException("admin user : " + adminUser.getEmailId() + " is not authorized to add branches!");
+		}
+	}
+	
+	/**
+	 * Creates a region
+	 * @param adminUser
+	 * @param region
+	 * @throws InvalidInputException
+	 * @throws RegionAdditionException
+	 * @throws SolrException
+	 */
+	@Transactional
+	@Override
+	public void createRegion(User adminUser, RegionUploadVO region) throws InvalidInputException, RegionAdditionException, SolrException {
+		if (adminUser == null) {
+			LOG.error("admin user parameter is null!");
+			throw new InvalidInputException("admin user parameter is null!");
+		}
+		if (region == null) {
+			LOG.error("region parameter is null!");
+			throw new InvalidInputException("region parameter is null!");
+		}
+		LOG.info("createRegion called to add region : " + region.getRegionName());
+		Company company = getCompany(adminUser);
+		LicenseDetail licenseDetail = getLicenseDetail(company);
+
+		if (organizationManagementService.isRegionAdditionAllowed(adminUser,
+				AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId()))) {
+			if(!validateRegion(region, company)){
+				LOG.error("Region with that name already exists!");
+				throw new RegionAdditionException("Region with that name already exists!");
+			}
+			LOG.debug("Adding region : " + region.getRegionName());
+			Region newRegion = organizationManagementService.addNewRegion(adminUser, region.getRegionName(), CommonConstants.NO,
+					region.getRegionAddress1(), region.getRegionAddress2());
+			organizationManagementService.addNewBranch(adminUser, newRegion.getRegionId(), CommonConstants.YES, CommonConstants.DEFAULT_BRANCH_NAME,
+					CommonConstants.DEFAULT_ADDRESS, null);
+		}
+		else {
+			LOG.error("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");
+			throw new RegionAdditionException("admin user : " + adminUser.getEmailId() + " is not authorized to add regions");
+		}
+
+	}
+	
+	/**
+	 * Used to get the admin user while testing
+	 * @return
+	 */
+	@Transactional
+	@Override
+	public User getUser(long userId) {
+		User adminUser = userDao.findById(User.class, userId);
+		return adminUser;
+	}
+	
+	/**
+	 * Takes a map of objects and creates them and returns list of errors if any
+	 * @param uploadObjects
+	 * @param adminUser
+	 * @return
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws SolrException
+	 * @throws UserAssignmentException
+	 */
+	@Transactional
+	@Override
+	public List<String> createAndReturnErrors(Map<String, List<Object>> uploadObjects, User adminUser) throws InvalidInputException,
+			NoRecordsFetchedException, SolrException, UserAssignmentException {
+
+		if (uploadObjects == null || uploadObjects.isEmpty()) {
+			LOG.error("uploadObjects parameter is null or empty!");
+			throw new InvalidInputException("uploadObjects parameter is null or empty!");
+		}
+		List<String> errorList = new ArrayList<String>();
+		LOG.info("Creating all the users,branches and regions");
+
+		// First we create all the users
+		List<Object> userUploadVOs = uploadObjects.get(CommonConstants.USERS_MAP_KEY);
+		if (userUploadVOs != null && !userUploadVOs.isEmpty()) {
+			LOG.debug("Creating all the users");
+			UserUploadVO user = null;
+			for (Object userUploadVO : userUploadVOs) {
+				try {
+					user = (UserUploadVO) userUploadVO;
+					LOG.debug("Creating user : " + user.getEmailId());
+					createUser(adminUser, user);
+					user = null;
+				}
+				catch (UserAdditionException e) {
+					LOG.error("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+					errorList.add("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+				}
+			}
+			LOG.debug("Creation of all users complete!");
+		}
+
+		// We create all the branches
+		List<Object> branchUploadVOs = uploadObjects.get(CommonConstants.BRANCHES_MAP_KEY);
+		if (branchUploadVOs != null && !branchUploadVOs.isEmpty()) {
+			LOG.debug("Creating all the branches");
+			BranchUploadVO branch = null;
+			for (Object branchUploadVO : branchUploadVOs) {
+				try {
+					branch = (BranchUploadVO) branchUploadVO;
+					LOG.debug("Creating branch : " + branch.getBranchName());
+					createBranch(adminUser, branch);
+					branch = null;
+				}
+				catch (BranchAdditionException e) {
+					LOG.error("ERROR : " + " while adding branch : " + branch.getBranchName() + " message : " + e.getMessage());
+					errorList.add("ERROR : " + " while adding branch : " + branch.getBranchName() + " message : " + e.getMessage());
+				}
+			}
+			LOG.debug("Creation of all branches complete!");
+		}
+
+		// We create all the regions
+		List<Object> regionUploadVOs = uploadObjects.get(CommonConstants.REGIONS_MAP_KEY);
+		if (regionUploadVOs != null && !regionUploadVOs.isEmpty()) {
+			LOG.debug("Creating all the regions");
+			RegionUploadVO region = null;
+			for (Object regionUploadVO : regionUploadVOs) {
+				try {
+					region = (RegionUploadVO) regionUploadVO;
+					LOG.debug("Creating region : " + region.getRegionName());
+					createRegion(adminUser, region);
+					region = null;
+				}
+				catch (RegionAdditionException e) {
+					LOG.error("ERROR : " + " while adding region : " + region.getRegionName() + " message : " + e.getMessage());
+					errorList.add("ERROR : " + " while adding region : " + region.getRegionName() + " message : " + e.getMessage());
+				}
+			}
+			LOG.debug("Creation of all regions complete!");
+		}
+
+		LOG.info("Objects created. Returning the list of errors");
+
+		return errorList;
+	}
+}
