@@ -3,6 +3,8 @@ package com.realtech.socialsurvey.core.feed.impl;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import twitter4j.Status;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
@@ -10,6 +12,7 @@ import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 
 @Component
+@Scope(value=ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Status, TwitterToken> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedProcessorImpl.class);
