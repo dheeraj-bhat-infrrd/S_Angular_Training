@@ -64,7 +64,7 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
             headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper clearfix">';
-            headContentHtml = headContentHtml +'		<div class="prof-btn-contact float-left" id="">Contact '+contactDetails.name+'</div>';
+            headContentHtml = headContentHtml +'		<div class="prof-btn-contact float-left" id="" onclick="focusOnContact()" >Contact '+contactDetails.name+'</div>';
             headContentHtml = headContentHtml +'		<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>';
             headContentHtml = headContentHtml +'	</div>';            
             $("#prof-company-head-content").html(headContentHtml);
@@ -168,6 +168,14 @@ function paintProfilePage(result) {
 	}
 }
 
+function focusOnContact() {
+	
+	$('html, body').animate({
+	      scrollTop: $('#prof-contact-hdr').offset().top
+	 }, 1000);
+	$('#prof-contact-form input:nth(0)').focus();		
+}
+
 function fetchAverageRatings(companyId) {
 	var url = window.location.origin +'/rest/profile/company/'+companyId+'/ratings';
 	callAjaxGET(url, paintAverageRatings, true);
@@ -177,11 +185,11 @@ function paintAverageRatings(data) {
 	var responseJson = $.parseJSON(data);
 	if(responseJson != undefined) {
 		var rating = $.parseJSON(responseJson.entity);
-		changeRatingPattern(rating,$("#rating-avg-comp"));
+		changeRatingPattern(rating,$("#rating-avg-comp"),true);
 	}
 }
 
-function changeRatingPattern(rating, ratingParent) {
+function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	/*var counter = 0;
 	ratingParent.children().each(function() {
 		$(this).addClass("icn-no-star");
@@ -202,16 +210,23 @@ function changeRatingPattern(rating, ratingParent) {
 	
 	var ratingIntVal = parseInt(rating) + 1;
 	
+	if(ratingIntVal >=5){
+		ratingIntVal = 5;
+	}
+	
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);
 	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>"
-	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>"
+	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
+	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
 	
-	$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
+	if(isOverallRating){
+		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
+		$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
+	}
 	
-	$('#rating-avg-comp').html('');
+	ratingParent.html('');
 	
-	$('#rating-avg-comp').append(ratingImgHtml).append(ratingValHtml);
+	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
 
 
@@ -508,11 +523,11 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'    </div>';
 		reviewsHtml=  reviewsHtml+'    <div class="float-right ppl-header-right">';
 		reviewsHtml=  reviewsHtml+'        <div class="st-rating-wrapper maring-0 clearfix review-ratings" data-rating="'+reviewItem.score+'">';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
+		/*reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
 		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-full-star"></div>';
 		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-half-star"></div>';
 		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
-		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';
+		reviewsHtml=  reviewsHtml+'           <div class="rating-star icn-no-star"></div>';*/
 		reviewsHtml=  reviewsHtml+'       </div>';
 		reviewsHtml=  reviewsHtml+'   </div>';
 		reviewsHtml=  reviewsHtml+'	</div>';
@@ -805,7 +820,7 @@ function fetchReviewsForAgentCallBack(data) {
 			paintReviews(result);
 		}
 		else {
-			hideReviewsHeader();
+			//hideReviewsHeader();
 			/**
 			 * calling method to populate count of hidden reviews, min score becomes the upper limit for score here
 			 */
@@ -822,7 +837,7 @@ function paintIndividualDetails(result){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Membership</div>';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content" style="display:block">';
 		$.each(result.associations,function(i,associations){
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+associations.name+'</div>';
 		});
@@ -830,6 +845,30 @@ function paintIndividualDetails(result){
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
+	
+	//Paint postions
+	var positions = result.positions; 
+	if(positions != undefined && positions.length > 0){
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Positions</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		for(var i=0;i<positions.length;i++){
+			var positionObj = positions[i];
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.name+'</div>';
+			if(!positionObj.isCurrent && positionObj.endTime){
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.startTime+" - "+positionObj.endTime+'</div>';				
+			}else{
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.startTime+' - current</div>';
+			}
+			
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.title+'</div>';
+		}
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+	
 	if(result.achievements != undefined && result.achievements.length > 0){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
@@ -842,6 +881,36 @@ function paintIndividualDetails(result){
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
+	
+	//paint expertise
+	if(result.expertise != undefined && result.expertise.length > 0){
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Expertise</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		for(var i=0;i<result.expertise.length;i++){
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+result.expertise[i]+'</div>';
+		}
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+
+	//paint hobbies
+	if(result.hobbies != undefined && result.hobbies.length > 0){
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Hobbies</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		for(var i=0;i<result.hobbies.length;i++){
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+result.hobbies[i]+'</div>';
+		}
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+	
+	
 	var licenses = result.licenses;
 	if(licenses != undefined){
 		if(licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
