@@ -112,8 +112,8 @@ public class UserManagementController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
 			}
+			
 			long companyId = user.getCompany().getCompanyId();
-
 			try {
 				long usersCount = solrSearchService.countUsersByCompany(companyId, 0, SOLR_BATCH_SIZE);
 				session.setAttribute("usersCount", usersCount);
