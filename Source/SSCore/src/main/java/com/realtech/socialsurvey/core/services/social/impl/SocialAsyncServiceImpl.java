@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.services.social.impl;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Future;
 import org.apache.http.client.HttpClient;
