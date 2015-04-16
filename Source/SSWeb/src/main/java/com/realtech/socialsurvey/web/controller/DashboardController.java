@@ -650,12 +650,12 @@ public class DashboardController {
 	@RequestMapping(value = "/sendsurveyremindermail")
 	public String sendReminderMailForSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() started.");
+		
 		try {
 			String customerName = request.getParameter("customerName");
 			String customerEmail = request.getParameter("customerEmail");
 			String agentName = request.getParameter("agentName");
-			String agentIdStr = request.getParameter("agentId");
-			long agentId = 0;
+			
 			if (customerName == null || customerName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for customerName.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for customerName.");
@@ -664,17 +664,21 @@ public class DashboardController {
 				LOG.error("Invalid value (null/empty) passed for customerEmail.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for customerEmail.");
 			}
-			if (agentIdStr == null || agentIdStr.isEmpty()) {
-				LOG.error("Invalid value (null/empty) passed for agentIdStr.");
-				throw new InvalidInputException("Invalid value (null/empty) passed for agentIdStr.");
-			}
+			
+			long agentId = 0;
 			try {
+				String agentIdStr = request.getParameter("agentId");
+				if (agentIdStr == null || agentIdStr.isEmpty()) {
+					LOG.error("Invalid value (null/empty) passed for agentIdStr.");
+					throw new InvalidInputException("Invalid value (null/empty) passed for agentIdStr.");
+				}
 				agentId = Long.parseLong(agentIdStr);
 			}
 			catch (NumberFormatException e) {
 				LOG.error("NumberFormatException caught while parsing agentId in sendReminderMailForSurvey(). Nested exception is ", e);
 				throw e;
 			}
+			
 			try {
 				if (enableKafka.equals(CommonConstants.YES)) {
 					emailServices.queueSurveyReminderMail(customerEmail, customerName, agentName);
@@ -687,12 +691,14 @@ public class DashboardController {
 				LOG.error("Exception occurred while trying to send survey reminder mail to : " + customerEmail);
 				throw e;
 			}
+			
 			// Increasing value of reminder count by 1.
 			surveyHandler.updateReminderCount(agentId, customerEmail);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in sendReminderMailForSurvey() while sending mail. Nested exception is ", e);
 		}
+
 		LOG.info("Method to send email to remind customer for survey sendReminderMailForSurvey() finished.");
 		return new Gson().toJson("success");
 	}
