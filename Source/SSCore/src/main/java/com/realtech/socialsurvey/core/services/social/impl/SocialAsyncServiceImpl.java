@@ -22,6 +22,7 @@ import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
 import com.realtech.socialsurvey.core.entities.LinkedInToken;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.PositionValues;
+import com.realtech.socialsurvey.core.entities.SkillValues;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
@@ -143,8 +144,12 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			AgentSettings agentSettings = (AgentSettings)unitSettings;
 			if(agentSettings.getExpertise() == null){
 				LOG.debug("Expertise is not present. Filling the data from linkedin");
-				if(linkedInProfileData.getSpecialties() != null){
-					agentSettings.setExpertise(new ArrayList<String>(Arrays.asList(linkedInProfileData.getSpecialties().split(","))));
+				if(linkedInProfileData.getSkills() != null && linkedInProfileData.getSkills().getValues() != null && !linkedInProfileData.getSkills().getValues().isEmpty()){
+					List<String> expertiseList = new ArrayList<String>();
+					for(SkillValues skillValue: linkedInProfileData.getSkills().getValues()){
+						expertiseList.add(skillValue.getSkill().getName());
+					}
+					agentSettings.setExpertise(expertiseList);
 					if(agentSettings.getExpertise() != null && agentSettings.getExpertise().size() > 0){
 						try {
 							profileManagementService.updateAgentExpertise(agentSettings, agentSettings.getExpertise());
