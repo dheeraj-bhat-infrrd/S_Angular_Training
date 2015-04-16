@@ -53,7 +53,7 @@ import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
@@ -136,12 +136,12 @@ public class ProfileManagementController {
 		}
 		if (selectedProfile == null) {
 			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-			Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
 
-			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileIdStr);
 			
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		}
 		
 		// fetching details from profile

@@ -121,6 +121,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set("review", review);
 		update.set(CommonConstants.IS_ABUSIVE_COLUMN, isAbusive);
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		update.set(CommonConstants.EDITABLE_SURVEY_COLUMN, false);
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("Method updateGatewayAnswer() to update review provided by customer finished.");
 	}
@@ -1060,6 +1061,19 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
 		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
 		LOG.info("updateSharedOn() finished.");
+	}
+
+	@Override
+	public void changeStatusOfSurvey(long agentId, String customerEmail, boolean editable) {
+		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.set(CommonConstants.EDITABLE_SURVEY_COLUMN, editable);
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("Method to update status of survey in SurveyDetails collection, changeStatusOfSurvey() finished.");
 	}
 
 	// JIRA SS-137 and 158 : EOC
