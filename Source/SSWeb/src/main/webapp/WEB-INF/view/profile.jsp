@@ -71,7 +71,8 @@
 </div>
 
 <div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
-    <div class="container">
+    <div class="">
+    	<div class="container">
         <div class="row prof-pic-name-wrapper">
             <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
                 <div class="prog-img-container">
@@ -90,23 +91,46 @@
                 </div>
             </div>
         </div>
-        
-        <div class="row">
+        </div>
+
+		<div class="prof-details-header">
+			<div class="container">
+				<div class="prof-details-header-row clearfix">
+					<div class="prof-link-header float-left clearfix">
+						<div id="prof-header-rating" class="rating-image float-left"></div>
+						<div id="prof-header-url" class="rating-image-txt float-left"></div>
+					</div>
+					<div id="web-addr-header" class="web-addr-header float-left clearfix hide">
+						<div class="web-address-img float-left"></div>
+						<div id="web-address-txt" class="web-address-txt float-left"></div>
+					</div>
+					<div class="float-right hm-hr-row-right clearfix">
+						<div id="social-connect-txt" class="float-left social-connect-txt"></div>
+						<div class="float-left social-item-icon icn-fb"></div>
+						<div class="float-left social-item-icon icn-twit"></div>
+						<div class="float-left social-item-icon icn-lin"></div>
+						<div class="float-left social-item-icon icn-yelp"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+<div class="container">
+			<div class="row">
             <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
-                <div class="prof-left-row prof-left-info bord-bot-dc">
+                <!-- <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
                     </div>
-                </div>
-                <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc hide">
+                </div> -->
+                <%-- <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc hide">
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
                             <!--contact info comes here  -->
                         </div>
                     </div>
-                </div>
+                </div> --%>
                 
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
@@ -148,7 +172,35 @@
 		               			</div>
                   		 	</c:when>
               		</c:choose>
-                        
+                    <div class="prof-left-row prof-left-assoc bord-bot-dc">
+                    	<div class="left-contact-wrapper">
+                    		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr"></div>
+                    		<div class="left-panel-content">
+                    			<div class="lp-row">
+                    				<div class="lp-input-cont">
+                    					<div class="float-left lp-username-icn lp-input-icn"></div>
+                    					<input type="text" class="lp-input" placeholder="example: John Doe">
+                    				</div>
+                    			</div>
+                    			<div class="lp-row">
+                    				<div class="lp-input-cont lp-email">
+                    					<div class="float-left lp-email-icn lp-input-icn"></div>
+                    					<input type="email" class="lp-input" placeholder="example: office@example.com">
+                    				</div>
+                    			</div>
+                    			<div class="lp-row">
+                    				<div class="lp-input-cont lp-textarea-cont">
+                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
+                    					<textarea type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
+                    				</div>
+                    			</div>
+                    			<div class="lp-row"></div>
+                    			<div class="lp-row">
+                    				<div class="lp-button">Submit Your message</div>
+                    			</div>
+                    		</div>
+                    	</div>
+                    </div>  
                     
             </div>
             <div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -157,7 +209,7 @@
                 </div>
                 <div class="rt-content-main bord-bot-dc clearfix">
                     <div class="float-left panel-tweet-wrapper">
-                        <div class="main-con-header">Recent Tweets</div>
+                        <div class="main-con-header">Recent Posts</div>
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj">
                             <div class="tweet-panel-item bord-bot-dc clearfix">
                                 <div class="tweet-icn icn-tweet float-left"></div>
@@ -188,6 +240,7 @@
                     </div>
                 </div>
             </div>
+        </div>
         </div>
     </div>
 </div>

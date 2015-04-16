@@ -25,6 +25,7 @@ import com.amazonaws.util.json.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
@@ -112,8 +113,8 @@ public class UserManagementController {
 				model.addAttribute("message",
 						messageUtils.getDisplayMessage(DisplayMessageConstants.USER_MANAGEMENT_NOT_AUTHORIZED, DisplayMessageType.ERROR_MESSAGE));
 			}
+			
 			long companyId = user.getCompany().getCompanyId();
-
 			try {
 				long usersCount = solrSearchService.countUsersByCompany(companyId, 0, SOLR_BATCH_SIZE);
 				session.setAttribute("usersCount", usersCount);
@@ -902,28 +903,22 @@ public class UserManagementController {
 			String emailId = request.getParameter(CommonConstants.EMAIL_ID);
 			String password = request.getParameter("password");
 			String confirmPassword = request.getParameter("confirmPassword");
-			String encryptedUrlParameters = request.getParameter("q");
 			String companyIdStr = request.getParameter("companyId");
-			Map<String, String> urlParams = new HashMap<>();
 
-			/**
-			 * form parameters validation
-			 */
+			// form parameters validation
 			validateCompleteRegistrationForm(firstName, lastName, emailId, password, companyIdStr, confirmPassword);
 
-			/**
-			 * Decrypting URL parameters
-			 */
+			// Decrypting URL parameters
+			Map<String, String> urlParams = new HashMap<>();
 			try {
+				String encryptedUrlParameters = request.getParameter("q");
 				urlParams = urlGenerator.decryptParameters(encryptedUrlParameters);
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
 
-			/**
-			 * check if email address entered matches with the one in the encrypted url
-			 */
+			// check if email address entered matches with the one in the encrypted url
 			if (!urlParams.get("emailId").equalsIgnoreCase(emailId)) {
 				LOG.error("Invalid Input exception. Reason emailId entered does not match with the one to which the mail was sent");
 				throw new InvalidInputException("Invalid Input exception", DisplayMessageConstants.INVALID_EMAILID);
@@ -937,20 +932,15 @@ public class UserManagementController {
 				throw new InvalidInputException("NumberFormat exception parsing companyId. Reason : " + e.getMessage(),
 						DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
 			AccountType accountType = null;
 			HttpSession session = request.getSession(true);
-
 			try {
-				/**
-				 * fetch user object with email Id
-				 */
+				// fetch user object with email Id
 				user = authenticationService.getUserWithLoginNameAndCompanyId(emailId, companyId);
 
-				/**
-				 * calling service to update user details on registration
-				 */
+				// calling service to update user details on registration
 				user = userManagementService.updateUserOnCompleteRegistration(user, emailId, companyId, firstName, lastName, password);
-
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.USER_NOT_PRESENT, e);
@@ -972,7 +962,6 @@ public class UserManagementController {
 			}
 
 			// updating the flags for user profiles
-
 			if (user.getIsAtleastOneUserprofileComplete() == CommonConstants.PROCESS_COMPLETE) {
 				// get the user's canonical settings
 				LOG.info("Fetching the user's canonical settings and setting it in session");
@@ -982,6 +971,27 @@ public class UserManagementController {
 			else {
 				// TODO: add logic for what happens when no user profile present
 			}
+			
+			// updating session with selected user profile if not set
+			LOG.debug("Updating session with selected user profile if not set");
+			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
+			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+			for (UserProfile profile : user.getUserProfiles()) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					selectedProfile = profile;
+					break;
+				}
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
+			
+			// updating session with aggregated user profiles, if not set
+			LOG.debug("Updating session with aggregated user profiles, if not set");
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			if (profileAbridgedMap.size() > 0) {
+				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
+				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+			}
+			session.setAttribute(CommonConstants.USER_PROFILE_MAP, profileMap);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while setting new Password. Reason : " + e.getMessage(), e);

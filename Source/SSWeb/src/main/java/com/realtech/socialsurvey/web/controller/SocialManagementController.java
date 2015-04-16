@@ -217,9 +217,8 @@ public class SocialManagementController {
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+			if (userSettings == null || selectedProfile == null) {
 				LOG.error("authenticateFacebookAccess : userSettings not found in session!");
 				throw new NonFatalException("authenticateFacebookAccess : userSettings not found in session!");
 			}
@@ -301,8 +300,6 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-
-			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -354,9 +351,8 @@ public class SocialManagementController {
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+			if (userSettings == null || selectedProfile == null) {
 				LOG.error("authenticateTwitterAccess : userSettings not found in session!");
 				throw new NonFatalException("authenticateTwitterAccess : userSettings not found in session!");
 			}
@@ -446,8 +442,6 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-
-			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);
@@ -499,9 +493,8 @@ public class SocialManagementController {
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+			if (userSettings == null || selectedProfile == null) {
 				LOG.error("authenticateLinkedInAccess : userSettings not found in session!");
 				throw new NonFatalException("authenticateLinkedInAccess : userSettings not found in session!");
 			}
@@ -592,8 +585,6 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-
-			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			LOG.error("Exception while getting linkedin access token. Reason : " + e.getMessage(), e);
@@ -642,9 +633,8 @@ public class SocialManagementController {
 
 		try {
 			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
-			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
-			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+			if (userSettings == null || selectedProfile == null) {
 				LOG.error("authenticateGoogleAccess : userSettings not found in session!");
 				throw new NonFatalException("authenticateGoogleAccess : userSettings not found in session!");
 			}
@@ -721,8 +711,6 @@ public class SocialManagementController {
 				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
 						DisplayMessageConstants.GENERAL_ERROR);
 			}
-
-			profileSettings.setSocialMediaTokens(mediaTokens);
 		}
 		catch (Exception e) {
 			session.removeAttribute(CommonConstants.SOCIAL_REQUEST_TOKEN);

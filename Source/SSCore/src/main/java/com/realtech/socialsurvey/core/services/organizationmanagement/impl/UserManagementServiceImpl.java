@@ -42,7 +42,7 @@ import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserInvite;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.DatabaseException;
@@ -1870,7 +1870,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	}
 	
 	@Override
-	public Map<Long, UserProfileSmall> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException {
+	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException {
 		LOG.debug("Method getUserProfile() called from UserManagementService");
 
 		// Fetch Regions and Branches from Solr
@@ -1891,11 +1891,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		boolean agentAdded = false;
 		RegionFromSearch region = null;
 		BranchFromSearch branch = null;
-		Map<Long, UserProfileSmall> profileSmallMap = new HashMap<Long, UserProfileSmall>();
+		Map<Long, AbridgedUserProfile> abridgedUserProfileMap = new HashMap<Long, AbridgedUserProfile>();
 		
-		UserProfileSmall profileSmall = null;
+		AbridgedUserProfile profileAbridged = null;
 		for (UserProfile profile : user.getUserProfiles()) {
 			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
+				profileAbridged = new AbridgedUserProfile();
 				
 				profileMap.put(profile.getUserProfileId(), profile);
 
@@ -1903,9 +1904,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 				int profileMasterId = profile.getProfilesMaster().getProfileId();
 				switch (profileMasterId) {
 					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-						profileSmall = getSmallUserProfile(profile.getUserProfileId(), user.getCompany().getCompany(), user.getCompany()
+						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user.getCompany()
 								.getCompanyId(), CommonConstants.COMPANY_ID_COLUMN, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
-						profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
 						break;
 					
 					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
@@ -1914,10 +1915,11 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							region = regions.get(regionId);
 						}
 						if (region.getIsDefaultBySystem() != 1) {
-							profileSmall = getSmallUserProfile(profile.getUserProfileId(), region.getRegionName(), regionId,
+							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), region.getRegionName(), regionId,
 									CommonConstants.REGION_ID_COLUMN, CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
-							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
 						}
+						regionId = 0;
 						break;
 
 					case CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID:
@@ -1926,17 +1928,18 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 							branch = branches.get(branchId);
 						}
 						if (branch.getIsDefaultBySystem() != 1) {
-							profileSmall = getSmallUserProfile(profile.getUserProfileId(), branch.getBranchName(), branchId,
+							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), branch.getBranchName(), branchId,
 									CommonConstants.BRANCH_ID_COLUMN, CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
-							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
 						}
+						branchId = 0;
 						break;
 
 					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
 						if (!agentAdded) {
-							profileSmall = getSmallUserProfile(profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW, regionId,
+							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW, user.getUserId(),
 									CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
-							profileSmallMap.put(profile.getUserProfileId(), profileSmall);
+							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
 							agentAdded = true;
 						}
 						break;
@@ -1949,29 +1952,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		switch (accountType) {
 			case COMPANY:
 			case ENTERPRISE:
-				return profileSmallMap;
+				return abridgedUserProfileMap;
 			
 			default:
 		}
 		
 		LOG.debug("Method getUserProfile() finished from UserManagementService");
-		return new HashMap<Long, UserProfileSmall>();
+		return new HashMap<Long, AbridgedUserProfile>();
 	}
 
-	private UserProfileSmall getSmallUserProfile(long userProfileId, String userProfileName, long profileId, String profileType, int profileMasterId) {
-		UserProfileSmall profileSmall = new UserProfileSmall();
-		profileSmall.setUserProfileId(userProfileId);
-		profileSmall.setUserProfileName(userProfileName);
-		profileSmall.setProfileName(profileType);
-		profileSmall.setProfileValue(profileId);
-		profileSmall.setProfilesMasterId(profileMasterId);
+	private AbridgedUserProfile getAbridgedUserProfile(AbridgedUserProfile profileAbridged, long userProfileId, String userProfileName, long profileId,
+			String profileType, int profileMasterId) {
+		profileAbridged.setUserProfileId(userProfileId);
+		profileAbridged.setUserProfileName(userProfileName);
+		profileAbridged.setProfileName(profileType);
+		profileAbridged.setProfileValue(profileId);
+		profileAbridged.setProfilesMasterId(profileMasterId);
 		
-		return profileSmall;
+		return profileAbridged;
 	}
 
 	@Override
-	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap,
-			Map<Long, UserProfileSmall> profileSmallMap, String profileIdStr) {
+	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap, String profileIdStr) {
 		long profileId = 0;
 		try {
 			if (profileIdStr != null && !profileIdStr.equals("")) {
