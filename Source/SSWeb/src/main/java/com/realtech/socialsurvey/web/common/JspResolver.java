@@ -26,6 +26,11 @@ public interface JspResolver {
 	public static final String SURVEY_BUILDER_QUESTION_EDIT = "buildSurvey_questionedit";
 	public static final String SURVEY_BUILDER_QUESTION_NEW = "buildSurvey_questionnew";
 	public static final String DASHBOARD = "dashboard";
+	public static final String DASHBOARD_PROFILEDETAIL = "dashboard_profiledetail";
+	public static final String DASHBOARD_SURVEYSTATUS = "dashboard_surveystatus";
+	public static final String DASHBOARD_SEARCHRESULTS = "dashboard_searchresults";
+	public static final String DASHBOARD_INCOMPLETESURVEYS = "dashboard_incompletesurveys";
+	public static final String DASHBOARD_REVIEWS = "dashboard_reviews";
 	public static final String USER_MANAGEMENT = "view-user-management";
 	public static final String USER_LIST_FOR_MANAGEMENT = "userlist";
 	public static final String USER_MANAGEMENT_EDIT_USER_DETAILS = "um-edit-row";

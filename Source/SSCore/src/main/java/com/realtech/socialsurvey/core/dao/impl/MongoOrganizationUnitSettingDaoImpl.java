@@ -41,6 +41,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_SEO_CONTENT_MODIFIED = "isSeoContentModified";
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
 	public static final String KEY_LOCK_SETTINGS = "lockSettings";
+	public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";
 
 	public static final String KEY_PROFILE_NAME = "profileName";
 	public static final String KEY_PROFILE_URL = "profileUrl";
@@ -48,9 +49,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
 	public static final String KEY_CONTACT_DETAILS = "contact_details";
 	public static final String KEY_ASSOCIATION = "associations";
+	public static final String KEY_EXPERTISE = "expertise";
 	public static final String KEY_ACHIEVEMENTS = "achievements";
 	public static final String KEY_LICENCES = "licenses";
 	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
+	public static final String KEY_COMPANY_POSITIONS = "positions";
 
 	public static final String KEY_IDENTIFIER = "iden";
 
@@ -77,8 +80,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	@Override
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsById(long identifier, String collectionName) {
 		LOG.info("Fetch organization unit settings from " + collectionName + " for id: " + identifier);
-		OrganizationUnitSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER, identifier)),
-				OrganizationUnitSettings.class, collectionName);
+		Query query = new Query();
+		query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(identifier));
+		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+		OrganizationUnitSettings settings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
 		return settings;
 	}
 
@@ -159,8 +164,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public OrganizationUnitSettings fetchOrganizationUnitSettingsByProfileName(String profileName, String collectionName) {
 		LOG.info("Method fetchOrganizationUnitSettingsByProfileName called for profileName:" + profileName + " and collectionName:" + collectionName);
 
-		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_PROFILE_NAME, profileName)),
-				OrganizationUnitSettings.class, collectionName);
+		Query query = new Query();
+		query.addCriteria(Criteria.where(KEY_PROFILE_NAME).is(profileName));
+		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
 
 		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
 		return organizationUnitSettings;
@@ -214,17 +221,17 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Override
 	public List<ProfileUrlEntity> fetchSEOOptimizedOrganizationUnitSettings(String collectionName, int skipCount, int numOfRecords) {
-		LOG.info("Getting SEO related data for "+collectionName);
+		LOG.info("Getting SEO related data for " + collectionName);
 		List<ProfileUrlEntity> profileUrls = null;
 		// only get profile name
 		// Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_DEFAULT_BY_SYSTEM).is(false));
 		query.fields().include(KEY_PROFILE_URL).exclude("_id");
-		if(skipCount > 0){
+		if (skipCount > 0) {
 			query.skip(skipCount);
 		}
-		if(numOfRecords > 0){
+		if (numOfRecords > 0) {
 			query.limit(numOfRecords);
 		}
 		profileUrls = mongoTemplate.find(query, ProfileUrlEntity.class, collectionName);
@@ -233,15 +240,15 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Override
 	public long fetchSEOOptimizedOrganizationUnitCount(String collectionName) {
-		LOG.info("Getting SEO Optimized count for collection "+collectionName);
+		LOG.info("Getting SEO Optimized count for collection " + collectionName);
 		Query query = new BasicQuery(new BasicDBObject(KEY_DEFAULT_BY_SYSTEM, false));
 		long count = mongoTemplate.count(query, collectionName);
-		LOG.info("Returning count "+count);
+		LOG.info("Returning count " + count);
 		return count;
 	}
-	
+
 	@Override
-	public void updateCompletedSurveyCountForAgent(long agentId){
+	public void updateCompletedSurveyCountForAgent(long agentId) {
 		LOG.info("Method to update completed survey count for agent started.");
 		Query query = new Query(Criteria.where("iden").is(agentId));
 		Update update = new Update();
@@ -252,19 +259,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Override
 	public List<FeedIngestionEntity> fetchSocialMediaTokens(String collectionName, int skipCount, int numOfRecords) {
-		LOG.info("Fetching social media tokens from "+collectionName);
+		LOG.info("Fetching social media tokens from " + collectionName);
 		List<FeedIngestionEntity> tokens = null;
 		Query query = new Query();
 		query.addCriteria(Criteria.where(KEY_SOCIAL_MEDIA_TOKENS).exists(true));
 		query.fields().include(KEY_SOCIAL_MEDIA_TOKENS).include(KEY_IDENTIFIER).exclude("_id");
-		if(skipCount > 0){
+		if (skipCount > 0) {
 			query.skip(skipCount);
 		}
-		if(numOfRecords > 0){
+		if (numOfRecords > 0) {
 			query.limit(numOfRecords);
 		}
 		tokens = mongoTemplate.find(query, FeedIngestionEntity.class, collectionName);
-		LOG.info("Fetched "+(tokens != null?tokens.size():"none") +" items with social media tokens from "+collectionName);
+		LOG.info("Fetched " + (tokens != null ? tokens.size() : "none") + " items with social media tokens from " + collectionName);
 		return tokens;
 	}
 }

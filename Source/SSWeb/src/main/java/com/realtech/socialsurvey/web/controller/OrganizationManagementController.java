@@ -29,7 +29,7 @@ import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.SurveySettings;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.UserProfileSmall;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
@@ -354,12 +354,12 @@ public class OrganizationManagementController {
 		}
 		if (selectedProfile == null) {
 			Map<Long, UserProfile> profileMap = (Map<Long, UserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_MAP);
-			Map<Long, UserProfileSmall> profileSmallMap = (Map<Long, UserProfileSmall>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
 
-			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileSmallMap, profileIdStr);
+			selectedProfile = userManagementService.updateSelectedProfile(user, accountType, profileMap, profileIdStr);
 			
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
-			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileSmallMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
+			session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
 		}
 		
 		OrganizationUnitSettings unitSettings = null;
@@ -378,18 +378,6 @@ public class OrganizationManagementController {
 		}
 		session.setAttribute(CommonConstants.USER_ACCOUNT_SETTINGS, unitSettings);
 
-		// setting userprofile settings in session
-		try {
-			OrganizationUnitSettings profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings,
-					selectedProfile.getBranchId(), selectedProfile.getRegionId(), selectedProfile.getProfilesMaster().getProfileId());
-			session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
-		}
-		catch (InvalidInputException e) {
-			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
-			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
-			return JspResolver.MESSAGE_HEADER;
-		}
-					
 		return JspResolver.EDIT_SETTINGS;
 	}
 

@@ -190,8 +190,8 @@ public interface SolrSearchService {
 	 * @throws InvalidInputException
 	 * @throws SolrException
 	 */
-	public String searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id) throws InvalidInputException,
-			SolrException;
+	public List<SolrDocument> searchBranchRegionOrAgentByName(String searchColumn, String searchKey, String columnName, long id)
+			throws InvalidInputException, SolrException;
 
 	/**
 	 * Method to search for the users based on branches specified
