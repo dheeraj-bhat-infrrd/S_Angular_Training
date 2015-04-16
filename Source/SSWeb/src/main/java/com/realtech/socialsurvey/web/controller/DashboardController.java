@@ -84,6 +84,7 @@ public class DashboardController {
 	/*
 	 * Method to initiate dashboard
 	 */
+	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/dashboard")
 	public String initDashboardPage(Model model, HttpServletRequest request) {
 		LOG.info("Dashboard Page started");
@@ -96,21 +97,27 @@ public class DashboardController {
 			model.addAttribute("userId", user.getUserId());
 			model.addAttribute("emailId", user.getEmailId());
 
-			// updating session with selected user profile
+			// updating session with selected user profile if not set
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
-			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-			for (UserProfile profile : user.getUserProfiles()) {
-				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
-					selectedProfile = profile;
-					break;
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			if (selectedProfile == null) {
+				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : user.getUserProfiles()) {
+					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+						selectedProfile = profile;
+						break;
+					}
 				}
+				session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			}
-			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			model = setSelectedProfileAttributes(model, user, selectedProfile);
 			
-			// updating session with aggregated user profiles
+			// updating session with aggregated user profiles, if not set
 			AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
-			Map<Long, AbridgedUserProfile> profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			Map<Long, AbridgedUserProfile> profileAbridgedMap = (Map<Long, AbridgedUserProfile>) session.getAttribute(CommonConstants.USER_PROFILE_LIST);
+			if (profileAbridgedMap == null) {
+				profileAbridgedMap = userManagementService.processedUserProfiles(user, accountType, profileMap);
+			}
 			if (profileAbridgedMap.size() > 0) {
 				session.setAttribute(CommonConstants.USER_PROFILE_LIST, profileAbridgedMap);
 				session.setAttribute(CommonConstants.PROFILE_NAME_COLUMN, profileAbridgedMap.get(selectedProfile.getUserProfileId()).getUserProfileName());
