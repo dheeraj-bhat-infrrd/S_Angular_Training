@@ -64,4 +64,8 @@ public interface SurveyHandler {
 	public String getMoodsToSendMail();
 
 	public void increaseSurveyCountForAgent(long agentId) throws SolrException;
+
+	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail);
+
+	String getGoogleShareUri();
 }

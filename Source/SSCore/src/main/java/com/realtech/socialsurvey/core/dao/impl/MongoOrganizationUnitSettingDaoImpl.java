@@ -41,6 +41,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_SEO_CONTENT_MODIFIED = "isSeoContentModified";
 	public static final String KEY_CONTACT_DETAIL_SETTINGS = "contact_details";
 	public static final String KEY_LOCK_SETTINGS = "lockSettings";
+	public static final String KEY_LINKEDIN_PROFILEDATA = "linkedInProfileData";
 
 	public static final String KEY_PROFILE_NAME = "profileName";
 	public static final String KEY_PROFILE_URL = "profileUrl";
@@ -48,9 +49,11 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 	public static final String KEY_PROFILE_IMAGE = "profileImageUrl";
 	public static final String KEY_CONTACT_DETAILS = "contact_details";
 	public static final String KEY_ASSOCIATION = "associations";
+	public static final String KEY_EXPERTISE = "expertise";
 	public static final String KEY_ACHIEVEMENTS = "achievements";
 	public static final String KEY_LICENCES = "licenses";
 	public static final String KEY_SOCIAL_MEDIA_TOKENS = "socialMediaTokens";
+	public static final String KEY_COMPANY_POSITIONS = "positions";
 
 	public static final String KEY_IDENTIFIER = "iden";
 

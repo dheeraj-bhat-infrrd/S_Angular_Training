@@ -1049,5 +1049,18 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		return surveys;
 	}
 
+	@Override
+	public void updateSharedOn(List<String> socialSites, long agentId, String customerEmail) {
+		LOG.info("updateSharedOn() started.");
+		Query query = new Query();
+		query.addCriteria(Criteria.where(CommonConstants.AGENT_ID_COLUMN).is(agentId));
+		query.addCriteria(Criteria.where(CommonConstants.CUSTOMER_EMAIL_COLUMN).is(customerEmail));
+		Update update = new Update();
+		update.pushAll(CommonConstants.SHARED_ON_COLUMN, socialSites.toArray());
+		update.set(CommonConstants.MODIFIED_ON_COLUMN, new Date());
+		mongoTemplate.updateMulti(query, update, SURVEY_DETAILS_COLLECTION);
+		LOG.info("updateSharedOn() finished.");
+	}
+
 	// JIRA SS-137 and 158 : EOC
 }
