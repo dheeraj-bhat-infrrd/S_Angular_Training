@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.entities;
 
-
 /**
  * Linkedin profile data from linkedin. The structure is same as linkedin
  */
@@ -19,6 +18,7 @@ public class LinkedInProfileData {
 	private Skills skills;
 	private String associations;
 	private String interests;
+	private PictureUrls pictureUrls;
 
 	public String getFirstName() {
 		return firstName;
@@ -122,6 +122,14 @@ public class LinkedInProfileData {
 
 	public void setInterests(String interests) {
 		this.interests = interests;
+	}
+
+	public PictureUrls getPictureUrls() {
+		return pictureUrls;
+	}
+
+	public void setPictureUrls(PictureUrls pictureUrls) {
+		this.pictureUrls = pictureUrls;
 	}
 
 }
