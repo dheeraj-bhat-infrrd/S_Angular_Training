@@ -1,9 +1,10 @@
 package com.realtech.socialsurvey.core.feed.impl;
 
 import java.util.List;
+import javax.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,8 @@ public class TwitterFeedIngester implements Runnable {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedIngester.class);
 
-	@Autowired
+	@Resource
+	@Qualifier("twitterFeed")
 	private SocialNetworkDataProcessor<Status, TwitterToken> processor;
 
 	private TwitterToken token;
