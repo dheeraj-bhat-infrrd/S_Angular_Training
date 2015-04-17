@@ -69,7 +69,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				if (statuses != null && statuses.size() > 0) {
 					status = statuses.get(CommonConstants.INITIAL_INDEX);
 				}
-				
+
 				if (status == null) {
 					status = new FeedStatus();
 					status.setFeedSource(FEED_SOURCE);
@@ -87,7 +87,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				if (statuses != null && statuses.size() > 0) {
 					status = statuses.get(CommonConstants.INITIAL_INDEX);
 				}
-				
+
 				if (status == null) {
 					status = new FeedStatus();
 					status.setFeedSource(FEED_SOURCE);
@@ -105,7 +105,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				if (statuses != null && statuses.size() > 0) {
 					status = statuses.get(CommonConstants.INITIAL_INDEX);
 				}
-				
+
 				if (status == null) {
 					status = new FeedStatus();
 					status.setFeedSource(FEED_SOURCE);
@@ -123,7 +123,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				if (statuses != null && statuses.size() > 0) {
 					status = statuses.get(CommonConstants.INITIAL_INDEX);
 				}
-				
+
 				if (status == null) {
 					status = new FeedStatus();
 					status.setFeedSource(FEED_SOURCE);
@@ -158,9 +158,9 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 				else {
 					resultList = twitter.getUserTimeline(new Paging(pageNo, PAGE_SIZE).sinceId(Long.parseLong(lastFetchedPostId)));
 				}
-				
+
 				tweets.addAll(resultList);
-				pageNo ++;
+				pageNo++;
 			}
 			while (resultList.size() == PAGE_SIZE);
 		}

@@ -15,11 +15,11 @@ public class SocialFeedIngester {
 
 	public static void main(String[] args) {
 		LOG.info("Starting ingesting social feed");
-		
+
 		LOG.debug("Loading the application context");
 		ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
 		SocialFeedIngestionKickStarter ingestor = context.getBean(SocialFeedIngestionKickStarter.class);
-		
+
 		ingestor.setContext(context);
 		ingestor.startFeedIngestion();
 	}

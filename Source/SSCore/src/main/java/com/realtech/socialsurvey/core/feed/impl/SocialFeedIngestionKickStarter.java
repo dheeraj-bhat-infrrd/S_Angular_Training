@@ -38,12 +38,12 @@ public class SocialFeedIngestionKickStarter {
 	public void startFeedIngestion() {
 		LOG.info("Starting feed ingestion.");
 		executors.setContext(context);
-		
+
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 		startFeedIngestion(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
-		
+
 		executors.shutDownExecutors();
 	}
 
@@ -87,7 +87,7 @@ public class SocialFeedIngestionKickStarter {
 
 		if (ingestionEntity != null && ingestionEntity.getSocialMediaTokens() != null) {
 			LOG.debug("Starting to fetch the feed.");
-			
+
 			try {
 				// check for individual social media entry
 				SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
