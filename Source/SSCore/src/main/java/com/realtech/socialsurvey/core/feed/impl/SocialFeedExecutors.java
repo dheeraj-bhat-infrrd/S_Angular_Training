@@ -60,7 +60,7 @@ public class SocialFeedExecutors implements InitializingBean {
 		}
 		LOG.debug("Shut down of executors complete.");
 	}
-	
+
 	public void shutDownExecutorsNow() {
 		LOG.debug("Shutting down executors Now.");
 		twitterExecutor.shutdownNow();
