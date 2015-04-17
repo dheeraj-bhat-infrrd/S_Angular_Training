@@ -31,8 +31,8 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 
 	// Method to fetch social posts for a particular user.
 	@Override
-	public List<SocialPost> getPostsByUserId(long userId, int skip, int limit) {
-		Query query = new Query(Criteria.where(CommonConstants.USER_ID).is(userId));
+	public List<SocialPost> getSocialPosts(long iden, String key, int skip, int limit) {
+		Query query = new Query(Criteria.where(key).is(iden));
 		if (skip != -1)
 			query.skip(skip);
 		if (limit != -1)

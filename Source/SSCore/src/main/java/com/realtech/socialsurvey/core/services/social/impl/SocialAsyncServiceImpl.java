@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Component;
 import com.google.gson.Gson;
+import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
 import com.realtech.socialsurvey.core.entities.LinkedInProfileData;
@@ -24,6 +25,8 @@ import com.realtech.socialsurvey.core.entities.PositionValues;
 import com.realtech.socialsurvey.core.entities.SkillValues;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
+import com.realtech.socialsurvey.core.services.search.SolrSearchService;
+import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.social.SocialAsyncService;
 
 @Component
@@ -33,6 +36,9 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+	
+	@Autowired
+	private SolrSearchService solrSearchService;
 
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
@@ -168,10 +174,15 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 					for(PositionValues positionValue: linkedInProfileData.getPositions().getValues()){
 						companyPositions = new CompanyPositions();
 						companyPositions.setName(positionValue.getCompany().getName());
+						companyPositions.setStartMonth(positionValue.getStartDate().getMonth());
+						companyPositions.setStartYear(positionValue.getStartDate().getYear());
 						companyPositions.setStartTime(positionValue.getStartDate().getMonth()+"-"+positionValue.getStartDate().getYear());
 						companyPositions.setIsCurrent(positionValue.isCurrent());
+						companyPositions.setTitle(positionValue.getTitle());
 						if(!positionValue.isCurrent()){
 							companyPositions.setEndTime(positionValue.getEndDate().getMonth()+"-"+positionValue.getEndDate().getYear());
+							companyPositions.setEndMonth(positionValue.getEndDate().getMonth());
+							companyPositions.setEndYear(positionValue.getEndDate().getYear());
 						}
 						companyPositionsList.add(companyPositions);
 					}
@@ -185,7 +196,15 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 						}
 					}
 				}
-				
+			}
+			// finally update details in solr
+			try {
+				LOG.debug("Updating details in solr");
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details().getAbout_me());
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl());
+			}
+			catch (SolrException e) {
+				LOG.error("Could not update details in solr",e);
 			}
 		}
 

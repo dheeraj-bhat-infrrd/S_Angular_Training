@@ -120,10 +120,10 @@
 					</div>
 					<div class="float-right hm-hr-row-right clearfix">
 						<div id="social-connect-txt" class="float-left social-connect-txt"></div>
-						<div class="float-left social-item-icon icn-fb"></div>
-						<div class="float-left social-item-icon icn-twit"></div>
-						<div class="float-left social-item-icon icn-lin"></div>
-						<div class="float-left social-item-icon icn-yelp"></div>
+						<div id="icn-fb" class="float-left social-item-icon icn-fb"></div>
+						<div id="icn-twit" class="float-left social-item-icon icn-twit"></div>
+						<div id="icn-lin" class="float-left social-item-icon icn-lin"></div>
+						<div id="icn-yelp" class="float-left social-item-icon icn-yelp"></div>
 					</div>
 				</div>
 			</div>
@@ -285,8 +285,9 @@
     <div class="float-left mob-icn icn-star-smile"></div>
     <div class="float-left mob-icn inc-more"></div>
 </div>
-
-<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
+<div style="display: none">
+	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
+</div>
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>

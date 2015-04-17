@@ -4,7 +4,9 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import org.apache.solr.common.SolrDocumentList;
+
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
@@ -18,6 +20,7 @@ import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -342,9 +345,9 @@ public interface ProfileManagementService {
 	 */
 	public void findProfileMailIdAndSendMail(String agentProfileName,String message,String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
-	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time);
+	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException;
 
-	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize);
+	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException ;
 
 	public long getPostsCountForUser(long userId);
 	
@@ -364,6 +367,14 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateAgentExpertise(AgentSettings agentSettings, List<String> expertise) throws InvalidInputException;
+	
+	/**
+	 * Updates the agents hobbies
+	 * @param agentSettings
+	 * @param hobbies
+	 * @throws InvalidInputException
+	 */
+	public void updateAgentHobbies(AgentSettings agentSettings, List<String> hobbies) throws InvalidInputException;
 	
 	/**
 	 * Updates the company positions for an agent
