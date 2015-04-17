@@ -2218,8 +2218,16 @@ public class ProfileManagementController {
 		try {
 			patternFirst = request.getParameter("find-pro-first-name");
 			patternLast = request.getParameter("find-pro-last-name");
-			startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));
-			batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));
+			try{
+				startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));	
+			}catch(NumberFormatException e){
+				startIndex = CommonConstants.FIND_PRO_START_INDEX;
+			}
+			try{
+				batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));	
+			}catch(NumberFormatException e){
+				batchSize = CommonConstants.FIND_PRO_BATCH_SIZE;
+			}
 
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfile().");
