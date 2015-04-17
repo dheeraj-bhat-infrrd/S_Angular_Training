@@ -8,6 +8,7 @@ public class CompanyPositions {
 	private String name;
 	private String startTime;
 	private String endTime;
+	private String title;
 	private boolean isCurrent;
 
 	public String getName() {
@@ -32,6 +33,18 @@ public class CompanyPositions {
 
 	public void setEndTime(String endTime) {
 		this.endTime = endTime;
+	}
+
+	public String getTitle() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title = title;
+	}
+
+	public void setCurrent(boolean isCurrent) {
+		this.isCurrent = isCurrent;
 	}
 
 	public boolean getIsCurrent() {
