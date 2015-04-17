@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -404,6 +405,9 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		AgentSettings agentSettingsType = null;
 		if (agentSettings instanceof AgentSettings) {
 			agentSettingsType = (AgentSettings) agentSettings;
+			// sort the company positions. since we are type casting the settings here, we are sorting the same here
+			sortCompanyPositions(agentSettingsType.getPositions());
+			
 		}
 
 		// add the company profile data into agent settings
@@ -1365,4 +1369,13 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 				agentSettings);
 		LOG.info("Updated company positions.");
 	}
+	
+	private List<CompanyPositions> sortCompanyPositions(List<CompanyPositions> positions){
+		LOG.debug("Sorting company positions");
+		if(positions!= null && positions.size() > 0){
+			Collections.sort(positions);
+		}
+		return positions;
+	}
+	
 }
