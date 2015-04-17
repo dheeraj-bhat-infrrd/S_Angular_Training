@@ -1014,9 +1014,9 @@ function updateHobbies() {
 
 	hobbies = JSON.stringify(hobbies);
 	var payload = {
-		"hobbies" : hobbies
+		"hobbiesList" : hobbies
 	};
-	callAjaxPostWithPayloadData("./updateHobbies.do",
+	callAjaxPostWithPayloadData("./updatehobbies.do",
 			callBackUpdateHobbies, payload);
 }
 
