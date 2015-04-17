@@ -2145,6 +2145,61 @@ public class ProfileManagementController {
 		LOG.info("Method updateProfileLicenses() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
+	
+	@RequestMapping(value = "/updateexpertise", method = RequestMethod.POST)
+	public String updateExpertise(Model model, HttpServletRequest request) {
+		LOG.info("Method updateExpertise() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String payload = request.getParameter("expertiseList");
+			List<String> expertiseList = null;
+			try {
+				if (payload == null) {
+					throw new InvalidInputException("Expertise passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				expertiseList = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateAgentExpertise(agentSettings, expertiseList);
+				agentSettings.setExpertise(expertiseList);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding expertise.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+
+			LOG.info("Expertise list updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.EXPERTISE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating expertise. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.EXPERTISE_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateProfileLicenses() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
 
 	// JIRA SS-97 by RM-06 : EOC
 
