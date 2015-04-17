@@ -2197,7 +2197,62 @@ public class ProfileManagementController {
 					messageUtils.getDisplayMessage(DisplayMessageConstants.EXPERTISE_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
 		}
 
-		LOG.info("Method updateProfileLicenses() finished from ProfileManagementController");
+		LOG.info("Method updateExpertise() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	@RequestMapping(value = "/updatehobbies", method = RequestMethod.POST)
+	public String updateHobbies(Model model, HttpServletRequest request) {
+		LOG.info("Method updateHobbies() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String payload = request.getParameter("hobbiesList");
+			List<String> hobbiesList = null;
+			try {
+				if (payload == null) {
+					throw new InvalidInputException("Hobbies passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				hobbiesList = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateAgentHobbies(agentSettings, hobbiesList);
+				agentSettings.setHobbies(hobbiesList);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding hobbies.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+
+			LOG.info("Hobbies list updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.HOBBIES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating hobbies. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.HOBBIES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateHobbies() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
 

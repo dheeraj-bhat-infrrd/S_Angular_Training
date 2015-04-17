@@ -1344,6 +1344,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_EXPERTISE, expertise, agentSettings);
 		LOG.info("Updated agent expertise.");
 	}
+	
+	@Override
+	public void updateAgentHobbies(AgentSettings agentSettings, List<String> hobbies) throws InvalidInputException {
+		if (hobbies == null || hobbies.isEmpty()) {
+			throw new InvalidInputException("Hobbies list is not proper");
+		}
+		LOG.info("Updating agent hobbies");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_HOBBIES, hobbies, agentSettings);
+		LOG.info("Updated agent hobbies.");
+	}
 
 	@Override
 	public void updateAgentCompanyPositions(AgentSettings agentSettings, List<CompanyPositions> companyPositions) throws InvalidInputException {

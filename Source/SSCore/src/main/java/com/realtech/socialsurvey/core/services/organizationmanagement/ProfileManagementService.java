@@ -366,6 +366,14 @@ public interface ProfileManagementService {
 	public void updateAgentExpertise(AgentSettings agentSettings, List<String> expertise) throws InvalidInputException;
 	
 	/**
+	 * Updates the agents hobbies
+	 * @param agentSettings
+	 * @param hobbies
+	 * @throws InvalidInputException
+	 */
+	public void updateAgentHobbies(AgentSettings agentSettings, List<String> hobbies) throws InvalidInputException;
+	
+	/**
 	 * Updates the company positions for an agent
 	 * @param agentSettings
 	 * @param companyPositions
