@@ -9,6 +9,7 @@ var startIndexInc;
 var batchSizeInc;
 var totalReviewsInc;
 var surveyFetchedSoFarInc;
+var accountType;
 
 // colName and colValue contains profile level of logged in user and value for
 // colName is present in colValue.
@@ -46,7 +47,8 @@ $(document).scroll(function() {
 	}
 });
 
-function paintDashboard(profileMasterId, newProfileName, newProfileValue) {
+function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
+	accountType = typeoOfAccount;
 	startIndexCmp = 0;
 	batchSizeCmp = 1;
 	totalReviews = 0;
@@ -99,7 +101,8 @@ function showCompanyAdminFlow(newProfileName, newProfileValue) {
 
 	showProfileDetails(newProfileName, 0, 30);
 	bindSelectButtons();
-	populateSurveyStatisticsList(newProfileName);
+	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
+		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, 0);
 	showSurveyStatisticsGraphically(newProfileName, 0);
 
@@ -118,7 +121,8 @@ function showRegionAdminFlow(newProfileName, newProfileValue) {
 
 	showProfileDetails(newProfileName, newProfileValue, 30);
 	bindSelectButtons();
-	populateSurveyStatisticsList(newProfileName);
+	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
+		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 
@@ -137,7 +141,8 @@ function showBranchAdminFlow(newProfileName, newProfileValue) {
 
 	showProfileDetails(newProfileName, newProfileValue, 30);
 	bindSelectButtons();
-	populateSurveyStatisticsList(newProfileName);
+	if((accountType!="INDIVIDUAL") && (accountType!="FREE"))
+		populateSurveyStatisticsList(newProfileName);
 	showSurveyStatistics(newProfileName, newProfileValue);
 	showSurveyStatisticsGraphically(newProfileName, newProfileValue);
 
@@ -202,13 +207,15 @@ function populateSurveyStatisticsList(columnName) {
 	
 	var options = "";
 	var optionsForGraph = "";
-	if (columnName == "companyId") {
+	if ((columnName == "companyId") && (accountType == "ENTERPRISE")) {
 		options += "<option value=regionName>Region</option>";
 		optionsForGraph += "<option value=regionName>Region</option>";
 	}
-	if (columnName == "companyId" || columnName == "regionId") {
-		options += "<option value=branchName>Branch</option>";
-		optionsForGraph += "<option value=branchName>Branch</option>";
+	if (accountType == "ENTERPRISE" || accountType == "COMPANY") {
+		if (columnName == "companyId" || columnName == "regionId") {
+			options += "<option value=branchName>Branch</option>";
+			optionsForGraph += "<option value=branchName>Branch</option>";
+		}
 	}
 	if (columnName == "companyId" || columnName == "regionId" || columnName == "branchId") {
 		options += "<option value=displayName>Individual</option>";
