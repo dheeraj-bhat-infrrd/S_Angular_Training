@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import twitter4j.Status;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 
 @Component
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -18,8 +19,8 @@ public class TwitterFeedIngester implements Runnable {
 	private static final Logger LOG = LoggerFactory.getLogger(TwitterFeedIngester.class);
 
 	@Autowired
-	private TwitterFeedProcessorImpl processor;
-	
+	private SocialNetworkDataProcessor<Status, TwitterToken> processor;
+
 	private TwitterToken token;
 	private String collectionName;
 	private long iden;
@@ -52,7 +53,5 @@ public class TwitterFeedIngester implements Runnable {
 		finally {
 			LOG.info("Done fetching tweets for " + collectionName + " with iden: " + iden);
 		}
-
 	}
-
 }
