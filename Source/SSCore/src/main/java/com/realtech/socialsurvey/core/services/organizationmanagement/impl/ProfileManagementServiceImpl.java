@@ -1291,13 +1291,28 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to store status of a user into the mongo.
 	 */
 	@Override
-	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time) {
+	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException {
 		LOG.info("Method to add post to a user's profile started.");
+		if (selectedProfile == null) {
+			throw new InvalidInputException("No user settings found in session");
+		}
 		SocialPost socialPost = new SocialPost();
-		socialPost.setAgentId(userId);
-		socialPost.setPostedBy(postedBy);
+		socialPost.setPostedBy(selectedProfile.getUser().getFirstName()+" "+selectedProfile.getUser().getLastName());
 		socialPost.setPostText(postText);
 		socialPost.setSource("SocialSurvey");
+		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			socialPost.setCompanyId(selectedProfile.getCompany().getCompanyId());
+		}
+		else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			socialPost.setRegionId(selectedProfile.getRegionId());
+		}
+		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			socialPost.setBranchId(selectedProfile.getBranchId());
+		}
+		else{
+			socialPost.setAgentId(selectedProfile.getAgentId());
+		}
 		socialPost.setTimeInMillis(System.currentTimeMillis());
 		socialPostDao.addPostToUserProfile(socialPost);
 		LOG.info("Method to add post to a user's profile finished.");
@@ -1307,10 +1322,30 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * Method to fetch social posts for a particular user.
 	 */
 	@Override
-	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize) {
-		LOG.info("Method to fetch social posts for a particular user, getPostsForUser() started.");
-		List<SocialPost> posts = socialPostDao.getPostsByUserId(userId, startIndex, batchSize);
-		LOG.info("Method to fetch social posts for a particular user, getPostsForUser() finished.");
+	public List<SocialPost> getSocialPosts(UserProfile selectedProfile, int startIndex, int batchSize) throws InvalidInputException{
+		LOG.info("Method to fetch social posts , getSocialPosts() started.");
+		if (selectedProfile == null) {
+			throw new InvalidInputException("No user settings found in session");
+		}
+		String key = CommonConstants.AGENT_ID;
+		long iden = selectedProfile.getAgentId();
+		
+		int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+		if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+			key = CommonConstants.COMPANY_ID;
+			iden = selectedProfile.getCompany().getCompanyId();
+		}
+		else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+			key = CommonConstants.REGION_ID;
+			iden = selectedProfile.getRegionId();
+		}
+		else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+			key = CommonConstants.BRANCH_ID;
+			iden = selectedProfile.getBranchId();
+		}
+		
+		List<SocialPost> posts = socialPostDao.getSocialPosts(iden, key, startIndex, batchSize);
+		LOG.info("Method to fetch social posts , getSocialPosts() finished.");
 		return posts;
 	}
 
