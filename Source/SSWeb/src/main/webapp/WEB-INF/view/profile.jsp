@@ -60,12 +60,26 @@
     <div class="container">
         <div class="hm-header-row hm-header-row-main clearfix">
             <div class="float-left hm-header-row-left"><spring:message code="label.readwritesharereviews.key"/></div>
-            <div class="float-right hm-hr-row-right clearfix">
+            <div class="float-right hm-find-pro-right clearfix">
+            	<form id="find-pro-form" method="POST" action="${pageContext.request.contextPath}/findapro.do">
+		           	<div class="float-left prof-input-header">Find a professional</div>
+		           	<div class="float-left prof-input-cont">
+		           		<input id="find-pro-first-name" name="find-pro-first-name" type="text" placeholder="First Name">
+		           	</div>
+		           	<div class="float-left prof-input-cont">
+		           		<input id="find-pro-last-name" name="find-pro-last-name" type="text" placeholder="Last Name">
+		           	</div>
+		           	<input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
+					<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10">
+		           	<input id="find-pro-submit" type="button" class="float-left prof-submit-btn" value="Search">
+            	</form>
+            </div>
+            <!-- <div class="float-right hm-hr-row-right clearfix">
                 <div class="float-left social-item-icon icn-fb"></div>
                 <div class="float-left social-item-icon icn-twit"></div>
                 <div class="float-left social-item-icon icn-lin"></div>
                 <div class="float-left social-item-icon icn-yelp"></div>
-            </div>
+            </div> -->
         </div>
     </div>
 </div>
@@ -176,28 +190,44 @@
                     	<div class="left-contact-wrapper">
                     		<div id="prof-contact-hdr" class="left-panel-header prof-contact-hdr"></div>
                     		<div class="left-panel-content">
-                    			<div class="lp-row">
-                    				<div class="lp-input-cont">
-                    					<div class="float-left lp-username-icn lp-input-icn"></div>
-                    					<input type="text" class="lp-input" placeholder="example: John Doe">
-                    				</div>
-                    			</div>
-                    			<div class="lp-row">
-                    				<div class="lp-input-cont lp-email">
-                    					<div class="float-left lp-email-icn lp-input-icn"></div>
-                    					<input type="email" class="lp-input" placeholder="example: office@example.com">
-                    				</div>
-                    			</div>
-                    			<div class="lp-row">
-                    				<div class="lp-input-cont lp-textarea-cont">
-                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
-                    					<textarea type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
-                    				</div>
-                    			</div>
-                    			<div class="lp-row"></div>
-                    			<div class="lp-row">
-                    				<div class="lp-button">Submit Your message</div>
-                    			</div>
+                    		<form id="prof-contact-form" action="">
+	                    			<div class="lp-row">
+	                    				<div class="lp-input-cont">
+	                    					<div class="float-left lp-username-icn lp-input-icn"></div>
+	                    					<input type="text" class="lp-input" placeholder="example: John Doe">
+	                    				</div>
+	                    			</div>
+	                    			<div class="lp-row">
+	                    				<div class="lp-input-cont lp-email">
+	                    					<div class="float-left lp-email-icn lp-input-icn"></div>
+	                    					<input type="email" class="lp-input" placeholder="example: office@example.com">
+	                    				</div>
+	                    			</div>
+	                    			<div class="lp-row">
+	                    				<div class="lp-input-cont lp-textarea-cont">
+	                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
+	                    					<textarea type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
+	                    				</div>
+	                    			</div>
+	                    			<div class="lp-row">
+		                    			<div class="prof-captcha-cont">
+											<div id="prof-captcha-img" class="prof-captcha-img"></div>
+											<div class="reg-captcha-btns clearfix">
+												<input id="captcha-text" class="float-left prof-cap-txt"
+													name="captchaResponse" placeholder="Type the above text"
+													autocomplete="off" autocorrect="off" autocapitalize="off">
+												<div class="clearfix reg-btns-wrapper float-right">
+													<div class="float-left reg-cap-img reg-cap-reload"></div>
+													<div class="float-left reg-cap-img reg-cap-sound"></div>
+													<div class="float-left reg-cap-img reg-cap-info"></div>
+												</div>
+											</div>
+										</div>
+	                    			</div>
+	                    			<div class="lp-row">
+	                    				<div class="lp-button">Submit Your message</div>
+	                    			</div>
+                    			</form>
                     		</div>
                     	</div>
                     </div>  
@@ -245,6 +275,10 @@
     </div>
 </div>
 
+<div id="outer_captcha" style="display: none;">
+	<div id="recaptcha"></div>
+</div>
+
 <div class="mobile-tabs hide clearfix">
     <div class="float-left mob-icn mob-icn-active icn-person"></div>
     <div class="float-left mob-icn icn-ppl"></div>
@@ -252,10 +286,12 @@
     <div class="float-left mob-icn inc-more"></div>
 </div>
 
+<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/index.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
@@ -397,6 +433,80 @@
     		'eventLabel': gaLabel,
     		'eventValue': gaName
     	});
+    	
+    	
+    	// Find a pro
+    	$('#find-pro-submit').click(function(e) {
+    		e.preventDefault();
+    		submitFindProForm();
+    	});
+    	
+    	function submitFindProForm() {
+    		console.log("Submitting Find a Profile form");
+    		if(validateFindProForm('find-pro-form')){
+    			$('#find-pro-form').submit();
+    		}
+    		showOverlay();
+    	}
+    	
+    	
+    	
+    	var captchaText = true;
+    	try {
+    		
+    		Recaptcha.create('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-',
+    				'recaptcha', {
+    					theme : 'white',
+    					callback : captchaLoaded
+    				});
+    		console.log("Captcha loaded");
+    	} catch (error) {
+    		console.log("Could not load captcha");
+    	}
+    	
+    	function captchaLoaded() {
+    		var imgData = $(".recaptcha_image_cell").html();
+    		console.log("Captcha image data : " + imgData);
+    		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
+    		if(challenge == undefined){
+    			$(".reg-cap-reload").trigger('click');
+    		}else{
+    			$("#prof-captcha-img").html(imgData);
+    		}
+    	}
+
+    	$(".reg-cap-reload").click(function() {
+    		console.log("Captcha reload button clicked");
+    		Recaptcha.reload();
+    		console.log("Initiated the click of hidden reload");
+    	});
+
+    	$(".reg-cap-sound").click(function() {
+    		if (captchaText == true) {
+    			console.log("Captcha sound button clicked");
+    			$("#recaptcha_switch_audio").click();
+    			console.log("Initiated the click of hidden sound");
+    			captchaText = false;
+    			$(this).addClass('reg-cap-text');
+    		} else {
+    			console.log("Captcha text button clicked");
+    			$("#recaptcha_switch_img").click();
+    			console.log("Initiated the click of hidden text");
+    			captchaText = true;
+    			$(this).removeClass('reg-cap-text');
+    		}
+    	});
+
+    	$(".reg-cap-info").click(function() {
+    		console.log("Info button clicked");
+    		$("#recaptcha_whatsthis").click();
+    	});
+    	
+    	
+    	
+    	
+    	
+    	
     });
 </script>
 </body>
