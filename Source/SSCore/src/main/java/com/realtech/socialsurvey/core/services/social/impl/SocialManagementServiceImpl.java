@@ -267,6 +267,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		List<OrganizationUnitSettings> settings = new ArrayList<>();
 		Set<Long> branchIds = new HashSet<>();
 		Set<Long> regionIds = new HashSet<>();
+		Set<Long> companyIds = new HashSet<>();
 		Map<String, Object> queries = new HashMap<>();
 		queries.put(CommonConstants.USER_COLUMN, userDao.findById(User.class, agentId));
 		queries.put(CommonConstants.PROFILE_MASTER_COLUMN,
@@ -275,6 +276,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		for (UserProfile userProfile : userProfiles) {
 			branchIds.add(userProfile.getBranchId());
 			regionIds.add(userProfile.getRegionId());
+			companyIds.add(userProfile.getCompany().getCompanyId());
 		}
 
 		for (Long branchId : branchIds) {
@@ -283,6 +285,10 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 
 		for (Long regionId : regionIds) {
 			settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId, CommonConstants.REGION_SETTINGS_COLLECTION));
+		}
+		
+		for (Long companyId : companyIds) {
+			settings.add(organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId, CommonConstants.COMPANY_SETTINGS_COLLECTION));
 		}
 
 		LOG.info("Method to get settings of branches and regions current agent belongs to, getSettingsForBranchesAndRegionsInHierarchy() finished.");
