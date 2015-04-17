@@ -50,6 +50,7 @@ public class TwitterToken {
 
 	@Override
 	public String toString() {
-		return "TwitterToken [twitterId=" + twitterId + ", twitterPageLink=" + twitterPageLink + "]";
+		return "TwitterToken [twitterId=" + twitterId + ", twitterPageLink=" + twitterPageLink + ", twitterAccessToken=" + twitterAccessToken
+				+ ", twitterAccessTokenSecret=" + twitterAccessTokenSecret + ", twitterAccessTokenCreatedOn=" + twitterAccessTokenCreatedOn + "]";
 	}
 }
