@@ -3,7 +3,6 @@ package com.realtech.socialsurvey.core.commons;
 /**
  * Holds application level constants
  */
-
 public interface CommonConstants {
 
 	/**
@@ -46,15 +45,14 @@ public interface CommonConstants {
 	public static final int ACCOUNTS_MASTER_TEAM = 2;
 	public static final int ACCOUNTS_MASTER_COMPANY = 3;
 	public static final int ACCOUNTS_MASTER_ENTERPRISE = 4;
-	
+
 	/**
-	 *  Verticals master constants 
+	 * Verticals master constants
 	 */
 	public static final int VERTICALS_MASTER_CUSTOM = -1;
 	public static final int VERTICALS_MASTER_BANKING = 1;
 	public static final int VERTICALS_MASTER_MORTGAGE = 2;
 	public static final int VERTICALS_MASTER_REALTOR = 3;
-	
 
 	/**
 	 * Profile completion stages constants and form action constants, store the url mappings
@@ -130,6 +128,7 @@ public interface CommonConstants {
 	public static final String SURVEY_QUESTION_ORDER_COLUMN = "questionOrder";
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
 	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
+	public static final String FEED_SOURCE_COLUMN = "feedSource";
 
 	/**
 	 * Mongo entities and column name constants
@@ -154,7 +153,7 @@ public interface CommonConstants {
 	public static final String REMINDERS_FOR_SOCIAL_POSTS = "remindersForSocialPosts";
 	public static final String REVIEW_COUNT_MONGO = "reviewCount";
 	public static final String EDITABLE_SURVEY_COLUMN = "editable";
-	
+
 	/**
 	 * Constants to be used in code for referencing variables(i.e in maps or session attributes)
 	 */
@@ -184,7 +183,7 @@ public interface CommonConstants {
 	public static final String CRM_SOURCE = "crm_source";
 	public static final String VERTICAL = "vertical";
 	public static final String VERTICAL_COLUMN = "verticalsMaster";
-	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade"; 
+	public static final String PAID_PLAN_UPGRADE_FLAG = "paidUpgrade";
 	public static final String LINKEDIN_AUTH_URL = "authUrl";
 	public static final String LINKEDIN_REQUEST_TOKEN = "linkedinRequestToken";
 	public static final String SUCCESS_ATTRIBUTE = "success";
@@ -384,7 +383,7 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_REGION_PROFILE = 102;
 	public static final int SERVICE_CODE_BRANCH_PROFILE = 103;
 	public static final int SERVICE_CODE_FETCH_ALL_REGIONS = 104;
-	
+
 	/*
 	 * Mongo constants
 	 */
@@ -417,7 +416,7 @@ public interface CommonConstants {
 	public static final String BRANCH_SETTINGS_COLLECTION = "BRANCH_SETTINGS";
 	public static final String AGENT_SETTINGS_COLLECTION = "AGENT_SETTINGS";
 	public static final String SOCIAL_POST_COLLECTION = "SOCIAL_POST";
-	
+
 	/*
 	 * Constants related to Dash board profile.
 	 */
@@ -425,7 +424,7 @@ public interface CommonConstants {
 	public static final int MAX_SENT_SURVEY_COUNT = 10;
 	public static final int MAX_SOCIAL_POSTS = 10;
 	public static final String DATE_FORMAT = "dd-MM-yyyy";
-	
+
 	/*
 	 * Constats for Find a pro
 	 */
