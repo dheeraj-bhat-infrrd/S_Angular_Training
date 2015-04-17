@@ -6,7 +6,7 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 
@@ -20,12 +20,13 @@ public class SocialFeedExecutors implements InitializingBean {
 	private static final Logger LOG = LoggerFactory.getLogger(SocialFeedExecutors.class);
 	
 	private int numOfThreads = 10;
-	
 	private ExecutorService twitterExecutor;
-	
-	@Autowired
-	private TwitterFeedIngester twitterFeedIngester;
-	
+	private ApplicationContext context;
+
+	public void setContext(ApplicationContext context) {
+		this.context = context; 
+	}
+
 	@Override
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("Creating executors for social feed");
@@ -36,6 +37,7 @@ public class SocialFeedExecutors implements InitializingBean {
 
 	public void addTwitterProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName){
 		LOG.info("Adding twitter details to pool");
+		TwitterFeedIngester twitterFeedIngester = context.getBean(TwitterFeedIngester.class);
 		twitterFeedIngester.setCollectionName(collectionName);
 		twitterFeedIngester.setIden(ingestionEntity.getIden());
 		twitterFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getTwitterToken());
