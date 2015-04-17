@@ -11,12 +11,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -24,7 +26,7 @@ import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
-import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.TwitterSocialPost;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
@@ -43,6 +45,9 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	@Autowired
 	private SocialPostDao socialPostDao;
 
+	@Autowired
+	private MongoTemplate mongoTemplate;
+	
 	@Value("${TWITTER_CONSUMER_KEY}")
 	private String twitterConsumerKey;
 
@@ -164,8 +169,12 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			}
 			while (resultList.size() == PAGE_SIZE);
 		}
-		catch (Exception e) {
+		catch (TwitterException e) {
 			LOG.error("Exception in Twitter feed extration. Reason: " + e.getMessage());
+			
+			// setting no.of retries
+			status.setRetries(status.getRetries() + 1);
+			feedStatusDao.saveOrUpdate(status);
 		}
 		return tweets;
 	}
@@ -174,9 +183,10 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	public void processFeed(List<Status> tweets, String organizationUnit) throws NonFatalException {
 		LOG.info("Process tweets for organizationUnit " + organizationUnit);
 
-		SocialPost post;
+		TwitterSocialPost post;
 		for (Status tweet : tweets) {
-			post = new SocialPost();
+			post = new TwitterSocialPost();
+			post.setTweet(tweet);
 			post.setPostText(tweet.getText());
 			post.setSource(FEED_SOURCE);
 			post.setPostId(tweet.getId());
@@ -205,7 +215,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			lastFetchedPostId = String.valueOf(tweet.getId());
 
 			// pushing to mongo
-			socialPostDao.addPostToUserProfile(post);
+			mongoTemplate.insert(post, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
 	}
 
