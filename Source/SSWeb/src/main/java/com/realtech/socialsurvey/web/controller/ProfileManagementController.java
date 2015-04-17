@@ -2145,6 +2145,116 @@ public class ProfileManagementController {
 		LOG.info("Method updateProfileLicenses() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
+	
+	@RequestMapping(value = "/updateexpertise", method = RequestMethod.POST)
+	public String updateExpertise(Model model, HttpServletRequest request) {
+		LOG.info("Method updateExpertise() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String payload = request.getParameter("expertiseList");
+			List<String> expertiseList = null;
+			try {
+				if (payload == null) {
+					throw new InvalidInputException("Expertise passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				expertiseList = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateAgentExpertise(agentSettings, expertiseList);
+				agentSettings.setExpertise(expertiseList);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding expertise.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+
+			LOG.info("Expertise list updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.EXPERTISE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating expertise. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.EXPERTISE_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateExpertise() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+	
+	@RequestMapping(value = "/updatehobbies", method = RequestMethod.POST)
+	public String updateHobbies(Model model, HttpServletRequest request) {
+		LOG.info("Method updateHobbies() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session");
+			}
+
+			String payload = request.getParameter("hobbiesList");
+			List<String> hobbiesList = null;
+			try {
+				if (payload == null) {
+					throw new InvalidInputException("Hobbies passed was null or empty");
+				}
+				ObjectMapper mapper = new ObjectMapper();
+				hobbiesList = mapper.readValue(payload, TypeFactory.defaultInstance().constructCollectionType(List.class, String.class));
+			}
+			catch (IOException ioException) {
+				throw new NonFatalException("Error occurred while parsing json.", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				profileManagementService.updateAgentHobbies(agentSettings, hobbiesList);
+				agentSettings.setHobbies(hobbiesList);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in adding hobbies.", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+
+			LOG.info("Hobbies list updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.HOBBIES_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating hobbies. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.HOBBIES_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateHobbies() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
 
 	// JIRA SS-97 by RM-06 : EOC
 
@@ -2163,8 +2273,16 @@ public class ProfileManagementController {
 		try {
 			patternFirst = request.getParameter("find-pro-first-name");
 			patternLast = request.getParameter("find-pro-last-name");
-			startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));
-			batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));
+			try{
+				startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));	
+			}catch(NumberFormatException e){
+				startIndex = CommonConstants.FIND_PRO_START_INDEX;
+			}
+			try{
+				batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));	
+			}catch(NumberFormatException e){
+				batchSize = CommonConstants.FIND_PRO_BATCH_SIZE;
+			}
 
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfile().");
@@ -2771,10 +2889,16 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/savestatus")
 	public String saveStatus(HttpServletRequest request, Model model) {
 		LOG.info("Method to store status of the user started");
-		String text = request.getParameter("text");
-		User user = sessionHelper.getCurrentUser();
-		String postedBy = user.getFirstName()+" "+user.getLastName();
-		profileManagementService.addPostToUserProfile(user.getUserId(), text, postedBy, "profile", System.currentTimeMillis());
+		HttpSession session = request.getSession(false);
+		try{
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			String text = request.getParameter("text");
+			profileManagementService.addSocialPosts(selectedProfile, text);
+		}catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while saving status of user. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.SAVE_STATUS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
 		LOG.info("Method to store status of the user finished");
 		return "Added the status successfully";
 	}
@@ -2784,10 +2908,12 @@ public class ProfileManagementController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/postsforuser")
-	public String getPostsForUser(HttpServletRequest request, Model model) {
-		LOG.info("Method to get posts for the user, getPostsForUser() started");
+	public String getSocialPosts(HttpServletRequest request, Model model) {
+		LOG.info("Method to get posts for the user, getSocialPosts() started");
 		String startIndexStr = request.getParameter("startIndex");
 		String batchSizeStr = request.getParameter("batchSize");
+		HttpSession session = request.getSession(false);
+		
 		if(startIndexStr == null || batchSizeStr == null){
 			LOG.error("Null value found for startIndex or batch size.");
 			return "Null value found for startIndex or batch size.";
@@ -2795,10 +2921,18 @@ public class ProfileManagementController {
 		
 		int startIndex = Integer.parseInt(startIndexStr);
 		int batchSize = Integer.parseInt(batchSizeStr);
-		
-		User user = sessionHelper.getCurrentUser();
-		List<SocialPost> posts = profileManagementService.getPostsForUser(user.getUserId(), startIndex, batchSize);
-		LOG.info("Method to get posts for the user, getPostsForUser() finished");
+		List<SocialPost> posts = null;
+		try{
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			
+			posts = profileManagementService.getSocialPosts(selectedProfile, startIndex, batchSize);
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.FETCH_SOCIAL_POSTS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to get posts for the user, getSocialPosts() finished");
 		return new Gson().toJson(posts);
 	}
 	
