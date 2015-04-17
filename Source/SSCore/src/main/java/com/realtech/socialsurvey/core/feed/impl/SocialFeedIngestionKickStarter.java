@@ -137,6 +137,7 @@ public class SocialFeedIngestionKickStarter {
 			catch (NoContextFoundException e) {
 				executors.shutDownExecutorsNow();
 				e.printStackTrace();
+				throw e;
 			}
 		}
 		else {
