@@ -246,6 +246,7 @@ public class SurveyManagementController {
 		LOG.info("Method to start survey initiateSurveyWithUrl() finished.");
 		return JspResolver.SHOW_SURVEY_QUESTIONS;
 	}
+
 	/*
 	 * Method to retrieve survey questions for a survey based upon the company id and agent id.
 	 */
@@ -333,11 +334,13 @@ public class SurveyManagementController {
 		LOG.info("Method to post feedback of customer to various pages of social networking sites started.");
 		try {
 			String agentName = request.getParameter("agentName");
+			String agentProfileLink = request.getParameter("agentProfileLink");
 			String custFirstName = request.getParameter("firstName");
 			String custLastName = request.getParameter("lastName");
 			String agentIdStr = request.getParameter("agentId");
 			String ratingStr = request.getParameter("rating");
 			String customerEmail = request.getParameter("customerEmail");
+			String feedback = request.getParameter("feedback");
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -352,14 +355,15 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on Social Survey \n";
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
-					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+			facebookMessage += feedback;
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + "for " + agentName
+					+ " on @SocialSurvey - view at www.social-survey.com/" + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
 				List<String> socialSites = new ArrayList<>();
-				socialSites.add("facebook");
-				socialSites.add("twitter");
-				socialSites.add("linkedin");
+				socialSites.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
+				socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
+				socialSites.add(CommonConstants.LINKEDIN_SOCIAL_SITE);
 				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
 			}
 			catch (FacebookException e) {
@@ -399,6 +403,156 @@ public class SurveyManagementController {
 		}
 		LOG.info("Method to post feedback of customer to various pages of social networking sites finished.");
 		return "Successfully posted to all the places in hierarchy";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/posttofacebook", method = RequestMethod.GET)
+	public String postToFacebook(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer to facebook started.");
+		try {
+			String urlParam = request.getParameter("q");
+			Map<String, String> facebookDetails = urlGenerator.decryptParameters(urlParam);
+			String agentName = facebookDetails.get("agentName");
+			String custFirstName = facebookDetails.get("firstName");
+			String custLastName = facebookDetails.get("lastName");
+			String agentIdStr = facebookDetails.get("agentId");
+			String ratingStr = facebookDetails.get("rating");
+			String customerEmail = facebookDetails.get("customerEmail");
+			String feedback = facebookDetails.get("feedback");
+			long agentId = 0;
+			double rating = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+				rating = Double.parseDouble(ratingStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+					+ " on Social Survey \n";
+			facebookMessage += feedback;
+			try {
+				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
+				List<String> socialSites = new ArrayList<>();
+				socialSites.add(CommonConstants.FACEBOOK_SOCIAL_SITE);
+				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+			}
+			catch (FacebookException e) {
+				LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+			}
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
+				}
+				catch (FacebookException e) {
+					LOG.error("FacebookException caught in postToSocialMedia() while trying to post to facebook. Nested excption is ", e);
+				}
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in postToFacebook(). Nested exception is ", e);
+		}
+		LOG.info("Method to post feedback of customer to facebook finished.");
+		return "";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/posttotwitter", method = RequestMethod.GET)
+	public String postToTwitter(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer to twitter started.");
+		try {
+			String urlParam = request.getParameter("q");
+			Map<String, String> twitterDetails = urlGenerator.decryptParameters(urlParam);
+			String agentName = twitterDetails.get("agentName");
+			String agentProfileLink = twitterDetails.get("agentProfileLink");
+			String custFirstName = twitterDetails.get("firstName");
+			String custLastName = twitterDetails.get("lastName");
+			String agentIdStr = twitterDetails.get("agentId");
+			String ratingStr = twitterDetails.get("rating");
+			String customerEmail = twitterDetails.get("customerEmail");
+			long agentId = 0;
+			double rating = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+				rating = Double.parseDouble(ratingStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToTwitter() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+					+ " on @SocialSurvey - view at www.social-survey.com/rest/pages" + agentProfileLink;
+			try {
+				socialManagementService.tweet(agentSettings, twitterMessage);
+				List<String> socialSites = new ArrayList<>();
+				socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
+				surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+			}
+			catch (TwitterException e) {
+				LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
+			}
+			for (OrganizationUnitSettings setting : settings) {
+				try {
+					socialManagementService.tweet(setting, twitterMessage);
+				}
+				catch (TwitterException e) {
+					LOG.error("TwitterException caught in postToTwitter() while trying to post to twitter. Nested excption is ", e);
+				}
+			}
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in postToTwitter(). Nested exception is ", e);
+		}
+		LOG.info("Method to post feedback of customer to twitter finished.");
+		return "";
+	}
+
+	@ResponseBody
+	@RequestMapping(value = "/posttolinkedin", method = RequestMethod.GET)
+	public String postToLinkedin(HttpServletRequest request) {
+		LOG.info("Method to post feedback of customer to linkedin started.");
+		try {
+			String urlParam = request.getParameter("q");
+			Map<String, String> linkedinDetails = urlGenerator.decryptParameters(urlParam);
+			String agentName = linkedinDetails.get("agentName");
+			String custFirstName = linkedinDetails.get("firstName");
+			String custLastName = linkedinDetails.get("lastName");
+			String agentIdStr = linkedinDetails.get("agentId");
+			String ratingStr = linkedinDetails.get("rating");
+			String customerEmail = linkedinDetails.get("customerEmail");
+			String agentProfileLink = linkedinDetails.get("agentProfileLink");
+			long agentId = 0;
+			double rating = 0;
+			try {
+				agentId = Long.parseLong(agentIdStr);
+				rating = Double.parseDouble(ratingStr);
+			}
+			catch (NumberFormatException e) {
+				LOG.error("Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ", e);
+				return e.getMessage();
+			}
+			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
+			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+					+ " on @SocialSurvey - view at www.social-survey.com/rest/pages/" + agentProfileLink;
+			socialManagementService.updateLinkedin(agentSettings, message);
+			for (OrganizationUnitSettings setting : settings) {
+				socialManagementService.updateLinkedin(setting, message);
+			}
+			List<String> socialSites = new ArrayList<>();
+			socialSites.add(CommonConstants.TWITTER_SOCIAL_SITE);
+			surveyHandler.updateSharedOn(socialSites, agentId, customerEmail);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in postToTwitter(). Nested exception is ", e);
+		}
+		LOG.info("Method to post feedback of customer to twitter finished.");
+		return "";
 	}
 
 	@ResponseBody
@@ -461,7 +615,10 @@ public class SurveyManagementController {
 
 			OrganizationUnitSettings settings = userManagementService.getUserSettings(agentId);
 
-			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null) {
+			if (settings.getSocialMediaTokens() == null || settings.getSocialMediaTokens().getYelpToken() == null) {
+
+			}
+			else {
 				yelpUrl.put("host", yelpRedirectUri);
 				yelpUrl.put("relativePath", settings.getSocialMediaTokens().getYelpToken().getYelpPageLink());
 			}
@@ -552,19 +709,21 @@ public class SurveyManagementController {
 		LOG.info("Method to get Google details, updateSharedOn() finished.");
 		return new Gson().toJson("Success");
 	}
-	
+
 	@ResponseBody
-	@RequestMapping(value="/makesurveyeditable")
-	public void makeSurveyEditable(HttpServletRequest request){
+	@RequestMapping(value = "/makesurveyeditable")
+	public void makeSurveyEditable(HttpServletRequest request) {
 		String agentIdStr = request.getParameter("agentId");
 		String customerEmail = request.getParameter("customerEmail");
-		try{if(agentIdStr==null || agentIdStr.isEmpty()){
-			throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+		try {
+			if (agentIdStr == null || agentIdStr.isEmpty()) {
+				throw new InvalidInputException("Invalid value (Null/Empty) found for agentId.");
+			}
+			long agentId = Long.parseLong(agentIdStr);
+			surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
 		}
-		long agentId = Long.parseLong(agentIdStr);
-		surveyHandler.changeStatusOfSurvey(agentId, customerEmail, true);
-		}catch(NonFatalException e){
-			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ",e);
+		catch (NonFatalException e) {
+			LOG.error("NonfatalException caught in makeSurveyEditable(). Nested exception is ", e);
 		}
 	}
 
@@ -591,6 +750,8 @@ public class SurveyManagementController {
 				editable = survey.getEditable();
 				surveyAndStage.put("agentName", survey.getAgentName());
 				surveyAndStage.put("customerEmail", customerEmail);
+				surveyAndStage.put("customerFirstName", survey.getCustomerFirstName());
+				surveyAndStage.put("customerLastName", survey.getCustomerLastName());
 				for (SurveyQuestionDetails surveyDetails : surveyQuestionDetails) {
 					for (SurveyResponse surveyResponse : survey.getSurveyResponse()) {
 						if (surveyDetails.getQuestion().trim().equalsIgnoreCase(surveyResponse.getQuestion())) {
@@ -616,6 +777,23 @@ public class SurveyManagementController {
 				surveyAndStage.put("autopostEnabled", surveySettings.isAutoPostEnabled());
 			}
 		}
+
+		AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+		try {
+			agentSettings.getSocialMediaTokens().getYelpToken().getYelpPageLink();
+			surveyAndStage.put("yelpEnabled", true);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("yelpEnabled", false);
+		}
+		try {
+			agentSettings.getSocialMediaTokens().getGoogleToken().getProfileLink();
+			surveyAndStage.put("googleEnabled", true);
+		}
+		catch (NullPointerException e) {
+			surveyAndStage.put("googleEnabled", false);
+		}
+		surveyAndStage.put("agentProfileLink", agentSettings.getProfileUrl());
 		surveyAndStage.put("stage", stage);
 		surveyAndStage.put("survey", surveyQuestionDetails);
 		surveyAndStage.put("agentId", agentId);

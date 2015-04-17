@@ -1021,7 +1021,7 @@ public class EmailServicesImpl implements EmailServices {
 	
 	@Async
 	@Override
-	public void queueSocialPostReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException {
+	public void queueSocialPostReminderMail(String recipientMailId, String displayName, String agentName, String links) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
@@ -1048,7 +1048,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendSocialPostReminderMail(String recipientMailId, String displayName, String agentName) throws InvalidInputException,
+	public void sendSocialPostReminderMail(String recipientMailId, String displayName, String agentName, String links) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
