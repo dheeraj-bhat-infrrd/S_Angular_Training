@@ -3,10 +3,12 @@ package com.realtech.socialsurvey.web.rest;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.List;
+
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,14 +18,19 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
+import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
+import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.exception.BaseRestException;
 import com.realtech.socialsurvey.core.exception.CompanyProfilePreconditionFailureErrorCode;
 import com.realtech.socialsurvey.core.exception.InputValidationException;
@@ -35,6 +42,7 @@ import com.realtech.socialsurvey.core.exception.RestErrorResponse;
 import com.realtech.socialsurvey.core.services.organizationmanagement.OrganizationManagementService;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
+
 import ezvcard.Ezvcard;
 import ezvcard.VCard;
 import ezvcard.VCardVersion;
@@ -1252,6 +1260,233 @@ public class ProfileController {
 			return getErrorResponse(e);
 		}
 		return null;
+	}
+	
+	/**
+	 * Service to get the posts of an individual
+	 * 
+	 * @param individualProfileName
+	 * @param start
+	 * @param numberOfRows
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/{individualProfileName}/posts")
+	public Response getPostsForIndividual(@PathVariable String individualProfileName, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
+		//TODO
+		LOG.info("Service to get posts of an individual called for individualProfileName : " + individualProfileName);
+		Response response = null;
+		try {
+			if (individualProfileName == null || individualProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_INDIVIDUAL_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_INDIVIDUAL_POSTS,
+						"Profile name for individual is invalid"), "individual profile name is null or empty");
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+			OrganizationUnitSettings individualProfile = null;
+			try {
+				individualProfile = profileManagementService.getIndividualByProfileName(individualProfileName);
+				
+				UserProfile selectedProfile = new UserProfile();
+				
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setAgentId(individualProfile.getIden());
+				
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				String json = new Gson().toJson(posts);
+				LOG.debug("individual posts json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException | NoRecordsFetchedException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_INDIVIDUAL_POSTS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_INDIVIDUAL_POSTS, "Profile name for individual is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get posts of individual finished");
+		return response;
+	}
+	
+	/**
+	 * Service to get the posts of company
+	 * 
+	 * @param companyName
+	 * @param start
+	 * @param numberOfRows
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/company/{companyProfileName}/posts")
+	public Response getPostsForCompany(@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
+		//TODO
+		LOG.info("Service to get posts of a company called for companyProfileName : " + companyProfileName);
+		Response response = null;
+		try {
+			if (companyProfileName == null || companyProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_COMPANY_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_COMPANY_POSTS,
+						"Profile name for company is invalid"), "company profile name is null or empty");
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+
+			OrganizationUnitSettings companyProfile = null;
+			try {
+				companyProfile = profileManagementService.getCompanyProfileByProfileName(companyProfileName);
+				UserProfile selectedProfile = new UserProfile();
+				
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+				
+				Company company = new Company();
+				company.setCompanyId(companyProfile.getIden());
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setCompany(company);
+				
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				String json = new Gson().toJson(posts);
+				LOG.debug("individual posts json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_COMPANY_POSTS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_COMPANY_POSTS, "Profile name for company is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get posts of company finished");
+		return response;
+	}
+	
+	/**
+	 * Service to get the posts of region
+	 * 
+	 * @param regionProfileName
+	 * @param start
+	 * @param numberOfRows
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/region/{companyProfileName}/{regionProfileName}/posts")
+	public Response getPostsForRegion(@PathVariable String regionProfileName,@PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
+		//TODO
+		LOG.info("Service to get posts of a region called for regionProfileName : " + regionProfileName);
+		Response response = null;
+		try {
+			if (regionProfileName == null || regionProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_REGION_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_REGION_POSTS,
+						"Profile name for region is invalid"), "region profile name is null or empty");
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+
+			OrganizationUnitSettings regionProfile = null;
+			try {
+				regionProfile = profileManagementService.getRegionByProfileName(companyProfileName, regionProfileName);
+				UserProfile selectedProfile = new UserProfile();
+				
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setRegionId(regionProfile.getIden());
+				
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				String json = new Gson().toJson(posts);
+				LOG.debug("individual posts json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_REGION_POSTS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_REGION_POSTS, "Profile name for region is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get posts of region finished");
+		return response;
+	}
+	
+	/**
+	 * Service to get the posts of branch
+	 * 
+	 * @param branchProfileName
+	 * @param start
+	 * @param numberOfRows
+	 * @return
+	 */
+	@ResponseBody
+	@RequestMapping(value = "/branch/{companyProfileName}/{branchProfileName}/posts")
+	public Response getPostsForBranch(@PathVariable String branchProfileName, @PathVariable String companyProfileName, @QueryParam(value = "start") Integer start,
+			@QueryParam(value = "numRows") Integer numRows) {
+		//TODO
+		LOG.info("Service to get posts of a branch called for branchProfileName : " + branchProfileName);
+		Response response = null;
+		try {
+			if (branchProfileName == null || branchProfileName.isEmpty()) {
+				throw new InputValidationException(new ProfileServiceErrorCode(
+						CommonConstants.ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE, CommonConstants.SERVICE_CODE_BRANCH_POSTS,
+						"Profile name for branch is invalid"), "branch profile name is null or empty");
+			}
+			if (start == null) {
+				start = -1;
+			}
+			if (numRows == null) {
+				numRows = -1;
+			}
+
+			OrganizationUnitSettings branchProfile = null;
+			try {
+				branchProfile = profileManagementService.getBranchByProfileName(companyProfileName, branchProfileName);
+				UserProfile selectedProfile = new UserProfile();
+				
+				ProfilesMaster profilesMaster = new ProfilesMaster();
+				profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID);
+				
+				selectedProfile.setProfilesMaster(profilesMaster);
+				selectedProfile.setBranchId(branchProfile.getIden());
+				
+				List<SocialPost> posts = profileManagementService.getSocialPosts(selectedProfile, start, numRows);
+				String json = new Gson().toJson(posts);
+				LOG.debug("individual posts json : " + json);
+				response = Response.ok(json).build();
+			}
+			catch (InvalidInputException e) {
+				throw new InternalServerException(new ProfileServiceErrorCode(CommonConstants.ERROR_CODE_BRANCH_POSTS_FETCH_FAILURE,
+						CommonConstants.SERVICE_CODE_BRANCH_POSTS, "Profile name for branch is invalid"), e.getMessage());
+			}
+		}
+		catch (BaseRestException e) {
+			response = getErrorResponse(e);
+		}
+		LOG.info("Service to get posts of branch finished");
+		return response;
 	}
 
 	/**
