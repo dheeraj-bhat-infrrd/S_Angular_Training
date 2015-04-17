@@ -71,7 +71,10 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +'	<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>';
             headContentHtml = headContentHtml +'	</div>';
             headContentHtml = headContentHtml +'	<div class="prof-btn-wrapper clearfix">';
-            headContentHtml = headContentHtml +'		<div class="prof-btn-contact float-left" id="" onclick="focusOnContact()" >Contact '+contactDetails.name+'</div>';
+            
+            var firstName = contactDetails.name.split(" ")[0];
+            
+            headContentHtml = headContentHtml +'		<div class="prof-btn-contact float-left" id="" onclick="focusOnContact()" >Contact '+firstName+'</div>';
             headContentHtml = headContentHtml +'		<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>';
             headContentHtml = headContentHtml +'	</div>';            
             $("#prof-company-head-content").html(headContentHtml);
@@ -197,6 +200,36 @@ function paintProfilePage(result) {
             	findProList(result.iden,result.contact_details.name);
             	
             });
+            
+            
+            //Add social links
+            if(result.socialMediaTokens){
+            	var socialToken = result.socialMediaTokens;
+            	if(socialToken.facebookToken && socialToken.facebookToken.facebookPageLink){
+            		$('#icn-fb').data('link',socialToken.facebookToken.facebookPageLink);            		
+            	}
+            	if(socialToken.twitterToken && socialToken.twitterToken.twitterPageLink){
+            		$('#icn-twit').data('link',socialToken.twitterToken.twitterPageLink);            		
+            	}
+            	if(socialToken.linkedInToken && socialToken.linkedInToken.linkedInPageLink){
+            		$('#icn-lin').data('link',socialToken.linkedInToken.linkedInPageLink);            		
+            	}
+            	if(socialToken.yelpToken && socialToken.yelpToken.yelpPageLink){
+            		$('#icn-yelp').data('link',socialToken.yelpToken.yelpPageLink);            		
+            	}
+            	
+            	$('.social-item-icon').bind('click',function(){
+            		var link = $(this).data('link');
+            		
+            		if(link == undefined || link == ""){
+            			return false;
+            		}
+            		
+            		window.open(link,'_blank');
+            		
+            	});
+            }
+            
 		}         
 	}
 }
@@ -642,7 +675,9 @@ function paintAllReviewsCount(data) {
 		$("#prof-company-review-count").html(reviewsSizeHtml);
 		if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
-				$(window).scrollTop($('#reviews-container').offset().top);
+				$('html, body').animate({
+					scrollTop : $('#reviews-container').offset().top
+				},500);
 			});
 		}
 	}
@@ -869,11 +904,25 @@ function paintIndividualDetails(result){
 	if(result.associations != undefined && result.associations.length > 0){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
 		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Membership</div>';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content" style="display:block">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Memberships</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		$.each(result.associations,function(i,associations){
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+associations.name+'</div>';
 		});
+		individualDetailsHtml = individualDetailsHtml + '		</div>';
+		individualDetailsHtml = individualDetailsHtml + '	</div>';
+		individualDetailsHtml = individualDetailsHtml + '</div>';
+	}
+	
+	//paint expertise
+	if(result.expertise != undefined && result.expertise.length > 0){
+		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Specialities</div>';
+		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
+		for(var i=0;i<result.expertise.length;i++){
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+result.expertise[i]+'</div>';
+		}
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
 		individualDetailsHtml = individualDetailsHtml + '</div>';
@@ -915,20 +964,6 @@ function paintIndividualDetails(result){
 		individualDetailsHtml = individualDetailsHtml + '</div>';
 	}
 	
-	//paint expertise
-	if(result.expertise != undefined && result.expertise.length > 0){
-		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
-		individualDetailsHtml = individualDetailsHtml + '	<div class="left-ach-wrapper">';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Expertise</div>';
-		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
-		for(var i=0;i<result.expertise.length;i++){
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-ach-row lp-row clearfix">'+result.expertise[i]+'</div>';
-		}
-		individualDetailsHtml = individualDetailsHtml + '		</div>';
-		individualDetailsHtml = individualDetailsHtml + '	</div>';
-		individualDetailsHtml = individualDetailsHtml + '</div>';
-	}
-
 	//paint hobbies
 	if(result.hobbies != undefined && result.hobbies.length > 0){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-ach bord-bot-dc">';
@@ -949,7 +984,7 @@ function paintIndividualDetails(result){
 		if(licenses.authorized_in != undefined && licenses.authorized_in.length > 0) {
 			individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-auth bord-bot-dc">';
 			individualDetailsHtml = individualDetailsHtml + '	<div class="left-auth-wrapper">';
-			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Authorised In</div>';
+			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed">Licenses</div>';
 			individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 			
 			$.each(licenses.authorized_in, function(i, authorizedIn) {
@@ -966,6 +1001,7 @@ function paintIndividualDetails(result){
         $(this).next('.lph-dd-content').slideToggle(200);
     });	
     
+	$('.lph-dd:nth(0)').trigger('click');
             
 }
 
