@@ -25,6 +25,9 @@ var firstName;
 var lastName;
 var surveyUrl = "/rest/survey/";
 var editable;
+var yelpEnabled;
+var googleEnabled;
+var agentProfileLink;
 
 $(document).on('click', '.sq-np-item-next', function() {
 });
@@ -105,6 +108,8 @@ function initSurveyWithUrl(q) {
 				loadAgentPic(agentId);
 				agentName = data.responseJSON.agentName;
 				customerEmail = data.responseJSON.customerEmail;
+				firstName = data.responseJSON.customerFirstName;
+				lastName = data.responseJSON.customerLastName;
 				paintSurveyPage(data);
 			}
 		},
@@ -155,6 +160,9 @@ function paintSurveyPage(jsonData) {
 	sadText = jsonData.responseJSON.sadText;
 	autoPost = jsonData.responseJSON.autopostEnabled;
 	autoPostScore = jsonData.responseJSON.autopostScore;
+	yelpEnabled = Boolean(jsonData.responseJSON.yelpEnabled);
+	googleEnabled = Boolean(jsonData.responseJSON.googleEnabled);
+	agentProfileLink = jsonData.responseJSON.agentProfileLink;
 	if (stage != undefined)
 		qno = stage;
 	paintSurveyPageFromJson();
@@ -441,6 +449,14 @@ function showMasterQuestionPage(){
 		if(autoPost){
 			postToSocialMedia(feedback);
 			$('#social-post-lnk').show();
+			if(yelpEnabled)
+				$('#ylp-btn').show();
+			else
+				$('#ylp-btn').hide();
+			if(googleEnabled)
+				$('#ggl-btn').show();
+			else
+				$('#ggl-btn').hide();
 		}
 		updateCustomerResponse(feedback);
 		$("div[data-ques-type]").hide();
@@ -460,7 +476,9 @@ function postToSocialMedia(feedback){
 		"lastName" : lastName,
 		"agentName" : agentName,
 		"rating" : rating,
-		"customerEmail" : customerEmail
+		"customerEmail" : customerEmail,
+		"feedback" : feedback,
+		"agentProfileLink" : agentProfileLink
 	};
 	$.ajax({
 		url : window.location.origin + surveyUrl + "posttosocialnetwork",
