@@ -1467,6 +1467,7 @@ button.paypal.is-active {
 	cursor: pointer;
 	border-radius: 3px;
 	color: #fff;
+	text-transform: capitalize;
 }
 
 .prof-btn-contact:hover,.prof-btn-survey:hover{
