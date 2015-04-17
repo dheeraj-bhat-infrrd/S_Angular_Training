@@ -1290,7 +1290,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time) {
 		LOG.info("Method to add post to a user's profile started.");
 		SocialPost socialPost = new SocialPost();
-		socialPost.setUserId(userId);
+		socialPost.setAgentId(userId);
 		socialPost.setPostedBy(postedBy);
 		socialPost.setPostText(postText);
 		socialPost.setSource("SocialSurvey");
@@ -1343,6 +1343,16 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Updating agent expertise");
 		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_EXPERTISE, expertise, agentSettings);
 		LOG.info("Updated agent expertise.");
+	}
+	
+	@Override
+	public void updateAgentHobbies(AgentSettings agentSettings, List<String> hobbies) throws InvalidInputException {
+		if (hobbies == null || hobbies.isEmpty()) {
+			throw new InvalidInputException("Hobbies list is not proper");
+		}
+		LOG.info("Updating agent hobbies");
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_HOBBIES, hobbies, agentSettings);
+		LOG.info("Updated agent hobbies.");
 	}
 
 	@Override
