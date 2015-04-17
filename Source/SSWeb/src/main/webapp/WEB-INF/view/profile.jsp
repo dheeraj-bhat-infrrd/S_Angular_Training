@@ -120,10 +120,10 @@
 					</div>
 					<div class="float-right hm-hr-row-right clearfix">
 						<div id="social-connect-txt" class="float-left social-connect-txt"></div>
-						<div class="float-left social-item-icon icn-fb"></div>
-						<div class="float-left social-item-icon icn-twit"></div>
-						<div class="float-left social-item-icon icn-lin"></div>
-						<div class="float-left social-item-icon icn-yelp"></div>
+						<div id="icn-fb" class="float-left social-item-icon icn-fb"></div>
+						<div id="icn-twit" class="float-left social-item-icon icn-twit"></div>
+						<div id="icn-lin" class="float-left social-item-icon icn-lin"></div>
+						<div id="icn-yelp" class="float-left social-item-icon icn-yelp"></div>
 					</div>
 				</div>
 			</div>
