@@ -425,4 +425,10 @@ public interface CommonConstants {
 	public static final int MAX_SENT_SURVEY_COUNT = 10;
 	public static final int MAX_SOCIAL_POSTS = 10;
 	public static final String DATE_FORMAT = "dd-MM-yyyy";
+	
+	/*
+	 * Constats for Find a pro
+	 */
+	public static final int FIND_PRO_START_INDEX = 0;
+	public static final int FIND_PRO_BATCH_SIZE = 10;
 }

@@ -44,7 +44,7 @@ function paintProfilePage(result) {
 			
 			$('#social-connect-txt').text("Contact with "+contactDetails.name+":");
 			$('#prof-header-url').text(location.href);
-			$('#prof-contact-hdr').text("Contact "+contactDetails.name)
+			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
 			
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
@@ -52,6 +52,13 @@ function paintProfilePage(result) {
 			}
             if(contactDetails.title != undefined) {
             	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.title+'</div>';
+            }
+            if(contactDetails.location != undefined) {
+            	headContentHtml = headContentHtml +' <div class="prof-addline2">'+contactDetails.location;
+            	if(contactDetails.industry != undefined){
+            		headContentHtml += " | "+ contactDetails.industry;
+            	}
+            	headContentHtml += "</div>";
             }
             headContentHtml = headContentHtml +' </div>';
             headContentHtml = headContentHtml +' <div class="prof-rating clearfix">';
@@ -70,15 +77,41 @@ function paintProfilePage(result) {
             $("#prof-company-head-content").html(headContentHtml);
             
             var addressHtml ="";
-            if(contactDetails.address1 != undefined){
-            	addressHtml = addressHtml +'<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
-            }
-            if(contactDetails.address2 != undefined){
-            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
-            }
-            if(contactDetails.country != undefined) {
-            	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
-            }
+            
+            
+            //TODO:Company profile addreess
+            
+            
+            if(profileLevel == 'INDIVIDUAL' && result.companyProfileData){
+            	var companyProfileData = result.companyProfileData;
+            	
+            	if(companyProfileData.name != undefined){
+                	addressHtml = addressHtml +'<div class="prof-user-addline1">'+companyProfileData.name+'</div>';
+                }
+                if(companyProfileData.address != undefined){
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+companyProfileData.address+'</div>';
+                }
+                if(companyProfileData.country != undefined) {
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+companyProfileData.country;
+                	if(companyProfileData.zipcode){
+                		addressHtml += ' , '+companyProfileData.zipcode;
+                	}
+                	addressHtml += '</div>';
+                }
+    		}else{
+    			if(contactDetails.address1 != undefined){
+                	addressHtml = addressHtml +'<div class="prof-user-addline1">'+contactDetails.address1+'</div>';
+                }
+                if(contactDetails.address2 != undefined){
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.address2+'</div>';
+                }
+                if(contactDetails.country != undefined) {
+                	addressHtml = addressHtml + '<div class="prof-user-addline2">'+contactDetails.country+'</div>';
+                }
+    		}
+            
+            
+            
             $("#prof-company-address").html(addressHtml);
             if(result.logo != undefined) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
@@ -604,10 +637,10 @@ function paintAllReviewsCount(data) {
 	var responseJson = $.parseJSON(data);
 	if(responseJson != undefined) {
 		var reviewsSizeHtml = responseJson.entity;
-		$("#profile-fetch-info").attr("total-reviews",reviewsSizeHtml);
-		if(reviewsSizeHtml > 0){
-			reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
-			$("#prof-company-review-count").html(reviewsSizeHtml);
+		$("#profile-fetch-info").attr("total-reviews",responseJson.entity);
+		reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
+		$("#prof-company-review-count").html(reviewsSizeHtml);
+		if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
 				$(window).scrollTop($('#reviews-container').offset().top);
 			});

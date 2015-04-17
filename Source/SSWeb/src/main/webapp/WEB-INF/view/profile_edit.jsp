@@ -38,7 +38,17 @@
 <c:if test="${not empty profile && not empty profileSettings.licenses}">
 	<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 </c:if>
-
+<c:if test="${profilemasterid == 4}">
+	<c:if test="${not empty profile && not empty profileSettings.expertise}">
+		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
+	</c:if>
+	<c:if test="${not empty profile && not empty profileSettings.positions}">
+		<c:set value="${profileSettings.positions}" var="positions"></c:set>
+	</c:if>
+	<c:if test="${not empty profile && not empty profileSettings.hobbies}">
+		<c:set value="${profileSettings.hobbies}" var="hobbies"></c:set>
+	</c:if>
+</c:if>
 <div id="prof-message-header" class="hide"></div>
 <div class="hm-header-main-wrapper">
 	<div>
@@ -456,6 +466,54 @@
 								</div>
 							</div>
 						</div>
+						<c:if test="${profilemasterid == 4}">
+							<div class="prof-left-row prof-left-auth bord-bot-dc">
+								<div class="left-expertise-wrapper">
+									<div class="clearfix">
+										<div class="float-left left-panel-header"><spring:message code="label.expertise.key" /></div>
+										<div class="float-right icn-share icn-plus-open-agent" onclick="addExpertise();"></div>
+									</div>
+									<div id="expertise-container" class="left-panel-content">
+										<c:choose>
+											<c:when test="${not empty expertiseList}">
+												<c:forEach items="${expertiseList}" var="expertise">
+													<div class="lp-dummy-row clearfix">
+														<input class="lp-expertise-row lp-row clearfix prof-edditable-sin-agent" value="${expertise}" data-status="saved">
+														<div class="float-right lp-expertise-item-img hide" data-type="expertise"></div>
+													</div>
+												</c:forEach>
+											</c:when>
+											<c:otherwise>
+												<span><spring:message code="label.expertise.empty.key"></spring:message></span>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
+							<div class="prof-left-row prof-left-auth bord-bot-dc">
+								<div class="left-hobbies-wrapper">
+									<div class="clearfix">
+										<div class="float-left left-panel-header"><spring:message code="label.hobbies.key" /></div>
+										<div class="float-right icn-share icn-plus-open-agent" onclick="addHobby();"></div>
+									</div>
+									<div id="hobbies-container" class="left-panel-content">
+										<c:choose>
+											<c:when test="${not empty hobbies}">
+												<c:forEach items="${hobbies}" var="hobby">
+													<div class="lp-dummy-row clearfix">
+														<input class="lp-hobby-row lp-row clearfix prof-edditable-sin-agent" value="${hobby}" data-status="saved">
+														<div class="float-right lp-hobby-item-img hide" data-type="hobby"></div>
+													</div>
+												</c:forEach>
+											</c:when>
+											<c:otherwise>
+												<span><spring:message code="label.hobbies.empty.key"></spring:message></span>
+											</c:otherwise>
+										</c:choose>
+									</div>
+								</div>
+							</div>
+						</c:if>
 					</c:when>
 					<c:otherwise>
 						<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12"></div>
