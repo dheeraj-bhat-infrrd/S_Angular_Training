@@ -2913,7 +2913,7 @@ button.paypal.is-active {
 }
 
 #recaptcha_image img#recaptcha_challenge_image {
-	width: 370px
+	width: 100%;
 }
 
 .reg-captcha-img {
@@ -5835,7 +5835,7 @@ tr.u-tbl-header td {
 }
 
 .lp-input-cont {
-    width: 280px;
+    width: 300px;
     height: 37px;
     margin: 15px 0;
     border: 1px solid #c4c4c4;
@@ -5866,7 +5866,7 @@ tr.u-tbl-header td {
 }
 
 .lp-button {
-    width: 280px;
+    width: 300px;
     height: 48px;
     margin: 10px 0;
     line-height: 48px;
@@ -5884,4 +5884,95 @@ tr.u-tbl-header td {
 
 .prof-contact-hdr{
 	text-transform: capitalize;
+}
+
+.lp-username-icn{
+	background: url(../images/username_1.png) no-repeat center;
+}
+
+.lp-email-icn{
+	background: url(../images/email_1.png) no-repeat center;
+}
+
+.lp-textarea-icn{
+	background: url(../images/note.png) no-repeat center;
+}
+
+.web-address-img{
+	width: 19px;
+	height: 25px;
+	background: url(../images/web_blue.png) no-repeat center;
+}
+
+.prof-input-cont {
+    width: 160px;
+    height: 35px;
+    border: 1px solid #d7d7d8;
+    border-radius: 3px;
+    background:#fff;
+    margin: 0 10px;
+}
+
+.hm-find-pro-right {
+    margin-top: 10px;
+}
+
+.prof-input-cont input {
+	width:100%;
+	height:100%;
+    border: none;
+    background: transparent;
+    line-height: 35px;
+    padding-left: 10px;
+}
+
+.prof-input-header {
+	line-height: 40px;
+	font-family: 'opensanssemibold';
+	font-size: 14px;
+	color: #777;
+}
+
+.prof-submit-btn {
+    line-height: 30px;
+    height: 35px;
+    width: 100px !important;
+    text-align: center;
+    background: #3E9DCB;
+    border:none;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.prof-submit-btn:hover {
+    background: #77B000;
+}
+
+.prof-submit-btn:hover,.prof-submit-btn:focus,.prof-submit-btn:active{
+	border:none;
+	outline: none;
+}
+
+.prof-captcha-cont {
+	width: 300px;
+	border: 1px solid #dcdcdc;
+	border-radius: 3px;
+}
+
+.prof-captcha-img {
+	width: 100%; 
+	height : 58px;
+	border-bottom: 1px solid #c4c4c4;
+	background: #fff no-repeat center;
+	background-size:cover;
+}
+
+.prof-cap-txt {
+  width: 184px;
+  height: 36px;
+  padding: 0 10px;
+  border: 0;
+  font-size: 12px;
+  color: #3e3e3e;
 }
