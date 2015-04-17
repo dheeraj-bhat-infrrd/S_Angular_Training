@@ -174,11 +174,15 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 					for(PositionValues positionValue: linkedInProfileData.getPositions().getValues()){
 						companyPositions = new CompanyPositions();
 						companyPositions.setName(positionValue.getCompany().getName());
+						companyPositions.setStartMonth(positionValue.getStartDate().getMonth());
+						companyPositions.setStartYear(positionValue.getStartDate().getYear());
 						companyPositions.setStartTime(positionValue.getStartDate().getMonth()+"-"+positionValue.getStartDate().getYear());
 						companyPositions.setIsCurrent(positionValue.isCurrent());
 						companyPositions.setTitle(positionValue.getTitle());
 						if(!positionValue.isCurrent()){
 							companyPositions.setEndTime(positionValue.getEndDate().getMonth()+"-"+positionValue.getEndDate().getYear());
+							companyPositions.setEndMonth(positionValue.getEndDate().getMonth());
+							companyPositions.setEndYear(positionValue.getEndDate().getYear());
 						}
 						companyPositionsList.add(companyPositions);
 					}
