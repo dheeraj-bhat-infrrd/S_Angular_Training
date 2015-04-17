@@ -11,6 +11,7 @@ import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
+import com.realtech.socialsurvey.core.exception.NoContextFoundException;
 
 /**
  * Kick starts the feed ingestion
@@ -86,50 +87,56 @@ public class SocialFeedIngestionKickStarter {
 
 		if (ingestionEntity != null && ingestionEntity.getSocialMediaTokens() != null) {
 			LOG.debug("Starting to fetch the feed.");
+			
+			try {
+				// check for individual social media entry
+				SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
+				if (token.getFacebookToken() != null) {
+					// TODO: process facebook token
+				}
+				else {
+					LOG.warn("No facebook token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
 
-			// check for individual social media entry
-			SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
-			if (token.getFacebookToken() != null) {
-				// TODO: process facebook token
-			}
-			else {
-				LOG.warn("No facebook token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-			}
+				if (token.getGoogleToken() != null) {
+					// TODO: process google plus token
+				}
+				else {
+					LOG.warn("No google+ token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
 
-			if (token.getGoogleToken() != null) {
-				// TODO: process google plus token
-			}
-			else {
-				LOG.warn("No google+ token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-			}
+				if (token.getLinkedInToken() != null) {
+					// TODO: process linkedin token
+				}
+				else {
+					LOG.warn("No linkedin token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
 
-			if (token.getLinkedInToken() != null) {
-				// TODO: process linkedin token
-			}
-			else {
-				LOG.warn("No linkedin token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-			}
+				if (token.getRssToken() != null) {
+					// TODO: process rss token
+				}
+				else {
+					LOG.warn("No rss token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
 
-			if (token.getRssToken() != null) {
-				// TODO: process rss token
-			}
-			else {
-				LOG.warn("No rss token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-			}
+				if (token.getTwitterToken() != null) {
+					LOG.info("Processing tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
+					executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
+				}
+				else {
+					LOG.warn("No twitter token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
 
-			if (token.getTwitterToken() != null) {
-				LOG.info("Processing tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
-				executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
+				if (token.getYelpToken() != null) {
+					// TODO: process yelp token
+				}
+				else {
+					LOG.warn("No yelp token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+				}
 			}
-			else {
-				LOG.warn("No twitter token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
-			}
-
-			if (token.getYelpToken() != null) {
-				// TODO: process yelp token
-			}
-			else {
-				LOG.warn("No yelp token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
+			catch (NoContextFoundException e) {
+				executors.shutDownExecutorsNow();
+				e.printStackTrace();
 			}
 		}
 		else {
