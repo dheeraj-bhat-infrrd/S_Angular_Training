@@ -27,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.Association;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
 import com.realtech.socialsurvey.core.entities.CompanyPositions;
+import com.realtech.socialsurvey.core.entities.CompanyProfileData;
 import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.ContactNumberSettings;
 import com.realtech.socialsurvey.core.entities.Licenses;
@@ -80,7 +81,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Autowired
 	private SurveyDetailsDao surveyDetailsDao;
-	
+
 	@Autowired
 	private SocialPostDao socialPostDao;
 
@@ -399,7 +400,22 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 		// Aggregate Company Profile settings
 		LockSettings userLock = new LockSettings();
-		agentSettings = aggregateProfileData(companySettings, agentSettings, userLock);
+		agentSettings = (AgentSettings) aggregateProfileData(companySettings, agentSettings, userLock);
+		AgentSettings agentSettingsType = null;
+		if (agentSettings instanceof AgentSettings) {
+			agentSettingsType = (AgentSettings) agentSettings;
+		}
+
+		// add the company profile data into agent settings
+		CompanyProfileData companyProfileData = new CompanyProfileData();
+		companyProfileData.setName(companySettings.getContact_details().getName());
+		companyProfileData.setCompanyLogo(companySettings.getLogo());
+		companyProfileData.setAddress(companySettings.getContact_details().getAddress());
+		companyProfileData.setCountry(companySettings.getContact_details().getCountry());
+		companyProfileData.setZipcode(companySettings.getContact_details().getZipcode());
+		if (agentSettingsType != null) {
+			agentSettingsType.setCompanyProfileData(companyProfileData);
+		}
 
 		// Aggregate Region Profile settings if exists
 		if (regionSettings != null) {
@@ -416,7 +432,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		agentSettings.setLockSettings(userLock);
 
 		LOG.debug("Method aggregateAgentProfile() finished from ProfileManagementService");
-		return agentSettings;
+		return (agentSettingsType != null ? agentSettingsType : agentSettings);
 	}
 
 	private OrganizationUnitSettings aggregateProfileData(OrganizationUnitSettings parentProfile, OrganizationUnitSettings userProfile,
@@ -477,7 +493,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 					userLock.setBlogAddressLocked(true);
 				}
 			}
-			
+
 			// Phone numbers
 			if (parentProfile.getContact_details().getContact_numbers() != null) {
 				if (parentLock.getIsWorkPhoneLocked() && !userLock.getIsWorkPhoneLocked()
@@ -580,7 +596,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
 				contactDetailsSettings, unitSettings, collection);
 		// Update the seo content flag to true
-		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, unitSettings, collection);
+		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true,
+				unitSettings, collection);
 		LOG.info("Contact details updated successfully");
 		return contactDetailsSettings;
 	}
@@ -595,7 +612,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_CONTACT_DETAIL_SETTINGS,
 				contactDetailsSettings, agentSettings);
 		// Update the seo content flag to true
-		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true, agentSettings);
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_SEO_CONTENT_MODIFIED, true,
+				agentSettings);
 		LOG.info("Contact details updated successfully");
 		return contactDetailsSettings;
 	}
@@ -1068,7 +1086,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			default:
 				throw new InvalidInputException("profile level is invalid in getProListByProfileLevel");
 		}
-		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, true,start, numOfRows);
+		solrSearchResult = solrSearchService.searchUsersByIden(iden, idenFieldName, true, start, numOfRows);
 
 		LOG.info("Method getProListByProfileLevel finished successfully");
 		return solrSearchResult;
@@ -1187,9 +1205,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method getIndividualsByRegionIds executed successfully");
 		return users;
 	}
-	
+
 	/**
 	 * Method that mails the contact us message to the respective individual,branch,region,company
+	 * 
 	 * @param agentProfileName
 	 * @param message
 	 * @param senderMailId
@@ -1199,35 +1218,34 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void findProfileMailIdAndSendMail(String profileName, String message,
-			String senderMailId,String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
-		
-		if(profileName == null || profileName.isEmpty()){
+	public void findProfileMailIdAndSendMail(String profileName, String message, String senderMailId, String profileType)
+			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
+
+		if (profileName == null || profileName.isEmpty()) {
 			LOG.error("contactAgent : profile name parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : profile name parameter is empty or null!");
 		}
-		
-		if(message == null || message.isEmpty()){
+
+		if (message == null || message.isEmpty()) {
 			LOG.error("contactAgent : message parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : message parameter is empty or null!");
 		}
-		
-		if(senderMailId == null || senderMailId.isEmpty()){
+
+		if (senderMailId == null || senderMailId.isEmpty()) {
 			LOG.error("contactAgent : senderMailId parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : senderMailId parameter is empty or null!");
 		}
-		
-		if(profileType == null || profileType.isEmpty()){
+
+		if (profileType == null || profileType.isEmpty()) {
 			LOG.error("contactAgent : profileType parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : profileType parameter is empty or null!");
 		}
-		
+
 		OrganizationUnitSettings settings = null;
-		
-		if(profileType.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)){
+
+		if (profileType.equals(CommonConstants.PROFILE_LEVEL_INDIVIDUAL)) {
 			LOG.debug("Fetching the agent settings from mongo for the agent with profile name : " + profileName);
-			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
-					CommonConstants.AGENT_SETTINGS_COLLECTION);
+			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName, CommonConstants.AGENT_SETTINGS_COLLECTION);
 			LOG.debug("Settings fetched from mongo!");
 		}
 		else if (profileType.equals(CommonConstants.PROFILE_LEVEL_COMPANY)) {
@@ -1238,14 +1256,14 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		}
 		else if (profileType.equals(CommonConstants.PROFILE_LEVEL_REGION)) {
 			LOG.debug("Fetching the region settings from mongo for the region with profile name : " + profileName);
-			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
-					CommonConstants.REGION_SETTINGS_COLLECTION);
+			settings = organizationUnitSettingsDao
+					.fetchOrganizationUnitSettingsByProfileName(profileName, CommonConstants.REGION_SETTINGS_COLLECTION);
 			LOG.debug("Settings fetched from mongo!");
 		}
 		else if (profileType.equals(CommonConstants.PROFILE_LEVEL_BRANCH)) {
 			LOG.debug("Fetching the branch settings from mongo for the branch with profile name : " + profileName);
-			settings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(profileName,
-					CommonConstants.BRANCH_SETTINGS_COLLECTION);
+			settings = organizationUnitSettingsDao
+					.fetchOrganizationUnitSettingsByProfileName(profileName, CommonConstants.BRANCH_SETTINGS_COLLECTION);
 			LOG.debug("Settings fetched from mongo!");
 		}
 		else {
@@ -1264,13 +1282,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new NoRecordsFetchedException("No records found for agent settings of profile name : " + profileName + " in mongo");
 		}
 	}
-		
-		
+
 	/*
 	 * Method to store status of a user into the mongo.
 	 */
 	@Override
-	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time){
+	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time) {
 		LOG.info("Method to add post to a user's profile started.");
 		SocialPost socialPost = new SocialPost();
 		socialPost.setUserId(userId);
@@ -1281,23 +1298,23 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		socialPostDao.addPostToUserProfile(socialPost);
 		LOG.info("Method to add post to a user's profile finished.");
 	}
-	
+
 	/*
 	 * Method to fetch social posts for a particular user.
 	 */
 	@Override
-	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize){
+	public List<SocialPost> getPostsForUser(long userId, int startIndex, int batchSize) {
 		LOG.info("Method to fetch social posts for a particular user, getPostsForUser() started.");
 		List<SocialPost> posts = socialPostDao.getPostsByUserId(userId, startIndex, batchSize);
 		LOG.info("Method to fetch social posts for a particular user, getPostsForUser() finished.");
 		return posts;
 	}
-	
+
 	/*
 	 * Method to fetch social posts for a particular user.
 	 */
 	@Override
-	public long getPostsCountForUser(long userId){
+	public long getPostsCountForUser(long userId) {
 		LOG.info("Method to fetch count of social posts for a particular user, getPostsCountForUser() started.");
 		long postsCount = socialPostDao.getPostsCountByUserId(userId);
 		LOG.info("Method to fetch count of social posts for a particular user, getPostsCountForUser() finished.");
@@ -1307,7 +1324,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	@Override
 	public void updateLinkedInProfileData(String collectionName, OrganizationUnitSettings organizationUnitSettings,
 			LinkedInProfileData linkedInProfileData) throws InvalidInputException {
-		LOG.info("Updating linked in profile data into "+collectionName);
+		LOG.info("Updating linked in profile data into " + collectionName);
 		if (linkedInProfileData == null) {
 			throw new InvalidInputException("LinkedInProfile details passed can not be null");
 		}
@@ -1315,12 +1332,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		organizationUnitSettingsDao.updateParticularKeyOrganizationUnitSettings(MongoOrganizationUnitSettingDaoImpl.KEY_LINKEDIN_PROFILEDATA,
 				linkedInProfileData, organizationUnitSettings, collectionName);
 		LOG.info("Updated the linkedin profile data.");
-		
+
 	}
 
 	@Override
 	public void updateAgentExpertise(AgentSettings agentSettings, List<String> expertise) throws InvalidInputException {
-		if(expertise == null || expertise.isEmpty()){
+		if (expertise == null || expertise.isEmpty()) {
 			throw new InvalidInputException("Expertise list is not proper");
 		}
 		LOG.info("Updating agent expertise");
@@ -1330,11 +1347,12 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 
 	@Override
 	public void updateAgentCompanyPositions(AgentSettings agentSettings, List<CompanyPositions> companyPositions) throws InvalidInputException {
-		if(companyPositions == null || companyPositions.isEmpty()){
+		if (companyPositions == null || companyPositions.isEmpty()) {
 			throw new InvalidInputException("Company positions passed are not proper");
 		}
 		LOG.info("Updating company positions");
-		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_COMPANY_POSITIONS, companyPositions, agentSettings);
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_COMPANY_POSITIONS, companyPositions,
+				agentSettings);
 		LOG.info("Updated company positions.");
 	}
 }
