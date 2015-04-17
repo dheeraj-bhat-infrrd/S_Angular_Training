@@ -185,7 +185,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			post.setTweet(tweet);
 			post.setPostText(tweet.getText());
 			post.setSource(FEED_SOURCE);
-			post.setPostId(tweet.getId());
+			post.setPostId(String.valueOf(tweet.getId()));
 			post.setTimeInMillis(tweet.getCreatedAt().getTime());
 
 			switch (organizationUnit) {

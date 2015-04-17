@@ -7,7 +7,7 @@ public class SocialPost {
 	private long branchId = -1;
 	private long agentId = -1;
 	private long timeInMillis = 0;
-	private long postId = -1;
+	private String postId;
 	private String postText;
 	private String postedBy;
 
@@ -75,11 +75,11 @@ public class SocialPost {
 		this.postedBy = postedBy;
 	}
 
-	public long getPostId() {
+	public String getPostId() {
 		return postId;
 	}
 
-	public void setPostId(long postId) {
+	public void setPostId(String postId) {
 		this.postId = postId;
 	}
 }
