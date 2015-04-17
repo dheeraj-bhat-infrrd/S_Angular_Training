@@ -29,6 +29,7 @@
 	<div class="dash-container container">
 		<div id="prof-container" data-profile-master-id="${profileMasterId}"
 			data-profile-id="${profileId}" data-column-name="${columnName}"
+			data-account-type="${accounttype}"
 			data-column-value="${columnValue}" class="dash-top-info">
 			<div id="dash-profile-detail-circles" class="row row-dash-top-adj">
 				<!-- Populated by profile detail -->
@@ -180,7 +181,8 @@ $(document).ready(function() {
 	var profileMasterId = $('#prof-container').attr('data-profile-master-id');
 	var currentProfileName = $('#prof-container').attr('data-column-name');
 	var currentProfileValue = $('#prof-container').attr('data-column-value');
+	var accountType = $('#prof-container').attr('data-account-type');
 
-	paintDashboard(profileMasterId, currentProfileName, currentProfileValue);
+	paintDashboard(profileMasterId, currentProfileName, currentProfileValue, accountType);
 });
 </script>
