@@ -23,7 +23,6 @@ import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.entities.TwitterSocialPost;
@@ -31,7 +30,7 @@ import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
 
-@Component
+@Component("twitterFeed")
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Status, TwitterToken> {
 
@@ -41,9 +40,6 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 
 	@Autowired
 	private GenericDao<FeedStatus, Long> feedStatusDao;
-
-	@Autowired
-	private SocialPostDao socialPostDao;
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
