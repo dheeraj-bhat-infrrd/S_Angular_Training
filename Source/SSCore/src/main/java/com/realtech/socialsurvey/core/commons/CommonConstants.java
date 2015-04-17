@@ -204,6 +204,10 @@ public interface CommonConstants {
 	public static final String BRANCHES_IN_SESSION = "branchesInSession";
 	public static final String REGIONS_IN_SESSION = "regionsInSession";
 	public static final String PROFILE_AGENT_VIEW = "Myself";
+	public static final String COMPANY_ID = "companyId";
+	public static final String REGION_ID = "regionId";
+	public static final String BRANCH_ID = "branchId";
+	public static final String AGENT_ID = "agentId";
 
 	/**
 	 * Batch Constants

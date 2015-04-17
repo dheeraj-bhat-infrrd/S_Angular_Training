@@ -99,6 +99,8 @@ public final class DisplayMessageConstants {
 	public static final String EXPERTISE_UPDATE_UNSUCCESSFUL = "EXPERTISE_UPDATE_UNSUCCESSFUL";
 	public static final String HOBBIES_UPDATE_SUCCESSFUL = "HOBBIES_UPDATE_SUCCESSFUL";
 	public static final String HOBBIES_UPDATE_UNSUCCESSFUL = "HOBBIES_UPDATE_UNSUCCESSFUL";
+	public static final String SAVE_STATUS_UNSUCCESSFUL = "SAVE_STATUS_UNSUCCESSFUL";
+	public static final String FETCH_SOCIAL_POSTS_UNSUCCESSFUL = "FETCH_SOCIAL_POSTS_UNSUCCESSFUL";
 
 	// success message constants
 	public static final String REGISTRATION_INVITE_SUCCESSFUL = "REGISTRATION_INVITE_SUCCESSFUL";
