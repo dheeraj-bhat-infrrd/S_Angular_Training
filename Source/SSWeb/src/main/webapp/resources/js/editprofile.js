@@ -881,6 +881,157 @@ function callBackUpdateLicenseAuthorizations(data) {
 	}
 }
 
+//TODO:Postions
+
+//Function to update Expertise
+function addExpertise() {
+	if ($('#expertise-container > div').length <= 0) {
+		$('#expertise-container').empty();
+	}
+
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#expertise-container').append(newDiv);
+
+	var newExpertise = $('<input>').attr({
+		"class" : "lp-expertise-row lp-row clearfix prof-edditable-sin-agent",
+		"placeholder" : "Add Skill",
+		"data-status" : "new"
+	});
+	var newExpertiseButton = $('<div>').attr({
+		"class" : "lp-ach-item-img hide",
+		"data-type" : "expertise"
+	});
+
+	$('#expertise-container').children().last().append(newExpertise);
+	$('#expertise-container').children().last().append(
+			newExpertiseButton);
+	newExpertise.focus();
+	newExpertiseButton.addClass('float-right');
+}
+
+$(document).on('blur', '#expertise-container input', function(e) {
+	e.stopPropagation();
+	delay(function() {
+		updateExpertise();
+	}, 0);
+});
+
+function updateExpertise() {
+	var expertiseList = [];
+	var statusEdited = false;
+
+	$('#expertise-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
+			var licence = value;
+			expertiseList.push(licence);
+
+			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
+		}
+	});
+	if (!statusEdited) {
+		return;
+	}
+
+	expertiseList = JSON.stringify(expertiseList);
+	var payload = {
+		"expertiseList" : expertiseList
+	};
+	callAjaxPostWithPayloadData("./updateexpertise.do",
+			callBackUpdateExpertise, payload);
+}
+
+function callBackUpdateExpertise(data) {
+	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	if (!$('#expertise-container').find('input').length) {
+		$('#expertise-container').append(
+				'<span>No license added yet</span>');
+	}
+}
+
+//Function to update Hobbies
+function addHobby() {
+	if ($('#hobbies-container > div').length <= 0) {
+		$('#hobbies-container').empty();
+	}
+
+	var newDiv = $('<div>').attr({
+		"class" : "lp-dummy-row clearfix"
+	});
+	$('#hobbies-container').append(newDiv);
+
+	var newExpertise = $('<input>').attr({
+		"class" : "lp-hobby-row lp-row clearfix prof-edditable-sin-agent",
+		"placeholder" : "Add Hobby",
+		"data-status" : "new"
+	});
+	var newExpertiseButton = $('<div>').attr({
+		"class" : "lp-ach-item-img hide",
+		"data-type" : "hobby"
+	});
+
+	$('#hobbies-container').children().last().append(newExpertise);
+	$('#hobbies-container').children().last().append(
+			newExpertiseButton);
+	newExpertise.focus();
+	newExpertiseButton.addClass('float-right');
+}
+
+$(document).on('blur', '#hobbies-container input', function(e) {
+	e.stopPropagation();
+	delay(function() {
+		updateHobbies();
+	}, 0);
+});
+
+function updateHobbies() {
+	var hobbies = [];
+	var statusEdited = false;
+
+	$('#hobbies-container').children().each(function() {
+		var status = $(this).children().first().attr('data-status');
+		var value = $(this).children().first().val();
+		if (value != "" && status != 'removed') {
+			var licence = value;
+			hobbies.push(licence);
+
+			statusEdited = true;
+		} else if (status == 'removed') {
+			statusEdited = true;
+		}
+	});
+	if (!statusEdited) {
+		return;
+	}
+
+	hobbies = JSON.stringify(hobbies);
+	var payload = {
+		"hobbiesList" : hobbies
+	};
+	callAjaxPostWithPayloadData("./updatehobbies.do",
+			callBackUpdateHobbies, payload);
+}
+
+function callBackUpdateHobbies(data) {
+	$('#prof-message-header').html(data);
+	$('#overlay-toast').html($('#display-msg-div').text().trim());
+	showToast();
+
+	if (!$('#expertise-container').find('input').length) {
+		$('#expertise-container').append(
+				'<span>No license added yet</span>');
+	}
+}
+
+
 // Update Social links
 
 $('body').on('click','#prof-edit-social-link .icn-fb',function(){

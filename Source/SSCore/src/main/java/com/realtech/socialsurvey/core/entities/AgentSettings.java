@@ -8,6 +8,7 @@ public class AgentSettings extends OrganizationUnitSettings {
 	private List<String> hobbies;
 	private long reviewCount;
 	private List<CompanyPositions> positions;
+	private CompanyProfileData companyProfileData;
 
 	public List<String> getExpertise() {
 		return expertise;
@@ -39,6 +40,14 @@ public class AgentSettings extends OrganizationUnitSettings {
 
 	public void setPositions(List<CompanyPositions> positions) {
 		this.positions = positions;
+	}
+
+	public CompanyProfileData getCompanyProfileData() {
+		return companyProfileData;
+	}
+
+	public void setCompanyProfileData(CompanyProfileData companyProfileData) {
+		this.companyProfileData = companyProfileData;
 	}
 
 	@Override

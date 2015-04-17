@@ -73,6 +73,7 @@
 				<value>com.realtech.socialsurvey.core.entities.VerticalCrmMapping</value>
 				<value>com.realtech.socialsurvey.core.entities.VerticalsMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmMaster</value>
+				<value>com.realtech.socialsurvey.core.entities.FeedStatus</value>
 			</list>
 		</property>
 	</bean>
