@@ -1273,7 +1273,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	public void addPostToUserProfile(long userId, String postText, String postedBy, String source, long time){
 		LOG.info("Method to add post to a user's profile started.");
 		SocialPost socialPost = new SocialPost();
-		socialPost.setUserId(userId);
+		socialPost.setAgentId(userId);
 		socialPost.setPostedBy(postedBy);
 		socialPost.setPostText(postText);
 		socialPost.setSource("SocialSurvey");
