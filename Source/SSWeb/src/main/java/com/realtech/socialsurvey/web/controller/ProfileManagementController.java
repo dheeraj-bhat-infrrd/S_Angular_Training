@@ -2889,10 +2889,16 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/savestatus")
 	public String saveStatus(HttpServletRequest request, Model model) {
 		LOG.info("Method to store status of the user started");
-		String text = request.getParameter("text");
-		User user = sessionHelper.getCurrentUser();
-		String postedBy = user.getFirstName()+" "+user.getLastName();
-		profileManagementService.addPostToUserProfile(user.getUserId(), text, postedBy, "profile", System.currentTimeMillis());
+		HttpSession session = request.getSession(false);
+		try{
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			String text = request.getParameter("text");
+			profileManagementService.addSocialPosts(selectedProfile, text);
+		}catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while saving status of user. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.SAVE_STATUS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
 		LOG.info("Method to store status of the user finished");
 		return "Added the status successfully";
 	}
@@ -2902,10 +2908,12 @@ public class ProfileManagementController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/postsforuser")
-	public String getPostsForUser(HttpServletRequest request, Model model) {
-		LOG.info("Method to get posts for the user, getPostsForUser() started");
+	public String getSocialPosts(HttpServletRequest request, Model model) {
+		LOG.info("Method to get posts for the user, getSocialPosts() started");
 		String startIndexStr = request.getParameter("startIndex");
 		String batchSizeStr = request.getParameter("batchSize");
+		HttpSession session = request.getSession(false);
+		
 		if(startIndexStr == null || batchSizeStr == null){
 			LOG.error("Null value found for startIndex or batch size.");
 			return "Null value found for startIndex or batch size.";
@@ -2913,10 +2921,18 @@ public class ProfileManagementController {
 		
 		int startIndex = Integer.parseInt(startIndexStr);
 		int batchSize = Integer.parseInt(batchSizeStr);
-		
-		User user = sessionHelper.getCurrentUser();
-		List<SocialPost> posts = profileManagementService.getPostsForUser(user.getUserId(), startIndex, batchSize);
-		LOG.info("Method to get posts for the user, getPostsForUser() finished");
+		List<SocialPost> posts = null;
+		try{
+			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+			
+			posts = profileManagementService.getSocialPosts(selectedProfile, startIndex, batchSize);
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while fetching posts. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.FETCH_SOCIAL_POSTS_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+		LOG.info("Method to get posts for the user, getSocialPosts() finished");
 		return new Gson().toJson(posts);
 	}
 	
