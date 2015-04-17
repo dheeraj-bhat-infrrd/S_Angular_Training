@@ -128,6 +128,8 @@ public class SocialManagementController {
 		// AuthUrl for diff social networks
 		String socialNetwork = request.getParameter("social");
 		String socialFlow = request.getParameter("flow");
+		
+		session.removeAttribute(CommonConstants.SOCIAL_FLOW);
 		switch (socialNetwork) {
 
 		// Building facebook authUrl
