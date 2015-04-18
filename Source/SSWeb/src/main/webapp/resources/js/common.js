@@ -204,7 +204,6 @@ function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
 
-
 /**
  * function for adding delay to a function call
  */
