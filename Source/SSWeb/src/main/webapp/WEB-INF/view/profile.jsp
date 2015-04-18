@@ -194,19 +194,19 @@
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont">
 	                    					<div class="float-left lp-username-icn lp-input-icn"></div>
-	                    					<input type="text" class="lp-input" placeholder="example: John Doe">
+	                    					<input id="lp-input-name" type="text" class="lp-input" placeholder="example: John Doe">
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-email">
 	                    					<div class="float-left lp-email-icn lp-input-icn"></div>
-	                    					<input type="email" class="lp-input" placeholder="example: office@example.com">
+	                    					<input id="lp-input-email" type="email" class="lp-input" placeholder="example: office@example.com">
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-textarea-cont">
 	                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
-	                    					<textarea type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
+	                    					<textarea id="lp-input-message" type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
@@ -386,40 +386,56 @@
             $('body').removeClass('body-no-scroll-y');
         });
         
-        $(document).on('click', '.bd-q-btn-done-pu', function() {
-			// perform deault functions
-			url = window.location.origin + "/pages/profile/sendmail.do";
-			data = "";
-			if($("#agent-profile-name").val() != ""){
-				data += "profilename=" + $("#agent-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			else if($("#company-profile-name").val() != ""){
-				data += "profilename=" + $("#company-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			else if($("#region-profile-name").val() != ""){
-				data += "profilename=" + $("#region-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			else if($("#branch-profile-name").val() != ""){
-				data += "profilename=" + $("#branch-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			
-			data += "&email=blah@blahblah.com";
-			data += "&message="+ $('.bd-q-pu-txtarea').val();
-			showOverlay();
-			callAjaxPostWithPayloadData(url,function(message){
-				$('#contact-us-pu-wrapper').hide();
-				$('body').removeClass('body-no-scroll-y');
-				$('#overlay-toast').html(message);
-	    		console.log("Added toast message : " + message);
-	    		showToast();
-	    		console.log("Finished showing the toast");
-
-			},data,true);
+        $('.lp-button').click(function(event){
+        	
+        	if(validateContactUsForm()){
+        		
+        		url = window.location.origin + "/pages/profile/sendmail.do";
+    			data = "";
+    			if($("#agent-profile-name").val() != ""){
+    				data += "profilename=" + $("#agent-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			else if($("#company-profile-name").val() != ""){
+    				data += "profilename=" + $("#company-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			else if($("#region-profile-name").val() != ""){
+    				data += "profilename=" + $("#region-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			else if($("#branch-profile-name").val() != ""){
+    				data += "profilename=" + $("#branch-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			
+    			data += "&name=" + $('#lp-input-name').val();
+    			data += "&email=" + $('#lp-input-email').val();
+    			data += "&message=" + $('#lp-input-message').val();
+    			data += "&recaptcha_challenge_field=" + $('#recaptcha_challenge_field').val();
+    			data += "&recaptcha_input=" + $('#captcha-text').val();
+    			
+    			showOverlay();
+    			callAjaxPostWithPayloadData(url,showMessage,data,true);
+        	}			
 		});
+        
+        function showMessage(data){
+        	var jsonData = JSON.parse(data);
+        	console.log("Data recieved : " + jsonData);
+        	if(jsonData["success"] == 1){
+        		console.log("Added toast message. Showing it now");
+	    		showInfoMobileAndWeb(jsonData["message"]);
+        		console.log("Finished showing the toast");
+    			$(".reg-cap-reload").click();
+        	}
+        	else{
+        		console.error("Error occured while sending contact us message. ");
+        		showErrorMobileAndWeb(jsonData["message"]);
+        		console.log("Finished showing the toast");
+    			$(".reg-cap-reload").click();
+        	}
+        }
         
         $(document).on('click','.vcard-download', function(){
         	var agentName = $("#agent-profile-name").val();
@@ -503,11 +519,112 @@
     		$("#recaptcha_whatsthis").click();
     	});
     	
+    	// Contact us form validation functions
+    	
+    	function validateMessage(elementId) {
+    		if ($('#'+elementId).val() != "") {
+    			return true;
+	    	} else {
+	    		showErrorMobileAndWeb('Please enter your message!');
+	    		return false;
+	    	}
+    	}
+    	
+    	function validateName(elementId){
+    		if ($('#'+elementId).val() != "") {
+    			if (nameRegex.test($('#'+elementId).val()) == true) {
+    				return true;
+    			} else {
+    				showErrorMobileAndWeb('Please enter your valid name!');
+    				return false;
+    			}
+    		} else {
+    			showErrorMobileAndWeb('Please enter your valid name!');
+    			return false;
+    		}
+    	}
+    	
+    	$('#lp-input-name').blur(function() {
+    		if (validateName(this.id)) {
+    			hideError();
+    		}
+    	});
+    	
+    	$('#lp-input-email').blur(function() {
+    		if (validateEmailId(this.id)) {
+    			hideError();
+    		}
+    	});
+    	
+    	$('#lp-input-message').blur(function() {
+    		if (validateMessage(this.id)) {
+    			hideError();
+    		}
+    	});
+    	
+    	$('#captcha-text').blur(function() {
+    		if (validateMessage(this.id)) {
+    			hideError();
+    		}
+    	});
     	
     	
-    	
-    	
-    	
+    	function validateContactUsForm() {
+        	isContactUsFormValid = true;
+
+        	var isFocussed = false;
+        	var isSmallScreen = false;
+        	if($(window).width() < 768){
+        		isSmallScreen = true;
+        	}
+        	
+        	// Validate form input elements
+    		if (!validateName('lp-input-name')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#lp-input-name').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+        	
+    		if (!validateEmailId('lp-input-email')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#lp-input-email').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+    		
+    		if (!validateMessage('lp-input-message')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#lp-input-message').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+    		
+    		if (!validateMessage('captcha-text')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#captcha-text').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+    		
+        	return isContactUsFormValid;
+    	}    	
     });
 </script>
 </body>
