@@ -92,7 +92,8 @@ public class SocialFeedIngestionKickStarter {
 				// check for individual social media entry
 				SocialMediaTokens token = ingestionEntity.getSocialMediaTokens();
 				if (token.getFacebookToken() != null) {
-					// TODO: process facebook token
+					LOG.info("Processing facebook posts for " + collectionName + " with iden: " + ingestionEntity.getIden());
+					executors.addFacebookProcessorToPool(ingestionEntity, collectionName);
 				}
 				else {
 					LOG.warn("No facebook token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
@@ -120,7 +121,7 @@ public class SocialFeedIngestionKickStarter {
 				}
 
 				if (token.getTwitterToken() != null) {
-					LOG.info("Processing tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
+					LOG.info("Processing twitter tweets for " + collectionName + " with iden: " + ingestionEntity.getIden());
 					executors.addTwitterProcessorToPool(ingestionEntity, collectionName);
 				}
 				else {
