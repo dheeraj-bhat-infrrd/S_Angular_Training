@@ -1377,18 +1377,13 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
-		if (reviewCount == 0) {
-			// hiding reviews-container if no reviews present
-			$("#prof-company-review-count").hide();
-			$("#reviews-container").hide();
-		} else {
-			reviewCount = reviewCount + ' Review(s)';
+		if (reviewCount > 0) {
+			$("#prof-company-review-count").click(function() {
+				$(window).scrollTop($('#reviews-container').offset().top);
+			});
 		}
-
+		reviewCount = reviewCount + ' Review(s)';
 		$("#prof-company-review-count").html(reviewCount);
-		$("#prof-company-review-count").click(function() {
-			$(window).scrollTop($('#reviews-container').offset().top);
-		});
 	}
 }
 
@@ -1400,7 +1395,7 @@ function fetchAvgRating(attrName, attrVal) {
 
 function paintAvgRating(avgRating) {
 	if (avgRating != undefined) {
-		changeRatingPattern(avgRating, $("#rating-avg-comp"));
+		changeRatingPattern(avgRating, $("#rating-avg-comp"),true);
 	}
 }
 
