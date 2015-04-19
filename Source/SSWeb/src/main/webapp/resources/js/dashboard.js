@@ -668,7 +668,10 @@ function updateCurrentProfile(profileId) {
 	callAjaxGET(url, function(data) {}, true);
 }
 
-// Dashboard View as
+function showSurveyRequestPage(){
+	window.open('./redirecttosurveyrequestpage.do', '_self');
+}
+
 $('#dashboard-sel').click(function(){
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 });

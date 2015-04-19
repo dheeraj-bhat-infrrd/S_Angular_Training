@@ -496,6 +496,17 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		}
 		return companySettings;
 	}
+	
+	@Override
+	public OrganizationUnitSettings getCompanySettings(long companyId) throws InvalidInputException {
+		
+		LOG.info("Get company settings for the companyId: " + companyId);
+		
+		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
+				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+
+		return companySettings;
+	}
 
 	@Override
 	public Map<Long, OrganizationUnitSettings> getRegionSettingsForUserProfiles(List<UserProfile> userProfiles) throws InvalidInputException {
@@ -2554,7 +2565,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 	@Override
 	public Set<Company> getAllCompanies() {
 		LOG.info("Method to get list of all companies, getAllCompanies() started");
-		@SuppressWarnings("unchecked") Set<Company> companies = (Set<Company>) companyDao.findAllActive(Company.class);
+		Set<Company> companies = new HashSet<Company>(companyDao.findAllActive(Company.class));
 		LOG.info("Method to get list of all companies, getAllCompanies() finished");
 		return companies;
 	}

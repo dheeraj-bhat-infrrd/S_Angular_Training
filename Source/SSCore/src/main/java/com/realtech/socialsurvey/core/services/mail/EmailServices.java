@@ -151,7 +151,7 @@ public interface EmailServices {
 
 	public void queueSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException;
 
-	public void sendSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException, UndeliveredEmailException;
+	public void sendDefaultSurveyReminderMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException, UndeliveredEmailException;
 
 	public void queueSurveyCompletionMailToAdmins(String recipientMailId, String customerName, String agentName, String mood) throws InvalidInputException;
 
@@ -173,5 +173,12 @@ public interface EmailServices {
 	 * @throws UndeliveredEmailException
 	 */
 	public void sendContactUsMail(String recipientEmailId,String displayName,String senderName, String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendSurveyReminderMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException,
+			UndeliveredEmailException;
+
+	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException;
 
 }
