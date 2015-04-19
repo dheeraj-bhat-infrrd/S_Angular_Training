@@ -38,6 +38,9 @@
 <c:if test="${not empty profile && not empty profileSettings.licenses}">
 	<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 </c:if>
+<c:if test="${not empty profile && not empty profileSettings.profileUrl}">
+	<c:set value="${profileSettings.profileUrl}" var="profileUrl"></c:set>
+</c:if>
 <c:if test="${profilemasterid == 4}">
 	<c:if test="${not empty profile && not empty profileSettings.expertise}">
 		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
@@ -245,7 +248,10 @@
 				<div class="prof-details-header-row clearfix">
 					<div class="prof-link-header float-left clearfix">
 						<div id="prof-header-rating" class="rating-image float-left"></div>
-						<div id="prof-header-url" class="rating-image-txt float-left"></div>
+						<c:if test="${not empty profileUrl}">
+							<div id="prof-header-url" class="rating-image-txt float-left">${profileUrl}</div>
+						</c:if>
+						
 					</div>
 					<c:if test="${not empty webAddresses.work }">
 						<div id="web-addr-header" class="web-addr-header float-left clearfix">
@@ -749,5 +755,9 @@
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
 	});
+	
+	//Prepend domain url
+	$('#prof-header-url').prepend(window.location.origin+"/pages");
+	
 });
 </script>
