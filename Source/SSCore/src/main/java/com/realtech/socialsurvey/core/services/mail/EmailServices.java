@@ -172,6 +172,6 @@ public interface EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
-	public void sendContactUsMail(String recipientEmailId,String displayName,String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException;
+	public void sendContactUsMail(String recipientEmailId,String displayName,String senderName, String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException;
 
 }

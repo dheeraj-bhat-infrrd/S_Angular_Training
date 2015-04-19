@@ -1089,7 +1089,7 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendContactUsMail(String recipientEmailId, String displayName,
+	public void sendContactUsMail(String recipientEmailId, String displayName, String senderName,
 			String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException {
 		
 		if( recipientEmailId == null || recipientEmailId.isEmpty()){
@@ -1099,6 +1099,10 @@ public class EmailServicesImpl implements EmailServices {
 		if( displayName == null || displayName.isEmpty()){
 			LOG.error("displayName is null or empty!");
 			throw new InvalidInputException("displayName is null or empty!");
+		}
+		if( senderName == null || senderName.isEmpty()){
+			LOG.error("senderName is null or empty!");
+			throw new InvalidInputException("senderName is null or empty!");
 		}
 		if( senderEmailId == null || senderEmailId.isEmpty()){
 			LOG.error("senderEmailId is null or empty!");
@@ -1118,7 +1122,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_BODY);
 
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,senderEmailId,message));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,senderName,senderEmailId,message));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
