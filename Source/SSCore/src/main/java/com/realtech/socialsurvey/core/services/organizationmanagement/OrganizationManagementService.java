@@ -48,6 +48,15 @@ public interface OrganizationManagementService {
 	 * @throws InvalidInputException
 	 */
 	public OrganizationUnitSettings getCompanySettings(User user) throws InvalidInputException;
+	
+	/**
+	 * Gets the company settings of the companyId.
+	 * 
+	 * @param companyId
+	 * @return company settings
+	 * @throws InvalidInputException
+	 */
+	public OrganizationUnitSettings getCompanySettings(long companyId) throws InvalidInputException;
 
 	/**
 	 * Gets the region settings of the list of user profiles.

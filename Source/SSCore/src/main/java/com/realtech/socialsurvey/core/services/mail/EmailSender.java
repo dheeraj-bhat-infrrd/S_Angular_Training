@@ -20,4 +20,6 @@ public interface EmailSender {
 	 */
 	public void sendEmailWithBodyReplacements(EmailEntity emailEntity, String subjectFileName, FileContentReplacements messageBodyReplacements)
 			throws InvalidInputException, UndeliveredEmailException;
+
+	public void sendEmail(EmailEntity emailEntity, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException;
 }
