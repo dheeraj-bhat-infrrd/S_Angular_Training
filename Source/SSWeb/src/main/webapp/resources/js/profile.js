@@ -3,6 +3,10 @@ var currentProfileIden = "";
 var startIndex = 0;
 var numOfRows = 3;
 var minScore=0;
+var publicPostStartIndex = 0;
+var publicPostNumRows = 3;
+var currentProfileName;
+var doStopPublicPostPagination = false;
 
 function fetchCompanyProfile() {
 	startIndex = 0;
@@ -40,6 +44,10 @@ function paintProfilePage(result) {
 		var headContentHtml = "";
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		$("#profile-main-content").show();
+		currentProfileName = result.profileName;
+		//paint public  posts
+		paintPublicPosts();
+		
 		if(contactDetails != undefined){
 			
 			$('#social-connect-txt').text("Contact with "+contactDetails.name+":");
@@ -254,47 +262,6 @@ function paintAverageRatings(data) {
 		changeRatingPattern(rating,$("#rating-avg-comp"),true);
 	}
 }
-
-function changeRatingPattern(rating, ratingParent,isOverallRating) {
-	/*var counter = 0;
-	ratingParent.children().each(function() {
-		$(this).addClass("icn-no-star");
-		$(this).removeClass("icn-half-star");
-		$(this).removeClass("icn-full-star");
-
-		if (rating >= counter) {
-			if (rating - counter >= 1) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-full-star");
-			} else if (rating - counter == 0.5) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-half-star");
-			}
-		}
-		counter++;
-	});*/
-	
-	var ratingIntVal = parseInt(rating) + 1;
-	
-	if(ratingIntVal >=5){
-		ratingIntVal = 5;
-	}
-	
-	var roundedFloatingVal = parseFloat(rating).toFixed(2);
-	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
-	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
-	
-	if(isOverallRating){
-		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
-		$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
-	}
-	
-	ratingParent.html('');
-	
-	ratingParent.append(ratingImgHtml).append(ratingValHtml);
-}
-
 
 function fetchCompanyRegions() {
 	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/regions';
@@ -1056,5 +1023,76 @@ function downloadVCard(agentName){
 
 function afterDownloadVCard(data){
 	console.log("V Card download complete");
+}
+
+//Function to paint posts
+function paintPublicPosts() {
+	
+	var profileLevel = $("#profile-fetch-info").attr("profile-level");
+	
+	var url = window.location.origin + "/rest/profile/";
+	if(profileLevel == 'COMPANY'){
+		//Fectch the reviews for company
+		url += "company/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	else if(profileLevel == 'REGION'){
+		//Fetch the reviews for region
+		url += "region/"+companyProfileName+"/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	else if(profileLevel == 'BRANCH') {
+		//Fetch the reviews for branch
+		url += "branch/"+companyProfileName+"/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	else if(profileLevel == 'INDIVIDUAL'){
+		//Fetch the reviews for individual
+		url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	callAjaxGET(url, callBackPaintPublicPosts, true);
+}
+
+function callBackPaintPublicPosts(data) {
+	
+	var posts = $.parseJSON(data);
+	
+	posts = $.parseJSON(posts.entity);
+	
+	var divToPopulate = "";
+	$.each(posts, function(i, post) {
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
+				+ '<div class="tweet-icn icn-tweet float-left"></div>'
+				+ '<div class="tweet-txt float-left">'
+				+ '<div class="tweet-text-main">' + post.postText + '</div>'
+				+ '<div class="tweet-text-link"><em>' + post.postedBy
+				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ '	</div>' + '</div>';
+	});
+	
+	if (publicPostStartIndex == 0){
+		$('#prof-posts').html(divToPopulate);
+		$('#prof-posts').perfectScrollbar();
+	}
+	else{
+		$('#prof-posts').append(divToPopulate);
+		$('#prof-posts').perfectScrollbar('update');
+	}
+
+	
+	publicPostStartIndex += posts.length;
+
+	if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
+		doStopPublicPostPagination = true;
+	}
+	
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) {
+				if (!doStopPublicPostPagination) {
+					paintPublicPosts();					
+				}
+					
+		}
+	});
 }
 
