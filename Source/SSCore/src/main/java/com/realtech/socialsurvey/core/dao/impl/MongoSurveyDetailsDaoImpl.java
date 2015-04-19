@@ -571,7 +571,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 */
 		if (startScore > -1 && limitScore > -1) {
 			query.addCriteria(new Criteria().andOperator(Criteria.where(CommonConstants.SCORE_COLUMN).gte(startScore),
-					Criteria.where(CommonConstants.SCORE_COLUMN).lt(limitScore)));
+					Criteria.where(CommonConstants.SCORE_COLUMN).lte(limitScore)));
 		}
 
 		long feedBackCount = mongoTemplate.count(query, SURVEY_DETAILS_COLLECTION);

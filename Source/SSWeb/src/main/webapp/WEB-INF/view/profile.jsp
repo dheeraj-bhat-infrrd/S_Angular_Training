@@ -8,6 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.profile.title.key"/></title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
@@ -74,12 +75,6 @@
 		           	<input id="find-pro-submit" type="button" class="float-left prof-submit-btn" value="Search">
             	</form>
             </div>
-            <!-- <div class="float-right hm-hr-row-right clearfix">
-                <div class="float-left social-item-icon icn-fb"></div>
-                <div class="float-left social-item-icon icn-twit"></div>
-                <div class="float-left social-item-icon icn-lin"></div>
-                <div class="float-left social-item-icon icn-yelp"></div>
-            </div> -->
         </div>
     </div>
 </div>
@@ -128,7 +123,8 @@
 				</div>
 			</div>
 		</div>
-<div class="container">
+		
+		<div class="container">
 			<div class="row">
             <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
@@ -240,8 +236,8 @@
                 <div class="rt-content-main bord-bot-dc clearfix">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>
-                        <div class="tweet-panel tweet-panel-left tweet-panel-left-adj">
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
+                        <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
+                            <!-- <div class="tweet-panel-item bord-bot-dc clearfix">
                                 <div class="tweet-icn icn-tweet float-left"></div>
                                 <div class="tweet-txt float-left">
                                     <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
@@ -256,7 +252,7 @@
                                     <div class="tweet-text-link"><em>http://abblk.com</em></div>
                                     <div class="tweet-text-time"><em>24 minutes ago</em></div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
@@ -297,6 +293,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
         adjustImage();
