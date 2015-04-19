@@ -65,7 +65,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
-		// TODO
+		GoogleFeedIngester googleFeedIngester =context.getBean(GoogleFeedIngester.class);
+		googleFeedIngester.setCollectionName(collectionName);
+		googleFeedIngester.setIden(ingestionEntity.getIden());
+		googleFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getGoogleToken());
+		twitterExecutor.execute(googleFeedIngester);
 	}
 
 	public void addYelpProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
