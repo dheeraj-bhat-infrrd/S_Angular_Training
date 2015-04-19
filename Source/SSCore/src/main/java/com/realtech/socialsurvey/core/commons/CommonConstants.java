@@ -385,6 +385,14 @@ public interface CommonConstants {
 	public static final int ERROR_CODE_BRANCH_REVIEWS_FETCH_FAILURE = 130;
 	public static final int ERROR_CODE_PRO_LIST_FETCH_PRECONDITION_FAILURE = 131;
 	public static final int ERROR_CODE_PRO_LIST_FETCH_FAILURE = 132;
+	public static final int ERROR_CODE_INDIVIDUAL_POSTS_FETCH_PRECONDITION_FAILURE = 133;
+	public static final int ERROR_CODE_INDIVIDUAL_POSTS_FETCH_FAILURE = 134;
+	public static final int ERROR_CODE_COMPANY_POSTS_FETCH_PRECONDITION_FAILURE = 135;
+	public static final int ERROR_CODE_COMPANY_POSTS_FETCH_FAILURE = 136;
+	public static final int ERROR_CODE_REGION_POSTS_FETCH_PRECONDITION_FAILURE = 137;
+	public static final int ERROR_CODE_REGION_POSTS_FETCH_FAILURE = 138;
+	public static final int ERROR_CODE_BRANCH_POSTS_FETCH_PRECONDITION_FAILURE = 139;
+	public static final int ERROR_CODE_BRANCH_POSTS_FETCH_FAILURE = 140;
 
 	/**
 	 * Service codes
@@ -418,6 +426,10 @@ public interface CommonConstants {
 	public static final int SERVICE_CODE_INDIVIDUAL_AVERAGE_RATINGS = 120;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS_COUNT = 121;
 	public static final int SERVICE_CODE_INDIVIDUAL_REVIEWS = 122;
+	public static final int SERVICE_CODE_INDIVIDUAL_POSTS = 123;
+	public static final int SERVICE_CODE_COMPANY_POSTS = 124;
+	public static final int SERVICE_CODE_BRANCH_POSTS = 125;
+	public static final int SERVICE_CODE_REGION_POSTS = 126;
 
 	/*
 	 * Mongo column and collection constants
