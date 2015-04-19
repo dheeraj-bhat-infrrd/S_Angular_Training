@@ -100,7 +100,7 @@ public class SocialFeedIngestionKickStarter {
 				}
 
 				if (token.getGoogleToken() != null) {
-					// TODO: process google plus token
+					executors.addGoogleProcessorToPool(ingestionEntity, collectionName);
 				}
 				else {
 					LOG.warn("No google+ token found for " + collectionName + " with iden: " + ingestionEntity.getIden());
