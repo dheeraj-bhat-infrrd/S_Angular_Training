@@ -1222,7 +1222,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void findProfileMailIdAndSendMail(String profileName, String message, String senderMailId, String profileType)
+	public void findProfileMailIdAndSendMail(String profileName, String message,String senderName, String senderMailId, String profileType)
 			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
 
 		if (profileName == null || profileName.isEmpty()) {
@@ -1233,6 +1233,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (message == null || message.isEmpty()) {
 			LOG.error("contactAgent : message parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : message parameter is empty or null!");
+		}
+		if (senderName == null || senderName.isEmpty()) {
+			LOG.error("contactAgent : senderName parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : senderName parameter is empty or null!");
 		}
 
 		if (senderMailId == null || senderMailId.isEmpty()) {
@@ -1278,7 +1282,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (settings != null) {
 			LOG.debug("Sending the contact us mail to the agent");
 			emailServices.sendContactUsMail(settings.getContact_details().getMail_ids().getWork(), settings.getContact_details().getName(),
-					senderMailId, message);
+					senderName,senderMailId, message);
 			LOG.debug("Contact us mail sent!");
 		}
 		else {
