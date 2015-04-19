@@ -449,11 +449,11 @@ function showMasterQuestionPage(){
 		if(autoPost){
 			postToSocialMedia(feedback);
 			$('#social-post-lnk').show();
-			if(yelpEnabled)
+			if(yelpEnabled && (mood=='happy'))
 				$('#ylp-btn').show();
 			else
 				$('#ylp-btn').hide();
-			if(googleEnabled)
+			if(googleEnabled && (mood=='happy'))
 				$('#ggl-btn').show();
 			else
 				$('#ggl-btn').hide();

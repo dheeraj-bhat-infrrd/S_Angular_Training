@@ -125,5 +125,9 @@ $(document).ready(function() {
 			$(this).addClass('sq-full-star');
 		}
 	});
+	
+	$('#srv-scr').click(function(){
+		showSurveyRequestPage();
+	});
 });
 </script>
