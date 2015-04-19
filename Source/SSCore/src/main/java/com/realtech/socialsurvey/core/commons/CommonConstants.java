@@ -249,7 +249,9 @@ public interface CommonConstants {
 	public static final String USERS_MAP_KEY = "users";
 	public static final String BRANCHES_MAP_KEY = "branches";
 	public static final String REGIONS_MAP_KEY = "regions";
-
+	public static final String REMINDER_MAIL_SUBJECT = "Gentle reminder to take survey";
+	public static final String SURVEY_MAIL_SUBJECT = "Invitation to take survey";
+	
 	/**
 	 * Logo related config
 	 */
