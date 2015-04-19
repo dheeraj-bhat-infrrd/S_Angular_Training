@@ -151,6 +151,40 @@ public final class EmailSenderImpl implements EmailSender {
 		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
 
 	}
+	
+	/**
+	 * Method to mail with subject and body provided as parameters.
+	 * 
+	 * @param emailEntity
+	 * @param subject
+	 * @param mailBody
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	@Override
+	public void sendEmail(EmailEntity emailEntity, String subject, String mailBody)
+			throws InvalidInputException, UndeliveredEmailException {
+		LOG.info("Method sendEmailWithBodyReplacements called for subject : "+subject);
+
+		if (subject == null || subject.isEmpty()) {
+			throw new InvalidInputException("Subject is null for sending mail");
+		}
+		if (mailBody == null) {
+			throw new InvalidInputException("Email body is null for sending mail");
+		}
+
+		LOG.debug("Setting the mail subject");
+		emailEntity.setSubject(subject);
+
+		LOG.debug("Setting the mail body");
+		emailEntity.setBody(mailBody);
+
+		// Send the mail
+		sendMail(emailEntity);
+
+		LOG.info("Method sendEmailWithBodyReplacements completed successfully");
+
+	}
 
 	/**
 	 * Method to create mail session
