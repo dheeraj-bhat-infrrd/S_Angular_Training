@@ -114,7 +114,7 @@ function paintProList(usersList) {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
 				}
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
-				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name" data-profilename="' + user.profileName + '">' + user.displayName + '</div>';
+				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name cursor-pointer" data-profilename="' + user.profileUrl + '">' + user.displayName + '</div>';
 				if(user.title != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
@@ -131,12 +131,11 @@ function paintProList(usersList) {
 			$('#ctnt-list-wrapper').append(usersHtml);
 			$('#fp-users-size').val(usersSize);
 			
-			/*$(".user-display-name").click(function(e){
-				// e.stopPropagation();
+			$(".user-display-name").click(function(e){
 				var agentProfileName = $(this).attr("data-profilename");
-				var url = window.location.origin + "/individualprofile/" + agentProfileName + ".do";
-				window.open(url, "_blank");
-			});*/
+				var url = window.location.origin + "/pages" + agentProfileName;
+				window.open(url);
+			});
 		}
 	}
 }
