@@ -231,7 +231,7 @@
 					</c:choose>
 				</div>
 				
-				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer">
+				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer" onclick="showEditAddressPopup();">
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
 					<c:if test="${not empty contactdetail.address}">
 						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.address}</div>

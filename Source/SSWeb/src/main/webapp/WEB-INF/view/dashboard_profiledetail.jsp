@@ -27,7 +27,7 @@
 		<div class="dsh-g-wrap dsh-g-wrap-4">
 			<div class="dsh-graph-item dsh-graph-item-1">
 				<div id="dg-img-4" class="dsh-graph-img dsh-graph-img-4"></div>
-				<div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4 <!-- person-img -->"></div>
+				<div id="dsh-prsn-img" class="dsh-graph-num dsh-graph-num-4"></div>
 				<div class="dsh-graph-txt dsh-graph-txt-4"><spring:message code="label.profilecomplete.key" /></div>
 				<div id="badges" class="dsg-g-rbn dsg-g-rbn-${badges}"></div>
 			</div>
