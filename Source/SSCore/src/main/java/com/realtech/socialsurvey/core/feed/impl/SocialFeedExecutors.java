@@ -90,7 +90,7 @@ public class SocialFeedExecutors implements InitializingBean {
 		LOG.debug("Shutting down executors.");
 		twitterExecutor.shutdown();
 		facebookExecutor.shutdown();
-		//googleExecutor.shutdown();
+		googleExecutor.shutdown();
 		//yelpExecutor.shutdown();
 
 		try {
