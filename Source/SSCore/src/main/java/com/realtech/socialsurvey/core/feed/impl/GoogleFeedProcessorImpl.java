@@ -291,6 +291,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 			}
 			if(socialPost == null)
 				break;
+			
 			switch (organizationUnit) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					socialPost.setCompanyId(profileId);
