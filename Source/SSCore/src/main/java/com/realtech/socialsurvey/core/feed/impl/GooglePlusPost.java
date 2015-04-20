@@ -1,5 +1,6 @@
 package com.realtech.socialsurvey.core.feed.impl;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public class GooglePlusPost {
@@ -7,6 +8,8 @@ public class GooglePlusPost {
 	private String id;
 	private String post;
 	private Date createdOn;
+	private Timestamp lastUpdatedOn;
+	
 	public String getId() {
 		return id;
 	}
@@ -25,7 +28,10 @@ public class GooglePlusPost {
 	public void setCreatedOn(Date createdOn) {
 		this.createdOn = createdOn;
 	}
-	
-	
-	
+	public Timestamp getLastUpdatedOn() {
+		return lastUpdatedOn;
+	}
+	public void setLastUpdatedOn(Timestamp lastUpdatedOn) {
+		this.lastUpdatedOn = lastUpdatedOn;
+	}
 }
