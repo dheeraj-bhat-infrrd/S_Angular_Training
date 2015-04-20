@@ -161,7 +161,7 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 	});
 }
 
-function changeRatingPattern(rating, ratingParent) {
+/*function changeRatingPattern(rating, ratingParent) {
 	var counter = 0;
 	ratingParent.children().each(function() {
 		$(this).addClass("icn-no-star");
@@ -179,6 +179,29 @@ function changeRatingPattern(rating, ratingParent) {
 		}
 		counter++;
 	});
+}*/
+
+function changeRatingPattern(rating, ratingParent,isOverallRating) {
+	
+	var ratingIntVal = parseInt(rating) + 1;
+	
+	if(ratingIntVal >=5){
+		ratingIntVal = 5;
+	}
+	
+	var roundedFloatingVal = parseFloat(rating).toFixed(2);
+	
+	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
+	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
+	
+	if(isOverallRating){
+		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
+		$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
+	}
+	
+	ratingParent.html('');
+	
+	ratingParent.append(ratingImgHtml).append(ratingValHtml);
 }
 
 /**

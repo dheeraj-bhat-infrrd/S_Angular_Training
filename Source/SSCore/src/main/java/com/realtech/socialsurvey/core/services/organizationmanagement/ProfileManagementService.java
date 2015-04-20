@@ -343,7 +343,7 @@ public interface ProfileManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UndeliveredEmailException
 	 */
-	public void findProfileMailIdAndSendMail(String agentProfileName,String message,String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+	public void findProfileMailIdAndSendMail(String agentProfileName,String message, String senderName, String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
 	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException;
 

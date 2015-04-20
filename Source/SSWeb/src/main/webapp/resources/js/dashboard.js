@@ -609,7 +609,7 @@ function sendSurveyReminderMail(agentId, agentName, customerEmail, customerName)
 	});
 }
 
-function changeRatingPattern(rating, ratingParent) {
+/*function changeRatingPattern(rating, ratingParent) {
 	var counter = 0;
 	ratingParent.children().each(function() {
 		$(this).addClass("icn-no-star");
@@ -627,7 +627,7 @@ function changeRatingPattern(rating, ratingParent) {
 		}
 		counter++;
 	});
-}
+}*/
 
 function showDisplayPic() {
 	var success = false;

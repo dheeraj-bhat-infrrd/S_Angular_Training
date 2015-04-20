@@ -14,7 +14,6 @@ import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
 import com.realtech.socialsurvey.core.entities.SmtpSettings;
@@ -28,7 +27,6 @@ import com.realtech.socialsurvey.core.utils.FileOperations;
 /**
  * Class with utility methods to send mails
  */
-@Component
 public final class EmailSenderImpl implements EmailSender {
 
 	private static final Logger LOG = LoggerFactory.getLogger(EmailSenderImpl.class);
@@ -46,8 +44,7 @@ public final class EmailSenderImpl implements EmailSender {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
-	@Override
-	public void sendMail(EmailEntity emailEntity) throws InvalidInputException, UndeliveredEmailException {
+	private void sendMail(EmailEntity emailEntity) throws InvalidInputException, UndeliveredEmailException {
 		if (emailEntity == null) {
 			LOG.error("Email entity is null for sending mail");
 			throw new InvalidInputException("Email entity is null for sending mail");
