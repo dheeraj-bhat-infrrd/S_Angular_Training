@@ -132,6 +132,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		}
 	}
 
+	/*
+	 * Method to generate survey URL to start a survey directly based upon agentId and customer email id. 
+	 */
 	@Override
 	public String getSurveyUrl(long agentId, String customerEmail, String baseUrl) throws InvalidInputException {
 		Map<String, String> urlParam = new HashMap<>();
@@ -171,6 +174,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		surveyDetailsDao.updateFinalScore(agentId, customerEmail);
 		LOG.info("Method to update customer review and final score on the basis of rating questions in SURVEY_DETAILS, updateCustomerAnswersInSurvey() finished.");
 	}
+
 
 	public SurveyDetails getSurveyDetails(long agentId, String customerEmail) {
 		LOG.info("Method getSurveyDetails() to return survey details by agent id and customer email started.");
@@ -299,6 +303,9 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 		LOG.info("Method to increase reminder count by 1, updateReminderCount() finished.");
 	}
 
+	/*
+	 * Method to get surveys 
+	 */
 	@Override
 	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId) {
 		LOG.info("started.");

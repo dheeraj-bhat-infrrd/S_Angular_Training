@@ -37,6 +37,7 @@ public class OrganizationUnitSettings {
 	private String modifiedBy;
 	private long createdOn;
 	private long modifiedOn;
+	private String completeProfileUrl;
 
 	public String getId() {
 		return id;
@@ -244,6 +245,14 @@ public class OrganizationUnitSettings {
 
 	public void setModifiedOn(long modifiedOn) {
 		this.modifiedOn = modifiedOn;
+	}
+
+	public String getCompleteProfileUrl() {
+		return completeProfileUrl;
+	}
+
+	public void setCompleteProfileUrl(String completeProfileUrl) {
+		this.completeProfileUrl = completeProfileUrl;
 	}
 
 	@Override

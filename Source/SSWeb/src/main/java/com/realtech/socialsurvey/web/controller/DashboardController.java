@@ -351,6 +351,9 @@ public class DashboardController {
 		}
 	}
 
+	/*
+	 * Method to fetch reviews for showing on dash board based upon start index and batch size.
+	 */
 	@RequestMapping(value = "/fetchdashboardreviews")
 	public String getReviews(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
@@ -408,6 +411,11 @@ public class DashboardController {
 		return JspResolver.DASHBOARD_REVIEWS;
 	}
 
+	/*
+	 * Method to fetch count of all the reviews in SURVEY_DETAILS collection.
+	 * It returns dta on the basis of columnName and columnValue which can be either of 
+	 * companyId/RegionId/BranchId/AgentId. 
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/fetchdashboardreviewCount")
 	public String getReviewCount(Model model, HttpServletRequest request) {
@@ -457,6 +465,9 @@ public class DashboardController {
 		return String.valueOf(reviewCount);
 	}
 
+	/*
+	 * Method to fetch name which has to be displayed in Review section of dash board.
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/fetchName")
 	public String getName(Model model, HttpServletRequest request) {
@@ -505,6 +516,10 @@ public class DashboardController {
 		return name;
 	}
 
+	/*
+	 * Method to fetch incomplete survey data.
+	 *  
+	 */
 	@RequestMapping(value = "/fetchdashboardincompletesurvey")
 	public String getIncompleteSurvey(Model model, HttpServletRequest request) {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
@@ -524,6 +539,9 @@ public class DashboardController {
 		return JspResolver.DASHBOARD_INCOMPLETESURVEYS;
 	}
 
+	/*
+	 * Method to get count of all the incomplete surveys.
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/fetchdashboardincompletesurveycount")
 	public String getIncompleteSurveyCount(Model model, HttpServletRequest request) {
@@ -550,7 +568,12 @@ public class DashboardController {
 		return JspResolver.SURVEY_REQUEST;
 	}
 
+	/*
+	 * Fetches incomplete surveys based upon the criteria.
+	 * Criteria can be startIndex and/or batchSize.
+	 */
 	private List<SurveyDetails> fetchIncompleteSurveys(HttpServletRequest request, User user) throws InvalidInputException {
+		LOG.debug("Method fetchIncompleteSurveys() started");
 		List<SurveyDetails> surveyDetails;
 		String startIndexStr = request.getParameter("startIndex");
 		String batchSizeStr = request.getParameter("batchSize");
@@ -591,7 +614,7 @@ public class DashboardController {
 			LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
 			throw e;
 		}
-
+		LOG.debug("Method fetchIncompleteSurveys() finished");
 		return surveyDetails;
 	}
 
@@ -886,6 +909,11 @@ public class DashboardController {
 		LOG.info("Method to get file containg incomplete surveys list getIncompleteSurveyFile() finished.");
 	}
 
+	/*
+	 * Method to
+	 * 1. Store initial details of customer.
+	 * 2. Send Invitation mail to the customer to take survey.
+	 */
 	@ResponseBody
 	@RequestMapping(value = "/sendsurveyinvite")
 	public String sendSurveyInvittion(HttpServletRequest request) {
@@ -934,10 +962,15 @@ public class DashboardController {
 		return "Success";
 	}
 
+	/*
+	 * Method to compose link for sending to a user to start survey started.
+	 */
 	private String composeLink(long userId, String custEmail) throws InvalidInputException {
+		LOG.debug("Method composeLink() started");
 		Map<String, String> urlParams = new HashMap<>();
 		urlParams.put(CommonConstants.AGENT_ID_COLUMN, userId+"");
 		urlParams.put(CommonConstants.CUSTOMER_EMAIL_COLUMN, custEmail);
+		LOG.debug("Method composeLink() finished");
 		return urlGenerator.generateUrl(urlParams, surveyHandler.getApplicationBaseUrl()+"rest/survey/showsurveypageforurl");
 	}
 
@@ -982,7 +1015,7 @@ public class DashboardController {
 	}
 
 	private String getProfileLevel(String columnName) {
-		LOG.debug("Method to return profile level based upon column to be quried started.");
+		LOG.debug("Method to return profile level based upon column to be queried started.");
 		String profileLevel = "";
 		switch (columnName) {
 			case CommonConstants.COMPANY_ID_COLUMN:

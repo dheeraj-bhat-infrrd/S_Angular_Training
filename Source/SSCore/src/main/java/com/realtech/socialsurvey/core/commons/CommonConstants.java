@@ -251,6 +251,10 @@ public interface CommonConstants {
 	public static final String REGIONS_MAP_KEY = "regions";
 	public static final String REMINDER_MAIL_SUBJECT = "Gentle reminder to take survey";
 	public static final String SURVEY_MAIL_SUBJECT = "Invitation to take survey";
+	public static final String AGENT_PROFILE_FIXED_URL = "pages/";
+	public static final String BRANCH_PROFILE_FIXED_URL = "pages/branch/";
+	public static final String REGION_PROFILE_FIXED_URL = "pages/region/";
+	public static final String COMPANY_PROFILE_FIXED_URL = "pages/company/";
 	
 	/**
 	 * Logo related config
