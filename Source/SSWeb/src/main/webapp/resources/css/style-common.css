@@ -1450,7 +1450,7 @@ button.paypal.is-active {
 	font-size: 15px;
 	height: 35px;
 	line-height: 35px;
-	width: 150px;
+	width: 120px;
 	text-align: center;
 	cursor: pointer;
 	border-radius: 3px;
@@ -1462,7 +1462,7 @@ button.paypal.is-active {
 	font-size: 15px;
 	height: 35px;
 	line-height: 35px;
-	width: 150px;;
+	padding:0 10px;
 	text-align: center;
 	cursor: pointer;
 	border-radius: 3px;
@@ -5864,10 +5864,6 @@ tr.u-tbl-header td {
 	border-right: 1px dotted #d4d4d4;
 }
 
-.left-contact-wrapper {
-    padding-left: 20px;
-}
-
 .lp-textarea-cont {
     height: 108px;
 }
@@ -5982,4 +5978,29 @@ tr.u-tbl-header td {
   border: 0;
   font-size: 12px;
   color: #3e3e3e;
+}
+
+.prof-review-sort-link {
+	margin: 0 10px;
+	font-size: 12px;
+	color: #DDD9D5;
+	cursor: pointer;
+}
+
+.prof-reviews-sort-divider{
+	font-size: 12px;
+	color: #DDD9D5;
+}
+
+.postions-content{
+	padding:10px 0;
+	border-bottom: 1px dashed #c4c4c4;
+}
+
+.postions-content:last-child{
+	border-bottom: none;
+}
+
+.left-postions-wrapper .left-panel-content{
+	  padding: 0 20px 0 0;
 }
