@@ -293,6 +293,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/googlemaps.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
