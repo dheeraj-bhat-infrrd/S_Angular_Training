@@ -137,32 +137,33 @@ function paintProfilePage(result) {
                     	address = address + companyProfileData.name;
                     }
             		if(companyProfileData.address != undefined){
-                    	address = address + companyProfileData.address;
+                    	address = address + ' ' + companyProfileData.address;
                     }
                     if(companyProfileData.country != undefined) {
-                    	address = address + companyProfileData.country;
+                    	address = address + ' ' + companyProfileData.country;
                     }
                     if(companyProfileData.zipcode != undefined) {
-                    	address = address + companyProfileData.zipcode;
+                    	address = address + ' ' + companyProfileData.zipcode;
                     }
                     
             	}else{
             		address = contactDetails.name;
             		
             		if(contactDetails.address1 != undefined){
-                    	address = address + contactDetails.address1;
+                    	address = address + ' ' + contactDetails.address1;
                     }
             		if(contactDetails.address2 != undefined){
-                    	address = address + contactDetails.address1;
+                    	address = address + ' ' + contactDetails.address2;
                     }
                     if(contactDetails.country != undefined) {
-                    	address = address + contactDetails.country;
+                    	address = address + ' ' + contactDetails.country;
                     }
                     if(contactDetails.zipcode != undefined) {
-                    	address = address + contactDetails.zipcode;
+                    	address = address + ' ' + contactDetails.zipcode;
                     }
             	}
-            	
+            	address=address.replace(/,/g,"");
+            	//address=address.replace(/ /g,"+");
             	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>')
             }
             
