@@ -63,10 +63,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
-	
+
 	@Value("${APPLICATION_BASE_URL}")
 	private String applicationBaseUrl;
-
 
 	@Override
 	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName) {
@@ -282,23 +281,23 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Fetched " + (tokens != null ? tokens.size() : "none") + " items with social media tokens from " + collectionName);
 		return tokens;
 	}
-	
+
 	private void setCompleteUrlForSettings(OrganizationUnitSettings settings, String collectionName) {
-		
-		switch(collectionName){
-			case CommonConstants.BRANCH_SETTINGS_COLLECTION :
-				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL + settings.getProfileUrl());
-				break;
-			case CommonConstants.REGION_SETTINGS_COLLECTION :
-				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL + settings.getProfileUrl());
-				break;
-			case CommonConstants.COMPANY_SETTINGS_COLLECTION :
-				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL + settings.getProfileUrl());
-				break;
-			case CommonConstants.AGENT_SETTINGS_COLLECTION :
-				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl());
-				break;
+		if (settings != null && collectionName != null && !collectionName.isEmpty()){
+			switch (collectionName) {
+				case CommonConstants.BRANCH_SETTINGS_COLLECTION:
+					settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL + settings.getProfileUrl());
+					break;
+				case CommonConstants.REGION_SETTINGS_COLLECTION:
+					settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL + settings.getProfileUrl());
+					break;
+				case CommonConstants.COMPANY_SETTINGS_COLLECTION:
+					settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL + settings.getProfileUrl());
+					break;
+				case CommonConstants.AGENT_SETTINGS_COLLECTION:
+					settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl());
+					break;
+			}
 		}
-		
 	}
 }
