@@ -282,6 +282,9 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		return tokens;
 	}
 
+	/*
+	 * Method to set complete profile URL for each of the setting being fetched.
+	 */
 	private void setCompleteUrlForSettings(OrganizationUnitSettings settings, String collectionName) {
 		if (settings != null && collectionName != null && !collectionName.isEmpty()){
 			switch (collectionName) {
