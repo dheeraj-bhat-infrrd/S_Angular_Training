@@ -520,9 +520,9 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderEmailId(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_USERNAME));
-		emailEntity.setSenderPassword(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_PASSWORD));
-		emailEntity.setSenderName(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_NAME));
+		emailEntity.setSenderEmailId(sendgridSenderUsername);
+		emailEntity.setSenderPassword(sendgridSenderPassword);
+		emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for verification mail");
