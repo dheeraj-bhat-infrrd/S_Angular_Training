@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -62,6 +63,10 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 	@Autowired
 	private MongoTemplate mongoTemplate;
+	
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
+
 
 	@Override
 	public void insertOrganizationUnitSettings(OrganizationUnitSettings organizationUnitSettings, String collectionName) {
@@ -85,6 +90,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		query.addCriteria(Criteria.where(KEY_IDENTIFIER).is(identifier));
 		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
 		OrganizationUnitSettings settings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
+		setCompleteUrlForSettings(settings, collectionName);
 		return settings;
 	}
 
@@ -93,6 +99,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		LOG.info("Fetch agent settings from for id: " + identifier);
 		AgentSettings settings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_IDENTIFIER, identifier)), AgentSettings.class,
 				AGENT_SETTINGS_COLLECTION);
+		setCompleteUrlForSettings(settings, CommonConstants.AGENT_SETTINGS_COLLECTION);
 		return settings;
 	}
 
@@ -169,7 +176,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		query.addCriteria(Criteria.where(KEY_PROFILE_NAME).is(profileName));
 		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
 		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(query, OrganizationUnitSettings.class, collectionName);
-
+		setCompleteUrlForSettings(organizationUnitSettings, collectionName);
 		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileName");
 		return organizationUnitSettings;
 	}
@@ -183,7 +190,7 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 
 		OrganizationUnitSettings organizationUnitSettings = mongoTemplate.findOne(new BasicQuery(new BasicDBObject(KEY_PROFILE_URL, profileUrl)),
 				OrganizationUnitSettings.class, collectionName);
-
+		setCompleteUrlForSettings(organizationUnitSettings, collectionName);
 		LOG.info("Successfully executed method fetchOrganizationUnitSettingsByProfileUrl");
 		return organizationUnitSettings;
 	}
@@ -274,5 +281,24 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 		tokens = mongoTemplate.find(query, FeedIngestionEntity.class, collectionName);
 		LOG.info("Fetched " + (tokens != null ? tokens.size() : "none") + " items with social media tokens from " + collectionName);
 		return tokens;
+	}
+	
+	private void setCompleteUrlForSettings(OrganizationUnitSettings settings, String collectionName) {
+		
+		switch(collectionName){
+			case CommonConstants.BRANCH_SETTINGS_COLLECTION :
+				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.BRANCH_PROFILE_FIXED_URL + settings.getProfileUrl());
+				break;
+			case CommonConstants.REGION_SETTINGS_COLLECTION :
+				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.REGION_PROFILE_FIXED_URL + settings.getProfileUrl());
+				break;
+			case CommonConstants.COMPANY_SETTINGS_COLLECTION :
+				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.COMPANY_PROFILE_FIXED_URL + settings.getProfileUrl());
+				break;
+			case CommonConstants.AGENT_SETTINGS_COLLECTION :
+				settings.setCompleteProfileUrl(applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + settings.getProfileUrl());
+				break;
+		}
+		
 	}
 }
