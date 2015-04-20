@@ -3,15 +3,12 @@ package com.realtech.socialsurvey.core.services.mail.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
@@ -37,9 +34,6 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Autowired
 	private EmailSender emailSender;
-
-	@Autowired
-	private PropertyFileReader propertyReader;
 
 	@Value("${MAX_PAYMENT_RETRIES}")
 	private int maxPaymentRetries;
