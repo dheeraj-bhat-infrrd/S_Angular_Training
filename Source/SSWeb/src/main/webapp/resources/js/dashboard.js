@@ -42,6 +42,7 @@ $('body').click(function() {
 });
 
 $(document).scroll(function() {
+	debugger;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
 		showReviews(colName, colValue);
 	}
@@ -50,7 +51,7 @@ $(document).scroll(function() {
 function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoOfAccount) {
 	accountType = typeoOfAccount;
 	startIndexCmp = 0;
-	batchSizeCmp = 1;
+	batchSizeCmp = 2;
 	totalReviews = 0;
 	reviewsFetchedSoFar = 0;
 	startIndexInc = 0;
@@ -290,10 +291,10 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 		"columnName" : columnName,
 		"columnValue" : columnValue
 	};
-	callAjaxGetWithPayloadData("./fetchdashboardreviewCount.do", function(totalReviews) {
-		
+	callAjaxGetWithPayloadData("./fetchdashboardreviewCount.do", function(totalReview) {
+		totalReviews = totalReview;
 		callAjaxGetWithPayloadData("./fetchName.do", function(name) {
-			if (totalReviews == 0) {
+			if (totalReview == 0) {
 				$("#review-desc").html("No reviews found for " + name);
 				return;
 			} else {
@@ -302,13 +303,14 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 			}
 		}, payload, false);
 		
-		if (parseInt(totalReviews) > 0) {
+		if (parseInt(totalReview) > 0) {
 			showReviews(columnName, columnValue);
 		}
 	}, payload, false);
 }
 
 function showReviews(columnName, columnValue) {
+	debugger;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
