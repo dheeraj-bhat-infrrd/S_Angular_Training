@@ -925,7 +925,7 @@ public class DashboardController {
 				}
 			}
 			else{
-				emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName+" "+custLastName, user.getFirstName()+(user.getLastName() !=null?" "+user.getLastName():""), link);
+				emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName+" "+custLastName, user.getFirstName()+(user.getLastName() !=null?" "+user.getLastName():""), link, user.getEmailId());
 			}
 		}
 		catch (NonFatalException e) {
