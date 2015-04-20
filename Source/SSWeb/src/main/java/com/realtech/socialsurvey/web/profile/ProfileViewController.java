@@ -13,10 +13,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import com.amazonaws.util.json.JSONException;
+import com.amazonaws.util.json.JSONObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
+import com.realtech.socialsurvey.core.services.authentication.CaptchaValidation;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileManagementService;
 import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
@@ -27,6 +30,9 @@ import com.realtech.socialsurvey.web.common.JspResolver;
 public class ProfileViewController {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(ProfileViewController.class);
+	
+	@Autowired
+	private CaptchaValidation captchaValidation;
 	
 	@Autowired
 	private MessageUtils messageUtils;
@@ -144,6 +150,22 @@ public class ProfileViewController {
 		return JspResolver.PROFILE_PAGE;
 	}
 	
+	private String makeJsonMessage(int status, String message) {
+
+		JSONObject jsonMessage = new JSONObject();
+		LOG.debug("Building json response");
+		try {
+			jsonMessage.put("success", status);
+			jsonMessage.put("message", message);
+		}
+		catch (JSONException e) {
+			LOG.error("Exception occured while building json response : " + e.getMessage(), e);
+		}
+
+		LOG.info("Returning json response : " + jsonMessage.toString());
+		return jsonMessage.toString();
+	}
+	
 	/**
 	 * Method called on click of the contact us link on all profile pages
 	 * @param request
@@ -164,31 +186,45 @@ public class ProfileViewController {
 				throw new InvalidInputException("Profile type not mentioned!");
 			}
 			
-			String profileName = request.getParameter("profilename"); 				
+			String profileName = request.getParameter("profilename"); 
+			String senderName = request.getParameter("name");
 			String senderMailId = request.getParameter("email");
 			String message = request.getParameter("message");
+			String recaptcha_challenge_field = request.getParameter("recaptcha_challenge_field");
+			String recaptchaInput = request.getParameter("recaptcha_input");
+			String remoteAddress = request.getRemoteAddr();
+			
+			if (!captchaValidation.isCaptchaValid(remoteAddress, recaptcha_challenge_field, recaptchaInput)) {
+				LOG.error("Captcha Validation failed!");
+				returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.INVALID_CAPTCHA, DisplayMessageType.SUCCESS_MESSAGE).toString();
+				return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
+			}
 			
 			LOG.debug("Sending mail to :  "  + profileName + " from : " + senderMailId);
 				
-			profileManagementService.findProfileMailIdAndSendMail(profileName, message,
+			profileManagementService.findProfileMailIdAndSendMail(profileName, message, senderName,
 					senderMailId,profileType);
 			LOG.debug("Mail sent!");
 			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_SENT, DisplayMessageType.SUCCESS_MESSAGE).toString();
 		} catch (InvalidInputException e) {
 			LOG.error("InvalidInputException : message : " + e.getMessage(),e);
 			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
 		} catch (NoRecordsFetchedException e) {
 			LOG.error("NoRecordsFetchedException : message : " + e.getMessage(),e);
 			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
 		} catch (UndeliveredEmailException e) {
 			LOG.error("UndeliveredEmailException : message : " + e.getMessage(),e);
 			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
 		} catch (Exception e) {
 			LOG.error("Exception : message : " + e.getMessage(),e);			
 			returnMessage = messageUtils.getDisplayMessage(DisplayMessageConstants.CONTACT_US_MESSAGE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).toString();
+			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, returnMessage);
 		}
 		
-		return returnMessage;
+		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, returnMessage);
 	}
 
 }

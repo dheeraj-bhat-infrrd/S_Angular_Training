@@ -300,6 +300,13 @@
 		   <version>0.9.6</version>
 		</dependency>
 		
+		<!-- sendgrid dependency -->
+		<dependency>
+            <groupId>com.sendgrid</groupId>
+            <artifactId>sendgrid-java</artifactId>
+            <version>2.1.0</version>
+        </dependency>
+		
 	</dependencies>
 
 	<build>

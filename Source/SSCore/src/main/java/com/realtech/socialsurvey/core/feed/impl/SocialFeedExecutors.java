@@ -22,8 +22,8 @@ public class SocialFeedExecutors implements InitializingBean {
 	private int numOfThreads = 10;
 	private ApplicationContext context;
 	private ExecutorService twitterExecutor;
-	//private ExecutorService facebookExecutor;
-	//private ExecutorService googleExecutor;
+	private ExecutorService facebookExecutor;
+	private ExecutorService googleExecutor;
 	//private ExecutorService yelpExecutor;
 
 	public void setContext(ApplicationContext context) {
@@ -34,8 +34,8 @@ public class SocialFeedExecutors implements InitializingBean {
 	public void afterPropertiesSet() throws Exception {
 		LOG.info("Creating executors for social feed");
 		twitterExecutor = Executors.newFixedThreadPool(numOfThreads);
-		//facebookExecutor = Executors.newFixedThreadPool(numOfThreads);
-		//googleExecutor = Executors.newFixedThreadPool(numOfThreads);
+		facebookExecutor = Executors.newFixedThreadPool(numOfThreads);
+		googleExecutor = Executors.newFixedThreadPool(numOfThreads);
 		//yelpExecutor = Executors.newFixedThreadPool(numOfThreads);
 		LOG.info("Done Creating executors for social feed");
 	}
@@ -45,6 +45,7 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
+		
 		TwitterFeedIngester twitterFeedIngester = context.getBean(TwitterFeedIngester.class);
 		twitterFeedIngester.setCollectionName(collectionName);
 		twitterFeedIngester.setIden(ingestionEntity.getIden());
@@ -57,7 +58,12 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
-		// TODO
+		
+		FacebookFeedIngester facebookFeedIngester = context.getBean(FacebookFeedIngester.class);
+		facebookFeedIngester.setCollectionName(collectionName);
+		facebookFeedIngester.setIden(ingestionEntity.getIden());
+		facebookFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getFacebookToken());
+		facebookExecutor.execute(facebookFeedIngester);
 	}
 
 	public void addGoogleProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
@@ -65,7 +71,11 @@ public class SocialFeedExecutors implements InitializingBean {
 		if (context == null) {
 			throw new NoContextFoundException("No Application context found");
 		}
-		// TODO
+		GoogleFeedIngester googleFeedIngester =context.getBean(GoogleFeedIngester.class);
+		googleFeedIngester.setCollectionName(collectionName);
+		googleFeedIngester.setIden(ingestionEntity.getIden());
+		googleFeedIngester.setToken(ingestionEntity.getSocialMediaTokens().getGoogleToken());
+		googleExecutor.execute(googleFeedIngester);
 	}
 
 	public void addYelpProcessorToPool(FeedIngestionEntity ingestionEntity, String collectionName) throws NoContextFoundException {
@@ -79,14 +89,14 @@ public class SocialFeedExecutors implements InitializingBean {
 	public void shutDownExecutors() {
 		LOG.debug("Shutting down executors.");
 		twitterExecutor.shutdown();
-		//facebookExecutor.shutdown();
-		//googleExecutor.shutdown();
+		facebookExecutor.shutdown();
+		googleExecutor.shutdown();
 		//yelpExecutor.shutdown();
 
 		try {
 			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			//facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			//googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			//yelpExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {
@@ -98,14 +108,14 @@ public class SocialFeedExecutors implements InitializingBean {
 	public void shutDownExecutorsNow() {
 		LOG.debug("Shutting down executors Now.");
 		twitterExecutor.shutdownNow();
-		//facebookExecutor.shutdownNow();
-		//googleExecutor.shutdownNow();
+		facebookExecutor.shutdownNow();
+		googleExecutor.shutdownNow();
 		//yelpExecutor.shutdownNow();
 
 		try {
 			twitterExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			//facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
-			//googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			facebookExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+			googleExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 			//yelpExecutor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 		catch (InterruptedException e) {

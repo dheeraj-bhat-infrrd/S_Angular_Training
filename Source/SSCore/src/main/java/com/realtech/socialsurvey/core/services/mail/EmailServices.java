@@ -172,13 +172,23 @@ public interface EmailServices {
 	 * @throws InvalidInputException
 	 * @throws UndeliveredEmailException
 	 */
-	public void sendContactUsMail(String recipientEmailId,String displayName,String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException;
+	public void sendContactUsMail(String recipientEmailId,String displayName,String senderName, String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException;
 
 	public void sendSurveyReminderMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException;
 
-	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException,
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId) throws InvalidInputException,
 			UndeliveredEmailException;
 
-	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException, UndeliveredEmailException;
+	/**
+	 * Sends survey invitation mail
+	 * @param recipientMailId
+	 * @param subject
+	 * @param mailBody
+	 * @param firstName
+	 * @param lastName
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody, String emailId, String name) throws InvalidInputException, UndeliveredEmailException;
 
 }
