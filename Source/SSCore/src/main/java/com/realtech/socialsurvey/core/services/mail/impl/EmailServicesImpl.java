@@ -37,14 +37,17 @@ public class EmailServicesImpl implements EmailServices {
 	@Value("${MAX_PAYMENT_RETRIES}")
 	private int maxPaymentRetries;
 	
-	@Value("${SENDGRID_SENDER_USERNAME}")
+	@Value("${SENDER_EMAIL_DOMAIN}")
+	private String defaultEmailDomain;
+	
+	/**@Value("${SENDGRID_SENDER_USERNAME}")
 	private String sendgridSenderUsername;
 	
 	@Value("${SENDGRID_SENDER_PASSWORD}")
 	private String sendgridSenderPassword;
 	
 	@Value("${SENDGRID_SENDER_NAME}")
-	private String sendgridSenderName;
+	private String sendgridSenderName;*/
 
 	@Async
 	@Override
@@ -210,12 +213,27 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderEmailId(sendgridSenderUsername);
-		emailEntity.setSenderPassword(sendgridSenderPassword);
-		emailEntity.setSenderName(sendgridSenderName);
+//		emailEntity.setSenderEmailId(sendgridSenderUsername);
+//		emailEntity.setSenderPassword(sendgridSenderPassword);
+//		emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for registrationInvite");
+		return emailEntity;
+	}
+	
+	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String emailId, String name){
+		LOG.debug("Preparing email entity for sending mail to " + recipientMailId+" agent email name: "+emailId+" name: "+name);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setSenderName(name);
+		emailEntity.setSenderEmailId(emailId.substring(0, emailId.indexOf("@")+1)+defaultEmailDomain);
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for sending mail");
 		return emailEntity;
 	}
 
@@ -513,9 +531,9 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderEmailId(sendgridSenderUsername);
-		emailEntity.setSenderPassword(sendgridSenderPassword);
-		emailEntity.setSenderName(sendgridSenderName);
+//		emailEntity.setSenderEmailId(sendgridSenderUsername);
+//		emailEntity.setSenderPassword(sendgridSenderPassword);
+//		emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for verification mail");
@@ -1151,7 +1169,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException,
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1166,7 +1184,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmailId, agentName);
 
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT;
 
@@ -1183,7 +1201,7 @@ public class EmailServicesImpl implements EmailServices {
 	
 	@Async
 	@Override
-	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException,
+	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody, String emailId, String name) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1198,7 +1216,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, emailId, name);
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmail(emailEntity, subject, mailBody);
