@@ -169,7 +169,8 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 		
 		try {
 			HttpClient httpClient = HttpClientBuilder.create().build();
-			String url = "https://www.googleapis.com/plus/v1/people/me/activities/public?access_token=" + token.getAccessToken();
+			
+			String url = createGooglePlusFeedURL(token.getAccessToken());
 			HttpGet getRequest = new HttpGet(url);
 			HttpResponse response = httpClient.execute(getRequest);
 			if (response.getStatusLine().getStatusCode() != 200) {
@@ -195,6 +196,22 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 		return posts;
 	}
 
+	private String createGooglePlusFeedURL(String accessToken) {
+		StringBuffer url = new StringBuffer("https://www.googleapis.com/plus/v1/people/me/activities/public?access_token=" + accessToken);
+		// Add parameters which are required in response fetch results.
+		
+		url.append("&fields=nextPageToken,updated,items(id,title,published)");
+		
+		// add maximum results per page
+		url.append("&maxResults=").append(PAGE_SIZE);
+		
+		if(!lastFetchedPostId.isEmpty()){
+			url.append("&pageToken=").append(lastFetchedPostId);
+		}
+		
+		return url.toString();
+	}
+
 	private Timestamp convertStrigToDate(String str) throws NonFatalException{
 		Date date = null;
 		SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
@@ -214,25 +231,34 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
         
 		try {
 			JsonParser jsonParser = new JsonParser();
-			JsonObject userArray = jsonParser.parse(jsonReader).getAsJsonObject();
-			JsonArray array = (JsonArray) userArray.get("items");
+			JsonObject parentObj = jsonParser.parse(jsonReader).getAsJsonObject();
+			String nextPageToken = "";
+			if(null != parentObj.get("nextPageToken")){
+				nextPageToken = parentObj.get("nextPageToken").getAsString();
+			}
+			 
+			Timestamp profileUpdatedOn = convertStrigToDate(parentObj.get("updated").getAsString());
+			if(!nextPageToken.isEmpty()){
+				lastFetchedPostId = nextPageToken;
+			}
+			
+			JsonArray array = (JsonArray) parentObj.get("items");
 			for (JsonElement jsonElement : array) {
 				if (jsonElement == null) {
 					continue;
 				}
 				
 				JsonObject items = (JsonObject) jsonElement;
+				GooglePlusPost post = new GooglePlusPost();
+				
 				
 				Timestamp postCreatedOn = convertStrigToDate(items.get("published").getAsString());
-				if (lastFetchedTill.before(postCreatedOn)) {
-					GooglePlusPost post = new GooglePlusPost();
-					post.setId(items.get("id").getAsString());
-					post.setCreatedOn(postCreatedOn);
-					post.setPost(items.get("title").getAsString());
-					posts.add(post);
-				}
-				if(posts.size() == PAGE_SIZE)
-					break;
+				
+				post.setId(items.get("id").getAsString());
+				post.setCreatedOn(postCreatedOn);
+				post.setPost(items.get("title").getAsString());
+				post.setLastUpdatedOn(profileUpdatedOn);
+				posts.add(post);
 			}
 		}
 		catch (NonFatalException e) {
@@ -244,13 +270,27 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	@Override
 	public void processFeed(List<GooglePlusPost> posts, String organizationUnit) throws NonFatalException {
 		LOG.info("Process tweets for organizationUnit " + organizationUnit);
+		Date lastFetchedOn = null;
 		for (GooglePlusPost post : posts) {
-
-			SocialPost socialPost = new SocialPost();
-			socialPost.setPostText(post.getPost());
-			socialPost.setSource(FEED_SOURCE);
-			socialPost.setPostId(post.getId());
-			socialPost.setTimeInMillis(post.getCreatedOn().getTime());
+			SocialPost socialPost = null;
+			if(lastFetchedTill == null){
+				socialPost = new SocialPost();
+				lastFetchedOn = post.getCreatedOn(); 
+				socialPost.setPostText(post.getPost());
+				socialPost.setSource(FEED_SOURCE);
+				socialPost.setPostId(post.getId());
+				socialPost.setTimeInMillis(post.getCreatedOn().getTime());
+			}
+			if (lastFetchedTill != null && lastFetchedTill.after(post.getCreatedOn())) {
+				socialPost = new SocialPost();
+				lastFetchedOn = post.getCreatedOn(); 
+				socialPost.setPostText(post.getPost());
+				socialPost.setSource(FEED_SOURCE);
+				socialPost.setPostId(post.getId());
+				socialPost.setTimeInMillis(post.getCreatedOn().getTime());
+			}
+			if(socialPost == null)
+				break;
 			switch (organizationUnit) {
 				case MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION:
 					socialPost.setCompanyId(profileId);
@@ -268,13 +308,13 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 					socialPost.setAgentId(profileId);
 					break;
 			}
-			// updating last fetched details
-			lastFetchedTill = new Timestamp(post.getCreatedOn().getTime());
-			lastFetchedPostId = post.getId();
 			// pushing to mongo
 			mongoTemplate.insert(socialPost, CommonConstants.SOCIAL_POST_COLLECTION);
 		}
-		
+		// updating last fetched details
+		if(lastFetchedOn != null){
+			lastFetchedTill = new Timestamp(lastFetchedOn.getTime());
+		}
 	}
 
 	@Override
