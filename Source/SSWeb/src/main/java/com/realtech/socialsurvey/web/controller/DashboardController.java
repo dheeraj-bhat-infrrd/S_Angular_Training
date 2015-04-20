@@ -918,14 +918,14 @@ public class DashboardController {
 				mailBody = mailBody.replaceAll("\\[Link\\]", link);
 				String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
 				try {
-					emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody);
+					emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()+(user.getLastName() != null?" "+user.getLastName():""));
 				}
 				catch (InvalidInputException | UndeliveredEmailException e) {
 					LOG.error("Exception caught while sending mail to " + custEmail + " .Nested exception is ", e);
 				}
 			}
 			else{
-				emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName+" "+custLastName, user.getFirstName()+" "+user.getLastName(), link);
+				emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName+" "+custLastName, user.getFirstName()+(user.getLastName() !=null?" "+user.getLastName():""), link);
 			}
 		}
 		catch (NonFatalException e) {
