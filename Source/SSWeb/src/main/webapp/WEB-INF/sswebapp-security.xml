@@ -13,6 +13,7 @@
 		<intercept-url pattern="/login.do" access="permitAll" />
 		<intercept-url pattern="/home.do" access="permitAll" />
 		<intercept-url pattern="/fetchgatrackingid.do" access="permitAll" />
+		<intercept-url pattern="/fetchgooglemapapikey.do" access="permitAll" />
 
 		<intercept-url pattern="/initfindapro.do" access="permitAll" />
 		<intercept-url pattern="/findapro.do" access="permitAll" />

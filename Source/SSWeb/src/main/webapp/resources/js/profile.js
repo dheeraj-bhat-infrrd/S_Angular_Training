@@ -127,7 +127,16 @@ function paintProfilePage(result) {
             if(result.logo != undefined) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
             	$("#prof-company-logo").css("background-size","100% auto");
+            }else{
+            	var address = contactDetails.name + 
+        					contactDetails.address1 + 
+        					contactDetails.address2 + 
+        					contactDetails.country + 
+        					contactDetails.zipcode ;
+            	
+            	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>')
             }
+            
             if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","contain");
