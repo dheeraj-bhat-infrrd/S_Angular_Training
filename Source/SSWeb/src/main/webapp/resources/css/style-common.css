@@ -2938,6 +2938,12 @@ button.paypal.is-active {
 	background-color: #f1f1f1;
 }
 
+.prof-user-logo iframe{
+	frameborder="0";
+	border:0;
+	width:100%;
+}
+
 .prof-user-addline1 {
 	/*    font-weight: bold !important;*/
 	font-family: 'OpenSansBold';
