@@ -18,7 +18,6 @@ import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
-import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 // JIRA: SS-7: By RM02: BOC
 /**
