@@ -257,7 +257,16 @@
                     </div>
                 </div>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
-                    <div class="main-con-header hide" id="prof-reviews-header"></div>
+                	<div class="clearfix hide">
+	                    <div class="main-con-header float-left" id="prof-reviews-header"></div>
+	                    
+	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">
+	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left">Sort by Feature</div>
+	                    	<div class="prof-reviews-sort-divider float-left">|</div>
+	                    	<div id="sort-by-date" class="prof-review-sort-link float-right">Sort by Date</div>
+	                    </div>
+                    </div>
+                    
                     <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here --> 
                     </div>

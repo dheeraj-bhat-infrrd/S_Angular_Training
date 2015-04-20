@@ -7,6 +7,9 @@ var publicPostStartIndex = 0;
 var publicPostNumRows = 3;
 var currentProfileName;
 var doStopPublicPostPagination = false;
+var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+		"Sep", "Oct", "Nov", "Dec" ];
+
 
 function fetchCompanyProfile() {
 	startIndex = 0;
@@ -622,7 +625,7 @@ function paintReviews(result){
 	}else {
 		$("#prof-review-item").append(reviewsHtml);
 	}
-	 $("#prof-reviews-header").show();
+	 $("#prof-reviews-header").parent().show();
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this));
 	});
@@ -703,15 +706,38 @@ function paintHiddenReviewsCount(data) {
 				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
 			}
 			
-			$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
+			$("#prof-hidden-review-count").html(reviewsSizeHtml);
+			
+			if($("#profile-fetch-info").attr("fetch-all-reviews") == "true"){
+				$("#prof-hidden-review-count").show();
+			}
+			
+			$('#prof-reviews-sort').show();
 			$("#prof-hidden-review-count").click(function(){
 				$('#prof-review-item').html('');
 				$(this).hide();
 				startIndex = 0;
-				minScore = 0;
 				$("#profile-fetch-info").attr("fetch-all-reviews", "true");
 				$(window).scrollTop($('#reviews-container').offset().top);
-				fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
+				fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows,0);
+			});
+
+			$('#sort-by-feature').on('click',function(e){
+				e.stopImmediatePropagation();
+				$("#prof-hidden-review-count").show();
+				$('#prof-review-item').html('');
+				startIndex = 0;
+				$("#profile-fetch-info").attr("fetch-all-reviews","false");
+				fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,minScore);
+			});
+
+			$('#sort-by-date').on('click',function(e){
+				e.stopImmediatePropagation();
+				$("#prof-hidden-review-count").hide();
+				$('#prof-review-item').html('');
+				startIndex = 0;
+				$("#profile-fetch-info").attr("fetch-all-reviews","true");
+				fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,0);
 			});
 		}
 	}
@@ -937,19 +963,31 @@ function paintIndividualDetails(result){
 	var positions = result.positions; 
 	if(positions != undefined && positions.length > 0){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
-		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-postions-wrapper">';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Positions</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for(var i=0;i<positions.length;i++){
+			individualDetailsHtml += '<div class="postions-content">';
 			var positionObj = positions[i];
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.name+'</div>';
-			if(!positionObj.isCurrent && positionObj.endTime){
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.startTime+" - "+positionObj.endTime+'</div>';				
-			}else{
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.startTime+' - current</div>';
+			if(positionObj.title){
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.title+'</div>';	
 			}
-			
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.title+'</div>';
+			if(positionObj.startTime){
+				
+				var startDateStr = positionObj.startTime.split("-");
+				
+				
+				if(!positionObj.isCurrent && positionObj.endTime){
+					
+					var endDateStr = positionObj.endTime.split("-");
+					
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +" - "+monthNames[endDateStr[0] - 1]+ " " + endDateStr[1] +'</div>';				
+				}else{
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +' - Current</div>';
+				}				
+			}
+			individualDetailsHtml += '</div>';
 		}
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
