@@ -381,10 +381,10 @@
         padding: 0;
     }
     .prof-btn-survey{
-        /* width: 250px;
+        /*width: 250px;
         height: 36px;
         line-height: 36px;
-        margin: 0 auto; */
+        margin: 0 auto;*/
     }
     .prof-rating .st-rating-wrapper{
 /*        display: none;*/
@@ -461,7 +461,7 @@
         color: #4A4A4A;
     }
     .left-panel-content{
-        padding-left: 15px;
+		padding-left: 15px;
     }
     .lp-con-row{
         border-bottom: 1px solid #dcdcdc;
@@ -511,7 +511,7 @@
         width: 100%;
     }
     .main-con-header {
-    	width:100%;
+	    width:100%;
         font-size: 16px;
         border-bottom: 1px solid #dcdcdc;
         line-height: 55px;
@@ -1286,6 +1286,9 @@
 @media (min-width: 768px) and (max-width: 991px) {
 	.container{
     	width: 100% !important;
+    }
+    .payment-option-tab{
+        width: 50%;
     }
     .payment-option-tab{
         width: 50%;
