@@ -11,7 +11,7 @@
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
 					<div id="dashboard-sel" class="float-left hr-txt2 cursor-pointer">${profileName}</div>
-					<div id="da-dd-wrapper-profiles" class="hr-dd-wrapper hide">
+					<div id="da-dd-wrapper-profiles" class="va-dd-wrapper hide">
 						<c:forEach var="userprofile" items="${profileList}">
 							<div class="da-dd-item" data-profile-id="${userprofile.key}"
 								data-column-name="${userprofile.value.profileName}"
