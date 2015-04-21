@@ -231,7 +231,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		if (agentSettings == null) {
 			throw new InvalidInputException("AgentSettings can not be null");
 		}
-		LOG.info("Getting Social Tokens information");
+		LOG.info("updateLinkedin() started.");
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
 				if (agentSettings.getSocialMediaTokens().getLinkedInToken() != null) {
@@ -257,7 +257,7 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 				}
 			}
 		}
-		LOG.info("Social Tokens updated successfully");
+		LOG.info("updateLinkedin() finished");
 	}
 
 	@Override

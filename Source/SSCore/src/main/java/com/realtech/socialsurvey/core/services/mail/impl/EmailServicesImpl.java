@@ -3,15 +3,12 @@ package com.realtech.socialsurvey.core.services.mail.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
-
-import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.EmailTemplateConstants;
 import com.realtech.socialsurvey.core.entities.EmailEntity;
 import com.realtech.socialsurvey.core.entities.FileContentReplacements;
@@ -21,7 +18,6 @@ import com.realtech.socialsurvey.core.services.mail.EmailSender;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
 import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.mq.ProducerForQueue;
-import com.realtech.socialsurvey.core.utils.PropertyFileReader;
 
 // JIRA: SS-7: By RM02: BOC
 /**
@@ -38,20 +34,20 @@ public class EmailServicesImpl implements EmailServices {
 	@Autowired
 	private EmailSender emailSender;
 
-	@Autowired
-	private PropertyFileReader propertyReader;
-
 	@Value("${MAX_PAYMENT_RETRIES}")
 	private int maxPaymentRetries;
 	
-	@Value("${SENDGRID_SENDER_USERNAME}")
+	@Value("${SENDER_EMAIL_DOMAIN}")
+	private String defaultEmailDomain;
+	
+	/**@Value("${SENDGRID_SENDER_USERNAME}")
 	private String sendgridSenderUsername;
 	
 	@Value("${SENDGRID_SENDER_PASSWORD}")
 	private String sendgridSenderPassword;
 	
 	@Value("${SENDGRID_SENDER_NAME}")
-	private String sendgridSenderName;
+	private String sendgridSenderName;*/
 
 	@Async
 	@Override
@@ -217,12 +213,27 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderEmailId(sendgridSenderUsername);
-		emailEntity.setSenderPassword(sendgridSenderPassword);
-		emailEntity.setSenderName(sendgridSenderName);
+//		emailEntity.setSenderEmailId(sendgridSenderUsername);
+//		emailEntity.setSenderPassword(sendgridSenderPassword);
+//		emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for registrationInvite");
+		return emailEntity;
+	}
+	
+	private EmailEntity prepareEmailEntityForSendingEmail(String recipientMailId, String emailId, String name){
+		LOG.debug("Preparing email entity for sending mail to " + recipientMailId+" agent email name: "+emailId+" name: "+name);
+		List<String> recipients = new ArrayList<String>();
+		recipients.add(recipientMailId);
+
+		EmailEntity emailEntity = new EmailEntity();
+		emailEntity.setRecipients(recipients);
+		emailEntity.setSenderName(name);
+		emailEntity.setSenderEmailId(emailId.substring(0, emailId.indexOf("@")+1)+defaultEmailDomain);
+		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
+
+		LOG.debug("Prepared email entity for sending mail");
 		return emailEntity;
 	}
 
@@ -520,9 +531,9 @@ public class EmailServicesImpl implements EmailServices {
 
 		EmailEntity emailEntity = new EmailEntity();
 		emailEntity.setRecipients(recipients);
-		emailEntity.setSenderEmailId(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_USERNAME));
-		emailEntity.setSenderPassword(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_PASSWORD));
-		emailEntity.setSenderName(propertyReader.getProperty(CommonConstants.CONFIG_PROPERTIES_FILE, CommonConstants.SENDGRID_SENDER_NAME));
+//		emailEntity.setSenderEmailId(sendgridSenderUsername);
+//		emailEntity.setSenderPassword(sendgridSenderPassword);
+//		emailEntity.setSenderName(sendgridSenderName);
 		emailEntity.setRecipientType(EmailEntity.RECIPIENT_TYPE_TO);
 
 		LOG.debug("Prepared email entity for verification mail");
@@ -1115,7 +1126,7 @@ public class EmailServicesImpl implements EmailServices {
 	 */
 	@Async
 	@Override
-	public void sendContactUsMail(String recipientEmailId, String displayName,
+	public void sendContactUsMail(String recipientEmailId, String displayName, String senderName,
 			String senderEmailId, String message) throws InvalidInputException, UndeliveredEmailException {
 		
 		if( recipientEmailId == null || recipientEmailId.isEmpty()){
@@ -1125,6 +1136,10 @@ public class EmailServicesImpl implements EmailServices {
 		if( displayName == null || displayName.isEmpty()){
 			LOG.error("displayName is null or empty!");
 			throw new InvalidInputException("displayName is null or empty!");
+		}
+		if( senderName == null || senderName.isEmpty()){
+			LOG.error("senderName is null or empty!");
+			throw new InvalidInputException("senderName is null or empty!");
 		}
 		if( senderEmailId == null || senderEmailId.isEmpty()){
 			LOG.error("senderEmailId is null or empty!");
@@ -1144,7 +1159,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.CONTACT_US_MAIL_BODY);
 
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,senderEmailId,message));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName,senderName,senderEmailId,message));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1154,7 +1169,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link) throws InvalidInputException,
+	public void sendDefaultSurveyInvitationMail(String recipientMailId, String displayName, String agentName, String link, String agentEmailId) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1169,7 +1184,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, agentEmailId, agentName);
 
 		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.SURVEY_INVITATION_MAIL_SUBJECT;
 
@@ -1186,7 +1201,7 @@ public class EmailServicesImpl implements EmailServices {
 	
 	@Async
 	@Override
-	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody) throws InvalidInputException,
+	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody, String emailId, String name) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -1201,7 +1216,7 @@ public class EmailServicesImpl implements EmailServices {
 
 		LOG.info("Sending survey reminder email to : " + recipientMailId);
 
-		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId, emailId, name);
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmail(emailEntity, subject, mailBody);
