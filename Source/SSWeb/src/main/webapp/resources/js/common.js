@@ -183,10 +183,17 @@ function callAjaxGetWithPayloadData(url, callBackFunction, payload,isAsync){
 
 function changeRatingPattern(rating, ratingParent,isOverallRating) {
 	
-	var ratingIntVal = parseInt(rating) + 1;
+	var ratingIntVal = 0;
 	
-	if(ratingIntVal >=5){
-		ratingIntVal = 5;
+
+	if (ratingIntVal % 1 == 0) {
+		ratingIntVal = parseInt(rating);
+	} else {
+		ratingIntVal = parseInt(rating) + 1;
+	}
+
+	if (ratingIntVal == 0) {
+		ratingIntVal = 1;
 	}
 	
 	var roundedFloatingVal = parseFloat(rating).toFixed(2);

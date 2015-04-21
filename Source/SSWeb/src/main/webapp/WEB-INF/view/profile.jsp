@@ -8,6 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.profile.title.key"/></title>
+    <link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
@@ -60,7 +61,7 @@
 <div class="hm-header-main-wrapper">
     <div class="container">
         <div class="hm-header-row hm-header-row-main clearfix">
-            <div class="float-left hm-header-row-left"><spring:message code="label.readwritesharereviews.key"/></div>
+            <div class="float-left hm-header-row-left padding-10"><spring:message code="label.readwritesharereviews.key"/></div>
             <div class="float-right hm-find-pro-right clearfix">
             	<form id="find-pro-form" method="POST" action="${pageContext.request.contextPath}/findapro.do">
 		           	<div class="float-left prof-input-header">Find a professional</div>
@@ -79,11 +80,11 @@
     </div>
 </div>
 
-<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
+<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 hide">
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
+            <div id="prof-img-cont" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper hide">
                 <div class="prog-img-container">
                     <div id="prof-image" class="prof-image pos-relative"></div>
                 </div>
@@ -125,8 +126,8 @@
 		</div>
 		
 		<div class="container">
-			<div class="row">
-            <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
+			<div class="row margin-top-10">
+            <div class="prof-left-panel-wrapper col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
                 <!-- <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">
@@ -229,11 +230,11 @@
                     </div>  
                     
             </div>
-            <div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
-                <div class="intro-wrapper rt-content-main bord-bot-dc" id="prof-company-intro">
+            <div class="row prof-right-panel-wrapper col-lg-8 col-md-8 col-sm-8 col-xs-12">
+                <div class="intro-wrapper rt-content-main bord-bot-dc hide" id="prof-company-intro">
                     <!-- about me comes here  -->
                 </div>
-                <div class="rt-content-main bord-bot-dc clearfix">
+                <div class="rt-content-main bord-bot-dc clearfix hide" id="recent-post-container">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>
                         <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
@@ -256,7 +257,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="people-say-wrapper rt-content-main" id="reviews-container">
+                <div class="people-say-wrapper rt-content-main hide" id="reviews-container">
                 	<div class="clearfix hide">
 	                    <div class="main-con-header float-left" id="prof-reviews-header"></div>
 	                    
