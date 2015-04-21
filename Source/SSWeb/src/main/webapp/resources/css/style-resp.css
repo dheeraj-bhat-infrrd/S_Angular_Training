@@ -4,6 +4,9 @@
         font-size: 12px;
         -webkit-user-select: none;                  
     }
+    .container{
+    	width: 100% !important;
+    }
     .login-main-wrapper{
         background: #fff;
     }
@@ -378,10 +381,10 @@
         padding: 0;
     }
     .prof-btn-survey{
-        width: 250px;
+        /*width: 250px;
         height: 36px;
         line-height: 36px;
-        margin: 0 auto;
+        margin: 0 auto;*/
     }
     .prof-rating .st-rating-wrapper{
 /*        display: none;*/
@@ -449,7 +452,7 @@
     #payment-details-form{
         padding: 0;
     }
-    .prof-left-social, .prof-right-panel-wrapper, .intro-wrapper{
+    .prof-left-social, .intro-wrapper{
         display: none;
     }
     .left-panel-header{
@@ -458,7 +461,7 @@
         color: #4A4A4A;
     }
     .left-panel-content{
-        padding: 0
+		padding-left: 15px;
     }
     .lp-con-row{
         border-bottom: 1px solid #dcdcdc;
@@ -508,6 +511,7 @@
         width: 100%;
     }
     .main-con-header {
+	    width:100%;
         font-size: 16px;
         border-bottom: 1px solid #dcdcdc;
         line-height: 55px;
@@ -1272,11 +1276,20 @@
     .float-left.vs-ans-txt {
         width: 100%;
     }
+    .prof-details-header{
+    	display: none;
+    }
 }
 
 
 /* ============== ONLY TABLETS ==============*/
 @media (min-width: 768px) and (max-width: 991px) {
+	.container{
+    	width: 100% !important;
+    }
+    .payment-option-tab{
+        width: 50%;
+    }
     .payment-option-tab{
         width: 50%;
     }
@@ -1518,10 +1531,38 @@
     .float-left.vs-ans-txt {
         width: 505px;
     }
+    .lp-input-cont,.lp-button,.prof-captcha-cont{
+    	width: 210px;
+    }
+    .lp-input{
+    	width: 168px;
+    }
+    .prof-captcha-cont .prof-cap-txt{
+    	width: 100%;
+    	border-bottom: 1px solid #dcdcdc;
+    }
+    .prof-captcha-cont #recaptcha_image {
+    	width: 205px !important;
+    }
+    .social-connect-txt{
+    	display: none;
+    }
+    .prof-wrapper{
+    	padding: 0 !important;
+    }
+    .hm-find-pro-right{
+    	width: 100%;
+    }
+    .lp-row{
+    	padding-left: 0;	
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
 @media (min-width: 992px) and (max-width: 1199px) {
+	.container{
+    	width: 100% !important;
+    }
     .hm-item-row{
         width: 100%
     }
@@ -1648,6 +1689,19 @@
     .hdr-logo{
         width: 130px;
         background-size: 88%;
+    }
+    .lp-input-cont,.lp-button,.prof-captcha-cont{
+    	width: 270px;
+    }
+    .lp-input{
+    	width: 225px;
+    }
+    .prof-captcha-cont .prof-cap-txt{
+    	width: 100%;
+    	border-bottom: 1px solid #dcdcdc;
+    }
+    .prof-captcha-cont #recaptcha_image {
+    	width: 265px !important;
     }
 }
 
