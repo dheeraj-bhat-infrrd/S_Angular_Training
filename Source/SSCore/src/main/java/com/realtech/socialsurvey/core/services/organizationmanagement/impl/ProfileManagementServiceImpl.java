@@ -904,6 +904,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
 	}
+	
+	/**
+	 * Method to get User by profileName
+	 * 
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	@Transactional
+	public User getUserByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName);
+
+		OrganizationUnitSettings agentSettings = null;
+		if (agentProfileName == null || agentProfileName.isEmpty()) {
+			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
+		}
+
+		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		if (agentSettings == null) {
+			throw new NoRecordsFetchedException("No settings found for agent while fetching agent profile");
+		}
+
+		User user = userDao.findById(User.class, agentSettings.getIden());
+
+		LOG.info("Method getUserProfilesByProfileName executed successfully");
+		return user;
+	}
 
 	@Override
 	@Transactional
