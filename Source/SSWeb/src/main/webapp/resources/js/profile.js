@@ -53,7 +53,7 @@ function paintProfilePage(result) {
 			$('#social-connect-txt').text("Contact with "+contactDetails.name+":");
 			$('#prof-header-url').text(location.href);
 			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
-			
+			$('#agent-desc').html(contactDetails.name+" - Reviews And Ratings");
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
 				headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
@@ -298,6 +298,7 @@ function paintAverageRatings(data) {
 	if(responseJson != undefined) {
 		var rating = $.parseJSON(responseJson.entity);
 		changeRatingPattern(rating,$("#rating-avg-comp"),true);
+		$('#prof-schema-agent-rating').html(parseFloat(rating).toFixed(2));
 	}
 }
 
@@ -678,6 +679,7 @@ function paintAllReviewsCount(data) {
 		$("#profile-fetch-info").attr("total-reviews",responseJson.entity);
 		reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
 		$("#prof-company-review-count").html(reviewsSizeHtml);
+		$("#prof-schema-reviews").html(reviewsSizeHtml);
 		if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
 				$('html, body').animate({

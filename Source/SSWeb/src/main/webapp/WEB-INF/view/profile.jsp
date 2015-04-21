@@ -284,6 +284,18 @@
 <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
+
+<!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
+
+<div class="hide" itemscope itemtype="http://schema.org/Product">
+   <span itemprop="name">Social Survey</span>
+   <span id="agent-desc" itemprop="title"></span>
+   <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
+		<span id="prof-schema-agent-rating" itemprop="ratingValue"></span>/5 based on <span id="prof-schema-reviews" itemprop="reviewCount"></span> reviews
+	</div>
+</div>
+<!-- EOC -->
+
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
