@@ -42,7 +42,6 @@ $('body').click(function() {
 });
 
 $(document).scroll(function() {
-	debugger;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
 		showReviews(colName, colValue);
 	}
@@ -310,7 +309,6 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 }
 
 function showReviews(columnName, columnValue) {
-	debugger;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
