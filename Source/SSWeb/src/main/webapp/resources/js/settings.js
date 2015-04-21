@@ -484,8 +484,8 @@ $('.se-dd-item').click(function(){
 	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
 });
 
-/*$('body').click(function(){
+$('body').click(function(){
 	if ($('#se-dd-wrapper-profiles').css('display') == "block") {
-		$('#se-dd-wrapper-profiles').slideToggle(200);
+		$('#se-dd-wrapper-profiles').toggle();
 	}
-});*/
+});

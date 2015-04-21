@@ -702,8 +702,8 @@ $('.da-dd-item').click(function(){
 	colValue = newProfileValue;
 });
 
-/*$('body').click(function(){
+$('body').click(function(){
 	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
-		$('#da-dd-wrapper-profiles').slideToggle(200);
+		$('#da-dd-wrapper-profiles').toggle();
 	}
-});*/
+});
