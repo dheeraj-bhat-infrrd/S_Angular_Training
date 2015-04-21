@@ -666,9 +666,12 @@ function updateCurrentProfile(profileId) {
 
 function showSurveyRequestPage(){
 	callAjaxGET('./redirecttosurveyrequestpage.do', function(data) {
+		$('#srv-req-pop').removeClass('hide');
+		$('#srv-req-pop').addClass('survey-request-popup-container');
 		$('#srv-req-pop').show();
 		$('#srv-req-pop').find('.survey-request-popup').html(data);
-	})
+		
+	});
 	//window.open('./redirecttosurveyrequestpage.do', '_self');
 }
 

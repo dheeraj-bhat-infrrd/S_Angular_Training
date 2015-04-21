@@ -97,8 +97,11 @@
 							success = true;
 					},
 					complete: function(){
-						if(success==true)
-							window.open('./landing.do', '_self');
+						if(success==true){
+							
+							$('#srv-req-pop').removeClass('survey-request-popup-container');
+							$('#srv-req-pop').addClass('hide');					
+						}
 					},
 					error : function(e) {
 						redirectErrorpage();
