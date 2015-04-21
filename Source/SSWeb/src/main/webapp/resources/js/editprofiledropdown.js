@@ -13,8 +13,8 @@ $('.pe-dd-item').click(function() {
 	showMainContent('./showprofilepage.do?profileId=' + newProfileId);
 });
 
-$('body').click(function() {
+/*$('body').click(function() {
 	if ($('#pe-dd-wrapper-profiles').css('display') == "block") {
 		$('#pe-dd-wrapper-profiles').slideToggle(200);
 	}
-});
+});*/
