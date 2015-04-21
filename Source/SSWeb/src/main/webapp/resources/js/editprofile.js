@@ -359,39 +359,37 @@ function callBackShowAddressDetails(data) {
 	adjustImage();
 }
 
-$(document).on('click', '#prof-address-container', function() {
+function showEditAddressPopup() {
 	callAjaxGET("./fetchaddressdetailsedit.do", callBackEditAddressDetails);
-});
+}
 
 function callBackEditAddressDetails(data) {
 	var header = "Edit Address Detail";
-	createPopupConfirm(header, data);
+	createEditAddressPopup(header, data);
 
-	$('#overlay-continue').click(
-			function() {
-				var profName = $('#prof-name').val();
-				var profAddress1 = $('#prof-address1').val();
-				var profAddress2 = $('#prof-address2').val();
-				var country = $('#prof-country').val();
-				var zipCode = $('#prof-zipcode').val();
-				if (!profName || !profAddress1 || !country || !zipCode) {
-					return;
-				}
+	$('#overlay-continue').click(function() {
+		var profName = $('#prof-name').val();
+		var profAddress1 = $('#prof-address1').val();
+		var profAddress2 = $('#prof-address2').val();
+		var country = $('#prof-country').val();
+		var zipCode = $('#prof-zipcode').val();
+		if (!profName || !profAddress1 || !country || !zipCode) {
+			return;
+		}
 
-				delay(function() {
-					var payload = {
-						"profName" : profName,
-						"address1" : profAddress1,
-						"address2" : profAddress2,
-						"country" : country,
-						"zipCode" : zipCode
-					};
-					callAjaxPostWithPayloadData("./updateprofileaddress.do",
-							callBackUpdateAddressDetails, payload);
-				}, 0);
+		delay(function() {
+			var payload = {
+				"profName" : profName,
+				"address1" : profAddress1,
+				"address2" : profAddress2,
+				"country" : country,
+				"zipCode" : zipCode
+			};
+			callAjaxPostWithPayloadData("./updateprofileaddress.do", callBackUpdateAddressDetails, payload);
+		}, 0);
 
-				$('#overlay-continue').unbind('click');
-			});
+		$('#overlay-continue').unbind('click');
+	});
 
 	$('.overlay-disable-wrapper').addClass('pu_arrow_rt');
 	$('body').css('overflow', 'hidden');
@@ -414,7 +412,7 @@ $('#overlay-cancel').click(function() {
 	overlayRevert();
 });
 
-function createPopupConfirm(header, body) {
+function createEditAddressPopup(header, body) {
 	$('#overlay-header').html(header);
 	$('#overlay-text').html(body);
 	$('#overlay-continue').html("Ok");
@@ -1377,18 +1375,13 @@ function fetchReviewCount(attrName, attrVal, minScore) {
 
 function paintReviewCount(reviewCount) {
 	if (reviewCount != undefined) {
-		if (reviewCount == 0) {
-			// hiding reviews-container if no reviews present
-			$("#prof-company-review-count").hide();
-			$("#reviews-container").hide();
-		} else {
-			reviewCount = reviewCount + ' Review(s)';
+		if (reviewCount > 0) {
+			$("#prof-company-review-count").click(function() {
+				$(window).scrollTop($('#reviews-container').offset().top);
+			});
 		}
-
+		reviewCount = reviewCount + ' Review(s)';
 		$("#prof-company-review-count").html(reviewCount);
-		$("#prof-company-review-count").click(function() {
-			$(window).scrollTop($('#reviews-container').offset().top);
-		});
 	}
 }
 
@@ -1400,7 +1393,7 @@ function fetchAvgRating(attrName, attrVal) {
 
 function paintAvgRating(avgRating) {
 	if (avgRating != undefined) {
-		changeRatingPattern(avgRating, $("#rating-avg-comp"));
+		changeRatingPattern(avgRating, $("#rating-avg-comp"),true);
 	}
 }
 

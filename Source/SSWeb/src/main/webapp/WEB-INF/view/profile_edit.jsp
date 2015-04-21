@@ -38,6 +38,9 @@
 <c:if test="${not empty profile && not empty profileSettings.licenses}">
 	<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 </c:if>
+<c:if test="${not empty profile && not empty profileSettings.profileUrl}">
+	<c:set value="${profileSettings.profileUrl}" var="profileUrl"></c:set>
+</c:if>
 <c:if test="${profilemasterid == 4}">
 	<c:if test="${not empty profile && not empty profileSettings.expertise}">
 		<c:set value="${profileSettings.expertise}" var="expertiseList"></c:set>
@@ -89,7 +92,7 @@
 				</div>
 			</c:if>
 
-			<c:if test="${accountMasterId != 5}">
+			<%-- <c:if test="${accountMasterId != 5}">
 				<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
 					<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
 					<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
@@ -97,7 +100,7 @@
 					<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
 					<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 				</div>
-			</c:if>
+			</c:if> --%>
 		</div>
 	</div>
 </div>
@@ -181,11 +184,11 @@
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
 						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
+							<!-- <div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
 							<div class="rating-star icn-no-star"></div>
-							<div class="rating-star icn-no-star"></div>
-							<div class="rating-star icn-no-star"></div>
+							<div class="rating-star icn-no-star"></div> -->
 						</div>
 						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
 					</div>
@@ -228,7 +231,7 @@
 					</c:choose>
 				</div>
 				
-				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer">
+				<div id="prof-address-container" class="prof-user-address prof-edit-icn cursor-pointer" onclick="showEditAddressPopup();">
 					<div class="prof-user-addline1 prof-edditable prof-addr-center" >${contactdetail.name}</div>
 					<c:if test="${not empty contactdetail.address}">
 						<div class="prof-user-addline2 prof-edditable prof-addr-center" >${contactdetail.address}</div>
@@ -239,7 +242,46 @@
 				</div>
 			</div>
 		</div>
+		
+		<div class="prof-details-header">
+			<div class="container">
+				<div class="prof-details-header-row clearfix">
+					<div class="prof-link-header float-left clearfix">
+						<div id="prof-header-rating" class="rating-image float-left"></div>
+						<c:if test="${not empty profileUrl}">
+							<div id="prof-header-url" class="rating-image-txt float-left">${profileUrl}</div>
+						</c:if>
+						
+					</div>
+					<c:if test="${not empty webAddresses.work }">
+						<div id="web-addr-header" class="web-addr-header float-left clearfix">
+							<div class="web-address-img float-left"></div>
+							<div id="web-address-txt" class="web-address-txt float-left">${webAddresses.work }</div>
+						</div>
+					</c:if>
 
+					<c:if test="${accountMasterId != 5}">
+						<div id="prof-edit-social-link"
+							class="prof-edit-social-link float-right hm-hr-row-right clearfix">
+							<div class="float-left social-item-icon icn-fb"
+								data-link="${facebookToken.facebookPageLink}"></div>
+							<div class="float-left social-item-icon icn-twit"
+								data-link="${twitterToken.twitterPageLink}"></div>
+							<div class="float-left social-item-icon icn-lin"
+								data-link="${linkedInToken.linkedInPageLink}"></div>
+							<div class="float-left social-item-icon icn-yelp"
+								data-link="${yelpToken.yelpPageLink}"></div>
+							<input id="social-token-text" type="text"
+								class="social-token-text hide"
+								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
+						</div>
+					</c:if>
+					
+				</div>
+			</div>
+		</div>
+		
+		<div class="container">
 		<div class="row">
 			<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
 				<div class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
@@ -625,6 +667,7 @@
 			   	</div>
 			</div>
 		</div>
+		</div>
 	</div>
 </div>
 
@@ -712,5 +755,9 @@
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
 	});
+	
+	//Prepend domain url
+	$('#prof-header-url').prepend(window.location.origin+"/pages");
+	
 });
 </script>

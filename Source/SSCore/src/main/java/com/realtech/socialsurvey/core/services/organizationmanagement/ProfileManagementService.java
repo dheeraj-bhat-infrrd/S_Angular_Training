@@ -248,6 +248,8 @@ public interface ProfileManagementService {
 	 */
 	public OrganizationUnitSettings getIndividualByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
 
+	public User getUserByProfileName(String profileName) throws InvalidInputException, NoRecordsFetchedException;
+
 	/**
 	 * Method to fetch reviews based on the profile level specified, iden is one of
 	 * agentId/branchId/regionId or companyId based on the profile level
@@ -343,7 +345,7 @@ public interface ProfileManagementService {
 	 * @throws NoRecordsFetchedException
 	 * @throws UndeliveredEmailException
 	 */
-	public void findProfileMailIdAndSendMail(String agentProfileName,String message,String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+	public void findProfileMailIdAndSendMail(String agentProfileName,String message, String senderName, String senderMailId, String profileType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
 
 	public void addSocialPosts(UserProfile selectedProfile, String postText) throws InvalidInputException;
 

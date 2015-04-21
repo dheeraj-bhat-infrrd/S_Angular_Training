@@ -351,13 +351,17 @@ public class SurveyManagementController {
 				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
 				return e.getMessage();
 			}
+			rating = Math.round(rating * 100) / 100;
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on Social Survey \n";
 			facebookMessage += feedback;
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + "for " + agentName
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at www.social-survey.com/" + agentProfileLink;
+			
+			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
+					+ " on SocialSurvey - view at www.social-survey.com/" + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
 				List<String> socialSites = new ArrayList<>();
@@ -392,9 +396,9 @@ public class SurveyManagementController {
 				}
 			}
 
-			socialManagementService.updateLinkedin(agentSettings, twitterMessage);
+			socialManagementService.updateLinkedin(agentSettings, linkedinMessage);
 			for (OrganizationUnitSettings setting : settings) {
-				socialManagementService.updateLinkedin(setting, twitterMessage);
+				socialManagementService.updateLinkedin(setting, linkedinMessage);
 			}
 		}
 		catch (NonFatalException e) {
@@ -414,11 +418,11 @@ public class SurveyManagementController {
 			Map<String, String> facebookDetails = urlGenerator.decryptParameters(urlParam);
 			String agentName = facebookDetails.get("agentName");
 			String custFirstName = facebookDetails.get("firstName");
+			String agentProfileLink = facebookDetails.get("agentProfileLink");
 			String custLastName = facebookDetails.get("lastName");
 			String agentIdStr = facebookDetails.get("agentId");
 			String ratingStr = facebookDetails.get("rating");
 			String customerEmail = facebookDetails.get("customerEmail");
-			String feedback = facebookDetails.get("feedback");
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -431,9 +435,9 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
+			rating = Math.round(rating * 100) / 100;
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on Social Survey \n";
-			facebookMessage += feedback;
+					+ " on Social Survey - view at www.social-survey.com/rest/pages" + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
 				List<String> socialSites = new ArrayList<>();
@@ -485,7 +489,8 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+			rating = Math.round(rating * 100) / 100;
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at www.social-survey.com/rest/pages" + agentProfileLink;
 			try {
 				socialManagementService.tweet(agentSettings, twitterMessage);
@@ -538,8 +543,9 @@ public class SurveyManagementController {
 			}
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
-			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
-					+ " on @SocialSurvey - view at www.social-survey.com/rest/pages/" + agentProfileLink;
+			rating = Math.round(rating * 100) / 100;
+			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
+					+ " on SocialSurvey - view at www.social-survey.com/rest/pages/" + agentProfileLink;
 			socialManagementService.updateLinkedin(agentSettings, message);
 			for (OrganizationUnitSettings setting : settings) {
 				socialManagementService.updateLinkedin(setting, message);

@@ -8,6 +8,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title><spring:message code="label.profile.title.key"/></title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
@@ -74,12 +75,6 @@
 		           	<input id="find-pro-submit" type="button" class="float-left prof-submit-btn" value="Search">
             	</form>
             </div>
-            <!-- <div class="float-right hm-hr-row-right clearfix">
-                <div class="float-left social-item-icon icn-fb"></div>
-                <div class="float-left social-item-icon icn-twit"></div>
-                <div class="float-left social-item-icon icn-lin"></div>
-                <div class="float-left social-item-icon icn-yelp"></div>
-            </div> -->
         </div>
     </div>
 </div>
@@ -128,7 +123,8 @@
 				</div>
 			</div>
 		</div>
-<div class="container">
+		
+		<div class="container">
 			<div class="row">
             <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
@@ -194,19 +190,19 @@
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont">
 	                    					<div class="float-left lp-username-icn lp-input-icn"></div>
-	                    					<input type="text" class="lp-input" placeholder="example: John Doe">
+	                    					<input id="lp-input-name" type="text" class="lp-input" placeholder="example: John Doe">
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-email">
 	                    					<div class="float-left lp-email-icn lp-input-icn"></div>
-	                    					<input type="email" class="lp-input" placeholder="example: office@example.com">
+	                    					<input id="lp-input-email" type="email" class="lp-input" placeholder="example: office@example.com">
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
 	                    				<div class="lp-input-cont lp-textarea-cont">
 	                    					<div class="float-left lp-textarea-icn lp-input-icn"></div>
-	                    					<textarea type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
+	                    					<textarea id="lp-input-message" type="email" class="lp-input" placeholder="example: I'd like to say 'good job!'"></textarea>
 	                    				</div>
 	                    			</div>
 	                    			<div class="lp-row">
@@ -240,8 +236,8 @@
                 <div class="rt-content-main bord-bot-dc clearfix">
                     <div class="float-left panel-tweet-wrapper">
                         <div class="main-con-header">Recent Posts</div>
-                        <div class="tweet-panel tweet-panel-left tweet-panel-left-adj">
-                            <div class="tweet-panel-item bord-bot-dc clearfix">
+                        <div class="tweet-panel tweet-panel-left tweet-panel-left-adj" id="prof-posts">
+                            <!-- <div class="tweet-panel-item bord-bot-dc clearfix">
                                 <div class="tweet-icn icn-tweet float-left"></div>
                                 <div class="tweet-txt float-left">
                                     <div class="tweet-text-main">Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit sre leru Lorem ipsunmm dore tit </div>
@@ -256,12 +252,21 @@
                                     <div class="tweet-text-link"><em>http://abblk.com</em></div>
                                     <div class="tweet-text-time"><em>24 minutes ago</em></div>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                     </div>
                 </div>
                 <div class="people-say-wrapper rt-content-main" id="reviews-container">
-                    <div class="main-con-header hide" id="prof-reviews-header"></div>
+                	<div class="clearfix hide">
+	                    <div class="main-con-header float-left" id="prof-reviews-header"></div>
+	                    
+	                    <div id="prof-reviews-sort" class="prof-reviews-sort clearfix float-right hide">
+	                    	<div id="sort-by-feature" class="prof-review-sort-link float-left">Sort by Feature</div>
+	                    	<div class="prof-reviews-sort-divider float-left">|</div>
+	                    	<div id="sort-by-date" class="prof-review-sort-link float-right">Sort by Date</div>
+	                    </div>
+                    </div>
+                    
                     <div id="prof-review-item" class="prof-reviews">
 	                   <!--  reviews get populated here --> 
                     </div>
@@ -288,6 +293,18 @@
 <div style="display: none">
 	<script src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 </div>
+
+<!-- Code snippet to show aggregated ratings for agent in Google results : BOC-->
+
+<div class="hide" itemscope itemtype="http://schema.org/Product">
+   <span itemprop="name">Social Survey</span>
+   <span id="agent-desc" itemprop="title"></span>
+   <div itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating">Rated 
+		<span id="prof-schema-agent-rating" itemprop="ratingValue"></span>/5 based on <span id="prof-schema-reviews" itemprop="reviewCount"></span> reviews
+	</div>
+</div>
+<!-- EOC -->
+
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/date.js"></script>
@@ -297,6 +314,8 @@
 <script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/profile.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/googlemaps.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.min.js"></script>
 <script>
     $(document).ready(function(){
         adjustImage();
@@ -386,40 +405,56 @@
             $('body').removeClass('body-no-scroll-y');
         });
         
-        $(document).on('click', '.bd-q-btn-done-pu', function() {
-			// perform deault functions
-			url = window.location.origin + "/pages/profile/sendmail.do";
-			data = "";
-			if($("#agent-profile-name").val() != ""){
-				data += "profilename=" + $("#agent-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			else if($("#company-profile-name").val() != ""){
-				data += "profilename=" + $("#company-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			else if($("#region-profile-name").val() != ""){
-				data += "profilename=" + $("#region-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			else if($("#branch-profile-name").val() != ""){
-				data += "profilename=" + $("#branch-profile-name").val();
-				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
-			}
-			
-			data += "&email=blah@blahblah.com";
-			data += "&message="+ $('.bd-q-pu-txtarea').val();
-			showOverlay();
-			callAjaxPostWithPayloadData(url,function(message){
-				$('#contact-us-pu-wrapper').hide();
-				$('body').removeClass('body-no-scroll-y');
-				$('#overlay-toast').html(message);
-	    		console.log("Added toast message : " + message);
-	    		showToast();
-	    		console.log("Finished showing the toast");
-
-			},data,true);
+        $('.lp-button').click(function(event){
+        	
+        	if(validateContactUsForm()){
+        		
+        		url = window.location.origin + "/pages/profile/sendmail.do";
+    			data = "";
+    			if($("#agent-profile-name").val() != ""){
+    				data += "profilename=" + $("#agent-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			else if($("#company-profile-name").val() != ""){
+    				data += "profilename=" + $("#company-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			else if($("#region-profile-name").val() != ""){
+    				data += "profilename=" + $("#region-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			else if($("#branch-profile-name").val() != ""){
+    				data += "profilename=" + $("#branch-profile-name").val();
+    				data += "&profiletype=" + $("#profile-fetch-info").attr("profile-level");
+    			}
+    			
+    			data += "&name=" + $('#lp-input-name').val();
+    			data += "&email=" + $('#lp-input-email').val();
+    			data += "&message=" + $('#lp-input-message').val();
+    			data += "&recaptcha_challenge_field=" + $('#recaptcha_challenge_field').val();
+    			data += "&recaptcha_input=" + $('#captcha-text').val();
+    			
+    			showOverlay();
+    			callAjaxPostWithPayloadData(url,showMessage,data,true);
+        	}			
 		});
+        
+        function showMessage(data){
+        	var jsonData = JSON.parse(data);
+        	console.log("Data recieved : " + jsonData);
+        	if(jsonData["success"] == 1){
+        		console.log("Added toast message. Showing it now");
+	    		showInfoMobileAndWeb(jsonData["message"]);
+        		console.log("Finished showing the toast");
+    			$(".reg-cap-reload").click();
+        	}
+        	else{
+        		console.error("Error occured while sending contact us message. ");
+        		showErrorMobileAndWeb(jsonData["message"]);
+        		console.log("Finished showing the toast");
+    			$(".reg-cap-reload").click();
+        	}
+        }
         
         $(document).on('click','.vcard-download', function(){
         	var agentName = $("#agent-profile-name").val();
@@ -503,11 +538,112 @@
     		$("#recaptcha_whatsthis").click();
     	});
     	
+    	// Contact us form validation functions
+    	
+    	function validateMessage(elementId) {
+    		if ($('#'+elementId).val() != "") {
+    			return true;
+	    	} else {
+	    		showErrorMobileAndWeb('Please enter your message!');
+	    		return false;
+	    	}
+    	}
+    	
+    	function validateName(elementId){
+    		if ($('#'+elementId).val() != "") {
+    			if (nameRegex.test($('#'+elementId).val()) == true) {
+    				return true;
+    			} else {
+    				showErrorMobileAndWeb('Please enter your valid name!');
+    				return false;
+    			}
+    		} else {
+    			showErrorMobileAndWeb('Please enter your valid name!');
+    			return false;
+    		}
+    	}
+    	
+    	$('#lp-input-name').blur(function() {
+    		if (validateName(this.id)) {
+    			hideError();
+    		}
+    	});
+    	
+    	$('#lp-input-email').blur(function() {
+    		if (validateEmailId(this.id)) {
+    			hideError();
+    		}
+    	});
+    	
+    	$('#lp-input-message').blur(function() {
+    		if (validateMessage(this.id)) {
+    			hideError();
+    		}
+    	});
+    	
+    	$('#captcha-text').blur(function() {
+    		if (validateMessage(this.id)) {
+    			hideError();
+    		}
+    	});
     	
     	
-    	
-    	
-    	
+    	function validateContactUsForm() {
+        	isContactUsFormValid = true;
+
+        	var isFocussed = false;
+        	var isSmallScreen = false;
+        	if($(window).width() < 768){
+        		isSmallScreen = true;
+        	}
+        	
+        	// Validate form input elements
+    		if (!validateName('lp-input-name')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#lp-input-name').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+        	
+    		if (!validateEmailId('lp-input-email')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#lp-input-email').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+    		
+    		if (!validateMessage('lp-input-message')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#lp-input-message').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+    		
+    		if (!validateMessage('captcha-text')) {
+    			isContactUsFormValid = false;
+    			if (!isFocussed) {
+        			$('#captcha-text').focus();
+        			isFocussed=true;
+        		}
+        		if (isSmallScreen) {
+        			return isContactUsFormValid;
+        		}
+    		}
+    		
+        	return isContactUsFormValid;
+    	}    	
     });
 </script>
 </body>

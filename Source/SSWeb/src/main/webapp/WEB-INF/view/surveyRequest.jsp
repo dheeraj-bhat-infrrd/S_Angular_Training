@@ -6,35 +6,12 @@
 <c:set var="user"
 	value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" />
 
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title><spring:message code="label.survey.title.key" /></title>
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-common.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/rangeslider.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
-<link rel="stylesheet"
-	href="${pageContext.request.contextPath}/resources/css/style-resp-1.1.css">
-
-</head>
-<body>
 	<div id="req-prof-container" data-agentid="${agentId}"
 		data-agentName="${agentName}"
 		class="prof-main-content-wrapper margin-top-25 margin-bottom-25 min-height-container">
-		<div class="container">
+		<div class="">
 			<div class="sq-ques-wrapper">
-				<div id="req-agnt-img" class="sq-top-img"></div>
+				<!-- <div id="req-agnt-img" class="sq-top-img"></div> -->
 				<div class="sq-quest-item">
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">Please fill in details of
@@ -93,42 +70,9 @@
 		<script
 			src="https://www.google.com/recaptcha/api/challenge?k=6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-"></script>
 	</div>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
-	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-	<script
-		src="https://www.google.com/jsapi?autoload={'modules':[{'name':'visualization','version':'1','packages':['corechart']}]}"></script>
-	<script src="${pageContext.request.contextPath}/resources/js/common.js"></script>
-	<script src="${pageContext.request.contextPath}/resources/js/script.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/usermanagement.js"></script>
-	<script src="https://js.braintreegateway.com/v2/braintree.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/rangeslider.min.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/surveyQuestion.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/progressbar.min.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/dashboard.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/editprofile.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/hierarchy-management.js"></script>
-	<script
-		src="${pageContext.request.contextPath}/resources/js/googletracking.js"></script>
 	<script>
 		$(document).ready(function() {
 			$("#req-cust-agnt-rel").html(paintListOptions());
-debugger;
 			$('#req-start-btn').click(function() {
 				var success = false;
 				var fname = $('#reqFirstName').val().trim();
@@ -190,6 +134,3 @@ debugger;
 			}
 		});
 	</script>
-	<jsp:include page="footer.jsp" />
-</body>
-</html>

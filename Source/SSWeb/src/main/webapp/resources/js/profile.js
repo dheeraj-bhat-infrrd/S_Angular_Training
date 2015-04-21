@@ -3,6 +3,13 @@ var currentProfileIden = "";
 var startIndex = 0;
 var numOfRows = 3;
 var minScore=0;
+var publicPostStartIndex = 0;
+var publicPostNumRows = 3;
+var currentProfileName;
+var doStopPublicPostPagination = false;
+var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
+		"Sep", "Oct", "Nov", "Dec" ];
+
 
 function fetchCompanyProfile() {
 	startIndex = 0;
@@ -40,12 +47,16 @@ function paintProfilePage(result) {
 		var headContentHtml = "";
 		var profileLevel = $("#profile-fetch-info").attr("profile-level");
 		$("#profile-main-content").show();
+		currentProfileName = result.profileName;
+		//paint public  posts
+		paintPublicPosts();
+		
 		if(contactDetails != undefined){
 			
 			$('#social-connect-txt').text("Contact with "+contactDetails.name+":");
 			$('#prof-header-url').text(location.href);
 			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
-			
+			$('#agent-desc').html(contactDetails.name+" - Reviews And Ratings");
 			headContentHtml = headContentHtml +'<div class="prof-name">'+contactDetails.name+'</div>';
 			if(result.vertical != undefined) {
 				headContentHtml = headContentHtml +' <div class="prof-address"><div class="prof-addline1">'+result.vertical+'</div>';
@@ -119,7 +130,46 @@ function paintProfilePage(result) {
             if(result.logo != undefined) {
             	$("#prof-company-logo").css("background", "url("+result.logo+") no-repeat center");
             	$("#prof-company-logo").css("background-size","100% auto");
+            }else{
+            	var address;
+            	
+            	if(profileLevel == 'INDIVIDUAL'){
+            		address = '';
+            		
+            		if(companyProfileData.name != undefined){
+                    	address = address + companyProfileData.name;
+                    }
+            		if(companyProfileData.address != undefined){
+                    	address = address + ' ' + companyProfileData.address;
+                    }
+                    if(companyProfileData.country != undefined) {
+                    	address = address + ' ' + companyProfileData.country;
+                    }
+                    if(companyProfileData.zipcode != undefined) {
+                    	address = address + ' ' + companyProfileData.zipcode;
+                    }
+                    
+            	}else{
+            		address = contactDetails.name;
+            		
+            		if(contactDetails.address1 != undefined){
+                    	address = address + ' ' + contactDetails.address1;
+                    }
+            		if(contactDetails.address2 != undefined){
+                    	address = address + ' ' + contactDetails.address2;
+                    }
+                    if(contactDetails.country != undefined) {
+                    	address = address + ' ' + contactDetails.country;
+                    }
+                    if(contactDetails.zipcode != undefined) {
+                    	address = address + ' ' + contactDetails.zipcode;
+                    }
+            	}
+            	address=address.replace(/,/g,"");
+            	//address=address.replace(/ /g,"+");
+            	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>')
             }
+            
             if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","contain");
@@ -252,49 +302,9 @@ function paintAverageRatings(data) {
 	if(responseJson != undefined) {
 		var rating = $.parseJSON(responseJson.entity);
 		changeRatingPattern(rating,$("#rating-avg-comp"),true);
+		$('#prof-schema-agent-rating').html(parseFloat(rating).toFixed(2));
 	}
 }
-
-function changeRatingPattern(rating, ratingParent,isOverallRating) {
-	/*var counter = 0;
-	ratingParent.children().each(function() {
-		$(this).addClass("icn-no-star");
-		$(this).removeClass("icn-half-star");
-		$(this).removeClass("icn-full-star");
-
-		if (rating >= counter) {
-			if (rating - counter >= 1) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-full-star");
-			} else if (rating - counter == 0.5) {
-				$(this).removeClass("icn-no-star");
-				$(this).addClass("icn-half-star");
-			}
-		}
-		counter++;
-	});*/
-	
-	var ratingIntVal = parseInt(rating) + 1;
-	
-	if(ratingIntVal >=5){
-		ratingIntVal = 5;
-	}
-	
-	var roundedFloatingVal = parseFloat(rating).toFixed(2);
-	
-	var ratingImgHtml = "<div class='rating-image float-left smiley-rat-"+ratingIntVal+"'></div>";
-	var ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+"</div>";
-	
-	if(isOverallRating){
-		ratingValHtml = "<div class='rating-rounded float-left'>"+roundedFloatingVal+" - </div>";
-		$('#prof-header-rating').addClass('smiley-rat-'+ratingIntVal);
-	}
-	
-	ratingParent.html('');
-	
-	ratingParent.append(ratingImgHtml).append(ratingValHtml);
-}
-
 
 function fetchCompanyRegions() {
 	var url = window.location.origin +'/rest/profile/'+companyProfileName+'/regions';
@@ -617,7 +627,7 @@ function paintReviews(result){
 	}else {
 		$("#prof-review-item").append(reviewsHtml);
 	}
-	 $("#prof-reviews-header").show();
+	 $("#prof-reviews-header").parent().show();
 	$(".review-ratings").each(function() {
 		changeRatingPattern($(this).data("rating"), $(this));
 	});
@@ -673,6 +683,7 @@ function paintAllReviewsCount(data) {
 		$("#profile-fetch-info").attr("total-reviews",responseJson.entity);
 		reviewsSizeHtml = reviewsSizeHtml +' Review(s)';
 		$("#prof-company-review-count").html(reviewsSizeHtml);
+		$("#prof-schema-reviews").html(reviewsSizeHtml);
 		if(responseJson.entity > 0){
 			$("#prof-company-review-count").click(function(){
 				$('html, body').animate({
@@ -698,15 +709,38 @@ function paintHiddenReviewsCount(data) {
 				reviewsSizeHtml = reviewsSizeHtml +' additional reviews not recommended';
 			}
 			
-			$("#prof-hidden-review-count").html(reviewsSizeHtml).show();
+			$("#prof-hidden-review-count").html(reviewsSizeHtml);
+			
+			if($("#profile-fetch-info").attr("fetch-all-reviews") == "true"){
+				$("#prof-hidden-review-count").show();
+			}
+			
+			$('#prof-reviews-sort').show();
 			$("#prof-hidden-review-count").click(function(){
 				$('#prof-review-item').html('');
 				$(this).hide();
 				startIndex = 0;
-				minScore = 0;
 				$("#profile-fetch-info").attr("fetch-all-reviews", "true");
 				$(window).scrollTop($('#reviews-container').offset().top);
-				fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows);
+				fetchReviewsForCompany(currentProfileIden, startIndex, numOfRows,0);
+			});
+
+			$('#sort-by-feature').on('click',function(e){
+				e.stopImmediatePropagation();
+				$("#prof-hidden-review-count").show();
+				$('#prof-review-item').html('');
+				startIndex = 0;
+				$("#profile-fetch-info").attr("fetch-all-reviews","false");
+				fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,minScore);
+			});
+
+			$('#sort-by-date').on('click',function(e){
+				e.stopImmediatePropagation();
+				$("#prof-hidden-review-count").hide();
+				$('#prof-review-item').html('');
+				startIndex = 0;
+				$("#profile-fetch-info").attr("fetch-all-reviews","true");
+				fetchReviewsForCompany(currentProfileIden,startIndex,numOfRows,0);
 			});
 		}
 	}
@@ -932,19 +966,31 @@ function paintIndividualDetails(result){
 	var positions = result.positions; 
 	if(positions != undefined && positions.length > 0){
 		individualDetailsHtml = individualDetailsHtml + '<div class="prof-left-row prof-left-assoc bord-bot-dc">';
-		individualDetailsHtml = individualDetailsHtml + '	<div class="left-assoc-wrapper">';
+		individualDetailsHtml = individualDetailsHtml + '	<div class="left-postions-wrapper">';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-header lph-dd lph-dd-closed lph-dd-open">Positions</div>';
 		individualDetailsHtml = individualDetailsHtml + '		<div class="left-panel-content lph-dd-content">';
 		for(var i=0;i<positions.length;i++){
+			individualDetailsHtml += '<div class="postions-content">';
 			var positionObj = positions[i];
 			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.name+'</div>';
-			if(!positionObj.isCurrent && positionObj.endTime){
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.startTime+" - "+positionObj.endTime+'</div>';				
-			}else{
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.startTime+' - current</div>';
+			if(positionObj.title){
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.title+'</div>';	
 			}
-			
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.title+'</div>';
+			if(positionObj.startTime){
+				
+				var startDateStr = positionObj.startTime.split("-");
+				
+				
+				if(!positionObj.isCurrent && positionObj.endTime){
+					
+					var endDateStr = positionObj.endTime.split("-");
+					
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +" - "+monthNames[endDateStr[0] - 1]+ " " + endDateStr[1] +'</div>';				
+				}else{
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +' - Current</div>';
+				}				
+			}
+			individualDetailsHtml += '</div>';
 		}
 		individualDetailsHtml = individualDetailsHtml + '		</div>';
 		individualDetailsHtml = individualDetailsHtml + '	</div>';
@@ -1056,5 +1102,76 @@ function downloadVCard(agentName){
 
 function afterDownloadVCard(data){
 	console.log("V Card download complete");
+}
+
+//Function to paint posts
+function paintPublicPosts() {
+	
+	var profileLevel = $("#profile-fetch-info").attr("profile-level");
+	
+	var url = window.location.origin + "/rest/profile/";
+	if(profileLevel == 'COMPANY'){
+		//Fectch the reviews for company
+		url += "company/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	else if(profileLevel == 'REGION'){
+		//Fetch the reviews for region
+		url += "region/"+companyProfileName+"/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	else if(profileLevel == 'BRANCH') {
+		//Fetch the reviews for branch
+		url += "branch/"+companyProfileName+"/"+currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	else if(profileLevel == 'INDIVIDUAL'){
+		//Fetch the reviews for individual
+		url += currentProfileName+"/posts?start="+publicPostStartIndex+"&numRows="+publicPostNumRows;
+	}
+	callAjaxGET(url, callBackPaintPublicPosts, true);
+}
+
+function callBackPaintPublicPosts(data) {
+	
+	var posts = $.parseJSON(data);
+	
+	posts = $.parseJSON(posts.entity);
+	
+	var divToPopulate = "";
+	$.each(posts, function(i, post) {
+		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
+				+ '<div class="tweet-icn icn-tweet float-left"></div>'
+				+ '<div class="tweet-txt float-left">'
+				+ '<div class="tweet-text-main">' + post.postText + '</div>'
+				+ '<div class="tweet-text-link"><em>' + post.postedBy
+				+ '</em></div>' + '<div class="tweet-text-time"><em>'
+				+ new Date(post.timeInMillis).toUTCString() + '</em></div>'
+				+ '	</div>' + '</div>';
+	});
+	
+	if (publicPostStartIndex == 0){
+		$('#prof-posts').html(divToPopulate);
+		$('#prof-posts').perfectScrollbar();
+	}
+	else{
+		$('#prof-posts').append(divToPopulate);
+		$('#prof-posts').perfectScrollbar('update');
+	}
+
+	
+	publicPostStartIndex += posts.length;
+
+	if (publicPostStartIndex < publicPostNumRows || posts.length < publicPostNumRows){
+		doStopPublicPostPagination = true;
+	}
+	
+	$('#prof-posts').on('scroll',function(){
+		var scrollContainer = this;
+		if (scrollContainer.scrollTop === scrollContainer.scrollHeight
+					- scrollContainer.clientHeight) {
+				if (!doStopPublicPostPagination) {
+					paintPublicPosts();					
+				}
+					
+		}
+	});
 }
 

@@ -750,9 +750,10 @@ public class SocialManagementController {
 		long userId = user.getUserId();
 
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
-
+		rating = Math.round(rating * 100) / 100;
 		String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 				+ " on Social Survey \n" + review;
+		facebookMessage = facebookMessage.replaceAll("null", "");
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
@@ -775,7 +776,7 @@ public class SocialManagementController {
 			String agentName = request.getParameter("agentName");
 			String custFirstName = request.getParameter("firstName");
 			String custLastName = request.getParameter("lastName");
-			String ratingStr = request.getParameter("rating");
+			String ratingStr = request.getParameter("score");
 			String agentIdStr = request.getParameter("agentId");
 			double rating = 0;
 			try {
@@ -790,10 +791,10 @@ public class SocialManagementController {
 			long userId = user.getUserId();
 
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
-
-			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
+			rating = Math.round(rating * 100) / 100;
+			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
-
+			twitterMessage = twitterMessage.replaceAll("null", "");
 			for (OrganizationUnitSettings setting : settings) {
 				try {
 					if (setting != null)
@@ -822,7 +823,7 @@ public class SocialManagementController {
 		String agentName = request.getParameter("agentName");
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
-		String ratingStr = request.getParameter("rating");
+		String ratingStr = request.getParameter("score");
 		String agentIdStr = request.getParameter("agentId");
 		double rating = 0;
 		try {
@@ -837,10 +838,10 @@ public class SocialManagementController {
 		long userId = user.getUserId();
 
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
-
-		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + "for " + agentName
-				+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
-
+		rating = Math.round(rating * 100) / 100;
+		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
+				+ " on SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+		message = message.replaceAll("null", "");
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)

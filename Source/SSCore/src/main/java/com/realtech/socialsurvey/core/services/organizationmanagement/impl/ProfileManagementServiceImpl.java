@@ -904,6 +904,33 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		LOG.info("Method getIndividualByProfileName executed successfully");
 		return agentSettings;
 	}
+	
+	/**
+	 * Method to get User by profileName
+	 * 
+	 * @throws NoRecordsFetchedException
+	 */
+	@Override
+	@Transactional
+	public User getUserByProfileName(String agentProfileName) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getUserProfilesByProfileName called for agentProfileName:" + agentProfileName);
+
+		OrganizationUnitSettings agentSettings = null;
+		if (agentProfileName == null || agentProfileName.isEmpty()) {
+			throw new InvalidInputException("agentProfileName is null or empty while getting agent settings");
+		}
+
+		agentSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsByProfileName(agentProfileName,
+				MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION);
+		if (agentSettings == null) {
+			throw new NoRecordsFetchedException("No settings found for agent while fetching agent profile");
+		}
+
+		User user = userDao.findById(User.class, agentSettings.getIden());
+
+		LOG.info("Method getUserProfilesByProfileName executed successfully");
+		return user;
+	}
 
 	@Override
 	@Transactional
@@ -1222,7 +1249,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * @throws UndeliveredEmailException
 	 */
 	@Override
-	public void findProfileMailIdAndSendMail(String profileName, String message, String senderMailId, String profileType)
+	public void findProfileMailIdAndSendMail(String profileName, String message,String senderName, String senderMailId, String profileType)
 			throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
 
 		if (profileName == null || profileName.isEmpty()) {
@@ -1233,6 +1260,10 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (message == null || message.isEmpty()) {
 			LOG.error("contactAgent : message parameter is empty or null!");
 			throw new InvalidInputException("contactAgent : message parameter is empty or null!");
+		}
+		if (senderName == null || senderName.isEmpty()) {
+			LOG.error("contactAgent : senderName parameter is empty or null!");
+			throw new InvalidInputException("contactAgent : senderName parameter is empty or null!");
 		}
 
 		if (senderMailId == null || senderMailId.isEmpty()) {
@@ -1278,7 +1309,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 		if (settings != null) {
 			LOG.debug("Sending the contact us mail to the agent");
 			emailServices.sendContactUsMail(settings.getContact_details().getMail_ids().getWork(), settings.getContact_details().getName(),
-					senderMailId, message);
+					senderName,senderMailId, message);
 			LOG.debug("Contact us mail sent!");
 		}
 		else {
