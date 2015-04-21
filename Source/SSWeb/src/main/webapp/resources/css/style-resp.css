@@ -360,6 +360,12 @@
     }
     .prof-image{
         width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
     }
     .prof-rating-mobile-wrapper{
         display: block;
@@ -368,17 +374,16 @@
         border-bottom: 1px solid #dcdcdc;
     }
     .prof-btn-wrapper{
-        width: 100%;
+        display: none;
+        /*width: 100%;
         padding-left: 5px;
-        margin-left: -15px;
         border-top: 1px solid #dcdcdc;
         padding-top: 8px;
-        bottom: 11px;
         position: static;
         height: 52px;
         border: 0;
-        margin: 0 auto;
-        padding: 0;
+        margin: 10px auto 0 auto;
+        padding: 0;*/
     }
     .prof-btn-survey{
         /*width: 250px;
@@ -472,7 +477,7 @@
     }
     .lp-con-icn{
         height: 55px;
-        width: 55px;
+        width: 42px;
     }
     .mobile-tabs{
         display: block !important;
@@ -748,18 +753,16 @@
         min-width: 40px;
     }
     .prof-img-wrapper{
-        display: block;
-        margin: 0px auto;
-        float: none;
-        padding: 2px;
-        width: 100% !important;
+        width: 50% !important;
     }
     .prof-name-wrapper{
-        float: none;
-        clear: both;
-        display: block;
-        margin: 0 auto;
         width: 100% !important;
+        border-left: 1px solid #dcdcdc;
+        border-bottom: none;
+    }
+    .prof-img-wrapper,.prof-name-wrapper{
+        display: block;
+        padding: 0;
     }
     .left-panel-content-adj{
         padding-left: 15px;
@@ -1279,6 +1282,9 @@
     .prof-details-header{
     	display: none;
     }
+    .prog-img-container{
+        height: 120px;
+    }
 }
 
 
@@ -1792,6 +1798,18 @@
        // display: none;
     }
     .header-slider-wrapper{
+        display: none;
+    }
+    .prof-contact-info{
+        display: none !important;
+    }
+    
+    #recent-post-container,#reviews-container,#contact-info,
+    #prof-company-intro,#prof-agent-container,#ppl-post-cont,
+    #contact-wrapper,#intro-about-me{
+        display: block !important;
+    }
+    .mob-contact-btn-wrapper{
         display: none;
     }
 }
