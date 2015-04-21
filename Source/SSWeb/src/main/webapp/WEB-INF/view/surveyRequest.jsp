@@ -128,7 +128,6 @@
 	<script>
 		$(document).ready(function() {
 			$("#req-cust-agnt-rel").html(paintListOptions());
-debugger;
 			$('#req-start-btn').click(function() {
 				var success = false;
 				var fname = $('#reqFirstName').val().trim();
