@@ -79,11 +79,11 @@
     </div>
 </div>
 
-<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 hide">
+<div id="profile-main-content" class="prof-main-content-wrapper margin-top-25 margin-bottom-25 hide">
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-            <div id="prof-img-cont" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper hide">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
                 <div class="prog-img-container">
                     <div id="prof-image" class="prof-image pos-relative"></div>
                 </div>
@@ -126,7 +126,7 @@
 		
 		<div class="container">
 			<div class="row margin-top-10">
-            <div class="prof-left-panel-wrapper col-lg-4 col-md-4 col-sm-4 col-xs-12">
+            <div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
                 
                 <!-- <div class="prof-left-row prof-left-info bord-bot-dc">
                     <div class="left-contact-wrapper">

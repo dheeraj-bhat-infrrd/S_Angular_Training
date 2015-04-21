@@ -8,7 +8,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><spring:message
 		code="label.completeregistration.title.key"></spring:message></title>
-<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/common.js"></script>
 <link rel="stylesheet"
