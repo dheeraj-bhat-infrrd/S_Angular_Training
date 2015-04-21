@@ -1545,7 +1545,7 @@ button.paypal.is-active {
 }
 
 .lp-con-row-item {
-	width: 290px;
+	width: 285px;
 	text-overflow: ellipsis;
 	overflow: hidden;
 	white-space: nowrap;
