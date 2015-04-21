@@ -471,7 +471,7 @@ function paintTextForMood(happyText, neutralText, sadText){
 
 // Settings View as
 $('#setting-sel').click(function(e){
-    e.stopPropagation();
+	e.stopPropagation();
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 });
 
@@ -484,8 +484,7 @@ $('.se-dd-item').click(function(){
 	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
 });
 
-$('body').click(function(e){
-	e.stopImmediatePropagation();
+$('body').click(function(){
 	if ($('#se-dd-wrapper-profiles').css('display') == "block") {
 		$('#se-dd-wrapper-profiles').slideToggle(200);
 	}
