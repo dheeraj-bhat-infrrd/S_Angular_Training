@@ -132,7 +132,7 @@
 					</div>
 				</div>
 
-				<div data-ques-type="stars" class="sq-quest-item">
+				<div data-ques-type="stars" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt">Survey Question</div>
 					<div class="sq-ques">
