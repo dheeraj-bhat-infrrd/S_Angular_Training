@@ -90,6 +90,8 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +'	</div>';            
             $("#prof-company-head-content").html(headContentHtml);
             
+            $('#mob-contact-btn').html('Contact '+firstName);
+            
             var addressHtml ="";
             
             
@@ -173,7 +175,8 @@ function paintProfilePage(result) {
             if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","contain");
-            	 $('#prof-img-cont').show();
+            	 $('#prog-img-container').show();
+                $('.prof-name-wrapper').attr("style","width: 50% !important");
             }else {
             	if(profileLevel == 'COMPANY'){
             		$("#prof-image").addClass("comp-default-img");
@@ -199,11 +202,11 @@ function paintProfilePage(result) {
             
             var contactInfoHtml = "";
             var mailIds = contactDetails.mail_ids;
-            if(mailIds != undefined) {
+            /*if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
-            }
+            }*/
             
             var webAddresses = contactDetails.web_addresses;
             if(webAddresses != undefined) {
@@ -252,6 +255,12 @@ function paintProfilePage(result) {
             	
             });
             
+            $('#mob-review-btn').click(function(e){
+            	e.stopPropagation();
+            	findProList(result.iden,result.contact_details.name);
+            	
+            });
+            
             
             //Add social links
             if(result.socialMediaTokens){
@@ -286,7 +295,7 @@ function paintProfilePage(result) {
 }
 
 function focusOnContact() {
-	
+	$('.inc-more').trigger('click');
 	$('html, body').animate({
 	      scrollTop: $('#prof-contact-hdr').offset().top
 	 }, 1000);
