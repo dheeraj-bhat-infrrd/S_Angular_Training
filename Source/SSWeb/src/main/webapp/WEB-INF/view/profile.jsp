@@ -83,7 +83,7 @@
     <div class="">
     	<div class="container">
         <div class="row prof-pic-name-wrapper">
-            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
+            <div id="prog-img-container" class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper hide">
                 <div class="prog-img-container">
                     <div id="prof-image" class="prof-image pos-relative"></div>
                 </div>
@@ -98,6 +98,17 @@
                 <div class="prof-user-address" id="prof-company-address">
                     <!-- address comes here -->
                 </div>
+            </div>
+            <div class="mob-contact-btn-wrapper">
+                <div class="mob-contact-btn-row clearfix">
+                    <div class="mob-contact-btn float-left">
+                        <div id="mob-contact-btn" class="mob-prof-contact-btn float-right" onclick="focusOnContact()"></div>
+                    </div>
+                    <div class="mob-contact-btn float-left">
+                        <div id="mob-review-btn" class="mob-prof-contact-btn float-left">Write a review</div>
+                    </div>
+                </div>
+                <div class="vcard-download cursor-pointer">Download Contact</div>
             </div>
         </div>
         </div>
@@ -133,15 +144,15 @@
                         <div class="left-panel-header cursor-pointer vcard-download">Download VCard</div>
                     </div>
                 </div> -->
-                <%-- <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc hide">
+                <div id="contact-info" class="prof-left-row prof-left-info bord-bot-dc prof-contact-info hide">
                     <div class="left-contact-wrapper">
                         <div class="left-panel-header"><spring:message code="label.contactinformation.key"/></div>
                         <div class="left-panel-content" id="prof-contact-information">
                             <!--contact info comes here  -->
                         </div>
                     </div>
-                </div> --%>
-                
+                </div>
+                <div id="prof-agent-container">
                  	<c:choose>
                    		<c:when test="${not empty branchProfileName}">
                    			<div id="branch-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
@@ -170,7 +181,7 @@
                   		 		</div>
                   		 	</c:when>
                   		 	<c:when test="${not empty companyProfileName}">
-                  		 		<div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
+                                <div id="comp-hierarchy" class="prof-left-row prof-left-assoc bord-bot-dc hide">
                   					<div class="left-assoc-wrapper">
 	                   		 			<input type="hidden" id="regionid-hidden"/>
 	                   		 			<input type="hidden" id="branchid-hidden"/>
@@ -227,6 +238,7 @@
                     		</div>
                     	</div>
                     </div>  
+                </div>
                     
             </div>
             <div class="row prof-right-panel-wrapper col-lg-8 col-md-8 col-sm-8 col-xs-12">
@@ -341,32 +353,49 @@
        
         $(window).resize(adjustImage);
         
-        $('.icn-person').click(function(){
-            $('.mob-icn').removeClass('mob-icn-active');
-            $(this).addClass('mob-icn-active');
-            $('.prof-left-panel-wrapper').show();
-            $('.prof-right-panel-wrapper').hide();
-            adjustImage();
-        });
         
-        $('.icn-ppl').click(function(){
+        $('.icn-person').click(function() {
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
-            $('.prof-left-panel-wrapper').hide();
-            $('.prof-right-panel-wrapper').show();
+            $('#contact-info').show();
+            $('#prof-agent-container').hide();
+            $('#prof-company-intro').hide();
+            $('#reviews-container').hide();
+            $('#recent-post-container').hide();
         });
-        
-        $('.icn-star-smile').click(function(){
+
+        $('.icn-ppl').click(function() {
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
+            $('#recent-post-container').show();
+            $('#contact-info').hide();
+            $('#prof-agent-container').hide();
+            $('#prof-company-intro').hide();
+            $('#reviews-container').hide();
         });
-        
-        $('.inc-more').click(function(){
+
+        $('.icn-star-smile').click(function() {
             $('.mob-icn').removeClass('mob-icn-active');
             $(this).addClass('mob-icn-active');
+            $('#reviews-container').show();
+            $('#contact-info').hide();
+            $('#prof-agent-container').hide();
+            $('#prof-company-intro').hide();
+            $('#recent-post-container').hide();
+        });
+
+        $('.inc-more').click(function() {
+            $('.mob-icn').removeClass('mob-icn-active');
+            $(this).addClass('mob-icn-active');
+            $('#prof-agent-container').show();
+            $('#prof-company-intro').hide();
+            $('#contact-info').hide();
+            $('#reviews-container').hide();
+            $('#recent-post-container').hide();
         });
         
         function adjustImage(){
+            $('.mobile-tabs').children('.mob-icn-active').click();
             var windW = $(window).width();
             if(windW < 768){
                 var imgW = $('#prof-image').width();

@@ -3195,7 +3195,7 @@ button.paypal.is-active {
 }
 
 .prof-name-container {
-	margin: 0 0 0 15px;
+	margin: 5px 0 5px 15px;
 }
 
 .form_contact_image {
@@ -6022,4 +6022,54 @@ tr.u-tbl-header td {
 
 .prof-img-wrapper{
 	padding: 0 5px !important;
+}
+
+.mob-contact-btn {
+    width: 50%;
+}
+
+.mob-prof-contact-btn {
+    padding: 0 10px;
+    background-color: #3E9DCB;
+    font-size: 14px;  
+    height: 35px; 
+    line-height: 35px;  
+    text-align: center;   
+    cursor: pointer;   
+    border-radius: 3px;   
+    color: #fff;   
+    margin: 10px;
+}
+
+.mob-contact-btn-wrapper{
+    clear: both;
+}
+
+.mob-contact-btn-row{
+    border-top: 1px solid #dcdcdc;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.mob-contact-btn:last-child{
+    border-left: 1px solid #dcdcdc;
+}
+
+/*.mob-prof-contact-btn.float-left{
+    margin-left: 10px;
+}
+
+.mob-prof-contact-btn.float-right{
+    margin-right: 10px;
+}*/
+
+.mob-prof-contact-btn:hover {
+    background: #77B000;
+}
+
+.vcard-download {
+    text-align: center;
+    height: 40px;
+    border-bottom: 1px solid #dcdcdc;
+    line-height: 40px;
+    font-size: 16px;
 }
