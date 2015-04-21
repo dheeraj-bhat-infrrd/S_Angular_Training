@@ -26,6 +26,9 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
+	<div id="srv-req-pop" class="survey-request-popup-container hide">
+		<div class="survey-request-popup"></div>
+	</div>
 	<div id="toast-container" class="toast-container">
 	   <span id="overlay-toast" class="overlay-toast"></span>
     </div>
