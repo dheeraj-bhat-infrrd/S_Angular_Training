@@ -1,5 +1,9 @@
 package com.realtech.socialsurvey.core.services.upload.impl;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -57,63 +61,64 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	@Override
 	public Map<String, List<Object>> parseCsv(String fileName) {
 
-		Map<String, List<Object>> uploadObjects = new HashMap<String, List<Object>>();
-
-//		UserUploadVO userUploadVO = new UserUploadVO();
-//		userUploadVO.setEmailId("karthik.srivatsa+31@raremile.com");
-//		//userUploadVO.setBelongsToCompany(true);
-//		userUploadVO.setAssignedBranchName("Blah2");
-//		userUploadVO.setBranchAdmin(false);
-//		// userUploadVO.setAssignedRegionName("Blah Region 2");
-//		// userUploadVO.setRegionAdmin(true);
-//		
-		UserUploadVO userUploadVO2 = new UserUploadVO();
-		userUploadVO2.setEmailId("karthik.srivatsa+34@raremile.com");
-		//userUploadVO.setBelongsToCompany(true);
-		userUploadVO2.setAssignedBranchName("Blah2");
-		userUploadVO2.setBranchAdmin(true);
-//		userUploadVO2.setAssignedRegionName("Blah Region 2");
-//		userUploadVO2.setRegionAdmin(true);
-//		
-//		UserUploadVO userUploadVO3 = new UserUploadVO();
-//		userUploadVO3.setEmailId("karthik.srivatsa+32@raremile.com");
-//		//userUploadVO.setBelongsToCompany(true);
-//		// userUploadVO.setAssignedBranchName("Blah2");
-//		// userUploadVO.setBranchAdmin(false);
-//		userUploadVO3.setAssignedRegionName("Blah Region 2");
-//		userUploadVO3.setRegionAdmin(true);
-
-//		BranchUploadVO branchUploadVO = new BranchUploadVO();
-//		//branchUploadVO.setAssignToCompany(true);
-//		branchUploadVO.setBranchName("Blah2");
-//		branchUploadVO.setBranchAddress1("Blah address1");
-//		branchUploadVO.setBranchAddress2("Blah address2");
-//		branchUploadVO.setAssignedRegionName("Blah Region 2");
-		
-//		BranchUploadVO branchUploadVO2 = new BranchUploadVO();
-//		// branchUploadVO.setAssignToCompany(true);
-//		branchUploadVO2.setBranchName("Blah3");
-//		branchUploadVO2.setBranchAddress1("Blah address1");
-//		branchUploadVO2.setBranchAddress2("Blah address2");
-//		branchUploadVO2.setAssignedRegionName("Blah Region");
-//		
-//		BranchUploadVO branchUploadVO3 = new BranchUploadVO();
-//		branchUploadVO.setAssignToCompany(true);
-//		branchUploadVO3.setBranchName("Blah4");
-//		branchUploadVO3.setBranchAddress1("Blah address1");
-//		branchUploadVO3.setBranchAddress2("Blah address2");
-//		// branchUploadVO.setAssignedRegionName("Blah Region");
-		
+		Map<String, List<Object>> uploadObjects = parseTestFile(fileName);
+//		Map<String, List<Object>> uploadObjects = new HashMap<String, List<Object>>();
 //
-//		RegionUploadVO regionUploadVO = new RegionUploadVO();
-//		regionUploadVO.setRegionName("Blah Region 2");
-//		regionUploadVO.setRegionAddress1("Blah region address 1");
-//		regionUploadVO.setRegionAddress2("Blah region address 2");
-
-//		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO,(Object)userUploadVO2,(Object)userUploadVO3));
-//		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO,(Object) branchUploadVO2,(Object) branchUploadVO3));
-//		uploadObjects.put(CommonConstants.REGIONS_MAP_KEY, Arrays.asList((Object) regionUploadVO));
-//		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO));
+////		UserUploadVO userUploadVO = new UserUploadVO();
+////		userUploadVO.setEmailId("karthik.srivatsa+31@raremile.com");
+////		//userUploadVO.setBelongsToCompany(true);
+////		userUploadVO.setAssignedBranchName("Blah2");
+////		userUploadVO.setBranchAdmin(false);
+////		// userUploadVO.setAssignedRegionName("Blah Region 2");
+////		// userUploadVO.setRegionAdmin(true);
+////		
+//		UserUploadVO userUploadVO2 = new UserUploadVO();
+//		userUploadVO2.setEmailId("karthik.srivatsa+34@raremile.com");
+//		//userUploadVO.setBelongsToCompany(true);
+//		userUploadVO2.setAssignedBranchName("Blah2");
+//		userUploadVO2.setBranchAdmin(true);
+////		userUploadVO2.setAssignedRegionName("Blah Region 2");
+////		userUploadVO2.setRegionAdmin(true);
+////		
+////		UserUploadVO userUploadVO3 = new UserUploadVO();
+////		userUploadVO3.setEmailId("karthik.srivatsa+32@raremile.com");
+////		//userUploadVO.setBelongsToCompany(true);
+////		// userUploadVO.setAssignedBranchName("Blah2");
+////		// userUploadVO.setBranchAdmin(false);
+////		userUploadVO3.setAssignedRegionName("Blah Region 2");
+////		userUploadVO3.setRegionAdmin(true);
+//
+////		BranchUploadVO branchUploadVO = new BranchUploadVO();
+////		//branchUploadVO.setAssignToCompany(true);
+////		branchUploadVO.setBranchName("Blah2");
+////		branchUploadVO.setBranchAddress1("Blah address1");
+////		branchUploadVO.setBranchAddress2("Blah address2");
+////		branchUploadVO.setAssignedRegionName("Blah Region 2");
+//		
+////		BranchUploadVO branchUploadVO2 = new BranchUploadVO();
+////		// branchUploadVO.setAssignToCompany(true);
+////		branchUploadVO2.setBranchName("Blah3");
+////		branchUploadVO2.setBranchAddress1("Blah address1");
+////		branchUploadVO2.setBranchAddress2("Blah address2");
+////		branchUploadVO2.setAssignedRegionName("Blah Region");
+////		
+////		BranchUploadVO branchUploadVO3 = new BranchUploadVO();
+////		branchUploadVO.setAssignToCompany(true);
+////		branchUploadVO3.setBranchName("Blah4");
+////		branchUploadVO3.setBranchAddress1("Blah address1");
+////		branchUploadVO3.setBranchAddress2("Blah address2");
+////		// branchUploadVO.setAssignedRegionName("Blah Region");
+//		
+////
+////		RegionUploadVO regionUploadVO = new RegionUploadVO();
+////		regionUploadVO.setRegionName("Blah Region 2");
+////		regionUploadVO.setRegionAddress1("Blah region address 1");
+////		regionUploadVO.setRegionAddress2("Blah region address 2");
+//
+////		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO,(Object)userUploadVO2,(Object)userUploadVO3));
+////		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO,(Object) branchUploadVO2,(Object) branchUploadVO3));
+////		uploadObjects.put(CommonConstants.REGIONS_MAP_KEY, Arrays.asList((Object) regionUploadVO));
+////		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO));
 //		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO2));
 
 
@@ -527,4 +532,156 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 		return errorList;
 	}
+	
+	private Map<String, List<Object>> parseTestFile(String txtFileName){
+		BufferedReader bfrReader = null;
+		FileReader reader = null;
+		boolean isRegionLine = false;
+		boolean isBranchLine = false;
+		boolean isUserLine = false;
+		List<RegionUploadVO> regionUploads = new ArrayList<RegionUploadVO>();
+		List<BranchUploadVO> branchUploads = new ArrayList<BranchUploadVO>();
+		List<UserUploadVO> userUploads = new ArrayList<UserUploadVO>();
+		Map<String, List<Object>> uploadObjects = new HashMap<>();
+		try {
+			reader = new FileReader(txtFileName);
+			bfrReader = new BufferedReader(reader);
+			String line = null;
+			RegionUploadVO regionVO = null;
+			BranchUploadVO branchVO = null;
+			UserUploadVO userVO = null;
+			while((line = bfrReader.readLine())!= null){
+				if(line.equals("##Regions")){
+					isRegionLine = true;
+					isBranchLine = false;
+					isUserLine = false;
+					continue;
+				}
+				if(line.equals("##Branches")){
+					isRegionLine = false;
+					isBranchLine = true;
+					isUserLine = false;
+					continue;
+				}
+				if(line.equals("##Users")){
+					isRegionLine = false;
+					isBranchLine = false;
+					isUserLine = true;
+					continue;
+				}
+				if(isRegionLine){
+					regionVO = createRegionUploadVO(line);
+					if(regionVO != null){
+						regionUploads.add(regionVO);
+					}
+				}
+				if(isBranchLine){
+					branchVO = createBranchUploadVO(line);
+					if(branchVO != null){
+						branchUploads.add(branchVO);
+					}
+				}
+				if(isUserLine){
+					userVO = createUserUploadVO(line);
+					if(userVO != null){
+						userUploads.add(userVO);
+					}
+				}
+			}
+			uploadObjects.put(CommonConstants.REGIONS_MAP_KEY, new ArrayList<Object>(regionUploads));
+			uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, new ArrayList<Object>(branchUploads));
+			uploadObjects.put(CommonConstants.USERS_MAP_KEY, new ArrayList<Object>(userUploads));
+			
+		}
+		catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally{
+			if(bfrReader != null){
+				try {
+					bfrReader.close();
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if(reader != null){
+				try {
+					reader.close();
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		return uploadObjects;
+	}
+	
+	private RegionUploadVO createRegionUploadVO(String line){
+		LOG.debug("Create region upload vo from: "+line);
+		RegionUploadVO upload = null;
+		String[] tokens = line.split("\t");
+		if(tokens != null && tokens.length == 2){
+			upload = new RegionUploadVO();
+			upload.setRegionName(tokens[0]);
+			upload.setRegionAddress1(tokens[1]);
+		}
+		return upload;
+	}
+	
+	private BranchUploadVO createBranchUploadVO(String line){
+		LOG.debug("Creating branch upload vo from: "+line);
+		BranchUploadVO upload = null;
+		String[] tokens = line.split("\t");
+		if(tokens!=null && tokens.length == 3){
+			upload = new BranchUploadVO();
+			upload.setBranchName(tokens[0]);
+			upload.setBranchAddress1(tokens[1]);
+			if(tokens[2].equals("#Company")){
+				upload.setAssignToCompany(true);
+			}else{
+				upload.setAssignToCompany(false);
+				upload.setAssignedRegionName(tokens[2].substring(1));
+			}
+		}
+		return upload;
+	}
+	
+	private  UserUploadVO createUserUploadVO(String line){
+		LOG.debug("Creating user vo from: "+line);
+		UserUploadVO upload = null;
+		String[] tokens = line.split("\t");
+		if(tokens != null){
+			upload = new UserUploadVO();
+			upload.setEmailId(tokens[1]);
+			if(tokens.length == 3){
+				// user under company
+				upload.setBelongsToCompany(true);
+			}else{
+				// admin of either branch or region
+				if(tokens[2].equals("#region")){
+					//upload.setRegionAdmin(true);
+					upload.setAssignedRegionName(tokens[3].substring(1));
+				}else if(tokens[2].equals("#branch")){
+					upload.setAssignedBranchName(tokens[3].substring(1));
+				}
+				if(tokens.length == 5){
+					// admin
+					if(upload.getAssignedRegionName() != null && !upload.getAssignedRegionName().isEmpty()){
+						upload.setRegionAdmin(true);
+					}else{
+						upload.setBranchAdmin(true);
+					}
+				}
+			}
+		}
+		return upload;
+	}
+	
 }
