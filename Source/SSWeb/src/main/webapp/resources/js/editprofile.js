@@ -1165,6 +1165,7 @@ function isValidUrl(url){
 function adjustImage() {
 	var windW = $(window).width();
 	if (windW < 768) {
+		$('.mobile-tabs').children('.mob-icn-active').click();
 		var imgW = $('#prof-image').width();
 		$('#prof-image').height(imgW * 0.7);
 		var h2 = $('.prog-img-container').height() - 11;
