@@ -675,7 +675,8 @@ function showSurveyRequestPage(){
 	//window.open('./redirecttosurveyrequestpage.do', '_self');
 }
 
-$('#dashboard-sel').click(function(){
+$('#dashboard-sel').click(function(e){
+	e.stopPropagation();
 	$('#da-dd-wrapper-profiles').slideToggle(200);
 });
 
@@ -700,4 +701,10 @@ $('.da-dd-item').click(function(){
 	
 	colName = newProfileName;
 	colValue = newProfileValue;
+});
+
+$('body').click(function(){
+	if ($('#da-dd-wrapper-profiles').css('display') == "block") {
+		$('#da-dd-wrapper-profiles').toggle();
+	}
 });
