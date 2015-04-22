@@ -4,9 +4,9 @@
 <c:choose>
 	<c:when test="${not empty reviewItems}">
 		<c:forEach var="reviewItem" varStatus="loop" items="${reviewItems}">
-			<c:set value="" var="reviewitemclass"></c:set>
-			<c:if test="${!loop.last}">
-				<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
+			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
+			<c:if test="${loop.last}">
+				<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
 			</c:if>
 			<div data-firstname="${reviewItem.customerFirstName}" data-lastname="${reviewItem.customerLastName}"
 				data-review="${reviewItem.review}" data-score="${reviewItem.score}"
