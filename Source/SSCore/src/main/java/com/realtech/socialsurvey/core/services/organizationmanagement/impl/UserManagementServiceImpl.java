@@ -18,6 +18,7 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -130,6 +131,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+	
+	@Autowired
+	private ProfileCompletionList profileCompletionList;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -1414,6 +1418,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("Invalid agent id for fetching user settings");
 		}
 		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
+		if (agentSettings != null && agentSettings.getProfileStages() != null) {
+			agentSettings.setProfileStages(profileCompletionList.getProfileCompletionList(agentSettings.getProfileStages()));
+		}
 		return agentSettings;
 	}
 
@@ -1717,6 +1724,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		// set the seo flag to true
 		agentSettings.setSeoContentModified(true);
 		agentSettings.setReviewCount(0);
+		
+		//Set default profile stages.
+		agentSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");

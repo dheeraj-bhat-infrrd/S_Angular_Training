@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -114,6 +115,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Value("${SAD_TEXT}")
 	private String sadText;
+	
+	@Autowired
+	private ProfileCompletionList profileCompletionList;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -371,6 +375,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
+		// set default profile stages.
+		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());		
+				
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -484,6 +491,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
+		
+		//Filter profile stages.
+		if (companySettings != null && companySettings.getProfileStages() != null) {
+			companySettings.setProfileStages(profileCompletionList.getProfileCompletionList(companySettings.getProfileStages()));
+		}
+				
 		// Decrypting the encompass password
 		if (companySettings != null && companySettings.getCrm_info() != null
 				&& companySettings.getCrm_info().getCrm_source().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
@@ -504,6 +517,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		
+		//Filter profile stages.
+		if (companySettings != null && companySettings.getProfileStages() != null) {
+			companySettings.setProfileStages(profileCompletionList.getProfileCompletionList(companySettings.getProfileStages()));
+		}
 
 		return companySettings;
 	}
@@ -582,6 +600,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Get the region settings for region id: " + regionId);
 		regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		
+		//Filter profile stages.
+		if (regionSettings != null && regionSettings.getProfileStages() != null) {
+			regionSettings.setProfileStages(profileCompletionList.getProfileCompletionList(regionSettings.getProfileStages()));
+		}
+				
 		return regionSettings;
 	}
 
@@ -601,6 +625,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 
+		//Filter profile stages.
+		if (organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null) {
+			organizationUnitSettings.setProfileStages(profileCompletionList.getProfileCompletionList(organizationUnitSettings.getProfileStages()));
+		}
+		
 		branchSettings = new BranchSettings();
 		branchSettings.setOrganizationUnitSettings(organizationUnitSettings);
 
@@ -2438,6 +2467,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
 		organizationSettings.setContact_details(contactSettings);
 		organizationSettings.setLockSettings(new LockSettings());
+		
+		// set default profile stages.
+		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
@@ -2473,6 +2505,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
 		organizationSettings.setContact_details(contactSettings);
 		organizationSettings.setLockSettings(new LockSettings());
+		
+		// set default profile stages.
+		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
