@@ -47,7 +47,7 @@
 					<div class="dsh-inp-wrapper">
 						<input id="dsh-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
 							onkeyup="searchBranchRegionOrAgent(this.value, 'icons')">
-						<div id="dsh-srch-res" class="dsh-sb-dd"></div>
+						<div id="dsh-srch-res"></div>
 					</div>
 				</div>
 				<div class="clearfix dash-sel-wrapper">
@@ -77,7 +77,7 @@
 					<div class="dsh-inp-wrapper">
 						<input id="dsh-grph-sel-item" class="dash-sel-item" type="text" placeholder="<spring:message code="label.starttyping.key" />"
 							onkeyup="searchBranchRegionOrAgent(this.value, 'graph')">
-						<div id="dsh-grph-srch-res" class="dsh-sb-dd"></div>
+						<div id="dsh-grph-srch-res"></div>
 					</div>
 				</div>
 				
