@@ -10,6 +10,10 @@ var doStopPublicPostPagination = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
 
+$(document).ajaxStop(function() {
+	adjustImage();
+});
+
 function adjustImage(){
     $('.mobile-tabs').children('.mob-icn-active').click();
     var windW = $(window).width();
@@ -342,22 +346,15 @@ function paintCompanyRegions(data) {
 		if(result != undefined && result.length > 0) {
 			var regionsHtml = "";
 			$.each(result,function(i, region) {
-				regionsHtml = regionsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 comp-region cursor-pointer" data-openstatus="closed" data-regionid = '+region.regionId+'>';
-				regionsHtml = regionsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
-				regionsHtml = regionsHtml+'    <div class="lp-sub-img icn-company region-icon" data-profilename="'+region.profileName+'"></div>';
-				regionsHtml = regionsHtml+'    <div class="lp-sub-txt">'+region.region+'</div>';
-				regionsHtml = regionsHtml+'	   <div class="lpsub-2 hide" id="comp-region-branches-'+region.regionId+'"></div>';
+				regionsHtml = regionsHtml+'<div class="bd-hr-item-l1 comp-region" data-openstatus="closed" data-regionid = '+region.regionId+'>';
+				regionsHtml = regionsHtml+'	<div class="bd-hr-item bd-lt-l1 clearfix">';
+				regionsHtml = regionsHtml+'    <div class="bd-hr-txt cursor-pointer region-link" data-profilename="'+region.profileName+'">'+region.region+'</div>';
 				regionsHtml = regionsHtml+'	</div>';
 				regionsHtml = regionsHtml+'</div>';
+				regionsHtml = regionsHtml+'	   <div class="bd-hr-item-l2 hide" id="comp-region-branches-'+region.regionId+'"></div>';
 			});
 			$("#comp-regions-content").html(regionsHtml);
 			$("#comp-hierarchy").show();
-			$(".region-icon").click(function(e) {
-				e.stopPropagation();
-				var regionProfileName = $(this).data("profilename");
-				var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
-				window.open(url, "_blank");
-			});
 			
 			$(".comp-region").click(function(){
 				if($(this).data("openstatus") == "closed") {
@@ -389,14 +386,21 @@ function paintBranchesForRegion(data) {
 		var result = $.parseJSON(responseJson.entity);
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,branch) {
-				branchesHtml = branchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel cursor-pointer comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
-				branchesHtml = branchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
-				branchesHtml = branchesHtml +'		<div class="lp-sub-img icn-rgn branch-icon" data-profilename="'+branch.profileName+'"></div>';
-				branchesHtml = branchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
-				branchesHtml = branchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
+				branchesHtml = branchesHtml +'<div class="bd-hr-item-l2 comp-region-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				branchesHtml = branchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
+				branchesHtml = branchesHtml +'		<div class="bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				branchesHtml = branchesHtml +'	</div>';
 				branchesHtml = branchesHtml +'</div>' ;
+				branchesHtml = branchesHtml +'		<div class="bd-hr-item-l3 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
 			});
+			
+			$(".branch-link").click(function(e) {
+				e.stopPropagation();
+				var branchProfileName = $(this).data("profilename");
+				var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
+				window.open(url, "_blank");
+			});
+			
 			$("#region-hierarchy").show();
 			if($("#region-branches").length > 0) {
 				$("#region-branches").html(branchesHtml);
@@ -405,12 +409,6 @@ function paintBranchesForRegion(data) {
 				$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
 			}
 			
-			$(".branch-icon").click(function(e){
-				e.stopPropagation();
-				var branchProfileName = $(this).data("profilename");
-				var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
-				window.open(url, "_blank");				
-			});
 			bindClickToFetchBranchIndividuals("comp-region-branch");
 		}
 	}
@@ -448,12 +446,12 @@ function paintIndividualForBranch(data) {
 		if(result != undefined && result.length > 0) {
 			$.each(result,function(i,individual) {
 				if(individual.contact_details != undefined){
-					individualsHtml=  individualsHtml+'<div class="lp-sub lp-sub-l3 bord-left-panel cursor-pointer branch-individual" data-profilename="'+individual.profileName+'">';
-					individualsHtml=  individualsHtml+'		<div class="lp-sub-header clearfix flat-left-bord">';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-img lp-pers-img pers-default-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
-					individualsHtml=  individualsHtml+'    		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
-					individualsHtml=  individualsHtml+'		</div>';
-					individualsHtml=  individualsHtml+'</div>';
+					individualsHtml = individualsHtml+'<div class="bd-hr-item-l3 comp-individual" data-agentid = '+individual.iden+'>';
+					individualsHtml = individualsHtml+'	<div class="bd-hr-item bd-lt-l3 clearfix">';
+					individualsHtml = individualsHtml+'    <div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+					individualsHtml = individualsHtml+'    <div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'+individual.profileName+'">'+individual.contact_details.name+'</div>';
+					individualsHtml = individualsHtml+'	</div>';
+					individualsHtml = individualsHtml+'</div>';
 				}
 			});
 			$("#branch-hierarchy").show();
@@ -463,8 +461,9 @@ function paintIndividualForBranch(data) {
 			else {
 				$("#comp-branch-individuals-"+branchId).html(individualsHtml).slideDown(200);
 			}
+			
 			paintProfileImage("individual-prof-image");
-			bindClickToFetchIndividualProfile("branch-individual");
+			//bindClickToFetchIndividualProfile("branch-individual");
 		}
 	}
 }
@@ -493,12 +492,12 @@ function paintIndividualsForRegion(data) {
 			if(result != undefined && result.length > 0) {
 				$.each(result,function(i,individual) {
 					if(individual.contact_details != undefined){
-						individualsHtml = individualsHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel cursor-pointer region-individual" data-openstatus="closed" data-profilename="'+individual.profileName+'" data-agentid="'+individual.branchId+'">';
-						individualsHtml = individualsHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
-						individualsHtml = individualsHtml +'		<div class="lp-sub-img lp-pers-img pers-default-img individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
-						individualsHtml = individualsHtml +'		<div class="lp-sub-txt">'+individual.contact_details.name+'</div>';
-						individualsHtml = individualsHtml +'	</div>';
-						individualsHtml = individualsHtml +'</div>' ;
+						individualsHtml = individualsHtml+'<div class="bd-hr-item-l2 comp-region-individual" data-agentid = '+individual.iden+'>';
+						individualsHtml = individualsHtml+'	<div class="bd-hr-item bd-lt-l3 clearfix">';
+						individualsHtml = individualsHtml+'    <div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl = "'+individual.profileImageUrl+'"></div>';
+						individualsHtml = individualsHtml+'    <div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'+individual.profileName+'">'+individual.contact_details.name+'</div>';
+						individualsHtml = individualsHtml+'	</div>';
+						individualsHtml = individualsHtml+'</div>';
 					}
 				});
 				$("#region-hierarchy").show();
@@ -508,8 +507,9 @@ function paintIndividualsForRegion(data) {
 				else {
 					$("#comp-region-branches-"+regionId).append(individualsHtml).slideDown(200);
 				}
+				
 				paintProfileImage("individual-prof-image");
-				bindClickToFetchIndividualProfile("region-individual");
+				//bindClickToFetchIndividualProfile("region-individual");
 		}
 	}
 }
@@ -537,18 +537,19 @@ function paintCompanyIndividuals(data) {
 			var compIndividualsHtml = "";
 			$.each(result,function(i, compIndividual) {
 				if(compIndividual.contact_details != undefined){
-					compIndividualsHtml = compIndividualsHtml+'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 cursor-pointer comp-individual" data-profilename="'+compIndividual.profileName+'" data-agentid = '+compIndividual.iden+'>';
-					compIndividualsHtml = compIndividualsHtml+'	<div class="lp-sub-header clearfix flat-left-bord">';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-img lp-pers-img pers-default-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
-					compIndividualsHtml = compIndividualsHtml+'    <div class="lp-sub-txt">'+compIndividual.contact_details.name+'</div>';
+					compIndividualsHtml = compIndividualsHtml+'<div class="bd-hr-item-l1 comp-individual" data-agentid = '+compIndividual.iden+'>';
+					compIndividualsHtml = compIndividualsHtml+'	<div class="bd-hr-item bd-lt-l3 clearfix">';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="float-left bd-hr-img pers-default-img comp-individual-prof-image" data-imageurl = "'+compIndividual.profileImageUrl+'"></div>';
+					compIndividualsHtml = compIndividualsHtml+'    <div class="bd-hr-txt cursor-pointer individual-link" data-profilename="'+compIndividual.profileName+'">'+compIndividual.contact_details.name+'</div>';
 					compIndividualsHtml = compIndividualsHtml+'	</div>';
 					compIndividualsHtml = compIndividualsHtml+'</div>';
 				}
 			});
 			$("#comp-regions-content").append(compIndividualsHtml);
 			$("#comp-hierarchy").show();
+			
 			paintProfileImage("comp-individual-prof-image");
-			bindClickToFetchIndividualProfile("comp-individual");
+			//bindClickToFetchIndividualProfile("comp-individual");
 		}
 	}
 }
@@ -565,13 +566,12 @@ function paintCompanyBranches(data) {
 		if(result != undefined && result.length > 0) {
 			var compBranchesHtml = "";
 			$.each(result,function(i,branch) {
-				compBranchesHtml = compBranchesHtml +'<div class="lp-sub lp-sub-l1 bord-left-panel mgn-left-0 cursor-pointer comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
-				compBranchesHtml = compBranchesHtml +'	<div class="lp-sub-header clearfix flat-left-bord">';
-				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-img icn-rgn"></div>';
-				compBranchesHtml = compBranchesHtml +'		<div class="lp-sub-txt">'+branch.branch+'</div>';
-				compBranchesHtml = compBranchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
+				compBranchesHtml = compBranchesHtml +'<div class="bd-hr-item-l1 comp-branch" data-openstatus="closed" data-branchid="'+branch.branchId+'">';
+				compBranchesHtml = compBranchesHtml +'	<div class="bd-hr-item bd-lt-l2 clearfix">';
+				compBranchesHtml = compBranchesHtml +'		<div class="bd-hr-txt cursor-pointer branch-link" data-profilename="'+branch.profileName+'">'+branch.branch+'</div>';
 				compBranchesHtml = compBranchesHtml +'	</div>';
 				compBranchesHtml = compBranchesHtml +'</div>' ;
+				compBranchesHtml = compBranchesHtml +'		<div class="lpsub-2 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
 			});
 			$("#comp-hierarchy").show();
 			$("#comp-regions-content").append(compBranchesHtml);
@@ -615,9 +615,6 @@ function paintReviews(result){
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.updatedOn);
 		var lastItemClass = "ppl-review-item";
-		if (i == resultSize - 1) {
-			lastItemClass = "ppl-review-item-last";
-        }
 		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
@@ -1211,3 +1208,25 @@ function callBackPaintPublicPosts(data) {
 		}
 	});
 }
+
+
+$('body').on('click',".branch-link",function(e) {
+	e.stopPropagation();
+	var branchProfileName = $(this).data("profilename");
+	var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
+	window.open(url, "_blank");
+});
+
+$('body').on('click',".individual-link",function(e) {
+	e.stopPropagation();
+	var agentProfileName = $(this).data("profilename");
+	var url = window.location.origin +"/pages/"+agentProfileName;
+	window.open(url, "_blank");
+});
+
+$('body').on('click',".region-link",function(e) {
+	e.stopPropagation();
+	var regionProfileName = $(this).data("profilename");
+	var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
+	window.open(url, "_blank");
+});

@@ -10,6 +10,7 @@ var batchSizeInc;
 var totalReviewsInc;
 var surveyFetchedSoFarInc;
 var accountType;
+var graphData;
 
 // colName and colValue contains profile level of logged in user and value for
 // colName is present in colValue.
@@ -64,7 +65,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	$(window).resize(function() {
 		newConW = $('.container').width();
 		if (newConW != oldConW) {
-			showSurveyStatisticsGraphically(colName, colValue);
+			paintSurveyGraph();
 			oldConW = $('.container').width();
 		}
 	});
@@ -390,7 +391,8 @@ function showSurveyGraph(columnName, columnValue, format) {
 		},
 		complete : function(data) {
 			if (success) {
-				paintSurveyGraph(data.responseJSON);
+				graphData = data.responseJSON;
+				paintSurveyGraph();
 			}
 		},
 		error : function(e) {
@@ -401,7 +403,10 @@ function showSurveyGraph(columnName, columnValue, format) {
 	});
 }
 
-function paintSurveyGraph(graphData) {
+function paintSurveyGraph() {
+	
+	if(graphData == undefined)
+		return;
 	var allTimeslots = [];
 	var timeslots = [];
 	var clickedSurveys = [];
@@ -454,6 +459,9 @@ function paintSurveyGraph(graphData) {
 		timeslots = [];
 	}
 	var element = document.getElementById("dsh-grph-format");
+	if(element == null){
+		return;l
+	}
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
 	if (format == 'weekly') {
