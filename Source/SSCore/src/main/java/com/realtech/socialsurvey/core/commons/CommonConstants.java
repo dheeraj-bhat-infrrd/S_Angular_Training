@@ -257,6 +257,8 @@ public interface CommonConstants {
 	public static final String BRANCH_PROFILE_FIXED_URL = "pages/branch/";
 	public static final String REGION_PROFILE_FIXED_URL = "pages/region/";
 	public static final String COMPANY_PROFILE_FIXED_URL = "pages/company/";
+	public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
+	public static final String SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
 	
 	/**
 	 * Logo related config
