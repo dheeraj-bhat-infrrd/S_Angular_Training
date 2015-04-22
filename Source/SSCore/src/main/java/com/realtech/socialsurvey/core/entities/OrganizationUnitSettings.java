@@ -38,6 +38,7 @@ public class OrganizationUnitSettings {
 	private long createdOn;
 	private long modifiedOn;
 	private String completeProfileUrl;
+	private List<ProfileStage> profileStages;
 
 	public String getId() {
 		return id;
@@ -253,6 +254,14 @@ public class OrganizationUnitSettings {
 
 	public void setCompleteProfileUrl(String completeProfileUrl) {
 		this.completeProfileUrl = completeProfileUrl;
+	}
+	
+	public List<ProfileStage> getProfileStages() {
+		return profileStages;
+	}
+
+	public void setProfileStages(List<ProfileStage> profileStages) {
+		this.profileStages = profileStages;
 	}
 
 	@Override

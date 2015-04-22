@@ -3,10 +3,14 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <c:choose>
 	<c:when test="${not empty reviewItems}">
-		<c:forEach var="reviewItem" items="${reviewItems}">
+		<c:forEach var="reviewItem" varStatus="loop" items="${reviewItems}">
+			<c:set value="" var="reviewitemclass"></c:set>
+			<c:if test="${!loop.last}">
+				<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
+			</c:if>
 			<div data-firstname="${reviewItem.customerFirstName}" data-lastname="${reviewItem.customerLastName}"
 				data-review="${reviewItem.review}" data-score="${reviewItem.score}"
-				data-agentname="${reviewItem.agentName}" class="ppl-review-item">
+				data-agentname="${reviewItem.agentName}" class="${reviewitemclass}">
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
 						<div class="ppl-head-1">${reviewItem.customerFirstName} ${reviewItem.customerLastName}</div>
@@ -33,6 +37,7 @@
 						<div class="float-left ppl-share-icns icn-twit twt-shr"></div>
 						<div class="float-left ppl-share-icns icn-lin lnkdn-shr"></div>
 						<div class="float-left ppl-share-icns icn-yelp yelp-shr"></div>
+                        <div class="float-left ppl-share-icns icn-gplus yelp-shr"></div>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide"></div>
 				</div>

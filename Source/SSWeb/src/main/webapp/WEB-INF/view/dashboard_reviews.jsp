@@ -4,9 +4,14 @@
 
 <c:choose>
 	<c:when test="${not empty reviews}">
-		<c:forEach var="feedback" items="${reviews}">
-			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}" data-agentid="${feedback.agentId}"
-				data-agentname="${feedback.agentName}" data-review="${feedback.review}" data-score="${feedback.score}" class="ppl-review-item">
+		<c:forEach var="feedback" varStatus="loop" items="${reviews}">
+			<c:set value="" var="reviewitemclass"></c:set>
+			<c:if test="${!loop.last}">
+				<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
+			</c:if>
+			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
+				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}"
+				data-review="${feedback.review}" data-score="${feedback.score}" class="${reviewitemclass}">
 				
 				<div class="ppl-header-wrapper clearfix">
 					<div class="float-left ppl-header-left">
@@ -32,6 +37,7 @@
 						<div class="float-left ppl-share-icns icn-twit"></div>
 						<div class="float-left ppl-share-icns icn-lin"></div>
 						<div class="float-left ppl-share-icns icn-yelp"></div>
+                        <div class="float-left ppl-share-icns icn-gplus"></div>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
