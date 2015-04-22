@@ -4,6 +4,9 @@
         font-size: 12px;
         -webkit-user-select: none;                  
     }
+    .container{
+    	width: 100% !important;
+    }
     .login-main-wrapper{
         background: #fff;
     }
@@ -357,6 +360,12 @@
     }
     .prof-image{
         width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        margin: auto;
     }
     .prof-rating-mobile-wrapper{
         display: block;
@@ -365,23 +374,22 @@
         border-bottom: 1px solid #dcdcdc;
     }
     .prof-btn-wrapper{
-        width: 100%;
+        display: none;
+        /*width: 100%;
         padding-left: 5px;
-        margin-left: -15px;
         border-top: 1px solid #dcdcdc;
         padding-top: 8px;
-        bottom: 11px;
         position: static;
         height: 52px;
         border: 0;
-        margin: 0 auto;
-        padding: 0;
+        margin: 10px auto 0 auto;
+        padding: 0;*/
     }
     .prof-btn-survey{
-        width: 250px;
+        /*width: 250px;
         height: 36px;
         line-height: 36px;
-        margin: 0 auto;
+        margin: 0 auto;*/
     }
     .prof-rating .st-rating-wrapper{
 /*        display: none;*/
@@ -449,7 +457,7 @@
     #payment-details-form{
         padding: 0;
     }
-    .prof-left-social, .prof-right-panel-wrapper, .intro-wrapper{
+    .prof-left-social, .intro-wrapper{
         display: none;
     }
     .left-panel-header{
@@ -458,7 +466,7 @@
         color: #4A4A4A;
     }
     .left-panel-content{
-        padding: 0
+		padding-left: 15px;
     }
     .lp-con-row{
         border-bottom: 1px solid #dcdcdc;
@@ -469,7 +477,7 @@
     }
     .lp-con-icn{
         height: 55px;
-        width: 55px;
+        width: 42px;
     }
     .mobile-tabs{
         display: block !important;
@@ -508,6 +516,7 @@
         width: 100%;
     }
     .main-con-header {
+	    width:100%;
         font-size: 16px;
         border-bottom: 1px solid #dcdcdc;
         line-height: 55px;
@@ -744,18 +753,16 @@
         min-width: 40px;
     }
     .prof-img-wrapper{
-        display: block;
-        margin: 0px auto;
-        float: none;
-        padding: 2px;
-        width: 100% !important;
+        width: 50% !important;
     }
     .prof-name-wrapper{
-        float: none;
-        clear: both;
-        display: block;
-        margin: 0 auto;
         width: 100% !important;
+        border-left: 1px solid #dcdcdc;
+        border-bottom: none;
+    }
+    .prof-img-wrapper,.prof-name-wrapper{
+        display: block;
+        padding: 0;
     }
     .left-panel-content-adj{
         padding-left: 15px;
@@ -1272,11 +1279,23 @@
     .float-left.vs-ans-txt {
         width: 100%;
     }
+    .prof-details-header{
+    	display: none;
+    }
+    .prog-img-container{
+        height: 120px;
+    }
 }
 
 
 /* ============== ONLY TABLETS ==============*/
 @media (min-width: 768px) and (max-width: 991px) {
+	.container{
+    	width: 100% !important;
+    }
+    .payment-option-tab{
+        width: 50%;
+    }
     .payment-option-tab{
         width: 50%;
     }
@@ -1518,10 +1537,38 @@
     .float-left.vs-ans-txt {
         width: 505px;
     }
+    .lp-input-cont,.lp-button,.prof-captcha-cont{
+    	width: 210px;
+    }
+    .lp-input{
+    	width: 168px;
+    }
+    .prof-captcha-cont .prof-cap-txt{
+    	width: 100%;
+    	border-bottom: 1px solid #dcdcdc;
+    }
+    .prof-captcha-cont #recaptcha_image {
+    	width: 205px !important;
+    }
+    .social-connect-txt{
+    	display: none;
+    }
+    .prof-wrapper{
+    	padding: 0 !important;
+    }
+    .hm-find-pro-right{
+    	width: 100%;
+    }
+    .lp-row{
+    	padding-left: 0;	
+    }
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
 @media (min-width: 992px) and (max-width: 1199px) {
+	.container{
+    	width: 100% !important;
+    }
     .hm-item-row{
         width: 100%
     }
@@ -1649,6 +1696,19 @@
         width: 130px;
         background-size: 88%;
     }
+    .lp-input-cont,.lp-button,.prof-captcha-cont{
+    	width: 270px;
+    }
+    .lp-input{
+    	width: 225px;
+    }
+    .prof-captcha-cont .prof-cap-txt{
+    	width: 100%;
+    	border-bottom: 1px solid #dcdcdc;
+    }
+    .prof-captcha-cont #recaptcha_image {
+    	width: 265px !important;
+    }
 }
 
 /* ============== LARGE SIZED SCREENS ==============*/
@@ -1738,6 +1798,18 @@
        // display: none;
     }
     .header-slider-wrapper{
+        display: none;
+    }
+    .prof-contact-info{
+        display: none !important;
+    }
+    
+    #recent-post-container,#reviews-container,#contact-info,
+    #prof-company-intro,#prof-agent-container,#ppl-post-cont,
+    #contact-wrapper,#intro-about-me{
+        display: block !important;
+    }
+    .mob-contact-btn-wrapper{
         display: none;
     }
 }
