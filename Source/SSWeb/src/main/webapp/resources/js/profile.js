@@ -53,7 +53,7 @@ function paintProfilePage(result) {
 		
 		if(contactDetails != undefined){
 			
-			$('#social-connect-txt').text("Contact with "+contactDetails.name+":");
+			$('#social-connect-txt').text("Contact using "+contactDetails.name+":");
 			$('#prof-header-url').text(location.href);
 			$('#prof-contact-hdr').text("Contact "+contactDetails.name);
 			$('#agent-desc').html(contactDetails.name+" - Reviews And Ratings");
@@ -89,6 +89,8 @@ function paintProfilePage(result) {
             headContentHtml = headContentHtml +'		<div class="prof-btn-survey float-left" id="read-write-share-btn">Write a Review</div>';
             headContentHtml = headContentHtml +'	</div>';            
             $("#prof-company-head-content").html(headContentHtml);
+            
+            $('#mob-contact-btn').html('Contact '+firstName);
             
             var addressHtml ="";
             
@@ -173,6 +175,8 @@ function paintProfilePage(result) {
             if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","contain");
+            	 $('#prog-img-container').show();
+                $('.prof-name-wrapper').attr("style","width: 50% !important");
             }else {
             	if(profileLevel == 'COMPANY'){
             		$("#prof-image").addClass("comp-default-img");
@@ -190,7 +194,7 @@ function paintProfilePage(result) {
             if(contactDetails.about_me != undefined) {
             	var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
-            	 $("#prof-company-intro").html(companyIntroHtml);
+            	 $("#prof-company-intro").html(companyIntroHtml).show();
             }
             
             var reviewsHeaderHtml = '<span class="ppl-say-txt-st">What people say</span> about '+contactDetails.name;
@@ -198,11 +202,11 @@ function paintProfilePage(result) {
             
             var contactInfoHtml = "";
             var mailIds = contactDetails.mail_ids;
-            if(mailIds != undefined) {
+            /*if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
-            }
+            }*/
             
             var webAddresses = contactDetails.web_addresses;
             if(webAddresses != undefined) {
@@ -251,6 +255,12 @@ function paintProfilePage(result) {
             	
             });
             
+            $('#mob-review-btn').click(function(e){
+            	e.stopPropagation();
+            	findProList(result.iden,result.contact_details.name);
+            	
+            });
+            
             
             //Add social links
             if(result.socialMediaTokens){
@@ -285,7 +295,7 @@ function paintProfilePage(result) {
 }
 
 function focusOnContact() {
-	
+	$('.inc-more').trigger('click');
 	$('html, body').animate({
 	      scrollTop: $('#prof-contact-hdr').offset().top
 	 }, 1000);
@@ -621,6 +631,11 @@ function paintReviews(result){
 		reviewsHtml=  reviewsHtml+'	</div>';
 		reviewsHtml=  reviewsHtml+'</div>';
 	});
+	
+	
+	if(result.length > 0){
+		$('#reviews-container').show();
+	}
 	
 	if($("#profile-fetch-info").attr("fetch-all-reviews") == "true" && startIndex == 0) {
 		$("#prof-review-item").html(reviewsHtml);
@@ -972,9 +987,9 @@ function paintIndividualDetails(result){
 		for(var i=0;i<positions.length;i++){
 			individualDetailsHtml += '<div class="postions-content">';
 			var positionObj = positions[i];
-			individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.name+'</div>';
+			individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-1 lp-row clearfix">'+positionObj.name+'</div>';
 			if(positionObj.title){
-				individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+positionObj.title+'</div>';	
+				individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-2 lp-row clearfix">'+positionObj.title+'</div>';	
 			}
 			if(positionObj.startTime){
 				
@@ -985,9 +1000,9 @@ function paintIndividualDetails(result){
 					
 					var endDateStr = positionObj.endTime.split("-");
 					
-					individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +" - "+monthNames[endDateStr[0] - 1]+ " " + endDateStr[1] +'</div>';				
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +" - "+monthNames[endDateStr[0] - 1]+ " " + endDateStr[1] +'</div>';				
 				}else{
-					individualDetailsHtml = individualDetailsHtml + '<div class="lp-assoc-row lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +' - Current</div>';
+					individualDetailsHtml = individualDetailsHtml + '<div class="lp-pos-row-3 lp-row clearfix">'+monthNames[startDateStr[0] - 1]+ " " + startDateStr[1] +' - Current</div>';
 				}				
 			}
 			individualDetailsHtml += '</div>';
@@ -1148,6 +1163,9 @@ function callBackPaintPublicPosts(data) {
 	});
 	
 	if (publicPostStartIndex == 0){
+		if(posts.length > 0){
+			$('#recent-post-container').show();
+		}
 		$('#prof-posts').html(divToPopulate);
 		$('#prof-posts').perfectScrollbar();
 	}
@@ -1174,4 +1192,3 @@ function callBackPaintPublicPosts(data) {
 		}
 	});
 }
-

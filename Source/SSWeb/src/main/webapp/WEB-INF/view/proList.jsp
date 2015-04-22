@@ -8,6 +8,7 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title><spring:message code="label.prolist.title.key" /></title>
+	<link rel="shortcut icon" href="${pageContext.request.contextPath}/favicon.ico" sizes="16x16">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common-1.1.css">
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/style-common.css">
