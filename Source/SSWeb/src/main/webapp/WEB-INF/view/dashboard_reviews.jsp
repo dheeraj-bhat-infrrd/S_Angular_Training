@@ -5,9 +5,9 @@
 <c:choose>
 	<c:when test="${not empty reviews}">
 		<c:forEach var="feedback" varStatus="loop" items="${reviews}">
-			<c:set value="" var="reviewitemclass"></c:set>
-			<c:if test="${!loop.last}">
-				<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
+			<c:set value="ppl-review-item" var="reviewitemclass"></c:set>
+			<c:if test="${loop.last}">
+				<c:set value="ppl-review-item-last" var="reviewitemclass"></c:set>
 			</c:if>
 			<div data-firstname="${feedback.customerFirstName}" data-lastname="${feedback.customerLastName}"
 				data-agentid="${feedback.agentId}" data-agentname="${feedback.agentName}"
