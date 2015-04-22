@@ -3195,7 +3195,7 @@ button.paypal.is-active {
 
 .prog-img-container {
 	position: relative;
-	width: 200px !important;
+	width: 200px;
 	max-width: 100%;
 }
 .prof-img-wrapper {
@@ -4130,6 +4130,7 @@ button.paypal.is-active {
 
 .left-panel-content-adj {
 	clear: both;
+	line-height: 32px;
 }
 
 .lp-align-adj {
