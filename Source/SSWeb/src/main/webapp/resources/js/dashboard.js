@@ -543,15 +543,21 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	};
 	
 	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
-		if (flow == 'icons')
+		if (flow == 'icons'){
+			$('#dsh-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-srch-res').html(data);
-		else if (flow == 'graph')
+		}
+		else if (flow == 'graph'){
+			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-grph-srch-res').html(data);
-
+		}
 		$('.dsh-res-display').click(function() {
-			if (flow == 'icons')
+			if (flow == 'icons'){
+				$('#dsh-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-sel-item').val($(this).html());
+			}
 			else if (flow == 'graph') {
+				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-grph-sel-item').val($(this).html());
 			}
 			

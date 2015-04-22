@@ -1800,11 +1800,11 @@
     .header-slider-wrapper{
         display: none;
     }
-    .prof-contact-info{
+    .prof-contact-info,#contact-info{
         display: none !important;
     }
     
-    #recent-post-container,#reviews-container,#contact-info,
+    #recent-post-container,#reviews-container,
     #prof-company-intro,#prof-agent-container,#ppl-post-cont,
     #contact-wrapper,#intro-about-me{
         display: block !important;
