@@ -547,22 +547,21 @@ function initiateJcrop(input) {
 		};
 		reader.readAsDataURL(input.files[0]);
 
-		$('#overlay-continue').click(
-				function() {
-					showOverlay();
-					var dataurl = canvas.toDataURL("image/png");
-					overlayRevert();
+		$('#overlay-continue').click(function() {
+			showOverlay();
+			var dataurl = canvas.toDataURL("image/png");
+			overlayRevert();
 
-					var formData = new FormData();
-					formData.append("imageBase64", dataurl);
-					formData.append("imageFileName", $('#prof-image').prop(
-							"files")[0].name);
+			var formData = new FormData();
+			formData.append("imageBase64", dataurl);
+			formData.append("imageFileName", $('#prof-image').prop(
+					"files")[0].name);
 
-					delay(function() {
-						callAjaxPOSTWithTextData("./updateprofileimage.do",
-								callBackOnProfileImageUpload, false, formData);
-					}, 1000);
-				});
+			delay(function() {
+				callAjaxPOSTWithTextData("./updateprofileimage.do",
+						callBackOnProfileImageUpload, false, formData);
+			}, 1000);
+		});
 	}
 }
 
@@ -582,10 +581,7 @@ function updatePreview(c) {
 		var imageObj = $("#target")[0];
 		var canvas = $("#canvas")[0];
 		var context = canvas.getContext("2d");
-		context
-				.drawImage(imageObj, (c.x) * ratio, (c.y) * ratio, (c.w)
-						* ratio, (c.h) * ratio, 0, 0, canvas.width,
-						canvas.height);
+		context.drawImage(imageObj, (c.x) * ratio, (c.y) * ratio, (c.w) * ratio, (c.h) * ratio, 0, 0, canvas.width, canvas.height);
 	}
 }
 
