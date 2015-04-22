@@ -57,12 +57,6 @@ public class CsvUpload {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		for(String error : errorList){
-			LOG.info(error);
-		}
-		
-		
 	}
 
 }
