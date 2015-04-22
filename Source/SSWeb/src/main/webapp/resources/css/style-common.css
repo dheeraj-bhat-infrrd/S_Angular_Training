@@ -3566,12 +3566,35 @@ button.paypal.is-active {
 	border-bottom: 0;
 }
 
+.va-dd-wrapper {
+	z-index: 999;
+	border: 1px solid #dcdcdc;
+	position: absolute;
+	border-top: 3px solid #5cc7ef;
+	background-color: #fff;
+	border-radius: 3px;
+	overflow: hidden;
+	width: 150px;
+	color: #666;
+	text-align: left;
+	top: 50px;
+	right: 5px;
+}
+
 .pe-dd-item {
 	cursor: pointer;
 	font-size: 14px;
 	line-height: 30px;
 	padding: 0 5px;
 	border-bottom: 1px solid #dcdcdc;
+}
+.pe-dd-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+	border-top: 1px solid #5cc7ef;
+}
+.pe-dd-item:last-child {
+	border-bottom: 0;
 }
 
 .da-dd-item {
@@ -3581,6 +3604,14 @@ button.paypal.is-active {
 	padding: 0 5px;
 	border-bottom: 1px solid #dcdcdc;
 }
+.da-dd-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+	border-top: 1px solid #5cc7ef;
+}
+.da-dd-item:last-child {
+	border-bottom: 0;
+}
 
 .se-dd-item {
 	cursor: pointer;
@@ -3589,8 +3620,12 @@ button.paypal.is-active {
 	padding: 0 5px;
 	border-bottom: 1px solid #dcdcdc;
 }
-
-.pe-dd-item: last-child {
+.se-dd-item:hover {
+	color: #fff;
+	background-color: #5cc7ef;
+	border-top: 1px solid #5cc7ef;
+}
+.se-dd-item:last-child {
 	border-bottom: 0;
 }
 

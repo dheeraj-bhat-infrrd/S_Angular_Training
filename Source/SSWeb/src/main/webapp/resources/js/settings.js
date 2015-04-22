@@ -470,7 +470,8 @@ function paintTextForMood(happyText, neutralText, sadText){
 }
 
 // Settings View as
-$('#setting-sel').click(function(){
+$('#setting-sel').click(function(e){
+	e.stopPropagation();
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 });
 
@@ -481,4 +482,10 @@ $('.se-dd-item').click(function(){
 	$('#se-dd-wrapper-profiles').slideToggle(200);
 	
 	showMainContent('./showcompanysettings.do?profileId=' + newProfileId);
+});
+
+$('body').click(function(){
+	if ($('#se-dd-wrapper-profiles').css('display') == "block") {
+		$('#se-dd-wrapper-profiles').toggle();
+	}
 });
