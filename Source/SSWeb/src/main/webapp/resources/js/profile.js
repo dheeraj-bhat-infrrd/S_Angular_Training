@@ -10,6 +10,23 @@ var doStopPublicPostPagination = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
 		"Sep", "Oct", "Nov", "Dec" ];
 
+function adjustImage(){
+    $('.mobile-tabs').children('.mob-icn-active').click();
+    var windW = $(window).width();
+    if(windW < 768){
+        var imgW = $('#prof-image').width();
+        $('#prof-image').height(imgW * 0.7);
+        var h2 = $('.prog-img-container').height() - 11;
+        var rowW = $('.lp-con-row').width() - 55 - 10;
+        $('.lp-con-row-item').width(rowW+'px');
+        $('.footer-main-wrapper').hide();
+    }else{
+        //$('.prof-name-container,#prof-image').height(200);
+        $('.lp-con-row-item').width('auto');
+        $('.footer-main-wrapper').show();
+    }
+}
+
 
 function fetchCompanyProfile() {
 	startIndex = 0;
@@ -174,7 +191,7 @@ function paintProfilePage(result) {
             	 $("#prof-image").css("background", "url("+result.profileImageUrl+") no-repeat center");
             	 $("#prof-image").css("background-size","contain");
             	 $('#prog-img-container').show();
-                $('.prof-name-wrapper').attr("style","width: 50% !important");
+                $('.prof-name-wrapper').attr("style","width: 50%");
             }else {
             	if(profileLevel == 'COMPANY'){
             		$("#prof-image").addClass("comp-default-img");
