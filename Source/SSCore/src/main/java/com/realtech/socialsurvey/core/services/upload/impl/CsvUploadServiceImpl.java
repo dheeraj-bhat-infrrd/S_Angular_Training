@@ -223,7 +223,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		else if (user.getAssignedBranchName() != null) {
 			// He belongs to a branch
 			LOG.debug("Adding user : " + user.getEmailId() + " belongs to branch : " + user.getAssignedBranchName());
-			List<Branch> branches = branchDao.findByColumn(Branch.class, CommonConstants.BRANCH_NAME_COLUMN, user.getAssignedBranchName());
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.BRANCH_NAME_COLUMN, user.getAssignedBranchName());
+			queries.put(CommonConstants.COMPANY_COLUMN, adminUser.getCompany());
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);			
 			if (branches == null || branches.isEmpty()) {
 				LOG.error("Branch name is invalid!");
 				throw new UserAdditionException("Branch name is invalid!");
@@ -251,7 +255,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		else if (user.getAssignedRegionName() != null) {
 			// He belongs to the region
 			LOG.debug("Adding user : " + user.getEmailId() + " belongs to region : " + user.getAssignedRegionName());
-			List<Region> regions = regionDao.findByColumn(Region.class, CommonConstants.REGION_NAME_COLUMN, user.getAssignedRegionName());
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.REGION_NAME_COLUMN, user.getAssignedRegionName());
+			queries.put(CommonConstants.COMPANY_COLUMN, adminUser.getCompany());
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
 			if (regions == null || regions.isEmpty()) {
 				LOG.error("Region name is invalid!");
 				throw new UserAdditionException("Region name is invalid!");
@@ -304,6 +312,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		LOG.info("createUser called to create user : " + user.getEmailId());
 		Company company = getCompany(adminUser);
 		LicenseDetail companyLicenseDetail = getLicenseDetail(company);
+		
+		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
+			LOG.error("User has not verified account. So user addition not allowed!");
+			throw new UserAdditionException("Account has not been verified!");
+		}
 
 		if (userDao.getUsersCountForCompany(company) >= companyLicenseDetail.getAccountsMaster().getMaxUsersAllowed()) {
 			LOG.error("Max number of users added! Cannot add more users.");
@@ -351,6 +364,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		LOG.info("createBranch called to create branch :  " + branch.getBranchName());
 		Company company = getCompany(adminUser);
 		LicenseDetail companyLicenseDetail = getLicenseDetail(company);
+		
+		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
+			LOG.error("User has not verified account. So branch addition not allowed!");
+			throw new BranchAdditionException("Account has not been verified!");
+		}
 
 		if (organizationManagementService.isBranchAdditionAllowed(adminUser,
 				AccountType.getAccountType(companyLicenseDetail.getAccountsMaster().getAccountsMasterId()))) {
@@ -363,7 +381,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			if (branch.getAssignedRegionName() != null) {
 				// He belongs to the region
 				LOG.debug("Adding branch : " + branch.getBranchName() + " belongs to region : " + branch.getAssignedRegionName());
-				List<Region> regions = regionDao.findByColumn(Region.class, CommonConstants.REGION_NAME_COLUMN, branch.getAssignedRegionName());
+				Map<String, Object> queries = new HashMap<String, Object>();
+				queries.put(CommonConstants.REGION_NAME_COLUMN, branch.getAssignedRegionName());
+				queries.put(CommonConstants.COMPANY_COLUMN, adminUser.getCompany());
+				queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+				List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
 				if (regions == null || regions.isEmpty()) {
 					LOG.error("Region name is invalid!");
 					throw new BranchAdditionException("Region name is invalid!");
@@ -415,6 +437,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		LOG.info("createRegion called to add region : " + region.getRegionName());
 		Company company = getCompany(adminUser);
 		LicenseDetail licenseDetail = getLicenseDetail(company);
+		
+		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
+			LOG.error("User has not verified account. So region addition not allowed!");
+			throw new RegionAdditionException("Account has not been verified!");
+		}
 
 		if (organizationManagementService.isRegionAdditionAllowed(adminUser,
 				AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId()))) {
@@ -467,25 +494,25 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 		List<String> errorList = new ArrayList<String>();
 		LOG.info("Creating all the users,branches and regions");
-
-		// First we create all the users
-		List<Object> userUploadVOs = uploadObjects.get(CommonConstants.USERS_MAP_KEY);
-		if (userUploadVOs != null && !userUploadVOs.isEmpty()) {
-			LOG.debug("Creating all the users");
-			UserUploadVO user = null;
-			for (Object userUploadVO : userUploadVOs) {
+		
+		// We create all the regions
+		List<Object> regionUploadVOs = uploadObjects.get(CommonConstants.REGIONS_MAP_KEY);
+		if (regionUploadVOs != null && !regionUploadVOs.isEmpty()) {
+			LOG.debug("Creating all the regions");
+			RegionUploadVO region = null;
+			for (Object regionUploadVO : regionUploadVOs) {
 				try {
-					user = (UserUploadVO) userUploadVO;
-					LOG.debug("Creating user : " + user.getEmailId());
-					createUser(adminUser, user);
-					user = null;
+					region = (RegionUploadVO) regionUploadVO;
+					LOG.debug("Creating region : " + region.getRegionName());
+					createRegion(adminUser, region);
+					region = null;
 				}
-				catch (UserAdditionException e) {
-					LOG.error("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
-					errorList.add("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+				catch (RegionAdditionException e) {
+					LOG.error("ERROR : " + " while adding region : " + region.getRegionName() + " message : " + e.getMessage());
+					errorList.add("ERROR : " + " while adding region : " + region.getRegionName() + " message : " + e.getMessage());
 				}
 			}
-			LOG.debug("Creation of all users complete!");
+			LOG.debug("Creation of all regions complete!");
 		}
 
 		// We create all the branches
@@ -507,26 +534,26 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			}
 			LOG.debug("Creation of all branches complete!");
 		}
-
-		// We create all the regions
-		List<Object> regionUploadVOs = uploadObjects.get(CommonConstants.REGIONS_MAP_KEY);
-		if (regionUploadVOs != null && !regionUploadVOs.isEmpty()) {
-			LOG.debug("Creating all the regions");
-			RegionUploadVO region = null;
-			for (Object regionUploadVO : regionUploadVOs) {
-				try {
-					region = (RegionUploadVO) regionUploadVO;
-					LOG.debug("Creating region : " + region.getRegionName());
-					createRegion(adminUser, region);
-					region = null;
+		
+		// First we create all the users
+				List<Object> userUploadVOs = uploadObjects.get(CommonConstants.USERS_MAP_KEY);
+				if (userUploadVOs != null && !userUploadVOs.isEmpty()) {
+					LOG.debug("Creating all the users");
+					UserUploadVO user = null;
+					for (Object userUploadVO : userUploadVOs) {
+						try {
+							user = (UserUploadVO) userUploadVO;
+							LOG.debug("Creating user : " + user.getEmailId());
+							createUser(adminUser, user);
+							user = null;
+						}
+						catch (UserAdditionException e) {
+							LOG.error("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+							errorList.add("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+						}
+					}
+					LOG.debug("Creation of all users complete!");
 				}
-				catch (RegionAdditionException e) {
-					LOG.error("ERROR : " + " while adding region : " + region.getRegionName() + " message : " + e.getMessage());
-					errorList.add("ERROR : " + " while adding region : " + region.getRegionName() + " message : " + e.getMessage());
-				}
-			}
-			LOG.debug("Creation of all regions complete!");
-		}
 
 		LOG.info("Objects created. Returning the list of errors");
 
