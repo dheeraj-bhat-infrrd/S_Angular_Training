@@ -110,7 +110,7 @@
 	<input id="prof-all-lock" type="hidden" value="locked">
 	<div class="">
         <div class="container">
-		<div class="row prof-pic-name-wrapper">
+		<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
@@ -149,7 +149,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
 					<div id="prof-name-container" class="float-left lp-edit-wrapper clearfix float-left">
 						<c:choose>
