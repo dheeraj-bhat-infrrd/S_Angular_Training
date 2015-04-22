@@ -3068,6 +3068,11 @@ button.paypal.is-active {
 	margin-top: 10px;
 }
 
+.ppl-review-item-last {
+	padding-bottom: 10px;
+	margin-top: 10px;
+}
+
 .survery-header-2 {
 	float: none;
 	text-align: center;
