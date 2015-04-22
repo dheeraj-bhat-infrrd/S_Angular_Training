@@ -322,7 +322,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 				if (!surveySettings.getIsReminderDisabled() && surveySettings.getSurvey_reminder_interval_in_days() > 0) {
 					surveyReminderInterval = surveySettings.getSurvey_reminder_interval_in_days();
 					maxReminders = surveySettings.getMax_number_of_survey_reminders();
-					autopostScore = surveySettings.getAuto_post_score();
+					autopostScore = surveySettings.getShow_survey_above_score();
 				}
 			}
 		}

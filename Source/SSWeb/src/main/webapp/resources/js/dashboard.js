@@ -42,7 +42,6 @@ $('body').click(function() {
 });
 
 $(document).scroll(function() {
-	debugger;
 	if ((window.innerHeight + window.pageYOffset) >= (document.body.offsetHeight) && startIndexCmp < totalReviews) {
 		showReviews(colName, colValue);
 	}
@@ -310,7 +309,6 @@ function getReviewsCountAndShowReviews(columnName, columnValue) {
 }
 
 function showReviews(columnName, columnValue) {
-	debugger;
 	var payload = {
 		"columnName" : columnName,
 		"columnValue" : columnValue,
@@ -326,7 +324,7 @@ function showReviews(columnName, columnValue) {
 		$(".review-ratings").each(function() {
 			changeRatingPattern($(this).data("rating"), $(this));
 		});
-		
+		$('.icn-fb').unbind('click');
 		$(".icn-fb").click(function() {
 			var firstName = $(this).parent().parent().parent().attr('data-firstname');
 			var lastName = $(this).parent().parent().parent().attr('data-lastname');
@@ -335,7 +333,7 @@ function showReviews(columnName, columnValue) {
 			var score = $(this).parent().parent().parent().attr('data-score');
 			shareOnFacebook(firstName, lastName, agentName, review, score);
 		});
-		
+		$('.icn-twit').unbind('click');
 		$(".icn-twit").click(function() {
 			var firstName = $(this).parent().parent().parent().attr('data-firstname');
 			var lastName = $(this).parent().parent().parent().attr('data-lastname');
@@ -344,7 +342,7 @@ function showReviews(columnName, columnValue) {
 			var score = $(this).parent().parent().parent().attr('data-score');
 			shareOnTwitter(firstName, lastName, agentName, review, score);
 		});
-		
+		$('.icn-lin').unbind('click');
 		$(".icn-lin").click(function() {
 			var firstName = $(this).parent().parent().parent().attr('data-firstname');
 			var lastName = $(this).parent().parent().parent().attr('data-lastname');
@@ -353,14 +351,10 @@ function showReviews(columnName, columnValue) {
 			var score = $(this).parent().parent().parent().attr('data-score');
 			shareOnLinkedin(firstName, lastName, agentName, review, score);
 		});
-		
+		$('.icn-yelp').unbind('click');
 		$(".icn-yelp").click(function() {
-			var firstName = $(this).parent().parent().parent().attr('data-firstname');
-			var lastName = $(this).parent().parent().parent().attr('data-lastname');
-			var agentName = $(this).parent().parent().parent().attr('data-agentname');
-			var review = $(this).parent().parent().parent().attr('data-review');
-			var score = $(this).parent().parent().parent().attr('data-score');
-			shareOnYelp(firstName, lastName, agentName, review, score);
+			var agentId = $(this).parent().parent().parent().attr('data-agentid');
+			shareOnYelp(agentId, window.location.origin+"/rest/survey/");
 		});
 		
 		startIndexCmp += batchSizeCmp;
@@ -671,7 +665,14 @@ function updateCurrentProfile(profileId) {
 }
 
 function showSurveyRequestPage(){
-	window.open('./redirecttosurveyrequestpage.do', '_self');
+	callAjaxGET('./redirecttosurveyrequestpage.do', function(data) {
+		$('#srv-req-pop').removeClass('hide');
+		$('#srv-req-pop').addClass('survey-request-popup-container');
+		$('#srv-req-pop').show();
+		$('#srv-req-pop').find('.survey-request-popup').html(data);
+		
+	});
+	//window.open('./redirecttosurveyrequestpage.do', '_self');
 }
 
 $('#dashboard-sel').click(function(e){
