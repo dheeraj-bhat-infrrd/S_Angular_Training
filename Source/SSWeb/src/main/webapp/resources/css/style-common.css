@@ -2484,9 +2484,12 @@ button.paypal.is-active {
 }
 
 .sq-top-img {
-	height: 70px;
+	height: 100px;
 	margin-bottom: 20px;
 	background: url(../images/chat.png) no-repeat center;
+	width: 100px;
+    margin: 0 auto;
+    border-radius: 50%;
 }
 
 .sq-bord-bot-sm {
@@ -2505,7 +2508,6 @@ button.paypal.is-active {
 .sq-main-txt {
 	margin-bottom: 20px;
 	font-weight: bold !important;
-	text-transform: uppercase;
 	font-size: 20px;
 }
 
