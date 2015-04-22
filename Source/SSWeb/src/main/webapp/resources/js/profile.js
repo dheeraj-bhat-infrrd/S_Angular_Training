@@ -616,7 +616,7 @@ function paintReviews(result){
 		var date = Date.parse(reviewItem.updatedOn);
 		var lastItemClass = "ppl-review-item";
 		if (i == resultSize - 1) {
-			lastItemClass = "";
+			lastItemClass = "ppl-review-item-last";
         }
 		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
