@@ -753,10 +753,10 @@
         min-width: 40px;
     }
     .prof-img-wrapper{
-        width: 50% !important;
+        width: 50%;
     }
     .prof-name-wrapper{
-        width: 100% !important;
+        width: 100%;
         border-left: 1px solid #dcdcdc;
         border-bottom: none;
     }
@@ -1285,6 +1285,10 @@
     .prog-img-container{
         height: 120px;
     }
+    .edit-prof-name-wrapper{
+        width: 50% !important;
+        border-left: none;
+    }
 }
 
 
@@ -1811,5 +1815,8 @@
     }
     .mob-contact-btn-wrapper{
         display: none;
+    }
+    .prof-name-wrapper{
+        width: 33.33333333% !important;
     }
 }
