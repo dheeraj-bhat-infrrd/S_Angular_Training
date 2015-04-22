@@ -34,6 +34,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.Organizati
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
+import com.realtech.socialsurvey.core.utils.DisplayMessageConstants;
 
 @Component
 public class CsvUploadServiceImpl implements CsvUploadService {
@@ -152,12 +153,15 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			}
 		}
 		else if (branchUploadVO.getAssignedRegionName()!= null && !branchUploadVO.getAssignedRegionName().isEmpty()) {
-			List<Region> regions = regionDao.findByColumn(Region.class, CommonConstants.REGION_NAME_COLUMN, branchUploadVO.getAssignedRegionName());
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.COMPANY_COLUMN, company);
+			queries.put(CommonConstants.REGION_NAME_COLUMN, branchUploadVO.getAssignedRegionName());
+			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
 			if(regions == null || regions.isEmpty()){
 				LOG.error("Invalid region name given!");
 				throw new BranchAdditionException("Invalid region name given!");
 			}
-			Map<String, Object> queries = new HashMap<String, Object>();
+			queries = new HashMap<String, Object>();
 			queries.put(CommonConstants.BRANCH_NAME_COLUMN, branchUploadVO.getBranchName());
 			queries.put(CommonConstants.REGION_COLUMN, regions.get(CommonConstants.INITIAL_INDEX));
 			queries.put(CommonConstants.COMPANY_COLUMN, company);
@@ -285,6 +289,81 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 
 	}
 	
+	private void assignUser(UserUploadVO user, User adminUser) throws UserAdditionException, InvalidInputException, SolrException, NoRecordsFetchedException, UserAssignmentException{
+		
+		LOG.info("User already exists so assigning user to approprite place");
+		List<User> assigneeUsers = userDao.findByColumn(User.class, CommonConstants.EMAIL_ID, user.getEmailId());
+		if(assigneeUsers == null || assigneeUsers.isEmpty()){
+			LOG.error("User : " + user.getEmailId() + " not found in the database");
+			throw new UserAdditionException("User : " + user.getEmailId() + " not found in the database");
+		}
+		User assigneeUser = assigneeUsers.get(CommonConstants.INITIAL_INDEX);
+		
+		if(user.isBelongsToCompany()){
+			LOG.debug("Assigning user id : " + assigneeUser.getUserId());
+			organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, 0, null, false);			
+		}
+		else if (user.getAssignedBranchName() != null) {
+			// He belongs to a branch
+			LOG.debug("Assigning user : " + user.getEmailId() + " belongs to branch : " + user.getAssignedBranchName());
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.BRANCH_NAME_COLUMN, user.getAssignedBranchName());
+			queries.put(CommonConstants.COMPANY_COLUMN, adminUser.getCompany());
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			List<Branch> branches = branchDao.findByKeyValue(Branch.class, queries);
+			if (branches == null || branches.isEmpty()) {
+				LOG.error("Branch name is invalid!");
+				throw new UserAdditionException("Branch name is invalid!");
+			}
+			if (branches.size() > 1) {
+				LOG.error("Ambuigity in assigning to branch. More than one braches of the name found");
+				throw new UserAdditionException("Ambuigity in assigning to branch. More than one braches of the name found");
+			}
+			else {
+				Branch branch = branches.get(CommonConstants.INITIAL_INDEX);
+				if (user.isBranchAdmin()) {
+					LOG.debug("User is the branch admin");
+					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch.getRegion().getRegionId(),
+							null, true);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+				else {
+					LOG.debug("User is not the branch admin");
+					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), branch.getBranchId(), branch.getRegion().getRegionId(),
+							null, false);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+			}
+		}
+		else if (user.getAssignedRegionName() != null) {
+			// He belongs to the region
+			LOG.debug("Assigning user : " + user.getEmailId() + " belongs to region : " + user.getAssignedRegionName());
+			Map<String, Object> queries = new HashMap<String, Object>();
+			queries.put(CommonConstants.REGION_NAME_COLUMN, user.getAssignedRegionName());
+			queries.put(CommonConstants.COMPANY_COLUMN, adminUser.getCompany());
+			queries.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+			List<Region> regions = regionDao.findByKeyValue(Region.class, queries);
+			if (regions == null || regions.isEmpty()) {
+				LOG.error("Region name is invalid!");
+				throw new UserAdditionException("Region name is invalid!");
+			}
+			else {
+				Region region = regions.get(CommonConstants.INITIAL_INDEX);
+				if (user.isRegionAdmin()) {
+					LOG.debug("User is the region admin.");
+					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, true);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+				else {
+					LOG.debug("User is not the admin of the region");
+					organizationManagementService.addIndividual(adminUser, assigneeUser.getUserId(), 0, region.getRegionId(), null, false);
+					LOG.debug("Added user : " + user.getEmailId());
+				}
+			}
+		}
+		
+	}
+	
 	/**
 	 * Creates a user and assigns him under the appropriate branch or region else company.
 	 * @param adminUser
@@ -312,11 +391,6 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		LOG.info("createUser called to create user : " + user.getEmailId());
 		Company company = getCompany(adminUser);
 		LicenseDetail companyLicenseDetail = getLicenseDetail(company);
-		
-		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
-			LOG.error("User has not verified account. So user addition not allowed!");
-			throw new UserAdditionException("Account has not been verified!");
-		}
 
 		if (userDao.getUsersCountForCompany(company) >= companyLicenseDetail.getAccountsMaster().getMaxUsersAllowed()) {
 			LOG.error("Max number of users added! Cannot add more users.");
@@ -335,9 +409,11 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 			LOG.debug("User added!");
 		}
 		else {
-			LOG.error("User with the email id already exists!");
-			throw new UserAdditionException("User with the email id already exists!");
+			LOG.debug("User already exists. Assigning him appropriately");
+			assignUser(user, adminUser);
+			LOG.debug("User assigned");
 		}
+		
 	}
 	
 	/**
@@ -365,11 +441,6 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		Company company = getCompany(adminUser);
 		LicenseDetail companyLicenseDetail = getLicenseDetail(company);
 		
-		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
-			LOG.error("User has not verified account. So branch addition not allowed!");
-			throw new BranchAdditionException("Account has not been verified!");
-		}
-
 		if (organizationManagementService.isBranchAdditionAllowed(adminUser,
 				AccountType.getAccountType(companyLicenseDetail.getAccountsMaster().getAccountsMasterId()))) {
 			
@@ -437,11 +508,6 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		LOG.info("createRegion called to add region : " + region.getRegionName());
 		Company company = getCompany(adminUser);
 		LicenseDetail licenseDetail = getLicenseDetail(company);
-		
-		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
-			LOG.error("User has not verified account. So region addition not allowed!");
-			throw new RegionAdditionException("Account has not been verified!");
-		}
 
 		if (organizationManagementService.isRegionAdditionAllowed(adminUser,
 				AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId()))) {
@@ -494,6 +560,12 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 		}
 		List<String> errorList = new ArrayList<String>();
 		LOG.info("Creating all the users,branches and regions");
+		
+		if(adminUser.getStatus() == CommonConstants.STATUS_NOT_VERIFIED){
+			LOG.error("User has not verified account. So region addition not allowed!");
+			errorList.add("ERROR : Account has not been verified!");
+			return errorList;
+		}
 		
 		// We create all the regions
 		List<Object> regionUploadVOs = uploadObjects.get(CommonConstants.REGIONS_MAP_KEY);
@@ -550,6 +622,16 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 						catch (UserAdditionException e) {
 							LOG.error("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
 							errorList.add("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+						}
+						catch (InvalidInputException e) {
+							if(e.getMessage() != null && e.getMessage().equals(DisplayMessageConstants.USER_ASSIGNMENT_ALREADY_EXISTS)){
+								LOG.error("ERROR : " + " while adding user : " + user.getEmailId() + " message : " + e.getMessage());
+								errorList.add("ERROR : " + " while adding user : " + user.getEmailId() + " message : User aleardy exists and assigned!");
+							}
+							else {
+								LOG.info(e.getErrorCode());
+								throw e;
+							}
 						}
 					}
 					LOG.debug("Creation of all users complete!");
