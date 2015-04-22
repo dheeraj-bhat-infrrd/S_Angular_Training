@@ -37,6 +37,7 @@
 						<div class="float-left ppl-share-icns icn-twit"></div>
 						<div class="float-left ppl-share-icns icn-lin"></div>
 						<div class="float-left ppl-share-icns icn-yelp"></div>
+                        <div class="float-left ppl-share-icns icn-gplus"></div>
 					</div>
 					<div class="float-left icn-share icn-remove icn-rem-size hide" style="display: none;"></div>
 				</div>
