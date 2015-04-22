@@ -3774,7 +3774,10 @@ button.paypal.is-active {
 
 .dash-panel-left {
 	padding-top: 30px;
-	border-right: 1px solid #dcdcdc;
+}
+
+.dash-panel-right {
+	border-left: 1px solid #dcdcdc;
 }
 
 .dash-lp-rt-img {
