@@ -63,66 +63,6 @@ public class CsvUploadServiceImpl implements CsvUploadService {
 	public Map<String, List<Object>> parseCsv(String fileName) {
 
 		Map<String, List<Object>> uploadObjects = parseTestFile(fileName);
-//		Map<String, List<Object>> uploadObjects = new HashMap<String, List<Object>>();
-//
-////		UserUploadVO userUploadVO = new UserUploadVO();
-////		userUploadVO.setEmailId("karthik.srivatsa+31@raremile.com");
-////		//userUploadVO.setBelongsToCompany(true);
-////		userUploadVO.setAssignedBranchName("Blah2");
-////		userUploadVO.setBranchAdmin(false);
-////		// userUploadVO.setAssignedRegionName("Blah Region 2");
-////		// userUploadVO.setRegionAdmin(true);
-////		
-//		UserUploadVO userUploadVO2 = new UserUploadVO();
-//		userUploadVO2.setEmailId("karthik.srivatsa+34@raremile.com");
-//		//userUploadVO.setBelongsToCompany(true);
-//		userUploadVO2.setAssignedBranchName("Blah2");
-//		userUploadVO2.setBranchAdmin(true);
-////		userUploadVO2.setAssignedRegionName("Blah Region 2");
-////		userUploadVO2.setRegionAdmin(true);
-////		
-////		UserUploadVO userUploadVO3 = new UserUploadVO();
-////		userUploadVO3.setEmailId("karthik.srivatsa+32@raremile.com");
-////		//userUploadVO.setBelongsToCompany(true);
-////		// userUploadVO.setAssignedBranchName("Blah2");
-////		// userUploadVO.setBranchAdmin(false);
-////		userUploadVO3.setAssignedRegionName("Blah Region 2");
-////		userUploadVO3.setRegionAdmin(true);
-//
-////		BranchUploadVO branchUploadVO = new BranchUploadVO();
-////		//branchUploadVO.setAssignToCompany(true);
-////		branchUploadVO.setBranchName("Blah2");
-////		branchUploadVO.setBranchAddress1("Blah address1");
-////		branchUploadVO.setBranchAddress2("Blah address2");
-////		branchUploadVO.setAssignedRegionName("Blah Region 2");
-//		
-////		BranchUploadVO branchUploadVO2 = new BranchUploadVO();
-////		// branchUploadVO.setAssignToCompany(true);
-////		branchUploadVO2.setBranchName("Blah3");
-////		branchUploadVO2.setBranchAddress1("Blah address1");
-////		branchUploadVO2.setBranchAddress2("Blah address2");
-////		branchUploadVO2.setAssignedRegionName("Blah Region");
-////		
-////		BranchUploadVO branchUploadVO3 = new BranchUploadVO();
-////		branchUploadVO.setAssignToCompany(true);
-////		branchUploadVO3.setBranchName("Blah4");
-////		branchUploadVO3.setBranchAddress1("Blah address1");
-////		branchUploadVO3.setBranchAddress2("Blah address2");
-////		// branchUploadVO.setAssignedRegionName("Blah Region");
-//		
-////
-////		RegionUploadVO regionUploadVO = new RegionUploadVO();
-////		regionUploadVO.setRegionName("Blah Region 2");
-////		regionUploadVO.setRegionAddress1("Blah region address 1");
-////		regionUploadVO.setRegionAddress2("Blah region address 2");
-//
-////		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO,(Object)userUploadVO2,(Object)userUploadVO3));
-////		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO,(Object) branchUploadVO2,(Object) branchUploadVO3));
-////		uploadObjects.put(CommonConstants.REGIONS_MAP_KEY, Arrays.asList((Object) regionUploadVO));
-////		uploadObjects.put(CommonConstants.BRANCHES_MAP_KEY, Arrays.asList((Object) branchUploadVO));
-//		uploadObjects.put(CommonConstants.USERS_MAP_KEY, Arrays.asList((Object) userUploadVO2));
-
-
 
 		return uploadObjects;
 	}
