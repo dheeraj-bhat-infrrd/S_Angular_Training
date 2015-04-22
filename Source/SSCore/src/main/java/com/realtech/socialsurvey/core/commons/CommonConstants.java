@@ -95,6 +95,8 @@ public interface CommonConstants {
 	public static final int MAX_DEFAULT_BRANCHES = 1;
 	public static final double MIN_RATING_SCORE = 0;
 	public static final double MAX_RATING_SCORE = 5;
+	public static final String YES_STRING = "Y";
+	public static final String NO_STRING = "N";
 
 	/**
 	 * Hibernate entities and column name constants

@@ -38,8 +38,8 @@
 <c:if test="${not empty profile && not empty profileSettings.licenses}">
 	<c:set value="${profileSettings.licenses.authorized_in}" var="authorisedInList"></c:set>
 </c:if>
-<c:if test="${not empty profile && not empty profileSettings.profileUrl}">
-	<c:set value="${profileSettings.profileUrl}" var="profileUrl"></c:set>
+<c:if test="${not empty profile && not empty profileSettings.completeProfileUrl}">
+	<c:set value="${profileSettings.completeProfileUrl}" var="completeProfileUrl"></c:set>
 </c:if>
 <c:if test="${profilemasterid == 4}">
 	<c:if test="${not empty profile && not empty profileSettings.expertise}">
@@ -248,8 +248,8 @@
 				<div class="prof-details-header-row clearfix">
 					<div class="prof-link-header float-left clearfix">
 						<div id="prof-header-rating" class="rating-image float-left"></div>
-						<c:if test="${not empty profileUrl}">
-							<div id="prof-header-url" class="rating-image-txt float-left">${profileUrl}</div>
+						<c:if test="${not empty completeProfileUrl}">
+							<div id="prof-header-url" class="rating-image-txt float-left">${completeProfileUrl}</div>
 						</c:if>
 						
 					</div>
@@ -284,7 +284,7 @@
 		<div class="container">
 		<div class="row">
 			<div class="prof-left-panel-wrapper margin-top-25 col-lg-4 col-md-4 col-sm-4 col-xs-12">
-				<div class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
+				<div id="contact-wrapper" class="prof-left-row prof-left-info bord-bot-dc main-rt-adj">
 					<div class="left-contact-wrapper">
 						<div class="clearfix">
 							<div class="float-left left-panel-header"><spring:message code="label.contactinformation.key" /></div>
@@ -629,7 +629,7 @@
 					</c:choose>
 				</div>
 				
-				<div class="rt-content-main bord-bot-dc clearfix">
+				<div id="ppl-post-cont" class="rt-content-main bord-bot-dc clearfix">
 					<div class="float-left panel-tweet-wrapper">
 						<textarea class="pe-whitespace sb-txtarea" id="status-body-text-edit" placeholder="<spring:message code="label.sspost.key"/>"></textarea>
 						<div id="prof-post-btn" class="pe-btn-post"><spring:message code="label.socialpost.key"/></div>
@@ -734,30 +734,46 @@
 	$('.icn-person').click(function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
-		$('.prof-left-panel-wrapper').show();
-		$('.prof-right-panel-wrapper').hide();
+		$('#contact-wrapper').show();
+		$('#prof-agent-container').hide();
+		$('#intro-about-me').hide();
+		$('#reviews-container').hide();
+		$('#ppl-post-cont').hide();
 		adjustImage();
 	});
 
 	$('.icn-ppl').click(function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
-		$('.prof-left-panel-wrapper').hide();
-		$('.prof-right-panel-wrapper').show();
+		$('#ppl-post-cont').show();
+		$('#contact-wrapper').hide();
+		$('#prof-agent-container').hide();
+		$('#intro-about-me').hide();
+		$('#reviews-container').hide();
 	});
 
 	$('.icn-star-smile').click(function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
+		$('#reviews-container').show();
+		$('#contact-wrapper').hide();
+		$('#prof-agent-container').hide();
+		$('#intro-about-me').hide();
+		$('#ppl-post-cont').hide();
 	});
 
 	$('.inc-more').click(function() {
 		$('.mob-icn').removeClass('mob-icn-active');
 		$(this).addClass('mob-icn-active');
+		$('#prof-agent-container').show();
+		$('#intro-about-me').hide();
+		$('#contact-wrapper').hide();
+		$('#reviews-container').hide();
+		$('#ppl-post-cont').hide();
 	});
 	
 	//Prepend domain url
-	$('#prof-header-url').prepend(window.location.origin+"/pages");
+	//$('#prof-header-url').prepend(window.location.origin+"/pages");
 	
 });
 </script>
