@@ -1249,8 +1249,7 @@ public class UserManagementController {
 
 			userManagementService.updateUserProfile(user, profileId, status);
 
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE)
-					.getMessage();
+			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PROFILE_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
 			statusMap.put("status", CommonConstants.SUCCESS_ATTRIBUTE);
 		}
 		catch (NumberFormatException e) {
