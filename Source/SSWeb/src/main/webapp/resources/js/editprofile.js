@@ -17,6 +17,10 @@ var delay = (function() {
 	};
 })();
 
+$(document).ajaxStop(function() {
+	adjustImage();
+});
+
 // Toggle text editor
 $(document).on(
 		'focus',
