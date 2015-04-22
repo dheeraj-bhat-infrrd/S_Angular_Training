@@ -1646,6 +1646,10 @@ button.paypal.is-active {
 	background: url(../images/yelp.png) no-repeat center;
 }
 
+.icn-gplus {
+	background: url(../images/gplus.png) no-repeat center;
+}
+
 .icn-tweet {
 	background: url(../images/tweet.png) no-repeat center;
 }
