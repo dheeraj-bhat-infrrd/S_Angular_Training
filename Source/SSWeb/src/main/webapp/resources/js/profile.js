@@ -95,9 +95,7 @@ function paintProfilePage(result) {
             var addressHtml ="";
             
             
-            //TODO:Company profile addreess
-            
-            
+            // Company profile address
             if(profileLevel == 'INDIVIDUAL' && result.companyProfileData){
             	var companyProfileData = result.companyProfileData;
             	
@@ -169,7 +167,7 @@ function paintProfilePage(result) {
             	}
             	address=address.replace(/,/g,"");
             	//address=address.replace(/ /g,"+");
-            	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>')
+            	$("#prof-company-logo").html('<iframe src="https://www.google.com/maps/embed/v1/place?key='+apikey+'&q='+address+'"></iframe>');
             }
             
             if(result.profileImageUrl != "" && result.profileImageUrl != undefined) {
@@ -211,18 +209,17 @@ function paintProfilePage(result) {
             var webAddresses = contactDetails.web_addresses;
             if(webAddresses != undefined) {
             	if(webAddresses.work != undefined) {
-            		
             		$('#web-addr-header').show();
             		$('#web-address-txt').html('<a href="' + webAddresses.work + '" target="_blank">' + webAddresses.work + '</a>');
             		
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
                     contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'">Our Website</a></div></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'" target="_blank">Our Website</a></div></div>';		            
             	}
             	if(webAddresses.blogs != undefined) {
                     contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
                     contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-blog"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.blogs+'">Our Blogs</a></div></div>';	            
+                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.blogs+'" target="_blank">Our Blogs</a></div></div>';	            
             	}
             }
             
@@ -597,9 +594,14 @@ function fetchReviewsForCompanyCallBack(data) {
 
 function paintReviews(result){
 	var reviewsHtml = "";
+	var resultSize = result.length;
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.updatedOn);
-		reviewsHtml=  reviewsHtml+'<div class="ppl-review-item">';
+		var lastItemClass = "ppl-review-item";
+		if (i == resultSize - 1) {
+			lastItemClass = "";
+        }
+		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
 		reviewsHtml=  reviewsHtml+'			<div class="ppl-head-1">'+reviewItem.customerFirstName+' '+reviewItem.customerLastName+'</div>';
@@ -1192,4 +1194,3 @@ function callBackPaintPublicPosts(data) {
 		}
 	});
 }
->>>>>>> fdd5a3e67ca5cfa84f8d54c5d0cea9eadee54aa1
