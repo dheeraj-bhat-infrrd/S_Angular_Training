@@ -213,7 +213,7 @@ function paintProfilePage(result) {
             	if(webAddresses.work != undefined) {
             		
             		$('#web-addr-header').show();
-            		$('#web-address-txt').text(webAddresses.work);
+            		$('#web-address-txt').html('<a href="' + webAddresses.work + '" target="_blank">' + webAddresses.work + '</a>');
             		
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
                     contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
@@ -1192,3 +1192,4 @@ function callBackPaintPublicPosts(data) {
 		}
 	});
 }
+>>>>>>> fdd5a3e67ca5cfa84f8d54c5d0cea9eadee54aa1
