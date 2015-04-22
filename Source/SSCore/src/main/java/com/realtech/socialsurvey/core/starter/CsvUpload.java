@@ -4,21 +4,12 @@ import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
-import com.realtech.socialsurvey.core.commons.CommonConstants;
-import com.realtech.socialsurvey.core.dao.GenericDao;
-import com.realtech.socialsurvey.core.dao.UserDao;
-import com.realtech.socialsurvey.core.entities.BranchUploadVO;
-import com.realtech.socialsurvey.core.entities.Company;
-import com.realtech.socialsurvey.core.entities.RegionUploadVO;
 import com.realtech.socialsurvey.core.entities.User;
-import com.realtech.socialsurvey.core.entities.UserUploadVO;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
-import com.realtech.socialsurvey.core.exception.UserAdditionException;
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserAssignmentException;
 import com.realtech.socialsurvey.core.services.search.exception.SolrException;
 import com.realtech.socialsurvey.core.services.upload.CsvUploadService;
@@ -36,13 +27,13 @@ public class CsvUpload {
 				
 		CsvUploadService csvUploadService = context.getBean(CsvUploadService.class);
 			
-		User adminUser = csvUploadService.getUser(24l);
+		User adminUser = csvUploadService.getUser(1l);
 		adminUser.setCompanyAdmin(true);
 		
 		List<String> errorList = null;
 			
 			
-		Map<String, List<Object>> uploadObjects = csvUploadService.parseCsv("blah");
+		Map<String, List<Object>> uploadObjects = csvUploadService.parseCsv("/Users/nishit/work/Social_Survey/testhierarchy.txt");
 		try {
 			errorList = csvUploadService.createAndReturnErrors(uploadObjects, adminUser);
 			
