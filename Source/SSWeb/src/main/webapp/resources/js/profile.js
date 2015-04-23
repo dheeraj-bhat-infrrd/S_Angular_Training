@@ -394,12 +394,12 @@ function paintBranchesForRegion(data) {
 				branchesHtml = branchesHtml +'		<div class="bd-hr-item-l3 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
 			});
 			
-			$(".branch-link").click(function(e) {
+			/*$(".branch-link").click(function(e) {
 				e.stopPropagation();
 				var branchProfileName = $(this).data("profilename");
 				var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
 				window.open(url, "_blank");
-			});
+			});*/
 			
 			$("#region-hierarchy").show();
 			if($("#region-branches").length > 0) {
@@ -420,7 +420,6 @@ function paintBranchesForRegion(data) {
  */
 function bindClickToFetchBranchIndividuals(bindingClass) {
 	$("."+bindingClass).click(function(e){
-		e.stopPropagation();
 		if($(this).data("openstatus") == "closed") {
 			fetchIndividualsForBranch($(this).data('branchid'));
 			$(this).data("openstatus","open");

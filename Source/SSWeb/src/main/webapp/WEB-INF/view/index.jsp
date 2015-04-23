@@ -159,8 +159,6 @@
 						<div class="m-inp-img-lname m-inp-img m-inp-img-adj"></div>
 						<input id="find-pro-first-name" name="find-pro-first-name" class="pro-inp" placeholder="First Name">
 						<input id="find-pro-last-name" name="find-pro-last-name" class="pro-inp" placeholder="Last Name">
-						<input id="find-pro-start-index" name="find-pro-start-index" type="hidden" value="0">
-						<input id="find-pro-row-size" name="find-pro-row-size" type="hidden" value="10">
 						<input id="find-pro-submit" type="button" class="pro-inp pro-btn" value="Search">
 					</div>
 				</form>
