@@ -347,8 +347,8 @@ public class SurveyManagementController {
 				agentId = Long.parseLong(agentIdStr);
 				rating = Double.parseDouble(ratingStr);
 			}
-			catch (NumberFormatException e) {
-				LOG.error("Number format exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
+			catch (NumberFormatException|NullPointerException e) {
+				LOG.error("Number format/Null Pointer exception caught in postToSocialMedia() while trying to convert agent Id. Nested exception is ", e);
 				return e.getMessage();
 			}
 			rating = Math.round(rating * 100) / 100;

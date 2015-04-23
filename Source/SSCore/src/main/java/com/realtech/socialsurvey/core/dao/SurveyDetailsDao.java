@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
@@ -45,11 +46,11 @@ public interface SurveyDetailsDao {
 	public long getClickedSurveyCount(String columnName, long columnValue, int noOfDays);
 
 	public List<SurveyDetails> getFeedbacks(String columnName, long columNValue, int start, int rows, double startScore, double limitScore,
-			boolean fetchAbusive);
+			boolean fetchAbusive, Date startDate, Date endDate);
 
 	public long getFeedBacksCount(String columnName, long columnValue, double startScore, double limitScore, boolean fetchAbusive);
 
-	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columNValue, int start, int rows, double startScore, double limitScore);
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columNValue, int start, int rows, double startScore, double limitScore, Date startDate, Date endDate);
 
 	public void updateReminderCount(long agentId, String customerEmail);
 
