@@ -511,9 +511,13 @@ input#find-pro-submit{
     margin-right: 10px;
 }
 
-.srch-name,.ctnt-item-desig {
-   font-weight: bold;
+.srch-name {
    font-size:12px;
+}
+
+.ctnt-item-desig {
+   font-size:11px;
+   font-family: 'opensanssemibold';
 }
 
 .srch-num {

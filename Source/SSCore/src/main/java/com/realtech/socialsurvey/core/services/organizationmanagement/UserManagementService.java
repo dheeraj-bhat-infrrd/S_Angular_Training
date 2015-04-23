@@ -2,10 +2,12 @@ package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.util.List;
 import java.util.Map;
+
 import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
@@ -77,6 +79,9 @@ public interface UserManagementService {
 	// Method to return user with provided email and company
 	public User getUserByEmailAndCompany(long companyId, String emailId) throws InvalidInputException, NoRecordsFetchedException;
 
+	// Method to return user with provided email
+	public User getUserByEmail(String emailId) throws InvalidInputException, NoRecordsFetchedException;
+
 	// Method to return users whose email id matches with the provided email id.
 	public List<User> getUsersBySimilarEmailId(User admin, String emailId) throws InvalidInputException;
 
@@ -93,6 +98,9 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public User getUserByUserId(long userId) throws InvalidInputException;
+
+
+	public List<ProListUser> getMultipleUsersByUserId(List<Long> userIds) throws InvalidInputException;
 
 	// Method to get list of the branches assigned to the given user.
 	public List<Branch> getBranchesAssignedToUser(User user) throws NoRecordsFetchedException;
@@ -191,7 +199,7 @@ public interface UserManagementService {
 	 * @throws InvalidInputException
 	 */
 	public AgentSettings getUserSettings(long agentId) throws InvalidInputException;
-
+	
 	/**
 	 * Get all the agent settings linked to the user profile
 	 * 
