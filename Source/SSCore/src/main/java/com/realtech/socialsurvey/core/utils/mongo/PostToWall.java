@@ -1,6 +1,5 @@
 package com.realtech.socialsurvey.core.utils.mongo;
 
-import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +15,7 @@ import com.realtech.socialsurvey.core.services.organizationmanagement.ProfileMan
 import com.realtech.socialsurvey.core.services.organizationmanagement.UserManagementService;
 
 @Component
-public class PostToWall implements Runnable {
+public class PostToWall {
 
 	public static final Logger LOG = LoggerFactory.getLogger(PostToWall.class);
 	private static final int POST_SIZE = 100;
@@ -30,15 +29,10 @@ public class PostToWall implements Runnable {
 	@Autowired
 	private ProfileManagementService profileManagementService;
 
-	@Override
 	@Transactional
-	public void run() {
+	public void postStatusForUser(List<String> emailIds) {
 		LOG.info("Started run method of PostToWall");
 		
-		// TODO parse emailIds
-		List<String> emailIds = new ArrayList<String>();
-		emailIds.add("ss_agent1@mailinator.com");
-
 		User user = null;
 		for (String email : emailIds) {
 			// Fetching user with emailId
