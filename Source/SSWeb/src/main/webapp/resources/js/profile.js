@@ -356,18 +356,6 @@ function paintCompanyRegions(data) {
 			$("#comp-regions-content").html(regionsHtml);
 			$("#comp-hierarchy").show();
 			
-			$(".comp-region").click(function(){
-				if($(this).data("openstatus") == "closed") {
-					$('#comp-region-branches-'+$(this).data('regionid')).html("");
-					fetchBranchesForRegion($(this).data('regionid'));
-					fetchIndividualsForRegion($(this).data('regionid'));
-					$(this).data("openstatus","open");
-				}else {
-					$('#comp-region-branches-'+$(this).data('regionid')).slideUp(200);
-					$(this).data("openstatus","closed");
-				}
-				
-			});
 		}
 	}
 }
@@ -394,13 +382,6 @@ function paintBranchesForRegion(data) {
 				branchesHtml = branchesHtml +'		<div class="bd-hr-item-l3 hide" id="comp-branch-individuals-'+branch.branchId+'"></div>';
 			});
 			
-			/*$(".branch-link").click(function(e) {
-				e.stopPropagation();
-				var branchProfileName = $(this).data("profilename");
-				var url = window.location.origin +"/pages/office/"+companyProfileName+"/"+branchProfileName;
-				window.open(url, "_blank");
-			});*/
-			
 			$("#region-hierarchy").show();
 			if($("#region-branches").length > 0) {
 				$("#region-branches").html(branchesHtml);
@@ -409,7 +390,7 @@ function paintBranchesForRegion(data) {
 				$("#comp-region-branches-"+regionId).html(branchesHtml).slideDown(200);
 			}
 			
-			bindClickToFetchBranchIndividuals("comp-region-branch");
+			//bindClickToFetchBranchIndividuals("comp-region-branch");
 		}
 	}
 }
@@ -419,7 +400,9 @@ function paintBranchesForRegion(data) {
  * @param bindingClass
  */
 function bindClickToFetchBranchIndividuals(bindingClass) {
+	$("."+bindingClass).unbind('click');
 	$("."+bindingClass).click(function(e){
+		e.preventDefault();
 		if($(this).data("openstatus") == "closed") {
 			fetchIndividualsForBranch($(this).data('branchid'));
 			$(this).data("openstatus","open");
@@ -574,7 +557,7 @@ function paintCompanyBranches(data) {
 			});
 			$("#comp-hierarchy").show();
 			$("#comp-regions-content").append(compBranchesHtml);
-			bindClickToFetchBranchIndividuals("comp-branch");
+			//bindClickToFetchBranchIndividuals("comp-branch");
 		}
 	}
 }
@@ -1228,4 +1211,29 @@ $('body').on('click',".region-link",function(e) {
 	var regionProfileName = $(this).data("profilename");
 	var url = window.location.origin +"/pages/region/"+companyProfileName+"/"+regionProfileName;
 	window.open(url, "_blank");
+});
+
+
+$('body').on("click",".comp-branch,.comp-region-branch",function(e){
+	e.preventDefault();
+	if($(this).data("openstatus") == "closed") {
+		fetchIndividualsForBranch($(this).data('branchid'));
+		$(this).data("openstatus","open");
+	}else {
+		$('#comp-branch-individuals-'+$(this).data('branchid')).slideUp(200);
+		$(this).data("openstatus","closed");
+	}
+});
+
+$('body').on("click",".comp-region",function(){
+	if($(this).data("openstatus") == "closed") {
+		$('#comp-region-branches-'+$(this).data('regionid')).html("");
+		fetchBranchesForRegion($(this).data('regionid'));
+		fetchIndividualsForRegion($(this).data('regionid'));
+		$(this).data("openstatus","open");
+	}else {
+		$('#comp-region-branches-'+$(this).data('regionid')).slideUp(200);
+		$(this).data("openstatus","closed");
+	}
+	
 });
