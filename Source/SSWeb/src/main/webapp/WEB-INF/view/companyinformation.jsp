@@ -277,7 +277,7 @@ function validateCountry() {
 	}
 }
 
-//Function to validate the zipcode
+// Function to validate the zipcode
 function validateCountryZipcode(elementId) {
 	var zipcode = $('#'+elementId).val();
 	if ($(window).width()<768) {
