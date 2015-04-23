@@ -94,17 +94,17 @@ function fetchUsers(newIndex) {
 }
 
 function infiniteScrollCallback(response) {
-	var users =  $.parseJSON(response);
-	if (users != undefined) {
-		paintProList(users);
-	}
+	var reponseJson = $.parseJSON(response);
+	$('#srch-num').text(reponseJson.userFound);
+	paintProList(reponseJson.users);
 }
 
 function paintProList(usersList) {
-	if(usersList != undefined) {
+	if (usersList != undefined) {
 		var usersSize = usersList.length;
 		var usersHtml = "";
-		if(usersSize > 0){
+		
+		if (usersSize > 0) {
 			$.each(usersList,function(i,user){
 				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
 				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '">';
@@ -114,7 +114,7 @@ function paintProList(usersList) {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
 				}
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
-				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name cursor-pointer" data-profilename="' + user.profileUrl + '">' + user.displayName + '</div>';
+				usersHtml = usersHtml + '<div class="ctnt-item-name user-display-name cursor-pointer" data-profilename="' + user.profileUrl + '">' + user.displayName + '</div>';
 				if(user.title != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
