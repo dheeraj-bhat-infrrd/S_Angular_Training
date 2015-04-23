@@ -27,7 +27,7 @@ public class CsvUpload {
 				
 		CsvUploadService csvUploadService = context.getBean(CsvUploadService.class);
 			
-		User adminUser = csvUploadService.getUser(1l);
+		User adminUser = csvUploadService.getUser(18153l);
 		adminUser.setCompanyAdmin(true);
 		
 		List<String> errorList = null;
@@ -40,6 +40,7 @@ public class CsvUpload {
 			for(String error : errorList){
 				LOG.info(error);
 			}
+			csvUploadService.postProcess(adminUser);
 		}
 		catch (InvalidInputException e) {
 			// TODO Auto-generated catch block

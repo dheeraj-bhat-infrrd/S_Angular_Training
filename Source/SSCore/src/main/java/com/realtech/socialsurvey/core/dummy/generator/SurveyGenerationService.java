@@ -5,6 +5,6 @@ import com.realtech.socialsurvey.core.entities.User;
 
 public interface SurveyGenerationService {
 
-	List<User> getAgents(String[] emails);
+	List<User> getAgents(List<String> emailIds);
 	
 }

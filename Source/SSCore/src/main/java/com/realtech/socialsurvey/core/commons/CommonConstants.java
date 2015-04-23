@@ -131,6 +131,7 @@ public interface CommonConstants {
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
 	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
 	public static final String FEED_SOURCE_COLUMN = "feedSource";
+	public static final String PASSWORD_COLUMN = "loginPassword";
 
 	/**
 	 * Mongo entities and column name constants
