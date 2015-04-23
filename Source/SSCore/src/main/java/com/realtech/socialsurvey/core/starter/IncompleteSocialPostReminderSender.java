@@ -47,7 +47,7 @@ public class IncompleteSocialPostReminderSender {
 				.getBean("organizationManagementService");
 		StringBuilder links = new StringBuilder();
 		for (Company company : organizationManagementService.getAllCompanies()) {
-			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostCustomersEmail(company.getCompanyId());
+			List<SurveyDetails> incompleteSocialPostCustomers = surveyHandler.getIncompleteSocialPostSurveys(company.getCompanyId());
 			for (SurveyDetails survey : incompleteSocialPostCustomers) {
 				for (String site : getRemainingSites(new HashSet<String>(survey.getSharedOn()))) {
 					try {
