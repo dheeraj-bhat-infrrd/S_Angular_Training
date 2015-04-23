@@ -75,7 +75,7 @@
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">Please fill in your
-								details to take survey</span></i>
+								details to take survey for ${agentName}</span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">

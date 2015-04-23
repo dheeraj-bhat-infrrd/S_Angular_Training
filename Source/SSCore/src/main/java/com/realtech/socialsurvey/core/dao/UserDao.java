@@ -20,6 +20,8 @@ public interface UserDao extends GenericDao<User, Long> {
 	
 	public User getActiveUser(String emailId) throws NoRecordsFetchedException;
 
+	public List<User> fetchUsersByEmailId(List<String> emailIds);
+
 	// JIRA SS-76 by RM-06 : EOC
 
 }
