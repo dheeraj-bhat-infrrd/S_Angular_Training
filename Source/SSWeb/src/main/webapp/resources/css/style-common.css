@@ -2485,7 +2485,10 @@ button.paypal.is-active {
 .sq-top-img {
 	height: 70px;
 	margin-bottom: 20px;
-	background: url(../images/chat.png) no-repeat center;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	width: 70px;
+    margin: 0 auto;
+    border-radius: 50%;
 }
 
 .sq-bord-bot-sm {
@@ -6146,4 +6149,5 @@ tr.u-tbl-header td {
 
 .edit-prof-pic-name-wrapper{
     border-bottom: 1px solid #dcdcdc;
+>>>>>>> 052166018b211e58826f0ba5509e09064abe73a8
 }
