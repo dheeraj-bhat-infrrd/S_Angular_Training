@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,11 +19,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -35,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
@@ -134,6 +139,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	
 	@Autowired
 	private ProfileCompletionList profileCompletionList;
+	
+	@Autowired
+	private SurveyDetailsDao surveyDetailsDao;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -632,6 +640,40 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Method to find user on the basis of user id finished for user id " + userId);
 		return user;
+	}
+	
+	/**
+	 * Method to get multiple users object for the given list of user ids, fetches users along with profile name and
+	 * profile url
+	 */
+	@Transactional
+	@Override
+	public List<ProListUser> getMultipleUsersByUserId(List<Long> userIds) throws InvalidInputException {
+		LOG.info("Method to find multiple users on the basis of list of user id started for user ids " + userIds);
+		List<ProListUser> users = new ArrayList<ProListUser>();
+		List<AgentSettings> agentSettingsList = organizationUnitSettingsDao.fetchMultipleAgentSettingsById(userIds);
+		if (agentSettingsList == null) {
+			throw new InvalidInputException("No settings found for user :" + userIds + " in getUserByUserId");
+		}
+		
+		for (AgentSettings agentSettings : agentSettingsList) {
+			ProListUser user = new ProListUser();
+			user.setUserId(agentSettings.getIden());
+			user.setDisplayName(agentSettings.getContact_details().getName());
+			user.setProfileName(agentSettings.getProfileName());
+			user.setProfileUrl(agentSettings.getProfileUrl());
+			user.setProfileImageUrl(agentSettings.getProfileImageUrl());
+			user.setEmailId(agentSettings.getContact_details().getMail_ids().getWork());
+			user.setTitle(agentSettings.getContact_details().getTitle());
+			user.setLocation(agentSettings.getContact_details().getLocation());
+			user.setIndustry(agentSettings.getContact_details().getIndustry());
+			user.setAboutMe(agentSettings.getContact_details().getAbout_me());
+			user.setReviewCount(agentSettings.getReviewCount());
+			user.setReviewScore(surveyDetailsDao.getRatingForPastNdays(CommonConstants.AGENT_ID,agentSettings.getIden(),CommonConstants.NO_LIMIT,true));
+			users.add(user);
+		}
+		LOG.info("Method to find multiple users on the basis of list of user id finished for user ids " + userIds);
+		return users;
 	}
 
 	/*
