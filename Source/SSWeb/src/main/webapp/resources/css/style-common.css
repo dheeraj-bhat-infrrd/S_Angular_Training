@@ -6149,5 +6149,25 @@ tr.u-tbl-header td {
 
 .edit-prof-pic-name-wrapper{
     border-bottom: 1px solid #dcdcdc;
->>>>>>> 052166018b211e58826f0ba5509e09064abe73a8
+}
+
+.user-display-name {
+    text-transform: capitalize;
+    font-family: 'opensanssemibold';
+}
+
+.ctnt-review-score {
+    line-height: 30px;
+    white-space: pre;
+}
+
+.ctnt-review-count {
+    line-height: 30px;
+    margin-left: 5px;
+    color: #3E9DCB;
+}
+
+.pro-addr-cont {
+    font-family: 'opensanslight';
+    font-size: 12px;
 }
