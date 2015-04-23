@@ -607,7 +607,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(companyId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_COMPANY, false);
+						CommonConstants.PROFILE_LEVEL_COMPANY, false, null, null);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -662,7 +662,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(regionId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_REGION, false);
+						CommonConstants.PROFILE_LEVEL_REGION, false, null, null);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -961,7 +961,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(branchId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_BRANCH, false);
+						CommonConstants.PROFILE_LEVEL_BRANCH, false, null, null);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
@@ -1097,7 +1097,7 @@ public class ProfileController {
 			}
 			try {
 				List<SurveyDetails> reviews = profileManagementService.getReviews(agentId, minScore, maxScore, start, numRows,
-						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false);
+						CommonConstants.PROFILE_LEVEL_INDIVIDUAL, false, null, null);
 				String json = new Gson().toJson(reviews);
 				LOG.debug("reviews json : " + json);
 				response = Response.ok(json).build();
