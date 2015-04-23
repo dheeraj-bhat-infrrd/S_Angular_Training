@@ -32,6 +32,7 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
+import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
@@ -52,8 +53,8 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
+import com.realtech.socialsurvey.core.entities.UserListFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
-import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.entities.WebAddressSettings;
 import com.realtech.socialsurvey.core.entities.YelpToken;
@@ -2255,7 +2256,6 @@ public class ProfileManagementController {
 		LOG.info("Method updateHobbies() finished from ProfileManagementController");
 		return JspResolver.MESSAGE_HEADER;
 	}
-
 	// JIRA SS-97 by RM-06 : EOC
 
 	/*
@@ -2264,38 +2264,19 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/findapro", method = RequestMethod.POST)
 	public String findAProfile(Model model, HttpServletRequest request) {
 		LOG.info("Method findAProfile called.");
-		SolrDocumentList results = null;
 		String patternFirst;
 		String patternLast;
-		int startIndex;
-		int batchSize;
 
 		try {
 			patternFirst = request.getParameter("find-pro-first-name");
 			patternLast = request.getParameter("find-pro-last-name");
-			try{
-				startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));	
-			}catch(NumberFormatException e){
-				startIndex = CommonConstants.FIND_PRO_START_INDEX;
-			}
-			try{
-				batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));	
-			}catch(NumberFormatException e){
-				batchSize = CommonConstants.FIND_PRO_BATCH_SIZE;
-			}
-
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfile().");
 				throw new InvalidInputException("Invalid searchKey passed in method findAProfile().");
 			}
 
-			try {
-				results = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
-			}
-			catch (MalformedURLException e) {
-				LOG.error("Error occured while searching in findAProfile(). Reason is ", e);
-				throw new NonFatalException("Error occured while searching in findAProfile(). Reason is ", e);
-			}
+			model.addAttribute("patternFirst", patternFirst);
+			model.addAttribute("patternLast", patternLast);
 		}
 		catch (NonFatalException nonFatalException) {
 			LOG.error("NonFatalException while searching in findAProfile(). Reason : " + nonFatalException.getMessage(), nonFatalException);
@@ -2305,10 +2286,6 @@ public class ProfileManagementController {
 			return new Gson().toJson(errorResponse);
 		}
 
-		model.addAttribute("numfound", results.getNumFound());
-		model.addAttribute("patternFirst", patternFirst);
-		model.addAttribute("patternLast", patternLast);
-
 		LOG.info("Method findAProfile finished.");
 		return JspResolver.PROFILE_LIST;
 	}
@@ -2317,29 +2294,43 @@ public class ProfileManagementController {
 	@RequestMapping(value = "/findaproscroll", method = RequestMethod.POST)
 	public String findAProfileScroll(Model model, HttpServletRequest request) {
 		LOG.info("Method findAProfileScroll called.");
-		List<SolrDocument> users = new ArrayList<SolrDocument>();
-		SolrDocumentList results = null;
-		String patternFirst;
-		String patternLast;
-		int startIndex;
-		int batchSize;
+		UserListFromSearch userList = new UserListFromSearch();
 
 		try {
-			patternFirst = request.getParameter("find-pro-first-name");
-			patternLast = request.getParameter("find-pro-last-name");
-			startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));
-			batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));
+			String patternFirst = request.getParameter("find-pro-first-name");
+			String patternLast = request.getParameter("find-pro-last-name");
 
+			int startIndex;
+			try {
+				startIndex = Integer.parseInt(request.getParameter("find-pro-start-index"));
+			}
+			catch (NumberFormatException e) {
+				startIndex = CommonConstants.FIND_PRO_START_INDEX;
+			}
+			
+			int batchSize;
+			try {
+				batchSize = Integer.parseInt(request.getParameter("find-pro-row-size"));
+			}
+			catch (NumberFormatException e) {
+				batchSize = CommonConstants.FIND_PRO_BATCH_SIZE;
+			}
+			
 			if (patternFirst == null && patternLast == null) {
 				LOG.error("Invalid search key passed in method findAProfileScroll().");
 				throw new InvalidInputException("Invalid searchKey passed in method findAProfileScroll().");
 			}
 
 			try {
-				results = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
+				SolrDocumentList results = solrSearchService.searchUsersByFirstOrLastName(patternFirst, patternLast, startIndex, batchSize);
+				
+				List<SolrDocument> users = new ArrayList<SolrDocument>();
 				for (SolrDocument solrDocument : results) {
 					users.add(solrDocument);
 				}
+				
+				userList.setUsers(users);
+				userList.setUserFound(results.getNumFound());
 			}
 			catch (MalformedURLException e) {
 				LOG.error("Error occured while searching in findAProfileScroll(). Reason is ", e);
@@ -2353,8 +2344,9 @@ public class ProfileManagementController {
 			errorResponse.setErrMessage(ErrorMessages.REQUEST_FAILED);
 			return new Gson().toJson(errorResponse);
 		}
+		
 		LOG.info("Method findAProfileScroll finished.");
-		return new Gson().toJson(users);
+		return new Gson().toJson(userList);
 	}
 
 	/**
