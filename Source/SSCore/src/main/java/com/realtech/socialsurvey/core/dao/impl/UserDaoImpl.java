@@ -23,7 +23,6 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDaoImpl.class);
 
-	
 	/*
 	 * Method to return all the users that match email id passed.
 	 */
@@ -122,6 +121,28 @@ public class UserDaoImpl extends GenericDaoImpl<User, Long> implements UserDao {
 		}
 		LOG.debug("Method checkIfAnyActiveUserExists() successfull, active user with the emailId " + emailId);
 		return users.get(CommonConstants.INITIAL_INDEX);
+	}
+
+	/*
+	 * Method to return all the users that match email id passed.
+	 */
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<User> fetchUsersByEmailId(List<String> emailIds) {
+		LOG.info("Method to fetch all the users by email id,fetchUsersBySimilarEmailId() started.");
+		Criteria criteria = getSession().createCriteria(User.class);
+		try {
+			criteria.add(Restrictions.in(CommonConstants.EMAIL_ID, emailIds));
+			criteria.add(Restrictions.eq(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE));
+		}
+		catch (HibernateException hibernateException) {
+			LOG.error("Exception caught in fetchUsersBySimilarEmailId() ", hibernateException);
+			throw new DatabaseException("Exception caught in fetchUsersBySimilarEmailId() ", hibernateException);
+		}
+
+		LOG.info("Method to fetch all the users by email id, fetchUsersBySimilarEmailId() finished.");
+
+		return (List<User>) criteria.list();
 	}
 }
 // JIRA SS-42 By RM-05 EOC

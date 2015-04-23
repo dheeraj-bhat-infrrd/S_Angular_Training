@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
@@ -376,7 +379,24 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
 		// set default profile stages.
-		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());		
+		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());	
+		// Setting default values for mail content in Mail content settings of company settings.
+		String takeSurveyMail = "";
+		String takeSurveyReminderMail = "";
+		try {
+			takeSurveyMail = readMailContentFromFile(CommonConstants.SURVEY_REQUEST_MAIL_FILENAME);
+			takeSurveyReminderMail = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
+		}
+		catch (IOException e) {
+			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ",e);
+		}
+		MailContent mailContent = new MailContent();
+		MailContentSettings mailContentSettings = new MailContentSettings();
+		mailContent.setMail_body(takeSurveyMail);
+		mailContentSettings.setTake_survey_mail(mailContent);
+		mailContent.setMail_body(takeSurveyReminderMail);
+		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		companySettings.setMail_content(mailContentSettings);;
 				
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
@@ -2948,5 +2968,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method to update branch completed successfully");
 		return branch;
 	}
+	
+	/*
+	 * Method to read default survey mail content from EmailTemplate which will be store into the Company Settings.
+	 */
+	private String readMailContentFromFile(String fileName) throws IOException {
+		LOG.debug("readSurveyReminderMailContentFromFile() started");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(fileName)));
+		StringBuilder content = new StringBuilder();
+		String line = reader.readLine();
+		try{
+			while(line!=null){
+			content.append(line);
+			line = reader.readLine();
+		}
+		}finally{
+			reader.close();
+		}
+		LOG.debug("readSurveyReminderMailContentFromFile() finished");
+		return content.toString();
+	}
+
+	
 }
 // JIRA: SS-27: By RM05: EOC
