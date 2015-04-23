@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="UTF-8"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <!DOCTYPE">
@@ -46,10 +45,8 @@
 						<div class="float-left fp-right-item">
 							<form id="find-pro-form" method="POST" action="./findapro.do">
 								<div class="fp-wrapper clearfix">
-									<input id="find-pro-first-name" name="find-pro-first-name" class="fp-inp" placeholder="First Name">
-									<input id="find-pro-last-name" name="find-pro-last-name" class="fp-inp" placeholder="Last Name">
-									<input id="find-pro-start-index" name="find-pro-start-index" type="hidden">
-									<input id="find-pro-row-size" name="find-pro-row-size" type="hidden">
+									<input id="find-pro-first-name" name="find-pro-first-name" value="${patternFirst}" class="fp-inp" placeholder="First Name">
+									<input id="find-pro-last-name" name="find-pro-last-name" value="${patternLast}" class="fp-inp" placeholder="Last Name">
 									<input id="find-pro-submit" type="button" class="fp-inp pro-btn" value="Search">
 								</div>
 							</form>
@@ -67,7 +64,7 @@
 							<div class="ctnt-list-header-left float-left">
 								<spring:message code="label.profilefoundfor.key" />
 									<c:choose>
-										<c:when test = "${not empty searchCriteria}">
+										<c:when test="${not empty searchCriteria}">
 											<span class="srch-name">${searchCriteria}</span>
 										</c:when>
 										<c:otherwise>
@@ -80,17 +77,11 @@
 								<input id="fp-profile-level-fetch-info" data-searchcriteria="${searchCriteria}" data-profile-level="${profileLevel}" data-iden="${iden}" type="hidden"/>
 							</div>
 							<div class="ctnt-list-header-right float-right">
-								<c:choose>
-									<c:when test="${numfound >= '0'}">
-										<span id="srch-num" class="srch-num">${numfound}</span>
-									</c:when>
-									<c:otherwise>
-										<span id="srch-num" class="srch-num">0</span>
-									</c:otherwise>
-								</c:choose>
+								<span id="srch-num" class="srch-num"></span>
 								<spring:message code="label.profilelistfound.key" />
 							</div>
 						</div>
+						
 						<div id="ctnt-list-wrapper" class="ctnt-list-wrapper">
 							<!-- Example user search results -->
 							<div class="ctnt-list-item clearfix hide">
@@ -119,8 +110,8 @@
 									</div>
 								</div>
 							</div>
-							
 						</div>
+						
 					</div>
 					<div class="ctnt-right-item col-lg-3 col-md-3 col-sm-3 col-xs-12 ads-container"></div>
 				</div>
@@ -136,20 +127,18 @@
 	<script src="${pageContext.request.contextPath}/resources/js/profile_common.js"></script>
 	<script src="${pageContext.request.contextPath}/resources/js/proList.js"></script>
 	<script>
-		$(document).ready(function() {
-			$('#find-pro-row-size').val(rowSize);
-			$('#find-pro-start-index').val(startIndex);
-			$('#fp-users-size').val(0);
-			
-			fetchUsers(startIndex);
-			adjustTextContainerWidthOnResize();
-			
-			$(window).resize(function() {
-				if ($(window).width() < 768) {
-					adjustTextContainerWidthOnResize();
-				}
-			});
+	$(document).ready(function() {
+		$('#fp-users-size').val(0);
+		
+		fetchUsers(startIndex);
+		adjustTextContainerWidthOnResize();
+		
+		$(window).resize(function() {
+			if ($(window).width() < 768) {
+				adjustTextContainerWidthOnResize();
+			}
 		});
+	});
 	</script>
 </body>
 </html>
