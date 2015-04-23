@@ -14,6 +14,7 @@ $(document).on('click', '.um-user-row', function() {
 	userId = userId.substr("um-user-".length);
 	paintUserDetailsForm(userId);
 });
+
 $(document).on('click', '.tm-table-remove-icn', function(event) {
 	if (!isUserManagementAuthorized)
 		return false;
@@ -35,7 +36,6 @@ $(document).on('blur', '#um-emailid', function() {
 
 function initUserManagementPage() {
 	userStartIndex = 0;
-	//paintUserDetailsForm("");
 	paintUserListInUserManagement(userStartIndex);
 	updatePaginateButtons();
 }
@@ -53,6 +53,7 @@ $(document).on('click', '#um-add-user', function() {
 	if (!isUserManagementAuthorized) {
 		return false;
 	}
+	
 	var userId;
 	if (isAddUser) {
 		// TODO Add code to create a new user.
@@ -62,10 +63,9 @@ $(document).on('click', '#um-add-user', function() {
 		inviteUser();
 		isAddUser=false;
 		userId = $('#mh-userId').val();
-	}else{
+	} else {
 		userId = $('#um-user-details-container').attr("data-id");
 	}
-	var branchId = $('#um-assignto').attr("branchId");
 	
 	if (!validateUserInviteDetails()) {
 		return false;
@@ -73,6 +73,8 @@ $(document).on('click', '#um-add-user', function() {
 	if (userId == "" || userId == undefined) {
 		return false;
 	}
+
+	var branchId = $('#um-assignto').attr("branchId");
 	assignUserToBranch(userId, branchId);
 });
 
@@ -88,15 +90,6 @@ $(document).on('click', '#um-clear-user-form', function() {
 	inviteUser();*/
 });
 
-/*
- * if (isUserManagementAuthorized) { $(document).on('click', '.um-user-row',
- * function() { console.log("user row clicked"); var userId = this.id; userId =
- * userId.substr("um-user-".length); paintUserDetailsForm(userId); });
- * $(document).on('click', '.tm-table-remove-icn', function(event) {
- * event.stopPropagation(); var userId =
- * $(this).closest('.um-user-row').attr("id"); userId =
- * userId.substr("um-user-".length); confirmDeleteUser(userId); }); }
- */
 /*
  * Function to assign branch to a user
  */
@@ -164,6 +157,7 @@ function unassignUserFromBranch(userId, branchId) {
 				console.log("User successfully unassigned from branch "
 						+ branchId);
 				$('#branch-to-unassign-' + branchId).remove();
+				
 				// check if there are any assigned branches left
 				if ($('#um-assigned-branch-container > div').length <= 0) {
 					$('#um-assignto').parent().parent().find(
@@ -181,9 +175,7 @@ function unassignUserFromBranch(userId, branchId) {
 }
 
 function inviteUser() {
-
 	var success = false;
-
 	var firstName = $('#um-fname').val();
 	var lastName = $('#um-lname').val();
 	var emailId = $('#um-emailid').val();
@@ -321,7 +313,6 @@ function paintUserDetailsForm(userId) {
 			console.error("error : " + e);
 		}
 	});
-
 }
 
 /*
@@ -332,7 +323,7 @@ function paintUserListInUserManagement(startIndex) {
 		"startIndex" : startIndex,
 		"batchSize" : userBatchSize
 	};
-	//var success = false;
+
 	$.ajax({
 		url : "./findusersforcompany.do",
 		type : "GET",
@@ -462,14 +453,12 @@ function validateUserEmailId(elementId) {
 				$('#' + elementId).next('.input-error-2').hide();
 				return true;
 			} else {
-				$('#' + elementId).next('.input-error-2').html(
-						'Please enter a valid email id.');
+				$('#' + elementId).next('.input-error-2').html('Please enter a valid email id.');
 				$('#' + elementId).next('.input-error-2').show();
 				return false;
 			}
 		} else {
-			$('#' + elementId).next('.input-error-2').html(
-					'Please enter email id.');
+			$('#' + elementId).next('.input-error-2').html('Please enter email id.');
 			$('#' + elementId).next('.input-error-2').show();
 			return false;
 		}
@@ -498,14 +487,12 @@ function validateUserFirstName(elementId) {
 				$('#' + elementId).next('.input-error-2').hide();
 				return true;
 			} else {
-				$('#' + elementId).next('.input-error-2').html(
-						'Please enter a valid first name.');
+				$('#' + elementId).next('.input-error-2').html('Please enter a valid first name.');
 				$('#' + elementId).next('.input-error-2').show();
 				return false;
 			}
 		} else {
-			$('#' + elementId).next('.input-error-2').html(
-					'Please enter first name.');
+			$('#' + elementId).next('.input-error-2').html('Please enter first name.');
 			$('#' + elementId).next('.input-error-2').show();
 			return false;
 		}
@@ -532,8 +519,7 @@ function validateUserLastName(elementId) {
 				$('#' + elementId).next('.input-error-2').hide();
 				return true;
 			} else {
-				$('#' + elementId).next('.input-error-2').html(
-						'Please enter a valid last name.');
+				$('#' + elementId).next('.input-error-2').html('Please enter a valid last name.');
 				$('#' + elementId).next('.input-error-2').show();
 				return false;
 			}
@@ -577,69 +563,59 @@ function paintUsersList(data) {
 	if (searchResult != null) {
 		var len = searchResult.length;
 		if (len > 0) {
-			$
-					.each(
-							searchResult,
-							function(i, user) {
-								var row = "";
-								row = $('<tr>').attr({
-									"id" : "um-user-" + user.userId,
-									"class" : "um-user-row"
-								});
-								var col1 = $('<td>').attr({
-									"class" : "col-username um-table-content"
-								}).html(user.firstName + " " + user.lastName);
-								var col2 = $('<td>').attr({
-									"class" : "col-email um-table-content"
-								}).html(user.emailId);
-								var col3 = $('<td>')
-										.attr(
-												{
-													"class" : "col-loanoff um-table-content clearfix"
-												});
-								if (user.isAgent) {
-									var colImage = $('<div>')
-											.attr(
-													{
-														"class" : "float-left tm-table-tick-icn icn-right-tick"
-													});
-									col3.append(colImage);
-								}
-								var col4 = $('<td>')
-										.attr(
-												{
-													"class" : "col-status um-table-content clearfix"
-												});
-								if (user.status == 1) {
-									var statusIcon = $('<div>')
-											.attr(
-													{
-														"class" : "tm-table-status-icn icn-green-col float-left"
-													});
-									col4.append(statusIcon);
-								} else if (user.status == 3) {
-									var statusIcon = $('<div>')
-											.attr(
-													{
-														"class" : "tm-table-status-icn icn-green-brown float-left"
-													});
-									col4.append(statusIcon);
-								}
-								var col5 = $('<td>')
-										.attr(
-												{
-													"class" : "col-remove um-table-content clearfix"
-												});
-								var iconRemove = $('<div>')
-										.attr(
-												{
-													"class" : "tm-table-remove-icn icn-remove-user float-left cursor-pointer"
-												});
-								col5.append(iconRemove);
-								row.append(col1).append(col2).append(col3)
-										.append(col4).append(col5);
-								$('#um-user-list').find('tbody').append(row);
-							});
+			$.each(searchResult, function(i, user) {
+				var row = $('<tr>').attr({
+					"id" : "um-user-" + user.userId,
+					"class" : "um-user-row"
+				});
+				
+				var col1 = $('<td>').attr({
+					"class" : "col-username um-table-content"
+				}).html(user.firstName + " " + user.lastName);
+				
+				var col2 = $('<td>').attr({
+					"class" : "col-email um-table-content"
+				}).html(user.emailId);
+				
+				var col3 = $('<td>').attr({
+					"class" : "col-loanoff um-table-content clearfix"
+				});
+				
+				if (user.isAgent) {
+					var colImage = $('<div>').attr({
+						"class" : "float-left tm-table-tick-icn icn-right-tick"
+					});
+					col3.append(colImage);
+				}
+				
+				var col4 = $('<td>').attr({
+					"class" : "col-status um-table-content clearfix"
+				});
+				
+				if (user.status == 1) {
+					var statusIcon = $('<div>').attr({
+						"class" : "tm-table-status-icn icn-green-col float-left"
+					});
+					col4.append(statusIcon);
+				} else if (user.status == 3) {
+					var statusIcon = $('<div>').attr({
+						"class" : "tm-table-status-icn icn-green-brown float-left"
+					});
+					col4.append(statusIcon);
+				}
+				
+				var col5 = $('<td>').attr({
+					"class" : "col-remove um-table-content clearfix"
+				});
+				
+				var iconRemove = $('<div>').attr({
+					"class" : "tm-table-remove-icn icn-remove-user float-left cursor-pointer"
+				});
+				
+				col5.append(iconRemove);
+				row.append(col1).append(col2).append(col3).append(col4).append(col5);
+				$('#um-user-list').find('tbody').append(row);
+			});
 		} else {
 			$('#um-user-list').find('tbody').append("No results found");
 		}
@@ -680,7 +656,6 @@ function searchBranchesForUser(branchPattern) {
 
 		}
 	});
-	// callAjaxGET(url, searchBranchesForUserCallBack, true);
 }
 
 function searchBranchesForUserCallBack(jsonData) {
@@ -801,31 +776,44 @@ function reinviteUserCallBack(data){
  }
 
 function updateUserProfile(profileId, profileStatus) {
+	showOverlay();
 	var payload = {
 		"profileId" : profileId,
 		"status" : profileStatus
 	};
-	var url = "./updateuserprofile.do";
-	showOverlay();
-	callAjaxGetWithPayloadData(url, updateUserProfileCallBack, payload, true);
-}
+	callAjaxPostWithPayloadData("./updateuserprofile.do", function(data) {
+		hideOverlay();
+		
+		var map =  $.parseJSON(data);
+		if (map.status == "success") {
+			showInfo(map.message);
+			if (profileStatus == 1) {
+				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-off');
+				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-on');
+				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'Active');
+				
+				// de-activate user profile
+				$('.tbl-switch-on').unbind('click');
+		        $('.tbl-switch-on').click(function(){
+		            var profileId = $(this).parent().data('profile-id');
+		            updateUserProfile(profileId, 0);
+		        });
+			} else if (profileStatus == 0) {
+				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
+				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
+				$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');
 
-function updateUserProfileCallBack(data) {
-	var map =  $.parseJSON(data);
-	if (map.status == "success") {
-		showInfo(map.message);
-		if (profileStatus == 1) {
-			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-off');
-			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-on');
-			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'Active');
-		} else if (profileStatus == 0) {
-			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').removeClass('tbl-switch-on');
-			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').addClass('tbl-switch-off');
-			$('#v-edt-tbl-row-' + profileId).find('.v-edt-tbl-switch').attr('title', 'InActive');
+				// activate user profile
+				$('.tbl-switch-off').unbind('click');
+		        $('.tbl-switch-off').click(function(){
+		            var profileId = $(this).parent().data('profile-id');
+		            updateUserProfile(profileId, 1);
+		        });
+			}
+		} else {
+			showError(map.message);
 		}
-	} else {
-		showError(map.message);
-	}
+	}, payload, false);
 }
 
 function bindEditUserClick(){
@@ -834,6 +822,7 @@ function bindEditUserClick(){
 		if ($(this).hasClass('v-tbl-icn-disabled')) {
 			return;
 		}
+		
 		// de-activate user profile
         $('.tbl-switch-on').click(function(){
             var profileId = $(this).parent().data('profile-id');
@@ -867,7 +856,6 @@ function bindEditUserClick(){
 	    }
 	});
 }
-
 
 $(document).on('click', '#page-previous', function(){
 	var newIndex = userStartIndex - userBatchSize;

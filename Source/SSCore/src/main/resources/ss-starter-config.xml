@@ -29,4 +29,7 @@
 	<bean id="regionsFullImport" class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport" class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport" class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+	
+	<!-- Posts to wall -->
+	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
 </beans>

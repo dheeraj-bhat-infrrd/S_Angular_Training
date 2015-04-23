@@ -19,107 +19,108 @@
 </head>
 
 <body>
-<div class="hdr-wrapper">
-	<div class="container hdr-container clearfix">
-		<div class="float-left hdr-logo"></div>
-		<div class="float-right clearfix hdr-btns-wrapper">
-			<div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
-			<div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
-		</div>
-	</div>
-</div>
-<div class="hm-header-main-wrapper">
-	<div class="container">
-		<div class="hm-header-row hm-header-row-main clearfix">
-			<div class="hm-header-row-left text-center padding-10"><spring:message code="label.signupstartjourney.key" /></div>
-		</div>
-	</div>
-</div>
-
-<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
-	<div class="container reg_panel_container">
-		<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
-		
-		<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data">
-			<div class="reg_form_wrapper_2">
-				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.company.key"/></div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn icn-company"></div>
-						<input class="rfr_txt_fld" id="com-company" data-non-empty="true"
-							name="company" placeholder='<spring:message code="label.company.key"/>'>
-					</div>
-				</div>
-				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.logo.key"/></div>
-					<div class="float-left rfr_txt">
-						<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
-						<input type="text" class="rfr_txt_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'>
-						<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo">
-						<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
-					</div>
-				</div>
-				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.address.key" /></div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn icn-fname"></div>
-						<input class="rfr_txt_fld" id="com-address1" data-non-empty="true"
-							name="address1" placeholder='<spring:message code="label.address1.key"/>'>
-					</div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn icn-lname"></div>
-						<input class="rfr_txt_fld" id="com-address2"
-							name="address2" placeholder='<spring:message code="label.address2.key"/>'>
-					</div>
-				</div>
-				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn icn-fname"></div>
-						<input class="rfr_txt_fld" id="com-country" data-non-empty="true"
-							name="country" placeholder='<spring:message code="label.country.key"/>'>
-					</div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn icn-lname"></div>
-						<input class="rfr_txt_fld" id="com-zipcode" data-non-empty="true" data-zipcode="true"
-							name="zipcode" placeholder='<spring:message code="label.zipcode.key"/>'>
-					</div>
-				</div>
-				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.phoneno.key" /></div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn icn-mbl"></div>
-						<input class="rfr_txt_fld" id="com-contactno" data-non-empty="true" data-phone="true"
-							name="contactno" placeholder="<spring:message code="label.phoneno.key" />">
-					</div>
-				</div>
-				<div class="reg_form_row clearfix">
-					<div class="float-left rfr_lbl"><spring:message code="label.businessvertical.key" /></div>
-					<div class="float-left rfr_txt">
-						<div class="rfr_icn"></div>
-						<c:if test="${not empty verticals}">
-							<select name="vertical" id="select-vertical" class="rfr_txt_fld">
-								<option disabled selected><spring:message code="label.vertical.key"/></option>
-								<c:forEach items="${verticals }" var="vertical">
-										<c:if test="${vertical.verticalsMasterId > 0 }">
-											<option id="vertical-${vertical.verticalsMasterId }">${vertical.verticalName}</option>
-										</c:if>								
-								</c:forEach>
-							</select>
-						</c:if>
-					</div>
-				</div>
-				
-				<div class="reg_form_row clearfix">
-					<div class="reg_btn" id="company-info-submit"><spring:message code="label.done.key" /></div>
-				</div>
+	<div class="hdr-wrapper">
+		<div class="container hdr-container clearfix">
+			<div class="float-left hdr-logo"></div>
+			<div class="float-right clearfix hdr-btns-wrapper">
+				<div class="float-left hdr-log-btn hdr-log-reg-btn"><spring:message code="label.signin.key" /></div>
+				<div class="float-left hdr-reg-btn hdr-log-reg-btn"><spring:message code="label.joinus.key" /></div>
 			</div>
-			<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
-			<input type="hidden" name="countrycode" id="country-code">
-		</form>
-		
+		</div>
 	</div>
-</div>
+	<div class="hm-header-main-wrapper">
+		<div class="container">
+			<div class="hm-header-row hm-header-row-main clearfix">
+				<div class="hm-header-row-left text-center padding-10"><spring:message code="label.signupstartjourney.key" /></div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
+		<div class="container reg_panel_container">
+			<div class="reg_header"><spring:message code="label.companysettings.header.key"/></div>
+			
+			<form id="company-info-form" method="POST" action="./addcompanyinformation.do" enctype="multipart/form-data">
+				<div class="reg_form_wrapper_2">
+					<div class="reg_form_row clearfix">
+						<div class="float-left rfr_lbl"><spring:message code="label.company.key"/></div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-company"></div>
+							<input class="rfr_txt_fld" id="com-company" data-non-empty="true"
+								name="company" value="${companyName}" placeholder='<spring:message code="label.company.key"/>'>
+						</div>
+					</div>
+					<div class="reg_form_row clearfix">
+						<div class="float-left rfr_lbl"><spring:message code="label.logo.key"/></div>
+						<div class="float-left rfr_txt">
+							<div class="icn-lname input-file-icn-left" id="input-file-icn-left"></div>
+							<input type="text" class="rfr_txt_fld" id="com-logo-decoy" placeholder='<spring:message code="label.logo.placeholder.key"/>'>
+							<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo">
+							<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj" id="icn-file"></div>
+						</div>
+					</div>
+					<div class="reg_form_row clearfix">
+						<div class="float-left rfr_lbl"><spring:message code="label.address.key" /></div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-fname"></div>
+							<input class="rfr_txt_fld" id="com-address1" data-non-empty="true"
+								name="address1" value="${address1}" placeholder='<spring:message code="label.address1.key"/>'>
+						</div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-lname"></div>
+							<input class="rfr_txt_fld" id="com-address2"
+								name="address2" value="${address2}" placeholder='<spring:message code="label.address2.key"/>'>
+						</div>
+					</div>
+					<div class="reg_form_row clearfix">
+						<div class="float-left rfr_lbl" style="visibility:hidden;"><spring:message code="label.address.key" /></div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-fname"></div>
+							<input class="rfr_txt_fld" id="com-country" data-non-empty="true"
+								name="country" value="${country}" placeholder='<spring:message code="label.country.key"/>'>
+						</div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-lname"></div>
+							<input class="rfr_txt_fld" id="com-zipcode" data-non-empty="true" data-zipcode="true"
+								name="zipcode" value="${zipCode}" placeholder='<spring:message code="label.zipcode.key"/>'>
+						</div>
+					</div>
+					<div class="reg_form_row clearfix">
+						<div class="float-left rfr_lbl"><spring:message code="label.phoneno.key" /></div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn icn-mbl"></div>
+							<input class="rfr_txt_fld" id="com-contactno" data-non-empty="true" data-phone="true"
+								name="contactno" value="${companyContactNo}" placeholder="<spring:message code="label.phoneno.key" />">
+						</div>
+					</div>
+					<div class="reg_form_row clearfix">
+						<div class="float-left rfr_lbl"><spring:message code="label.businessvertical.key" /></div>
+						<div class="float-left rfr_txt">
+							<div class="rfr_icn"></div>
+							<c:if test="${not empty verticals}">
+								<select name="vertical" id="select-vertical" class="rfr_txt_fld">
+									<option disabled selected><spring:message code="label.vertical.key"/></option>
+									<c:forEach items="${verticals}" var="vertical">
+										<c:if test="${vertical.verticalsMasterId > 0}">
+											<option id="vertical-${vertical.verticalsMasterId}">${vertical.verticalName}</option>
+										</c:if>								
+									</c:forEach>
+								</select>
+							</c:if>
+						</div>
+					</div>
+					
+					<div class="reg_form_row clearfix">
+						<div class="reg_btn" id="company-info-submit"><spring:message code="label.done.key" /></div>
+					</div>
+				</div>
+				<input type="hidden" value="${emailid}" name="originalemailid" id="originalemailid">
+				<input type="hidden" value="${countryCode}" name="countrycode" id="country-code">
+				<input type="hidden" value="${message}" data-status="${status}" name="message" id="message"/>
+			</form>
+			
+		</div>
+	</div>
 
 <script src="${pageContext.request.contextPath}/resources/js/jquery-2.1.1.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/bootstrap.min.js"></script>
@@ -135,6 +136,25 @@ var selectedCountryRegEx = "";
 $(document).ready(function() {
 	isCompanyInfoPageValid = false;
 
+	if ($('#message').val() != "") {
+		if ($('#message').attr('data-status') == 'ERROR_MESSAGE') {
+			showError($('#message').val());
+		} else {
+			showInfo($('#message').val());
+		}
+	}
+	
+	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
+		var countryCode = $('#country-code').val();
+		for (var i = 0; i < postCodeRegex.length; i++) {
+			if (postCodeRegex[i].code == countryCode) {
+				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				break;
+			}
+		}
+	}
+	
 	$('#company-info-submit').click(function() {
 		submitCompanyInfoForm();
 	});
@@ -149,22 +169,22 @@ $(document).ready(function() {
 	});
 	
 	// Integrating autocomplete with country input text field
-	$( "#com-country" ).autocomplete({
+	$("#com-country").autocomplete({
 		minLength: 1,
 		source: countryData,
 		delay : 0,
-		open : function( event, ui ) {
+		open : function(event, ui) {
 			$( "#country-code" ).val("");
 		},
-		focus: function( event, ui ) {
-			$( "#com-country" ).val( ui.item.label );
+		focus: function(event, ui) {
+			$( "#com-country" ).val(ui.item.label);
 			return false;
 		},
-		select: function( event, ui ) {
-			$( "#com-country" ).val( ui.item.label );
-			$( "#country-code" ).val( ui.item.code );
-			for(var i=0;i<postCodeRegex.length;i++){
-				if(postCodeRegex[i].code == ui.item.code){
+		select: function(event, ui) {
+			$("#com-country").val(ui.item.label);
+			$("#country-code").val(ui.item.code);
+			for (var i = 0; i < postCodeRegex.length; i++) {
+				if (postCodeRegex[i].code == ui.item.code) {
 					selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
 					selectedCountryRegEx = new RegExp(selectedCountryRegEx);
 					break;
@@ -172,13 +192,10 @@ $(document).ready(function() {
 			}
 			return false;
 		},
-		close: function( event, ui ) {
-		}})
-		.autocomplete( "instance" )._renderItem = function( ul, item ) {
-		return $( "<li>" )
-			.append(item.label)
-			.appendTo( ul );
-	  };
+		close: function(event, ui) {}
+	}).autocomplete("instance")._renderItem = function(ul, item) {
+		return $("<li>").append(item.label).appendTo(ul);
+  	};
 });
 
 $('#com-company').blur(function() {
@@ -247,26 +264,20 @@ $('#com-contactno').blur(function() {
 function validateCountry() {
 	var country = $.trim($('#com-country').val());
 	if (country == "") {
-		// $('#com-page-country').html("Please enter country name");
-		// $('#com-page-country').show();
 		showError('Please enter country name');
 		return false;
 	} else {
 		var countryCode = $.trim($('#country-code').val());
 		if (countryCode == "") {
-			// $('#com-page-country').html("Please enter valid country name");
-			// $('#com-page-country').show();
 			showError('Please enter valid country name');
 			return false;
 		} else {
-			// $('#com-page-country').html("");
-			// $('#com-page-country').hide();
 			return true;
 		}
 	}
 }
 
-//Function to validate the zipcode
+// Function to validate the zipcode
 function validateCountryZipcode(elementId) {
 	var zipcode = $('#'+elementId).val();
 	if ($(window).width()<768) {
@@ -274,31 +285,22 @@ function validateCountryZipcode(elementId) {
 			if (selectedCountryRegEx.test(zipcode) == true) {
 				return true;
 			} else {
-				// $('#overlay-toast').html('Please enter a valid zipcode.');
-				// showToast();
 				showError('Please enter a valid zipcode');
 				return false;
 			}
 		} else {
-			// $('#overlay-toast').html('Please enter zipcode.');
-			// showToast();
 			showError('Please enter zipcode');
 			return false;
 		}
 	} else {
 		if (zipcode != "") {
 			if (selectedCountryRegEx.test(zipcode) == true) {
-				// $('#'+elementId).parent().next('.login-reg-err').hide();
 				return true;
 			} else {
-				// $('#'+elementId).parent().next('.login-reg-err').html('Please enter a valid zipcode.');
-				// $('#'+elementId).parent().next('.login-reg-err').show();
 				showError('Please enter a valid zipcode');
 				return false;
 			}
 		} else {
-			// $('#'+elementId).parent().next('.login-reg-err').html('Please enter zipcode.');
-			// $('#'+elementId).parent().next('.login-reg-err').show();
 			showError('Please enter zipcode');
 			return false;
 		}
@@ -343,7 +345,6 @@ function validateCompanyInformationForm(elementId) {
 			return isCompanyInfoPageValid;
 		}
 	}
-	
 	if(!validateCountry('com-country')){
 		isCompanyInfoPageValid = false;
 		if(!isFocussed){
@@ -354,7 +355,6 @@ function validateCompanyInformationForm(elementId) {
 			return isCompanyInfoPageValid;
 		}
 	}
-	
 	if(!validateCountryZipcode('com-zipcode')){
 		isCompanyInfoPageValid = false;
 		if(!isFocussed){
