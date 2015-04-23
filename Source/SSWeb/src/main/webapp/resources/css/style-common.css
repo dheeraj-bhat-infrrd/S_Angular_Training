@@ -2484,10 +2484,10 @@ button.paypal.is-active {
 }
 
 .sq-top-img {
-	height: 100px;
+	height: 70px;
 	margin-bottom: 20px;
-	background: url(../images/chat.png) no-repeat center;
-	width: 100px;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	width: 70px;
     margin: 0 auto;
     border-radius: 50%;
 }
