@@ -208,7 +208,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		Date endDate = Calendar.getInstance().getTime();
 		Date startDate = getNdaysBackDate(noOfDays);
 		Query query = new Query(Criteria.where(CommonConstants.SURVEY_CLICKED_COLUMN).is(true));
-		query.addCriteria(Criteria.where("surveyResponse").size(0));
+		/*query.addCriteria(Criteria.where("surveyResponse").size(0));*/
 		if (columnName != null) {
 			query.addCriteria(Criteria.where(columnName).is(columnValue));
 		}
@@ -505,7 +505,7 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 */
 	@Override
 	public List<SurveyDetails> getFeedbacks(String columnName, long columnValue, int start, int rows, double startScore, double limitScore,
-			boolean fetchAbusive) {
+			boolean fetchAbusive, Date startDate, Date endDate) {
 		LOG.info("Method to fetch all the feedbacks from SURVEY_DETAILS collection, getFeedbacks() started.");
 		Query query = new Query();
 		if (columnName != null) {
@@ -516,7 +516,15 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		 * fetching only completed surveys
 		 */
 		query.addCriteria(Criteria.where(CommonConstants.STAGE_COLUMN).is(CommonConstants.SURVEY_STAGE_COMPLETE));
+		
+		if(startDate!=null){
+			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
+		}
 
+		if(endDate!=null){
+			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
+		}
+		
 		/**
 		 * adding isabusive criteria only if fetch abusive flag is false, i.e only non abusive posts
 		 * are to be fetched else fetch all the records
@@ -586,7 +594,8 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 	 */
 
 	@Override
-	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columnValue, int start, int rows, double startScore, double limitScore) {
+	public List<SurveyDetails> getIncompleteSurvey(String columnName, long columnValue, int start, int rows, double startScore, double limitScore,
+			Date startDate, Date endDate) {
 		LOG.info("Method to fetch all the incomplete survey from SURVEY_DETAILS collection, getIncompleteSurvey() started.");
 		Query query = new Query();
 		if (columnName != null) {
@@ -602,6 +611,12 @@ public class MongoSurveyDetailsDaoImpl implements SurveyDetailsDao {
 		}
 		if (rows > -1) {
 			query.limit(rows);
+		}
+		if(startDate!=null){
+			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).gte(startDate));
+		}
+		if(endDate!=null){
+			query.addCriteria(Criteria.where(CommonConstants.MODIFIED_ON_COLUMN).lte(endDate));
 		}
 		query.with(new Sort(Sort.Direction.DESC, CommonConstants.MODIFIED_ON_COLUMN));
 		List<SurveyDetails> surveysWithReviews = mongoTemplate.find(query, SurveyDetails.class, SURVEY_DETAILS_COLLECTION);

@@ -366,7 +366,6 @@ $(document).on('scroll', '#dsh-inc-srvey', function() {
 	console.log($('.ps-scrollbar-y').css('top'));
 });
 
-// TODO
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
 	var format = element.options[element.selectedIndex].value;
