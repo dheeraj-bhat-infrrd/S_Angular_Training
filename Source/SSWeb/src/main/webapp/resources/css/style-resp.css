@@ -2,7 +2,8 @@
 @media (max-width: 767px) {
     body{
         font-size: 12px;
-        -webkit-user-select: none;                  
+        -webkit-user-select: none;   
+        overflow-x:hidden;                
     }
     .container{
     	width: 100% !important;
@@ -1291,6 +1292,31 @@
         width: 50% !important;
         border-left: none;
     }
+    .td-region-edit .edit-region-form{
+    	width: 100%;
+    }
+    td.v-tbl-line{
+    	width: 12%;
+    }
+    td.v-tbl-name{
+    	width: 36%;
+    }
+    td.v-tbl-add{
+    	display: none;
+    }
+    td.v-tbl-role{
+    	width: 32%;
+    }
+    td.v-tbl-btns{
+    	width: 18%;
+    }
+    td.v-tbl-spacer{
+    	width: 2%;
+    }
+    .v-tbl-icn,.v-tbl-icn-disabled{
+    	max-width: 28px;
+    	float: right;
+    }
 }
 
 
@@ -1568,6 +1594,18 @@
     .lp-row{
     	padding-left: 0;	
     }
+    .bd-hr-container{
+    	padding: 0 5px;
+    }
+    .bd-hr-left-panel{
+    	padding: 0 5px 20px 5px;
+    }
+    .bd-hr-item {
+		padding-left: 5px;
+	}
+	.bd-hr-img{
+		margin-right: 7px;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
