@@ -107,31 +107,65 @@ function paintProList(usersList) {
 		if (usersSize > 0) {
 			$.each(usersList,function(i,user){
 				var evenOddClass = (i % 2 == 0) ? '' : 'ctnt-list-item-even';
-				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '">';
+				usersHtml = usersHtml + '<div class="ctnt-list-item clearfix ' + evenOddClass + '" data-profilename="' + user.profileUrl + '">';
 				if (user.profileImageUrl != undefined) {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img" style="background: url(' + user.profileImageUrl + ') no-repeat center; background-size: cover;"></div>';
 				} else {
 					usersHtml = usersHtml + '<div class="float-left ctnt-list-item-img pro-list-default-img"></div>';
 				}
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
-				usersHtml = usersHtml + '<div class="ctnt-item-name user-display-name cursor-pointer" data-profilename="' + user.profileUrl + '">' + user.displayName + '</div>';
+				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
+
+				//TODO:remvoe hardcoding
+				user.title = "Software Engineer";
 				if(user.title != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
+				
+				//TODO:remvoe hardcoding
+				user.location = "San Francisco Bay Area";
+				user.industry = "Finace";
+				
+				if(user.location != undefined) {
+					usersHtml = usersHtml +' <div class="pro-addr-cont">'+user.location;
+	            	if(user.industry != undefined){
+	            		usersHtml += " | "+ user.industry;
+	            	}
+	            	usersHtml += "</div>";
+	            }
+				
 				if(user.aboutMe != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-comment">' + user.aboutMe + '</div>';
 				}
+				
+				var reviewCount = 0;
+				
+				if(user.reviewCount){
+					reviewCount  = user.reviewCount;
+				}
+				
+				var reviewScore = 0;
+				if(user.reviewScore){
+					reviewScore  = user.reviewScore;
+				}
+				
 				usersHtml = usersHtml + '</div>';
-				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap">'
-					+ '<div class="ctnt-review-btn" user="' + user.userId + '">Review</div>'
-				+ '</div>'
-			+ '</div>';
+				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-btn-wrap clearfix">';
+				usersHtml = usersHtml + '<div class="float-left ctnt-review-score" data-score="' + reviewScore + '"></div>';
+				usersHtml = usersHtml + '<div class="float-left ctnt-review-count" user="' + user.userId + '">'+reviewCount+' Review(s)</div>';
+				usersHtml = usersHtml + '</div>';
+				usersHtml = usersHtml + '</div>';
 			});
 			
 			$('#ctnt-list-wrapper').append(usersHtml);
 			$('#fp-users-size').val(usersSize);
 			
-			$(".user-display-name").click(function(e){
+			$('.ctnt-review-score').each(function(){
+				changeRatingPattern($(this).attr("data-score"), $(this));
+				$(this).append(" - ");
+			});
+			
+			$(".ctnt-list-item").click(function(e){
 				var agentProfileName = $(this).attr("data-profilename");
 				var url = window.location.origin + "/pages" + agentProfileName;
 				window.open(url);
