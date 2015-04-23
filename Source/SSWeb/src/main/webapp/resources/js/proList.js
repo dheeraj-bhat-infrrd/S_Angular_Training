@@ -116,15 +116,9 @@ function paintProList(usersList) {
 				usersHtml = usersHtml + '<div class="float-left ctnt-list-item-txt-wrap">';
 				usersHtml = usersHtml + '	<div class="ctnt-item-name user-display-name">' + user.displayName + '</div>';
 
-				//TODO:remvoe hardcoding
-				user.title = "Software Engineer";
 				if(user.title != undefined){
 					usersHtml = usersHtml + '<div class="ctnt-item-desig">' + user.title + '</div>';
 				}
-				
-				//TODO:remvoe hardcoding
-				user.location = "San Francisco Bay Area";
-				user.industry = "Finace";
 				
 				if(user.location != undefined) {
 					usersHtml = usersHtml +' <div class="pro-addr-cont">'+user.location;
