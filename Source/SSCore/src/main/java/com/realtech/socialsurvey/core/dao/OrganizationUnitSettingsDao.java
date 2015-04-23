@@ -1,10 +1,12 @@
 package com.realtech.socialsurvey.core.dao;
 
 import java.util.List;
+
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.FeedIngestionEntity;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.ProfileUrlEntity;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 
 /**
  * Gets the organization settings
@@ -42,6 +44,15 @@ public interface OrganizationUnitSettingsDao {
 	 * @return
 	 */
 	public AgentSettings fetchAgentSettingsById(long identifier);
+	
+	/**
+	 * Gets multiple user settings
+	 * 
+	 * @param identifiers
+	 * @return List<AgentSettings>
+	 * @throws InvalidInputException
+	 */
+	public List<AgentSettings> fetchMultipleAgentSettingsById(List<Long> identifiers) throws InvalidInputException;
 
 	/**
 	 * Updates a particular element in the collection
