@@ -23,7 +23,13 @@
 	<bean id="emailServices" class="com.realtech.socialsurvey.core.services.mail.impl.EmailServicesImpl" />
 	<bean id="organizationManagementService" class="com.realtech.socialsurvey.core.services.organizationmanagement.impl.OrganizationManagementServiceImpl" />
 	
+	<bean id="surveyGenerationService" class="com.realtech.socialsurvey.core.dummy.generator.SurveyGenerationServiceImpl" />
+	<bean id="surveyBuilder" class="com.realtech.socialsurvey.core.services.surveybuilder.impl.SurveyBuilderImpl" />
+	
 	<bean id="regionsFullImport" class="com.realtech.socialsurvey.core.utils.solr.RegionsFullImport" />
 	<bean id="branchesFullImport" class="com.realtech.socialsurvey.core.utils.solr.BranchesFullImport" />
 	<bean id="usersFullImport" class="com.realtech.socialsurvey.core.utils.solr.UsersFullImport" />
+	
+	<!-- Posts to wall -->
+	<bean id="postToWall" class="com.realtech.socialsurvey.core.utils.mongo.PostToWall" />
 </beans>

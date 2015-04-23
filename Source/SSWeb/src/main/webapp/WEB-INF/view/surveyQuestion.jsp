@@ -56,6 +56,14 @@
 	<div class="hdr-wrapper">
 		<div class="container hdr-container clearfix">
 			<div class="float-left hdr-logo"></div>
+			<div class="float-right clearfix hdr-btns-wrapper">
+					<div class="float-left hdr-log-btn hdr-log-reg-btn">
+						<spring:message code="label.signin.key" />
+					</div>
+					<div class="float-left hdr-reg-btn hdr-log-reg-btn">
+						<spring:message code="label.joinus.key" />
+					</div>
+			</div>
 			<div id="header-user-info" class="header-user-info float-right clearfix">
 				<c:if test="${displaylogo != null}">
 					<div class="float-left user-info-seperator"></div>
@@ -75,7 +83,7 @@
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">Please fill in your
-								details to take survey</span></i>
+								details to take survey for ${agentName}</span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
