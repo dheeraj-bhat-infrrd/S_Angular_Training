@@ -259,6 +259,7 @@ public interface CommonConstants {
 	public static final String COMPANY_PROFILE_FIXED_URL = "pages/company/";
 	public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
+	public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
 	
 	/**
 	 * Logo related config
