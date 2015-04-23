@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -1003,7 +1004,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 */
 	@Override
 	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			boolean fetchAbusive) throws InvalidInputException {
+			boolean fetchAbusive, Date startDate, Date endDate) throws InvalidInputException {
 		LOG.info("Method getReviews called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		List<SurveyDetails> surveyDetails = null;
@@ -1011,7 +1012,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("iden is invalid while fetching reviews");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive);
+		surveyDetails = surveyDetailsDao.getFeedbacks(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, fetchAbusive,
+				startDate, endDate);
 		return surveyDetails;
 	}
 
@@ -1184,8 +1186,8 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 	 * agentId/branchId/regionId or companyId based on the profile level
 	 */
 	@Override
-	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
-			throws InvalidInputException {
+	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
+			Date startDate, Date endDate) throws InvalidInputException {
 		LOG.info("Method getIncompleteSurvey() called for iden:" + iden + " startScore:" + startScore + " limitScore:" + limitScore + " startIndex:"
 				+ startIndex + " numOfRows:" + numOfRows + " profileLevel:" + profileLevel);
 		List<SurveyDetails> surveyDetails = null;
@@ -1193,7 +1195,7 @@ public class ProfileManagementServiceImpl implements ProfileManagementService, I
 			throw new InvalidInputException("iden is invalid while fetching incomplete reviews");
 		}
 		String idenColumnName = getIdenColumnNameFromProfileLevel(profileLevel);
-		surveyDetails = surveyDetailsDao.getIncompleteSurvey(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore);
+		surveyDetails = surveyDetailsDao.getIncompleteSurvey(idenColumnName, iden, startIndex, numOfRows, startScore, limitScore, startDate, endDate);
 		return surveyDetails;
 	}
 
