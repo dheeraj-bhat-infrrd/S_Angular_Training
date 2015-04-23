@@ -39,7 +39,7 @@
 <div id="temp-message" class="hide"></div>
 
 <script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.jquery.js"></script>
-<script src="${pageContext.request.contextPath}resources/js/perfect-scrollbar.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/perfect-scrollbar.js"></script>
 <script>
     $(document).ready(function() {
 		hideOverlay();
