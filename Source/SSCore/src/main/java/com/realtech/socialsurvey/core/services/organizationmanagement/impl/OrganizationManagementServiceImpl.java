@@ -374,7 +374,10 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		surveySettings.setNeutralText(neutralText);
 		surveySettings.setSadText(sadText);
 		surveySettings.setAutoPostEnabled(true);
+		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
+		
 		companySettings.setSurvey_settings(surveySettings);
+		
 
 		// set seo content flag
 		companySettings.setSeoContentModified(true);

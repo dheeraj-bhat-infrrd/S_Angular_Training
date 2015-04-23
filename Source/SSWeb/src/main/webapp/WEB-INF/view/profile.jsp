@@ -130,6 +130,7 @@
 						<div id="icn-twit" class="float-left social-item-icon icn-twit"></div>
 						<div id="icn-lin" class="float-left social-item-icon icn-lin"></div>
 						<div id="icn-yelp" class="float-left social-item-icon icn-yelp"></div>
+                        <div id="icn-gplus" class="float-left social-item-icon icn-gplus"></div>
 					</div>
 				</div>
 			</div>
@@ -405,24 +406,6 @@
             $('#reviews-container').hide();
             $('#recent-post-container').hide();
         });
-        
-        function adjustImage(){
-            $('.mobile-tabs').children('.mob-icn-active').click();
-            var windW = $(window).width();
-            if(windW < 768){
-                var imgW = $('#prof-image').width();
-                $('#prof-image').height(imgW * 0.7);
-                var h2 = $('.prog-img-container').height() - 11;
-                var rowW = $('.lp-con-row').width() - 55 - 10;
-                $('.lp-con-row-item').width(rowW+'px');
-                $('.footer-main-wrapper').hide();
-                $('.footer-main-wrapper').hide();
-            }else{
-                $('.prof-name-container,#prof-image').height(200);
-                $('.lp-con-row-item').width('auto');
-                $('.footer-main-wrapper').show();
-            }
-        }
         
         $(document).on('click','.bd-q-contact-us',function(){
             $('#contact-us-pu-wrapper').show();
