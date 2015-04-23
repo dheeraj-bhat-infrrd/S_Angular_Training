@@ -1,7 +1,6 @@
 package com.realtech.socialsurvey.core.entities;
 
 import java.util.List;
-import org.apache.solr.common.SolrDocument;
 
 /**
  * User List with count entity from the search
@@ -9,7 +8,7 @@ import org.apache.solr.common.SolrDocument;
 public class UserListFromSearch {
 
 	private long userFound;
-	private List<SolrDocument> users;
+	private List<ProListUser> users;
 
 	public long getUserFound() {
 		return userFound;
@@ -19,11 +18,11 @@ public class UserListFromSearch {
 		this.userFound = userFound;
 	}
 
-	public List<SolrDocument> getUsers() {
+	public List<ProListUser> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<SolrDocument> users) {
+	public void setUsers(List<ProListUser> users) {
 		this.users = users;
 	}
 
