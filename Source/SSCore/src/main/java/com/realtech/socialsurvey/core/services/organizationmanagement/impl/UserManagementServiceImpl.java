@@ -1922,7 +1922,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		agentSettings.setProfileUrl(profileUrl);
 		organizationUnitSettingsDao
 				.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_NAME, profileName, agentSettings);
-		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileName, agentSettings);
+		organizationUnitSettingsDao.updateParticularKeyAgentSettings(MongoOrganizationUnitSettingDaoImpl.KEY_PROFILE_URL, profileUrl, agentSettings);
 		profileManagementService.updateAgentContactDetails(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
 				contactDetails);
 		LOG.debug("Updated newly activated user {} to mongo", user.getUserId());
