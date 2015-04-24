@@ -208,7 +208,7 @@
 		$(document).ready(function(){
 			var message = '<c:out value="${message}"/>';
 			console.log("Showing toast message : " + message);
-			showInfo(message);
+			showErrorMobileAndWeb(message);
 		});
 	</script>
 </c:if>  
