@@ -27,6 +27,164 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
+	<c:if test="${user.numOfLogins == 1 }">
+		<div class="overlay-login overlay-main">
+			<div id="welocome-step1" class="welcome-popup-wrapper">
+				<div class="welcome-popup-hdr-wrapper clearfix">
+					<div class="float-left wc-hdr-txt">Connect to Linkedin</div>
+					<div class="float-right wc-hdr-step">Step 1</div>
+				</div>
+				<div class="welcome-popup-body-wrapper clearfix">
+					<div class="wc-popup-body-hdr">Left's Import your profile data to get you setup quickly</div>
+					<div class="wc-popup-body-cont">
+						<div class="linkedin-img"></div>
+						<div class="wc-connect-txt">
+							There's no need to enter your profile manually if you have a
+							Linkedin account.<br />
+							We'll import your data to save you some time
+						</div>
+						<div class="wl-import-btn">Import From Linkedin</div>
+						<div class="wc-connect-txt">
+							Don't have account?<br />
+							You can also <span class="txt-highlight">manually enter your profile information</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="welocome-step2" class="welcome-popup-wrapper hide">
+				<div class="welcome-popup-hdr-wrapper clearfix">
+					<div class="float-left wc-hdr-txt">Tell us about You and Your Business</div>
+					<div class="float-right wc-hdr-step">Step 2</div>
+				</div>
+				<div class="welcome-popup-body-wrapper clearfix">
+					<div class="wc-popup-body-hdr linkedin-import-hdr">Data Imported From Linkedin</div>
+					<div class="wc-popup-body-cont">
+					</div>
+				</div>
+			</div>
+			<div id="welocome-step3" class="welcome-popup-wrapper hide">
+				<div class="welcome-popup-hdr-wrapper clearfix">
+					<div class="float-left wc-hdr-txt">Connect to Your Social Accounts</div>
+					<div class="float-right wc-hdr-step">Step 3</div>
+				</div>
+				<div class="welcome-popup-body-wrapper clearfix">
+					<div class="wc-popup-body-hdr">Connect so we can share your happy customer views</div>
+					<div class="wc-popup-body-cont">
+						<div class="wc-social-icn-row clearfix">
+							<div class="wc-social-icn i-fb float-left"></div>
+							<div class="wc-icn-txt float-left">www.facebook.com/scott-harris</div>
+						</div>
+						<div class="wc-social-icn-row clearfix">
+							<div class="wc-social-icn i-twt float-left"></div>
+							<div class="wc-icn-txt float-left">www.twitter.com/scott-harris</div>
+						</div>
+						<div class="wc-social-icn-row clearfix">
+							<div class="wc-social-icn i-ln float-left"></div>
+							<div class="wc-icn-txt float-left">www.linkedin.com/scott-harris</div>
+						</div>
+						<div class="wc-social-icn-row clearfix">
+							<div class="wc-social-icn i-gplus float-left"></div>
+							<div class="wc-icn-txt float-left">www.googleplus.com/scott-harris</div>
+						</div>
+						<div class="wc-social-icn-row clearfix">
+							<div class="wc-social-icn i-rss float-left"></div>
+							<div class="wc-icn-txt float-left">blogs.scott-harris.com</div>
+						</div>
+						<div class="wc-social-icn-row clearfix">
+							<div class="wc-social-icn i-yelp float-left"></div>
+							<div class="wc-icn-txt float-left">www.Yelp.com/scott-harris</div>
+						</div>
+					</div>
+				</div>
+				<div class="wc-btn-row clearfix">
+					<div class="wc-btn-col float-left">
+						<div class="wc-skip-btn float-right">Skip</div>
+					</div>
+					<div class="wc-btn-col float-left">
+						<div class="wc-sub-btn float-left">Done</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>
+	
+	<c:if test="${user.numOfLogins == 2 }">
+		<div class="overlay-login overlay-main">
+			<div class="welcome-popup-wrapper">
+				<div class="welcome-popup-hdr-wrapper clearfix">
+					<div class="float-left wc-hdr-txt">Send Survey Request</div>
+				</div>
+				<div class="welcome-popup-body-wrapper clearfix">
+					<div class="wc-popup-body-hdr">Connect so we can share your happy customer reviews</div>
+					<div class="wc-popup-body-cont">
+						<div class="wc-review-table">
+							<div class="wc-review-tr wc-review-hdr">
+								<div class="wc-review-th1">First Name</div>
+								<div class="wc-review-th2">Last Name</div>
+								<div class="wc-review-th3">Email Address</div>
+								<div class="wc-review-th4"></div>
+							</div>
+							
+							<div class="wc-review-tr">
+								<div class="wc-review-tc1">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc2">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc3">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc4">
+									<div class="wc-review-rmv-icn"></div>
+								</div>
+							</div>
+							
+							<div class="wc-review-tr">
+								<div class="wc-review-tc1">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc2">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc3">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc4">
+									<div class="wc-review-rmv-icn"></div>
+								</div>
+							</div>
+							
+							<div class="wc-review-tr">
+								<div class="wc-review-tc1">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc2">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc3">
+									<input class="wc-review-input">
+								</div>
+								<div class="wc-review-tc4">
+									<div class="wc-review-rmv-icn"></div>
+								</div>
+							</div>
+							
+						</div>
+					</div>
+				</div>
+				<div class="wc-btn-row clearfix">
+					<div class="wc-btn-col float-left">
+						<div class="wc-skip-btn float-right">Skip this step</div>
+					</div>
+					<div class="wc-btn-col float-left">
+						<div class="wc-sub-btn float-left">Send</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</c:if>
+	
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
 		<div class="survey-request-popup"></div>
 	</div>
