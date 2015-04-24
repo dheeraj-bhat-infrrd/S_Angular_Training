@@ -72,6 +72,7 @@ public interface CommonConstants {
 	/**
 	 * Status constants
 	 */
+	public static final int ONE = 1; 
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_SURVEY_TEMPLATE = 2;
