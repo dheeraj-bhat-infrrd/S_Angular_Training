@@ -169,7 +169,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Override
 	@Transactional(rollbackFor = { NonFatalException.class, FatalException.class })
-	public void inviteCorporateToRegister(String firstName, String lastName, String emailId) throws InvalidInputException, UndeliveredEmailException,
+	public void inviteCorporateToRegister(String firstName, String lastName, String emailId, boolean isReinvitation) throws InvalidInputException, UndeliveredEmailException,
 			NonFatalException {
 		LOG.info("Inviting corporate to register. Details\t first name:" + firstName + "\t lastName: " + lastName + "\t email id: " + emailId);
 
@@ -181,7 +181,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.debug("Generating URL");
 		String url = urlGenerator.generateUrl(urlParams, applicationBaseUrl + CommonConstants.REQUEST_MAPPING_SHOW_REGISTRATION);
 		LOG.debug("Sending invitation for registration");
-		inviteUser(url, emailId, firstName, lastName);
+		inviteUser(url, emailId, firstName, lastName, isReinvitation);
 
 		LOG.info("Successfully sent invitation to :" + emailId + " for registration");
 	}
@@ -1146,15 +1146,16 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * @throws UndeliveredEmailException
 	 * @throws NonFatalException
 	 */
-	private void inviteUser(String url, String emailId, String firstName, String lastName) throws UserAlreadyExistsException, InvalidInputException,
+	private void inviteUser(String url, String emailId, String firstName, String lastName, boolean isReinvitation) throws UserAlreadyExistsException, InvalidInputException,
 			UndeliveredEmailException {
 		LOG.debug("Method inviteUser called with url : " + url + " emailId : " + emailId + " firstname : " + firstName + " lastName : " + lastName);
 
 		String queryParam = extractUrlQueryParam(url);
-		if (userWithEmailIdExists(emailId)) {
-			throw new UserAlreadyExistsException("user with specified email id already exists");
+		if (!isReinvitation) {
+			if (userWithEmailIdExists(emailId)) {
+				throw new UserAlreadyExistsException("user with specified email id already exists");
+			}
 		}
-
 		LOG.debug("Calling method to store the registration invite");
 		storeCompanyAdminInvitation(queryParam, emailId);
 

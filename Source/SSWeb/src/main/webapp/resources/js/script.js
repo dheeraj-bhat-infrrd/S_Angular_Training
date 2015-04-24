@@ -628,6 +628,19 @@ function redirectTo404ErrorPage(){
 	location.href =  window.location.origin + "/error";
 }
 
+function sendVerificationMail(emailUrl){
+	var payload = {
+			"emailUrl" : emailUrl
+	};
+	callAjaxGetWithPayloadData("./sendverificationmail", verificationCallback, payload, true);
+}
+
+function verificationCallback(){
+	$('#overlay-toast').html('Verification mail sent to the registered Email Id');
+	showOverlay();
+}
+
+
 // Header buttons
 $(document).on('click', '.hdr-log-btn', function() {
 	window.location = "/login.do";
