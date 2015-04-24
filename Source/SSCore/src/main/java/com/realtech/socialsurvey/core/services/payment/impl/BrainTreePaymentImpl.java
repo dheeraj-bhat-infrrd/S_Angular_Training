@@ -1549,7 +1549,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("subscription parameter is null or empty!");
 			throw new InvalidInputException("subscription parameter is null or empty!");
 		}	
-		LOG.info("enableDisabledProcessingSubscription called to enable subscription id : " + subscription.getId());
+		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt called to enable subscription id : " + subscription.getId());
 		
 		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN, subscription.getId());
 		
@@ -1588,9 +1588,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 			
 			emailServices.sendAccountReactivationMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+			LOG.info("Company activated!");
 		}
 		
-		LOG.info("Company activated!");
+		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt execution complete!");
+		
 	}
 
 }
