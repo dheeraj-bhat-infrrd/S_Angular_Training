@@ -4,9 +4,6 @@ package com.realtech.socialsurvey.web.common;
  * Holds the jsp name as constants
  */
 public interface JspResolver {
-	public static final String REGIONS_AUTOCOMPLETE = "regionsautocomplete";
-	public static final String USER_ID_ON_INVITE = "useridoninvite";
-
 	// Registration
 	public static final String REGISTRATION = "registration";
 	public static final String COMPANY_INFORMATION = "companyinformation";
@@ -14,6 +11,7 @@ public interface JspResolver {
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
 	public static final String INVITATION = "invitation";
+	public static final String USER_ID_ON_INVITE = "useridoninvite";
 
 	// Generic pages
 	public static final String INDEX = "index";
@@ -48,15 +46,10 @@ public interface JspResolver {
 	public static final String HIERARCHY_REGION_EDIT = "hierarchy-region-edit";
 	public static final String HIERARCHY_OFFICE_EDIT = "hierarchy-office-edit";
 	public static final String HIERARCHY_INDIVIDUAL_EDIT = "hierarchy-individual-edit";
-	
 	public static final String VIEW_HIERARCHY = "hierarchy-view";
 	public static final String VIEW_HIERARCHY_REGION_LIST = "hierarchy-view-regions-list";
 	public static final String VIEW_HIERARCHY_BRANCH_LIST = "hierarchy-view-branches-list";
 	public static final String VIEW_HIERARCHY_USERS_LIST = "hierarchy-view-users-list";
-
-	public static final String EXISTING_BRANCHES = "existingbranches";
-	public static final String EXISTING_ENTERPRISE_REGIONS = "existingenterpriseregions";
-	public static final String EXISTING_ENTERPRISE_BRANCHES = "existingenterprisebranches";
 
 	// Survey Management
 	public static final String SURVEY_BUILDER = "buildSurvey";
