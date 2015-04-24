@@ -20,7 +20,7 @@ function adjustImage(){
     if(windW < 768){
         var imgW = $('#prof-image').width();
         $('#prof-image').height(imgW * 0.7);
-        var h2 = $('.prog-img-container').height() - 11;
+        // var h2 = $('.prog-img-container').height() - 11;
         var rowW = $('.lp-con-row').width() - 55 - 10;
         $('.lp-con-row-item').width(rowW+'px');
         $('.footer-main-wrapper').hide();
@@ -220,8 +220,8 @@ function paintProfilePage(result) {
             $("#prof-reviews-header").html(reviewsHeaderHtml);
             
             var contactInfoHtml = "";
-            var mailIds = contactDetails.mail_ids;
-            /*if(mailIds != undefined) {
+            /*var mailIds = contactDetails.mail_ids;
+            if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
@@ -606,6 +606,9 @@ function paintReviews(result){
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.updatedOn);
 		var lastItemClass = "ppl-review-item";
+		if (i == resultSize - 1) {
+			lastItemClass = "ppl-review-item-last";
+        }
 		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
