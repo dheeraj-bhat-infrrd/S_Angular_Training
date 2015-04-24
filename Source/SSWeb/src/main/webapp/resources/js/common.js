@@ -371,3 +371,8 @@ function shareOnGooglePlus(agentId, location){
 		}
 	});
 }
+
+//Function to open forgot password page
+function openForgotPasswordPage(){
+	window.location.href = "./forgotpassword.do";
+}
