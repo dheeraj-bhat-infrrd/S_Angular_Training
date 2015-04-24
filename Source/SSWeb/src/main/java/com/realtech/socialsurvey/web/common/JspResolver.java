@@ -72,4 +72,5 @@ public interface JspResolver {
 	public static final String VIEW_HIERARCHY_USERS_LIST = "hierarchy-view-users-list";
 	public static final String SHOW_SURVEY_QUESTIONS = "surveyQuestion";
 	public static final String SURVEY_REQUEST = "surveyRequest";
+	public static final String ACCOUNT_DISABLED_PAGE = "accountdisabled";
 }

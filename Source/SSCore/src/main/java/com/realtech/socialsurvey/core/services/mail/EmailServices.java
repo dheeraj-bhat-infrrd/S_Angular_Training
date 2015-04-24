@@ -99,9 +99,9 @@ public interface EmailServices {
 	 * @param retries
 	 * @throws InvalidInputException
 	 */
-	public void queueRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException;
+	public void queueRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException;
 	
-	public void sendRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException,
+	public void sendRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException,
 			UndeliveredEmailException;
 
 	/**
@@ -190,5 +190,22 @@ public interface EmailServices {
 	 * @throws UndeliveredEmailException
 	 */
 	public void sendSurveyInvitationMail(String recipientMailId, String subject, String mailBody, String emailId, String name) throws InvalidInputException, UndeliveredEmailException;
-
+	
+	/**
+	 * Sends account blocking mail when retries fail
+	 * @param recipientMailId
+	 * @param displayName
+	 * @throws UndeliveredEmailException 
+	 * @throws InvalidInputException 
+	 */
+	public void sendAccountBlockingMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
+	
+	/**
+	 * Send mail to customer when his account is reactivated
+	 * @param recipientMailId
+	 * @param displayName
+	 * @throws InvalidInputException 
+	 * @throws UndeliveredEmailException 
+	 */
+	public void sendAccountReactivationMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException;
 }

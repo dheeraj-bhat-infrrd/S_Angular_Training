@@ -352,6 +352,9 @@ public interface CommonConstants {
 	public static final String IMAGE_URL = "imageUrl";
 	public static final String CLIENT_TOKEN = "clienttoken";
 	public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
+	public static final int STATUS_PAYMENT_FAILED = 2;
+	public static final String DISABLED_ACCOUNT_FLAG = "disabled";
+	public static final int PAYMENT_RETRIES = 2;
 
 	// Survey Constants
 	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
