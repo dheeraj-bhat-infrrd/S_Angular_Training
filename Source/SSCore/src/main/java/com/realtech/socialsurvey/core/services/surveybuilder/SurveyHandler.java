@@ -59,7 +59,7 @@ public interface SurveyHandler {
 
 	public void updateReminderCount(List<Long> agents, List<String> customers);
 
-	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId);
+	public List<SurveyDetails> getIncompleteSocialPostSurveys(long companyId);
 
 	public String getMoodsToSendMail();
 

@@ -1451,12 +1451,11 @@ button.paypal.is-active {
 	font-size: 14px;
 	height: 35px;
 	line-height: 35px;
-	width: 110px;
+	padding: 0 10px;
 	text-align: center;
 	cursor: pointer;
 	border-radius: 3px;
 	color: #fff;
-	margin-left: 15px;
 }
 .prof-btn-contact {
 	background-color: #3E9DCB;
@@ -1464,6 +1463,8 @@ button.paypal.is-active {
 	height: 35px;
 	line-height: 35px;
 	padding:0 10px;
+    margin-right: 15px;
+    margin-bottom: 5px;
 	text-align: center;
 	cursor: pointer;
 	border-radius: 3px;
@@ -1476,7 +1477,7 @@ button.paypal.is-active {
 }
 
 .prof-wrapper {
-	height: 200px;
+	/*height: 200px;*/
 }
 
 .prof-wrapper.prof-map-wrapper{
@@ -1494,9 +1495,7 @@ button.paypal.is-active {
 
 .prof-btn-wrapper {
 	width: 100%;
-	position: absolute;
-	bottom: 0;
-	height: 40px;
+	margin: 5px 0;
 }
 
 .prof-rating-mobile-wrapper {
@@ -1644,6 +1643,10 @@ button.paypal.is-active {
 
 .icn-yelp {
 	background: url(../images/yelp.png) no-repeat center;
+}
+
+.icn-gplus {
+	background: url(../images/gplus.png) no-repeat center;
 }
 
 .icn-tweet {
@@ -2482,7 +2485,10 @@ button.paypal.is-active {
 .sq-top-img {
 	height: 70px;
 	margin-bottom: 20px;
-	background: url(../images/chat.png) no-repeat center;
+	background: url(../images/place-holder-individual.png) no-repeat center;
+	width: 70px;
+    margin: 0 auto;
+    border-radius: 50%;
 }
 
 .sq-bord-bot-sm {
@@ -3068,6 +3074,11 @@ button.paypal.is-active {
 	margin-top: 10px;
 }
 
+.ppl-review-item-last {
+	padding-bottom: 10px;
+	margin-top: 10px;
+}
+
 .survery-header-2 {
 	float: none;
 	text-align: center;
@@ -3187,11 +3198,11 @@ button.paypal.is-active {
 
 .prog-img-container {
 	position: relative;
-	width: 200px !important;
+	width: 200px;
 	max-width: 100%;
 }
 .prof-img-wrapper {
-	width: 200px !important;
+	width: 200px;
 }
 
 .prof-name-container {
@@ -3765,7 +3776,10 @@ button.paypal.is-active {
 
 .dash-panel-left {
 	padding-top: 30px;
-	border-right: 1px solid #dcdcdc;
+}
+
+.dash-panel-right {
+	border-left: 1px solid #dcdcdc;
 }
 
 .dash-lp-rt-img {
@@ -4119,6 +4133,7 @@ button.paypal.is-active {
 
 .left-panel-content-adj {
 	clear: both;
+	line-height: 32px;
 }
 
 .lp-align-adj {
@@ -4445,6 +4460,7 @@ button.paypal.is-active {
 
 .bd-hr-form-wrapper {
 	width: 670px;
+	max-width:100%;
 	margin: 30px auto;
 }
 
@@ -5277,11 +5293,12 @@ tr.u-tbl-header td {
 	font-size: 16px;
 	margin-right: 10px;
 	width: 884px;
-	line-height: 28px;
+	line-height: normal;
 	padding-top: 14px;
 	padding-bottom: 13px;
-	height: 50px;
+	min-height: 50px;
 	padding-left: 40px;
+	background-position: left 13px !important;
 }
 
 .srv-tbl-chk {
@@ -5785,8 +5802,11 @@ tr.u-tbl-header td {
 
 .cs-gq-lbl {
 	font-size: 14px;
-	line-height: 40px;
+	min-height: 40px;
+	line-height: 20px;
+	padding: 10px 0;
 	width: 350px;
+	max-width: 100%;
 }
 
 .txtareaRow {
@@ -5795,6 +5815,7 @@ tr.u-tbl-header td {
 
 .textarea-bd-mcq-txt {
 	width: 500px;
+	max-width:100%;
 	padding: 10px;
 	height: 100px;
 }
@@ -6061,10 +6082,11 @@ tr.u-tbl-header td {
 
 .mob-contact-btn {
     width: 50%;
+    padding: 10px;
 }
 
 .mob-prof-contact-btn {
-    padding: 0 10px;
+    width: 100%;
     background-color: #3E9DCB;
     font-size: 14px;  
     height: 35px; 
@@ -6072,8 +6094,7 @@ tr.u-tbl-header td {
     text-align: center;   
     cursor: pointer;   
     border-radius: 3px;   
-    color: #fff;   
-    margin: 10px;
+    color: #fff;
 }
 
 .mob-contact-btn-wrapper{
@@ -6130,4 +6151,29 @@ tr.u-tbl-header td {
 	background: #fff;
 	border: 1px solid #c4c4c4;
 	border-radius: 3px;
+}
+
+.edit-prof-pic-name-wrapper{
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.user-display-name {
+    text-transform: capitalize;
+    font-family: 'opensanssemibold';
+}
+
+.ctnt-review-score {
+    line-height: 30px;
+    white-space: pre;
+}
+
+.ctnt-review-count {
+    line-height: 30px;
+    margin-left: 5px;
+    color: #3E9DCB;
+}
+
+.pro-addr-cont {
+    font-family: 'opensanslight';
+    font-size: 12px;
 }

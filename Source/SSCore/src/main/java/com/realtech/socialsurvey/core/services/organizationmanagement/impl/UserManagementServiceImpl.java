@@ -7,7 +7,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.annotation.Resource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -17,10 +19,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
+import com.realtech.socialsurvey.core.dao.SurveyDetailsDao;
 import com.realtech.socialsurvey.core.dao.UserDao;
 import com.realtech.socialsurvey.core.dao.UserInviteDao;
 import com.realtech.socialsurvey.core.dao.UserProfileDao;
@@ -34,6 +39,7 @@ import com.realtech.socialsurvey.core.entities.ContactDetailsSettings;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
 import com.realtech.socialsurvey.core.entities.MailIdSettings;
 import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
+import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.ProfilesMaster;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
@@ -130,6 +136,12 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
+
+	@Autowired
+	private ProfileCompletionList profileCompletionList;
+	
+	@Autowired
+	private SurveyDetailsDao surveyDetailsDao;
 
 	/**
 	 * Method to get profile master based on profileId, gets the profile master from Map which is
@@ -464,6 +476,28 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		LOG.info("Method getUserByEmailAndCompany() finished from UserManagementService");
 		return users.get(CommonConstants.INITIAL_INDEX);
 	}
+	
+	// Method to return user with provided email
+	@Transactional
+	@Override
+	public User getUserByEmail(String emailId) throws InvalidInputException, NoRecordsFetchedException {
+		LOG.info("Method getUserByEmail() called from UserManagementService");
+
+		if (emailId == null || emailId.isEmpty()) {
+			throw new InvalidInputException("Email id is null or empty in getUserByEmailAndCompany()");
+		}
+
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.LOGIN_NAME, emailId);
+
+		List<User> users = userDao.findByKeyValue(User.class, queries);
+		if (users == null || users.isEmpty()) {
+			throw new NoRecordsFetchedException("No users found with the login name : {}", emailId);
+		}
+
+		LOG.info("Method getUserByEmail() finished from UserManagementService");
+		return users.get(CommonConstants.INITIAL_INDEX);
+	}
 
 	@Transactional
 	@Override
@@ -497,9 +531,13 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		int maxUsersAllowed = licenseDetails.get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getMaxUsersAllowed();
-		long currentNumberOfUsers = userDao.getUsersCountForCompany(user.getCompany());
-
-		isUserAdditionAllowed = (currentNumberOfUsers < maxUsersAllowed) ? true : false;
+		if (maxUsersAllowed != CommonConstants.NO_LIMIT) {
+			long currentNumberOfUsers = userDao.getUsersCountForCompany(user.getCompany());
+			isUserAdditionAllowed = (currentNumberOfUsers < maxUsersAllowed) ? true : false;
+		}else{
+			LOG.debug("No limit for number of user");
+			isUserAdditionAllowed = true;
+		}
 
 		LOG.info("Method to check whether users can be added or not finished.");
 		return isUserAdditionAllowed;
@@ -606,6 +644,40 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		LOG.info("Method to find user on the basis of user id finished for user id " + userId);
 		return user;
+	}
+	
+	/**
+	 * Method to get multiple users object for the given list of user ids, fetches users along with profile name and
+	 * profile url
+	 */
+	@Transactional
+	@Override
+	public List<ProListUser> getMultipleUsersByUserId(List<Long> userIds) throws InvalidInputException {
+		LOG.info("Method to find multiple users on the basis of list of user id started for user ids " + userIds);
+		List<ProListUser> users = new ArrayList<ProListUser>();
+		List<AgentSettings> agentSettingsList = organizationUnitSettingsDao.fetchMultipleAgentSettingsById(userIds);
+		if (agentSettingsList == null) {
+			throw new InvalidInputException("No settings found for user :" + userIds + " in getUserByUserId");
+		}
+		
+		for (AgentSettings agentSettings : agentSettingsList) {
+			ProListUser user = new ProListUser();
+			user.setUserId(agentSettings.getIden());
+			user.setDisplayName(agentSettings.getContact_details().getName());
+			user.setProfileName(agentSettings.getProfileName());
+			user.setProfileUrl(agentSettings.getProfileUrl());
+			user.setProfileImageUrl(agentSettings.getProfileImageUrl());
+			user.setEmailId(agentSettings.getContact_details().getMail_ids().getWork());
+			user.setTitle(agentSettings.getContact_details().getTitle());
+			user.setLocation(agentSettings.getContact_details().getLocation());
+			user.setIndustry(agentSettings.getContact_details().getIndustry());
+			user.setAboutMe(agentSettings.getContact_details().getAbout_me());
+			user.setReviewCount(agentSettings.getReviewCount());
+			user.setReviewScore(surveyDetailsDao.getRatingForPastNdays(CommonConstants.AGENT_ID,agentSettings.getIden(),CommonConstants.NO_LIMIT,true));
+			users.add(user);
+		}
+		LOG.info("Method to find multiple users on the basis of list of user id finished for user ids " + userIds);
+		return users;
 	}
 
 	/*
@@ -776,7 +848,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		userDao.update(user);
 
 		/**
-		 *  Updating status of user into solr
+		 * Updating status of user into solr
 		 */
 		solrSearchService.addUserToSolr(user);
 		LOG.info("Successfully completed method to update user status");
@@ -1216,6 +1288,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setStatus(status);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 		user.setLastLogin(currentTimestamp);
+		user.setNumOfLogins(CommonConstants.ONE);
 		user.setCreatedOn(currentTimestamp);
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(createdBy);
@@ -1414,6 +1487,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			throw new InvalidInputException("Invalid agent id for fetching user settings");
 		}
 		AgentSettings agentSettings = organizationUnitSettingsDao.fetchAgentSettingsById(agentId);
+		if (agentSettings != null && agentSettings.getProfileStages() != null) {
+			agentSettings.setProfileStages(profileCompletionList.getProfileCompletionList(agentSettings.getProfileStages()));
+		}
 		return agentSettings;
 	}
 
@@ -1718,6 +1794,9 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		agentSettings.setSeoContentModified(true);
 		agentSettings.setReviewCount(0);
 
+		// Set default profile stages.
+		agentSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
+
 		organizationUnitSettingsDao.insertAgentSettings(agentSettings);
 		LOG.info("Inserted into agent settings");
 	}
@@ -1868,9 +1947,10 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 		return user;
 	}
-	
+
 	@Override
-	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException {
+	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap)
+			throws NonFatalException {
 		LOG.debug("Method getUserProfile() called from UserManagementService");
 
 		// Fetch Regions and Branches from Solr
@@ -1892,23 +1972,24 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		RegionFromSearch region = null;
 		BranchFromSearch branch = null;
 		Map<Long, AbridgedUserProfile> abridgedUserProfileMap = new HashMap<Long, AbridgedUserProfile>();
-		
+
 		AbridgedUserProfile profileAbridged = null;
 		for (UserProfile profile : user.getUserProfiles()) {
 			if (profile.getStatus() == CommonConstants.STATUS_ACTIVE) {
 				profileAbridged = new AbridgedUserProfile();
-				
+
 				profileMap.put(profile.getUserProfileId(), profile);
 
 				// updating display name for drop down
 				int profileMasterId = profile.getProfilesMaster().getProfileId();
 				switch (profileMasterId) {
 					case CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID:
-						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user.getCompany()
-								.getCompanyId(), CommonConstants.COMPANY_ID_COLUMN, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+						profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), user.getCompany().getCompany(), user
+								.getCompany().getCompanyId(), CommonConstants.COMPANY_ID_COLUMN,
+								CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
 						abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
 						break;
-					
+
 					case CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID:
 						regionId = profile.getRegionId();
 						if (regionId != 0l) {
@@ -1937,8 +2018,8 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 
 					case CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID:
 						if (!agentAdded) {
-							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW, user.getUserId(),
-									CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
+							profileAbridged = getAbridgedUserProfile(profileAbridged, profile.getUserProfileId(), CommonConstants.PROFILE_AGENT_VIEW,
+									user.getUserId(), CommonConstants.AGENT_ID_COLUMN, CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID);
 							abridgedUserProfileMap.put(profile.getUserProfileId(), profileAbridged);
 							agentAdded = true;
 						}
@@ -1953,22 +2034,22 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 			case COMPANY:
 			case ENTERPRISE:
 				return abridgedUserProfileMap;
-			
+
 			default:
 		}
-		
+
 		LOG.debug("Method getUserProfile() finished from UserManagementService");
 		return new HashMap<Long, AbridgedUserProfile>();
 	}
 
-	private AbridgedUserProfile getAbridgedUserProfile(AbridgedUserProfile profileAbridged, long userProfileId, String userProfileName, long profileId,
-			String profileType, int profileMasterId) {
+	private AbridgedUserProfile getAbridgedUserProfile(AbridgedUserProfile profileAbridged, long userProfileId, String userProfileName,
+			long profileId, String profileType, int profileMasterId) {
 		profileAbridged.setUserProfileId(userProfileId);
 		profileAbridged.setUserProfileName(userProfileName);
 		profileAbridged.setProfileName(profileType);
 		profileAbridged.setProfileValue(profileId);
 		profileAbridged.setProfilesMasterId(profileMasterId);
-		
+
 		return profileAbridged;
 	}
 
@@ -1996,7 +2077,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 					selectedProfile = profileMap.get(profileId);
 				}
 				break;
-			
+
 			default:
 				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 				for (UserProfile profile : user.getUserProfiles()) {
@@ -2006,7 +2087,17 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 					}
 				}
 		}
-		
+
 		return selectedProfile;
+	}
+
+	@Transactional
+	@Override
+	public void updateUserLoginTimeAndNum(User user) throws NonFatalException {
+		LOG.info("Updating users login time and number of logins for user: "+user.toString());
+		user.setLastLogin(new Timestamp(System.currentTimeMillis()));
+		user.setNumOfLogins(user.getNumOfLogins()+1);
+		userDao.update(user);
+		LOG.info("Updated user login time and number of login");
 	}
 }

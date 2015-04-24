@@ -1,12 +1,11 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement;
 
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import org.apache.solr.common.SolrDocumentList;
-
 import com.realtech.socialsurvey.core.entities.Achievement;
 import com.realtech.socialsurvey.core.entities.AgentSettings;
 import com.realtech.socialsurvey.core.entities.Association;
@@ -260,11 +259,13 @@ public interface ProfileManagementService {
 	 * @param startIndex
 	 * @param numOfRows
 	 * @param profileLevel
+	 * @param startDate
+	 * @param endDate
 	 * @return
 	 * @throws InvalidInputException
 	 */
 	public List<SurveyDetails> getReviews(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
-			boolean fetchAbusive) throws InvalidInputException;
+			boolean fetchAbusive, Date startDate, Date endDate) throws InvalidInputException;
 
 	/**
 	 * Method to get average ratings based on the profile level specified, iden is one of
@@ -332,8 +333,8 @@ public interface ProfileManagementService {
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel)
-			throws InvalidInputException;
+	public List<SurveyDetails> getIncompleteSurvey(long iden, double startScore, double limitScore, int startIndex, int numOfRows, String profileLevel,
+			Date startDate, Date endDate) throws InvalidInputException;
 	
 	/**
 	 * Method that mails the contact us message to the respective individual,branch,region,company
@@ -385,6 +386,5 @@ public interface ProfileManagementService {
 	 * @throws InvalidInputException
 	 */
 	public void updateAgentCompanyPositions(AgentSettings agentSettings, List<CompanyPositions> companyPositions) throws InvalidInputException;
-
 
 }

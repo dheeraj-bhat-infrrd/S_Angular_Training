@@ -146,10 +146,10 @@ public class OrganizationManagementController {
 		String companyName = request.getParameter("company");
 		String address1 = request.getParameter("address1");
 		String address2 = request.getParameter("address2");
-		String zipCode = request.getParameter("zipcode");
-		String companyContactNo = request.getParameter("contactno");
 		String country = request.getParameter("country");
 		String countryCode = request.getParameter("countrycode");
+		String zipCode = request.getParameter("zipcode");
+		String companyContactNo = request.getParameter("contactno");
 		String vertical = request.getParameter("vertical");
 
 		try {
@@ -161,15 +161,22 @@ public class OrganizationManagementController {
 				try {
 					verticalsMasters = organizationManagementService.getAllVerticalsMaster();
 					model.addAttribute("verticals", verticalsMasters);
+					
+					model.addAttribute("companyName", companyName);
+					model.addAttribute("address1", address1);
+					model.addAttribute("address2", address2);
+					model.addAttribute("country", country);
+					model.addAttribute("countryCode", countryCode);
+					model.addAttribute("zipCode", zipCode);
+					model.addAttribute("companyContactNo", companyContactNo);
 				}
 				catch (InvalidInputException e1) {
-					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()",
-							DisplayMessageConstants.GENERAL_ERROR, e1);
+					throw new InvalidInputException("Invalid Input exception occured in method getAllVerticalsMaster()", DisplayMessageConstants.GENERAL_ERROR, e1);
 				}
+				
 				throw new InvalidInputException("Invalid input exception occured while validating form parameters", e.getErrorCode(), e);
 			}
-			String address = getCompleteAddress(address1, address2);
-
+			
 			HttpSession session = request.getSession(false);
 			User user = sessionHelper.getCurrentUser();
 			String logoName = null;
@@ -180,7 +187,7 @@ public class OrganizationManagementController {
 
 			Map<String, String> companyDetails = new HashMap<String, String>();
 			companyDetails.put(CommonConstants.COMPANY_NAME, companyName);
-			companyDetails.put(CommonConstants.ADDRESS, address);
+			companyDetails.put(CommonConstants.ADDRESS, getCompleteAddress(address1, address2));
 			companyDetails.put(CommonConstants.ADDRESS1, address1);
 			if (address2 != null) {
 				companyDetails.put(CommonConstants.ADDRESS2, address2);
@@ -198,19 +205,17 @@ public class OrganizationManagementController {
 			user = organizationManagementService.addCompanyInformation(user, companyDetails);
 
 			LOG.debug("Updating profile completion stage");
-			userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID,
-					CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
-
-			LOG.debug("Successfully executed service to add company details");
+			userManagementService.updateProfileCompletionStage(user, CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID, CommonConstants.ADD_ACCOUNT_TYPE_STAGE);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while adding company information. Reason :" + e.getMessage(), e);
+			model.addAttribute("status", DisplayMessageType.ERROR_MESSAGE);
 			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
 			return JspResolver.COMPANY_INFORMATION;
 		}
+		
 		LOG.info("Method addCompanyInformation of UserManagementController completed successfully");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
-
 	}
 
 	/**

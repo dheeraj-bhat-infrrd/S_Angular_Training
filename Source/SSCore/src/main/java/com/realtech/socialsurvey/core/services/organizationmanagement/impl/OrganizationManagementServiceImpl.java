@@ -1,6 +1,9 @@
 package com.realtech.socialsurvey.core.services.organizationmanagement.impl;
 
 // JIRA: SS-27: By RM05: BOC
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.sql.Timestamp;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.ProfileCompletionList;
 import com.realtech.socialsurvey.core.commons.Utils;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -114,6 +118,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 
 	@Value("${SAD_TEXT}")
 	private String sadText;
+	
+	@Autowired
+	private ProfileCompletionList profileCompletionList;
 
 	/**
 	 * This method adds a new company and updates the same for current user and all its user
@@ -367,10 +374,33 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		surveySettings.setNeutralText(neutralText);
 		surveySettings.setSadText(sadText);
 		surveySettings.setAutoPostEnabled(true);
+		surveySettings.setShow_survey_above_score(CommonConstants.DEFAULT_AUTOPOST_SCORE);
+		
 		companySettings.setSurvey_settings(surveySettings);
+		
 
 		// set seo content flag
 		companySettings.setSeoContentModified(true);
+		// set default profile stages.
+		companySettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());	
+		// Setting default values for mail content in Mail content settings of company settings.
+		String takeSurveyMail = "";
+		String takeSurveyReminderMail = "";
+		try {
+			takeSurveyMail = readMailContentFromFile(CommonConstants.SURVEY_REQUEST_MAIL_FILENAME);
+			takeSurveyReminderMail = readMailContentFromFile(CommonConstants.SURVEY_REMINDER_MAIL_FILENAME);
+		}
+		catch (IOException e) {
+			LOG.error("IOException occured in addOrganizationalDetails while copying default Email content. Nested exception is ",e);
+		}
+		MailContent mailContent = new MailContent();
+		MailContentSettings mailContentSettings = new MailContentSettings();
+		mailContent.setMail_body(takeSurveyMail);
+		mailContentSettings.setTake_survey_mail(mailContent);
+		mailContent.setMail_body(takeSurveyReminderMail);
+		mailContentSettings.setTake_survey_reminder_mail(mailContent);
+		companySettings.setMail_content(mailContentSettings);;
+				
 		LOG.debug("Inserting company settings.");
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(companySettings, MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
@@ -484,6 +514,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
 
+		
+		//Filter profile stages.
+		if (companySettings != null && companySettings.getProfileStages() != null) {
+			companySettings.setProfileStages(profileCompletionList.getProfileCompletionList(companySettings.getProfileStages()));
+		}
+				
 		// Decrypting the encompass password
 		if (companySettings != null && companySettings.getCrm_info() != null
 				&& companySettings.getCrm_info().getCrm_source().equalsIgnoreCase(CommonConstants.CRM_SOURCE_ENCOMPASS)) {
@@ -504,6 +540,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		
 		OrganizationUnitSettings companySettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(companyId,
 				MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION);
+		
+		//Filter profile stages.
+		if (companySettings != null && companySettings.getProfileStages() != null) {
+			companySettings.setProfileStages(profileCompletionList.getProfileCompletionList(companySettings.getProfileStages()));
+		}
 
 		return companySettings;
 	}
@@ -582,6 +623,12 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Get the region settings for region id: " + regionId);
 		regionSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(regionId,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
+		
+		//Filter profile stages.
+		if (regionSettings != null && regionSettings.getProfileStages() != null) {
+			regionSettings.setProfileStages(profileCompletionList.getProfileCompletionList(regionSettings.getProfileStages()));
+		}
+				
 		return regionSettings;
 	}
 
@@ -601,6 +648,11 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		organizationUnitSettings = organizationUnitSettingsDao.fetchOrganizationUnitSettingsById(branchId,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
 
+		//Filter profile stages.
+		if (organizationUnitSettings != null && organizationUnitSettings.getProfileStages() != null) {
+			organizationUnitSettings.setProfileStages(profileCompletionList.getProfileCompletionList(organizationUnitSettings.getProfileStages()));
+		}
+		
 		branchSettings = new BranchSettings();
 		branchSettings.setOrganizationUnitSettings(organizationUnitSettings);
 
@@ -2438,6 +2490,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromRegion(region);
 		organizationSettings.setContact_details(contactSettings);
 		organizationSettings.setLockSettings(new LockSettings());
+		
+		// set default profile stages.
+		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION);
@@ -2473,6 +2528,9 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		ContactDetailsSettings contactSettings = getContactDetailsSettingsFromBranch(branch);
 		organizationSettings.setContact_details(contactSettings);
 		organizationSettings.setLockSettings(new LockSettings());
+		
+		// set default profile stages.
+		organizationSettings.setProfileStages(profileCompletionList.getDefaultProfileCompletionList());
 
 		organizationUnitSettingsDao.insertOrganizationUnitSettings(organizationSettings,
 				MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION);
@@ -2913,5 +2971,27 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		LOG.info("Method to update branch completed successfully");
 		return branch;
 	}
+	
+	/*
+	 * Method to read default survey mail content from EmailTemplate which will be store into the Company Settings.
+	 */
+	private String readMailContentFromFile(String fileName) throws IOException {
+		LOG.debug("readSurveyReminderMailContentFromFile() started");
+		BufferedReader reader = new BufferedReader(new InputStreamReader(this.getClass().getClassLoader().getResourceAsStream(fileName)));
+		StringBuilder content = new StringBuilder();
+		String line = reader.readLine();
+		try{
+			while(line!=null){
+			content.append(line);
+			line = reader.readLine();
+		}
+		}finally{
+			reader.close();
+		}
+		LOG.debug("readSurveyReminderMailContentFromFile() finished");
+		return content.toString();
+	}
+
+	
 }
 // JIRA: SS-27: By RM05: EOC

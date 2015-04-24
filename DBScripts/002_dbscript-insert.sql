@@ -5,7 +5,7 @@ INSERT INTO `ss_user`.`PROFILES_MASTER` VALUES (10,'NP',1, NOW(),'ADMIN', NOW(),
 INSERT into ss_user.ACCOUNTS_MASTER values(1,"Individual",1,365,35.99,1,NOW(),"1",NOW(),"1");
 INSERT into ss_user.ACCOUNTS_MASTER values(2,"Team",30,365,45.99,1,NOW(),"1",NOW(),"1");
 INSERT into ss_user.ACCOUNTS_MASTER values(3,"Company",60,365,65.99,1,NOW(),"1",NOW(),"1");
-INSERT into ss_user.ACCOUNTS_MASTER values(4,"Enterprise",100,365,99.99,1,NOW(),"1",NOW(),"1");
+INSERT into ss_user.ACCOUNTS_MASTER values(4,"Enterprise",-1,365,99.99,1,NOW(),"1",NOW(),"1");
 INSERT into ss_user.ACCOUNTS_MASTER values(5,"Free Account",1,365,0.0,1,NOW(),"1",NOW(),"1");
 
 -- Insert verticals_master table data Feb-2-2015
