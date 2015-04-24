@@ -84,36 +84,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 	private String twitterRedirectUri;
 
 	// Linkedin
-	@Value("${LINKED_IN_API_KEY}")
-	private String linkedInApiKey;
-	@Value("${LINKED_IN_API_SECRET}")
-	private String linkedInApiSecret;
 	@Value("${LINKED_IN_REST_API_URI}")
 	private String linkedInRestApiUri;
-
+	
+	// Yelp
 	@Value("${YELP_REDIRECT_URI}")
 	private String yelpRedirectUri;
-
-	/**
-	 * Returns the LinkedIn request token for a particular URL
-	 * 
-	 * @return
-	 */
-
-	/*public LinkedInRequestToken getLinkedInRequestToken() {
-		LinkedInOAuthService oauthService = getLinkedInInstance();
-		LinkedInRequestToken requestToken = oauthService.getOAuthRequestToken();
-		requestToken = oauthService.getOAuthRequestToken();
-		return requestToken;
-	}
-
-	public LinkedInOAuthService getLinkedInInstance() {
-		return LinkedInOAuthServiceFactory.getInstance().createLinkedInOAuthService(linkedInApiKey, linkedInApiSecret);
-	} // LinkedIn data update public LinkedInApiClientFactory
-
-	public LinkedInApiClientFactory getLinkedInApiClientFactory() {
-		return LinkedInApiClientFactory.newInstance(linkedInApiKey, linkedInApiSecret);
-	}*/
 
 	/**
 	 * Returns the Twitter request token for a particular URL

@@ -88,7 +88,7 @@ public class RegistrationController {
 			// continue with the invitation
 			try {
 				LOG.debug("Calling service for sending the registration invitation");
-				userManagementService.inviteCorporateToRegister(firstName, lastName, emailId);
+				userManagementService.inviteCorporateToRegister(firstName, lastName, emailId, false);
 				LOG.debug("Service for sending the registration invitation excecuted successfully");
 			}
 			catch (InvalidInputException e) {

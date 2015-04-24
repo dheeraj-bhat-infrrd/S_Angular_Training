@@ -160,7 +160,7 @@ public interface UserManagementService {
 	 * 
 	 * @throws NonFatalException
 	 */
-	public void inviteCorporateToRegister(String firstName, String lastName, String emailId) throws InvalidInputException, UndeliveredEmailException,
+	public void inviteCorporateToRegister(String firstName, String lastName, String emailId, boolean isReinvitation) throws InvalidInputException, UndeliveredEmailException,
 			NonFatalException;
 
 	public Map<String, String> validateRegistrationUrl(String encryptedUrlParameter) throws InvalidInputException;
@@ -275,5 +275,12 @@ public interface UserManagementService {
 	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException;
 
 	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap, String profileIdStr);
+	
+	/**
+	 * Updates the users last login time and num of login
+	 * @param user
+	 * @throws NonFatalException
+	 */
+	public void updateUserLoginTimeAndNum(User user) throws NonFatalException;
 }
 // JIRA SS-34 BY RM02 BOC

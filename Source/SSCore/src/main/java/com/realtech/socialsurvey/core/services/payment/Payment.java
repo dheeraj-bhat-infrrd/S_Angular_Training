@@ -7,6 +7,8 @@ import com.braintreegateway.BraintreeGateway;
 import com.braintreegateway.Subscription;
 import com.braintreegateway.Transaction;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.RetriedTransaction;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
@@ -82,13 +84,13 @@ public interface Payment {
 	public String makePayment(String paymentMethodToken, BigDecimal amount) throws InvalidInputException;
 	
 	/**
-	 * Updates the number of retries in the LicenseDetail table and sends a mail to the User.
+	 * On getting a SUBSCRIPTION WENT PAST DUE webhook it updates license details table and sends a mail
 	 * @param subscription
 	 * @return boolean value
 	 * @throws UndeliveredEmailException 
 	 * @throws NoRecordsFetchedException 
 	 */
-	public void updateRetriesForPayment(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
+	public void changeLicenseToPastDue(Subscription subscription) throws InvalidInputException, UndeliveredEmailException, NoRecordsFetchedException;
 	
 	/**
 	 * Retries payment for a particular subscription id and returns the Transaction object.
@@ -192,4 +194,30 @@ public interface Payment {
 	 * @throws InvalidInputException
 	 */
 	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId,int toAccountsMasterId) throws InvalidInputException;
+	
+	/**
+	 * On getting a SUBSCRIPTION CHARGED UNSUCCESSFULLY webhook increments the number of retries and blocks account if necessary
+	 * @throws InvalidInputException 
+	 * @throws PaymentRetryUnsuccessfulException 
+	 * @throws NoRecordsFetchedException 
+	 */
+	public void incrementRetriesAndSendMail(Subscription subscription) throws InvalidInputException, NoRecordsFetchedException;
+	
+	/**
+	 * Checks for an existing transaction in retried transaction table
+	 * @param subscriptionId
+	 * @return
+	 * @throws InvalidInputException 
+	 */
+	public RetriedTransaction checkForExistingTransaction(LicenseDetail licenseDetail) throws InvalidInputException;
+	
+	/**
+	 * On recieveing SUBSCRIPTION CHARGED SUCCESSFULLY webhook it checks if license is past due and updates it
+	 * @param licenseDetail
+	 * @throws InvalidInputException 
+	 * @throws NoRecordsFetchedException 
+	 * @throws UndeliveredEmailException 
+	 */
+	public void checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(Subscription subscription) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+		
 }

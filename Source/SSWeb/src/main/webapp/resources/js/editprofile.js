@@ -1438,7 +1438,7 @@ function callBackOnUpdateMailIds(data) {
 }
 
 function bindClickForIndividuals(elementClass) {
-	$("." + bindingClass).unbind('click');
+	$("." + elementClass).unbind('click');
 	$("." + elementClass).click(function(e) {
 		e.stopPropagation();
 	});
