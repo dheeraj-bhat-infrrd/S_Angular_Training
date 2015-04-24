@@ -228,19 +228,24 @@ function paintProfilePage(result) {
             }*/
             
             var webAddresses = contactDetails.web_addresses;
-            if(webAddresses != undefined) {
-            	if(webAddresses.work != undefined) {
+            if (webAddresses != undefined) {
+            	if (webAddresses.work != undefined) {
+            		// making a proper url
+            		var validWebAddress = returnValidWebAddress(webAddresses.work);
+            		
             		$('#web-addr-header').show();
-            		$('#web-address-txt').html('<a href="' + webAddresses.work + '" target="_blank">' + webAddresses.work + '</a>');
+            		$('#web-address-txt').html('<a href="' + validWebAddress + '" target="_blank">' + webAddresses.work + '</a>');
             		
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'" target="_blank">Our Website</a></div></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-web"></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validWebAddress + '" target="_blank">Our Website</a></div></div>';		            
             	}
-            	if(webAddresses.blogs != undefined) {
+            	if (webAddresses.blogs != undefined) {
+            		var validBlogAddress = returnValidWebAddress(webAddresses.blogs);
+            		
                     contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-blog"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.blogs+'" target="_blank">Our Blogs</a></div></div>';	            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-blog"></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validBlogAddress + '" target="_blank">Our Blogs</a></div></div>';	            
             	}
             }
             
@@ -302,14 +307,18 @@ function paintProfilePage(result) {
             		if(link == undefined || link == ""){
             			return false;
             		}
-            		
             		window.open(link,'_blank');
-            		
             	});
             }
-            
 		}         
 	}
+}
+
+function returnValidWebAddress(webAddress) {
+	if (webAddress && !webAddress.match(/^http([s]?):\/\/.*/)) {
+		webAddress = 'http://' + webAddress;
+	}
+	return webAddress;
 }
 
 function focusOnContact() {
