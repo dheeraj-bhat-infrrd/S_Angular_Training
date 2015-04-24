@@ -165,7 +165,7 @@ public class HierarchyManagementController {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/fetchallbranches", method = RequestMethod.GET)
+	/*@RequestMapping(value = "/fetchallbranches", method = RequestMethod.GET)
 	public String fetchAllBranches(Model model, HttpServletRequest request) {
 
 		LOG.info("Fetching all the branches for current user");
@@ -181,10 +181,10 @@ public class HierarchyManagementController {
 				LOG.debug("Successfully executed service to get the list of branches in company : " + branches);
 
 				model.addAttribute("branches", branches);
-				/**
+				*//**
 				 * UI for enterprise branches and regions is different hence deciding which jsp to
 				 * return
-				 */
+				 *//*
 				if (accountType == AccountType.ENTERPRISE) {
 					jspToReturn = JspResolver.EXISTING_ENTERPRISE_BRANCHES;
 				}
@@ -206,13 +206,13 @@ public class HierarchyManagementController {
 		return jspToReturn;
 	}
 
-	/**
+	*//**
 	 * Fetch the list of regions for the company
 	 * 
 	 * @param model
 	 * @param request
 	 * @return
-	 */
+	 *//*
 	@RequestMapping(value = "/fetchallregions", method = RequestMethod.GET)
 	public String fetchAllRegions(Model model, HttpServletRequest request) {
 
@@ -242,13 +242,13 @@ public class HierarchyManagementController {
 		return JspResolver.EXISTING_ENTERPRISE_REGIONS;
 	}
 
-	/**
+	*//**
 	 * Method to fetch all regions for selector
 	 * 
 	 * @param model
 	 * @param request
 	 * @return
-	 */
+	 *//*
 	@RequestMapping(value = "/fetchregionsselector", method = RequestMethod.GET)
 	public String fetchRegionsSelector(Model model, HttpServletRequest request) {
 		LOG.info("Method fetchRegionsSelector called in HierarchyManagementController ");
@@ -276,7 +276,7 @@ public class HierarchyManagementController {
 		}
 		LOG.info("Successfully fetched the list of regions");
 		return JspResolver.REGIONS_AUTOCOMPLETE;
-	}
+	}*/
 
 	/**
 	 * Deactivates a region status

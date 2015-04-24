@@ -1,5 +1,10 @@
 package com.realtech.socialsurvey.core.starter;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,9 +34,11 @@ public class DummySurveyGenerator {
 	private SurveyHandler surveyHandler;
 
 	public static final Logger LOG = LoggerFactory.getLogger(DummySurveyGenerator.class);
-	private static int totalSize = 10;
+	private static int totalSize = 100;
 	private static int happyUpperLimit = 3;
 	private static int neutralUpperLimit = 6;
+	
+	private static String fileName = "/Users/nishit/work/Social_Survey/emailids.txt";
 
 	public static void main(String[] args) {
 		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
@@ -44,7 +51,8 @@ public class DummySurveyGenerator {
 		String custEmailDomain = "@mailinator.com";
 		int count = 0;
 		// Get agents
-		List<User> agents = surveyGenerationService.getAgents(args);
+		List<String> emailIds = readEmailIdsFromFile(fileName);
+		List<User> agents = surveyGenerationService.getAgents(emailIds);
 
 		for (User user : agents) {
 			for (count = 1; count <= totalSize; count++) {
@@ -85,5 +93,48 @@ public class DummySurveyGenerator {
 				}
 			}
 		}
+	}
+	
+	public static List<String> readEmailIdsFromFile(String fileName){
+		BufferedReader bfrReader = null;
+		FileReader reader = null;
+		List<String> emailIds = new ArrayList<>();
+		try {
+			reader = new FileReader(fileName);
+			bfrReader = new BufferedReader(reader);
+			String line = null;
+			while ((line = bfrReader.readLine()) != null) {
+				emailIds.add(line.trim());
+			}
+		}
+		catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			if (bfrReader != null) {
+				try {
+					bfrReader.close();
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			if (reader != null) {
+				try {
+					reader.close();
+				}
+				catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		return emailIds;
 	}
 }

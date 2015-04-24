@@ -77,5 +77,11 @@ public interface CsvUploadService {
 	 */
 	public List<String> createAndReturnErrors(Map<String, List<Object>> uploadObjects, User adminUser) throws InvalidInputException,
 			NoRecordsFetchedException, SolrException, UserAssignmentException;
+	
+	/**
+	 * Post process code
+	 * @param adminUser
+	 */
+	public void postProcess(User adminUser);
 
 }
