@@ -183,7 +183,7 @@ public class TopicConsumer implements Runnable {
 		String retries = message.substring(messageParsedIndex+RETRIES_MARKER.length());
 		LOG.debug("Retries: "+retries);
 		LOG.debug("Sending retry charge mail");
-		emailServices.sendRetryChargeEmail(recipient, name, retries);
+		emailServices.sendRetryChargeEmail(recipient, name);
 	}
 	
 	private void parseMailWithRecipientAndName(String message, EmailHeader header) throws NonFatalException{

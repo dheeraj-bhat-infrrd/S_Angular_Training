@@ -33,6 +33,7 @@ public interface JspResolver {
 
 	// Dashboard
 	public static final String USER_LOGIN = "userlogin";
+	public static final String ACCOUNT_DISABLED_PAGE = "accountdisabled";
 	public static final String LANDING = "landing";
 	public static final String DASHBOARD = "dashboard";
 	public static final String DASHBOARD_PROFILEDETAIL = "dashboard_profiledetail";
