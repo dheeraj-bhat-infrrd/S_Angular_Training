@@ -10,6 +10,7 @@ var batchSizeInc;
 var totalReviewsInc;
 var surveyFetchedSoFarInc;
 var accountType;
+var graphData;
 
 // colName and colValue contains profile level of logged in user and value for
 // colName is present in colValue.
@@ -64,7 +65,7 @@ function paintDashboard(profileMasterId, newProfileName, newProfileValue, typeoO
 	$(window).resize(function() {
 		newConW = $('.container').width();
 		if (newConW != oldConW) {
-			showSurveyStatisticsGraphically(colName, colValue);
+			paintSurveyGraph();
 			oldConW = $('.container').width();
 		}
 	});
@@ -365,7 +366,6 @@ $(document).on('scroll', '#dsh-inc-srvey', function() {
 	console.log($('.ps-scrollbar-y').css('top'));
 });
 
-// TODO
 function showSurveyStatisticsGraphically(columnName, columnValue) {
 	var element = document.getElementById("dsh-grph-format");
 	var format = element.options[element.selectedIndex].value;
@@ -390,7 +390,8 @@ function showSurveyGraph(columnName, columnValue, format) {
 		},
 		complete : function(data) {
 			if (success) {
-				paintSurveyGraph(data.responseJSON);
+				graphData = data.responseJSON;
+				paintSurveyGraph();
 			}
 		},
 		error : function(e) {
@@ -401,7 +402,10 @@ function showSurveyGraph(columnName, columnValue, format) {
 	});
 }
 
-function paintSurveyGraph(graphData) {
+function paintSurveyGraph() {
+	
+	if(graphData == undefined)
+		return;
 	var allTimeslots = [];
 	var timeslots = [];
 	var clickedSurveys = [];
@@ -454,6 +458,9 @@ function paintSurveyGraph(graphData) {
 		timeslots = [];
 	}
 	var element = document.getElementById("dsh-grph-format");
+	if(element == null){
+		return;l
+	}
 	var format = element.options[element.selectedIndex].value;
 	var type = '';
 	if (format == 'weekly') {
@@ -543,15 +550,21 @@ function searchBranchRegionOrAgent(searchKeyword, flow) {
 	};
 	
 	callAjaxGetWithPayloadData("./findregionbranchorindividual.do", function(data) {
-		if (flow == 'icons')
+		if (flow == 'icons'){
+			$('#dsh-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-srch-res').html(data);
-		else if (flow == 'graph')
+		}
+		else if (flow == 'graph'){
+			$('#dsh-grph-srch-res').addClass('dsh-sb-dd');
 			$('#dsh-grph-srch-res').html(data);
-
+		}
 		$('.dsh-res-display').click(function() {
-			if (flow == 'icons')
+			if (flow == 'icons'){
+				$('#dsh-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-sel-item').val($(this).html());
+			}
 			else if (flow == 'graph') {
+				$('#dsh-grph-srch-res').removeClass('dsh-sb-dd');
 				$('#dsh-grph-sel-item').val($(this).html());
 			}
 			

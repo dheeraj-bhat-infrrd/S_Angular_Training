@@ -241,6 +241,8 @@ public class LoginController {
 
 					if (redirectTo.equals(JspResolver.LANDING)) {
 						setSession(session);
+						// update the last login time and number of logins
+						userManagementService.updateUserLoginTimeAndNum(user);
 					}
 				}
 				else {

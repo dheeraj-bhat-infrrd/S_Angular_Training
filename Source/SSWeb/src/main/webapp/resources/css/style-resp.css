@@ -2,7 +2,8 @@
 @media (max-width: 767px) {
     body{
         font-size: 12px;
-        -webkit-user-select: none;                  
+        -webkit-user-select: none;   
+        overflow-x:hidden;                
     }
     .container{
     	width: 100% !important;
@@ -415,6 +416,7 @@
     }
     .prof-wrapper{
         height: auto;
+        min-height: 175px;
     }
     .prof-name-wrapper{
         padding-top: 10px;
@@ -477,7 +479,7 @@
     }
     .lp-con-icn{
         height: 55px;
-        width: 42px;
+        width: 40px;
     }
     .mobile-tabs{
         display: block !important;
@@ -753,10 +755,10 @@
         min-width: 40px;
     }
     .prof-img-wrapper{
-        width: 50% !important;
+        width: 50%;
     }
     .prof-name-wrapper{
-        width: 100% !important;
+        width: 100%;
         border-left: 1px solid #dcdcdc;
         border-bottom: none;
     }
@@ -1284,6 +1286,36 @@
     }
     .prog-img-container{
         height: 120px;
+        width: auto;
+    }
+    .edit-prof-name-wrapper{
+        width: 50% !important;
+        border-left: none;
+    }
+    .td-region-edit .edit-region-form{
+    	width: 100%;
+    }
+    td.v-tbl-line{
+    	width: 12%;
+    }
+    td.v-tbl-name{
+    	width: 36%;
+    }
+    td.v-tbl-add{
+    	display: none;
+    }
+    td.v-tbl-role{
+    	width: 32%;
+    }
+    td.v-tbl-btns{
+    	width: 18%;
+    }
+    td.v-tbl-spacer{
+    	width: 2%;
+    }
+    .v-tbl-icn,.v-tbl-icn-disabled{
+    	max-width: 28px;
+    	float: right;
     }
 }
 
@@ -1562,6 +1594,18 @@
     .lp-row{
     	padding-left: 0;	
     }
+    .bd-hr-container{
+    	padding: 0 5px;
+    }
+    .bd-hr-left-panel{
+    	padding: 0 5px 20px 5px;
+    }
+    .bd-hr-item {
+		padding-left: 5px;
+	}
+	.bd-hr-img{
+		margin-right: 7px;
+	}
 }
 
 /* ============== MEDIUM SIZED SCREENS ==============*/
@@ -1800,16 +1844,19 @@
     .header-slider-wrapper{
         display: none;
     }
-    .prof-contact-info{
+    .prof-contact-info,#contact-info{
         display: none !important;
     }
     
-    #recent-post-container,#reviews-container,#contact-info,
+    #recent-post-container,#reviews-container,
     #prof-company-intro,#prof-agent-container,#ppl-post-cont,
     #contact-wrapper,#intro-about-me{
         display: block !important;
     }
     .mob-contact-btn-wrapper{
         display: none;
+    }
+    .prof-name-wrapper{
+        width: 33.33333333% !important;
     }
 }

@@ -19,8 +19,8 @@ public class HierarchyTestFileGenerator {
 	private static int REGIONS_START_NUM = 1;
 	private static int NUM_OF_BRANCHES_PER_ORGANIZATION_UNIT = 10;
 	private static int BRANCHES_START_NUM = 1;
-	private static int NUM_OF_USERS_PER_ORGANIZATION_UNIT = 50;
-	private static int USERS_START_NUM = 1;
+	private static int NUM_OF_USERS_PER_ORGANIZATION_UNIT = 500;
+	private static int USERS_START_NUM = 18153;
 	private static int NUM_OF_ADMIN_PER_ORGANIZATION_UNIT = 1;
 	private List<String> regionNames = new ArrayList<String>();
 	private List<String> branchNames = new ArrayList<String>();

@@ -98,6 +98,7 @@
 					<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
 					<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
 					<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+                    <div class="float-left social-item-icon icn-glpus" data-link=""></div>
 					<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 				</div>
 			</c:if> --%>
@@ -107,8 +108,9 @@
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
-	<div class="container">
-		<div class="row prof-pic-name-wrapper">
+	<div class="">
+        <div class="container">
+		<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
 				<div id="prof-img-container" class="prog-img-container prof-img-lock-wrapper">
 					<c:choose>
@@ -147,7 +149,7 @@
 					</div>
 				</div>
 			</div>
-			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper">
+			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper pos-relative prof-name-wrapper edit-prof-name-wrapper">
 				<div id="prof-basic-container" class="prof-name-container">
 					<div id="prof-name-container" class="float-left lp-edit-wrapper clearfix float-left">
 						<c:choose>
@@ -242,7 +244,7 @@
 				</div>
 			</div>
 		</div>
-		
+		</div>
 		<div class="prof-details-header">
 			<div class="container">
 				<div class="prof-details-header-row clearfix">
@@ -271,6 +273,8 @@
 								data-link="${linkedInToken.linkedInPageLink}"></div>
 							<div class="float-left social-item-icon icn-yelp"
 								data-link="${yelpToken.yelpPageLink}"></div>
+                            <div class="float-left social-item-icon icn-gplus"
+								data-link=""></div>
 							<input id="social-token-text" type="text"
 								class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>

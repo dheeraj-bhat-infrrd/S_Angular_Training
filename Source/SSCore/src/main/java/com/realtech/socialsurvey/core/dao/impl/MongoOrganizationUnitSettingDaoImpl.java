@@ -2,6 +2,7 @@ package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Repository;
+
 import com.mongodb.BasicDBObject;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.OrganizationUnitSettingsDao;
@@ -100,6 +102,19 @@ public class MongoOrganizationUnitSettingDaoImpl implements OrganizationUnitSett
 				AGENT_SETTINGS_COLLECTION);
 		setCompleteUrlForSettings(settings, CommonConstants.AGENT_SETTINGS_COLLECTION);
 		return settings;
+	}
+	
+	@Override
+	public List<AgentSettings> fetchMultipleAgentSettingsById(List<Long> identifiers) {
+		LOG.info("Fetch multiple agent settings from list of Ids: " + identifiers);
+		Query query = new Query();
+		query.addCriteria(Criteria.where(KEY_IDENTIFIER).in(identifiers));
+		query.fields().exclude(KEY_LINKEDIN_PROFILEDATA);
+		List<AgentSettings> settingsList = mongoTemplate.find(query, AgentSettings.class,AGENT_SETTINGS_COLLECTION);
+		for (AgentSettings settings : settingsList) {
+			setCompleteUrlForSettings(settings, CommonConstants.AGENT_SETTINGS_COLLECTION);
+		}
+		return settingsList;
 	}
 
 	@Override

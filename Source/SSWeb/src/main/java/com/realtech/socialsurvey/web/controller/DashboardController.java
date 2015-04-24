@@ -5,7 +5,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -359,7 +362,7 @@ public class DashboardController {
 		LOG.info("Method to get reviews of company, region, branch, agent getReviews() started.");
 		User user = sessionHelper.getCurrentUser();
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
-
+		
 		try {
 			String startIndexStr = request.getParameter("startIndex");
 			String batchSizeStr = request.getParameter("batchSize");
@@ -394,7 +397,7 @@ public class DashboardController {
 			}
 
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1, -1, startIndex, batchSize, profileLevel, true);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, startIndex, batchSize, profileLevel, true, null, null);
 			}
 			catch (InvalidInputException e) {
 				LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
@@ -608,7 +611,7 @@ public class DashboardController {
 		}
 
 		try {
-			surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, startIndex, batchSize, profileLevel);
+			surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, startIndex, batchSize, profileLevel, null, null);
 		}
 		catch (InvalidInputException e) {
 			LOG.error("InvalidInputException caught in getReviews() while fetching reviews. Nested exception is ", e);
@@ -766,6 +769,26 @@ public class DashboardController {
 		List<SurveyDetails> surveyDetails = new ArrayList<>();
 		try {
 			String columnName = request.getParameter("columnName");
+			String startDateStr = request.getParameter("startDate");
+			String endDateStr = request.getParameter("endDate");
+			Date startDate = null;
+			Date endDate = Calendar.getInstance().getTime();
+			if (startDateStr != null) {
+				try {
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
+			if (endDateStr != null) {
+				try {
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
 			if (columnName == null || columnName.isEmpty()) {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
@@ -793,7 +816,7 @@ public class DashboardController {
 				}
 			}
 			try {
-				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true);
+				surveyDetails = profileManagementService.getReviews(iden, -1, -1, -1, -1, profileLevel, true, startDate, endDate);
 				String fileLocation = "Completed_Survey_" + profileLevel + "_" + iden + EXCEL_FILE_EXTENSION;
 				XSSFWorkbook workbook = dashboardService.downloadCompleteSurveyData(surveyDetails, fileLocation);
 				response.setContentType(EXCEL_FORMAT);
@@ -846,6 +869,29 @@ public class DashboardController {
 				LOG.error("Invalid value (null/empty) passed for profile level.");
 				throw new InvalidInputException("Invalid value (null/empty) passed for profile level.");
 			}
+			
+			String startDateStr = request.getParameter("startDate");
+			String endDateStr = request.getParameter("endDate");
+			
+			Date startDate = null;
+			Date endDate = Calendar.getInstance().getTime();
+			if (startDateStr != null) {
+				try {
+					startDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(startDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
+			if (endDateStr != null) {
+				try {
+					endDate = new SimpleDateFormat(CommonConstants.DATE_FORMAT).parse(endDateStr);
+				}
+				catch (ParseException e) {
+					LOG.error("ParseException caught in getCompleteSurveyFile() while parsing startDate. Nested exception is ", e);
+				}
+			}
+			
 			String profileLevel = getProfileLevel(columnName);
 			long iden = 0;
 
@@ -869,7 +915,7 @@ public class DashboardController {
 				}
 			}
 			try {
-				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel);
+				surveyDetails = profileManagementService.getIncompleteSurvey(iden, 0, 0, -1, -1, profileLevel, startDate, endDate);
 				String fileName = "Incomplete_Survey_" + profileLevel + "_" + iden + ".xlsx";
 				XSSFWorkbook workbook = dashboardService.downloadIncompleteSurveyData(surveyDetails, fileName);
 				response.setContentType(EXCEL_FORMAT);
@@ -890,7 +936,7 @@ public class DashboardController {
 						responseStream.close();
 					}
 					catch (IOException e) {
-						e.printStackTrace();
+						LOG.error("IOException caught in getIncompleteSurveyFile(). Nested exception is ",e);
 					}
 				}
 				response.flushBuffer();

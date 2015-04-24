@@ -307,7 +307,7 @@ public class SurveyHandlerImpl implements SurveyHandler, InitializingBean {
 	 * Method to get surveys 
 	 */
 	@Override
-	public List<SurveyDetails> getIncompleteSocialPostCustomersEmail(long companyId) {
+	public List<SurveyDetails> getIncompleteSocialPostSurveys(long companyId) {
 		LOG.info("started.");
 		int surveyReminderInterval = 0;
 		int maxReminders = 0;
