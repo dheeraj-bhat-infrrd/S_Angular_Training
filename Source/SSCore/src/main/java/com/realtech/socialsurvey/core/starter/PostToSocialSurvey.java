@@ -17,7 +17,7 @@ public class PostToSocialSurvey {
 
 	public static final Logger LOG = LoggerFactory.getLogger(PostToSocialSurvey.class);
 	
-	private static String fileName = null;
+	private static String fileName = "/Users/nishit/work/Social_Survey/emailids.txt";
 
 	public static void main(String[] args) {
 		LOG.info("Starting up the PostToSocialSurvey");

@@ -34,11 +34,11 @@ public class DummySurveyGenerator {
 	private SurveyHandler surveyHandler;
 
 	public static final Logger LOG = LoggerFactory.getLogger(DummySurveyGenerator.class);
-	private static int totalSize = 10;
+	private static int totalSize = 100;
 	private static int happyUpperLimit = 3;
 	private static int neutralUpperLimit = 6;
 	
-	private static String fileName = null;
+	private static String fileName = "/Users/nishit/work/Social_Survey/emailids.txt";
 
 	public static void main(String[] args) {
 		@SuppressWarnings("resource") ApplicationContext context = new ClassPathXmlApplicationContext("ss-starter-config.xml");
