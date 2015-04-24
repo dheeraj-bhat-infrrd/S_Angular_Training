@@ -1288,6 +1288,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		user.setStatus(status);
 		Timestamp currentTimestamp = new Timestamp(System.currentTimeMillis());
 		user.setLastLogin(currentTimestamp);
+		user.setNumOfLogins(CommonConstants.ONE);
 		user.setCreatedOn(currentTimestamp);
 		user.setModifiedOn(currentTimestamp);
 		user.setCreatedBy(createdBy);
@@ -2088,5 +2089,15 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 		}
 
 		return selectedProfile;
+	}
+
+	@Transactional
+	@Override
+	public void updateUserLoginTimeAndNum(User user) throws NonFatalException {
+		LOG.info("Updating users login time and number of logins for user: "+user.toString());
+		user.setLastLogin(new Timestamp(System.currentTimeMillis()));
+		user.setNumOfLogins(user.getNumOfLogins()+1);
+		userDao.update(user);
+		LOG.info("Updated user login time and number of login");
 	}
 }

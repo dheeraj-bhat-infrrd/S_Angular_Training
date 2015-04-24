@@ -227,6 +227,8 @@ public class LoginController {
 						sessionHelper.getCanonicalSettings(session);
 						// Set the session variables
 						sessionHelper.setSettingVariablesInSession(session);
+						// update the last login time and number of logins
+						userManagementService.updateUserLoginTimeAndNum(user);
 					}
 				}
 				else {
