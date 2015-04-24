@@ -578,9 +578,17 @@ public class SocialManagementController {
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setAgentSettings(agentSettings);
 
-				// starting async service for data update from linkedin
-				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-						mediaTokens.getLinkedInToken());
+				String socialFlow = (String) session.getAttribute(CommonConstants.SOCIAL_FLOW);
+				if (socialFlow != null && socialFlow.equalsIgnoreCase(CommonConstants.FLOW_REGISTRATION)) {
+					// starting service for data update from linkedin
+					agentSettings = (AgentSettings) socialAsyncService.linkedInDataUpdate(
+							MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, mediaTokens.getLinkedInToken());
+				}
+				else {
+					// starting async service for data update from linkedin
+					socialAsyncService.linkedInDataUpdateAsync(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+							mediaTokens.getLinkedInToken());
+				}
 			}
 			else {
 				throw new InvalidInputException("Invalid input exception occurred while creating access token for linkedin", DisplayMessageConstants.GENERAL_ERROR);

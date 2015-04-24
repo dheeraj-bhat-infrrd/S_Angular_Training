@@ -215,6 +215,7 @@ public interface CommonConstants {
 	public static final String REGION_ID = "regionId";
 	public static final String BRANCH_ID = "branchId";
 	public static final String AGENT_ID = "agentId";
+	public static final String FLOW_REGISTRATION = "registration";
 
 	/**
 	 * Batch Constants

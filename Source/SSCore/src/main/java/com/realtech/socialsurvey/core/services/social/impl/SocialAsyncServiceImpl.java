@@ -36,7 +36,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 
 	@Autowired
 	private ProfileManagementService profileManagementService;
-	
+
 	@Autowired
 	private SolrSearchService solrSearchService;
 
@@ -45,7 +45,17 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 
 	@Async
 	@Override
-	public Future<OrganizationUnitSettings> linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken) {
+	public Future<OrganizationUnitSettings> linkedInDataUpdateAsync(String collection, OrganizationUnitSettings unitSettings,
+			LinkedInToken linkedInToken) {
+		LOG.info("Method linkedInDataUpdateAsync() called from SocialAsyncServiceImpl");
+		unitSettings = linkedInDataUpdate(collection, unitSettings, linkedInToken);
+		
+		LOG.info("Method linkedInDataUpdateAsync() finished from SocialAsyncServiceImpl");
+		return new AsyncResult<OrganizationUnitSettings>(unitSettings);
+	}
+
+	@Override
+	public OrganizationUnitSettings linkedInDataUpdate(String collection, OrganizationUnitSettings unitSettings, LinkedInToken linkedInToken) {
 		LOG.info("Method linkedInDataUpdate() called from SocialAsyncServiceImpl");
 
 		StringBuilder linkedInFetch = new StringBuilder(linkedInRestApiUri)
@@ -53,11 +63,13 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 		linkedInFetch.append("?oauth2_access_token=").append(linkedInToken.getLinkedInAccessToken());
 		linkedInFetch.append("&format=json");
 		LOG.debug("URL to be posted to linked in: " + linkedInFetch.toString());
+
 		LinkedInProfileData linkedInProfileData = null;
 		try {
 			HttpClient httpclient = HttpClientBuilder.create().build();
 			HttpGet httpget = new HttpGet(linkedInFetch.toString());
 			String responseBody = httpclient.execute(httpget, new BasicResponseHandler());
+
 			LOG.debug("Response from linkedin: " + responseBody);
 			linkedInProfileData = new Gson().fromJson(responseBody, LinkedInProfileData.class);
 		}
@@ -84,10 +96,9 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			if (linkedInProfileData.getSummary() != null && !linkedInProfileData.getSummary().isEmpty()) {
 				unitSettings.getContact_details().setAbout_me(linkedInProfileData.getSummary());
 				isContactDetailsUpdated = true;
-				// profileManagementService.updateContactDetails(collection, unitSettings,
-				// unitSettings.getContact_details());
 			}
 		}
+		
 		if (unitSettings.getContact_details().getName() == null || unitSettings.getContact_details().getName().isEmpty()) {
 			LOG.debug("Name is empty. Filling with linkedin data");
 			unitSettings.getContact_details().setFirstName(linkedInProfileData.getFirstName());
@@ -123,6 +134,7 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			}
 		}
 
+		// updating contact details to mongo
 		if (isContactDetailsUpdated) {
 			LOG.debug("Contact details were updated. Updating the same in database");
 			try {
@@ -133,9 +145,11 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 			}
 		}
 
+		// updating profile image url to mongo
 		if (unitSettings.getProfileImageUrl() == null || unitSettings.getProfileImageUrl().isEmpty()) {
 			try {
-				if(linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().getValues() != null && !linkedInProfileData.getPictureUrls().getValues().isEmpty()){
+				if (linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().getValues() != null
+						&& !linkedInProfileData.getPictureUrls().getValues().isEmpty()) {
 					unitSettings.setProfileImageUrl(linkedInProfileData.getPictureUrls().getValues().get(0));
 					profileManagementService.updateProfileImage(collection, unitSettings, unitSettings.getProfileImageUrl());
 				}
@@ -144,18 +158,22 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 				LOG.error(e.getMessage(), e);
 			}
 		}
-		
-		if(unitSettings instanceof AgentSettings){
-			AgentSettings agentSettings = (AgentSettings)unitSettings;
-			if(agentSettings.getExpertise() == null){
+
+		if (unitSettings instanceof AgentSettings) {
+			AgentSettings agentSettings = (AgentSettings) unitSettings;
+
+			if (agentSettings.getExpertise() == null) {
 				LOG.debug("Expertise is not present. Filling the data from linkedin");
-				if(linkedInProfileData.getSkills() != null && linkedInProfileData.getSkills().getValues() != null && !linkedInProfileData.getSkills().getValues().isEmpty()){
+				if (linkedInProfileData.getSkills() != null && linkedInProfileData.getSkills().getValues() != null
+						&& !linkedInProfileData.getSkills().getValues().isEmpty()) {
+
 					List<String> expertiseList = new ArrayList<String>();
-					for(SkillValues skillValue: linkedInProfileData.getSkills().getValues()){
+					for (SkillValues skillValue : linkedInProfileData.getSkills().getValues()) {
 						expertiseList.add(skillValue.getSkill().getName());
 					}
 					agentSettings.setExpertise(expertiseList);
-					if(agentSettings.getExpertise() != null && agentSettings.getExpertise().size() > 0){
+
+					if (agentSettings.getExpertise() != null && agentSettings.getExpertise().size() > 0) {
 						try {
 							profileManagementService.updateAgentExpertise(agentSettings, agentSettings.getExpertise());
 						}
@@ -165,28 +183,34 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 					}
 				}
 			}
-			
-			if(agentSettings.getPositions() == null || agentSettings.getPositions().isEmpty()){
+
+			if (agentSettings.getPositions() == null || agentSettings.getPositions().isEmpty()) {
 				LOG.debug("Positions is not present. Filling the data from linkedin");
-				if(linkedInProfileData.getPositions() != null && linkedInProfileData.getPositions().getValues() != null && !linkedInProfileData.getPositions().getValues().isEmpty()){
+
+				if (linkedInProfileData.getPositions() != null && linkedInProfileData.getPositions().getValues() != null
+						&& !linkedInProfileData.getPositions().getValues().isEmpty()) {
+
 					List<CompanyPositions> companyPositionsList = new ArrayList<CompanyPositions>();
 					CompanyPositions companyPositions = null;
-					for(PositionValues positionValue: linkedInProfileData.getPositions().getValues()){
+
+					for (PositionValues positionValue : linkedInProfileData.getPositions().getValues()) {
 						companyPositions = new CompanyPositions();
 						companyPositions.setName(positionValue.getCompany().getName());
 						companyPositions.setStartMonth(positionValue.getStartDate().getMonth());
 						companyPositions.setStartYear(positionValue.getStartDate().getYear());
-						companyPositions.setStartTime(positionValue.getStartDate().getMonth()+"-"+positionValue.getStartDate().getYear());
+						companyPositions.setStartTime(positionValue.getStartDate().getMonth() + "-" + positionValue.getStartDate().getYear());
 						companyPositions.setIsCurrent(positionValue.isCurrent());
 						companyPositions.setTitle(positionValue.getTitle());
-						if(!positionValue.isCurrent()){
-							companyPositions.setEndTime(positionValue.getEndDate().getMonth()+"-"+positionValue.getEndDate().getYear());
+
+						if (!positionValue.isCurrent()) {
+							companyPositions.setEndTime(positionValue.getEndDate().getMonth() + "-" + positionValue.getEndDate().getYear());
 							companyPositions.setEndMonth(positionValue.getEndDate().getMonth());
 							companyPositions.setEndYear(positionValue.getEndDate().getYear());
 						}
 						companyPositionsList.add(companyPositions);
 					}
-					if(companyPositionsList.size() > 0){
+
+					if (companyPositionsList.size() > 0) {
 						agentSettings.setPositions(companyPositionsList);
 						try {
 							profileManagementService.updateAgentCompanyPositions(agentSettings, companyPositionsList);
@@ -197,18 +221,20 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 					}
 				}
 			}
+
 			// finally update details in solr
 			try {
 				LOG.debug("Updating details in solr");
-				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details().getAbout_me());
+				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.ABOUT_ME_SOLR, agentSettings.getContact_details()
+						.getAbout_me());
 				solrSearchService.editUserInSolr(agentSettings.getIden(), CommonConstants.PROFILE_IMAGE_URL_SOLR, agentSettings.getProfileImageUrl());
 			}
 			catch (SolrException e) {
-				LOG.error("Could not update details in solr",e);
+				LOG.error("Could not update details in solr", e);
 			}
 		}
 
 		LOG.info("Method linkedInDataUpdate() finished from SocialAsyncServiceImpl");
-		return new AsyncResult<OrganizationUnitSettings>(unitSettings);
+		return unitSettings;
 	}
 }
