@@ -612,7 +612,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void queueRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException {
+	public void queueRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException {
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
 			LOG.error("Recipient email Id is empty or null for sending retry charge mail ");
 			throw new InvalidInputException("Recipient email Id is empty or null for sending retry charge mail ");
@@ -623,11 +623,6 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("displayName parameter is empty or null for sending retry charge mail ");
 		}
 
-		if (retries == null || retries.isEmpty()) {
-			LOG.error("retries is empty or null for sending retry charge mail ");
-			throw new InvalidInputException("retries parameter is empty or null for sending retry charge mail ");
-		}
-
 		LOG.info("Queueing retry charge email to : " + recipientMailId);
 
 		// format for the registration mail is RECIPIENT^^<comman separated
@@ -635,7 +630,6 @@ public class EmailServicesImpl implements EmailServices {
 		StringBuilder contentBuilder = new StringBuilder();
 		contentBuilder.append("RECIPIENT^^").append(recipientMailId);
 		contentBuilder.append("$$").append("NAME^^").append(displayName);
-		contentBuilder.append("$$").append("RETRIES^^").append(retries);
 		LOG.debug("queueing content: " + contentBuilder.toString());
 		queueProducer.queueEmail(EmailHeader.RETRY_CHARGE, contentBuilder.toString());
 		LOG.info("Queued the retry charged mail");
@@ -644,7 +638,7 @@ public class EmailServicesImpl implements EmailServices {
 
 	@Async
 	@Override
-	public void sendRetryChargeEmail(String recipientMailId, String displayName, String retries) throws InvalidInputException,
+	public void sendRetryChargeEmail(String recipientMailId, String displayName) throws InvalidInputException,
 			UndeliveredEmailException {
 
 		if (recipientMailId == null || recipientMailId.isEmpty()) {
@@ -657,11 +651,6 @@ public class EmailServicesImpl implements EmailServices {
 			throw new InvalidInputException("displayName parameter is empty or null for sending retry charge mail ");
 		}
 
-		if (retries == null || retries.isEmpty()) {
-			LOG.error("retries is empty or null for sending retry charge mail ");
-			throw new InvalidInputException("retries parameter is empty or null for sending retry charge mail ");
-		}
-
 		LOG.info("Sending retry charge email to : " + recipientMailId);
 
 		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
@@ -671,7 +660,7 @@ public class EmailServicesImpl implements EmailServices {
 		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
 		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.RETRY_CHARGE_MAIL_BODY);
 
-		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName, retries, String.valueOf(maxPaymentRetries)));
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
 
 		LOG.debug("Calling email sender to send mail");
 		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
@@ -1222,6 +1211,81 @@ public class EmailServicesImpl implements EmailServices {
 		emailSender.sendEmail(emailEntity, subject, mailBody);
 
 		LOG.info("Successfully sent survey completion mail");
+	}
+	
+	/**
+	 * Sends account blocking mail when retries fail
+	 * @param recipientMailId
+	 * @param displayName
+	 * @throws UndeliveredEmailException 
+	 * @throws InvalidInputException 
+	 */
+	@Async
+	@Override
+	public void sendAccountBlockingMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+
+		LOG.info("Sending account blocking email to : " + recipientMailId);
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_BLOCKING_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_BLOCKING_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent account blocking mail");		
+	}
+	
+	/**
+	 * Send mail to customer when his account is reactivated
+	 * @param recipientMailId
+	 * @param displayName
+	 * @throws InvalidInputException 
+	 * @throws UndeliveredEmailException 
+	 */
+	@Async
+	@Override
+	public void sendAccountReactivationMail(String recipientMailId, String displayName) throws InvalidInputException, UndeliveredEmailException {
+		if (recipientMailId == null || recipientMailId.isEmpty()) {
+			LOG.error("Recipient email Id is empty or null for sending survey completion mail ");
+			throw new InvalidInputException("Recipient email Id is empty or null for sending survey completion mail ");
+		}
+
+		if (displayName == null || displayName.isEmpty()) {
+			LOG.error("displayName parameter is empty or null for sending account upgrade mail ");
+			throw new InvalidInputException("displayName parameter is empty or null for sending survey completion mail ");
+		}
+
+		LOG.info("Sending account reactivation email to : " + recipientMailId);
+
+		EmailEntity emailEntity = prepareEmailEntityForSendingEmail(recipientMailId);
+
+		String subjectFileName = EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_REACTIVATION_MAIL_SUBJECT;
+
+		FileContentReplacements messageBodyReplacements = new FileContentReplacements();
+		messageBodyReplacements.setFileName(EmailTemplateConstants.EMAIL_TEMPLATES_FOLDER + EmailTemplateConstants.ACCOUNT_REACTIVATION_MAIL_BODY);
+
+		messageBodyReplacements.setReplacementArgs(Arrays.asList(displayName));
+
+		LOG.debug("Calling email sender to send mail");
+		emailSender.sendEmailWithBodyReplacements(emailEntity, subjectFileName, messageBodyReplacements);
+
+		LOG.info("Successfully sent account blocking mail");		
 	}
 
 }
