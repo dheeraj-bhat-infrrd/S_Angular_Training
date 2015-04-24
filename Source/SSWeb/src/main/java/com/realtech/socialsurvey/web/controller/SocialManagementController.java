@@ -77,6 +77,7 @@ public class SocialManagementController {
 	@Autowired
 	private UserManagementService userManagementService;
 
+	// Facebook
 	@Value("${FB_REDIRECT_URI}")
 	private String facebookRedirectUri;
 
@@ -103,13 +104,13 @@ public class SocialManagementController {
 	private String googleApiRedirectUri;
 	@Value("${GOOGLE_API_SCOPE}")
 	private String googleApiScope;
-
-	@Value("${YELP_REDIRECT_URI}")
-	private String yelpRedirectUri;
-	
 	@Value("${GOOGLE_SHARE_URI}")
 	private String googleShareUri;
 
+	// Yelp
+	@Value("${YELP_REDIRECT_URI}")
+	private String yelpRedirectUri;
+	
 	/**
 	 * Returns the social authorization page
 	 * 
@@ -132,7 +133,7 @@ public class SocialManagementController {
 		session.removeAttribute(CommonConstants.SOCIAL_FLOW);
 		switch (socialNetwork) {
 
-		// Building facebook authUrl
+			// Building facebook authUrl
 			case "facebook":
 				Facebook facebook = socialManagementService.getFacebookInstance();
 
@@ -242,7 +243,7 @@ public class SocialManagementController {
 				accessToken = facebook.getOAuthAccessToken(oauthCode, facebookRedirectUri);
 			}
 			catch (FacebookException e) {
-				LOG.error("Error while creating access token " + e.getLocalizedMessage(), e);
+				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
 			}
 
 			// Storing token
@@ -299,8 +300,7 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
-						DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for facebook", DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -320,12 +320,12 @@ public class SocialManagementController {
 	private SocialMediaTokens updateFacebookToken(facebook4j.auth.AccessToken accessToken, SocialMediaTokens mediaTokens) {
 		LOG.debug("Method updateFacebookToken() called from SocialManagementController");
 		if (mediaTokens == null) {
-			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+			LOG.debug("Media tokens do not exist. Creating them and adding the facebook access token");
 			mediaTokens = new SocialMediaTokens();
 			mediaTokens.setFacebookToken(new FacebookToken());
 		}
 		else {
-			LOG.debug("Updating the existing media tokens for LinkedIn");
+			LOG.debug("Updating the existing media tokens for facebook");
 			if (mediaTokens.getFacebookToken() == null) {
 				mediaTokens.setFacebookToken(new FacebookToken());
 			}
@@ -441,8 +441,7 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
-						DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for twitter", DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -462,12 +461,12 @@ public class SocialManagementController {
 	private SocialMediaTokens updateTwitterToken(AccessToken accessToken, SocialMediaTokens mediaTokens) {
 		LOG.debug("Method updateTwitterToken() called from SocialManagementController");
 		if (mediaTokens == null) {
-			LOG.debug("Media tokens do not exist. Creating them and adding the LinkedIn access token");
+			LOG.debug("Media tokens do not exist. Creating them and adding the twitter access token");
 			mediaTokens = new SocialMediaTokens();
 			mediaTokens.setTwitterToken(new TwitterToken());
 		}
 		else {
-			LOG.debug("Updating the existing media tokens for LinkedIn");
+			LOG.debug("Updating the existing media tokens for twitter");
 			if (mediaTokens.getTwitterToken() == null) {
 				mediaTokens.setTwitterToken(new TwitterToken());
 			}
@@ -579,13 +578,20 @@ public class SocialManagementController {
 				agentSettings.setSocialMediaTokens(mediaTokens);
 				userSettings.setAgentSettings(agentSettings);
 
-				// starting async service for data update from linkedin
-				socialAsyncService.linkedInDataUpdate(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
-						mediaTokens.getLinkedInToken());
+				String socialFlow = (String) session.getAttribute(CommonConstants.SOCIAL_FLOW);
+				if (socialFlow != null && socialFlow.equalsIgnoreCase(CommonConstants.FLOW_REGISTRATION)) {
+					// starting service for data update from linkedin
+					agentSettings = (AgentSettings) socialAsyncService.linkedInDataUpdate(
+							MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings, mediaTokens.getLinkedInToken());
+				}
+				else {
+					// starting async service for data update from linkedin
+					socialAsyncService.linkedInDataUpdateAsync(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+							mediaTokens.getLinkedInToken());
+				}
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
-						DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for linkedin", DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -710,8 +716,7 @@ public class SocialManagementController {
 				userSettings.setAgentSettings(agentSettings);
 			}
 			else {
-				throw new InvalidInputException("Invalid input exception occurred while uploading profile image.",
-						DisplayMessageConstants.GENERAL_ERROR);
+				throw new InvalidInputException("Invalid input exception occurred while creating access token for google", DisplayMessageConstants.GENERAL_ERROR);
 			}
 		}
 		catch (Exception e) {
@@ -728,6 +733,27 @@ public class SocialManagementController {
 		return JspResolver.SOCIAL_AUTH_MESSAGE;
 	}
 
+	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens) {
+		LOG.debug("Method updateGoogleToken() called from SocialManagementController");
+		if (mediaTokens == null) {
+			LOG.debug("Media tokens do not exist. Creating them and adding the Google access token");
+			mediaTokens = new SocialMediaTokens();
+			mediaTokens.setGoogleToken(new SocialProfileToken());
+		}
+		else {
+			LOG.debug("Updating the existing media tokens for google plus");
+			if (mediaTokens.getGoogleToken() == null) {
+				mediaTokens.setGoogleToken(new SocialProfileToken());
+			}
+		}
+		mediaTokens.getGoogleToken().setAccessToken(accessToken.getToken());
+		mediaTokens.getGoogleToken().setAccessTokenSecret(accessToken.getSecret());
+		mediaTokens.getGoogleToken().setAccessTokenCreatedOn(System.currentTimeMillis());
+
+		LOG.debug("Method updateGoogleToken() finished from SocialManagementController");
+		return mediaTokens;
+	}
+	
 	@ResponseBody
 	@RequestMapping(value = "/postonfacebook", method = RequestMethod.GET)
 	public String postToFacebook(HttpServletRequest request) {
@@ -735,10 +761,11 @@ public class SocialManagementController {
 		String agentName = request.getParameter("agentName");
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
-		String ratingStr = request.getParameter("score");
 		String review = request.getParameter("review");
+		
 		double rating = 0;
 		try {
+			String ratingStr = request.getParameter("score");
 			rating = Double.parseDouble(ratingStr);
 		}
 		catch (NumberFormatException e) {
@@ -747,23 +774,22 @@ public class SocialManagementController {
 		}
 
 		User user = sessionHelper.getCurrentUser();
-		long userId = user.getUserId();
-
-		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
+		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 		rating = Math.round(rating * 100) / 100;
 		String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 				+ " on Social Survey \n" + review;
 		facebookMessage = facebookMessage.replaceAll("null", "");
+		
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
 					socialManagementService.updateStatusIntoFacebookPage(setting, facebookMessage);
 			}
 			catch (FacebookException | InvalidInputException e) {
-				LOG.error("FacebookException/InvalidInputException caught in postToFacebook() while trying to post to facebook. Nested excption is ",
-						e);
+				LOG.error("FacebookException/InvalidInputException caught in postToFacebook() while trying to post to facebook. Nested excption is ", e);
 			}
 		}
+		
 		LOG.info("Method to post feedback of customer to facebook finished.");
 		return "Successfully posted to all the your facebook profiles";
 	}
@@ -776,10 +802,11 @@ public class SocialManagementController {
 			String agentName = request.getParameter("agentName");
 			String custFirstName = request.getParameter("firstName");
 			String custLastName = request.getParameter("lastName");
-			String ratingStr = request.getParameter("score");
 			String agentIdStr = request.getParameter("agentId");
+			
 			double rating = 0;
 			try {
+				String ratingStr = request.getParameter("score");
 				rating = Double.parseDouble(ratingStr);
 			}
 			catch (NumberFormatException e) {
@@ -788,13 +815,12 @@ public class SocialManagementController {
 			}
 
 			User user = sessionHelper.getCurrentUser();
-			long userId = user.getUserId();
-
-			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
+			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 			rating = Math.round(rating * 100) / 100;
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
 			twitterMessage = twitterMessage.replaceAll("null", "");
+
 			for (OrganizationUnitSettings setting : settings) {
 				try {
 					if (setting != null)
@@ -812,6 +838,7 @@ public class SocialManagementController {
 			LOG.error("Non fatal Exception caught in postToTwitter() while trying to post to social networking sites. Nested excption is ", e);
 			return e.getMessage();
 		}
+		
 		LOG.info("Method to post feedback of customer to various pages of twitter finished.");
 		return "Successfully posted to all the your twitter profiles";
 	}
@@ -823,10 +850,11 @@ public class SocialManagementController {
 		String agentName = request.getParameter("agentName");
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
-		String ratingStr = request.getParameter("score");
 		String agentIdStr = request.getParameter("agentId");
+		
 		double rating = 0;
 		try {
+			String ratingStr = request.getParameter("score");
 			rating = Double.parseDouble(ratingStr);
 		}
 		catch (NumberFormatException e) {
@@ -835,13 +863,12 @@ public class SocialManagementController {
 		}
 
 		User user = sessionHelper.getCurrentUser();
-		long userId = user.getUserId();
-
-		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(userId);
+		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 		rating = Math.round(rating * 100) / 100;
 		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
 				+ " on SocialSurvey - view at www.social-survey.com/" + agentIdStr;
 		message = message.replaceAll("null", "");
+		
 		for (OrganizationUnitSettings setting : settings) {
 			try {
 				if (setting != null)
@@ -864,8 +891,7 @@ public class SocialManagementController {
 
 		try {
 			sessionHelper.getCanonicalSettings(request.getSession(false));
-			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
-					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getYelpToken() != null){
 				yelpUrl.put("host", yelpRedirectUri);
@@ -879,6 +905,7 @@ public class SocialManagementController {
 			response.setErrMessage(e.getMessage());
 			return new Gson().toJson(response);
 		}
+		
 		LOG.info("Method to get Yelp details, getYelpLink() finished.");
 		return new Gson().toJson(yelpUrl);
 	}
@@ -891,8 +918,7 @@ public class SocialManagementController {
 
 		try {
 			sessionHelper.getCanonicalSettings(request.getSession(false));
-			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
-					CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings settings = (OrganizationUnitSettings) request.getSession(false).getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
 
 			if (settings.getSocialMediaTokens() != null && settings.getSocialMediaTokens().getGoogleToken() != null){
 				googleUrl.put("host", googleShareUri);
@@ -906,28 +932,8 @@ public class SocialManagementController {
 			response.setErrMessage(e.getMessage());
 			return new Gson().toJson(response);
 		}
+		
 		LOG.info("Method to get Google details, getGooglePlusLink() finished.");
 		return new Gson().toJson(googleUrl);
-	}
-
-	private SocialMediaTokens updateGoogleToken(Token accessToken, SocialMediaTokens mediaTokens) {
-		LOG.debug("Method updateGoogleToken() called from SocialManagementController");
-		if (mediaTokens == null) {
-			LOG.debug("Media tokens do not exist. Creating them and adding the Google access token");
-			mediaTokens = new SocialMediaTokens();
-			mediaTokens.setGoogleToken(new SocialProfileToken());
-		}
-		else {
-			LOG.debug("Updating the existing media tokens for LinkedIn");
-			if (mediaTokens.getGoogleToken() == null) {
-				mediaTokens.setGoogleToken(new SocialProfileToken());
-			}
-		}
-		mediaTokens.getGoogleToken().setAccessToken(accessToken.getToken());
-		mediaTokens.getGoogleToken().setAccessTokenSecret(accessToken.getSecret());
-		mediaTokens.getGoogleToken().setAccessTokenCreatedOn(System.currentTimeMillis());
-
-		LOG.debug("Method updateGoogleToken() finished from SocialManagementController");
-		return mediaTokens;
 	}
 }

@@ -58,6 +58,9 @@ public class User implements UserDetails, Serializable {
 	@Column(name = "LAST_LOGIN")
 	private Timestamp lastLogin;
 
+	@Column(name = "NUM_OF_LOGINS")
+	private long numOfLogins;
+
 	@Column(name = "LOGIN_NAME")
 	private String loginName;
 
@@ -90,10 +93,10 @@ public class User implements UserDetails, Serializable {
 
 	@Transient
 	private boolean companyAdmin;
-	
+
 	@Transient
 	private String profileName;
-	
+
 	@Transient
 	private String profileUrl;
 
@@ -174,6 +177,14 @@ public class User implements UserDetails, Serializable {
 		this.lastLogin = lastLogin;
 	}
 
+	public long getNumOfLogins() {
+		return numOfLogins;
+	}
+
+	public void setNumOfLogins(long numOfLogins) {
+		this.numOfLogins = numOfLogins;
+	}
+
 	public String getLoginName() {
 		return this.loginName;
 	}
@@ -237,7 +248,7 @@ public class User implements UserDetails, Serializable {
 	public void setStatus(int status) {
 		this.status = status;
 	}
-	
+
 	public String getProfileName() {
 		return profileName;
 	}

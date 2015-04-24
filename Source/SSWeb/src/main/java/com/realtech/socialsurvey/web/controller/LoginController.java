@@ -32,6 +32,7 @@ import com.realtech.socialsurvey.core.entities.VerticalsMaster;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.authentication.AuthenticationService;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
@@ -124,6 +125,14 @@ public class LoginController {
 		LOG.info("Forgot Password Page started");
 		return JspResolver.FORGOT_PASSWORD;
 	}
+	
+	private void setSession(HttpSession session) throws InvalidInputException, NoRecordsFetchedException{
+		// get the user's canonical settings
+		LOG.info("Fetching the user's canonical settings and setting it in session");
+		sessionHelper.getCanonicalSettings(session);
+		// Set the session variables
+		sessionHelper.setSettingVariablesInSession(session);
+	}
 
 	/**
 	 * Method for logging in user
@@ -145,11 +154,20 @@ public class LoginController {
 			HttpSession session = request.getSession(true);
 
 			List<LicenseDetail> licenseDetails = user.getCompany().getLicenseDetails();
-			if (licenseDetails != null && !licenseDetails.isEmpty()) {
+			if (licenseDetails != null && !licenseDetails.isEmpty()) {	
+				
 				LicenseDetail licenseDetail = licenseDetails.get(0);
 				accountType = AccountType.getAccountType(licenseDetail.getAccountsMaster().getAccountsMasterId());
 				LOG.debug("Adding account type in session");
 				session.setAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, accountType);
+				
+				LOG.debug("Checking if the account is disabled because of payment failure");
+				if(user.getCompany().getStatus() == CommonConstants.STATUS_PAYMENT_FAILED){
+					LOG.debug("Payment has failed. Returning account disabled page");
+					setSession(session);
+					model.addAttribute(CommonConstants.DISABLED_ACCOUNT_FLAG, CommonConstants.YES);
+					return JspResolver.ACCOUNT_DISABLED_PAGE;
+				}
 			}
 			else {
 				LOG.debug("License details not found for the user's company");
@@ -222,11 +240,9 @@ public class LoginController {
 					}
 
 					if (redirectTo.equals(JspResolver.LANDING)) {
-						// get the user's canonical settings
-						LOG.info("Fetching the user's canonical settings and setting it in session");
-						sessionHelper.getCanonicalSettings(session);
-						// Set the session variables
-						sessionHelper.setSettingVariablesInSession(session);
+						setSession(session);
+						// update the last login time and number of logins
+						userManagementService.updateUserLoginTimeAndNum(user);
 					}
 				}
 				else {
