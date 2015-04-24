@@ -3,105 +3,127 @@
     .header-logo-wrapper{
         height: 50px;
         float: none;
-        background: url(../images/ss-logo.png) no-repeat center;
+        /* background: url(../images/ss-logo.png) no-repeat center; */
         background-size: 90px;
         width: 125px;
     }
     .header-row{
-        margin: 0 -15px;
-        background-color: rgba(0, 159, 224, 0.8);
+        margin: 0 -10px;
+        /* background-color: rgba(0, 159, 224, 0.8); */
     }
     .header-login-wrapper{
         float: none;
         width: 100%;
         overflow: auto;
         height: auto;
-        background: #fff;
+        margin: 10px 0;
+        /* background: #fff; */
     }
     .h-email-wrapper, .h-pwd-wrapper, .h-login-btn-wrapper{
-        float: none;
-        width: 100%;
-        margin: 0;
+        /* float: none; */
+        /* width: 100%; */
+        /* margin: 0; */
     }
-    .h-login-btn-wrapper{
-        overflow: auto;
-    }
-    .h-btn-login-txt{
+    
+    .h-email-wrapper {
+		width: 49%;
+		margin: 0;
+		padding: 10px 0px 10px 10px ;
+	}
+	
+	.h-pwd-wrapper {
+		width: 49%;
+		margin: 0;
+		padding: 10px 10px 0px 0px;
+		float: right;
+	}
+	
+	.h-login-btn-wrapper {
+		overflow: auto;
+		width: 100%;
+		margin: 0;
+		padding: 0px 10px 10px 10px;
+	}
+	.h-btn-login-txt{
         display: block;
     }
     .h-lbl{
         line-height: 30px;
         margin-bottom: 0;
         padding: 0 10px;
-        display: none;  
+        /* display: none; */  
     }
     .h-inp{
         width: 100%;
-        border-radius: 0;
-        border-bottom: 1px solid #dcdcdc;
+        /* border-radius: 0; */
+        /* border-bottom: 1px solid #dcdcdc; */
         height: 44px;
-        padding-left: 50px;
+        padding-left: 10px;
     }
     .h-btn-login{
-        margin: 0;
+        /* margin: 0; */
         width: 100%;
-        background: #7fba00;
-        color: #fff;
-        text-align: center;
+        /* background: #7fba00; */
+        /* color: #fff; */
+        /* text-align: center; */
         line-height: 44px;
         height: 44px;
-        border-radius: 0;
+        /* border-radius: 0; */
         font-size: 13px;
     }
     .hero-txt-wrapper{
         width: 100%;
         padding: 10px 0px;
-        font-size: 24px;
-        display: none;
+        font-size: 18px;
         margin: 0;
     }
     .txt-header-small{
         font-size: 18px;
     }
     .content-wrapper{
-        margin: 0 -15px;
-    }
+        margin: 0 -10px;
+    
+}
     .c-pic-panel{
         display: none;
     }
     .c-reg-panel{
         width: 100%;
-        padding: 0;
+        padding: 0 10px;
         height: auto;
-        background: #fff;
+        /* background: #fff; */
         color: #3e3e3e;
     }
     .reg-txt-top1{
         font-size: 18px;
         text-align: center;
         margin-top: 5px;
-    }
+    
+        color: #fff;
+}
     .reg-txt-top2{
         text-align: center;
-    }
+    
+        color: #fff;
+}
     .reg-inp{
-        width: 100% !important;
-        border-radius: 0;
+        width: 49%;
+        /* border-radius: 0; */
         margin: 0;
         border-bottom: 1px solid #dcdcdc;
-        padding-left: 50px;
+        padding-left: 10px;
         height: 44px;
     }
     .reg-item{
-        margin-bottom: 0;
-        overflow: auto;
+        /* margin-bottom: 0; */
+        /* overflow: auto; */
     }
     reg-item-bord-top{
         border-top: 1px solid #dcdcdc;
     }
     .reg-captcha-wrapper{
         width: 100%;
-        border-radius: 0;
+        /* border-radius: 0; */
     }
     .reg-captcha-btns{
         width: 100%;
@@ -120,35 +142,28 @@
         border-bottom: 0;
         width: 100%;
     }
-    .pro-wrapper{
-        margin: 0px -15px;
-        overflow: auto;
-    }
-    .pro-left-wrapper{
-        width: 100%;
-        line-height: 60px;
-        text-align: center;
-        font-size: 16px;
-        padding: 0;
-        margin: 0;
-        height: 60px;
-        background: #fff;
-    }
-    .pro-right-wrapper{
+	.pro-wrapper {
+		margin: 10px 0 !important;
+		overflow: auto;
+		width: 100%;
+	}
+	.pro-left-wrapper {
+		width: 100%;
+		text-align: center;
+		height: 50px;
+		line-height: 50px;
+	}
+	.pro-right-wrapper{
         width: 100%;
         height: auto;
-        padding: 0;
+        padding: 10px;
         margin: 0;
-        background-color: #fff;
     }
     .pro-inp{
-        margin-right: 10px;
-        margin: 0 0 15px 0;
-        width: 100%;
-        border-radius: 0;
+        margin: 0;
+        width: 49%;
         margin-bottom: 0;
-        border-bottom: 1px solid #dcdcdc;
-        padding-left: 50px;
+        padding-left: 10px;
         height: 44px;
         background-position: 10px center !important;
     }
@@ -239,7 +254,7 @@
         width: 100%;
     }
     .index-body{
-        background: #fff;
+        /* background: #fff; */
     }
     .registration-form-cls{
         margin-bottom: 0;
@@ -247,28 +262,37 @@
     .blue-ext-right{
         display: none;
     }
-    .fp-txt-1{
-        color: #3e3e3e;
-        border-bottom: 1px solid #dcdcdc;
-    }
     .reg-inp-1-adj{
         border-top: 1px solid #dcdcdc;
     }
-    .m-inp-img, .header-search-icn, .pro-left-wrapper-login{
+    .header-search-icn{
         display: block;
     }
     .disclaimer {
         font-size: 11px;
         padding: 0 10px;
         margin-top: 11px;
-        color: #333;
+        /* color: #333; */
     }
+    .reg-inp-2{
+    	float: right;
+    }
+    input#find-pro-submit{
+    	width: 100%;
+    	margin: 10px 0 0 0;
+    }
+    input#find-pro-last-name {
+		float: right;
+	}
 }
 
 
 
 /* ============== ANTHING ABOVE SMARTPHONES ==============*/
 @media (min-width: 768px) {
+	.pro-wrapper{
+		display: block !important;
+	}
 }
 
 
@@ -315,7 +339,6 @@
         width: 335px;
     }
     .pro-wrapper{
-        width: 719px;
     }
     .pro-left-wrapper{
         width: 100%;
@@ -448,39 +471,20 @@
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+/* ============== SMALL SIZED MOBILE SCREENS ==============*/
+@media (max-width: 475px) {
+    .h-email-wrapper, .h-pwd-wrapper, .h-login-btn-wrapper{
+    	width: 100%;
+    	margin: 0;
+    	padding: 0 10px;
+    	float: none;
+    }
+    .h-login-btn-wrapper{
+    	margin-top: 10px;
+    }
+    .reg-inp,.pro-inp{
+    	width: 100%;
+    	margin: 5px 0;
+    	float: none;
+    }
+}

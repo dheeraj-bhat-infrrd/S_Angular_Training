@@ -19,7 +19,7 @@
 			<div class="header-row clearfix">
 				<div id="header-search-icn" class="header-search-icn"></div>
 				<div class="float-left header-logo-wrapper ss-logo"></div>
-				<div id="pro-wrapper-top" class="pro-wrapper-top pro-wrapper clearfix hide"></div>
+				<div id="pro-wrapper-top" class="pro-wrapper-top pro-wrapper clearfix hide float-left"></div>
 				
 				<div class="float-right header-login-wrapper clearfix">
 					<div id="" class="pro-left-wrapper pro-left-wrapper-login hide"><div class="fp-txt-1">Login</div></div>
@@ -35,7 +35,7 @@
 						<div class="float-left h-pwd-wrapper">
 							<div class="h-lbl clearfix">
 								<div class="float-left">Password</div>
-								<div class="float-right fgt-pwd"><a href ="./forgotpassword.do">Forgot Password?</a></div>
+								<div class="float-right fgt-pwd"><span onclick ="openForgotPasswordPage();">Forgot Password?</span></div>
 							</div>
 							<div class="h-inp-wrapper">
 								<div class="m-inp-img m-inp-img-pwd"></div>
@@ -347,6 +347,10 @@ $(document).ready(function(){
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
 	});
+	
+	function openForgotPasswordPage(){
+		window.location.href = "./forgotpassword.do";
+	}
 });
 </script>
 
