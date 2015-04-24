@@ -740,6 +740,9 @@ $('.sq-happy-smile').click(function() {
 	mood = "happy";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
+	$('.sq-happy-smile').removeClass('opacity-red');
+	$('.sq-neutral-smile').addClass('opacity-red');
+	$('.sq-sad-smile').addClass('opacity-red');
 });
 $('.sq-neutral-smile').click(function() {
 	// Update customer's mood in db and ask for feedback that could have made
@@ -747,6 +750,9 @@ $('.sq-neutral-smile').click(function() {
 	mood = "neutral";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
+	$('.sq-neutral-smile').removeClass('opacity-red');
+	$('.sq-happy-smile').addClass('opacity-red');
+	$('.sq-sad-smile').addClass('opacity-red');
 });
 $('.sq-sad-smile').click(function() {
 	// Update customer's mood in db and ask what went wrong during the entire
@@ -754,6 +760,9 @@ $('.sq-sad-smile').click(function() {
 	mood = "sad";
 	$('#next-textarea-smiley').removeClass("btn-com-disabled");
 	isSmileTypeQuestion = true;
+	$('.sq-sad-smile').removeClass('opacity-red');
+	$('.sq-neutral-smile').addClass('opacity-red');
+	$('.sq-happy-smile').addClass('opacity-red');
 });
 
 $('#start-btn').click(function() {
