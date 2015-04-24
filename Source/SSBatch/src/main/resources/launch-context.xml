@@ -41,7 +41,7 @@
 
 	<!-- Run every 10 seconds -->
 	<task:scheduled-tasks>
-		<task:scheduled ref="paymentRetriesJobRunner" method="run" cron="*/20 * * * * *" />
+<!-- 		<task:scheduled ref="paymentRetriesJobRunner" method="run" cron="*/20 * * * * *" /> -->
 		<task:scheduled ref="unsubscribeAccountsJobRunner" method="run" cron="*/20 * * * * *" />
 	 	<task:scheduled ref="logoDeletionJobRunner" method="run" cron="*/20 * * * * *"/>
 	</task:scheduled-tasks>

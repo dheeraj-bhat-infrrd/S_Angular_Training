@@ -112,19 +112,46 @@ public class WebHookController {
 				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
 						+ " | Subscription: " + webhookNotification.getSubscription().getId());
 			}
+			else if(kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY.toString())) {
+				HashMap<String, String> sampleNotification = gateway.getGatewayInstance().webhookTesting().sampleNotification(
+					    WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY, subscriptionId
+					);
+
+				webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
+					    sampleNotification.get("bt_signature"),
+					    sampleNotification.get("bt_payload")
+					);
+				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
+						+ " | Subscription: " + webhookNotification.getSubscription().getId());
+			}
+			else if(kind.equals(WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY.toString())) {
+				HashMap<String, String> sampleNotification = gateway.getGatewayInstance().webhookTesting().sampleNotification(
+					    WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY, subscriptionId
+					);
+
+				webhookNotification = gateway.getGatewayInstance().webhookNotification().parse(
+					    sampleNotification.get("bt_signature"),
+					    sampleNotification.get("bt_payload")
+					);
+				LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
+						+ " | Subscription: " + webhookNotification.getSubscription().getId());
+			}
 			else{
 				return "Kind not known!";
 			}
 			
-		}
-		
+		}	
 
 		try {
-
 			if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_WENT_PAST_DUE) {
-				gateway.updateRetriesForPayment(webhookNotification.getSubscription());
+				gateway.changeLicenseToPastDue(webhookNotification.getSubscription());
 			}
-
+			else if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY) {
+				gateway.incrementRetriesAndSendMail(webhookNotification.getSubscription());
+			}
+			else if (webhookNotification.getKind() == WebhookNotification.Kind.SUBSCRIPTION_CHARGED_SUCCESSFULLY) {
+				gateway.checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(webhookNotification.getSubscription());
+			}
 		}
 		catch (InvalidInputException e) {
 			LOG.error("WebHookController getSubscriptionNotifications() : InvalidInputException thrown : " + e.getMessage());

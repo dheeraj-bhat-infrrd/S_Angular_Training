@@ -140,7 +140,10 @@ public class PaymentController {
 			}
 			catch (SubscriptionUnsuccessfulException e) {
 				LOG.error("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),e);
-				throw new CreditCardException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL,e);
+				if (e.getErrorCode().equals(DisplayMessageConstants.BANK_REJECTED)) {
+					throw new SubscriptionUnsuccessfulException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),DisplayMessageConstants.BANK_REJECTED,e);
+				}
+				throw new SubscriptionUnsuccessfulException("PaymentController subscribeForPlan() : SubscriptionUnsuccessfulException thrown : " + e.getMessage(),DisplayMessageConstants.SUBSCRIPTION_UNSUCCESSFUL,e);
 			}
 			
 			LOG.info("Subscription Successful!");
@@ -247,7 +250,12 @@ public class PaymentController {
 		}
 		catch (CardUpdateUnsuccessfulException e) {
 			LOG.error("Exception has occured : " + e.getMessage(), e);
-			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			if(e.getErrorCode().equals(DisplayMessageConstants.BANK_REJECTED)){
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.BANK_REJECTED, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			}
+			else {
+				message = messageUtils.getDisplayMessage(DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION, DisplayMessageType.ERROR_MESSAGE).getMessage();
+			}
 			return message;
 		}
 
@@ -257,4 +265,104 @@ public class PaymentController {
 		return message;
 
 	}
+	
+//	private String makeJsonMessage(int status, String message) {
+//
+//		JSONObject jsonMessage = new JSONObject();
+//		LOG.debug("Building json response");
+//		try {
+//			jsonMessage.put("success", status);
+//			jsonMessage.put("message", message);
+//		}
+//		catch (JSONException e) {
+//			LOG.error("Exception occured while building json response : " + e.getMessage(), e);
+//		}
+//
+//		LOG.info("Returning json response : " + jsonMessage.toString());
+//		return jsonMessage.toString();
+//	}
+	
+//	@RequestMapping(value = "/upgradecardfordisabledaccount", method = RequestMethod.POST)
+//	@ResponseBody
+//	public String upgradeCardForDisabledAccount(Model model, HttpServletRequest request) {
+//		LOG.info("Payment controller called to upgrade payment method");
+//		
+//		String message = null;
+//		String paymentNonce = request.getParameter(CommonConstants.PAYMENT_NONCE);
+//		LOG.info("Payment upgrade called with nonce : " + paymentNonce);
+//
+//		// Fetching the user from session
+//		LOG.debug("Fetching user from session");
+//		User user = sessionHelper.getCurrentUser();
+//		// Getting the company and the license detail object
+//		Company company = user.getCompany();
+//		LicenseDetail licenseDetail = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX);
+//
+//		LOG.info("Making API call to update card details");
+//		try {
+//			gateway.changePaymentMethod(licenseDetail.getSubscriptionId(), paymentNonce, String.valueOf(company.getCompanyId()));
+//			organizationManagementService.changeCompanyStatusToPaymentProcessing(company);
+//		}
+//		catch (InvalidInputException | NoRecordsFetchedException e) {
+//			LOG.error("Exception has occured : " + e.getMessage(), e);
+//			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+//			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+//		}
+//		catch (PaymentException e) {
+//			LOG.error("Exception has occured : " + e.getMessage(), e);
+//			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+//			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+//		}
+//		catch (CreditCardException e) {
+//			LOG.error("Exception has occured : " + e.getMessage(), e);
+//			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+//			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+//		}
+//		catch (CardUpdateUnsuccessfulException e) {
+//			LOG.error("Exception has occured : " + e.getMessage(), e);
+//			message = messageUtils.getDisplayMessage(DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION, DisplayMessageType.ERROR_MESSAGE).getMessage();
+//			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+//		}
+//		
+//		LOG.info("Payment details change successful! Returning message");
+//		message = messageUtils.getDisplayMessage(DisplayMessageConstants.RETRY_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE).getMessage();
+//
+//		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
+//	}
+	
+//	@RequestMapping(value="/disabledaccountretry",method=RequestMethod.GET)
+//	@ResponseBody
+//	public String retryChargeForDisabledAccount(HttpServletRequest request){
+//		LOG.info("retryChargeForDisabledAccount called to retry payment");
+//		String message = null;
+//		try {
+//			
+//			User user = sessionHelper.getCurrentUser();
+//			if(user == null){
+//				LOG.error("User not found in the session!");
+//				throw new InvalidInputException("User not found in the session!");
+//			}
+//			
+//			Company company = user.getCompany();
+//			if(company == null){
+//				LOG.error("company not found in the session!");
+//				throw new InvalidInputException("company not found in the session!");
+//			}
+//			
+//			if(company.getLicenseDetails() == null || company.getLicenseDetails().isEmpty()){
+//				LOG.error("license details not found for company id : " + company.getCompanyId());
+//				throw new InvalidInputException("license details not found for company id : " + company.getCompanyId());
+//			}
+//			gateway.retryChargeForSubscription(company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX));
+//			organizationManagementService.changeCompanyStatusToPaymentProcessing(company);
+//			message = messageUtils.getDisplayMessage(DisplayMessageConstants.RETRY_SUCCESSFUL, DisplayMessageType.ERROR_MESSAGE).getMessage();
+//		}
+//		catch (InvalidInputException | NoRecordsFetchedException | PaymentRetryUnsuccessfulException e){
+//			LOG.error("Exception has occured : " + e.getMessage(), e);
+//			message = messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE).getMessage();
+//			return makeJsonMessage(CommonConstants.STATUS_INACTIVE, message);
+//		}		
+//		
+//		return makeJsonMessage(CommonConstants.STATUS_ACTIVE, message);
+//	}
 }

@@ -72,6 +72,7 @@ public interface CommonConstants {
 	/**
 	 * Status constants
 	 */
+	public static final int ONE = 1; 
 	public static final int STATUS_ACTIVE = 1;
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_SURVEY_TEMPLATE = 2;
@@ -131,6 +132,7 @@ public interface CommonConstants {
 	public static final String SURVEY_IS_RATING_QUESTION_COLUMN = "isRatingQuestion";
 	public static final String VERTICALS_MASTER_NAME_COLUMN = "verticalName";
 	public static final String FEED_SOURCE_COLUMN = "feedSource";
+	public static final String PASSWORD_COLUMN = "loginPassword";
 
 	/**
 	 * Mongo entities and column name constants
@@ -350,6 +352,9 @@ public interface CommonConstants {
 	public static final String IMAGE_URL = "imageUrl";
 	public static final String CLIENT_TOKEN = "clienttoken";
 	public static final String PAYMENT_CHANGE_FLAG = "paymentChange";
+	public static final int STATUS_PAYMENT_FAILED = 2;
+	public static final String DISABLED_ACCOUNT_FLAG = "disabled";
+	public static final int PAYMENT_RETRIES = 2;
 
 	// Survey Constants
 	public static final String QUESTION_MULTIPLE_CHOICE = "mcq";
