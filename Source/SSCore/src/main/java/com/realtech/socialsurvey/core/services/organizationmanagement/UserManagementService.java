@@ -275,5 +275,12 @@ public interface UserManagementService {
 	public Map<Long, AbridgedUserProfile> processedUserProfiles(User user, AccountType accountType, Map<Long, UserProfile> profileMap) throws NonFatalException;
 
 	public UserProfile updateSelectedProfile(User user, AccountType accountType, Map<Long, UserProfile> profileMap, String profileIdStr);
+	
+	/**
+	 * Updates the users last login time and num of login
+	 * @param user
+	 * @throws NonFatalException
+	 */
+	public void updateUserLoginTimeAndNum(User user) throws NonFatalException;
 }
 // JIRA SS-34 BY RM02 BOC

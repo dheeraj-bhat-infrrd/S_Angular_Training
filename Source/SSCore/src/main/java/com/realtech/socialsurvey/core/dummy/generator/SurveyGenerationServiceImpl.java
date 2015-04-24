@@ -1,7 +1,5 @@
 package com.realtech.socialsurvey.core.dummy.generator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,9 +15,8 @@ public class SurveyGenerationServiceImpl implements SurveyGenerationService{
 	
 	@Override
 	@Transactional
-	public List<User> getAgents(String[] emails) {
+	public List<User> getAgents(List<String> emailIds) {
 		
-		ArrayList<String> emailIds = new ArrayList<String>(Arrays.asList(emails));
 		return userDao.fetchUsersByEmailId(emailIds);
 	}
 	

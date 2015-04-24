@@ -45,4 +45,9 @@ public final class EmailTemplateConstants {
 	public static final String SOCIALPOST_REMINDER_MAIL_BODY = "SocialPostReminderMailBody.html";
 	public static final String CONTACT_US_MAIL_SUBJECT = "ContactUsMailSubject.txt";
 	public static final String CONTACT_US_MAIL_BODY = "ContactUsMailBody.html";
+	public static final String ACCOUNT_BLOCKING_MAIL_SUBJECT = "AccountBlockingMailSubject.txt";
+	public static final String ACCOUNT_BLOCKING_MAIL_BODY = "AccountBlockingMailBody.html";
+	public static final String ACCOUNT_REACTIVATION_MAIL_BODY = "AccountReactivationMailBody.html";
+	public static final String ACCOUNT_REACTIVATION_MAIL_SUBJECT = "AccountReactivationMailSubject.txt";
+
 }
