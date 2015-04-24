@@ -234,12 +234,12 @@
 					<div class="sq-rat-wrapper">
 						<textarea id="text-area" class="sq-txt-area"></textarea>
 						<div id="smiles-final" class="sq-happy-wrapper clearfix">
-							<div id="happy-smile" star-no="1"
-								class="sq-smile-icn-wrapper sq-happy-smile"></div>
-							<div id="neutral-smile" star-no="2"
-								class="sq-smile-icn-wrapper sq-neutral-smile"></div>
 							<div id="sad-smile" star-no="3"
 								class="sq-smile-icn-wrapper sq-sad-smile"></div>
+							<div id="neutral-smile" star-no="2"
+								class="sq-smile-icn-wrapper sq-neutral-smile"></div>
+							<div id="happy-smile" star-no="1"
+								class="sq-smile-icn-wrapper sq-happy-smile"></div>
 						</div>
 						<div id="pst-srvy-div">
 							<input id="post-survey" type="CHECKBOX" checked>I want to
