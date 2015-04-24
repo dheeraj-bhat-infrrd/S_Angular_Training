@@ -340,7 +340,6 @@ public class SurveyManagementController {
 			String agentIdStr = request.getParameter("agentId");
 			String ratingStr = request.getParameter("rating");
 			String customerEmail = request.getParameter("customerEmail");
-			String feedback = request.getParameter("feedback");
 			long agentId = 0;
 			double rating = 0;
 			try {
@@ -355,8 +354,8 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on Social Survey \n";
-			facebookMessage += feedback;
+					+ " on Social Survey - view at www.social-survey.com/" + agentProfileLink;
+			
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
 					+ " on @SocialSurvey - view at www.social-survey.com/" + agentProfileLink;
 			
