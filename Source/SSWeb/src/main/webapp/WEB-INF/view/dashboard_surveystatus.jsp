@@ -52,7 +52,7 @@
 					<div id='survey-completed' class='float-left stat-icn-txt-rt'>${completedPrc}%</div>
 				</c:when>
 				<c:otherwise>
-					<div id='survey-completed' class='float-left stat-icn-txt-rt'>0</div>
+					<div id='survey-completed' class='float-left stat-icn-txt-rt'>0%</div>
 				</c:otherwise>
 			</c:choose>
 		</div>
