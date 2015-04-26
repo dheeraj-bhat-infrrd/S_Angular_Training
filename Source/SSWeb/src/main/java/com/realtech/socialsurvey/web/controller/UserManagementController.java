@@ -1310,6 +1310,20 @@ public class UserManagementController {
 		statusMap.put("message", message);
 		return new Gson().toJson(statusMap);
 	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/sendverificationmail", method = RequestMethod.GET)
+	public String sendVerificationMail(Model model, HttpServletRequest request) {
+		LOG.info("Method sendVerificationMail() called from UserManagementController");
+		try {
+			User user = sessionHelper.getCurrentUser();
+			userManagementService.inviteCorporateToRegister(user.getFirstName(), user.getLastName(), user.getEmailId(), true);
+		}
+		catch (NonFatalException e) {
+			LOG.error("InvalidInputException while updating profile. Reason : " + e.getMessage(), e);
+		}
+		return "success";
+	}
 
 	// verify change password parameters
 	private void validateChangePasswordFormParameters(String oldPassword, String newPassword, String confirmNewPassword) throws InvalidInputException {
