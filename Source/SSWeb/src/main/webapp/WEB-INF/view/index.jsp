@@ -347,10 +347,6 @@ $(document).ready(function(){
 	$('#header-search-icn').click(function(e) {
 		$('#pro-wrapper-top').slideToggle(200);
 	});
-	
-	function openForgotPasswordPage(){
-		window.location.href = "./forgotpassword.do";
-	}
 });
 </script>
 
