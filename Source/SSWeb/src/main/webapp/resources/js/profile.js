@@ -20,7 +20,7 @@ function adjustImage(){
     if(windW < 768){
         var imgW = $('#prof-image').width();
         $('#prof-image').height(imgW * 0.7);
-        var h2 = $('.prog-img-container').height() - 11;
+        // var h2 = $('.prog-img-container').height() - 11;
         var rowW = $('.lp-con-row').width() - 55 - 10;
         $('.lp-con-row-item').width(rowW+'px');
         $('.footer-main-wrapper').hide();
@@ -220,27 +220,32 @@ function paintProfilePage(result) {
             $("#prof-reviews-header").html(reviewsHeaderHtml);
             
             var contactInfoHtml = "";
-            var mailIds = contactDetails.mail_ids;
-            /*if(mailIds != undefined) {
+            /*var mailIds = contactDetails.mail_ids;
+            if(mailIds != undefined) {
             	contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-mail"></div>';	            
                 contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item bd-q-contact-us" data-mailid = "'+mailIds.work+'">Contact Us</div></div>';
             }*/
             
             var webAddresses = contactDetails.web_addresses;
-            if(webAddresses != undefined) {
-            	if(webAddresses.work != undefined) {
+            if (webAddresses != undefined) {
+            	if (webAddresses.work != undefined) {
+            		// making a proper url
+            		var validWebAddress = returnValidWebAddress(webAddresses.work);
+            		
             		$('#web-addr-header').show();
-            		$('#web-address-txt').html('<a href="' + webAddresses.work + '" target="_blank">' + webAddresses.work + '</a>');
+            		$('#web-address-txt').html('<a href="' + validWebAddress + '" target="_blank">' + webAddresses.work + '</a>');
             		
             		contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-web"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.work+'" target="_blank">Our Website</a></div></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-web"></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validWebAddress + '" target="_blank">Our Website</a></div></div>';		            
             	}
-            	if(webAddresses.blogs != undefined) {
+            	if (webAddresses.blogs != undefined) {
+            		var validBlogAddress = returnValidWebAddress(webAddresses.blogs);
+            		
                     contactInfoHtml =	contactInfoHtml+'<div class="lp-con-row lp-row clearfix">';		        
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-icn icn-blog"></div>';		            
-                    contactInfoHtml =	contactInfoHtml+'	<div class="float-left lp-con-row-item blue-text"><a href="'+webAddresses.blogs+'" target="_blank">Our Blogs</a></div></div>';	            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-icn icn-blog"></div>';		            
+                    contactInfoHtml =	contactInfoHtml+'<div class="float-left lp-con-row-item blue-text"><a href="' + validBlogAddress + '" target="_blank">Our Blogs</a></div></div>';	            
             	}
             }
             
@@ -302,14 +307,18 @@ function paintProfilePage(result) {
             		if(link == undefined || link == ""){
             			return false;
             		}
-            		
             		window.open(link,'_blank');
-            		
             	});
             }
-            
 		}         
 	}
+}
+
+function returnValidWebAddress(webAddress) {
+	if (webAddress && !webAddress.match(/^http([s]?):\/\/.*/)) {
+		webAddress = 'http://' + webAddress;
+	}
+	return webAddress;
 }
 
 function focusOnContact() {
@@ -597,6 +606,9 @@ function paintReviews(result){
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.updatedOn);
 		var lastItemClass = "ppl-review-item";
+		if (i == resultSize - 1) {
+			lastItemClass = "ppl-review-item-last";
+        }
 		reviewsHtml=  reviewsHtml+'<div class="' + lastItemClass + '">';
 		reviewsHtml=  reviewsHtml+'	<div class="ppl-header-wrapper clearfix">';
 		reviewsHtml=  reviewsHtml+'		<div class="float-left ppl-header-left">';    
