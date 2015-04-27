@@ -332,7 +332,8 @@ function showReviews(columnName, columnValue) {
 			var agentName = $(this).parent().parent().parent().attr('data-agentname');
 			var review = $(this).parent().parent().parent().attr('data-review');
 			var score = $(this).parent().parent().parent().attr('data-score');
-			shareOnFacebook(firstName, lastName, agentName, review, score);
+			var agentId = $(this).parent().parent().parent().attr('data-agentid');
+			shareOnFacebook(firstName, lastName, agentName, review, score, agentId);
 		});
 		$('.icn-twit').unbind('click');
 		$(".icn-twit").click(function() {
@@ -341,7 +342,8 @@ function showReviews(columnName, columnValue) {
 			var agentName = $(this).parent().parent().parent().attr('data-agentname');
 			var review = $(this).parent().parent().parent().attr('data-review');
 			var score = $(this).parent().parent().parent().attr('data-score');
-			shareOnTwitter(firstName, lastName, agentName, review, score);
+			var agentId = $(this).parent().parent().parent().attr('data-agentid');
+			shareOnTwitter(firstName, lastName, agentName, review, score, agentId);
 		});
 		$('.icn-lin').unbind('click');
 		$(".icn-lin").click(function() {
@@ -350,7 +352,8 @@ function showReviews(columnName, columnValue) {
 			var agentName = $(this).parent().parent().parent().attr('data-agentname');
 			var review = $(this).parent().parent().parent().attr('data-review');
 			var score = $(this).parent().parent().parent().attr('data-score');
-			shareOnLinkedin(firstName, lastName, agentName, review, score);
+			var agentId = $(this).parent().parent().parent().attr('data-agentid');
+			shareOnLinkedin(firstName, lastName, agentName, review, score, agentId);
 		});
 		$('.icn-yelp').unbind('click');
 		$(".icn-yelp").click(function() {
