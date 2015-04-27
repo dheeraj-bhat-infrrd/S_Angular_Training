@@ -742,3 +742,332 @@ input#find-pro-submit{
     font-size: 12px;
     font-family: opensanslight !important;
 }
+
+
+/*Styles for first time login popup*/
+.overlay-login {
+}
+
+.welcome-popup-wrapper {
+    position: relative;
+    top: 75px;
+    width: 990px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+    padding: 10px 30px 30px 30px;
+}
+
+.welcome-popup-hdr-wrapper {
+    height: 55px;
+    line-height: 55px;
+}
+
+.wc-hdr-txt {
+    font-family: 'opensanssemibold';
+    font-size: 18px;
+}
+
+.wc-hdr-step {
+    font-family: 'opensanslight';
+}
+
+.welcome-popup-body-wrapper {
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+
+.wc-step3-body-cont{
+	padding-top: 20px;
+}
+
+.wc-popup-body-hdr {
+    padding: 28px 0 28px 22px;
+    font-size: 16px;
+    background: #F9F9FB;
+}
+
+.linkedin-img {
+    height: 125px;
+    width: 100%;
+    background: url(../images/LInkedin.png) no-repeat center;
+}
+
+.wc-connect-txt {
+    text-align: center;
+    font-size: 14px;
+}
+
+.wl-import-btn {
+    background: #009FE0;
+    color: #fff;
+    width: 200px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    margin: 30px auto;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.wc-popup-body-cont {
+	padding: 20px;
+    padding-bottom: 30px;
+}
+
+span.txt-highlight {
+    font-size: 14px;
+    color: #3E9DCB;
+    cursor: pointer;
+}
+
+.wc-social-icn{
+	width: 200px;
+	height: 30px;
+	cursor: pointer;
+}
+
+.i-fb{
+	background: url(../images/fb_wide.png) no-repeat center;
+}
+
+.i-twt{
+	background: url(../images/twiter_wide.png) no-repeat center;
+}
+
+.i-ln{
+	background: url(../images/linkedin_wide.png) no-repeat center;
+}
+
+.i-gplus{
+	background: url(../images/gPlus_wide.png) no-repeat center;
+}
+
+.i-rss{
+	background: url(../images/rss_wide.png) no-repeat center;
+}
+
+.i-yelp{
+	background: url(../images/yelp_wide.png) no-repeat center;
+}
+
+.wc-icn-txt{
+	padding-left: 10px;
+	color: #3E9DCB;
+	font-size: 14px;
+}
+
+.wc-social-icn-row {
+	padding-left: 90px;
+	margin: 10px 0;
+}
+
+.wc-btn-row {
+    height: 40px;
+    line-height: 40px;
+    margin-top: 25px;
+    padding: 0 10px;
+}
+
+.wc-btn-col {
+    width: 50%;
+    padding: 0 15px;
+}
+
+.wc-sub-btn {
+    width: 140px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    background: #009FE0;
+    cursor: pointer;
+}
+
+.wl-import-btn:hover, .wc-sub-btn:hover{
+    background: #7AB400;
+}
+
+.wc-skip-btn{
+	cursor: pointer;
+	font-size: 16px;
+}
+
+.wc-review-tr {
+    height: 50px;
+    line-height: 50px;
+    margin: 0 0 10px 0;
+}
+
+.wc-review-hdr{
+	margin: 0;
+}
+
+.wc-review-tr>div {
+    padding: 0 5px;
+}
+
+.wc-review-hdr>div{
+	padding-left: 20px;
+	font-family: 'opensanssemibold';
+	font-size: 16px;
+}
+
+.wc-review-th1,.wc-review-tc1 {
+    width: 30%;
+}
+
+.wc-review-th2,.wc-review-tc2 {
+    width: 30%;
+}
+
+.wc-review-th3,.wc-review-tc3 {
+    width: 30%;
+}
+
+.wc-review-th4,.wc-review-tc4 {
+    width: 10%;
+}
+
+.wc-review-input{
+	width: 100%;
+	height: 100%;
+	background: #FCFCFC;
+	border: 1px solid #dcdcdc;
+	border-radius:3px;
+	padding: 0 0 0 15px;
+}
+
+.wc-review-table{
+	padding: 30px;
+}
+
+.wc-review-rmv-icn{
+	width:100%;
+	height:50px;
+	background: url(../images/close_srv.png) no-repeat center;
+	cursor: pointer;
+}
+
+.wc-form-txt {
+	line-height: 40px !important;
+	height: 40px;
+	margin-right: 30px;
+	text-align: right;
+	width: 120px;
+	font-size: 14px;
+}
+
+.wc-form-input-cont {
+	position: relative;
+}
+
+input.wc-form-input {
+	width: 275px;
+	height: 40px;
+	padding: 0 10px;
+	border-radius: 3px;
+	outline: none;
+	box-shadow: none;
+	border: 1px solid #dcdcdc;
+	margin-right: 30px;
+	font-size: 12px;
+}
+
+.wc-form-row {
+	margin-bottom: 15px;
+}
+
+.wc-step2-body-row-hdr {
+    margin-bottom: 10px;
+    line-height: 40px;
+    font-family: 'opensanssemibold';
+    font-size: 16px;
+}
+
+.wc-step2-body-row {
+    margin-bottom: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #dcdcdc;
+}
+
+.wc-step2-body-row:last-child {
+	margin: 0;
+	padding: 0;
+	border: none;
+}
+
+.wc-prof-input-cont{
+	margin-bottom: 10px;
+}
+
+textarea.wc-about-prof-txt {
+    width: 100%;
+    height: 80px;
+    padding: 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+
+.wc-div-txt {
+	width: 20%;
+	text-align: center;
+	height: 150px;
+	line-height: 150px;
+	font-size: 15px;
+}
+
+.wc-edit-photo-cont-col {
+    width: 40%;
+}
+
+.wc-linkedin-photo {
+    width: 150px;
+    height: 150px;
+    border: 1px solid #dcdcdc;
+    border-radius: 3px;
+}
+
+.wc-photo-upload {
+    width: 150px;
+    height: 150px;
+    border: 1px dashed #dcdcdc;
+    background: #F9F9FB;
+}
+
+.wc-linkedin-photo-txt {
+    font-size: 11px;
+    color: #c0c0c0;
+}
+
+span.wc-highlight {
+    color: #3E9DCB;
+    font-family: 'opensanssemibold';
+}
+
+.wc-submit-btn {
+    height: 40px;
+    line-height: 40px;
+    margin: 10px 0 0 10px;
+    padding: 0 30px;
+    text-align: center;
+    background: #3E9DCB;
+    color: #fff;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.wc-submit-btn:hover {
+	background: #7AB400;
+}
+
+.wc-prof-hdr {
+    line-height: 40px;
+    font-size: 15px;
+}
+
+.linkedin-import-hdr{
+	margin-right:20px;
+	background: url(../images/LInkedin.png) no-repeat center;
+	background-color: transparent;
+}

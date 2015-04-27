@@ -26,6 +26,7 @@
 	<c:set value="${socialMediaTokens.twitterToken}" var="twitterToken"></c:set>
 	<c:set value="${socialMediaTokens.linkedInToken}" var="linkedInToken"></c:set>
 	<c:set value="${socialMediaTokens.yelpToken}" var="yelpToken"></c:set>
+	<c:set value="${socialMediaTokens.googleToken}" var="googleToken"></c:set>
 </c:if>
 
 <!-- Setting agent page variables -->
@@ -80,6 +81,7 @@
 	<div class="container">
 		<div class="hm-header-row hm-header-row-main clearfix">
 			<div class="float-left hm-header-row-left"><spring:message code="label.profileheader.key" /></div>
+			
 			<c:if test="${not empty profileList && fn:length(profileList) > 1}">
 				<div class="float-right header-right clearfix hr-dsh-adj-rt" style="z-index: 9999; margin-left: 50px;">
 					<div class="float-left hr-txt1"><spring:message code="label.viewas.key" /></div>
@@ -91,24 +93,13 @@
 					</div>
 				</div>
 			</c:if>
-
-			<%-- <c:if test="${accountMasterId != 5}">
-				<div id="prof-edit-social-link" class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-					<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
-					<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
-					<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
-					<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
-                    <div class="float-left social-item-icon icn-glpus" data-link=""></div>
-					<input id="social-token-text" type="text" class="social-token-text hide" placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
-				</div>
-			</c:if> --%>
 		</div>
 	</div>
 </div>
 
 <div class="prof-main-content-wrapper margin-top-25 margin-bottom-25">
 	<input id="prof-all-lock" type="hidden" value="locked">
-	<div class="">
+	<div>
         <div class="container">
 		<div class="row prof-pic-name-wrapper edit-prof-pic-name-wrapper">
 			<div class="col-lg-4 col-md-4 col-sm-4 col-xs-6 prof-wrapper prof-img-wrapper">
@@ -185,13 +176,7 @@
 					</div>
 					
 					<div id="prof-rating-review-count" class="prof-rating clearfix">
-						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp">
-							<!-- <div class="rating-star icn-no-star"></div>
-							<div class="rating-star icn-no-star"></div>
-							<div class="rating-star icn-no-star"></div>
-							<div class="rating-star icn-no-star"></div>
-							<div class="rating-star icn-no-star"></div> -->
-						</div>
+						<div class="st-rating-wrapper maring-0 clearfix float-left" id="rating-avg-comp"></div>
 						<div class="float-left review-count-left cursor-pointer" id="prof-company-review-count"></div>
 					</div>
 				</div>
@@ -265,22 +250,15 @@
 					<c:if test="${accountMasterId != 5}">
 						<div id="prof-edit-social-link"
 							class="prof-edit-social-link float-right hm-hr-row-right clearfix">
-							<div class="float-left social-item-icon icn-fb"
-								data-link="${facebookToken.facebookPageLink}"></div>
-							<div class="float-left social-item-icon icn-twit"
-								data-link="${twitterToken.twitterPageLink}"></div>
-							<div class="float-left social-item-icon icn-lin"
-								data-link="${linkedInToken.linkedInPageLink}"></div>
-							<div class="float-left social-item-icon icn-yelp"
-								data-link="${yelpToken.yelpPageLink}"></div>
-                            <div class="float-left social-item-icon icn-gplus"
-								data-link=""></div>
-							<input id="social-token-text" type="text"
-								class="social-token-text hide"
+							<div class="float-left social-item-icon icn-fb" data-link="${facebookToken.facebookPageLink}"></div>
+							<div class="float-left social-item-icon icn-twit" data-link="${twitterToken.twitterPageLink}"></div>
+							<div class="float-left social-item-icon icn-lin" data-link="${linkedInToken.linkedInPageLink}"></div>
+							<div class="float-left social-item-icon icn-yelp" data-link="${yelpToken.yelpPageLink}"></div>
+                            <div class="float-left social-item-icon icn-gplus" data-link="${googleToken.profileLink}"></div>
+							<input id="social-token-text" type="text" class="social-token-text hide"
 								placeholder='<spring:message code="label.socialpage.placeholder.key"/>'>
 						</div>
 					</c:if>
-					
 				</div>
 			</div>
 		</div>
@@ -592,7 +570,6 @@
 			</div>
 			
 			<div class="row prof-right-panel-wrapper margin-top-25 col-lg-8 col-md-8 col-sm-8 col-xs-12">
-				
 				<div id="intro-about-me" class="intro-wrapper rt-content-main bord-bot-dc main-rt-adj">
 					<div class="main-con-header main-con-header-adj clearfix">
 						<div class="float-left">
@@ -775,9 +752,5 @@
 		$('#reviews-container').hide();
 		$('#ppl-post-cont').hide();
 	});
-	
-	//Prepend domain url
-	//$('#prof-header-url').prepend(window.location.origin+"/pages");
-	
 });
 </script>
