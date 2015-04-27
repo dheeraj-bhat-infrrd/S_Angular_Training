@@ -7,7 +7,7 @@ var attrVal = null;
 var webAddressRegEx = /((http(s?):\/\/)?)(www.)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w.?=&_]+)?/;
 var timer = 0;
 var profileId;
-var proPostBatchSize = 3;
+var proPostBatchSize = 10;
 var proPostStartIndex = 0;
 var proPostCount = 0;
 var delay = (function() {
