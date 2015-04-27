@@ -83,7 +83,7 @@
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">Please fill in your
-								details to take survey for ${agentName}</span></i>
+								details to take survey for<br><span class="semibold">${agentName}</span></span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
@@ -150,11 +150,11 @@
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
 						<div id="sq-stars" class="sq-star-wrapper clearfix">
-							<div star-no="1" class="sq-star"></div>
-							<div star-no="2" class="sq-star"></div>
-							<div star-no="3" class="sq-star"></div>
-							<div star-no="4" class="sq-star"></div>
-							<div star-no="5" class="sq-star"></div>
+							<div star-no="1" class="sq-star opacity-red"></div>
+							<div star-no="2" class="sq-star opacity-red"></div>
+							<div star-no="3" class="sq-star opacity-red"></div>
+							<div star-no="4" class="sq-star opacity-red"></div>
+							<div star-no="5" class="sq-star opacity-red"></div>
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">

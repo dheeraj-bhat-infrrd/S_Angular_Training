@@ -9,12 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.imageio.ImageIO;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.QueryParam;
-
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.slf4j.Logger;
@@ -28,9 +26,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
-
 import sun.misc.BASE64Decoder;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.google.gson.Gson;
@@ -55,6 +51,7 @@ import com.realtech.socialsurvey.core.entities.ProListUser;
 import com.realtech.socialsurvey.core.entities.Region;
 import com.realtech.socialsurvey.core.entities.SocialMediaTokens;
 import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.entities.SurveyDetails;
 import com.realtech.socialsurvey.core.entities.TwitterToken;
 import com.realtech.socialsurvey.core.entities.User;
@@ -1530,7 +1527,10 @@ public class ProfileManagementController {
 			LOG.debug("No social media token in profile added");
 			socialMediaTokens = new SocialMediaTokens();
 		}
-		FacebookToken facebookToken = new FacebookToken();
+		if (socialMediaTokens.getFacebookToken() == null) {
+			socialMediaTokens.setFacebookToken(new FacebookToken());
+		}
+		FacebookToken facebookToken = socialMediaTokens.getFacebookToken();
 		facebookToken.setFacebookPageLink(fbLink);
 		socialMediaTokens.setFacebookToken(facebookToken);
 		LOG.debug("Method updateFacebookToken() finished from ProfileManagementController");
@@ -1639,7 +1639,10 @@ public class ProfileManagementController {
 			LOG.debug("No social media token in profile added");
 			socialMediaTokens = new SocialMediaTokens();
 		}
-		TwitterToken twitterToken = new TwitterToken();
+		if (socialMediaTokens.getTwitterToken() == null) {
+			socialMediaTokens.setTwitterToken(new TwitterToken());
+		}
+		TwitterToken twitterToken = socialMediaTokens.getTwitterToken();
 		twitterToken.setTwitterPageLink(twitterLink);
 		socialMediaTokens.setTwitterToken(twitterToken);
 		LOG.debug("Method updateTwitterToken() finished from ProfileManagementController");
@@ -1748,7 +1751,10 @@ public class ProfileManagementController {
 			LOG.debug("No social media token in profile added");
 			socialMediaTokens = new SocialMediaTokens();
 		}
-		LinkedInToken linkedIntoken = new LinkedInToken();
+		if (socialMediaTokens.getLinkedInToken() == null) {
+			socialMediaTokens.setLinkedInToken(new LinkedInToken());
+		}
+		LinkedInToken linkedIntoken = socialMediaTokens.getLinkedInToken();
 		linkedIntoken.setLinkedInPageLink(linkedinLink);
 		socialMediaTokens.setLinkedInToken(linkedIntoken);
 		LOG.debug("Method updateLinkedinToken() finished from ProfileManagementController");
@@ -1857,13 +1863,129 @@ public class ProfileManagementController {
 			LOG.debug("No social media token in profile added");
 			socialMediaTokens = new SocialMediaTokens();
 		}
-		YelpToken yelpToken = new YelpToken();
+		if (socialMediaTokens.getYelpToken() == null) {
+			socialMediaTokens.setYelpToken(new YelpToken());
+		}
+		YelpToken yelpToken = socialMediaTokens.getYelpToken();
 		yelpToken.setYelpPageLink(yelpLink);
 		socialMediaTokens.setYelpToken(yelpToken);
 		LOG.debug("Method updateYelpLink() finished from ProfileManagementController");
 		return socialMediaTokens;
 	}
 
+	// TODO
+	@RequestMapping(value = "/updategooglelink", method = RequestMethod.POST)
+	public String updateGoogleLink(Model model, HttpServletRequest request) {
+		LOG.info("Method updateGoogleLink() called from ProfileManagementController");
+		HttpSession session = request.getSession(false);
+		SocialMediaTokens socialMediaTokens = null;
+
+		try {
+			UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+			OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) session.getAttribute(CommonConstants.USER_PROFILE_SETTINGS);
+			UserProfile selectedProfile = (UserProfile) request.getSession(false).getAttribute(CommonConstants.USER_PROFILE);
+			if (userSettings == null || profileSettings == null || selectedProfile == null) {
+				throw new InvalidInputException("No user settings found in session", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			String gplusLink = request.getParameter("gpluslink");
+			try {
+				if (gplusLink == null || gplusLink.isEmpty()) {
+					throw new InvalidInputException("GooglePlus link passed was null or empty", DisplayMessageConstants.GENERAL_ERROR);
+				}
+				urlValidationHelper.validateUrl(gplusLink);
+			}
+			catch (IOException ioException) {
+				throw new InvalidInputException("GooglePlus link passed was invalid", DisplayMessageConstants.GENERAL_ERROR, ioException);
+			}
+
+			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+			if (profilesMaster == CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID) {
+				OrganizationUnitSettings companySettings = userSettings.getCompanySettings();
+				if (companySettings == null) {
+					throw new InvalidInputException("No company settings found in current session");
+				}
+				socialMediaTokens = companySettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleToken(socialMediaTokens, gplusLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.COMPANY_SETTINGS_COLLECTION, companySettings,
+						socialMediaTokens);
+				companySettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setCompanySettings(companySettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_REGION_ADMIN_PROFILE_ID) {
+				long regionId = selectedProfile.getRegionId();
+				OrganizationUnitSettings regionSettings = userSettings.getRegionSettings().get(regionId);
+				if (regionSettings == null) {
+					throw new InvalidInputException("No Region settings found in current session");
+				}
+				socialMediaTokens = regionSettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleToken(socialMediaTokens, gplusLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.REGION_SETTINGS_COLLECTION, regionSettings,
+						socialMediaTokens);
+				regionSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getRegionSettings().put(regionId, regionSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_BRANCH_ADMIN_PROFILE_ID) {
+				long branchId = selectedProfile.getBranchId();
+				OrganizationUnitSettings branchSettings = userSettings.getBranchSettings().get(branchId);
+				if (branchSettings == null) {
+					throw new InvalidInputException("No Branch settings found in current session");
+				}
+				socialMediaTokens = branchSettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleToken(socialMediaTokens, gplusLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.BRANCH_SETTINGS_COLLECTION, branchSettings,
+						socialMediaTokens);
+				branchSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.getBranchSettings().put(branchId, branchSettings);
+			}
+			else if (profilesMaster == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+				AgentSettings agentSettings = userSettings.getAgentSettings();
+				if (agentSettings == null) {
+					throw new InvalidInputException("No Agent settings found in current session");
+				}
+				socialMediaTokens = agentSettings.getSocialMediaTokens();
+				socialMediaTokens = updateGoogleToken(socialMediaTokens, gplusLink);
+				profileManagementService.updateSocialMediaTokens(MongoOrganizationUnitSettingDaoImpl.AGENT_SETTINGS_COLLECTION, agentSettings,
+						socialMediaTokens);
+				agentSettings.setSocialMediaTokens(socialMediaTokens);
+				userSettings.setAgentSettings(agentSettings);
+			}
+			else {
+				throw new InvalidInputException("Invalid input exception occurred in updating GooglePlus url", DisplayMessageConstants.GENERAL_ERROR);
+			}
+
+			profileSettings.setSocialMediaTokens(socialMediaTokens);
+
+			LOG.info("GooglePlus link updated successfully");
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.GPLUS_TOKEN_UPDATE_SUCCESSFUL, DisplayMessageType.SUCCESS_MESSAGE));
+		}
+		catch (NonFatalException nonFatalException) {
+			LOG.error("NonFatalException while updating GooglePlus link in profile. Reason :" + nonFatalException.getMessage(), nonFatalException);
+			model.addAttribute("message",
+					messageUtils.getDisplayMessage(DisplayMessageConstants.GPLUS_TOKEN_UPDATE_UNSUCCESSFUL, DisplayMessageType.ERROR_MESSAGE));
+		}
+
+		LOG.info("Method updateGoogleLink() finished from ProfileManagementController");
+		return JspResolver.MESSAGE_HEADER;
+	}
+
+	private SocialMediaTokens updateGoogleToken(SocialMediaTokens socialMediaTokens, String gplusLink) {
+		LOG.debug("Method updateGoogleToken() called from ProfileManagementController");
+		if (socialMediaTokens == null) {
+			LOG.debug("No social media token in profile added");
+			socialMediaTokens = new SocialMediaTokens();
+		}
+		if (socialMediaTokens.getGoogleToken() == null) {
+			socialMediaTokens.setGoogleToken(new SocialProfileToken());
+		}
+		SocialProfileToken googleToken = socialMediaTokens.getGoogleToken();
+		googleToken.setProfileLink(gplusLink);
+		socialMediaTokens.setGoogleToken(googleToken);
+		LOG.debug("Method updateGoogleToken() finished from ProfileManagementController");
+		return socialMediaTokens;
+	}
+	
 	/**
 	 * Method to update achievements in profile
 	 * 
