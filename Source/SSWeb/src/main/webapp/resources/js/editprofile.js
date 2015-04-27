@@ -1030,8 +1030,7 @@ function callBackUpdateHobbies(data) {
 }
 
 
-// Update Social links
-
+// Update Social links - facebook
 $('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
@@ -1042,6 +1041,19 @@ $('body').on('click','#prof-edit-social-link .icn-fb',function(){
 	});
 });
 
+function updateFacebookLink(link) {
+	var payload = {
+		"fblink" : link	
+	};
+	if(isValidUrl(link)){
+        callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateSocialLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - twitter
 $('body').on('click','#prof-edit-social-link .icn-twit',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
@@ -1052,6 +1064,19 @@ $('body').on('click','#prof-edit-social-link .icn-twit',function(){
 	});
 });
 
+function updateTwitterLink(link) {
+	var payload = {
+		"twitterlink" : link	
+	};
+	if(isValidUrl(link)){
+        	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - linkedin
 $('body').on('click','#prof-edit-social-link .icn-lin',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
@@ -1062,6 +1087,19 @@ $('body').on('click','#prof-edit-social-link .icn-lin',function(){
 	});
 });
 
+function updateLinkedInLink(link) {
+	var payload = {
+		"linkedinlink" : link	
+	};
+	if(isValidUrl(link)){
+		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+// Update Social links - yelp
 $('body').on('click','#prof-edit-social-link .icn-yelp',function(){
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
@@ -1072,79 +1110,42 @@ $('body').on('click','#prof-edit-social-link .icn-yelp',function(){
 	});
 });
 
-function updateFacebookLink(link) {
-	var payload = {
-		"fblink" : link	
-	};
-	if(isValidUrl(link)){
-        callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateFacebookLink, payload);
-	}else{
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}
-
-function callBackUpdateFacebookLink(data) {
-	$('#prof-message-header').html(data);
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-
-	showProfileSocialLinks();
-}
-
-function updateTwitterLink(link) {
-	var payload = {
-		"twitterlink" : link	
-	};
-	if(isValidUrl(link)){
-        	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateTwitterLink, payload);
-	}else{
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}
-
-function callBackUpdateTwitterLink(data) {
-	$('#prof-message-header').html(data);
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-
-	showProfileSocialLinks();
-}
-
-function updateLinkedInLink(link) {
-	var payload = {
-		"linkedinlink" : link	
-	};
-	if(isValidUrl(link)){
-		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateLinkedInLink, payload);
-	}else{
-		$('#overlay-toast').html("Enter a valid url");
-		showToast();
-	}
-}
-
-function callBackUpdateLinkedInLink(data) {
-	$('#prof-message-header').html(data);
-	$('#overlay-toast').html($('#display-msg-div').text().trim());
-	showToast();
-
-	showProfileSocialLinks();
-}
-
 function updateYelpLink(link) {
 	var payload = {
 		"yelplink" : link	
 	};
 	if(isValidUrl(link)){
-		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateYelpLink, payload);
+		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
 	}else{
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
-function callBackUpdateYelpLink(data) {
+// TODO Update Social links - google plus
+$('body').on('click','#prof-edit-social-link .icn-gplus',function(){
+	$('#social-token-text').show();
+	var link = $(this).attr("data-link");
+	$('#social-token-text').attr({
+		"placeholder" : "Add Google link",
+		"value" : link,
+		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
+	});
+});
+
+function updateGoogleLink(link) {
+	var payload = {
+		"gpluslink" : link	
+	};
+	if(isValidUrl(link)){
+        callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
+	}else{
+		$('#overlay-toast').html("Enter a valid url");
+		showToast();
+	}
+}
+
+function callBackUpdateSocialLink(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
