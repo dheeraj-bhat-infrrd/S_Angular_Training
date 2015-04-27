@@ -50,6 +50,14 @@
 						</div>
 					</div>
 				</div>
+				<div class="wc-btn-row clearfix">
+					<div class="wc-btn-col float-left">
+						<div class="wc-skip-btn float-right">Skip this Step</div>
+					</div>
+					<div class="wc-btn-col float-left">
+						<div class="wc-sub-btn float-left wc-next-btn">Next</div>
+					</div>
+				</div>
 			</div>
 			<div id="welocome-step2" class="welcome-popup-wrapper hide">
 				<div class="welcome-popup-hdr-wrapper clearfix">
@@ -57,8 +65,128 @@
 					<div class="float-right wc-hdr-step">Step 2</div>
 				</div>
 				<div class="welcome-popup-body-wrapper clearfix">
-					<div class="wc-popup-body-hdr linkedin-import-hdr">Data Imported From Linkedin</div>
+					<div class="wc-popup-body-hdr">Data Imported From Linkedin
+					<div class="float-right linkedin-import-hdr"></div>
+					</div>
 					<div class="wc-popup-body-cont">
+						<div class="wc-step2-body-row">
+							<div class="wc-step2-body-row-hdr">Upload/Edit Your Photo</div>
+							<div class="wc-step2-body-row-cont">
+								<div class="wc-edit-photo-cont clearfix">
+									<div class="wc-edit-photo-cont-col float-left">
+										<div class="float-right">
+											<div class="wc-linkedin-photo"></div>
+											<div class="wc-linkedin-photo-txt">Photo imported from <span class="wc-highlight">Linkedin</span></div>
+										</div>
+									</div>
+									<div class="wc-div-txt float-left">(Or)</div>
+									<div class="wc-edit-photo-cont-col float-left">
+										<div class="float-left">
+											<div class="wc-photo-upload"></div>
+											<div class="wc-submit-btn">Upload</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="wc-step2-body-row">
+							<div class="wc-step2-body-row-hdr">Business Name, Address and Logo</div>
+							<div class="wc-step2-body-row-cont">
+								<div class="wc-form-container">
+									<div class="wc-form-row clearfix">
+										<div class="float-left wc-form-txt">Company</div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" id="com-company" data-non-empty="true"
+								name="company" value="${companyName}" placeholder='<spring:message code="label.company.key"/>'>
+										</div>
+									</div>
+									<div class="wc-form-row clearfix">
+										<div class="float-left wc-form-txt">Logo</div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" placeholder='<spring:message code="label.logo.placeholder.key"/>'>
+											<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo">
+											<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"></div>
+										</div>
+									</div>
+									<div class="wc-form-row clearfix">
+										<div class="float-left wc-form-txt">Address</div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" id="com-address1" data-non-empty="true"
+								name="address1" value="${address1}" placeholder='<spring:message code="label.address1.key"/>'>
+										</div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" id="com-address2"
+								name="address2" value="${address2}" placeholder='<spring:message code="label.address2.key"/>'>
+										</div>
+									</div>
+									<div class="wc-form-row clearfix">
+										<div class="float-left wc-form-txt"></div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" id="com-country" data-non-empty="true"
+								name="country" value="${country}" placeholder='<spring:message code="label.country.key"/>'>
+										</div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" id="com-zipcode" data-non-empty="true" data-zipcode="true"
+								name="zipcode" value="${zipCode}" placeholder='<spring:message code="label.zipcode.key"/>'>
+										</div>
+									</div>
+									<div class="wc-form-row clearfix">
+										<div class="float-left wc-form-txt">Phone No</div>
+										<div class="float-left wc-form-input-cont">
+											<input class="wc-form-input" id="com-contactno" data-non-empty="true" data-phone="true"
+								name="contactno" value="${companyContactNo}" placeholder="<spring:message code="label.phoneno.key" />">
+										</div>
+									</div>
+									<div class="wc-form-row clearfix">
+										<div class="float-left wc-form-txt">Business Type</div>
+										<div class="float-left wc-form-input-cont">
+											<select name="vertical" id="select-vertical"
+												class="rfr_txt_fld">
+												<option disabled selected>Select a business
+													type</option>
+												<option id="vertical-1">MORTGAGE</option>
+											</select>
+										</div>
+									</div>
+									<div class="wc-form-row clearfix">
+										<div class="reg_btn">Update</div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="wc-step2-body-row">
+							<div class="wc-step2-body-row-hdr">Tell us about yourself</div>
+							<div class="wc-step2-body-row-cont">
+								<div class="wc-prof-details">
+									<div class="wc-prof-hdr">About Scott Haris</div>
+									<div class="wc-prof-details-row clearfix">
+										<div class="wc-prof-input-cont float-left">
+											<input class="wc-form-input">
+										</div>
+										<div class="wc-prof-input-cont float-left">
+											<input class="wc-form-input">
+										</div>
+										<div class="wc-linkedin-photo-txt float-right">Photo imported from <span class="wc-highlight">Linkedin</span></div>
+									</div>
+									<div class="wc-prof-details-row clearfix">
+										<textarea class="wc-about-prof-txt"></textarea>
+									</div>
+									
+									<div class="wc-prof-details-row clearfix">
+										<div class="wc-submit-btn float-right">Update</div>
+									</div>
+									
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="wc-btn-row clearfix">
+					<div class="wc-btn-col float-left">
+						<div class="wc-skip-btn float-right">Skip this Step</div>
+					</div>
+					<div class="wc-btn-col float-left">
+						<div class="wc-sub-btn float-left wc-next-btn">Next</div>
 					</div>
 				</div>
 			</div>
@@ -69,7 +197,7 @@
 				</div>
 				<div class="welcome-popup-body-wrapper clearfix">
 					<div class="wc-popup-body-hdr">Connect so we can share your happy customer views</div>
-					<div class="wc-popup-body-cont">
+					<div class="wc-popup-body-cont wc-step3-body-cont">
 						<div class="wc-social-icn-row clearfix">
 							<div class="wc-social-icn i-fb float-left"></div>
 							<div class="wc-icn-txt float-left">www.facebook.com/scott-harris</div>
@@ -98,17 +226,17 @@
 				</div>
 				<div class="wc-btn-row clearfix">
 					<div class="wc-btn-col float-left">
-						<div class="wc-skip-btn float-right">Skip</div>
+						<div class="wc-skip-btn float-right wc-final-skip">Skip</div>
 					</div>
 					<div class="wc-btn-col float-left">
-						<div class="wc-sub-btn float-left">Done</div>
+						<div class="wc-sub-btn float-left wc-final-submit">Done</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</c:if>
 	
-	<c:if test="${user.numOfLogins == 2 }">
+	<c:if test="${user.numOfLogins > 1 }">
 		<div class="overlay-login overlay-main">
 			<div class="welcome-popup-wrapper">
 				<div class="welcome-popup-hdr-wrapper clearfix">
@@ -118,54 +246,54 @@
 					<div class="wc-popup-body-hdr">Connect so we can share your happy customer reviews</div>
 					<div class="wc-popup-body-cont">
 						<div class="wc-review-table">
-							<div class="wc-review-tr wc-review-hdr">
-								<div class="wc-review-th1">First Name</div>
-								<div class="wc-review-th2">Last Name</div>
-								<div class="wc-review-th3">Email Address</div>
-								<div class="wc-review-th4"></div>
+							<div class="wc-review-tr wc-review-hdr clearfix">
+								<div class="wc-review-th1 float-left">First Name</div>
+								<div class="wc-review-th2 float-left">Last Name</div>
+								<div class="wc-review-th3 float-left">Email Address</div>
+								<div class="wc-review-th4 float-left"></div>
 							</div>
 							
-							<div class="wc-review-tr">
-								<div class="wc-review-tc1">
+							<div class="wc-review-tr clearfix">
+								<div class="wc-review-tc1 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc2">
+								<div class="wc-review-tc2 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc3">
+								<div class="wc-review-tc3 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc4">
+								<div class="wc-review-tc4 float-left">
 									<div class="wc-review-rmv-icn"></div>
 								</div>
 							</div>
 							
-							<div class="wc-review-tr">
-								<div class="wc-review-tc1">
+							<div class="wc-review-tr clearfix">
+								<div class="wc-review-tc1 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc2">
+								<div class="wc-review-tc2 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc3">
+								<div class="wc-review-tc3 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc4">
+								<div class="wc-review-tc4 float-left">
 									<div class="wc-review-rmv-icn"></div>
 								</div>
 							</div>
 							
-							<div class="wc-review-tr">
-								<div class="wc-review-tc1">
+							<div class="wc-review-tr clearfix">
+								<div class="wc-review-tc1 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc2">
+								<div class="wc-review-tc2 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc3">
+								<div class="wc-review-tc3 float-left">
 									<input class="wc-review-input">
 								</div>
-								<div class="wc-review-tc4">
+								<div class="wc-review-tc4 float-left">
 									<div class="wc-review-rmv-icn"></div>
 								</div>
 							</div>
@@ -175,10 +303,10 @@
 				</div>
 				<div class="wc-btn-row clearfix">
 					<div class="wc-btn-col float-left">
-						<div class="wc-skip-btn float-right">Skip this step</div>
+						<div class="wc-skip-btn float-right wc-final-skip">Skip this step</div>
 					</div>
 					<div class="wc-btn-col float-left">
-						<div class="wc-sub-btn float-left">Send</div>
+						<div class="wc-sub-btn float-left wc-final-submit">Send</div>
 					</div>
 				</div>
 			</div>
