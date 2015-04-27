@@ -379,3 +379,14 @@ function shareOnGooglePlus(agentId, location){
 function openForgotPasswordPage(){
 	window.location.href = "./forgotpassword.do";
 }
+
+//Dashboard popup click functions
+$('body').on('click','.wc-skip-btn, .wc-sub-btn',function(){
+	var parent = $(this).closest('.welcome-popup-wrapper');
+	parent.hide();
+	parent.next('.welcome-popup-wrapper').show();
+});
+
+$('body').on('click','.wc-final-skip, .wc-final-submit',function(){
+	$(this).closest('.overlay-login ').hide();
+});
