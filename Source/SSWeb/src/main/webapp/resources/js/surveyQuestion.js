@@ -554,7 +554,7 @@ $('.sq-star').hover(function() {
 	var smileVal = $(this).attr('star-no');
 	$(this).parent().find('.sq-star').each(function(index) {
 		if (index < smileVal) {
-			$(this).addClass('sq-full-star');
+			$(this).removeClass('opacity-red');
 		}
 	});
 }, function() {
