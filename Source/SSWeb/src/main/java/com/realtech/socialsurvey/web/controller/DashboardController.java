@@ -113,8 +113,9 @@ public class DashboardController {
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 			UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
 			if (selectedProfile == null) {
-				selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
-				for (UserProfile profile : user.getUserProfiles()) {
+				List<UserProfile> profiles = userManagementService.getAllUserProfilesForUser(user);
+				selectedProfile = profiles.get(CommonConstants.INITIAL_INDEX);
+				for (UserProfile profile : profiles) {
 					if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 						selectedProfile = profile;
 						break;
