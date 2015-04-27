@@ -222,14 +222,15 @@ var delay = (function() {
 	};
 })();
 
-function shareOnFacebook(firstName, lastName, agentName, review, score){
+function shareOnFacebook(firstName, lastName, agentName, review, score, agentId){
 	var success= false;
 	var payload = {
 			"firstName" : firstName,
 			"lastName" : lastName,
 			"agentName" : agentName,
 			"review" : review,
-			"score" : score
+			"score" : score,
+			"agentId" : agentId
 		};
 		$.ajax({
 			url : "./postonfacebook.do",
@@ -253,14 +254,15 @@ function shareOnFacebook(firstName, lastName, agentName, review, score){
 		});
 }
 
-function shareOnTwitter(firstName, lastName, agentName, review, score){
+function shareOnTwitter(firstName, lastName, agentName, review, score, agentId){
 	var success= false;
 	var payload = {
 			"firstName" : firstName,
 			"lastName" : lastName,
 			"agentName" : agentName,
 			"review" : review,
-			"score" : score
+			"score" : score,
+			"agentId" : agentId
 		};
 		$.ajax({
 			url : "./postontwitter.do",
@@ -284,14 +286,15 @@ function shareOnTwitter(firstName, lastName, agentName, review, score){
 		});
 }
 
-function shareOnLinkedin(firstName, lastName, agentName, review, score){
+function shareOnLinkedin(firstName, lastName, agentName, review, score, agentId){
 	var success= false;
 	var payload = {
 			"firstName" : firstName,
 			"lastName" : lastName,
 			"agentName" : agentName,
 			"review" : review,
-			"score" : score
+			"score" : score,
+			"agentId" : agentId
 		};
 		$.ajax({
 			url : "./postonlinkedin.do",

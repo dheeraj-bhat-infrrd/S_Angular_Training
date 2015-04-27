@@ -110,6 +110,9 @@ public class SocialManagementController {
 	// Yelp
 	@Value("${YELP_REDIRECT_URI}")
 	private String yelpRedirectUri;
+
+	@Value("${APPLICATION_BASE_URL}")
+	private String applicationBaseUrl;
 	
 	/**
 	 * Returns the social authorization page
@@ -761,10 +764,12 @@ public class SocialManagementController {
 		String agentName = request.getParameter("agentName");
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
-		String review = request.getParameter("review");
+		String agentIdStr = request.getParameter("agentId");
 		
 		double rating = 0;
+		long agentId = 0;
 		try {
+			agentId = Long.parseLong(agentIdStr);
 			String ratingStr = request.getParameter("score");
 			rating = Double.parseDouble(ratingStr);
 		}
@@ -776,8 +781,21 @@ public class SocialManagementController {
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 		rating = Math.round(rating * 100) / 100;
+		
+		String agentProfileLink = "";
+		AgentSettings agentSettings;
+		try {
+			agentSettings = userManagementService.getUserSettings(agentId);
+			if(agentSettings!=null && agentSettings.getProfileUrl()!=null){
+				agentProfileLink = agentSettings.getProfileUrl();
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in postToFacebook(). Nested exception is ", e);
+		}
+		
 		String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-				+ " on Social Survey \n" + review;
+				+ " on Social Survey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 		facebookMessage = facebookMessage.replaceAll("null", "");
 		
 		for (OrganizationUnitSettings setting : settings) {
@@ -805,7 +823,9 @@ public class SocialManagementController {
 			String agentIdStr = request.getParameter("agentId");
 			
 			double rating = 0;
+			long agentId = 0;
 			try {
+				agentId = Long.parseLong(agentIdStr);
 				String ratingStr = request.getParameter("score");
 				rating = Double.parseDouble(ratingStr);
 			}
@@ -814,11 +834,23 @@ public class SocialManagementController {
 				return e.getMessage();
 			}
 
+			String agentProfileLink = "";
+			AgentSettings agentSettings;
+			try {
+				agentSettings = userManagementService.getUserSettings(agentId);
+				if(agentSettings!=null && agentSettings.getProfileUrl()!=null){
+					agentProfileLink = agentSettings.getProfileUrl();
+				}
+			}
+			catch (InvalidInputException e) {
+				LOG.error("InvalidInputException caught in postToFacebook(). Nested exception is ", e);
+			}
+			
 			User user = sessionHelper.getCurrentUser();
 			List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 			rating = Math.round(rating * 100) / 100;
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+					+ " on @SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			twitterMessage = twitterMessage.replaceAll("null", "");
 
 			for (OrganizationUnitSettings setting : settings) {
@@ -853,7 +885,9 @@ public class SocialManagementController {
 		String agentIdStr = request.getParameter("agentId");
 		
 		double rating = 0;
+		long agentId = 0;
 		try {
+			agentId = Long.parseLong(agentIdStr);
 			String ratingStr = request.getParameter("score");
 			rating = Double.parseDouble(ratingStr);
 		}
@@ -861,12 +895,24 @@ public class SocialManagementController {
 			LOG.error("Number format exception caught in postToLinkedin() while trying to convert agent Id. Nested exception is ", e);
 			return e.getMessage();
 		}
+		
+		String agentProfileLink = "";
+		AgentSettings agentSettings;
+		try {
+			agentSettings = userManagementService.getUserSettings(agentId);
+			if(agentSettings!=null && agentSettings.getProfileUrl()!=null){
+				agentProfileLink = agentSettings.getProfileUrl();
+			}
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException caught in postToFacebook(). Nested exception is ", e);
+		}
 
 		User user = sessionHelper.getCurrentUser();
 		List<OrganizationUnitSettings> settings = socialManagementService.getBranchAndRegionSettingsForUser(user.getUserId());
 		rating = Math.round(rating * 100) / 100;
 		String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-				+ " on SocialSurvey - view at www.social-survey.com/" + agentIdStr;
+				+ " on SocialSurvey - view at " + applicationBaseUrl + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 		message = message.replaceAll("null", "");
 		
 		for (OrganizationUnitSettings setting : settings) {
