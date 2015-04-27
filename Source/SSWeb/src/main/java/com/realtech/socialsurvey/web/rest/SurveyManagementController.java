@@ -354,13 +354,13 @@ public class SurveyManagementController {
 			List<OrganizationUnitSettings> settings = socialManagementService.getSettingsForBranchesAndRegionsInHierarchy(agentId);
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on Social Survey - view at www.social-survey.com/" + agentProfileLink;
+					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at www.social-survey.com/" + agentProfileLink;
+					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			
 			String linkedinMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at www.social-survey.com/" + agentProfileLink;
+					+ " on SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
 				List<String> socialSites = new ArrayList<>();
@@ -436,7 +436,7 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			rating = Math.round(rating * 100) / 100;
 			String facebookMessage = rating + "-Star Survey Response from " + custFirstName + " " + custLastName + " for " + agentName
-					+ " on Social Survey - view at www.social-survey.com/rest/pages" + agentProfileLink;
+					+ " on Social Survey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.updateStatusIntoFacebookPage(agentSettings, facebookMessage);
 				List<String> socialSites = new ArrayList<>();
@@ -490,7 +490,7 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			rating = Math.round(rating * 100) / 100;
 			String twitterMessage = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on @SocialSurvey - view at www.social-survey.com/rest/pages" + agentProfileLink;
+					+ " on @SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			try {
 				socialManagementService.tweet(agentSettings, twitterMessage);
 				List<String> socialSites = new ArrayList<>();
@@ -544,7 +544,7 @@ public class SurveyManagementController {
 			AgentSettings agentSettings = userManagementService.getUserSettings(agentId);
 			rating = Math.round(rating * 100) / 100;
 			String message = rating + "-Star Survey Response from " + custFirstName + custLastName + " for " + agentName
-					+ " on SocialSurvey - view at www.social-survey.com/rest/pages/" + agentProfileLink;
+					+ " on SocialSurvey - view at " + getApplicationBaseUrl() + CommonConstants.AGENT_PROFILE_FIXED_URL + agentProfileLink;
 			socialManagementService.updateLinkedin(agentSettings, message);
 			for (OrganizationUnitSettings setting : settings) {
 				socialManagementService.updateLinkedin(setting, message);
