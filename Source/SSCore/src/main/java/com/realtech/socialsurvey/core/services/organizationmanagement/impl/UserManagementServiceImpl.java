@@ -1079,6 +1079,7 @@ public class UserManagementServiceImpl implements UserManagementService, Initial
 	 * Method to fetch all the user profiles for the user
 	 */
 	@Override
+	@Transactional
 	public List<UserProfile> getAllUserProfilesForUser(User user) throws InvalidInputException {
 		if (user == null) {
 			LOG.error("User object passed was be null");
