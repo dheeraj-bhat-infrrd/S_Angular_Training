@@ -7,6 +7,7 @@ public class GooglePlusPost {
 	
 	private String id;
 	private String post;
+	private String postedBy;
 	private Date createdOn;
 	private Timestamp lastUpdatedOn;
 	
@@ -33,5 +34,11 @@ public class GooglePlusPost {
 	}
 	public void setLastUpdatedOn(Timestamp lastUpdatedOn) {
 		this.lastUpdatedOn = lastUpdatedOn;
+	}
+	public String getPostedBy() {
+		return postedBy;
+	}
+	public void setPostedBy(String postedBy) {
+		this.postedBy = postedBy;
 	}
 }

@@ -2,9 +2,11 @@ package com.realtech.socialsurvey.core.feed.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import twitter4j.Paging;
 import twitter4j.ResponseList;
 import twitter4j.Status;
@@ -21,7 +24,9 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.AccessToken;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.TwitterStatusTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
@@ -178,7 +183,8 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 	@Override
 	public void processFeed(List<Status> tweets, String organizationUnit) throws NonFatalException {
 		LOG.info("Process tweets for organizationUnit " + organizationUnit);
-
+		
+		Collections.sort(tweets,new TwitterStatusTimeComparator());
 		TwitterSocialPost post;
 		for (Status tweet : tweets) {
 			post = new TwitterSocialPost();
@@ -186,6 +192,7 @@ public class TwitterFeedProcessorImpl implements SocialNetworkDataProcessor<Stat
 			post.setPostText(tweet.getText());
 			post.setSource(FEED_SOURCE);
 			post.setPostId(String.valueOf(tweet.getId()));
+			post.setPostedBy(tweet.getUser().getName());
 			post.setTimeInMillis(tweet.getCreatedAt().getTime());
 
 			switch (organizationUnit) {
