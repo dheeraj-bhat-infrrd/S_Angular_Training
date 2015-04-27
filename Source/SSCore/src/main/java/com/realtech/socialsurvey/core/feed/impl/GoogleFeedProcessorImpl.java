@@ -11,6 +11,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -33,7 +35,7 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
-import com.realtech.socialsurvey.core.entities.SocialPost;
+import com.realtech.socialsurvey.core.entities.GooglePlusSocialPost;
 import com.realtech.socialsurvey.core.entities.SocialProfileToken;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
@@ -200,7 +202,7 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 		StringBuffer url = new StringBuffer("https://www.googleapis.com/plus/v1/people/me/activities/public?access_token=" + accessToken);
 		// Add parameters which are required in response fetch results.
 		
-		url.append("&fields=nextPageToken,updated,items(id,title,published)");
+		url.append("&fields=nextPageToken,updated,items(id,title,published,actor)");
 		
 		// add maximum results per page
 		url.append("&maxResults=").append(PAGE_SIZE);
@@ -254,9 +256,12 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 				
 				Timestamp postCreatedOn = convertStrigToDate(items.get("published").getAsString());
 				
+				JsonObject actor = (JsonObject) items.get("actor");
+				
 				post.setId(items.get("id").getAsString());
 				post.setCreatedOn(postCreatedOn);
 				post.setPost(items.get("title").getAsString());
+				post.setPostedBy(actor.get("displayName").getAsString());
 				post.setLastUpdatedOn(profileUpdatedOn);
 				posts.add(post);
 			}
@@ -271,24 +276,32 @@ public class GoogleFeedProcessorImpl implements SocialNetworkDataProcessor<Googl
 	public void processFeed(List<GooglePlusPost> posts, String organizationUnit) throws NonFatalException {
 		LOG.info("Process tweets for organizationUnit " + organizationUnit);
 		Date lastFetchedOn = null;
+		
+		GooglePlusSocialPost socialPost= null;
 		for (GooglePlusPost post : posts) {
-			SocialPost socialPost = null;
 			if(lastFetchedTill == null){
-				socialPost = new SocialPost();
+				socialPost = new GooglePlusSocialPost();
+				socialPost.setPost(post);
 				lastFetchedOn = post.getCreatedOn(); 
 				socialPost.setPostText(post.getPost());
+				socialPost.setPostedBy(post.getPostedBy());
 				socialPost.setSource(FEED_SOURCE);
 				socialPost.setPostId(post.getId());
+				//socialPost.setPostedBy(post.);
 				socialPost.setTimeInMillis(post.getCreatedOn().getTime());
 			}
+			
 			if (lastFetchedTill != null && lastFetchedTill.after(post.getCreatedOn())) {
-				socialPost = new SocialPost();
+				socialPost = new GooglePlusSocialPost();
+				socialPost.setPost(post);
 				lastFetchedOn = post.getCreatedOn(); 
 				socialPost.setPostText(post.getPost());
+				socialPost.setPostedBy(post.getPostedBy());
 				socialPost.setSource(FEED_SOURCE);
 				socialPost.setPostId(post.getId());
 				socialPost.setTimeInMillis(post.getCreatedOn().getTime());
 			}
+			
 			if(socialPost == null)
 				break;
 			
