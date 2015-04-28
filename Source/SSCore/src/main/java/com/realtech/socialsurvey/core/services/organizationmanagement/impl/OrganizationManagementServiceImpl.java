@@ -361,7 +361,7 @@ public class OrganizationManagementServiceImpl implements OrganizationManagement
 		companySettings.setContact_details(contactDetailSettings);
 		companySettings.setProfileName(generateProfileNameForCompany(company.getCompany(), company.getCompanyId()));
 		// profile url for company will be same as profile name
-		companySettings.setProfileUrl(companySettings.getProfileName());
+		companySettings.setProfileUrl("/" + companySettings.getProfileName());
 		companySettings.setCreatedOn(System.currentTimeMillis());
 		companySettings.setCreatedBy(String.valueOf(user.getUserId()));
 		companySettings.setModifiedOn(System.currentTimeMillis());
