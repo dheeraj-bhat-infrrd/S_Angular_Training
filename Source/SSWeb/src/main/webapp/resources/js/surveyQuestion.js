@@ -12,7 +12,7 @@ var customerResponse;
 var customerEmail;
 var mood;
 var stage;
-var isSmileTypeQuestion;
+var isSmileTypeQuestion=true;
 var swearWords = [];
 var isAbusive;
 var autoPost;
@@ -447,19 +447,17 @@ function showMasterQuestionPage(){
 		//if ($('#pst-srvy-div').is(':visible'))
 		//	autoPost = $('#post-survey').is(":checked");
 		var feedback = $("#text-area").val();
-		if($('#shr-post-chk-box').hasClass('bd-check-img')){
-			if(autoPost){
-				postToSocialMedia(feedback);
-				$('#social-post-lnk').show();
-				if(yelpEnabled && (mood=='happy'))
-					$('#ylp-btn').show();
-				else
-					$('#ylp-btn').hide();
-				if(googleEnabled && (mood=='happy'))
-					$('#ggl-btn').show();
-				else
-					$('#ggl-btn').hide();
-			}
+		if($('#shr-post-chk-box').hasClass('bd-check-img') && (rating >= autoPostScore) && (Boolean(autoPost) == true)){
+			postToSocialMedia(feedback);
+			$('#social-post-lnk').show();
+			if(yelpEnabled && (mood=='happy'))
+				$('#ylp-btn').show();
+			else
+				$('#ylp-btn').hide();
+			if(googleEnabled && (mood=='happy'))
+				$('#ggl-btn').show();
+			else
+				$('#ggl-btn').hide();
 		}
 		updateCustomerResponse(feedback);
 		$("div[data-ques-type]").hide();
@@ -666,6 +664,7 @@ $('.sq-np-item-next')
 // Code to be executed on click of previous for star and smile questions.
 
 $('.sq-np-item-prev').click(function() {
+	$("#pst-srvy-div").hide();
 	if (qno == 0) {
 		return;
 	}
