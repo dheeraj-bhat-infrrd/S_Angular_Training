@@ -962,9 +962,9 @@ $('body').on('click', '#prof-edit-social-link .icn-fb', function() {
 	var link = $(this).attr('data-link');
 	$('#social-token-text').attr({
 		"placeholder" : "Add facebook link",
-		"value" : link,
 		"onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateFacebookLink(link) {
@@ -986,9 +986,9 @@ $('body').on('click', '#prof-edit-social-link .icn-twit', function() {
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add Twitter link",
-		"value" : link,
 		"onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateTwitterLink(link) {
@@ -1010,9 +1010,9 @@ $('body').on('click', '#prof-edit-social-link .icn-lin', function() {
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add LinkedIn link",
-		"value" : link,
 		"onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateLinkedInLink(link) {
@@ -1034,9 +1034,9 @@ $('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add Yelp link",
-		"value" : link,
 		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateYelpLink(link) {
@@ -1058,9 +1058,9 @@ $('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add Google link",
-		"value" : link,
 		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateGoogleLink(link) {
