@@ -1161,8 +1161,21 @@ function callBackPaintPublicPosts(data) {
 	
 	var divToPopulate = "";
 	$.each(posts, function(i, post) {
+		
+		var iconClass = "";
+		if(post.source == "google")
+			iconClass = "icn-gplus";
+		else if(post.source == "SocialSurvey")
+			iconClass = "icn-ss";
+		else if(post.source == "facebook")
+			iconClass = "icn-fb";
+		else if(post.source == "twitter")
+			iconClass = "icn-twit";
+		else if(post.source == "linkedin")
+			iconClass = "icn-lin";
+		
 		divToPopulate += '<div class="tweet-panel-item bord-bot-dc clearfix">'
-				+ '<div class="tweet-icn icn-tweet float-left"></div>'
+				+ '<div class="tweet-icn '+ iconClass +' float-left"></div>'
 				+ '<div class="tweet-txt float-left">'
 				+ '<div class="tweet-text-main">' + post.postText + '</div>'
 				+ '<div class="tweet-text-link"><em>' + post.postedBy

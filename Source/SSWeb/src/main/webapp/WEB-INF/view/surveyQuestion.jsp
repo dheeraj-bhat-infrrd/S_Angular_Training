@@ -83,7 +83,7 @@
 					<!-- <div class="sq-main-txt">Survey Question</div> -->
 					<div class="sq-ques">
 						<i><span class="sq-ques-txt">Please fill in your
-								details to take survey for ${agentName}</span></i>
+								details to take survey for<br><span class="semibold">${agentName}</span></span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
@@ -150,11 +150,11 @@
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper">
 						<div id="sq-stars" class="sq-star-wrapper clearfix">
-							<div star-no="1" class="sq-star"></div>
-							<div star-no="2" class="sq-star"></div>
-							<div star-no="3" class="sq-star"></div>
-							<div star-no="4" class="sq-star"></div>
-							<div star-no="5" class="sq-star"></div>
+							<div star-no="1" class="sq-star opacity-red"></div>
+							<div star-no="2" class="sq-star opacity-red"></div>
+							<div star-no="3" class="sq-star opacity-red"></div>
+							<div star-no="4" class="sq-star opacity-red"></div>
+							<div star-no="5" class="sq-star opacity-red"></div>
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
@@ -174,11 +174,11 @@
 					<div class="sq-bord-bot-sm"></div>
 					<div id="sq-smiles" class="sq-rat-wrapper">
 						<div class="sq-star-wrapper clearfix">
-							<div smile-no="1" class="sq-smile"></div>
-							<div smile-no="2" class="sq-smile"></div>
-							<div smile-no="3" class="sq-smile"></div>
-							<div smile-no="4" class="sq-smile"></div>
-							<div smile-no="5" class="sq-smile"></div>
+							<div smile-no="1" class="sq-smile sq-smile-1 opacity-red"></div>
+							<div smile-no="2" class="sq-smile sq-smile-2 opacity-red"></div>
+							<div smile-no="3" class="sq-smile sq-smile-3 opacity-red"></div>
+							<div smile-no="4" class="sq-smile sq-smile-4 opacity-red"></div>
+							<div smile-no="5" class="sq-smile sq-smile-5 opacity-red"></div>
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
@@ -193,8 +193,8 @@
 				<div data-ques-type="scale" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
-					<div id="ques-text-scale" class="sq-ques">
-						<i><span class="sq-ques-txt"></span></i>
+					<div class="sq-ques">
+						<i><span id="ques-text-scale" class="sq-ques-txt"></span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper mgn-bot-40">
@@ -241,9 +241,10 @@
 							<div id="happy-smile" star-no="1"
 								class="sq-smile-icn-wrapper sq-happy-smile"></div>
 						</div>
-						<div id="pst-srvy-div">
-							<input id="post-survey" type="CHECKBOX" checked>I want to
-							share my survey
+						<div id="pst-srvy-div" class="pst-srvy">
+							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
+							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
+							<div class="float-left bd-check-txt">I want to share my survey</div>
 						</div>
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley"
