@@ -289,16 +289,16 @@ function paintProfilePage(result) {
             if(result.socialMediaTokens){
             	var socialToken = result.socialMediaTokens;
             	if(socialToken.facebookToken && socialToken.facebookToken.facebookPageLink){
-            		$('#icn-fb').data('link',socialToken.facebookToken.facebookPageLink);            		
+            		$('#icn-fb').data('link', returnValidWebAddress(socialToken.facebookToken.facebookPageLink));            		
             	}
             	if(socialToken.twitterToken && socialToken.twitterToken.twitterPageLink){
-            		$('#icn-twit').data('link',socialToken.twitterToken.twitterPageLink);            		
+            		$('#icn-twit').data('link', returnValidWebAddress(socialToken.twitterToken.twitterPageLink));            		
             	}
             	if(socialToken.linkedInToken && socialToken.linkedInToken.linkedInPageLink){
-            		$('#icn-lin').data('link',socialToken.linkedInToken.linkedInPageLink);            		
+            		$('#icn-lin').data('link', returnValidWebAddress(socialToken.linkedInToken.linkedInPageLink));
             	}
             	if(socialToken.yelpToken && socialToken.yelpToken.yelpPageLink){
-            		$('#icn-yelp').data('link',socialToken.yelpToken.yelpPageLink);            		
+            		$('#icn-yelp').data('link', returnValidWebAddress(socialToken.yelpToken.yelpPageLink));            		
             	}
             	
             	$('.social-item-icon').bind('click',function(){

@@ -143,13 +143,13 @@ public class DashboardController {
 			LOG.error("InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is ", e);
 			model.addAttribute("message", "InvalidInputException caught in initDashboardPage while setting details about user. Nested exception is "
 					+ e.getMessage());
-			return "errorpage500";
+			return JspResolver.ERROR_PAGE;
 		}
 		catch (SolrException e) {
 			LOG.error("SolrException caught in initDashboardPage while setting details about user. Nested exception is ", e);
 			model.addAttribute("message",
 					"SolrException caught in initDashboardPage while setting details about user. Nested exception is " + e.getMessage());
-			return "errorpage500";
+			return JspResolver.ERROR_PAGE;
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException while logging in. Reason : " + e.getMessage(), e);
@@ -180,6 +180,7 @@ public class DashboardController {
 			model.addAttribute("columnName", CommonConstants.AGENT_ID_COLUMN);
 			model.addAttribute("columnValue", selectedProfile.getAgentId());
 		}
+		
 		return model;
 	}
 

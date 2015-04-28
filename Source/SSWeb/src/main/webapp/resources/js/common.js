@@ -375,18 +375,31 @@ function shareOnGooglePlus(agentId, location){
 	});
 }
 
-//Function to open forgot password page
+// Function to open forgot password page
 function openForgotPasswordPage(){
 	window.location.href = "./forgotpassword.do";
 }
 
-//Dashboard popup click functions
-$('body').on('click','.wc-skip-btn, .wc-sub-btn',function(){
+// Dashboard popup click functions
+function openAuthPage(socialNetwork) {
+	window.open("./socialauth.do?social=" + socialNetwork, "Authorization Page", "width=800,height=600,scrollbars=yes");
+}
+function openAuthPageRegistration(socialNetwork) {
+	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
+}
+
+$('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
+	if ($(this).closest('.wc-btn-row').attr('data-page') == 'one') {
+		callAjaxGET("./showlinkedindatacompare.do", function(data) {
+			$('#welocome-step2').html(data);
+		}, false);
+	}
+	
 	var parent = $(this).closest('.welcome-popup-wrapper');
 	parent.hide();
 	parent.next('.welcome-popup-wrapper').show();
 });
 
-$('body').on('click','.wc-final-skip, .wc-final-submit',function(){
+$('body').on('click', '.wc-final-skip, .wc-final-submit', function(){
 	$(this).closest('.overlay-login ').hide();
 });

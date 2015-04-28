@@ -10,6 +10,7 @@ public interface JspResolver {
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
+	public static final String LINKEDIN_COMPARE = "linkedin_compare";
 	public static final String INVITATION = "invitation";
 	public static final String USER_ID_ON_INVITE = "useridoninvite";
 
