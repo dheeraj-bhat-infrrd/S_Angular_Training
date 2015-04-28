@@ -642,6 +642,8 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 
+			// To replace all the white spaces present in the string.
+			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 
 			long regionId = 0l;
@@ -917,6 +919,8 @@ public class HierarchyManagementController {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
 			validateRegionForm(regionName);
+			// To replace all the white spaces present in the string.
+			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 			User user = sessionHelper.getCurrentUser();
 			HttpSession session = request.getSession(false);
