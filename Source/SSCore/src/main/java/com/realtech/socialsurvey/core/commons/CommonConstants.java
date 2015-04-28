@@ -77,6 +77,7 @@ public interface CommonConstants {
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_SURVEY_TEMPLATE = 2;
 	public static final int STATUS_NOT_VERIFIED = 2;
+	public static final int STATUS_UNDER_PROCESSING = 2;
 	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
@@ -256,10 +257,10 @@ public interface CommonConstants {
 	public static final String REGIONS_MAP_KEY = "regions";
 	public static final String REMINDER_MAIL_SUBJECT = "Gentle reminder to take survey";
 	public static final String SURVEY_MAIL_SUBJECT = "Invitation to take survey";
-	public static final String AGENT_PROFILE_FIXED_URL = "pages/";
+	public static final String AGENT_PROFILE_FIXED_URL = "pages";
 	public static final String BRANCH_PROFILE_FIXED_URL = "pages";
 	public static final String REGION_PROFILE_FIXED_URL = "pages";
-	public static final String COMPANY_PROFILE_FIXED_URL = "pages/company/";
+	public static final String COMPANY_PROFILE_FIXED_URL = "pages/company";
 	public static final String SURVEY_REQUEST_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
 	public static final String SURVEY_REMINDER_MAIL_FILENAME = "EmailTemplates/SurveyParticipationMailBody.html";
 	public static final float DEFAULT_AUTOPOST_SCORE = 3.5f;
@@ -468,4 +469,9 @@ public interface CommonConstants {
 	 */
 	public static final int FIND_PRO_START_INDEX = 0;
 	public static final int FIND_PRO_BATCH_SIZE = 10;
+	
+	// Braintree subscription types
+	public static final int SUBSCRIPTION_WENT_PAST_DUE = 1;
+	public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
+	public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
 }

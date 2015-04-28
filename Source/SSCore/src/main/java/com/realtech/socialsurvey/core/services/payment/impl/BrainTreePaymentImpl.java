@@ -81,7 +81,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 	@Autowired
 	private GenericDao<User, Long> userDao;
-	
+
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
 
@@ -90,7 +90,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 	@Autowired
 	private EmailServices emailServices;
-	
+
 	@Autowired
 	private CoreCommon coreCommonServices;
 
@@ -163,7 +163,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		}
 		catch (BraintreeException e) {
 			LOG.error("BraintreeException occured when cancelling subscription with id : " + subscriptionId + " message : " + e.getMessage());
-			throw new PaymentException("BraintreeException occured when cancelling subscription with id : " + subscriptionId,e);
+			throw new PaymentException("BraintreeException occured when cancelling subscription with id : " + subscriptionId, e);
 		}
 
 		if (result.isSuccess()) {
@@ -293,7 +293,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
 					+ " to the vault. Message : " + e.getMessage());
 			throw new PaymentException("addCustomerWithPayment() : Unexpected exception occured while adding customer id : " + company.getCompanyId()
-					+ " to the vault.",e);
+					+ " to the vault.", e);
 		}
 
 		LOG.debug("addCustomerWithPayment : adding user " + Long.toString(company.getCompanyId()) + " : Status : " + result.isSuccess()
@@ -321,7 +321,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 				throw new SubscriptionUnsuccessfulException("Subscription creation failed, reason : \n " + errorMessage);
 			}
-			
+
 		}
 	}
 
@@ -355,14 +355,15 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("Customer " + customerId + " Not Found!");
 		}
 		catch (UnexpectedException | DownForMaintenanceException e) {
-			LOG.error("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId + " Message : " + e.getMessage());
+			LOG.error("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId + " Message : "
+					+ e.getMessage());
 			throw new PaymentException("containsCustomer() : Unexpected Exception has occured while searching for customer with id " + customerId);
 		}
 		catch (BraintreeException e) {
-			LOG.error("containsCustomer() : BraintreeException has occured while searching for customer with id " + customerId + " Message : " + e.getMessage());
+			LOG.error("containsCustomer() : BraintreeException has occured while searching for customer with id " + customerId + " Message : "
+					+ e.getMessage());
 			throw new PaymentException("containsCustomer() : BraintreeException has occured while searching for customer with id " + customerId);
 		}
-		
 
 		return customer;
 
@@ -380,7 +381,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 * @throws PaymentException
 	 * @throws SubscriptionUnsuccessfulException
 	 * @throws NoRecordsFetchedException
-	 * @throws CreditCardException 
+	 * @throws CreditCardException
 	 * @throws NonFatalException
 	 */
 	private String subscribeCustomer(String customerId, String planId) throws InvalidInputException, PaymentException,
@@ -416,11 +417,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				result = gateway.subscription().create(request);
 			}
 			catch (UnexpectedException e) {
-				LOG.error("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId + " Message : " + e.getMessage());
+				LOG.error("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId + " Message : "
+						+ e.getMessage());
 				throw new PaymentException("subscribeCustomer(): Unexpected Exception occured while subscribing customer with id : " + customerId);
 			}
 			catch (BraintreeException e) {
-				LOG.error("subscribeCustomer(): BraintreeException occured while subscribing customer with id : " + customerId + " Message : " + e.getMessage());
+				LOG.error("subscribeCustomer(): BraintreeException occured while subscribing customer with id : " + customerId + " Message : "
+						+ e.getMessage());
 				throw new PaymentException("subscribeCustomer(): BraintreeException occured while subscribing customer with id : " + customerId);
 			}
 
@@ -431,7 +434,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 				LOG.info("Subscription successful, subscription id : " + subscriptionId);
 			}
 			else {
-		
+
 				LOG.info("Result : " + result.isSuccess() + " message : " + result.getMessage());
 				ValidationErrors creditCardErrors = result.getErrors().forObject("subscription").forObject("creditCard");
 				if (creditCardErrors.size() > 0) {
@@ -454,11 +457,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 					throw new CreditCardException("Credit Card Validation failed, reason : \n " + errorMessage,
 							DisplayMessageConstants.CREDIT_CARD_INVALID);
 				}
-				if(!result.getTransaction().getProcessorResponseCode().isEmpty()){
+				if (!result.getTransaction().getProcessorResponseCode().isEmpty()) {
 					LOG.error("Subscription Unsuccessful : PROCESSOR REJECTED message : " + result.getMessage());
-					throw new SubscriptionUnsuccessfulException("Subscription Unsuccessful : message : " + result.getMessage(),DisplayMessageConstants.BANK_REJECTED);
+					throw new SubscriptionUnsuccessfulException("Subscription Unsuccessful : message : " + result.getMessage(),
+							DisplayMessageConstants.BANK_REJECTED);
 				}
-				
+
 				LOG.error("Subscription Unsuccessful : message : " + result.getMessage());
 				throw new SubscriptionUnsuccessfulException("Subscription Unsuccessful : message : " + result.getMessage());
 			}
@@ -632,7 +636,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 		return transactionId;
 	}
-	
+
 	@Override
 	@Transactional
 	/**
@@ -932,7 +936,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("subscriptionId parameter given to unsubscribe is null or empty");
 		}
 		LOG.info("Cancelling the subscription with id : " + subscriptionId);
-		
+
 		Result<Subscription> result = gateway.subscription().cancel(subscriptionId);
 
 		if (result.isSuccess()) {
@@ -991,7 +995,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new PaymentException("upgradeSubscription : UexpectedException has occured", DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 		catch (BraintreeException e) {
-			LOG.error("upgradeSubscription : BraintreeException has occured. Message : " + e.getMessage(),e);
+			LOG.error("upgradeSubscription : BraintreeException has occured. Message : " + e.getMessage(), e);
 			throw new PaymentException("upgradeSubscription : BraintreeException has occured", DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
 
@@ -1007,7 +1011,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 					errorMessage += " Message : " + error.getMessage() + "\n";
 				}
 			}
-			if(!result.getTransaction().getProcessorResponseCode().isEmpty()){
+			if (!result.getTransaction().getProcessorResponseCode().isEmpty()) {
 				throw new SubscriptionUpgradeUnsuccessfulException("Subscription upgrade unsuccessful, message : \n" + errorMessage,
 						DisplayMessageConstants.BANK_REJECTED);
 			}
@@ -1152,6 +1156,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		Company company = user.getCompany();
 		// We need the subscription id in case of free account
 		String subscriptionId = null;
+		double originalPrice = 0.0; // holds the original price of the subscription
 
 		// Fetching the new accounts master record
 		LOG.debug("Fetching the new accounts master record from the database.");
@@ -1191,7 +1196,10 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		else {
 			// Making API call to Braintree to update subscription.
 			LOG.info("Subscription isnt due. So upgrading the subscription");
-			upgradeSubscription(licenseDetail.getSubscriptionId(), newAccountsMaster.getAmount(), braintreePlanId);
+			// get original price of the subscription
+			originalPrice = getSubscriptionPriceFromBraintree(company);
+			double newPrice = calculateAmount(company, newAccountsMaster);
+			upgradeSubscription(licenseDetail.getSubscriptionId(), (float) newPrice, braintreePlanId);
 			LOG.info("Subscription upgraded at braintree");
 		}
 
@@ -1208,7 +1216,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			String braintreeOldPlanId = getBraintreePlanId(licenseDetail.getAccountsMaster().getAccountsMasterId());
 			// Reverting the account to the old plan
 			LOG.info("Reverting the subscription to the old plan");
-			upgradeSubscription(licenseDetail.getSubscriptionId(), licenseDetail.getAccountsMaster().getAmount(), braintreeOldPlanId);
+			// assuming original price cannot be null
+			upgradeSubscription(licenseDetail.getSubscriptionId(), (float) originalPrice, braintreeOldPlanId);
 			throw e;
 		}
 
@@ -1292,8 +1301,7 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			LOG.error("BraintreeException caught : message : " + e.getMessage());
 			throw new PaymentException("BraintreeException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
-		
-		
+
 		LOG.info("Returning the payment method details");
 		return paymentDetailsMap;
 	}
@@ -1370,7 +1378,8 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 					throw new CardUpdateUnsuccessfulException("Subscription creation failed, reason : \n " + errorMessage);
 				}
 				if (!result.getTransaction().getProcessorResponseCode().isEmpty()) {
-					throw new CardUpdateUnsuccessfulException("Subscription creation failed, reason : \n " + result.getMessage(),DisplayMessageConstants.BANK_REJECTED);
+					throw new CardUpdateUnsuccessfulException("Subscription creation failed, reason : \n " + result.getMessage(),
+							DisplayMessageConstants.BANK_REJECTED);
 
 				}
 				throw new CardUpdateUnsuccessfulException("Subscription creation failed, reason : \n " + result.getMessage());
@@ -1378,11 +1387,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			}
 
 		}
-		catch (UnexpectedException | DownForMaintenanceException e ) {
+		catch (UnexpectedException | DownForMaintenanceException e) {
 			LOG.error("UnexpectedException caught : message : " + e.getMessage());
 			throw new PaymentException("UnexpectedException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
-		catch (BraintreeException e ) {
+		catch (BraintreeException e) {
 			LOG.error("BraintreeException caught : message : " + e.getMessage());
 			throw new PaymentException("BraintreeException caught : message : " + e.getMessage(), DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
 		}
@@ -1400,8 +1409,12 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 	 */
 	@Transactional
 	@Override
-	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId, int toAccountsMasterId) throws InvalidInputException {
+	public float getBalacnceAmountForPlanUpgrade(Company company, int fromAccountsMasterId, int toAccountsMasterId) throws InvalidInputException {
 
+		if (company == null) {
+			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid company parameter ");
+			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
+		}
 		if (fromAccountsMasterId <= 0) {
 			LOG.error("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
 			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid fromAccountsMasterId parameter ");
@@ -1412,23 +1425,27 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			throw new InvalidInputException("getBalacnceAmountForPlanUpgrade : Invalid toAccountsMasterId parameter ");
 		}
 
+		// find the number of users for the company
+		long numOfUsers = findNumberOfUsersForCompany(company);
 		// We fetch the accounts master records for each.
+
 		AccountsMaster fromAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, fromAccountsMasterId);
 		AccountsMaster toAccountsMaster = accountsMasterDao.findById(AccountsMaster.class, toAccountsMasterId);
 
-		return toAccountsMaster.getAmount() - fromAccountsMaster.getAmount();
+		return (toAccountsMaster.getAmount() * numOfUsers) - (fromAccountsMaster.getAmount() * numOfUsers);
 	}
-	
+
 	/**
 	 * Checks for an existing transaction in retried transaction table
+	 * 
 	 * @param subscriptionId
 	 * @return
-	 * @throws InvalidInputException 
+	 * @throws InvalidInputException
 	 */
 	@Transactional
 	@Override
 	public RetriedTransaction checkForExistingTransaction(LicenseDetail licenseDetail) throws InvalidInputException {
-		
+
 		if (licenseDetail == null) {
 			LOG.error("Null parameter given to checkForExistingTransactions!");
 			throw new InvalidInputException("Null parameter given to checkForExistingTransactions!");
@@ -1458,39 +1475,42 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		LOG.debug("Transaction found. Returning it.");
 		return existingTransaction;
 	}
-	
+
 	/**
-	 * On getting a SUBSCRIPTION CHARGED UNSUCCESSFULLY webhook increments the number of retries and blocks account if necessary
-	 * @throws InvalidInputException 
-	 * @throws PaymentRetryUnsuccessfulException 
-	 * @throws NoRecordsFetchedException 
+	 * On getting a SUBSCRIPTION CHARGED UNSUCCESSFULLY webhook increments the number of retries and
+	 * blocks account if necessary
+	 * 
+	 * @throws InvalidInputException
+	 * @throws PaymentRetryUnsuccessfulException
+	 * @throws NoRecordsFetchedException
 	 */
 	@Transactional
 	@Override
 	public void incrementRetriesAndSendMail(Subscription subscription) throws InvalidInputException, NoRecordsFetchedException {
-		
-		if(subscription == null){
+
+		if (subscription == null) {
 			LOG.error("subscription parameter is null or empty");
-			throw new InvalidInputException("subscription parameter is null or empty");	
-		}	
-		
+			throw new InvalidInputException("subscription parameter is null or empty");
+		}
+
 		boolean retriesExceeded = false;
-		
-		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN, subscription.getId());
-		
-		if(licenseDetails == null || licenseDetails.isEmpty()){
+
+		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN,
+				subscription.getId());
+
+		if (licenseDetails == null || licenseDetails.isEmpty()) {
 			LOG.error("No license details record found for the subscription id : " + subscription.getId());
 			throw new NoRecordsFetchedException("No license details record found for the subscription id : " + subscription.getId());
 		}
-		
-		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);		
-		
+
+		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
+
 		// Sending retry email to client.
 		LOG.debug("Fetching the corporate admin");
 		User user = coreCommonServices.getCorporateAdmin(licenseDetail.getCompany());
 		LOG.debug("Sending mail for retrying subscription charge.");
-		
-		if(licenseDetail.getPaymentRetries() >= CommonConstants.PAYMENT_RETRIES -1){
+
+		if (licenseDetail.getPaymentRetries() >= CommonConstants.PAYMENT_RETRIES - 1) {
 			retriesExceeded = true;
 			licenseDetail.setPaymentRetries(licenseDetail.getPaymentRetries() + CommonConstants.PAYMENT_INCREMENT);
 			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
@@ -1505,17 +1525,18 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 			licenseDetail.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 			licenseDetailDao.update(licenseDetail);
 		}
-		
+
 		try {
-			if(enableKafka.equals(CommonConstants.YES)){
-				if(retriesExceeded){
+			if (enableKafka.equals(CommonConstants.YES)) {
+				if (retriesExceeded) {
 					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
 				}
 				else {
 					emailServices.queueRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
 				}
-			}else{
-				if(retriesExceeded){
+			}
+			else {
+				if (retriesExceeded) {
 					emailServices.sendAccountBlockingMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
 				}
 				else {
@@ -1526,73 +1547,238 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 		catch (InvalidInputException e1) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e1.getMessage());
 
-			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e1);
+			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), e1);
 		}
 		catch (UndeliveredEmailException e) {
 			LOG.error("CustomItemProcessor : Exception caught when sending retry charge mail. Message : " + e.getMessage());
 
-			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName()+" "+user.getLastName(), e);
+			coreCommonServices.sendEmailSendingFailureMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(), e);
 		}
 	}
-	
+
 	/**
-	 * On recieveing SUBSCRIPTION CHARGED SUCCESSFULLY webhook it checks if license is past due and updates it
+	 * On recieveing SUBSCRIPTION CHARGED SUCCESSFULLY webhook it checks if license is past due and
+	 * updates it
+	 * 
 	 * @param licenseDetail
-	 * @throws InvalidInputException 
-	 * @throws NoRecordsFetchedException 
-	 * @throws UndeliveredEmailException 
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws UndeliveredEmailException
 	 */
 	@Transactional
 	@Override
-	public void checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(Subscription subscription) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException {
-		if(subscription == null){
+	public void checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(Subscription subscription) throws InvalidInputException,
+			NoRecordsFetchedException, UndeliveredEmailException {
+		if (subscription == null) {
 			LOG.error("subscription parameter is null or empty!");
 			throw new InvalidInputException("subscription parameter is null or empty!");
-		}	
-		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt called to enable subscription id : " + subscription.getId());
-		
-		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN, subscription.getId());
-		
-		if(licenseDetails == null || licenseDetails.isEmpty()){
-			LOG.error("License details objecy not found for subscription id : "  + subscription.getId());
-			throw new NoRecordsFetchedException("License details objecy not found for subscription id : "  + subscription.getId());
 		}
-		
+		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt called to enable subscription id : " + subscription.getId());
+
+		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN,
+				subscription.getId());
+
+		if (licenseDetails == null || licenseDetails.isEmpty()) {
+			LOG.error("License details objecy not found for subscription id : " + subscription.getId());
+			throw new NoRecordsFetchedException("License details objecy not found for subscription id : " + subscription.getId());
+		}
+
 		LicenseDetail licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
-		
-		if(licenseDetail.getIsSubscriptionDue() == CommonConstants.YES){
-			
+
+		if (licenseDetail.getIsSubscriptionDue() == CommonConstants.YES) {
+
 			Company company = licenseDetail.getCompany();
-			if(company == null){
+			if (company == null) {
 				LOG.error("company property not found in license detail parameter");
 				throw new NoRecordsFetchedException("company property not found in license detail parameter");
 			}
-			
-			if(licenseDetail.getPaymentRetries() == CommonConstants.PAYMENT_RETRIES){
+
+			if (licenseDetail.getPaymentRetries() == CommonConstants.PAYMENT_RETRIES) {
 				// Now we update the company table to reflect change
 				company.setStatus(CommonConstants.STATUS_ACTIVE);
 				companyDao.update(company);
 				LOG.debug("Company table updated!");
-			}			
+			}
 			// We set the license details record to reflect changes
 			licenseDetail.setIsSubscriptionDue(CommonConstants.NO);
 			licenseDetail.setPaymentRetries(CommonConstants.INITIAL_PAYMENT_RETRIES);
 			licenseDetailDao.update(licenseDetail);
 			LOG.debug("License detail table updated!");
-			
+
 			User user = coreCommonServices.getCorporateAdmin(company);
-			
-			if(user == null){
+
+			if (user == null) {
 				LOG.error("Corporate admin not found for company : " + company.getCompanyId());
 				throw new NoRecordsFetchedException("Corporate admin not found for company : " + company.getCompanyId());
 			}
-			
+
 			emailServices.sendAccountReactivationMail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
 			LOG.info("Company activated!");
 		}
-		
+
 		LOG.info("checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt execution complete!");
-		
+
+	}
+
+	@Transactional
+	@Override
+	public void intimateUser(Subscription subscription, int notificationType) throws InvalidInputException, NoRecordsFetchedException,
+			UndeliveredEmailException {
+		if (subscription == null) {
+			throw new InvalidInputException("Subscription passed is null");
+		}
+		LOG.info("Initmating user for subscription type : " + subscription.toString() + " with notification type: " + notificationType);
+		// get the user from subscription
+		LicenseDetail licenseDetail = null;
+		List<LicenseDetail> licenseDetails = licenseDetailDao.findByColumn(LicenseDetail.class, CommonConstants.SUBSCRIPTION_ID_COLUMN,
+				subscription.getId());
+
+		if (licenseDetails.isEmpty() || licenseDetails == null) {
+			LOG.error("Subscription details not found in the LicenseDetail table.");
+			throw new NoRecordsFetchedException("Subscription details not found in the LicenseDetail table.");
+		}
+		else {
+			licenseDetail = licenseDetails.get(CommonConstants.INITIAL_INDEX);
+		}
+
+		// Getting the list of corporate admins from user profiles table
+		Map<String, Object> queries = new HashMap<>();
+		queries.put(CommonConstants.COMPANY_COLUMN, licenseDetail.getCompany());
+		queries.put(CommonConstants.IS_OWNER_COLUMN, CommonConstants.IS_OWNER);
+		List<User> users = userDao.findByKeyValue(User.class, queries);
+		User user = null;
+		if (users.isEmpty() || users == null) {
+			LOG.error("Corporate Admin details not found in the User table.");
+			throw new NoRecordsFetchedException("Corporate Admin details not found in the User table.");
+		}
+		else {
+			user = users.get(CommonConstants.INITIAL_INDEX);
+		}
+		// send mail to the user
+		if (notificationType == CommonConstants.SUBSCRIPTION_WENT_PAST_DUE) {
+			LOG.debug("Sending subscription past due date mail");
+			emailServices.sendSubscriptionChargeUnsuccessfulEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName(),
+					String.valueOf(retryDays));
+		}
+		else if (notificationType == CommonConstants.SUBSCRIPTION_CHARGED_SUCCESSFULLY) {
+			LOG.debug("Sending charge successful mail");
+			// TODO: implement
+		}
+		else if (notificationType == CommonConstants.SUBSCRIPTION_CHARGED_UNSUCCESSFULLY) {
+			LOG.debug("Sending charge unsuccessful mail");
+			emailServices.sendRetryChargeEmail(user.getEmailId(), user.getFirstName() + " " + user.getLastName());
+		}
+	}
+
+	@Transactional
+	@Override
+	public void updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException,
+			SubscriptionUpgradeUnsuccessfulException {
+		if (company == null) {
+			LOG.warn("Company is null while updating the subscription price");
+			throw new InvalidInputException("Subscription id cannot be null");
+		}
+		LOG.debug("Updating the braintree subscription for comapny: " + company.toString());
+		// get the number of users for the company
+		long numOfUsers = findNumberOfUsersForCompany(company);
+		// get the current accounts master account linked with the company
+		double amount = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getAccountsMaster().getAmount() * numOfUsers;
+		// get the current price
+		double previousAmount = getSubscriptionPriceFromBraintree(company);
+		if (previousAmount != amount) {
+			LOG.debug("Upgrading the account for " + company.getCompany() + " with by " + numOfUsers + " users for an amount of " + amount);
+			// Calling braintree for updating the amount
+			LOG.debug("Calling braintree for updating the amount");
+			SubscriptionRequest updateRequest = new SubscriptionRequest().price(new BigDecimal(String.valueOf(amount))).options()
+					.prorateCharges(true).revertSubscriptionOnProrationFailure(false).done();
+
+			Result<Subscription> result = null;
+			try {
+				LOG.debug("Making api call to revising the price of the subscription");
+				result = gateway.subscription().update(company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getSubscriptionId(),
+						updateRequest);
+			}
+			catch (NotFoundException e) {
+				LOG.error("updateSubscriptionPrice : NotFoundException has occured");
+				throw new NoRecordsFetchedException("updateSubscriptionPrice : NotFoundException has occured");
+			}
+			catch (UnexpectedException | DownForMaintenanceException e) {
+				LOG.error("updateSubscriptionPrice : UexpectedException has occured");
+				throw new PaymentException("updateSubscriptionPrice : UexpectedException has occured",
+						DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+			}
+			catch (BraintreeException e) {
+				LOG.error("updateSubscriptionPrice : BraintreeException has occured. Message : " + e.getMessage(), e);
+				throw new PaymentException("updateSubscriptionPrice : BraintreeException has occured",
+						DisplayMessageConstants.PAYMENT_GATEWAY_EXCEPTION);
+			}
+
+			if (result.isSuccess()) {
+				LOG.debug("Update Subscription Price successful! ");
+			}
+			else {
+				LOG.debug("UpdateSubscriptionPrice unsuccessful, message : " + result.getMessage());
+				String errorMessage = "";
+				if (result.getErrors().getAllValidationErrors().size() > 0) {
+					for (ValidationError error : result.getErrors().getAllDeepValidationErrors()) {
+						errorMessage += "Error code : " + error.getCode();
+						errorMessage += " Message : " + error.getMessage() + "\n";
+					}
+				}
+				if (!result.getTransaction().getProcessorResponseCode().isEmpty()) {
+					throw new SubscriptionUpgradeUnsuccessfulException("UpdateSubscriptionPrice unsuccessful, message : \n" + errorMessage,
+							DisplayMessageConstants.BANK_REJECTED);
+				}
+				throw new SubscriptionUpgradeUnsuccessfulException("UpdateSubscriptionPrice unsuccessful, message : \n" + errorMessage,
+						DisplayMessageConstants.SUBSCRIPTION_UPGRADE_UNSUCCESSFUL);
+			}
+		}
+	}
+
+	@Transactional
+	private double calculateAmount(Company company, AccountsMaster accountsMaster) throws InvalidInputException {
+		if (company == null) {
+			LOG.error("Company is null in calculateAmount");
+			throw new InvalidInputException("Company is null in calculateAmount");
+		}
+		if (accountsMaster == null) {
+			LOG.error("AccountsMaster is null in calculateAmount");
+			throw new InvalidInputException("AccountsMaster is null in calculateAmount");
+		}
+		LOG.debug("Calculating the amount for company " + company.getCompany() + " and accounts master: " + accountsMaster.getAccountName());
+		// get the amount for the accounts master based on the number of users in the company
+		long numOfUsers = findNumberOfUsersForCompany(company);
+
+		LOG.debug("Found " + numOfUsers + " users for company " + company.getCompany());
+		// return the amount
+		return accountsMaster.getAmount() * numOfUsers;
+	}
+
+	@Transactional
+	private long findNumberOfUsersForCompany(Company company) {
+		LOG.debug("Finding number of active users for company " + company.toString());
+		Map<String, Object> queryMap = new HashMap<String, Object>();
+		queryMap.put(CommonConstants.COMPANY_COLUMN, company);
+		queryMap.put(CommonConstants.STATUS_COLUMN, CommonConstants.STATUS_ACTIVE);
+		long numOfUsers = userDao.findNumberOfRowsByKeyValue(User.class, queryMap);
+		return numOfUsers;
+	}
+
+	@Transactional
+	private double getSubscriptionPriceFromBraintree(Company company) throws InvalidInputException {
+		if (company == null) {
+			LOG.error("Company is null in getSubscriptionPriceFromBraintree.");
+			throw new InvalidInputException("Company is null in getSubscriptionPriceFromBraintree.");
+		}
+		LOG.debug("Getting present subscription price for company: " + company.getCompany());
+		double price = 0.0;
+		String subscriptionId = company.getLicenseDetails().get(CommonConstants.INITIAL_INDEX).getSubscriptionId();
+		Subscription subscription = gateway.subscription().find(subscriptionId);
+		if (subscription != null) {
+			price = subscription.getPrice().doubleValue();
+		}
+		LOG.debug("Returning price " + price + " for company " + company.getCompany());
+		return price;
 	}
 
 }

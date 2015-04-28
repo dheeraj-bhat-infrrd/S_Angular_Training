@@ -663,7 +663,7 @@ public class SurveyManagementController {
 
 			if (settings.getProfileUrl() != null) {
 				googleUrl.put("host", surveyHandler.getGoogleShareUri());
-				googleUrl.put("profileServer", surveyHandler.getApplicationBaseUrl() + "pages/");
+				googleUrl.put("profileServer", surveyHandler.getApplicationBaseUrl() + "pages");
 				googleUrl.put("relativePath", settings.getProfileUrl());
 			}
 		}

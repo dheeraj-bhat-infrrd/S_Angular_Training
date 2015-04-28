@@ -188,12 +188,13 @@ public interface Payment {
 	
 	/**
 	 * Returns the balance amount while upgrading from one plan to another
+	 * @param company
 	 * @param fromAccountsMasterId
 	 * @param toAccountsMasterId
 	 * @return
 	 * @throws InvalidInputException
 	 */
-	public float getBalacnceAmountForPlanUpgrade(int fromAccountsMasterId,int toAccountsMasterId) throws InvalidInputException;
+	public float getBalacnceAmountForPlanUpgrade(Company company, int fromAccountsMasterId,int toAccountsMasterId) throws InvalidInputException;
 	
 	/**
 	 * On getting a SUBSCRIPTION CHARGED UNSUCCESSFULLY webhook increments the number of retries and blocks account if necessary
@@ -219,5 +220,24 @@ public interface Payment {
 	 * @throws UndeliveredEmailException 
 	 */
 	public void checkIfCompanyIsDisabledOrSubscriptionIsPastDueAndEnableIt(Subscription subscription) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+	
+	/**
+	 * Sends a mail to user according to the notification type for payment.
+	 * @param subscription
+	 * @param notificationType
+	 * @throws InvalidInputException
+	 * @throws UndeliveredEmailException
+	 */
+	public void intimateUser(Subscription subscription, int notificationType) throws InvalidInputException, NoRecordsFetchedException, UndeliveredEmailException;
+	
+	/**
+	 * Updates the subscription with the new amount
+	 * @param company
+	 * @throws InvalidInputException
+	 * @throws NoRecordsFetchedException
+	 * @throws PaymentException
+	 * @throws SubscriptionUpgradeUnsuccessfulException
+	 */
+	public void updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
 		
 }
