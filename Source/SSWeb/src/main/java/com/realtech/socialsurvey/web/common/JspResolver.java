@@ -10,6 +10,7 @@ public interface JspResolver {
 	public static final String ACCOUNT_TYPE_SELECTION = "accounttypeselection";
 	public static final String COMPLETE_REGISTRATION = "completeregistration";
 	public static final String LINKEDIN_ACCESS = "linkedinaccess";
+	public static final String LINKEDIN_COMPARE = "linkedin_compare";
 	public static final String INVITATION = "invitation";
 	public static final String USER_ID_ON_INVITE = "useridoninvite";
 
@@ -81,7 +82,6 @@ public interface JspResolver {
 	public static final String PROFILE_BASIC_DETAILS = "profile_basicdetails";
 	public static final String PROFILE_IMAGE = "profile_profileimage";
 	public static final String PROFILE_LOGO = "profile_profilelogo";
-	public static final String PROFILE_SOCIAL_LINKS = "profile_sociallinks";
 	public static final String PROFILE_REVIEWS = "profile_reviews";
 	public static final String PROFILE_HIERARCHY = "profile_hierarchy";
 	public static final String PROFILE_HIERARCHY_CLICK_REGION = "profile_hierarchy_region";

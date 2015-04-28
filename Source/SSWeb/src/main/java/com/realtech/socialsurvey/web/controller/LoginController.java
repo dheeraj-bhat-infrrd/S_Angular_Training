@@ -223,9 +223,8 @@ public class LoginController {
 					}
 					
 					/**
-					 * Compute all conditions for user and if user is CA then check for profile
+					 * Compute all conditions for user and if user is CA then check for profile completion stage.
 					 */
-					// completion stage.
 					if (user.isCompanyAdmin()) {
 						UserProfile adminProfile = null;
 						for (UserProfile userProfile : user.getUserProfiles()) {
