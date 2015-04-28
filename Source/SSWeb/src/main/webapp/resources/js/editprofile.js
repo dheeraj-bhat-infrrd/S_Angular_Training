@@ -544,17 +544,6 @@ function callBackOnProfileImageUpload(data) {
 	loadDisplayPicture();
 }
 
-// Function to show social media links
-function showProfileSocialLinks() {
-	$('#social-token-text').hide();
-	callAjaxGET("./fetchprofilesociallinks.do", callBackShowProfileSocialLinks);
-}
-
-function callBackShowProfileSocialLinks(data) {
-	$('#prof-edit-social-link').html(data);
-	adjustImage();
-}
-
 // Agent details
 $(document).on('focus', '.prof-edditable-sin-agent', function() {
 	$(this).addClass('prof-name-edit');
@@ -968,9 +957,9 @@ function callBackUpdateHobbies(data) {
 
 
 // Update Social links - facebook
-$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
 	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
+	var link = $(this).attr('data-link');
 	$('#social-token-text').attr({
 		"placeholder" : "Add facebook link",
 		"value" : link,
@@ -982,16 +971,17 @@ function updateFacebookLink(link) {
 	var payload = {
 		"fblink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-fb').value(link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
 // Update Social links - twitter
-$('body').on('click','#prof-edit-social-link .icn-twit',function(){
+$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -1005,16 +995,17 @@ function updateTwitterLink(link) {
 	var payload = {
 		"twitterlink" : link	
 	};
-	if(isValidUrl(link)){
-        	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
-	}else{
+	if (isValidUrl(link)) {
+        callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-twit').value(link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
 // Update Social links - linkedin
-$('body').on('click','#prof-edit-social-link .icn-lin',function(){
+$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -1028,16 +1019,17 @@ function updateLinkedInLink(link) {
 	var payload = {
 		"linkedinlink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-lin').value(link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
 // Update Social links - yelp
-$('body').on('click','#prof-edit-social-link .icn-yelp',function(){
+$('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -1051,16 +1043,17 @@ function updateYelpLink(link) {
 	var payload = {
 		"yelplink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-yelp').value(link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
-// TODO Update Social links - google plus
-$('body').on('click','#prof-edit-social-link .icn-gplus',function(){
+// Update Social links - google plus
+$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
@@ -1074,9 +1067,10 @@ function updateGoogleLink(link) {
 	var payload = {
 		"gpluslink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-gplus').value(link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
@@ -1086,8 +1080,8 @@ function callBackUpdateSocialLink(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-
-	showProfileSocialLinks();
+	
+	$('#social-token-text').val('');
 }
 
 function isValidUrl(url){

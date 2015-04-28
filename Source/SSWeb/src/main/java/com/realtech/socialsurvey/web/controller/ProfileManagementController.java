@@ -239,12 +239,6 @@ public class ProfileManagementController {
 		return JspResolver.PROFILE_LOGO;
 	}
 
-	@RequestMapping(value = "/fetchprofilesociallinks", method = RequestMethod.GET)
-	public String fetchProfileSocialLinks(Model model, HttpServletRequest request) {
-		LOG.info("Fetching profile links");
-		return JspResolver.PROFILE_SOCIAL_LINKS;
-	}
-
 	/**
 	 * Method to update profile lock settings
 	 * 
