@@ -1,6 +1,7 @@
 package com.realtech.socialsurvey.core.dao.impl;
 
 import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.SocialPostDao;
 import com.realtech.socialsurvey.core.entities.SocialPost;
@@ -17,7 +19,18 @@ import com.realtech.socialsurvey.core.entities.SocialPost;
 public class MongoSocialPostDaoImpl implements SocialPostDao {
 
 	private static final Logger LOG = LoggerFactory.getLogger(MongoSocialPostDaoImpl.class);
-
+	
+	public static final String KEY_POST_ID = "postId";
+	public static final String KEY_POST_TEXT = "postText";
+	public static final String KEY_POSTED_BY = "postedBy";
+	public static final String KEY_SOURCE = "source";
+	public static final String KEY_COMPANY_ID = "companyId";
+	public static final String KEY_REGION_ID = "regionId";
+	public static final String KEY_BRANCH_ID = "branchId";
+	public static final String KEY_AGENT_ID = "agentId";
+	public static final String KEY_TIME_IN_MILLIS = "timeInMillis";
+	
+	
 	@Autowired
 	private MongoTemplate mongoTemplate;
 
@@ -32,7 +45,13 @@ public class MongoSocialPostDaoImpl implements SocialPostDao {
 	// Method to fetch social posts for a particular user.
 	@Override
 	public List<SocialPost> getSocialPosts(long iden, String key, int skip, int limit) {
+		
 		Query query = new Query(Criteria.where(key).is(iden));
+		query.fields().include(KEY_POST_ID);
+		query.fields().include(KEY_POST_TEXT);
+		query.fields().include(KEY_POSTED_BY);
+		query.fields().include(KEY_SOURCE);
+		query.fields().include(KEY_TIME_IN_MILLIS);
 		if (skip != -1)
 			query.skip(skip);
 		if (limit != -1)
