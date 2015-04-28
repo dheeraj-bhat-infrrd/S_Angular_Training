@@ -174,11 +174,11 @@
 					<div class="sq-bord-bot-sm"></div>
 					<div id="sq-smiles" class="sq-rat-wrapper">
 						<div class="sq-star-wrapper clearfix">
-							<div smile-no="1" class="sq-smile"></div>
-							<div smile-no="2" class="sq-smile"></div>
-							<div smile-no="3" class="sq-smile"></div>
-							<div smile-no="4" class="sq-smile"></div>
-							<div smile-no="5" class="sq-smile"></div>
+							<div smile-no="1" class="sq-smile sq-smile-1 opacity-red"></div>
+							<div smile-no="2" class="sq-smile sq-smile-2 opacity-red"></div>
+							<div smile-no="3" class="sq-smile sq-smile-3 opacity-red"></div>
+							<div smile-no="4" class="sq-smile sq-smile-4 opacity-red"></div>
+							<div smile-no="5" class="sq-smile sq-smile-5 opacity-red"></div>
 						</div>
 					</div>
 					<div class="sq-np-wrapper clearfix">
@@ -242,8 +242,9 @@
 								class="sq-smile-icn-wrapper sq-happy-smile"></div>
 						</div>
 						<div id="pst-srvy-div">
-							<input id="post-survey" type="CHECKBOX" checked>I want to
-							share my survey
+							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
+							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
+							<div class="float-left bd-check-txt">I want to share my survey</div>
 						</div>
 						<div class="sq-np-wrapper clearfix">
 							<div id="prev-textarea-smiley"
