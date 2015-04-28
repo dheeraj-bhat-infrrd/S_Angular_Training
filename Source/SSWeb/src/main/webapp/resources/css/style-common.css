@@ -15,6 +15,7 @@
 
 * {
 	font-family: 'OpenSans';
+	font-size: 13px;
 	font-weight: normal !important;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -80,6 +81,10 @@ a,a:hover,a:visited {
 
 .show {
 	display: block;
+}
+
+.semibold {
+	font-family: 'opensanssemibold';
 }
 
 .margin-0-auto {
@@ -1640,6 +1645,10 @@ button.paypal.is-active {
 	background: url(../images/linkdin.png) no-repeat center;
 }
 
+.icn-ss {
+	background: url(../images/smiley-rat-5.png) no-repeat center;
+}
+
 .icn-yelp {
 	background: url(../images/yelp.png) no-repeat center;
 }
@@ -2504,10 +2513,10 @@ button.paypal.is-active {
 }
 
 .sq-main-txt {
-	margin-bottom: 20px;
+	margin-top: 20px;
 	font-weight: bold !important;
 	text-transform: capitalize;
-	font-size: 20px;
+	font-size: 16px;
 }
 
 .sq-ques-wrapper {
@@ -2519,7 +2528,7 @@ button.paypal.is-active {
 	cursor: pointer;
 	width: 62px;
 	height: 62px;
-	background: url(../images/no_star.png) no-repeat center;
+	background: url(../images/sq-star.png) no-repeat center;
 }
 
 .sq-smile-icn-wrapper {
@@ -2542,7 +2551,7 @@ button.paypal.is-active {
 }
 
 .opacity-red {
-	opacity : .6;
+	opacity : .4;
 }
 
 .sq-full-star {
@@ -2554,11 +2563,46 @@ button.paypal.is-active {
 }
 
 .sq-smile {
+}
+
+.sq-smile-1 {
 	float: left;
 	cursor: pointer;
 	width: 62px;
 	height: 62px;
-	background: url(../images/icn-succ-grey.png) no-repeat center;
+	background: url(../images/smiley-rat-1.png) no-repeat center;
+}
+
+.sq-smile-2 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-2.png) no-repeat center;
+}
+
+.sq-smile-3 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-3.png) no-repeat center;
+}
+
+.sq-smile-4 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-4.png) no-repeat center;
+}
+
+.sq-smile-5 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-5.png) no-repeat center;
 }
 
 .sq-full-smile {
@@ -2619,12 +2663,33 @@ button.paypal.is-active {
 }
 
 .sq-np-item-next {
+	position:relative;
 	padding: 0 50px 0 40px;
 	border-radius: 0 20px 20px 0;
+	background-image: url(../images/right-arw.png);
+	background-repeat: no-repeat;
+	background-position: 95px center;
+}
+
+.sq-np-item-next:before{
+	position:absolute;
+	left:0;
+	width: 2px;
+	height: 40px;
+	margin-left:-1px;
+	content: "";
+	background-image: url(../images/sq-divider.png);
+	background-repeat: no-repeat;
+	background-position: center;
+	z-index: 2;
+	
 }
 
 .sq-np-item-prev {
 	border-radius: 0 20px 20px 0;
+	background-image: url(../images/left-arw.png);
+	background-repeat: no-repeat;
+	background-position: 5px center;
 }
 
 .sq-btn-wrapper {
@@ -2639,8 +2704,8 @@ button.paypal.is-active {
 	line-height: 40px;
 	text-align: center;
 	text-transform: uppercase;
-	background-color: #5CC7EF;
-	margin: 0 auto;
+	background-color: #009FE0;
+	margin: 0px 0px 0px 165px;
 }
 
 .sq-btn-continue:hover {
@@ -2662,7 +2727,7 @@ button.paypal.is-active {
 }
 
 .sq-slider-val {
-	color: #5CC7EF;
+	color: #009FE0;
 	font-size: 60px;
 	text-align: center;
 	margin-bottom: 20px;
@@ -2907,7 +2972,7 @@ button.paypal.is-active {
 .sq-mcq-ans-wrapper {
 	width: 260px;
 	text-align: left;
-	font-size: 18px;
+	font-size: 13px;
 	line-height: 24px;
 }
 
@@ -3166,8 +3231,8 @@ button.paypal.is-active {
 	height: 150px;
 	border: 1px solid #e3e3e3;
 	border-radius: 3px;
-	box-shadow: 0px 2px 2px 0px #e3e3e3;
 	padding: 10px;
+	margin-bottom: 10px;
 }
 
 .pts-hover-1 {
@@ -3282,6 +3347,7 @@ button.paypal.is-active {
 	box-shadow: none;
 	border: 1px solid #dcdcdc;
 	font-size: 12px;
+	background-color: #FFF;
 }
 
 .lp-edit-locks-locked {
@@ -3441,7 +3507,7 @@ button.paypal.is-active {
 .sq-np-item-disabled {
 	color: #EFEFEF !important;
 	cursor: default !important;
-	background-color: #5CC7EF !important;
+	background-color: #009FE0 !important;
 }
 
 .showHoverTab {
@@ -6180,3 +6246,8 @@ tr.u-tbl-header td {
     font-family: 'opensanslight';
     font-size: 12px;
 }
+
+.pst-srvy {
+  width: 200px;
+  margin: 0 auto 50px auto;
+ }
