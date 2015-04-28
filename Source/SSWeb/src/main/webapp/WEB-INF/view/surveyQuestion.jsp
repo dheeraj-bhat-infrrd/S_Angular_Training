@@ -193,8 +193,8 @@
 				<div data-ques-type="scale" class="sq-quest-item hide">
 					<!-- <div class="sq-top-img"></div> -->
 					<div class="sq-main-txt"></div>
-					<div id="ques-text-scale" class="sq-ques">
-						<i><span class="sq-ques-txt"></span></i>
+					<div class="sq-ques">
+						<i><span id="ques-text-scale" class="sq-ques-txt"></span></i>
 					</div>
 					<div class="sq-bord-bot-sm"></div>
 					<div class="sq-rat-wrapper mgn-bot-40">
@@ -241,7 +241,7 @@
 							<div id="happy-smile" star-no="1"
 								class="sq-smile-icn-wrapper sq-happy-smile"></div>
 						</div>
-						<div id="pst-srvy-div">
+						<div id="pst-srvy-div" class="pst-srvy">
 							<div id="shr-post-chk-box" class="float-left bd-check-img"></div>
 							<input type="hidden" id="shr-pst-cb" name="sharepost" value="true">
 							<div class="float-left bd-check-txt">I want to share my survey</div>

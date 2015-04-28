@@ -1645,6 +1645,10 @@ button.paypal.is-active {
 	background: url(../images/linkdin.png) no-repeat center;
 }
 
+.icn-ss {
+	background: url(../images/smiley-rat-5.png) no-repeat center;
+}
+
 .icn-yelp {
 	background: url(../images/yelp.png) no-repeat center;
 }
@@ -2664,14 +2668,14 @@ button.paypal.is-active {
 	border-radius: 0 20px 20px 0;
 	background-image: url(../images/right-arw.png);
 	background-repeat: no-repeat;
-	background-position: right center;
+	background-position: 95px center;
 }
 
 .sq-np-item-next:before{
 	position:absolute;
 	left:0;
 	width: 2px;
-	height: 30px;
+	height: 40px;
 	margin-left:-1px;
 	content: "";
 	background-image: url(../images/sq-divider.png);
@@ -2685,7 +2689,7 @@ button.paypal.is-active {
 	border-radius: 0 20px 20px 0;
 	background-image: url(../images/left-arw.png);
 	background-repeat: no-repeat;
-	background-position: left center;
+	background-position: 5px center;
 }
 
 .sq-btn-wrapper {
@@ -2700,7 +2704,7 @@ button.paypal.is-active {
 	line-height: 40px;
 	text-align: center;
 	text-transform: uppercase;
-	background-color: #5CC7EF;
+	background-color: #009FE0;
 	margin: 0px 0px 0px 165px;
 }
 
@@ -2723,7 +2727,7 @@ button.paypal.is-active {
 }
 
 .sq-slider-val {
-	color: #5CC7EF;
+	color: #009FE0;
 	font-size: 60px;
 	text-align: center;
 	margin-bottom: 20px;
@@ -3503,7 +3507,7 @@ button.paypal.is-active {
 .sq-np-item-disabled {
 	color: #EFEFEF !important;
 	cursor: default !important;
-	background-color: #5CC7EF !important;
+	background-color: #009FE0 !important;
 }
 
 .showHoverTab {
@@ -6242,3 +6246,8 @@ tr.u-tbl-header td {
     font-family: 'opensanslight';
     font-size: 12px;
 }
+
+.pst-srvy {
+  width: 200px;
+  margin: 0 auto 50px auto;
+ }
