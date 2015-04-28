@@ -2559,11 +2559,46 @@ button.paypal.is-active {
 }
 
 .sq-smile {
+}
+
+.sq-smile-1 {
 	float: left;
 	cursor: pointer;
 	width: 62px;
 	height: 62px;
-	background: url(../images/icn-succ-grey.png) no-repeat center;
+	background: url(../images/smiley-rat-1.png) no-repeat center;
+}
+
+.sq-smile-2 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-2.png) no-repeat center;
+}
+
+.sq-smile-3 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-3.png) no-repeat center;
+}
+
+.sq-smile-4 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-4.png) no-repeat center;
+}
+
+.sq-smile-5 {
+	float: left;
+	cursor: pointer;
+	width: 62px;
+	height: 62px;
+	background: url(../images/smiley-rat-5.png) no-repeat center;
 }
 
 .sq-full-smile {
