@@ -77,6 +77,7 @@ public interface CommonConstants {
 	public static final int STATUS_INACTIVE = 0;
 	public static final int STATUS_SURVEY_TEMPLATE = 2;
 	public static final int STATUS_NOT_VERIFIED = 2;
+	public static final int STATUS_UNDER_PROCESSING = 2;
 	public static final int STATUS_TEMPORARILY_INACTIVE = 3;
 	public static final int PROCESS_COMPLETE = 1;
 	public static final int PROCESS_NOT_STARTED = 0;
@@ -468,4 +469,9 @@ public interface CommonConstants {
 	 */
 	public static final int FIND_PRO_START_INDEX = 0;
 	public static final int FIND_PRO_BATCH_SIZE = 10;
+	
+	// Braintree subscription types
+	public static final int SUBSCRIPTION_WENT_PAST_DUE = 1;
+	public static final int SUBSCRIPTION_CHARGED_UNSUCCESSFULLY = 2;
+	public static final int SUBSCRIPTION_CHARGED_SUCCESSFULLY = 3;
 }
