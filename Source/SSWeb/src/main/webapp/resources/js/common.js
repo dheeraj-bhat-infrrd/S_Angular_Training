@@ -91,11 +91,10 @@ function callAjaxPOSTWithTextData(url, callBackFunction, isAsync, formData) {
  * @param formId
  */
 function callAjaxFormSubmit(url, callBackFunction, formId) {
-	console.log("ajax form submit called for url :" + url + " and formId : "
-			+ formId);
-	var $form = $("#"+formId);
+	console.log("ajax form submit called for url :" + url + " and formId : " + formId);
+	var $form = $("#" + formId);
 	var payLoad = $form.serialize();
-	console.log("payload is --"+payLoad);
+	console.log("payload is --" + payLoad);
 	$.ajax({
 		url : url,
 		type : "POST",
@@ -121,7 +120,7 @@ function redirectErrorpage(){
  * @param callBackFunction
  * @param payload
  */
-function callAjaxPostWithPayloadData(url, callBackFunction, payload,isAsync){
+function callAjaxPostWithPayloadData(url, callBackFunction, payload, isAsync){
 	console.log("callAjaxPostWithPayloadData for payload--"+payload+" url--"+url);
 	if (typeof isAsync === "undefined") {
 		isAsync = true;
