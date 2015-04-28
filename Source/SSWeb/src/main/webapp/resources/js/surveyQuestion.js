@@ -867,12 +867,14 @@ $('.sq-pts-dgreen').click(function() {
 	$("#next-scale").removeClass("btn-com-disabled");
 });
 
-$('#ylp-btn').click(function() {
+$('#ylp-btn').click(function(e) {
+	e.stopImmediatePropagation();
 	shareOnYelp(agentId, window.location.origin+"/rest/survey/");
 	updateSharedOn("yelp", agentId, customerEmail);
 });
 
-$('#ggl-btn').click(function() {
+$('#ggl-btn').click(function(e) {
+	e.stopImmediatePropagation();
 	shareOnGooglePlus(agentId, window.location.origin+"/rest/survey/");
 	updateSharedOn("google", agentId, customerEmail);
 });

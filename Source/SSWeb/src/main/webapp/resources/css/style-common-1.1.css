@@ -529,9 +529,10 @@ input#find-pro-submit{
 
 .ctnt-list-item {
     padding: 20px;
-    height: 108px;
+    min-height: 108px;
     border-bottom: 1px solid #EEEDE9;
     padding: 15px 20px 20px 20px;
+    cursor: pointer;
 }
 
 .ctnt-review-btn {
