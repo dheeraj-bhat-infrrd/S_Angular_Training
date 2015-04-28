@@ -141,10 +141,6 @@
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/countrydata.js"></script>
-<script src="${pageContext.request.contextPath}/resources/js/zipcoderegex.js"></script>
-<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
-<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script>
 var selectedCountryRegEx = "";
 $(document).ready(function() {
@@ -259,8 +255,22 @@ function validateCompanyInformationForm(elementId) {
 	return isCompanyInfoPageValid;
 }
 
+function validateCountry() {
+	var country = $.trim($('#com-country').val());
+	if (country == "") {
+		return false;
+	} else {
+		var countryCode = $.trim($('#country-code').val());
+		if (countryCode == "") {
+			return false;
+		} else {
+			return true;
+		}
+	}
+}
+
 $(document).on('click', '#wc-address-submit', function() {
-	if (validateSummaryForm()) {
+	if (validateCompanyInformationForm()) {
 		var payload = {
 			"address1" : $('#com-address1').val(),
 			"address2" : $('#com-address2').val(),
