@@ -973,7 +973,7 @@ function updateFacebookLink(link) {
 	};
 	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateSocialLink, payload);
-        $('#icn-fb').value(link);
+        $('#icn-fb').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -997,7 +997,7 @@ function updateTwitterLink(link) {
 	};
 	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-twit').value(link);
+        $('#icn-twit').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -1021,7 +1021,7 @@ function updateLinkedInLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload);
-        $('#icn-lin').value(link);
+        $('#icn-lin').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -1045,7 +1045,7 @@ function updateYelpLink(link) {
 	};
 	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
-        $('#icn-yelp').value(link);
+        $('#icn-yelp').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
@@ -1069,7 +1069,7 @@ function updateGoogleLink(link) {
 	};
 	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
-        $('#icn-gplus').value(link);
+        $('#icn-gplus').attr("data-link", link);
 	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
