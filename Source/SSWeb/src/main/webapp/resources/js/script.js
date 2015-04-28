@@ -663,3 +663,35 @@ $(document).keyup(function(e) {
 			$('.bd-q-btn-done').trigger('click');
 	}
 });
+
+function validateInputField(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+function validateTextArea(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).text() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).text() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}

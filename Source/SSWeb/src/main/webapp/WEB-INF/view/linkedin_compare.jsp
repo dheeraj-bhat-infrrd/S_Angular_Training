@@ -1,6 +1,11 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
+<c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
+<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
+<c:if test="${not empty profile}">
+	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
+</c:if>
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
 	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
 	<c:set value="${profileSettings.profileImageUrl}" var="profileimage"></c:set>
@@ -23,7 +28,8 @@
 				<div class="wc-edit-photo-cont clearfix">
 					<div class="wc-edit-photo-cont-col float-left">
 						<div class="float-right">
-							<div class="wc-linkedin-photo" style="background: url(${linkedInData.pictureUrls.values[0]}) no-repeat center; background-size: contain"></div>
+							<div class="wc-linkedin-photo"
+								style="background: url(${linkedInData.pictureUrls.values[0]}) no-repeat center; background-size: contain"></div>
 							<div class="wc-linkedin-photo-txt">
 								<spring:message code="label.photo.from.key" />
 								<span class="wc-highlight"><spring:message code="label.linkedin.key" /></span>
@@ -35,7 +41,8 @@
 						<div class="float-left">
 							<c:choose>
 								<c:when test="${not empty profileimage}">
-									<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer" style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
+									<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer"
+										style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
 								</c:when>
 								<c:otherwise>
 									<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer"></div>						
@@ -98,27 +105,30 @@
 			</div>
 		</div>
 		<div class="wc-step2-body-row">
-			<div class="wc-step2-body-row-hdr">Tell us about yourself</div>
+			<div class="wc-step2-body-row-hdr"><spring:message code="label.tellus.key" /></div>
 			<div class="wc-step2-body-row-cont">
 				<div class="wc-prof-details">
-					<div class="wc-prof-hdr">About Scott Haris</div>
-					<div class="wc-prof-details-row clearfix">
-						<div class="wc-prof-input-cont float-left">
-							<input class="wc-form-input" value="${linkedInData.industry}">
+					<div class="wc-prof-hdr"><spring:message code="label.about.key" />${contactdetail.name}</div>
+					<form id="wc-summary-form" action="./updatesummarydata.do">
+						<div class="wc-prof-details-row clearfix">
+							<div class="wc-prof-input-cont float-left">
+								<input id="wc-industry" class="wc-form-input" value="${linkedInData.industry}">
+							</div>
+							<div class="wc-prof-input-cont float-left">
+								<input id="wc-location" class="wc-form-input" value="${linkedInData.location.name}">
+							</div>
+							<div class="wc-linkedin-photo-txt float-right">
+								<spring:message code="label.data.from.key" />
+								<span class="wc-highlight"><spring:message code="label.linkedin.key" /></span>
+							</div>
 						</div>
-						<div class="wc-prof-input-cont float-left">
-							<input class="wc-form-input" value="${linkedInData.location.name}">
+						<div class="wc-prof-details-row clearfix">
+							<textarea id="wc-summary" class="wc-about-prof-txt">${linkedInData.summary}</textarea>
 						</div>
-						<div class="wc-linkedin-photo-txt float-right">Data imported from <span class="wc-highlight">Linkedin</span></div>
-					</div>
-					<div class="wc-prof-details-row clearfix">
-						<textarea class="wc-about-prof-txt">${linkedInData.summary}</textarea>
-					</div>
-					
-					<div class="wc-prof-details-row clearfix">
-						<div class="wc-submit-btn float-right">Update</div>
-					</div>
-					
+						<div class="wc-prof-details-row clearfix">
+							<div id="wc-summary-submit" class="wc-submit-btn float-right"><spring:message code="label.update.key" /></div>
+						</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -138,6 +148,7 @@
 <script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
 <script>
+// Profile image
 $(document).on('click', '#wc-photo-upload', function() {
 	$('#prof-image').trigger('click');
 });
@@ -147,14 +158,83 @@ $(document).on('change', '#prof-image', function() {
 });
 
 function callBackOnProfileImageUpload(data) {
+	$('#message-header').html(data);
 	callAjaxGET("./fetchuploadedprofileimage.do", function(profileImageUrl) {
 		$('#wc-photo-upload').css("background", "url(" + profileImageUrl + ") no-repeat center");
 		$('#wc-photo-upload').css("background-size","contain");
-
 		hideOverlay();
 	});
 
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 }
+
+// Summary
+function validateSummaryForm() {
+	var isFocussed = false;
+	var isFormValid = true;
+	var isSmallScreen = false;
+	if ($(window).width() < 768) {
+		isSmallScreen = true;
+	}
+
+	if (!validateInputField('wc-industry')) {
+		$('#overlay-toast').html('Please enter industry');
+		showToast();
+		
+		isFormValid = false;
+		if (!isFocussed) {
+			$('#wc-industry').focus();
+			isFocussed = true;
+			return isFormValid;
+		}
+		if (isSmallScreen) {
+			return isFormValid;
+		}
+	}
+	if (!validateInputField('wc-location')) {
+		$('#overlay-toast').html('Please enter location');
+		showToast();
+		
+		isFormValid = false;
+		if (!isFocussed) {
+			$('#wc-location').focus();
+			isFocussed = true;
+			return isFormValid;
+		}
+		if (isSmallScreen) {
+			return isFormValid;
+		}
+	}
+	if (!validateTextArea('wc-summary')) {
+		$('#overlay-toast').html('Please enter summary');
+		showToast();
+		
+		isFormValid = false;
+		if (!isFocussed) {
+			$('#wc-summary').focus();
+			isFocussed = true;
+			return isFormValid;
+		}
+		if (isSmallScreen) {
+			return isFormValid;
+		}
+	}
+	return isFormValid;
+}
+
+$(document).on('click', '#wc-summary-submit', function() {
+	if (validateSummaryForm()) {
+		var payload = {
+			"industry" : $('#wc-industry').val(),
+			"location" : $('#wc-location').val(),
+			"aboutme" : $('#wc-summary').text()
+		};
+		callAjaxPostWithPayloadData("./updatesummarydata.do", function(data) {
+			$('#message-header').html(data);
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, payload, false)
+	}
+});
 </script>

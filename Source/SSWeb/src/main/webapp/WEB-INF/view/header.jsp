@@ -202,6 +202,7 @@
     </div>
     <div class="overlay-payment hide" id="outer-payment"></div>
     <div class="overlay-loader hide"></div>
+    <div id="message-header" class="hide"></div>
     
 	<div id="overlay-main" class="overlay-main hide">
 		<div class="overlay-disable-wrapper">
