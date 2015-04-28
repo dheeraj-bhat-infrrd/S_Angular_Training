@@ -2,10 +2,12 @@ package com.realtech.socialsurvey.core.feed.impl;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,9 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
 import com.realtech.socialsurvey.core.commons.CommonConstants;
+import com.realtech.socialsurvey.core.commons.FacebookPostCreatedTimeComparator;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.impl.MongoOrganizationUnitSettingDaoImpl;
 import com.realtech.socialsurvey.core.entities.FacebookSocialPost;
@@ -23,6 +27,7 @@ import com.realtech.socialsurvey.core.entities.FacebookToken;
 import com.realtech.socialsurvey.core.entities.FeedStatus;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.feed.SocialNetworkDataProcessor;
+
 import facebook4j.Facebook;
 import facebook4j.FacebookException;
 import facebook4j.FacebookFactory;
@@ -159,18 +164,20 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 			ResponseList<Post> resultList;
 			do {
 				if (lastFetchedTill != null) {
-					resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE).since(lastFetchedTill));
+					resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE).until(lastFetchedTill));
 				}
 				else {
 					resultList = facebook.getFeed(new Reading().limit(PAGE_SIZE));
 				}
 
 				posts.addAll(resultList);
+				Collections.sort(resultList,new FacebookPostCreatedTimeComparator());
 				
 				// updating last post time
 				if (resultList.size() > 0) {
-					lastFetchedTill = resultList.get(resultList.size() - 1).getCreatedTime();
+					lastFetchedTill = resultList.get(0).getCreatedTime();
 				}
+				
 			}
 			while (resultList.size() == PAGE_SIZE);
 		}
@@ -192,9 +199,18 @@ public class FacebookFeedProcessorImpl implements SocialNetworkDataProcessor<Pos
 		for (Post post : posts) {
 			feed = new FacebookSocialPost();
 			feed.setPost(post);
-			feed.setPostText(post.getMessage());
+			
+			if(post.getMessage() != null){
+				feed.setPostText(post.getMessage());
+			}else if(post.getName() != null){
+				feed.setPostText(post.getName());
+			}else{
+				feed.setPostText(post.getStory());
+			}
+			
 			feed.setSource(FEED_SOURCE);
 			feed.setPostId(post.getId());
+			feed.setPostedBy(post.getFrom().getName());
 			feed.setTimeInMillis(post.getCreatedTime().getTime());
 
 			switch (organizationUnit) {
