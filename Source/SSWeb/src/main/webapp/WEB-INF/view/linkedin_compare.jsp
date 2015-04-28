@@ -58,49 +58,44 @@
 			</div>
 		</div>
 		<div class="wc-step2-body-row">
-			<div class="wc-step2-body-row-hdr">Business Name, Address and Logo</div>
+			<div class="wc-step2-body-row-hdr"><spring:message code="label.editaddress.key"/></div>
 			<div class="wc-step2-body-row-cont">
 				<div class="wc-form-container">
-					<div class="wc-form-row clearfix">
-						<div class="float-left wc-form-txt">Logo</div>
-						<div class="float-left wc-form-input-cont">
-							<input class="wc-form-input" placeholder='<spring:message code="label.logo.placeholder.key"/>'>
-							<input type="file" class="rfr_txt_fld com-logo-comp-info" id="com-logo" name="logo">
-							<div class="float-right input-icon-internal icn-file file-pick-logo file-pick-logo-adj"></div>
+					<form id="wc-address-form">
+						<div class="wc-form-row clearfix">
+							<div class="float-left wc-form-txt"><spring:message code="label.address.key"/></div>
+							<div class="float-left wc-form-input-cont">
+								<input class="wc-form-input" id="com-address1" data-non-empty="true" name="address1"
+									value="${contactdetail.address1}" placeholder='<spring:message code="label.address1.key"/>'>
+							</div>
+							<div class="float-left wc-form-input-cont">
+								<input class="wc-form-input" id="com-address2" name="address2"
+									value="${contactdetail.address2}" placeholder='<spring:message code="label.address2.key"/>'>
+							</div>
 						</div>
-					</div>
-					<div class="wc-form-row clearfix">
-						<div class="float-left wc-form-txt">Address</div>
-						<div class="float-left wc-form-input-cont">
-							<input class="wc-form-input" id="com-address1" data-non-empty="true" name="address1"
-								value="${contactdetail.address1}" placeholder='<spring:message code="label.address1.key"/>'>
+						<div class="wc-form-row clearfix">
+							<div class="float-left wc-form-txt"></div>
+							<div class="float-left wc-form-input-cont">
+								<input class="wc-form-input" id="com-country" data-non-empty="true" name="country"
+									value="${contactdetail.country}" placeholder='<spring:message code="label.country.key"/>'>
+								<input type="hidden" value="${contactdetail.countryCode}" name="countrycode" id="country-code">
+							</div>
+							<div class="float-left wc-form-input-cont">
+								<input class="wc-form-input" id="com-zipcode" data-non-empty="true" data-zipcode="true" name="zipcode"
+									value="${contactdetail.zipcode}" placeholder='<spring:message code="label.zipcode.key"/>'>
+							</div>
 						</div>
-						<div class="float-left wc-form-input-cont">
-							<input class="wc-form-input" id="com-address2" name="address2"
-								value="${contactdetail.address2}" placeholder='<spring:message code="label.address2.key"/>'>
+						<div class="wc-form-row clearfix">
+							<div class="float-left wc-form-txt"><spring:message code="label.phoneno.key" /></div>
+							<div class="float-left wc-form-input-cont">
+								<input class="wc-form-input" id="com-contactno" data-non-empty="true" data-phone="true" name="contactno"
+									value="${contactdetail.contact_numbers.work}" placeholder="<spring:message code="label.phoneno.key" />">
+							</div>
 						</div>
-					</div>
-					<div class="wc-form-row clearfix">
-						<div class="float-left wc-form-txt"></div>
-						<div class="float-left wc-form-input-cont">
-							<input class="wc-form-input" id="com-country" data-non-empty="true" name="country"
-								value="${contactdetail.country}" placeholder='<spring:message code="label.country.key"/>'>
+						<div class="wc-form-row clearfix">
+							<div id="wc-address-submit" class="reg_btn"><spring:message code="label.update.key" /></div>
 						</div>
-						<div class="float-left wc-form-input-cont">
-							<input class="wc-form-input" id="com-zipcode" data-non-empty="true" data-zipcode="true" name="zipcode"
-								value="${contactdetail.zipcode}" placeholder='<spring:message code="label.zipcode.key"/>'>
-						</div>
-					</div>
-					<div class="wc-form-row clearfix">
-						<div class="float-left wc-form-txt">Phone No</div>
-						<div class="float-left wc-form-input-cont">
-							<input class="wc-form-input" id="com-contactno" data-non-empty="true" data-phone="true" name="contactno"
-								value="${contactdetail.contact_numbers.work}" placeholder="<spring:message code="label.phoneno.key" />">
-						</div>
-					</div>
-					<div class="wc-form-row clearfix">
-						<div class="reg_btn">Update</div>
-					</div>
+					</form>
 				</div>
 			</div>
 		</div>
@@ -109,7 +104,7 @@
 			<div class="wc-step2-body-row-cont">
 				<div class="wc-prof-details">
 					<div class="wc-prof-hdr"><spring:message code="label.about.key" />${contactdetail.name}</div>
-					<form id="wc-summary-form" action="./updatesummarydata.do">
+					<form id="wc-summary-form">
 						<div class="wc-prof-details-row clearfix">
 							<div class="wc-prof-input-cont float-left">
 								<input id="wc-industry" class="wc-form-input" value="${linkedInData.industry}">
@@ -144,10 +139,57 @@
 </div>
 
 <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.css">
-
-<script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
 <script src="${pageContext.request.contextPath}/resources/jcrop/jquery.Jcrop.min.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/jcrop.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/countrydata.js"></script>
+<script src="${pageContext.request.contextPath}/resources/js/zipcoderegex.js"></script>
+<script src="http://code.jquery.com/jquery-1.10.2.js"></script>
+<script src="http://code.jquery.com/ui/1.11.2/jquery-ui.js"></script>
 <script>
+var selectedCountryRegEx = "";
+$(document).ready(function() {
+	if ($('#com-country').val() != "" && $('#country-code').val() != "") {
+		var countryCode = $('#country-code').val();
+		for (var i = 0; i < postCodeRegex.length; i++) {
+			if (postCodeRegex[i].code == countryCode) {
+				selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+				selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+				break;
+			}
+		}
+	}
+	
+	// Integrating autocomplete with country input text field
+	$("#com-country").autocomplete({
+		minLength : 1,
+		source : countryData,
+		delay : 0,
+		open : function(event, ui) {
+			$("#country-code").val("");
+		},
+		focus : function(event, ui) {
+			$("#com-country").val(ui.item.label);
+			return false;
+		},
+		select : function(event, ui) {
+			$("#com-country").val(ui.item.label);
+			$("#country-code").val(ui.item.code);
+			for (var i = 0; i < postCodeRegex.length; i++) {
+				if (postCodeRegex[i].code == ui.item.code) {
+					selectedCountryRegEx = "^" + postCodeRegex[i].regex + "$";
+					selectedCountryRegEx = new RegExp(selectedCountryRegEx);
+					break;
+				}
+			}
+			return false;
+		},
+		close : function(event, ui) {
+		}
+	}).autocomplete("instance")._renderItem = function(ul, item) {
+		return $("<li>").append(item.label).appendTo(ul);
+	};
+});
+
 // Profile image
 $(document).on('click', '#wc-photo-upload', function() {
 	$('#prof-image').trigger('click');
@@ -169,56 +211,109 @@ function callBackOnProfileImageUpload(data) {
 	showToast();
 }
 
+// Company information
+function validateCompanyInformationForm(elementId) {
+	var isCompanyInfoPageValid = true;
+	var isFocussed = false;
+
+	if (!validateAddress1('com-address1')) {
+		isCompanyInfoPageValid = false;
+		if (!isFocussed) {
+			$('#com-address1').focus();
+			isFocussed = true;
+		}
+		return isCompanyInfoPageValid;
+	}
+	if (!validateAddress2('com-address2')) {
+		isCompanyInfoPageValid = false;
+		if (!isFocussed) {
+			$('#com-address2').focus();
+			isFocussed = true;
+		}
+		return isCompanyInfoPageValid;
+	}
+	if (!validateCountry('com-country')) {
+		isCompanyInfoPageValid = false;
+		if (!isFocussed) {
+			$('#com-country').focus();
+			isFocussed = true;
+		}
+		return isCompanyInfoPageValid;
+	}
+	if (!validateCountryZipcode('com-zipcode')) {
+		isCompanyInfoPageValid = false;
+		if (!isFocussed) {
+			$('#com-zipcode').focus();
+			isFocussed = true;
+		}
+		return isCompanyInfoPageValid;
+	}
+	if (!validatePhoneNumber('com-contactno')) {
+		isCompanyInfoPageValid = false;
+		if (!isFocussed) {
+			$('#com-contactno').focus();
+			isFocussed = true;
+		}
+		return isCompanyInfoPageValid;
+	}
+	return isCompanyInfoPageValid;
+}
+
+$(document).on('click', '#wc-address-submit', function() {
+	if (validateSummaryForm()) {
+		var payload = {
+			"address1" : $('#com-address1').val(),
+			"address2" : $('#com-address2').val(),
+			"country" : $('#com-country').val(),
+			"countrycode" : $('#country-code').val(),
+			"zipcode" : $('#com-zipcode').val(),
+			"contactno" : $('#com-contactno').val()
+		};
+		callAjaxPostWithPayloadData("./editcompanyinformation.do", function(data) {
+			$('#message-header').html(data);
+			$('#overlay-toast').html($('#display-msg-div').text().trim());
+			showToast();
+		}, payload, false);
+	}
+});
+
 // Summary
 function validateSummaryForm() {
 	var isFocussed = false;
 	var isFormValid = true;
-	var isSmallScreen = false;
-	if ($(window).width() < 768) {
-		isSmallScreen = true;
-	}
 
 	if (!validateInputField('wc-industry')) {
 		$('#overlay-toast').html('Please enter industry');
 		showToast();
-		
+
 		isFormValid = false;
 		if (!isFocussed) {
 			$('#wc-industry').focus();
 			isFocussed = true;
-			return isFormValid;
 		}
-		if (isSmallScreen) {
-			return isFormValid;
-		}
+		return isFormValid;
 	}
 	if (!validateInputField('wc-location')) {
 		$('#overlay-toast').html('Please enter location');
 		showToast();
-		
+
 		isFormValid = false;
 		if (!isFocussed) {
 			$('#wc-location').focus();
 			isFocussed = true;
-			return isFormValid;
 		}
-		if (isSmallScreen) {
-			return isFormValid;
-		}
+		return isFormValid;
 	}
 	if (!validateTextArea('wc-summary')) {
 		$('#overlay-toast').html('Please enter summary');
 		showToast();
-		
+
 		isFormValid = false;
 		if (!isFocussed) {
 			$('#wc-summary').focus();
 			isFocussed = true;
-			return isFormValid;
 		}
-		if (isSmallScreen) {
-			return isFormValid;
-		}
+		return isFormValid;
 	}
 	return isFormValid;
 }
@@ -234,7 +329,7 @@ $(document).on('click', '#wc-summary-submit', function() {
 			$('#message-header').html(data);
 			$('#overlay-toast').html($('#display-msg-div').text().trim());
 			showToast();
-		}, payload, false)
+		}, payload, false);
 	}
 });
 </script>
