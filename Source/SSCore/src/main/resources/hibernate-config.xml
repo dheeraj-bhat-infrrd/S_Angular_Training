@@ -74,6 +74,7 @@
 				<value>com.realtech.socialsurvey.core.entities.VerticalsMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.CrmMaster</value>
 				<value>com.realtech.socialsurvey.core.entities.FeedStatus</value>
+				<value>com.realtech.socialsurvey.core.entities.UsercountModificationNotification</value>
 			</list>
 		</property>
 	</bean>
