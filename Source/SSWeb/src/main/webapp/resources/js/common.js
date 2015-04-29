@@ -420,7 +420,6 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
 			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
 		+ '</div>';
-		
 		parentDiv.after(htmlData);
 		
 		// enable remove button
@@ -432,14 +431,36 @@ $(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', 
 
 $(document).on('click', '.wc-review-rmv-icn', function() {
 	var parentDiv = $(this).parent().parent();
-	$(this).closest('wc-review-tr').remove();
-
+	
 	// disable remove button
 	if (parentDiv.children().length <= 2) {
 		$('.wc-review-rmv-icn').addClass('hide');
 	}
+	parentDiv.remove();
 });
 
-$(document).on('click', '.wc-send-survey', function() {
-	
+$(document).on('click', '#wc-send-survey', function() {
+	var receiversList = [];
+	$('#wc-review-table').children().each(function() {
+		if (!$(this).hasClass('wc-review-hdr')) {
+			
+			var firstname = $(this).find('input.wc-review-fname').first().val();
+			var lastname = $(this).find('input.wc-review-lname').first().val();
+			var emailId = $(this).find('input.wc-review-email').first().val();
+			if (nameRegex.test(firstname) && lastNameRegEx.test(lastname) && emailRegex.test(emailId)) {
+				var receiver = {};
+				receiver.firstname = firstname;
+				receiver.lastname = lastname;
+				receiver.emailId = emailId;
+
+				receiversList.push(receiver);
+			}
+		}
+	});
+
+	receiversList = JSON.stringify(receiversList);
+	var payload = {
+		"receiversList" : receiversList
+	};
+	callAjaxPostWithPayloadData("./sendmultiplesurveyinvites.do", function(data) {}, payload);
 });

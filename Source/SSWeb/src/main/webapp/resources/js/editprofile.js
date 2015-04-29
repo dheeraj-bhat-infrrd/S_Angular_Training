@@ -622,8 +622,6 @@ function updateAssociations() {
 	$('#association-container').children().each(function() {
 		var status = $(this).children().first().attr('data-status');
 		var value = $(this).children().first().val();
-		console.log(status);
-		console.log(value);
 		if (value != "" && status != 'removed') {
 			var association = {};
 			association.name = value;
