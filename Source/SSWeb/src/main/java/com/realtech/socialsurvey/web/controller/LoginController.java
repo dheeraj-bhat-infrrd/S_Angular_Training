@@ -79,7 +79,7 @@ public class LoginController {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if (!(auth instanceof AnonymousAuthenticationToken)) {
 			try {
-				response.sendRedirect("./" + JspResolver.USER_LOGIN + ".do");
+				response.sendRedirect("./" + JspResolver.LANDING + ".do");
 			}
 			catch (IOException e) {
 				LOG.error("IOException while redirecting logged in user. Reason : " + e.getMessage(), e);
@@ -240,6 +240,20 @@ public class LoginController {
 
 					if (redirectTo.equals(JspResolver.LANDING)) {
 						setSession(session);
+						
+						// setting linkedin popup attribute
+						boolean showLinkedInPopup = false;
+						for (UserProfile profile : user.getUserProfiles()) {
+							if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+								showLinkedInPopup = true;
+								break;
+							}
+						}
+						if (user.getNumOfLogins() != 0) {
+							showLinkedInPopup = false;
+						}
+						model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+						
 						// update the last login time and number of logins
 						userManagementService.updateUserLoginTimeAndNum(user);
 					}
