@@ -4,13 +4,19 @@
 <script src="${pageContext.request.contextPath}/resources/js/landing.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-	callAjaxGET("./linkedindataimport.do", function(data) {
-		$('#overlay-login').html(data);
-		console.log(data);
-		if ($("#welocome-step1").length) {
-			$('#overlay-login').removeClass("hide");
-		}
-	}, true);
+	var showLinkedInPopup = "${showLinkedInPopup}";
+	console.log(showLinkedInPopup);
+	if (showLinkedInPopup == "true") {
+		callAjaxGET("./linkedindataimport.do", function(data) {
+			$('#overlay-login').html(data);
+			if ($("#welocome-step1").length) {
+				$('#overlay-login').removeClass("hide");
+			}
+		}, true);
+	}
+	else {
+		
+	}
 	
 	showMainContent('./dashboard.do');
 });

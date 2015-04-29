@@ -977,14 +977,19 @@ public class UserManagementController {
 			
 			// updating session with selected user profile if not set
 			LOG.debug("Updating session with selected user profile if not set");
+			boolean showLinkedInPopup = false;
 			Map<Long, UserProfile> profileMap = new HashMap<Long, UserProfile>();
 			UserProfile selectedProfile = user.getUserProfiles().get(CommonConstants.INITIAL_INDEX);
 			for (UserProfile profile : user.getUserProfiles()) {
 				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
 					selectedProfile = profile;
+
+					// setting linkedin popup attribute
+					showLinkedInPopup = true;
 					break;
 				}
 			}
+			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
 			session.setAttribute(CommonConstants.USER_PROFILE, selectedProfile);
 			
 			// updating session with aggregated user profiles, if not set
