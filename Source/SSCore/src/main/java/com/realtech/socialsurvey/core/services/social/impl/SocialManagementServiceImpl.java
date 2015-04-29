@@ -172,10 +172,16 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		Facebook facebook = getFacebookInstance();
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
-				if (agentSettings.getSocialMediaTokens().getFacebookToken() != null) {
+				if (agentSettings.getSocialMediaTokens().getFacebookToken() != null &&
+						agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken() != null) {
 					facebook.setOAuthAccessToken(new AccessToken(agentSettings.getSocialMediaTokens().getFacebookToken().getFacebookAccessToken(),
 							null));
-					facebook.postStatusMessage(message);
+					try {
+						facebook.postStatusMessage(message);
+					}
+					catch (RuntimeException e) {
+						LOG.error("Runtime exception caught while trying to post on facebook. Nested exception is ", e);
+					}
 				}
 			}
 		}
@@ -191,11 +197,17 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		Twitter twitter = getTwitterInstance();
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
-				if (agentSettings.getSocialMediaTokens().getTwitterToken() != null) {
+				if (agentSettings.getSocialMediaTokens().getTwitterToken() != null &&
+						agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret() != null) {
 
 					twitter.setOAuthAccessToken(new twitter4j.auth.AccessToken(agentSettings.getSocialMediaTokens().getTwitterToken()
 							.getTwitterAccessToken(), agentSettings.getSocialMediaTokens().getTwitterToken().getTwitterAccessTokenSecret()));
-					twitter.updateStatus(message);
+					try {
+						twitter.updateStatus(message);
+					}
+					catch (RuntimeException e) {
+						LOG.error("Runtime exception caught while trying to tweet. Nested exception is ", e);
+					}
 				}
 			}
 		}
@@ -210,7 +222,8 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 		LOG.info("updateLinkedin() started.");
 		if (agentSettings != null) {
 			if (agentSettings.getSocialMediaTokens() != null) {
-				if (agentSettings.getSocialMediaTokens().getLinkedInToken() != null) {
+				if (agentSettings.getSocialMediaTokens().getLinkedInToken() != null &&
+						agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken() !=null ) {
 
 					String linkedInPost = new StringBuilder(linkedInRestApiUri).substring(0, linkedInRestApiUri.length() - 1);
 					linkedInPost += "/shares?oauth2_access_token=" + agentSettings.getSocialMediaTokens().getLinkedInToken().getLinkedInAccessToken();
@@ -225,7 +238,12 @@ public class SocialManagementServiceImpl implements SocialManagementService, Ini
 						StringEntity entity = new StringEntity("{\"comment\": \"" + message + "\",\"visibility\": {\"code\": \"anyone\"}}");
 
 						post.setEntity(entity);
-						client.execute(post);
+						try {
+							client.execute(post);
+						}
+						catch (RuntimeException e) {
+							LOG.error("Runtime exception caught while trying to add an update on linkedin. Nested exception is ", e);
+						}
 					}
 					catch (IOException e) {
 						throw new NonFatalException("IOException caught while posting on Linkedin. Nested exception is ", e);
