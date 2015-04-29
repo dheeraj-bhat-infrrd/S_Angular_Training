@@ -1672,12 +1672,13 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 
 	@Transactional
 	@Override
-	public boolean updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException,
+	public Map<String, Object> updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException,
 			SubscriptionUpgradeUnsuccessfulException {
 		if (company == null) {
 			LOG.warn("Company is null while updating the subscription price");
 			throw new InvalidInputException("Subscription id cannot be null");
 		}
+		Map<String, Object> resultMap = new HashMap<>();
 		boolean priceChanged = false;
 		LOG.debug("Updating the braintree subscription for comapny: " + company.toString());
 		// get the number of users for the company
@@ -1735,7 +1736,11 @@ public class BrainTreePaymentImpl implements Payment, InitializingBean {
 						DisplayMessageConstants.SUBSCRIPTION_UPGRADE_UNSUCCESSFUL);
 			}
 		}
-		return priceChanged;
+		resultMap.put(CommonConstants.SUBSCRIPTION_PRICE_CHANGED, priceChanged);
+		resultMap.put(CommonConstants.SUBSCRIPTION_OLD_PRICE, previousAmount);
+		resultMap.put(CommonConstants.SUBSCRIPTION_REVISED_PRICE, amount);
+		resultMap.put(CommonConstants.SUBSCRIPTION_REVISED_NUMOFUSERS, numOfUsers);
+		return resultMap;
 	}
 
 	@Transactional

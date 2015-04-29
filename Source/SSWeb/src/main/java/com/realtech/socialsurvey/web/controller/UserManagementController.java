@@ -477,6 +477,8 @@ public class UserManagementController {
 
 			try {
 				userManagementService.removeExistingUser(user, userIdToRemove);
+				// update the user count modificaiton notification
+				userManagementService.updateUserCountModificationNotification(user.getCompany());
 			}
 			catch (InvalidInputException e) {
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.REGISTRATION_INVITE_GENERAL_ERROR, e);
@@ -970,6 +972,8 @@ public class UserManagementController {
 				LOG.info("Fetching the user's canonical settings and setting it in session");
 				sessionHelper.getCanonicalSettings(session);
 				sessionHelper.setSettingVariablesInSession(session);
+				LOG.debug("Updating user count modification notification");
+				userManagementService.updateUserCountModificationNotification(user.getCompany());
 			}
 			else {
 				// TODO: add logic for what happens when no user profile present

@@ -81,6 +81,8 @@ public class WebHookController {
 		if (testingFlag == null || testingFlag.equals("0")) {
 			webhookNotification = gateway.getGatewayInstance().webhookNotification()
 					.parse(request.getParameter("bt_signature"), request.getParameter("bt_payload"));
+			
+			LOG.info("Webhook Notification: "+webhookNotification.toString());
 
 			LOG.info("Webhook Received " + webhookNotification.getTimestamp().getTime() + " | Kind: " + webhookNotification.getKind()
 					+ " | Subscription: " + webhookNotification.getSubscription().getId());
