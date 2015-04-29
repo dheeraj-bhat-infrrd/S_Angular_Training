@@ -235,7 +235,9 @@
 					<div class="prof-link-header float-left clearfix">
 						<div id="prof-header-rating" class="rating-image float-left"></div>
 						<c:if test="${not empty completeProfileUrl}">
-							<div id="prof-header-url" class="rating-image-txt float-left">${completeProfileUrl}</div>
+							<div id="prof-header-url" class="rating-image-txt float-left">
+								<a href="${completeProfileUrl}" target="_blank">${completeProfileUrl}</a>
+							</div>
 						</c:if>
 						
 					</div>
