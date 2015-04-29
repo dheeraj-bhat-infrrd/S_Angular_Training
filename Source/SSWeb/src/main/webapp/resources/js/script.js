@@ -593,7 +593,6 @@ function upgradeToPaidPlan(){
 }
 
 function loadDisplayPicture(){
-	console.log('Reached Method');
 	var success = false;
 	$.ajax({
 		url : "./getdisplaypiclocation.do",
@@ -605,18 +604,18 @@ function loadDisplayPicture(){
 		},
 		complete : function(data) {
 			if (success) {
-				console.log("Image location : "+data.responseJSON);
+				console.log("Image location : " + data.responseJSON);
 				var imageUrl = data.responseJSON;
-				if(imageUrl != '' && imageUrl != undefined){
-					$("#hdr-usr-img").css("background", "url("+imageUrl+") no-repeat center");
-					$("#hdr-usr-img").css("background-size","cover");
+				if (imageUrl != '' && imageUrl != undefined) {
+					$("#hdr-usr-img").css("background", "url(" + imageUrl + ") no-repeat center");
+					$("#hdr-usr-img").css("background-size", "cover");
 					$("#usr-initl").html("");
 				}
 				return data.responseJSON;
 			}
 		},
 		error : function() {
-			
+			console.log("error");
 		}
 	});
 }
