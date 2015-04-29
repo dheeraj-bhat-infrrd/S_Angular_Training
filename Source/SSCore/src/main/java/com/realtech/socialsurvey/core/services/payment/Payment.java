@@ -233,11 +233,12 @@ public interface Payment {
 	/**
 	 * Updates the subscription with the new amount
 	 * @param company
+	 * @return flag indicating if there was a change in pricing
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 * @throws SubscriptionUpgradeUnsuccessfulException
 	 */
-	public void updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
+	public boolean updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
 		
 }
