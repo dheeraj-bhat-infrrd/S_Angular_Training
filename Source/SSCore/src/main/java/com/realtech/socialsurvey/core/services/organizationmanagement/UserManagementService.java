@@ -282,5 +282,12 @@ public interface UserManagementService {
 	 * @throws NonFatalException
 	 */
 	public void updateUserLoginTimeAndNum(User user) throws NonFatalException;
+	
+	/**
+	 * Updates the user modification notification table
+	 * @param company
+	 * @throws InvalidInputException
+	 */
+	public void updateUserCountModificationNotification(Company company) throws InvalidInputException;
 }
 // JIRA SS-34 BY RM02 BOC
