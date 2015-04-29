@@ -280,27 +280,21 @@ $(document).ready(function(){
 			showOverlay();
 		}
 	}
+	
 	function captchaLoaded() {
-		/* $('#registerForm').on('added.field.bv',function(e, data) {
-				// The field "recaptcha_response_field" has just been added
-				if (data.field === 'recaptcha_response_field') {
-				// Find the icon
-				var $parent = data.element.parents('.form-group'), $icon = $parent
-				.find('.form-control-feedback[data-bv-icon-for="'
-				+ data.field + '"]');
-				// Move icon to other position
-				$icon.insertAfter('#recaptcha');
-				}
-		}); */
-		
 		var imgData = $(".recaptcha_image_cell").html();
 		console.log("Captcha image data : " + imgData);
-		$(".reg-captcha-img").html(imgData);
+		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
+		if(challenge == undefined){
+			Recaptcha.reload();
+		}else{
+			$(".reg-captcha-img").html(imgData);
+		}
 	}
 	
 	$(".reg-cap-reload").click(function(){
 		console.log("Captcha reload button clicked");
-		$("#recaptcha_reload").click();
+		Recaptcha.reload();
 		console.log("Initiated the click of hidden reload");
 	});
 	
