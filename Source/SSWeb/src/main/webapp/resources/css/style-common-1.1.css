@@ -885,6 +885,15 @@ span.txt-highlight {
     cursor: pointer;
 }
 
+.wc-sub-send-btn {
+    width: 140px;
+    text-align: center;
+    border-radius: 3px;
+    color: #fff;
+    background: #009FE0;
+    cursor: pointer;
+}
+
 .wl-import-btn:hover, .wc-sub-btn:hover{
     background: #7AB400;
 }

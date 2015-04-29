@@ -27,83 +27,41 @@
 	<link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/perfect-scrollbar.min.css">
 </head>
 <body>
-	<div id="overlay-login" class="overlay-login overlay-main hide"></div>
-	<c:if test="${user.numOfLogins > 0}">
-		<div class="overlay-login overlay-main hide">
-			<div class="welcome-popup-wrapper">
-				<div class="welcome-popup-hdr-wrapper clearfix">
-					<div class="float-left wc-hdr-txt">Send Survey Request</div>
-				</div>
-				<div class="welcome-popup-body-wrapper clearfix">
-					<div class="wc-popup-body-hdr">Connect so we can share your happy customer reviews</div>
-					<div class="wc-popup-body-cont">
-						<div class="wc-review-table">
-							<div class="wc-review-tr wc-review-hdr clearfix">
-								<div class="wc-review-th1 float-left">First Name</div>
-								<div class="wc-review-th2 float-left">Last Name</div>
-								<div class="wc-review-th3 float-left">Email Address</div>
-								<div class="wc-review-th4 float-left"></div>
-							</div>
-							
-							<div class="wc-review-tr clearfix">
-								<div class="wc-review-tc1 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc2 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc3 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc4 float-left">
-									<div class="wc-review-rmv-icn"></div>
-								</div>
-							</div>
-							
-							<div class="wc-review-tr clearfix">
-								<div class="wc-review-tc1 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc2 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc3 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc4 float-left">
-									<div class="wc-review-rmv-icn"></div>
-								</div>
-							</div>
-							
-							<div class="wc-review-tr clearfix">
-								<div class="wc-review-tc1 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc2 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc3 float-left">
-									<input class="wc-review-input">
-								</div>
-								<div class="wc-review-tc4 float-left">
-									<div class="wc-review-rmv-icn"></div>
-								</div>
-							</div>
-							
+	<div id="overlay-linkedin-import" class="overlay-login overlay-main hide"></div>
+	<div id="overlay-send-survey" class="overlay-login overlay-main hide">
+		<div class="welcome-popup-wrapper">
+			<div class="welcome-popup-hdr-wrapper clearfix">
+				<div class="float-left wc-hdr-txt"><spring:message code="label.sendsurvey.key" /></div>
+			</div>
+			<div class="welcome-popup-body-wrapper clearfix">
+				<div class="wc-popup-body-hdr"><spring:message code="label.happyreviews.key" /></div>
+				<div class="wc-popup-body-cont">
+					<div id="wc-review-table" class="wc-review-table">
+						<div class="wc-review-tr wc-review-hdr clearfix">
+							<div class="wc-review-th1 float-left"><spring:message code="label.firstname.key" /></div>
+							<div class="wc-review-th2 float-left"><spring:message code="label.lastname.key" /></div>
+							<div class="wc-review-th3 float-left"><spring:message code="label.emailid.key" /></div>
+							<div class="wc-review-th4 float-left"></div>
+						</div>
+						<div class="wc-review-tr clearfix">
+							<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>
+							<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>
+							<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>
+							<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>
 						</div>
 					</div>
 				</div>
-				<div class="wc-btn-row clearfix">
-					<div class="wc-btn-col float-left">
-						<div class="wc-skip-btn float-right wc-final-skip">Skip this step</div>
-					</div>
-					<div class="wc-btn-col float-left">
-						<div class="wc-sub-btn float-left wc-final-submit">Send</div>
-					</div>
+			</div>
+			<div class="wc-btn-row clearfix">
+				<div class="wc-btn-col float-left">
+					<div class="wc-skip-btn float-right wc-final-skip"><spring:message code="label.skip.key" /></div>
+				</div>
+				<div class="wc-btn-col float-left">
+					<div id="wc-send-survey" class="wc-sub-send-btn float-left wc-final-submit"><spring:message code="label.send.key" /></div>
 				</div>
 			</div>
 		</div>
-	</c:if>
+	</div>
 	
 	<div id="srv-req-pop" class="survey-request-popup-container hide">
 		<div class="survey-request-popup"></div>
