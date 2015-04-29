@@ -394,6 +394,12 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 		}, false);
 	}
 	
+	if ($(this).closest('.wc-btn-row').attr('data-page') == 'two') {
+		callAjaxGET("./finalizeprofileimage.do", function(data) {
+			console.log(data);
+		}, false);
+	}
+	
 	var parent = $(this).closest('.welcome-popup-wrapper');
 	parent.hide();
 	parent.next('.welcome-popup-wrapper').show();
