@@ -52,7 +52,9 @@ public class ReviseSubscriptionPrice {
 		userModificationRecord.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		userCountModificationDao.update(userModificationRecord);
 		LOG.debug("User count modification set to under processing");
-		calculateSubscriptionAmountAndCharge(userModificationRecord.getCompany());
+		if(calculateSubscriptionAmountAndCharge(userModificationRecord.getCompany())){
+			// TODO: send mail
+		}
 		deleteUserCountNotificationTable(userModificationRecord);
 	}
 
@@ -65,12 +67,14 @@ public class ReviseSubscriptionPrice {
 	 * @throws NonFatalException
 	 */
 	@Transactional
-	public void calculateSubscriptionAmountAndCharge(Company company) throws NonFatalException {
+	public boolean calculateSubscriptionAmountAndCharge(Company company) throws NonFatalException {
+		boolean suscriptionCharged = false;
 		if (company != null) {
 			LOG.info("Finding the amount to be charged for company id: " + company.getCompany());
 			// get the subscription id, license type
-			payment.updateSubscriptionPriceBasedOnUsersCount(company);
+			suscriptionCharged = payment.updateSubscriptionPriceBasedOnUsersCount(company);
 		}
+		return suscriptionCharged;
 	}
 
 	/**

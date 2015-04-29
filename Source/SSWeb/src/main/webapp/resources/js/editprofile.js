@@ -521,73 +521,10 @@ $(document).on('change', '#prof-logo', function() {
 	}, 1000);
 });
 
-var imageMaxWidth = 470;
-var ratio;
-
 // Function to crop and upload profile image
 $(document).on('change', '#prof-image', function() {
 	initiateJcrop(this);
 });
-
-function initiateJcrop(input) {
-	if (input.files && input.files[0]) {
-		createPopupCanvas();
-
-		var reader = new FileReader();
-		reader.onload = function(e) {
-			$('#target').attr('src', e.target.result);
-			if (typeof ratio === 'undefined') {
-				ratio = $('#target').width() / imageMaxWidth;
-			}
-			$('#target').removeClass('hide');
-			$('#target').width(imageMaxWidth);
-
-			$('#target').Jcrop({
-				aspectRatio : 1,
-				setSelect : [ 200, 100, 200, 200 ],
-				onSelect : updatePreview,
-				onChange : updatePreview
-			});
-		};
-		reader.readAsDataURL(input.files[0]);
-
-		$('#overlay-continue').click(function() {
-			showOverlay();
-			var dataurl = canvas.toDataURL("image/png");
-			overlayRevert();
-
-			var formData = new FormData();
-			formData.append("imageBase64", dataurl);
-			formData.append("imageFileName", $('#prof-image').prop(
-					"files")[0].name);
-
-			delay(function() {
-				callAjaxPOSTWithTextData("./updateprofileimage.do",
-						callBackOnProfileImageUpload, false, formData);
-			}, 1000);
-		});
-	}
-}
-
-function createPopupCanvas() {
-	var canvas = '<img src="" id="target" class="hide" style="position:absoulte;"/>'
-			+ '<canvas id="canvas" width="200" height="200" style="overflow:hidden; position:absoulte; display:none;"></canvas>';
-	$('#overlay-header').html("Edit image");
-	$('#overlay-text').html(canvas).css('position', 'relative');
-	$('#overlay-continue').html("Upload");
-	$('#overlay-cancel').html("Cancel");
-
-	$('#overlay-main').show();
-}
-
-function updatePreview(c) {
-	if (parseInt(c.w) > 0) {
-		var imageObj = $("#target")[0];
-		var canvas = $("#canvas")[0];
-		var context = canvas.getContext("2d");
-		context.drawImage(imageObj, (c.x) * ratio, (c.y) * ratio, (c.w) * ratio, (c.h) * ratio, 0, 0, canvas.width, canvas.height);
-	}
-}
 
 function callBackOnProfileImageUpload(data) {
 	$('#prof-message-header').html(data);
@@ -605,17 +542,6 @@ function callBackOnProfileImageUpload(data) {
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
 	loadDisplayPicture();
-}
-
-// Function to show social media links
-function showProfileSocialLinks() {
-	$('#social-token-text').hide();
-	callAjaxGET("./fetchprofilesociallinks.do", callBackShowProfileSocialLinks);
-}
-
-function callBackShowProfileSocialLinks(data) {
-	$('#prof-edit-social-link').html(data);
-	adjustImage();
 }
 
 // Agent details
@@ -1031,115 +957,120 @@ function callBackUpdateHobbies(data) {
 
 
 // Update Social links - facebook
-$('body').on('click','#prof-edit-social-link .icn-fb',function(){
+$('body').on('click', '#prof-edit-social-link .icn-fb', function() {
 	$('#social-token-text').show();
-	var link = $(this).attr("data-link");
+	var link = $(this).attr('data-link');
 	$('#social-token-text').attr({
 		"placeholder" : "Add facebook link",
-		"value" : link,
 		"onblur" : "updateFacebookLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateFacebookLink(link) {
 	var payload = {
 		"fblink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updatefacebooklink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-fb').attr("data-link", link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
 // Update Social links - twitter
-$('body').on('click','#prof-edit-social-link .icn-twit',function(){
+$('body').on('click', '#prof-edit-social-link .icn-twit', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add Twitter link",
-		"value" : link,
 		"onblur" : "updateTwitterLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateTwitterLink(link) {
 	var payload = {
 		"twitterlink" : link	
 	};
-	if(isValidUrl(link)){
-        	callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
-	}else{
+	if (isValidUrl(link)) {
+        callAjaxPostWithPayloadData("./updatetwitterlink.do", callBackUpdateSocialLink, payload);
+        $('#icn-twit').attr("data-link", link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
 // Update Social links - linkedin
-$('body').on('click','#prof-edit-social-link .icn-lin',function(){
+$('body').on('click', '#prof-edit-social-link .icn-lin', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add LinkedIn link",
-		"value" : link,
 		"onblur" : "updateLinkedInLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateLinkedInLink(link) {
 	var payload = {
 		"linkedinlink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updatelinkedinlink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-lin').attr("data-link", link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
 // Update Social links - yelp
-$('body').on('click','#prof-edit-social-link .icn-yelp',function(){
+$('body').on('click', '#prof-edit-social-link .icn-yelp', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add Yelp link",
-		"value" : link,
 		"onblur" : "updateYelpLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateYelpLink(link) {
 	var payload = {
 		"yelplink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
 		callAjaxPostWithPayloadData("./updateyelplink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-yelp').attr("data-link", link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
 }
 
-// TODO Update Social links - google plus
-$('body').on('click','#prof-edit-social-link .icn-gplus',function(){
+// Update Social links - google plus
+$('body').on('click', '#prof-edit-social-link .icn-gplus', function() {
 	$('#social-token-text').show();
 	var link = $(this).attr("data-link");
 	$('#social-token-text').attr({
 		"placeholder" : "Add Google link",
-		"value" : link,
 		"onblur" : "updateGoogleLink(this.value);$('#social-token-text').hide();"
 	});
+	$('#social-token-text').val(link);
 });
 
 function updateGoogleLink(link) {
 	var payload = {
 		"gpluslink" : link	
 	};
-	if(isValidUrl(link)){
+	if (isValidUrl(link)) {
         callAjaxPostWithPayloadData("./updategooglelink.do", callBackUpdateSocialLink, payload);
-	}else{
+        $('#icn-gplus').attr("data-link", link);
+	} else {
 		$('#overlay-toast').html("Enter a valid url");
 		showToast();
 	}
@@ -1149,8 +1080,8 @@ function callBackUpdateSocialLink(data) {
 	$('#prof-message-header').html(data);
 	$('#overlay-toast').html($('#display-msg-div').text().trim());
 	showToast();
-
-	showProfileSocialLinks();
+	
+	$('#social-token-text').val('');
 }
 
 function isValidUrl(url){
