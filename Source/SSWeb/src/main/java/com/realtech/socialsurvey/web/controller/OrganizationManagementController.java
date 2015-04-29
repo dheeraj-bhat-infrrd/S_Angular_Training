@@ -998,9 +998,7 @@ public class OrganizationManagementController {
 	 */
 	@RequestMapping(value = "/defaultbrandandregioncreation", method = RequestMethod.GET)
 	public String createDefaultBranchesAndRegions(HttpServletRequest request, Model model) {
-
 		LOG.info("createDefaultBranchesAndRegions called to do pre processing before log in");
-
 		User user = sessionHelper.getCurrentUser();
 
 		try {
@@ -1019,7 +1017,6 @@ public class OrganizationManagementController {
 			}
 
 			AccountsMaster currentAccountsMaster = currentLicenseDetail.getAccountsMaster();
-
 			if (currentAccountsMaster == null) {
 				LOG.error("createDefaultBranchesAndRegions : Accounts Master not found for license details with id : "
 						+ currentLicenseDetail.getLicenseId());
@@ -1059,6 +1056,23 @@ public class OrganizationManagementController {
 				LOG.error("InvalidInputException while updating profile completion stage. Reason : " + e.getMessage(), e);
 				throw new InvalidInputException(e.getMessage(), DisplayMessageConstants.GENERAL_ERROR, e);
 			}
+			
+			// setting linkedin popup attribute
+			boolean showLinkedInPopup = false;
+			boolean showSendSurveyPopup = false;
+			user = userManagementService.getUserByUserId(user.getUserId());
+			for (UserProfile profile : user.getUserProfiles()) {
+				if (profile.getProfilesMaster().getProfileId() == CommonConstants.PROFILES_MASTER_AGENT_PROFILE_ID) {
+					showLinkedInPopup = true;
+					showSendSurveyPopup = true;
+					break;
+				}
+			}
+			model.addAttribute("showLinkedInPopup", String.valueOf(showLinkedInPopup));
+			model.addAttribute("showSendSurveyPopup", String.valueOf(showSendSurveyPopup));
+			
+			// update the last login time and number of logins
+			userManagementService.updateUserLoginTimeAndNum(user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonfatalException while adding account type. Reason: " + e.getMessage(), e);
@@ -1067,9 +1081,7 @@ public class OrganizationManagementController {
 		}
 
 		LOG.info("createDefaultBranchesAndRegions : Default branches and regions created. Returing the landing page!");
-
 		return JspResolver.LANDING;
-
 	}
 
 	/**
