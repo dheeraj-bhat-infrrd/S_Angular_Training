@@ -232,8 +232,8 @@ public class SocialAsyncServiceImpl implements SocialAsyncService {
 		// updating profile image url to mongo
 		if (unitSettings.getProfileImageUrl() == null || unitSettings.getProfileImageUrl().isEmpty()) {
 			try {
-				if (linkedInProfileData.getPictureUrls() != null && linkedInProfileData.getPictureUrls().getValues() != null
-						&& !linkedInProfileData.getPictureUrls().getValues().isEmpty()) {
+				if (linkedInProfileData != null && linkedInProfileData.getPictureUrls() != null
+						&& linkedInProfileData.getPictureUrls().getValues() != null && !linkedInProfileData.getPictureUrls().getValues().isEmpty()) {
 					unitSettings.setProfileImageUrl(linkedInProfileData.getPictureUrls().getValues().get(0));
 					profileManagementService.updateProfileImage(collection, unitSettings, unitSettings.getProfileImageUrl());
 				}

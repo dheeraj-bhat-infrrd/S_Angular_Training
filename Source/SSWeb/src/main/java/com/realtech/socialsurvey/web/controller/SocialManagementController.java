@@ -1004,6 +1004,6 @@ public class SocialManagementController {
 		}
 		
 		LOG.info("Method finalizeProfileImage() finished from SocialManagementController");
-		return JspResolver.LANDING;
+		return CommonConstants.SUCCESS_ATTRIBUTE;
 	}
 }

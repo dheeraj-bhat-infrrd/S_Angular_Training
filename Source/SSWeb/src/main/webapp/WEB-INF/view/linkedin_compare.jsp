@@ -326,7 +326,7 @@ function validateSummaryForm() {
 		return isFormValid;
 	}
 	if (!validateTextArea('wc-summary')) {
-		$('#overlay-toast').html('Please enter summary');
+		$('#overlay-toast').html('Please add or edit summary');
 		showToast();
 
 		isFormValid = false;
@@ -344,7 +344,7 @@ $(document).on('click', '#wc-summary-submit', function() {
 		var payload = {
 			"industry" : $('#wc-industry').val(),
 			"location" : $('#wc-location').val(),
-			"aboutme" : $('#wc-summary').text()
+			"aboutme" : $('#wc-summary').val()
 		};
 		callAjaxPostWithPayloadData("./updatesummarydata.do", function(data) {
 			$('#message-header').html(data);

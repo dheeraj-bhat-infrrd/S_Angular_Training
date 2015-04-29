@@ -6,7 +6,7 @@
 $(document).ready(function() {
 	callAjaxGET("./linkedindataimport.do", function(data) {
 		$('#overlay-login').html(data);
-		
+		console.log(data);
 		if ($("#welocome-step1").length) {
 			$('#overlay-login').removeClass("hide");
 		}

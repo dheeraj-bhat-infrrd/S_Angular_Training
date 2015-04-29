@@ -396,7 +396,7 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 	
 	if ($(this).closest('.wc-btn-row').attr('data-page') == 'two') {
 		callAjaxGET("./finalizeprofileimage.do", function(data) {
-			
+			console.log(data);
 		}, false);
 	}
 	
