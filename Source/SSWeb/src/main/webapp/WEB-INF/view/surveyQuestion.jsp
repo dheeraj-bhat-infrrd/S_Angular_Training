@@ -352,7 +352,12 @@ $(document).ready(function() {
 	function captchaLoaded() {
 		var imgData = $(".recaptcha_image_cell").html();
 		console.log("Captcha image data : " + imgData);
-		$(".reg-captcha-img").html(imgData);
+		var challenge = Recaptcha.get_challenge('6LdlHOsSAAAAAM8ypy8W2KXvgMtY2dFsiQT3HVq-');
+		if(challenge == undefined){
+			Recaptcha.reload();
+		}else{
+			$(".reg-captcha-img").html(imgData);
+		}
 	}
 
 	$(".reg-cap-reload").click(function() {

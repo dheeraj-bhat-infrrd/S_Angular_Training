@@ -4,7 +4,7 @@ var startIndex = 0;
 var numOfRows = 3;
 var minScore=0;
 var publicPostStartIndex = 0;
-var publicPostNumRows = 3;
+var publicPostNumRows = 4;
 var currentProfileName;
 var doStopPublicPostPagination = false;
 var monthNames = [ "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
@@ -602,6 +602,7 @@ function fetchReviewsForCompanyCallBack(data) {
 function paintReviews(result){
 	var reviewsHtml = "";
 	var resultSize = result.length;
+	$('.ppl-review-item-last').removeClass('ppl-review-item-last').addClass('ppl-review-item');
 	$.each(result, function(i, reviewItem) {
 		var date = Date.parse(reviewItem.updatedOn);
 		var lastItemClass = "ppl-review-item";
