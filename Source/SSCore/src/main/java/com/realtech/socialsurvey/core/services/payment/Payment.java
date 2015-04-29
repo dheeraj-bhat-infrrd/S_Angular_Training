@@ -233,12 +233,12 @@ public interface Payment {
 	/**
 	 * Updates the subscription with the new amount
 	 * @param company
-	 * @return flag indicating if there was a change in pricing
+	 * @return result map
 	 * @throws InvalidInputException
 	 * @throws NoRecordsFetchedException
 	 * @throws PaymentException
 	 * @throws SubscriptionUpgradeUnsuccessfulException
 	 */
-	public boolean updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
+	public Map<String, Object> updateSubscriptionPriceBasedOnUsersCount(Company company) throws InvalidInputException, NoRecordsFetchedException, PaymentException, SubscriptionUpgradeUnsuccessfulException;
 		
 }
