@@ -663,3 +663,64 @@ $(document).keyup(function(e) {
 			$('.bd-q-btn-done').trigger('click');
 	}
 });
+
+function validateInputField(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).val() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).val() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+function validateTextArea(elementId) {
+	if ($(window).width() < 768) {
+		if ($('#' + elementId).text() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	} else {
+		if ($('#' + elementId).text() != "") {
+			return true;
+		} else {
+			return false;
+		}
+	}
+}
+
+function validateCountryZipcode(elementId) {
+	var zipcode = $('#' + elementId).val();
+	if ($(window).width() < 768) {
+		if (zipcode != "") {
+			if (selectedCountryRegEx.test(zipcode) == true) {
+				return true;
+			} else {
+				showError('Please enter a valid zipcode');
+				return false;
+			}
+		} else {
+			showError('Please enter zipcode');
+			return false;
+		}
+	} else {
+		if (zipcode != "") {
+			if (selectedCountryRegEx.test(zipcode) == true) {
+				return true;
+			} else {
+				showError('Please enter a valid zipcode');
+				return false;
+			}
+		} else {
+			showError('Please enter zipcode');
+			return false;
+		}
+	}
+}

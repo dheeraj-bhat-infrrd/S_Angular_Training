@@ -750,7 +750,8 @@ public class HierarchyManagementController {
 			if (isAdminStr != null && !isAdminStr.isEmpty()) {
 				isAdmin = Boolean.parseBoolean(isAdminStr);
 			}
-
+			// To replace all the white spaces present in the string.
+			selectedUserEmail = selectedUserEmail.replaceAll("\\s","");
 			validateBranchForm(branchName, branchAddress1);
 			String[] assigneeEmailIds = validateAndParseEmailIds(selectedUserId, selectedUserEmail);
 			long regionId = 0l;

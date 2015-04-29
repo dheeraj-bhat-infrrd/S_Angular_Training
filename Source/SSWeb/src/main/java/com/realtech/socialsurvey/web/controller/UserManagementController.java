@@ -29,11 +29,14 @@ import com.realtech.socialsurvey.core.entities.AbridgedUserProfile;
 import com.realtech.socialsurvey.core.entities.Branch;
 import com.realtech.socialsurvey.core.entities.BranchFromSearch;
 import com.realtech.socialsurvey.core.entities.LicenseDetail;
+import com.realtech.socialsurvey.core.entities.LockSettings;
+import com.realtech.socialsurvey.core.entities.OrganizationUnitSettings;
 import com.realtech.socialsurvey.core.entities.RegionFromSearch;
 import com.realtech.socialsurvey.core.entities.User;
 import com.realtech.socialsurvey.core.entities.UserAssignment;
 import com.realtech.socialsurvey.core.entities.UserFromSearch;
 import com.realtech.socialsurvey.core.entities.UserProfile;
+import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
@@ -1000,7 +1003,59 @@ public class UserManagementController {
 		}
 
 		LOG.info("Method completeRegistration() to complete registration of user finished.");
-		return JspResolver.LINKEDIN_ACCESS;
+		return JspResolver.LANDING;
+	}
+	
+	@RequestMapping(value = "/showlinkedindatacompare")
+	public String showLinkedInDataCompare(Model model, HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		
+		User user = sessionHelper.getCurrentUser();
+		AccountType accountType = (AccountType) session.getAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION);
+		UserSettings userSettings = (UserSettings) session.getAttribute(CommonConstants.CANONICAL_USERSETTINGS_IN_SESSION);
+		UserProfile selectedProfile = (UserProfile) session.getAttribute(CommonConstants.USER_PROFILE);
+		
+		long branchId = 0;
+		long regionId = 0;
+		int profilesMaster = 0;
+		if (selectedProfile != null) {
+			branchId = selectedProfile.getBranchId();
+			regionId = selectedProfile.getRegionId();
+			profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
+		}
+		
+		// Setting userSettings in session
+		OrganizationUnitSettings profileSettings = null;
+		try {
+			profileSettings = profileManagementService.aggregateUserProfile(user, accountType, userSettings, branchId, regionId, profilesMaster);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		session.setAttribute(CommonConstants.USER_PROFILE_SETTINGS, profileSettings);
+
+		// Setting parentLock in session
+		LockSettings parentLock = null;
+		try {
+			parentLock = profileManagementService.aggregateParentLockSettings(user, accountType, userSettings, branchId, regionId, profilesMaster);
+		}
+		catch (InvalidInputException e) {
+			LOG.error("InvalidInputException while fetching profile. Reason :" + e.getMessage(), e);
+			model.addAttribute("message", messageUtils.getDisplayMessage(e.getErrorCode(), DisplayMessageType.ERROR_MESSAGE));
+		}
+		session.setAttribute(CommonConstants.PARENT_LOCK, parentLock);
+		
+		return JspResolver.LINKEDIN_COMPARE;
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/fetchuploadedprofileimage", method = RequestMethod.GET)
+	public String fetchProfileImage(Model model, HttpServletRequest request) {
+		LOG.info("Fetching profile image");
+		OrganizationUnitSettings profileSettings = (OrganizationUnitSettings) request.getSession(false).getAttribute(
+				CommonConstants.USER_PROFILE_SETTINGS);
+		return profileSettings.getProfileImageUrl();
 	}
 
 	/**

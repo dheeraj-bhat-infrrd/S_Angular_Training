@@ -217,7 +217,7 @@ public class OrganizationManagementController {
 		LOG.info("Method addCompanyInformation of UserManagementController completed successfully");
 		return JspResolver.ACCOUNT_TYPE_SELECTION;
 	}
-
+	
 	/**
 	 * Method to validate form parameters of company information provided by the user
 	 * 
@@ -248,15 +248,15 @@ public class OrganizationManagementController {
 			throw new InvalidInputException("Country code is null or empty while adding company information", DisplayMessageConstants.INVALID_COUNTRY);
 		}
 
-		// if (zipCode == null || zipCode.isEmpty() ||
-		// !zipCode.matches(CommonConstants.ZIPCODE_REGEX)) {
 		if (zipCode == null || zipCode.isEmpty()) {
 			throw new InvalidInputException("Zipcode is not valid while adding company information", DisplayMessageConstants.INVALID_ZIPCODE);
 		}
+		
 		if (companyContactNo == null || companyContactNo.isEmpty() || !companyContactNo.matches(CommonConstants.PHONENUMBER_REGEX)) {
 			throw new InvalidInputException("Company contact number is not valid while adding company information",
 					DisplayMessageConstants.INVALID_COMPANY_PHONEN0);
 		}
+		
 		if (vertical == null || vertical.isEmpty()) {
 			throw new InvalidInputException("Vertical selected is not valid", DisplayMessageConstants.INVALID_VERTICAL);
 		}
@@ -977,7 +977,7 @@ public class OrganizationManagementController {
 					.getAccountsMasterId();
 
 			model.addAttribute("balanceAmount",
-					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(fromAccountsMasterId, toAccountsMasterId)) + "$");
+					String.format("%.02f", gateway.getBalacnceAmountForPlanUpgrade(user.getCompany(), fromAccountsMasterId, toAccountsMasterId)) + "$");
 			model.addAttribute(CommonConstants.ACCOUNT_TYPE_IN_SESSION, toAccountsMasterId);
 		}
 		catch (InvalidInputException e) {
