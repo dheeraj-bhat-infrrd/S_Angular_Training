@@ -15,7 +15,6 @@
 
 * {
 	font-family: 'OpenSans';
-	font-size: 13px;
 	font-weight: normal !important;
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
@@ -3142,6 +3141,10 @@ button.paypal.is-active {
 	margin-top: 10px;
 }
 
+.ppl-review-item:last-child {
+    border-bottom: none;
+}
+
 .ppl-review-item-last {
 	padding-bottom: 10px;
 	margin-top: 10px;
@@ -4457,6 +4460,7 @@ button.paypal.is-active {
 
 .bd-hr-item {
 	padding-left: 15px;
+	cursor: pointer;
 }
 
 .bd-hr-txt {
@@ -5936,6 +5940,26 @@ tr.u-tbl-header td {
 
 .smiley-rat-5{
 	background: url(../images/smiley-rat-5.png) no-repeat center;
+}
+
+.smiley-bg-rat-1{
+	background: url(../images/smiley-bg-rat-1.png) no-repeat center;
+}
+
+.smiley-bg-rat-2{
+	background: url(../images/smiley-bg-rat-2.png) no-repeat center;
+}
+
+.smiley-bg-rat-3{
+	background: url(../images/smiley-bg-rat-3.png) no-repeat center;
+}
+
+.smiley-bg-rat-4{
+	background: url(../images/smiley-bg-rat-4.png) no-repeat center;
+}
+
+.smiley-bg-rat-5{
+	background: url(../images/smiley-bg-rat-5.png) no-repeat center;
 }
 
 .prof-details-header{

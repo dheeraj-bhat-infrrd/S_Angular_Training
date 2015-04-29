@@ -964,6 +964,7 @@
     .dash-lp-item{
         margin-bottom: 0;
         line-height: 34px;
+        padding: 5px 0 5px 15px;
     }
     .dash-lp-header{
         font-size: 16px;
@@ -1316,6 +1317,12 @@
     .v-tbl-icn,.v-tbl-icn-disabled{
     	max-width: 28px;
     	float: right;
+    }
+    .dash-lp-txt{
+    	line-height: normal;
+    }
+    .dash-lp-txt span{
+    	display: block;
     }
 }
 
