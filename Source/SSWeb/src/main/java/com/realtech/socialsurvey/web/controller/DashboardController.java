@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.google.gson.Gson;
 import com.realtech.socialsurvey.core.commons.CommonConstants;
@@ -37,6 +38,7 @@ import com.realtech.socialsurvey.core.entities.UserSettings;
 import com.realtech.socialsurvey.core.enums.AccountType;
 import com.realtech.socialsurvey.core.enums.DisplayMessageType;
 import com.realtech.socialsurvey.core.exception.InvalidInputException;
+import com.realtech.socialsurvey.core.exception.NoRecordsFetchedException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
 import com.realtech.socialsurvey.core.services.generator.URLGenerator;
 import com.realtech.socialsurvey.core.services.mail.EmailServices;
@@ -964,50 +966,86 @@ public class DashboardController {
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/sendsurveyinvite")
-	public String sendSurveyInvittion(HttpServletRequest request) {
+	public String sendSurveyInvitation(HttpServletRequest request) {
+		LOG.info("Method sendSurveyInvitation() called from DashboardController.");
 		String custFirstName = request.getParameter("firstName");
 		String custLastName = request.getParameter("lastName");
 		String custEmail = request.getParameter("email");
 		String custRelationWithAgent = request.getParameter("relation");
 		User user = sessionHelper.getCurrentUser();
+
 		try {
-			if (custFirstName == null || custFirstName.isEmpty()) {
-				LOG.error("Null/Empty value found for customer's first name.");
-				throw new InvalidInputException("Null/Empty value found for customer's first name.");
-			}
-			if (custLastName == null || custLastName.isEmpty()) {
-				LOG.error("Null/Empty value found for customer's last name.");
-				throw new InvalidInputException("Null/Empty value found for customer's last name.");
-			}
-			if (custEmail == null || custEmail.isEmpty()) {
-				LOG.error("Null/Empty value found for customer's email id.");
-				throw new InvalidInputException("Null/Empty value found for customer's email id.");
-			}
-			String link = composeLink(user.getUserId(), custEmail);
-			surveyHandler.storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
-			OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
-			if (companySettings != null && companySettings.getMail_content() != null
-					&& companySettings.getMail_content().getTake_survey_mail() != null) {
-				String mailBody = companySettings.getMail_content().getTake_survey_mail().getMail_body();
-				mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName()+" "+user.getLastName());
-				mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName+" "+custLastName);
-				mailBody = mailBody.replaceAll("\\[Link\\]", link);
-				String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
-				try {
-					emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()+(user.getLastName() != null?" "+user.getLastName():""));
-				}
-				catch (InvalidInputException | UndeliveredEmailException e) {
-					LOG.error("Exception caught while sending mail to " + custEmail + " .Nested exception is ", e);
-				}
-			}
-			else{
-				emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName+" "+custLastName, user.getFirstName()+(user.getLastName() !=null?" "+user.getLastName():""), link, user.getEmailId());
-			}
+			sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user);
 		}
 		catch (NonFatalException e) {
 			LOG.error("NonFatalException caught in sendSurveyInvittion(). Nested exception is ", e);
 		}
+
+		LOG.info("Method sendSurveyInvitation() finished from DashboardController.");
 		return "Success";
+	}
+	
+	// TODO
+	@ResponseBody
+	@RequestMapping(value = "/sendmultiplesurveyinvites", method = RequestMethod.POST)
+	public String sendMultipleSurveyInvitations(HttpServletRequest request) {
+		LOG.info("Method sendMultipleSurveyInvitations() called from DashboardController.");
+		String custFirstName = request.getParameter("firstName");
+		String custLastName = request.getParameter("lastName");
+		String custEmail = request.getParameter("email");
+		String custRelationWithAgent = request.getParameter("relation");
+		User user = sessionHelper.getCurrentUser();
+
+		try {
+			sendSurveyInvitationMail(custFirstName, custLastName, custEmail, custRelationWithAgent, user);
+		}
+		catch (NonFatalException e) {
+			LOG.error("NonFatalException caught in sendSurveyInvittion(). Nested exception is ", e);
+		}
+
+		LOG.info("Method sendMultipleSurveyInvitations() finished from DashboardController.");
+		return "Success";
+	}
+
+	private void sendSurveyInvitationMail(String custFirstName, String custLastName, String custEmail, String custRelationWithAgent, User user)
+			throws InvalidInputException, SolrException, NoRecordsFetchedException, UndeliveredEmailException {
+		LOG.debug("Method sendSurveyInvitationMail() called from DashboardController.");
+		if (custFirstName == null || custFirstName.isEmpty()) {
+			LOG.error("Null/Empty value found for customer's first name.");
+			throw new InvalidInputException("Null/Empty value found for customer's first name.");
+		}
+		if (custLastName == null || custLastName.isEmpty()) {
+			LOG.error("Null/Empty value found for customer's last name.");
+			throw new InvalidInputException("Null/Empty value found for customer's last name.");
+		}
+		if (custEmail == null || custEmail.isEmpty()) {
+			LOG.error("Null/Empty value found for customer's email id.");
+			throw new InvalidInputException("Null/Empty value found for customer's email id.");
+		}
+
+		String link = composeLink(user.getUserId(), custEmail);
+		surveyHandler.storeInitialSurveyDetails(user.getUserId(), custEmail, custFirstName, custLastName, 0, custRelationWithAgent, link);
+
+		OrganizationUnitSettings companySettings = organizationManagementService.getCompanySettings(user.getCompany().getCompanyId());
+		if (companySettings != null && companySettings.getMail_content() != null && companySettings.getMail_content().getTake_survey_mail() != null) {
+			String mailBody = companySettings.getMail_content().getTake_survey_mail().getMail_body();
+			mailBody = mailBody.replaceAll("\\[AgentName\\]", user.getFirstName() + " " + user.getLastName());
+			mailBody = mailBody.replaceAll("\\[Name\\]", custFirstName + " " + custLastName);
+			mailBody = mailBody.replaceAll("\\[Link\\]", link);
+			String mailSubject = CommonConstants.SURVEY_MAIL_SUBJECT;
+			try {
+				emailServices.sendSurveyInvitationMail(custEmail, mailSubject, mailBody, user.getEmailId(), user.getFirstName()
+						+ (user.getLastName() != null ? " " + user.getLastName() : ""));
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Exception caught while sending mail to " + custEmail + ". Nested exception is ", e);
+			}
+		}
+		else {
+			emailServices.sendDefaultSurveyInvitationMail(custEmail, custFirstName + " " + custLastName, user.getFirstName()
+					+ (user.getLastName() != null ? " " + user.getLastName() : ""), link, user.getEmailId());
+		}
+		LOG.debug("Method sendSurveyInvitationMail() finished from DashboardController.");
 	}
 
 	/*

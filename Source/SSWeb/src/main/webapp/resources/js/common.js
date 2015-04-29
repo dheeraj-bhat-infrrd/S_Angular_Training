@@ -387,6 +387,7 @@ function openAuthPageRegistration(socialNetwork) {
 	window.open("./socialauth.do?social=" + socialNetwork + "&flow=registration", "Authorization Page", "width=600,height=600,scrollbars=yes");
 }
 
+// Skip / Next buttons 
 $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 	if ($(this).closest('.wc-btn-row').attr('data-page') == 'one') {
 		callAjaxGET("./showlinkedindatacompare.do", function(data) {
@@ -406,5 +407,39 @@ $('body').on('click', '.wc-skip-btn, .wc-sub-btn', function() {
 });
 
 $('body').on('click', '.wc-final-skip, .wc-final-submit', function(){
-	$(this).closest('.overlay-login ').hide();
+	$(this).closest('.overlay-login').hide();
+});
+
+// Send Survey
+$(document).on('input', '.wc-review-fname, .wc-review-lname, .wc-review-email', function() {
+	var parentDiv = $(this).parent().parent();
+	if (parentDiv.is(':last-child')) {
+		var htmlData = '<div class="wc-review-tr clearfix">'
+			+ '<div class="wc-review-tc1 float-left"><input class="wc-review-input wc-review-fname"></div>'
+			+ '<div class="wc-review-tc2 float-left"><input class="wc-review-input wc-review-lname"></div>'
+			+ '<div class="wc-review-tc3 float-left"><input class="wc-review-input wc-review-email"></div>'
+			+ '<div class="wc-review-tc4 float-left"><div class="wc-review-rmv-icn hide"></div></div>'
+		+ '</div>';
+		
+		parentDiv.after(htmlData);
+		
+		// enable remove button
+		if (parentDiv.parent().children().length > 2) {
+			$('.wc-review-rmv-icn').removeClass('hide');
+		}
+	}
+});
+
+$(document).on('click', '.wc-review-rmv-icn', function() {
+	var parentDiv = $(this).parent().parent();
+	$(this).closest('wc-review-tr').remove();
+
+	// disable remove button
+	if (parentDiv.children().length <= 2) {
+		$('.wc-review-rmv-icn').addClass('hide');
+	}
+});
+
+$(document).on('click', '.wc-send-survey', function() {
+	
 });
