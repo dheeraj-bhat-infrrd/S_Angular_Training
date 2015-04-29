@@ -3730,7 +3730,7 @@ button.paypal.is-active {
 .dsh-star-item {
 	height: 50px;
 	width: 43px;
-	background-size: 40px;
+	background-size: 40px !important;
 }
 
 .dsh-rating-item {
