@@ -13,8 +13,13 @@ import com.realtech.socialsurvey.core.commons.CommonConstants;
 import com.realtech.socialsurvey.core.dao.GenericDao;
 import com.realtech.socialsurvey.core.dao.UsercountModificationNotificationDao;
 import com.realtech.socialsurvey.core.entities.Company;
+import com.realtech.socialsurvey.core.entities.ProfilesMaster;
+import com.realtech.socialsurvey.core.entities.UserProfile;
 import com.realtech.socialsurvey.core.entities.UsercountModificationNotification;
+import com.realtech.socialsurvey.core.exception.InvalidInputException;
 import com.realtech.socialsurvey.core.exception.NonFatalException;
+import com.realtech.socialsurvey.core.services.mail.EmailServices;
+import com.realtech.socialsurvey.core.services.mail.UndeliveredEmailException;
 import com.realtech.socialsurvey.core.services.payment.Payment;
 
 /**
@@ -27,12 +32,18 @@ public class ReviseSubscriptionPrice {
 
 	@Autowired
 	private GenericDao<Company, Long> companyDao;
+	
+	@Autowired
+	private GenericDao<UserProfile, Long> userProfileDao;
 
 	@Autowired
 	private Payment payment;
 
 	@Autowired
 	private UsercountModificationNotificationDao userCountModificationDao;
+	
+	@Autowired
+	private EmailServices emailServices;
 
 	@Transactional
 	public List<UsercountModificationNotification> getCompaniesWithUserCountModified() {
@@ -52,8 +63,12 @@ public class ReviseSubscriptionPrice {
 		userModificationRecord.setModifiedOn(new Timestamp(System.currentTimeMillis()));
 		userCountModificationDao.update(userModificationRecord);
 		LOG.debug("User count modification set to under processing");
-		if(calculateSubscriptionAmountAndCharge(userModificationRecord.getCompany())){
-			// TODO: send mail
+		Map<String, Object> subscriptionResult = calculateSubscriptionAmountAndCharge(userModificationRecord.getCompany());
+		boolean subscriptionStatus = (Boolean)subscriptionResult.get(CommonConstants.SUBSCRIPTION_PRICE_CHANGED);
+		if(subscriptionStatus){
+			LOG.debug("Sending subscription price revision mail");
+			sendNotificationMail(userModificationRecord.getCompany(), subscriptionResult);
+			LOG.debug("S=ubscription price revision mail sent");
 		}
 		deleteUserCountNotificationTable(userModificationRecord);
 	}
@@ -67,14 +82,14 @@ public class ReviseSubscriptionPrice {
 	 * @throws NonFatalException
 	 */
 	@Transactional
-	public boolean calculateSubscriptionAmountAndCharge(Company company) throws NonFatalException {
-		boolean suscriptionCharged = false;
+	public Map<String, Object> calculateSubscriptionAmountAndCharge(Company company) throws NonFatalException {
+		Map<String, Object> paymentResult = null;
 		if (company != null) {
 			LOG.info("Finding the amount to be charged for company id: " + company.getCompany());
 			// get the subscription id, license type
-			suscriptionCharged = payment.updateSubscriptionPriceBasedOnUsersCount(company);
+			paymentResult = payment.updateSubscriptionPriceBasedOnUsersCount(company);
 		}
-		return suscriptionCharged;
+		return paymentResult;
 	}
 
 	/**
@@ -91,6 +106,34 @@ public class ReviseSubscriptionPrice {
 		// TODO: check status before deleting. Deleting directly for now
 		userCountModificationDao.deleteByIdAndStatus(userCountModificationCount, CommonConstants.STATUS_UNDER_PROCESSING);
 		LOG.info("Deleted the user count modification record.");
+		
+	}
+	
+	@Transactional
+	private void sendNotificationMail(Company company, Map<String, Object> values){
+		LOG.debug("Sending mail to company "+company.getCompany()+" for charge");
+		// get the mail id for the company
+		Map<String, Object> queryMap = new HashMap<>();
+		ProfilesMaster profilesMaster = new ProfilesMaster();
+		profilesMaster.setProfileId(CommonConstants.PROFILES_MASTER_COMPANY_ADMIN_PROFILE_ID);
+		queryMap.put(CommonConstants.PROFILE_MASTER_COLUMN, profilesMaster);
+		queryMap.put(CommonConstants.COMPANY_COLUMN, company);
+		List<UserProfile> userProfiles = userProfileDao.findByKeyValue(UserProfile.class, queryMap);
+		if(userProfiles != null && !userProfiles.isEmpty()){
+			LOG.debug("Found the company admin profile for company "+company.getCompany());
+			String emailId = userProfiles.get(CommonConstants.INITIAL_INDEX).getEmailId();
+			String name = userProfiles.get(CommonConstants.INITIAL_INDEX).getUser().getFirstName();
+			LOG.debug("Company admin email id for company "+company.getCompany()+" is "+emailId);
+			String oldAmount = String.valueOf(values.get(CommonConstants.SUBSCRIPTION_OLD_PRICE));
+			String revisedAmount = String.valueOf(values.get(CommonConstants.SUBSCRIPTION_REVISED_PRICE));
+			String numOfUsers = String.valueOf(values.get(CommonConstants.SUBSCRIPTION_REVISED_NUMOFUSERS));
+			try {
+				emailServices.sendSubscriptionRevisionMail(emailId, name, oldAmount, revisedAmount, numOfUsers);
+			}
+			catch (InvalidInputException | UndeliveredEmailException e) {
+				LOG.error("Could not send mail to company "+company.getCompany(), e);
+			}
+		}
 		
 	}
 
