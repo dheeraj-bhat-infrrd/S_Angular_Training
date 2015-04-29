@@ -2,13 +2,10 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 
 <c:set value="${sessionScope.SPRING_SECURITY_CONTEXT.authentication.principal}" var="user" />
-<c:set value="${user.company.licenseDetails[0].accountsMaster.accountsMasterId}" var="accountMasterId"/>
 <c:if test="${not empty profile}">
 	<c:set value="${profile.profilesMaster.profileId}" var="profilemasterid"></c:set>
 </c:if>
 <c:if test="${not empty profileSettings && not empty profileSettings.contact_details}">
-	<c:set value="${profileSettings.logo}" var="profilelogo"></c:set>
-	<c:set value="${profileSettings.profileImageUrl}" var="profileimage"></c:set>
 	<c:set value="${profileSettings.contact_details}" var="contactdetail"></c:set>
 	<c:set value="${profileSettings.linkedInProfileData}" var="linkedInData"></c:set>
 </c:if>
@@ -39,15 +36,7 @@
 					<div class="wc-div-txt float-left"><spring:message code="label.or.key" /></div>
 					<div class="wc-edit-photo-cont-col float-left">
 						<div class="float-left">
-							<c:choose>
-								<c:when test="${not empty profileimage}">
-									<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer"
-										style="background: url(${profileimage}) no-repeat center; background-size: contain"></div>
-								</c:when>
-								<c:otherwise>
-									<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer"></div>						
-								</c:otherwise>
-							</c:choose>
+							<div id="wc-photo-upload" class="wc-photo-upload cursor-pointer"></div>
 							<form class="hide" enctype="multipart/form-data">
 								<input type='file' id="prof-image" />
 							</form>
@@ -153,6 +142,18 @@ $(document).ready(function() {
 				break;
 			}
 		}
+	}
+	
+	// update default image
+	var profilemasterid = "${profilemasterid}";
+	if (profilemasterid == 4) {
+		$("#wc-photo-upload").addClass('dsh-pers-default-img');
+	} else if (profilemasterid == 3) {
+		$("#wc-photo-upload").addClass('dsh-office-default-img');
+	} else if (profilemasterid == 2) {
+		$("#wc-photo-upload").addClass('dsh-region-default-img');
+	} else if (profilemasterid == 1) {
+		$("#wc-photo-upload").addClass('dsh-comp-default-img');
 	}
 	
 	// Integrating autocomplete with country input text field

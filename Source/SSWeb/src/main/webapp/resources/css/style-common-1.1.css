@@ -1033,7 +1033,7 @@ textarea.wc-about-prof-txt {
     width: 150px;
     height: 150px;
     border: 1px dashed #dcdcdc;
-    background: #F9F9FB;
+    /* background: #F9F9FB; */
 }
 
 .wc-linkedin-photo-txt {
