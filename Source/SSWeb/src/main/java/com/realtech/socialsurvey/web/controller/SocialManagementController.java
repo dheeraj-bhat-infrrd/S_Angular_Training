@@ -249,9 +249,6 @@ public class SocialManagementController {
 				LOG.error("Error while creating access token for facebook: " + e.getLocalizedMessage(), e);
 			}
 
-			// TODO fetch profile url
-			
-			
 			// Storing token
 			SocialMediaTokens mediaTokens;
 			int profilesMaster = selectedProfile.getProfilesMaster().getProfileId();
