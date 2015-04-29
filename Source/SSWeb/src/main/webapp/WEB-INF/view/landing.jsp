@@ -5,17 +5,16 @@
 <script type="text/javascript">
 $(document).ready(function() {
 	var showLinkedInPopup = "${showLinkedInPopup}";
-	console.log(showLinkedInPopup);
 	if (showLinkedInPopup == "true") {
 		callAjaxGET("./linkedindataimport.do", function(data) {
-			$('#overlay-login').html(data);
+			$('#overlay-linkedin-import').html(data);
 			if ($("#welocome-step1").length) {
-				$('#overlay-login').removeClass("hide");
+				$('#overlay-linkedin-import').removeClass("hide");
 			}
 		}, true);
 	}
 	else {
-		
+		$('#overlay-send-survey').removeClass("hide");
 	}
 	
 	showMainContent('./dashboard.do');
