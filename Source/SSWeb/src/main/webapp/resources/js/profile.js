@@ -211,7 +211,7 @@ function paintProfilePage(result) {
         		}
             }
             if(contactDetails.about_me != undefined) {
-            	var companyIntroHtml = '<div class="main-con-header mgn-top-10m">About '+ contactDetails.name+'</div>';
+            	var companyIntroHtml = '<div class="main-con-header">About '+ contactDetails.name+'</div>';
             	companyIntroHtml = companyIntroHtml + '<div class="pe-whitespace intro-body">'+contactDetails.about_me+'</div>';
             	 $("#prof-company-intro").html(companyIntroHtml).show();
             }
